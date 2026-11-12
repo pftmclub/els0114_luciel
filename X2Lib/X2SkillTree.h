@@ -2634,6 +2634,12 @@ public:
 	RNSI_SA_SBH_BLAZING_DANCE_TRANS_UPGRADE               = 28061,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH1o
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID name Elesis's ChangeDamageData gates First Strike on ( value from June's Enum.lua )
+	RNSI_P_SSK_FIRST_STRIKE                               = 28401,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

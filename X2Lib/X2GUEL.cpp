@@ -5028,6 +5028,19 @@ void CX2GUEL::SetEquippedSkillLevelStateData( const CX2SkillTree::SkillTemplet* 
 
 void CX2GUEL::SetSkillLevelStateData( const CX2SkillTree::SkillTemplet* pSkillTemplet_, UserUnitStateData& stateData_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1o: June 3201f850 ( reached through vslot 0x7a8 32028190 ): the upgrade-swap level and the additional power rate
+	if ( NULL == pSkillTemplet_ || NULL == GetUnit() )
+		return;
+
+	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
+	const int iSkillTempletLevel = max( 1, userSkillTree.GetSkillLevel( pSkillTemplet_->m_eID, false, 0, true ) );
+
+	stateData_.m_SPLevel	= iSkillTempletLevel;
+	stateData_.m_fPowerRate	= pSkillTemplet_->GetSkillPowerRateValue( iSkillTempletLevel );
+	stateData_.m_eSkillID	= pSkillTemplet_->m_eID;
+	stateData_.m_fPowerRate	= ( GetSkillAdditionalPowerRate( static_cast<int>( pSkillTemplet_->m_eID ) ) + 1.f ) * stateData_.m_fPowerRate;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( NULL == pSkillTemplet_ )
 		return;
 
@@ -5040,6 +5053,7 @@ void CX2GUEL::SetSkillLevelStateData( const CX2SkillTree::SkillTemplet* pSkillTe
 	stateData_.m_SPLevel	= iSkillTempletLevel;
 	stateData_.m_fPowerRate	= pSkillTemplet_->GetSkillPowerRateValue( iSkillTempletLevel );
 	stateData_.m_eSkillID	= pSkillTemplet_->m_eID;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ShowActiveSkillCutInAndLight( float fTimeToShow_, bool bOnlyLight_ /*= false*/ )
 {
@@ -5815,6 +5829,20 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 {
 	CX2GUUser::CreateMinorParticleArray();
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1o: June 32b90430 ( vslot 0x534 ): Endurance Power's two active states count too, for the now state only
+/*virtual*/ bool CX2GUEL::IsDamageState( const bool bFuture_ )
+{
+	if ( true == CX2GUUser::IsDamageState( bFuture_ ) )
+		return true;
+
+	if ( false == bFuture_
+		&& ( ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_MEMO == GetNowStateID() || ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE == GetNowStateID() ) )
+		return true;
+
+	return false;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 /*static*/ void CX2GUEL::AppendMajorParticleToDeviceList( CKTDXDeviceDataList& listInOut_ )
 {
 	if ( g_pData->GetGameMajorParticle() == NULL )
@@ -14366,6 +14394,25 @@ const bool CX2GUEL::GetUnitClassLine( UNIT_CLASS_LINE UnitClassLine_ )
 
 /* virtual */ void CX2GUEL::ChangeDamageData()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1o: June 32b732e0 ( vslot 0x83c ): gated on First Strike learned, not the class; PvP halves the damage bonus
+	if ( true == IsFirstStrikeRelateState() && 0 < GetSkillLevelValue( CX2SkillTree::RNSI_P_SSK_FIRST_STRIKE ) )
+	{
+		CX2GUEL::CFirstStrikeData cFirstStrikeData = GetFirstStrikeData();
+		float fAddStopTimeDef = cFirstStrikeData.GetFirstStrikeAddStopTimeDef();
+		if ( ESI_JUMP_ATTACK_X == GetNowStateID() )
+			fAddStopTimeDef = fAddStopTimeDef * 0.5f;
+
+		m_DamageData.fStopTimeDef = m_DamageData.fStopTimeDef + fAddStopTimeDef;
+		m_DamageData.fHitAddMP = m_DamageData.fHitAddMP * cFirstStrikeData.GetFirstStrikeAddIncreaseMPRate();
+
+		float fAddDamageRate = cFirstStrikeData.GetFirstStrikeAddDamage();
+		if ( CX2Main::XS_PVP_GAME == g_pMain->GetNowStateID() )
+			fAddDamageRate = ( fAddDamageRate - 1.f ) * 0.5f + 1.f;
+
+		m_DamageData.damage.fPhysic = m_DamageData.damage.fPhysic * fAddDamageRate;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == IsFirstStrikeRelateState() && GetUnitClass() == CX2Unit::UC_ELESIS_GRAND_MASTER )
 	{
 		CX2GUEL::CFirstStrikeData cFirstStrikeData = GetFirstStrikeData();
@@ -14378,6 +14425,7 @@ const bool CX2GUEL::GetUnitClassLine( UNIT_CLASS_LINE UnitClassLine_ )
 		m_DamageData.fHitAddMP = m_DamageData.fHitAddMP * cFirstStrikeData.GetFirstStrikeAddIncreaseMPRate();		// 마나 회수율 증가 ( 배율 증가 ) 		
 		m_DamageData.damage.fPhysic = m_DamageData.damage.fPhysic * cFirstStrikeData.GetFirstStrikeAddDamage();		// 데미지 증가 ( 배율 증가 )
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 void CX2GUEL::DrasticChargeProc_FrameMove()

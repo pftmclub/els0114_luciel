@@ -46,3 +46,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L331, L333, L948.
 - **`ch0_classn.tsv` rows:** 1 (filter on its `proposed_phase` column).
 - 0x428 `GetDefenceRateBySkill` `32b52260`, 0x6a0 / 0x6a4 (skill 8023 + memo 608111 exempt; constants = March), 0x2b8 `32b80f20` (June-only 28416 / 28417 part), `MemoConditionElesis` (vtable `334fa4f4`).
+
+## Amended by CH1o (2026-11-13)
+
+- `GetActualCoolTime` 0x6a4 `32b7ee10` calls vslot 0x534 `@32b7ef2c` with `false`: that is `IsDamageState( false )`, written by CH1o under `_LIVE` (base `CX2GUUser::IsDamageState`, Elesis's override adds Endurance Power's two active states). Call it by name.

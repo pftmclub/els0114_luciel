@@ -3467,6 +3467,9 @@ public:
 		virtual bool IsWaitState() { return GetWaitStateID() == GetNowStateID(); }	/// June user vslot 0x520 ( base 3208e710; Rose adds her second wait )
 		virtual bool IsClassCommonMoveState() { return false; }	/// June user vslot 0x578 ( base 31e4c550; Luciel adds his two move-state sets )
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		virtual bool IsDamageState( const bool bFuture_ );	/// char-elesis CH1o: June user vslot 0x534 ( base 3208e8c0; Elesis and Ain override it )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
 		virtual void AfterEquipSlotChange() {}	/// June user vslot 0x654 ( base 31f3f070, empty )
 		virtual void AfterImageFrameMove() { if( m_pAfterImage != NULL ) m_pAfterImage->OnFrameMove( m_fTime, m_fElapsedTime ); }	/// June user vslot 0x850 ( base 31fd8230 )

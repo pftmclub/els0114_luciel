@@ -44753,6 +44753,25 @@ void CX2GUUser::StickShakeInput( const bool bLeft_, const bool bRight_ )
 void CX2GUUser::CountReservedSkillUse()
 {
 	const CX2SkillTree::SKILL_ID eSkillID = GetNowStateSkillID();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1o: June @32057d88-32057ddd: no reserved start, so a damage state drops the reservation unless it holds MP for a skill usable while hit
+	if ( CX2SkillTree::SI_NONE == m_eSkillUseReservedSkillID || m_eSkillUseReservedSkillID != eSkillID
+		|| NULL == g_pData->GetSkillTree()->GetSkillTemplet( eSkillID ) )
+	{
+		if ( true == IsDamageState( false ) )
+		{
+			const CX2SkillTree::SkillTemplet* pReservedSkillTemplet = NULL;
+			if ( CX2SkillTree::SI_NONE != m_eSkillUseReservedSkillID && 0.f != m_fReservedSkillMp )
+				pReservedSkillTemplet = GetEquippedActiveSkillTemplet( m_eSkillUseReservedSkillID, true );
+
+			if ( NULL == pReservedSkillTemplet
+				|| ( CX2SkillTree::ASUT_DAMAGE != pReservedSkillTemplet->m_eActiveSkillUseCondtion
+					&& CX2SkillTree::ASUT_DAMAGE_EXCEPT_AIR != pReservedSkillTemplet->m_eActiveSkillUseCondtion ) )
+				ClearSkillUseReserve();
+		}
+		return;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( CX2SkillTree::SI_NONE == m_eSkillUseReservedSkillID || m_eSkillUseReservedSkillID != eSkillID )
 		return;
 
@@ -44861,6 +44880,17 @@ void CX2GUUser::CountReservedSkillUse()
 		}
 	}
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1o: June 3208e8c0 ( user vslot 0x534 ): June asks the damage-state getters 0x46c-0x4a4 / 0x114 / 0x118, which only Lu/Ciel overrides
+bool CX2GUUser::IsDamageState( const bool bFuture_ )
+{
+	const int iStateID = ( true == bFuture_ ) ? GetFutureStateID() : GetNowStateID();
+	return USI_DAMAGE_SMALL_FRONT == iStateID || USI_DAMAGE_SMALL_BACK == iStateID || USI_DAMAGE_BIG_FRONT == iStateID || USI_DAMAGE_BIG_BACK == iStateID
+		|| USI_DAMAGE_DOWN_FRONT == iStateID || USI_DAMAGE_DOWN_BACK == iStateID || USI_DAMAGE_AIR_SMALL == iStateID || USI_DAMAGE_AIR_DOWN == iStateID
+		|| USI_DAMAGE_AIR_DOWN_INVINCIBLE == iStateID || USI_DAMAGE_AIR_DOWN_LANDING == iStateID || USI_DAMAGE_AIR_FALL == iStateID
+		|| USI_DAMAGE_AIR_UP == iStateID || USI_DAMAGE_AIR_FLY_FRONT == iStateID || USI_DAMAGE_AIR_FLY_BACK == iStateID || USI_DAMAGE_REVENGE == iStateID;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_CORE

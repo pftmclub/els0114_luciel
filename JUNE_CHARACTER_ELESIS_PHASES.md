@@ -1105,6 +1105,50 @@ A fresh Ghidra decompile of `32b8c470`, read against `2e92189d` and the exe byte
 
 **Nothing to play-test.** Next: `/x2-phase char-elesis CH1o` (Opus 5.5 high).
 
+### CH1o - Done (2026-11-13)
+
+**Landed** (flag `_LIVE`, still `//#define`; `SERV_IRUHADEV_JUNE_ENUM_NAMES` for one name; 9 funcmap rows `Char Elesis CH1o`; checklist L289 `(Elesis: CH1o)`).
+Files: `X2GUEL.cpp` / `X2GUEl.h`, `X2GUUser.cpp` / `.h`, `X2SkillTree.h`. Every block carries `char-elesis CH1o`. Read from the exe bytes (`charport_adis.py
+elesis --phase CH1o`, `disasm_range.py`, `vtslot.py`, `dispsweep.py` with a "`mov r, [r+slot]` then `call r`" filter, an E8 / E9 scan, `enumprobe.py`).
+- **0x83c `32b732e0` is March's `ChangeDamageData` (First Strike).** The base (`CX2GUUser`, empty `31f3f070`) and its call at the end of `SetDamageData`
+  (`31fcd280`, every path) were already in March / ported, so the kickoff's "add the base and the call site" needs nothing. June's body went inside
+  `CX2GUEL::ChangeDamageData`: the same 8 states (switch on id / 100 - 164 = `IsFirstStrikeRelateState`), gated on `GetSkillLevelValue(
+  RNSI_P_SSK_FIRST_STRIKE )` > 0 (28401, `31fceab0`) instead of `UC_ELESIS_GRAND_MASTER`; stop time + `+0x9660` (x 0.5 in `ESI_JUMP_ATTACK_X`), MP x
+  `+0x9668`, damage x `+0x9664` (both "> 0 else 1" = March's getters); June-only: in `XS_PVP_GAME` (`g_pMain +0x8c == 9`) the damage rate becomes ( rate -
+  1 ) x 0.5 + 1. `RNSI_P_SSK_FIRST_STRIKE` joins `X2SkillTree.h`. The writer of `m_cFirstStrikeData` is CH4a's (amended: June `32b88898` reads 28401;
+  March's reads 8406, which June's tree no longer has, so the bonus stays at its 1.0 / 0.0 defaults until CH4a).
+- **0x534: new user virtual `IsDamageState( bool bFuture_ )`** (base `3208e8c0`, settles CH0's candidate): the now or future state is one of 15 damage
+  states, read by June through getters 0x46c-0x4a4 / 0x114 / 0x118 that return June 26-31 and 34-42 = March `USI_DAMAGE_SMALL_FRONT` .. `USI_DAMAGE_REVENGE`
+  without the two STANDUP states (`enumprobe`: March = June - 1 there). Only Lu/Ciel overrides those getters, so the base names the `USI_` states
+  (char-luciel `CH1o.md` amended). **Elesis's override** `32b90430`: base first, then, for the now state only, her two Endurance Power active states
+  (June 205 / 206). Ain (`32a50f40`) also overrides it.
+- **Its engine caller, `CommonStateStart @32057d88-32057ddd`** (Ara CH1o precedent: the base comes with its call site): when the starting state is not the
+  reserved skill's, a damage state drops the skill reservation (`ClearSkillUseReserve`, slot 514) unless it holds MP (`m_fReservedSkillMp` != 0) for a skill
+  whose `m_eActiveSkillUseCondtion` (templet `+0x98`, confirmed through Elesis's `CheckSkillUseCondition` call `@32b84cdb`) is `ASUT_DAMAGE` /
+  `_EXCEPT_AIR`. Written in `CountReservedSkillUse`'s no-match returns under `_LIVE`. The buff port's comment there ("not ported: March reserves no MP")
+  predates the char ports' reserved MP; left, comments are not rewritten. The other caller, `GetActualCoolTime @32b7ef2c`, is CH4b's (amended).
+- **`SetSkillLevelStateData`** = June `3201f850` inside March's class copy (Ara's form): `max( 1, GetSkillLevel( id, false, 0, true ) )`, power rate, id,
+  x ( `GetSkillAdditionalPowerRate( id )` + 1 ). No Elesis code calls `3201f850` directly; she reaches it through vslot 0x7a8 `32028190` (not overridden).
+- **No code:** `32b526d0` = March's `AppendMajorParticleToDeviceList` (same 7 names, null test); `32b903c0` / `32b903d0` = destructor adjustor thunks
+  (`sub ecx, 0x1a0 / 0x190; jmp 32b90520`); 0x558 `GetHpTier` `32b6fb80` has **no caller** in June (no dispatch, no E8; only the vtable holds it), so it
+  stays CH1h's plain `_CORE` member and no user virtual is added (corrects CH1h's lead); 0x670 `IsInJobLine` stays a plain member (every June dispatch
+  of 0x670 is in class code). No CH1a-CH1n Done note or review routed anything else here, and none said "this needs Opus".
+- **No `JUNE_BUGS` row:** the override's future-state gap is unreachable (both callers pass `false`).
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h X2Lib/X2GUUser.cpp X2Lib/X2GUUser.h`: `files: 4 PASS, 0
+  PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` (+48 / +3 / +30 / +3), `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0
+  #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only for `define: NOT FOUND` (`//#define`). `flagcheck
+  SERV_IRUHADEV_JUNE_ENUM_NAMES --worktree --files X2Lib/X2SkillTree.h`: `1 PASS~` (+6), `RESULT: PASS`. `bytes>=0x80` unchanged in all five files.
+- `junediverge.py --check` the five files: `allow-listed: 7`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `0 A/B row(s)`.
+- Dependency flags ON (`flagprobe.py`): `SERV_ELESIS_SECOND_CLASS_CHANGE` (the call), `_JUNE_SOCKET_PARITY`, `_USER_SKILL_USE_HELPERS`, `_SKILL_TEMPLET`,
+  `_CHAR_ARME_CORE` (`ASUT_DAMAGE`), `_DIVERGE_SKILL_LEVEL_VALUE`, `_BUFF_NEW_FINALIZER`, `SERV_ADD_LUNATIC_PSYKER`.
+- One-file probes (`census.cl_cmd`, `/c /Zs /EHsc`, no PCH): `X2GUEL.cpp` off / `_LIVE` / `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`, `X2GUUser.cpp`
+  off / `_LIVE`: exit 0, 0 errors x5. `cl /P` off / `_LIVE`: `IsDamageState` 0 / 4 in both files, the reservation test 0 / 1, the power-rate term 0 / 1.
+- No `_DEBUG` define. Full build skipped: no play-test.
+
+**Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1o review` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

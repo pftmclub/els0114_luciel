@@ -1057,6 +1057,9 @@ public:
 	void SetIsProvokeStateChange ( bool val ) { m_bIsProvokeStateChange = val; }
 
 	virtual void ChangeDamageData ();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	virtual bool IsDamageState( const bool bFuture_ );	// char-elesis CH1o: June vslot 0x534 32b90430
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	
 	void DrasticChargeProc_FrameMove ();			// µå·¡½ºÆ½ Â÷Áö ÀÌÆåÆ®
 	void XX_DOWN_XProc_FrameMove ();				// XX ¹Ø X ÀÌÆåÆ®

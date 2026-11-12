@@ -55,3 +55,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - CH1j declared under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` ( `//#define` in `Always.h`; define it with `_LIVE` when the bodies exist ) and calls from `CommonFrameMove`: `BloodRunawayProc_FrameMove` `32b734d0` ( the Blood Runaway tick, skill 28414: CH0 mislabelled it as the Fire Blossoms twin; Fire Blossoms is `32b87520`, written in CH1j ), `GrandMasterTranscendenceProc_FrameMove` `32b7e580` ( skill 28415, moved here from CH4c ) and `ApplyGrandMasterAura` `32b7e740`. Write the three bodies in place of the declarations.
 - `InitPassiveSkillState` writes members CH1j declared ( `X2GUEl.h`, `_CORE` ): `m_usBlazeAbsoluLevel` ( +0x97a4, `32b88cdd` ), `m_fAdvancedKnightMasteryMPValue` ( +0x9780, ability 0x2b of 28404, `32b88689` ). `m_fDashChargeTime` ( +0x9790 ) is read by `32b7e580`; `m_fDashElapsedTime` ( +0x977c ) by CH1k's range.
 - `awk -F'	' '$7=="CH4a"' june2017_re/char_elesis/ch0_class_map.tsv` now lists 13 rows ( 32b7e580 added ).
+
+## Amended by CH1o (2026-11-13)
+
+- **0x83c is done, and it is not what the Task line says.** `32b732e0` is March's `ChangeDamageData` (First Strike; no buff erase, no weapon type): CH1o put June's body inside it under `_LIVE` and gated it on `RNSI_P_SSK_FIRST_STRIKE` (28401) learned. Drop 0x83c from this phase.
+- So `InitPassiveSkillState` must write `m_cFirstStrikeData` from 28401: June `32b88898-32b888ac` stores abilities 0x4e / 0xf / 0x2b of that templet into `+0x9660` / `+0x9664` / `+0x9668` (stop time / damage / MP rate); March's writer (`X2GUEL.cpp:759`) reads `SI_P_SGM_FIRST_STRIKE` (8406).
