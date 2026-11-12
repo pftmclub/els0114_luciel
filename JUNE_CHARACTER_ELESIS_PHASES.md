@@ -762,6 +762,32 @@ All 27 class-map rows of phase CH1g2 are handled: 0 `inside`, 27 `new` (plain na
 
 **Nothing to play-test.** Review: `kickoffs/char-elesis/CH1g2-review.md` ( Opus 5.5 high; covers CH1e-CH1g2; no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1g2 review`.
 
+### CH1g2 - Review (2026-11-12; covers CH1e-CH1g2)
+
+**Verdict: pass, no code change.** All 105 class-map rows (CH1e 21, CH1f 14, CH1f2 25, CH1g 18, CH1g2 27) were read against `charport_adis.py elesis --phase <p>`; every listing-only row (carved `n`) was read branch by branch from the raw listing, the carved rows for targets, key tests, constants and names. Every transcription equals June; every `inside` row's `#else` is March's body, untouched. Two bookkeeping fixes, no source edit: checklist row 7n L499 gains its `(Elesis: CH1g ...)` tag (the aim writer is `32b73c90`, `32b73bf0` only resets the float), and `ch1_offsets.tsv` row `0x96f4` now names CH1g2's use (Crimson Avenger dash X-Z, 0 to 3). The `X2GUEl.h:1083` comment ("0 to 1") is left as written (CP949, comment only).
+
+| Spot check (kickoff) | June | result |
+|---|---|---|
+| Z-Z-Z loops `32b66ac0` / `32b66df0` | word `+0x9758`: `ZZ` start writes 0 (`32b51a20`), `32b51a70` `inc word` ( both loop starts ), Z test `cmp word, 4` / `jae`; flag 0 -> `0x12e` / `0x12d`, animation end -> `0x12f`; key window `start <= t < end`, flag fires on `change < t` or animation end | = port |
+| Z-X loop `32b677d0` | inside animation end: `fld 2.0 / fcomp [+0x8088]` ( Now state time ) `jnp` -> change, else `pureX` -> skip; target `0x133`; animation end with X held skips the cancels ( the port's `else if` chain hangs off the `if` ) | = port |
+| X-Z charge `32b523d0` / `32b52420` | `stateChange <= future t` with `pureZ == 0`, or `3.1 <= t` -> `0x14b`; FrameMove `CommonFrameMove` first, `charge + elapsed`, clamp at the double 3.0 | = port |
+| X-Z fire `32b7d920` | `CommonFrameMove` first, 0.01 s tick; `IsEnoughMPForAttack( 5, Dummy2_Lhand, 0, 0 )` ( vslot 0x6f0 ); `CreateInstance` 23 args: power `GetPowerRate() x ( 1 + 0.5 c )`, pos `GetPos()`, angle / move axis `GetRotateDegree()`, land `+0x80c4`, bReserve false, reserve -1, force-down 1, life time `1 + 0.333 c`, hit count -1, gap -1, mesh 0, hit-add MP -1, two false; `SetScale( 1 + 0.133 c )` x3 | = port |
+| Z-Z-Z FrameMoves `32b7c2e0` / `32b7c510` / `32b7c940` / `32b7cd70` | 0.43 `ZZZ`; 0.01 `Uppercut` then 0.25 `ZZZ`; 0.08 `ZZZ` then 0.31 `Uppercut`; 0.37 `Finish`; `FlushMp( 3 )` ( vslot 0xe4 ), `PlayEffectSet` default arguments ( hyper false, -1 / -1, scale 1 ), else `CreateNotEnoughMPEffect( Dummy2_Lhand, 0, 0, 0 )`; `CommonFrameMove` last | = port |
+| `EL_STATE_ID` names | CH1g2's 8 ( 300-303 / 305-307 / 331 ) and CH1e-CH1g's 12 equal `ch0_state_skill.tsv` names and ids; the listing pushes ( `0x12c`-`0x133`, `0x14b` ) agree; C++ values are appended, CH1m registers by script name | ok |
+| `ch1_offsets.tsv` `0x9758` / `0x96f4` | word count; charge float ( row widened, above ) | ok |
+| Macros, namespaces | `IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_` and `ZX_CANCEL_AFTER_EX_ON_LINE_` identical in the `_LIVE` and `_CORE` / `#ifndef _LIVE` blocks and match June's compare directions; `_CONST_EL_CH1E_` .. `_CH1G2_` values right, all used | ok |
+| JUNE_BUGS 629 / 631 / 632 / 633 | each row says what the code does ( 629 the SGM XX attack time chain, 631 no jump-down arm in `SPK_ZX_LOOP`, 632 Pyro Knight reaches `SBH_XZ` Z, 633 dead cancels after `SDK_XX` ) | ok |
+
+Notes: June's flag chains read the alternate future animation ( `+0x8e90` / `+0x8e84`, Luciel's second body ); the macros use `m_pXSkinAnimFuture`, right for Elesis. The June event-timer test is the inlined `EventTimerOneshot` the port's `X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE` idiom writes. No drift found; no `_DEBUG` define to retire.
+
+**Gates.**
+- `flagcheck ... --range ae70cf92^..HEAD` stopped in the tool ( `Unevaluable: line 27167`, a char-chung `#if` in a peer commit ), so it was run per commit over the five that touch `X2GUEL.*` ( `ae70cf92`, `fe45d2e0`, `5fc51cf0`, `b6a7f9ba`, `40185d05` ). `_CORE` with `_LIVE`: `RESULT: PASS` in all five ( define `KTDXLIB/Always.h:12637`; `files:` 2 PASS, 1 PASS in `5fc51cf0`; 0 PASS~ / OTHER / FAIL / ERROR ). `_LIVE` with `_CORE`: `X2GUEL.cpp` PASS in all five, `X2GUEl.h` OTHER ( belongs to `_CORE` ), `RESULT: FAIL` only for `define: NOT FOUND` ( `_LIVE` is `//#define`, by design ). Every run: `0 deleted, 0 non-ASCII inserted, 0 EOL-mismatched, 0 #else/#endif without the flag token, 0 encoding change(s)`.
+- `junediverge.py --check-all`: `allow-listed: 207`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `0 A/B row(s) remain in 2 file(s)`.
+- One-file `/Zs` probe of `X2GUEL.cpp` ( `census.cl_cmd`, no PCH ): 0 errors as-is and with `-DSERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`.
+- Full build skipped: no play-test.
+
+**Nothing to play-test.** Next: `/x2-phase char-elesis CH1h` ( Sonnet 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
