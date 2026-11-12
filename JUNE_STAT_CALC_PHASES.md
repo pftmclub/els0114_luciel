@@ -852,6 +852,7 @@ additional damage, after the hooks; then the HP change).
 enum header under `JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL -> `RESULT: PASS`. `junediverge --check <9 files>`: `RESULT: PASS`.
 `enumscan --reuse --check <8 files>`: 0 A/B rows. Probes (`/Zs`, US_SERVICE): `X2GUNPC`, `X2Game`, `X2DamageManager`, `X2Main`, `X2GameUnit` 0 errors,
 no new warnings. The `#error` guard first named `X2OPTIMIZE_NPC_NONHOST_SIMULATION` (KTDX.h defines it after Always.h): dropped.
+After commit `3812c4cd`: `flagcheck --range 3812c4cd^..3812c4cd`: 8 PASS, 1 DEFINE, 1 OTHER, 0 FAIL, 0 deleted -> `RESULT: PASS`.
 **Build.** Full build skipped: no play-test (D4b builds and hands off the play-test for both sides; its kickoff lists D4a's checks).
 
 **Bookkeeping.** `dr_blocks.tsv`, map, funcmap, divergence row, JUNE_BUGS 640, checklist 7aw, backlog Stages 19 / 20, D4b and D5 kickoffs, `MODS.md`.
