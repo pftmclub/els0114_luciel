@@ -52,6 +52,15 @@ namespace _CONST_EL_
 
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1b: June's expansion of ELSE_IF_STATE_CHANGE_ON_EX_ ( the flag also fires when the future animation ends, the time tests run before the key test )
+#define ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, bCondition, iStateID ) \
+	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && \
+		( (float)(fChangeTiming) < m_pXSkinAnimFuture->GetNowAnimationTime() || true == m_pXSkinAnimFuture->IsAnimationEnd() ) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(fInputTiming) && (float)(fInputTimingStart) <= m_pXSkinAnimFuture->GetNowAnimationTime() && true == (bCondition) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
 {
 	{ 
@@ -4180,23 +4189,46 @@ void CX2GUEL::DieFrontStartFuture()
 }
 void CX2GUEL::DieFrontStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b52850
 	CommonStateStart();
 	DyingStart();
 	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CommonStateStart();
+	DyingStart();
+	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DieFrontFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4efc0
+	const float TIME_CREATE_STEP_DUST = 0.19f;
+	const float TIME_SACRIFICE_OF_HERO = 1.12f;
+
+	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	const float TIME_CREATE_STEP_DUST = 0.19f;		// 연기가 발생되야하는 애니메이션 시간
 	const float TIME_SACRIFICE_OF_HERO = 1.12f;		// 영웅의 희생이 실행되어야 하는 애니메이션 시간
 
 	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DieFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b528c0
+	if( false == GetShowObject() && true == m_pXSkinAnim->IsAnimationEnd() )
+	{
+		StateChange( GUSI_DIE );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( GetShowObject() == false && m_pXSkinAnim->IsAnimationEnd() == true )
 	{
 		StateChange( GUSI_DIE );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_DIE_BACK
@@ -4216,23 +4248,46 @@ void CX2GUEL::DieBackStartFuture()
 }
 void CX2GUEL::DieBackStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b52900
 	CommonStateStart();
 	DyingStart();
 	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CommonStateStart();
+	DyingStart();
+	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DieBackFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4efe0
+	const float TIME_CREATE_STEP_DUST = 0.19f;
+	const float TIME_SACRIFICE_OF_HERO = 1.12f;
+
+	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	const float TIME_CREATE_STEP_DUST = 0.19f;		// 연기가 발생되야하는 애니메이션 시간
 	const float TIME_SACRIFICE_OF_HERO = 1.12f;		// 영웅의 희생이 실행되어야 하는 애니메이션 시간
 
 	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DieBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b52970
+	if( false == GetShowObject() && true == m_pXSkinAnim->IsAnimationEnd() )
+	{
+		StateChange( GUSI_DIE );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( GetShowObject() == false  && m_pXSkinAnim->IsAnimationEnd() == true )
 	{
 		StateChange( GUSI_DIE );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_WAIT
@@ -5550,6 +5605,13 @@ void CX2GUEL::DamageBigEventProcess()
 //ESI_DAMAGE_DOWN_FRONT
 void CX2GUEL::DamageDownFrontFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b52b00
+	if( true == m_pXSkinAnim->EventTimerOneshot( 0.19f ) )
+		CreateStepDust();
+
+	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
     if( true == m_pXSkinAnim->EventTimerOneshot( 0.19f ) )
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -5558,9 +5620,96 @@ void CX2GUEL::DamageDownFrontFrameMove()
 		CreateStepDust();
 
 	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DamageDownFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b52b50
+	bool& bChangeStandUpAttackFront			= m_FrameDataFuture.stateParam.bEventFlagList[1];
+	bool& bChangeStandUpRollingFrontFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
+	bool& bChangeStandUpRollingFrontBack	= m_FrameDataFuture.stateParam.bEventFlagList[3];
+	bool& bChangeStandUpBigAttackFront		= m_FrameDataFuture.stateParam.bEventFlagList[4];
+	const float fInputStartTime = ( true == m_bAbleQuickStand ) ? m_fEventTime[0].keyInputStart : 0.33f;
+
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DAMAGE_AIR_FALL );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == bChangeStandUpAttackFront )
+			StateChange( ESI_STANDUP_ATTACK_FRONT );
+		else if( true == bChangeStandUpBigAttackFront )
+			StateChange( ESI_QUICK_STANDUP_ATTACK_FRONT );
+		else if( true == bChangeStandUpRollingFrontFront )
+			StateChange( ESI_STANDUP_ROLLING_FRONT_FRONT );
+		else if( true == bChangeStandUpRollingFrontBack )
+			StateChange( ESI_STANDUP_ROLLING_FRONT_BACK );
+		else
+			StateChange( USI_DAMAGE_STANDUP_FRONT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 5, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_bAbleQuickStand && true == bChangeStandUpRollingFrontFront, ESI_STANDUP_ROLLING_FRONT_FRONT )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 6, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_bAbleQuickStand && true == bChangeStandUpRollingFrontFront, ESI_STANDUP_ROLLING_FRONT_BACK )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 7, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_bAbleQuickStand && true == bChangeStandUpRollingFrontFront, ESI_STANDUP_ATTACK_FRONT )
+	else if( fInputStartTime < m_pXSkinAnimFuture->GetNowAnimationTime() )
+	{
+		if( true == m_InputData.oneZ )
+		{
+			bChangeStandUpAttackFront		= true;
+			bChangeStandUpRollingFrontFront	= false;
+			bChangeStandUpRollingFrontBack	= false;
+			bChangeStandUpBigAttackFront	= false;
+		}
+		else if( true == m_InputData.oneX )
+		{
+			bChangeStandUpAttackFront		= false;
+			bChangeStandUpRollingFrontFront	= false;
+			bChangeStandUpRollingFrontBack	= false;
+			bChangeStandUpBigAttackFront	= true;
+		}
+		else if( true == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontBack	= false;
+				bChangeStandUpRollingFrontFront	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontFront	= false;
+				bChangeStandUpRollingFrontBack	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+		}
+		else
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontFront	= false;
+				bChangeStandUpRollingFrontBack	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontBack	= false;
+				bChangeStandUpRollingFrontFront	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+		}
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	bool& bChangeStandUpAttackFront			= m_FrameDataFuture.stateParam.bEventFlagList[1];
 	bool& bChangeStandUpRollingFrontFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
 	bool& bChangeStandUpRollingFrontBack	= m_FrameDataFuture.stateParam.bEventFlagList[3];
@@ -5681,18 +5830,113 @@ void CX2GUEL::DamageDownFrontEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_DAMAGE_DOWN_BACK
 void CX2GUEL::DamageDownBackFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b52f00
 	if( true == m_pXSkinAnim->EventTimer( 0.32f ) )
 		CreateStepDust();
 
 	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	if( true == m_pXSkinAnim->EventTimer( 0.32f ) )
+		CreateStepDust();
+
+	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DamageDownBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b52f40
+	bool& bChangeStandUpAttackBack			= m_FrameDataFuture.stateParam.bEventFlagList[1];
+	bool& bChangeStandUpRollingBackFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
+	bool& bChangeStandUpRollingBackBack	= m_FrameDataFuture.stateParam.bEventFlagList[3];
+	bool& bChangeStandUpBigAttackBack		= m_FrameDataFuture.stateParam.bEventFlagList[4];
+	const float fInputStartTime = ( true == m_bAbleQuickStand ) ? m_fEventTime[0].keyInputStart : 0.33f;
+
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DAMAGE_AIR_FALL );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == bChangeStandUpAttackBack )
+			StateChange( ESI_STANDUP_ATTACK_BACK );
+		else if( true == bChangeStandUpBigAttackBack )
+			StateChange( ESI_QUICK_STANDUP_ATTACK_BACK );
+		else if( true == bChangeStandUpRollingBackFront )
+			StateChange( ESI_STANDUP_ROLLING_BACK_FRONT );
+		else if( true == bChangeStandUpRollingBackBack )
+			StateChange( ESI_STANDUP_ROLLING_BACK_BACK );
+		else
+			StateChange( USI_DAMAGE_STANDUP_BACK );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 5, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_bAbleQuickStand && true == bChangeStandUpRollingBackFront, ESI_STANDUP_ROLLING_BACK_FRONT )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 6, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_bAbleQuickStand && true == bChangeStandUpRollingBackBack, ESI_STANDUP_ROLLING_BACK_BACK )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 7, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_bAbleQuickStand && true == bChangeStandUpAttackBack, ESI_STANDUP_ATTACK_BACK )
+	else if( fInputStartTime < m_pXSkinAnimFuture->GetNowAnimationTime() )
+	{
+		if( true == m_InputData.oneZ )
+		{
+			bChangeStandUpAttackBack		= true;
+			bChangeStandUpRollingBackFront	= false;
+			bChangeStandUpRollingBackBack	= false;
+			bChangeStandUpBigAttackBack	= false;
+		}
+		else if( true == m_InputData.oneX )
+		{
+			bChangeStandUpAttackBack		= false;
+			bChangeStandUpRollingBackFront	= false;
+			bChangeStandUpRollingBackBack	= false;
+			bChangeStandUpBigAttackBack	= true;
+		}
+		else if( true == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackBack	= false;
+				bChangeStandUpRollingBackFront	= true;
+				bChangeStandUpBigAttackBack	= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackFront	= false;
+				bChangeStandUpRollingBackBack	= true;
+				bChangeStandUpBigAttackBack	= false;
+			}
+		}
+		else
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackFront	= false;
+				bChangeStandUpRollingBackBack	= true;
+				bChangeStandUpBigAttackBack	= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackBack	= false;
+				bChangeStandUpRollingBackFront	= true;
+				bChangeStandUpBigAttackBack	= false;
+			}
+		}
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	bool& bChangeStandUpAttackBack			= m_FrameDataFuture.stateParam.bEventFlagList[1];
 	bool& bChangeStandUpRollingBackFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
 	bool& bChangeStandUpRollingBackBack		= m_FrameDataFuture.stateParam.bEventFlagList[3];
@@ -5817,17 +6061,42 @@ void CX2GUEL::DamageDownBackEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_DAMAGE_AIR_DOWN_LANDING
 void CX2GUEL::DamageAirDownLandingEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b532f0 ( a jump to 32b52b50 )
 	DamageDownFrontEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	DamageDownFrontEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_STANDUP_ROLLING_FRONT_FRONT
 void CX2GUEL::StandUpRollingFrontFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b53300
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChangeDashIfPossible();
+		else
+			StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneX && true == m_bAbleQuickStandAttack, ESI_QUICK_STANDUP_ATTACK_BACK_ADVANCED )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5850,18 +6119,45 @@ void CX2GUEL::StandUpRollingFrontFrontEventProcess()
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::StandUpRollingFrontFrontEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4f0d0
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CommonStateEnd();
 
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_STANDUP_ROLLING_FRONT_BACK
 void CX2GUEL::StandUpRollingFrontBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b53440
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChangeDashIfPossible();
+		else
+			StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneX && true == m_bAbleQuickStandAttack, ESI_QUICK_STANDUP_ATTACK_FRONT_ADVANCED )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5884,17 +6180,44 @@ void CX2GUEL::StandUpRollingFrontBackEventProcess()
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::StandUpRollingFrontBackEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4f110
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_STANDUP_ROLLING_BACK_FRONT
 void CX2GUEL::StandUpRollingBackFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b53580
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChangeDashIfPossible();
+		else
+			StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneX && true == m_bAbleQuickStandAttack, ESI_QUICK_STANDUP_ATTACK_BACK_ADVANCED )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5916,17 +6239,44 @@ void CX2GUEL::StandUpRollingBackFrontEventProcess()
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::StandUpRollingBackFrontEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4f150
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_STANDUP_ROLLING_BACK_BACK
 void CX2GUEL::StandUpRollingBackBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b536c0
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChangeDashIfPossible();
+		else
+			StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneX && true == m_bAbleQuickStandAttack, ESI_QUICK_STANDUP_ATTACK_FRONT_ADVANCED )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5948,12 +6298,20 @@ void CX2GUEL::StandUpRollingBackBackEventProcess()
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::StandUpRollingBackBackEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4f190
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_STANDUP_ATTACK_FRONT
@@ -6081,6 +6439,8 @@ void CX2GUEL::StandUpAttackBackStateEndFuture()
 //ESI_STANDUP_ATTACK_FRONT_NO_DOWN
 void CX2GUEL::StandUpAttackFrontNoDownEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b53900
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
 	{
 		if( false == IsOnSomethingFuture() )
@@ -6098,17 +6458,45 @@ void CX2GUEL::StandUpAttackFrontNoDownEventProcess()
 		}
 	}
 	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( m_InputData.pureRight == true || m_InputData.pureLeft == true )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( USI_WAIT );
+		}
+	}
+	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::StandUpAttackFrontNoDownEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4f270
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_STANDUP_ATTACK_BACK_NO_DOWN
 void CX2GUEL::StandUpAttackBackNoDownEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b53980
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
 	{
 		if( false == IsOnSomethingFuture() )
@@ -6126,12 +6514,38 @@ void CX2GUEL::StandUpAttackBackNoDownEventProcess()
 		}
 	}
 	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( m_InputData.pureRight == true || m_InputData.pureLeft == true )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( USI_WAIT );
+		}
+	}
+	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::StandUpAttackBackNoDownEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1b: June 32b4f2b0
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 //ESI_DASH_JUMP_POWER_LANDING

@@ -122,7 +122,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH1b | **ready**: reactions; review covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUEL.*` | `CH1b.md` |
+| CH1b | **code done 2026-11-12** (23 rows, 2 June differences, `_LIVE` stays off, no play-test, full build skipped); **review owed**: `/x2-phase char-elesis CH1b review` covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUEL.*` | `CH1b.md`, `CH1b-review.md` |
 | CH1c | blocked (CH1b review): riding, pepper run, dance | Sonnet 5.5 / high | CH1b review | `X2GUEL.*` | `CH1c.md` |
 | CH1d | blocked (CH1c): ground combos | Sonnet 5.5 / high | CH1c | `X2GUEL.*` | `CH1d.md` |
 | CH1d2 | blocked (CH1d): dash and dash / jump combos; review covers CH1c-CH1d2 | Sonnet 5.5 / high, Opus review | CH1d | `X2GUEL.*` | `CH1d2.md` |
@@ -162,7 +162,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH6 | blocked (CH4c review, CH5 review, CHNb review): scans rerun + user walk incl. both job changes, the creation screen and the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH4c, CH5, CHNb reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, template paragraph, `stage7-plan` -> `char-add` | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
 
-Done: CH0 (2026-11-12; maps + asset list, 5 splits, no code). CH1a (2026-11-12; 33 rows, 2 June differences, `_LIVE` stays off; no play-test, full build skipped).
+Done: CH0 (2026-11-12; maps + asset list, 5 splits, no code). CH1a (2026-11-12; 33 rows, 2 June differences, `_LIVE` stays off; no play-test, full build skipped). CH1b code (2026-11-12; 23 rows, `_LIVE` stays off; no play-test, full build skipped; review owed).
 
 Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for 35 / 120 / 121 / 125 follow Ara's rule (CHNa writes, user packs); CH0: moot, the flat StatTable (e37c9211) already has their rows.
 

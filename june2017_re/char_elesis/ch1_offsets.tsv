@@ -128,4 +128,6 @@ offset	kind	name	note
 0x8908	field	m_fNowSkillPassiveRate	Ara-held stand-in for CX2GUUser +0x8908 ( ctor 1.0 ); GetNowSkillPassiveRate 32ba7ec0 is stored by CommonStateStartFuture, the base 320506f0 @32051bef multiplies it into +0x8900 and resets it ( CH1q2 ports that reader ) ( CH1j )
 0x95d0	field	m_uiChivalryLevel	Elesis; level of RNSI_P_SSK_CHIVALRY 28400, set by InitPassiveSkillState 32b88300 @32b889dd ( CH1a )
 0x9618	field	m_bIsDashAttackPossible	Elesis; DashJump EventProcess tests it before dash jump Z / X ( CH1a )
+0x9638	field	m_bAbleQuickStand	Elesis; DamageDown Front / Back EventProcess: key window start = m_fEventTime[0].keyInputStart while set, else 0.33; gates flags 5 / 6 / 7 ( CH1b )
+0x9639	field	m_bAbleQuickStandAttack	Elesis; StandUpRolling EventProcess flag 0: X pressed inside the key window while set -> the QUICK_STANDUP_ATTACK_*_ADVANCED state ( CH1b )
 0x96e4	field	m_fDashComboStartDelay	Elesis; Dash EventProcess: Blazing Heart dash X only while < 0 ( CH1a )

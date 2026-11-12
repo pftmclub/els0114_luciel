@@ -473,6 +473,35 @@ All 33 class-map rows of phase CH1a are written, all `inside`: June's body in Ma
 
 **Nothing to play-test.** Review: none of its own, the CH1b review covers CH1a-CH1b (no `_DEBUG` define here). Next: `/x2-phase char-elesis CH1b` (Sonnet 5.5 high).
 
+### CH1b - Done (2026-11-12)
+
+All 23 class-map rows of phase CH1b are written, all `inside`: June's body in March's own `CX2GUEL` function under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, March's in `#else`, tag `// char-elesis CH1b: June <va>` in each block. 7 were `listing-only` (no Ghidra function: the two Die FrameMoves, the four DamageDown FrameMove / EventProcess and AirDownLanding); all 23 were read from the raw listing with `charport_adis.py elesis --phase CH1b`, and none needed "this needs Opus". No `_CORE` (no `new` row), no `_WOS` / `_SUMMON` / `_BLOOD` line. `_LIVE` stays `//#define` (CH1a defined it). New: one file-local macro in `X2GUEL.cpp` (under `_LIVE`, before `s_SkillCutInSet`); `ch1_offsets.tsv` `+0x9638` `m_bAbleQuickStand` / `+0x9639` `m_bAbleQuickStandAttack`; 23 funcmap rows `Char Elesis CH1b`. No checklist row to mark (no state here writes the state power rate and none calls the buff factor); no `JUNE_BUGS` row (no June defect, only changes).
+
+| June | `CX2GUEL::` | June | `CX2GUEL::` |
+|---|---|---|---|
+| `32b52850` `32b4efc0` `32b528c0` | DieFront Start / FrameMove / EventProcess (also `ESI_RIDING_DIE`) | `32b52900` `32b4efe0` `32b52970` | DieBack Start / FrameMove / EventProcess |
+| `32b52b00` `32b52b50` | DamageDownFront FrameMove / EventProcess | `32b52f00` `32b52f40` | DamageDownBack FrameMove / EventProcess |
+| `32b532f0` | DamageAirDownLanding EventProcess (a jump to `32b52b50`) | `32b53300` `32b53440` `32b53580` `32b536c0` | StandUpRolling FrontFront / FrontBack / BackFront / BackBack EventProcess |
+| `32b4f0d0` `32b4f110` `32b4f150` `32b4f190` | StandUpRolling FrontFront / FrontBack / BackFront / BackBack End | `32b53900` `32b53980` `32b4f270` `32b4f2b0` | StandUpAttack Front / Back NoDown EventProcess / End |
+
+**Where June differs from March** (the other 15 are March's logic written out whole, each read from the raw listing):
+- **DamageDownFront / Back EventProcess `32b52b50` / `32b52f40`:**
+  - Flags 5 / 6 / 7 (the quick-stand arms) also fire on animation end: `stateChange < now || IsAnimationEnd()`, with the time tests before the key test. This is June's expansion of `ELSE_IF_STATE_CHANGE_ON_EX_`, written as the file-local `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_` (Ara's, Elesis's own `_LIVE` guard). The animation-end branch above already catches the same condition, so the extra clause never decides (kept as June has it). The inlined alternate-future-animation choice (`+0x8e90` / `+0x8e84`, Luciel's second body) and the accessor `32070cf0` are read as `m_pXSkinAnimFuture` (precedent: Ara / Rena).
+  - **No `GetRandomInt()` roll on the X key.** March: `GetRandomInt() < m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent` picks `ESI_QUICK_STANDUP_ATTACK_*`, else `ESI_STANDUP_ATTACK_*`. June's animation-end arm pushes `ESI_QUICK_STANDUP_ATTACK_FRONT` / `_BACK` (`0xb8` / `0xb9`) whenever the X flag is set (no `0x1c8` virtual call in the listing). Written as June has it. **Routed to CH4a:** with the roll gone, check whether `m_iNoDownDamageAtStandUpAttackPercent` still has a June writer in `InitPassiveSkillState` `32b88300`.
+  - The key window start is `m_bAbleQuickStand ? keyInputStart : 0.33` (Ara's is 0.66); flags 5 / 6 / 7 of the Front state all test `bChangeStandUpRollingFrontFront` (as March), Back tests `RollingBackFront` / `RollingBackBack` / `AttackBack`.
+- **StandUpRolling EventProcess (4):** flag 0 (X in the key window while `m_bAbleQuickStandAttack` -> `ESI_QUICK_STANDUP_ATTACK_BACK_ADVANCED` `0xf3` for FrontFront / BackFront, `_FRONT_ADVANCED` `0xf4` for FrontBack / BackBack) also fires on animation end; the `y -= LINE_RADIUS` (Front pair) / `x 1.5` (Back pair) and the dash / WAIT choice are March's. June's copy drops March's `SERV_ELESIS_SECOND_CLASS_CHANGE` wrapper (as June does everywhere).
+- **= March:** both Die triples (`DieFrameMove( 0.19, 1.12 )`, `DyingStart` vslot `0x338`, play speed 0.5, `GetShowObject()` inlined), DamageDown FrameMoves (Front: `EventTimerOneshot( 0.19 )` = March's `X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE` branch, defined; Back: `EventTimer( 0.32 )`), AirDownLanding, the four Rolling Ends and the NoDown pair (animation end first, then JUMP_DOWN `y -= LINE_RADIUS x 1.5` / dash / WAIT; Ends: invincibility 0.3 / 0.3).
+- **Ids:** by March's names (`USI_*`, `ESI_*`, `GUSI_DIE`); June's numbers differ for `ESI_*` (ch0 `DIFF` rows) and registration is CH1m. Spot-checked against the listings: `USI_DAMAGE_AIR_FALL` `0x26` = 5 + 33, `USI_JUMP_DOWN` `0x11`, `USI_WAIT` `0xd`, `ESI_STANDUP_*` `0x9a`-`0x9f` (June 154-159).
+- **Not in this phase though the kickoff text lists them:** the win / lose / draw blocks (`32b52650` / `32b6de60` / `32b52690`) are class-map phase **CH1h**; start, wall, amusement, frozen and transformed use base callbacks (nothing in the class range; CH1m registers them). The class map and the 23-row count govern, as in CH1a.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --worktree --files X2Lib/X2GUEL.cpp`: `files: 1 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only because `_LIVE` is commented out (by design). `git diff --numstat`: 414 / 0; `bytes>=0x80` 13,134 before and after.
+- One-file `/Zs` probe of `X2GUEL.cpp` (`census.cl_cmd`, no PCH): 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` (`/P` with the flag: 10 `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_` expansions = 3 + 3 + 4, 0 without).
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off; nothing registers a June body), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: `kickoffs/char-elesis/CH1b-review.md` (Opus 5.5 high, covers CH1a-CH1b; no `_DEBUG` define here). Next: `/x2-phase char-elesis CH1b review`, then CH1c.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

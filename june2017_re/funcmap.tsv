@@ -10525,3 +10525,26 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b57240	CX2GUEL::ESI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess	PORTED	Char Elesis CH1a: inside, June body under JUNE_CHAR_ELESIS_LIVE; landing, dash jump, wall landing, JUMP_UP at speed >= 0, riding; = March
 32b5f7c0	CX2GUEL::ESI_QUICK_STANDUP_ATTACK_FRONT_ADVANCED_EventProcess	PORTED	Char Elesis CH1a: inside, June body under JUNE_CHAR_ELESIS_LIVE; animation end WAIT, then the cancel macros ( skill / walk / bwalk / dash / ZX_EX ); the macros already carry June expansion ( JUNE_BUFF_AWAKE_LOCK ); = March
 32b5fac0	CX2GUEL::ESI_QUICK_STANDUP_ATTACK_BACK_ADVANCED_EventProcess	PORTED	Char Elesis CH1a: inside, June body under JUNE_CHAR_ELESIS_LIVE; animation end WAIT + CommonEventProcess; = March
+32b4efc0	CX2GUEL::DieFrontFrameMove	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; DieFrameMove( 0.19, 1.12 ), shared with ESI_RIDING_DIE; = March
+32b52850	CX2GUEL::DieFrontStart	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; CommonStateStart, DyingStart ( vslot 0x338 ), play speed 0.5, shared with ESI_RIDING_DIE; = March
+32b528c0	CX2GUEL::DieFrontEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; GetShowObject() false and animation end -> GUSI_DIE ( GetShowObject inlined: manager chain then +0x172 ); = March
+32b4efe0	CX2GUEL::DieBackFrameMove	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; DieFrameMove( 0.19, 1.12 ); = March
+32b52900	CX2GUEL::DieBackStart	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; CommonStateStart, DyingStart, play speed 0.5; = March
+32b52970	CX2GUEL::DieBackEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as DieFrontEventProcess; = March
+32b52b00	CX2GUEL::DamageDownFrontFrameMove	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; EventTimerOneshot( 0.19 ) = March's X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE branch ( defined ), CreateStepDust, CommonFrameMove; = March
+32b52b50	CX2GUEL::DamageDownFrontEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; DIFFERS: flags 5 / 6 / 7 also fire on animation end ( file-local ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_ ) and the X-key flag goes to ESI_QUICK_STANDUP_ATTACK_FRONT with no GetRandomInt roll; also shared with ESI_DAMAGE_AIR_DOWN_LANDING
+32b52f00	CX2GUEL::DamageDownBackFrameMove	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; EventTimer( 0.32 ), CreateStepDust, CommonFrameMove; = March
+32b52f40	CX2GUEL::DamageDownBackEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; DIFFERS as DamageDownFrontEventProcess ( animation-end clause on flags 5 / 6 / 7, X key -> ESI_QUICK_STANDUP_ATTACK_BACK with no roll )
+32b532f0	CX2GUEL::DamageAirDownLandingEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; a jump to 32b52b50 ( DamageDownFrontEventProcess ); = March
+32b53300	CX2GUEL::StandUpRollingFrontFrontEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; DIFFERS: flag 0 ( X + m_bAbleQuickStandAttack -> ESI_QUICK_STANDUP_ATTACK_BACK_ADVANCED ) also fires on animation end; the rest = March ( y -= LINE_RADIUS )
+32b53440	CX2GUEL::StandUpRollingFrontBackEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b53300 with ESI_QUICK_STANDUP_ATTACK_FRONT_ADVANCED; DIFFERS only by the animation-end clause
+32b53580	CX2GUEL::StandUpRollingBackFrontEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b53300 with y -= LINE_RADIUS x 1.5 ( 45.0 ) and ESI_QUICK_STANDUP_ATTACK_BACK_ADVANCED; DIFFERS only by the animation-end clause
+32b536c0	CX2GUEL::StandUpRollingBackBackEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b53300 with y -= LINE_RADIUS x 1.5 and ESI_QUICK_STANDUP_ATTACK_FRONT_ADVANCED; DIFFERS only by the animation-end clause
+32b4f0d0	CX2GUEL::StandUpRollingFrontFrontEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; CommonStateEnd + SetForceInvincible / SetShowInvincible 0.3 ( vslots 0x11c / 0x120 ); = March
+32b4f110	CX2GUEL::StandUpRollingFrontBackEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
+32b4f150	CX2GUEL::StandUpRollingBackFrontEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
+32b4f190	CX2GUEL::StandUpRollingBackBackEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
+32b53900	CX2GUEL::StandUpAttackFrontNoDownEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; animation end: JUMP_DOWN ( y -= LINE_RADIUS x 1.5 ) / dash / WAIT; = March
+32b53980	CX2GUEL::StandUpAttackBackNoDownEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b53900; = March
+32b4f270	CX2GUEL::StandUpAttackFrontNoDownEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
+32b4f2b0	CX2GUEL::StandUpAttackBackNoDownEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
