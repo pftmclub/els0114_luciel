@@ -57,3 +57,4 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - **Functions:** `awk -F'\t' '$7=="CH1c"' june2017_re/char_elesis/ch0_class_map.tsv` = 2 (1 listing-only: col 9 `n`; 1 `inside`, 1 `new`: col 5; proposed names col 6, `?` = name by the class pattern from the body).
 - **Script states:** `awk -F'\t' '$8=="CH1c"' june2017_re/char_elesis/ch0_state_skill.tsv` = 37.
+- **CH1b review (2026-11-12):** June's walk / back-walk / dash / ZX cancels test `bFootOnLine` (`+0x7e1c`) before the keys; use the file-local `WALK_` / `BWALK_` / `DASH_CANCEL_AFTER_ON_LINE_` / `ZX_CANCEL_AFTER_EX_ON_LINE_` (top of `X2GUEL.cpp`) where the listing does, March's macro where it does not. Only `SKILL_CANCEL_AFTER` already carries June's expansion.

@@ -437,7 +437,9 @@ core", "Transcription rules"), with Elesis's flags and her class range `0x32b4e7
 later group's callee declared with `// June <va>: body in <phase>`; an unmapped engine callee is "this needs Opus" (stop). June's numbers and
 quirks verbatim; `m_fNowStatePowerRate` (7i) with June's operator; June's BFI arguments (7ai). **Way of the Sword, summon and blood lines inside a
 function a CH1a-CH1k phase transcribes** are written under `_WOS` / `_SUMMON` / `_BLOOD` (an `#ifdef` inside the `_LIVE` body) when they call a June
-piece CH1q / CH3b0 / CH4c has not written yet; March's live Way of the Sword calls stay March's until CH1q.
+piece CH1q / CH3b0 / CH4c has not written yet; March's live Way of the Sword calls stay March's until CH1q. **Cancel macros (CH1b review):** only
+`SKILL_CANCEL_AFTER` carries June's expansion; where the listing tests `+0x7e1c` (`bFootOnLine`) before the keys, a walk / back-walk / dash / ZX cancel
+is the file-local `WALK_` / `BWALK_` / `DASH_CANCEL_AFTER_ON_LINE_` / `ZX_CANCEL_AFTER_EX_ON_LINE_` (top of `X2GUEL.cpp`), else March's macro.
 
 **Done gate (CH1 final):** Elesis (8 / 29 / 30 / 120 / 121) loads June's script and motions; `[JUNE_CHAR] ELESIS DATA` logs the load; no new
 `KEM_ERROR` / `Motion Error` / missing-animation line against a pre-CH1 run; combos, dash, jump, damage and riding play June's animations; the Way
@@ -501,6 +503,32 @@ All 23 class-map rows of phase CH1b are written, all `inside`: June's body in Ma
 - Full build skipped: no play-test (`_LIVE` is off; nothing registers a June body), so no `DEPLOY OK` / `exestr` line.
 
 **Nothing to play-test.** Review: `kickoffs/char-elesis/CH1b-review.md` (Opus 5.5 high, covers CH1a-CH1b; no `_DEBUG` define here). Next: `/x2-phase char-elesis CH1b review`, then CH1c.
+
+### CH1b - Review (2026-11-12; covers CH1a-CH1b)
+
+Verdict: **pass after one fix.** All 56 functions are `inside` under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` (still `//#define`); the spot-checks below were read against the raw listing (`charport_adis.py elesis <va>`), branch by branch, `fcomp` / `test ah` direction included.
+
+**Fixed in place (CH1a, `32b5f7c0` QUICK_STANDUP_ATTACK_FRONT_ADVANCED EventProcess).** The CH1a note said all five cancel macros already carry June's expansion. Only `SKILL_CANCEL_AFTER` does (`SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK`). June's walk (`+0x8c98`), back-walk (`+0x8c94`), dash (`+0x8c9c`) and Z / X (`+0x8c88`) cancels also need `bFootOnLine` (`+0x7e1c`) before the key test (@`32b5f901` / `32b5f962` / `32b5f9c4` / `32b5fa28` / `32b5fa7d`), and the Z / X arms are two separate `else if`s. Ara's file-local `_ON_LINE_` macros (char-ara CH1d / CH1e / CH2d) were copied to the top of `X2GUEL.cpp` under `_LIVE` (tag `// char-elesis CH1b review`), and the June body now uses them. It was the only cancel-macro site in CH1a-CH1b. The plan's transcription rules now say so for CH1c-CH1k.
+
+**Checked = June:**
+- DamageDownFront / Back EventProcess `32b52b50` / `32b52f40`: the animation-end arm's order (flag 1 attack, flag 4 quick attack `0xb8` / `0xb9`, flag 2, flag 3, stand-up); the X key sets flag 4 with no `GetRandomInt` (no `0x1c8` call); flags 5 / 6 / 7 = `flag && ( stateChange < now || IsAnimationEnd() )`, then `keyInputStart <= now < keyInputEnd && m_bAbleQuickStand && <flag>`; Front tests flag 2 for all three, Back tests flags 2 / 3 / 1; the key window `now > ( m_bAbleQuickStand ? keyInputStart : 0.33 )`; the facing / pure-key flag writes (word stores read byte by byte); the air-fall arm `y -= 30`.
+- StandUpRolling EventProcess `32b53300` / `32b53440` / `32b53580` / `32b536c0`: flag 0 -> `0xf3` / `0xf4` / `0xf3` / `0xf4`; `y -= 30` / `30` / `45` / `45`; condition `oneX && m_bAbleQuickStandAttack`; the animation-end clause.
+- DamageDown FrameMoves: Front `EventTimerOneshot( 0.19 )` (the inlined `m_fAnimOneshotTimer < t` test at `+0x24c`), Back `EventTimer( 0.32 )`.
+- PlayAnimationSwordWaitStart `32b6e0c0`: `m_uiChivalryLevel > 0` (unsigned `jbe`) -> 0.15 else 0.25; fatal when `maxHP x threshold >= nowHP`; the `Wait_W0` (2) / `Wait_W1` (-2) / `Wait` arms and both transition branches.
+- DashJumpEventProcess `32b6e660`: the both-keys branch (clamp to `GetJumpSpeed()`, JUMP_UP if > 0 else JUMP_DOWN, the riding arm skipped), the wall landing, dash-jump Z / X on `m_bIsDashAttackPossible`, `oneUp && nowSpeed.y <= 0`, `oneDown` -> `2 x fMaxGSpeed`.
+- JumpAttackZ / X EventProcess and FrameMoveFuture, Dash `32b80020` (Blazing Heart X only while `m_fDashComboStartDelay < 0`, the four DASH_END arms, CanDown -45), DashEnd StartFuture / FrameMove / EventProcess (the 0.3 x `GetMaxAnimationTime()` split, Blazing Heart X), QUICK_STANDUP_ATTACK_BACK_ADVANCED.
+- `ch1_offsets.tsv` CH1a / CH1b rows (`+0x95d0`, `+0x9618`, `+0x9638`, `+0x9639`, `+0x96e4`, `+0x7d86`-`+0x7d8c`, `+0x8c10`-`+0x8c24`, `+0x4060`) agree with the listings.
+
+**CH4a lead (CH1b):** June's `InitPassiveSkillState` `32b88300` writes `+0x95d0` (@`32b883b3`, `32b889dd`) and `+0x9638` / `+0x9639` (@`32b883bb`, `32b88617`) but never `+0x4060`. The only writer of `m_iNoDownDamageAtStandUpAttackPercent` is the shared base (Get Chance, `X2GUUser.cpp:6443`). Her class needs no writer; the line is in `kickoffs/char-elesis/CH4a.md`.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --range 34269173^..27f88883`: `files: 2 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `0 deleted`, `0 non-ASCII`, `0 EOL-mismatched`, `0 #else/#endif without the flag token`, `0 encoding change(s)`; `RESULT: FAIL` only for the commented-out `#define`.
+- The fix: `--worktree --files X2Lib/X2GUEL.cpp`: `1 PASS, 0 OTHER, 0 FAIL`; its 5 deleted lines are CH1a's own lines inside the flag block (the tag comment and the 4 macro calls). `--base 34269173^ X2Lib/X2GUEL.cpp`: `1 PASS`, `0 deleted line(s)`. `bytes>=0x80` 13,134 before and after, CRLF matched.
+- `junediverge.py --check-all`: `allow-listed: 206`, `RESULT: PASS`; `--check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: 0 A/B rows.
+- One-file `/Zs` probe of `X2GUEL.cpp` (`census.cl_cmd`, no PCH), after the fix: 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`.
+- Full build skipped: no play-test.
+
+No `JUNE_BUGS` row, no `_DEBUG` define to retire. Next: `/x2-phase char-elesis CH1c` (Sonnet 5.5 high).
 
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
