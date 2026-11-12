@@ -80,6 +80,40 @@ namespace _CONST_EL_
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && true == IsOnSomethingFuture() && true == m_InputData.oneX ) \
 	{ StateChange( GetComboXStateID() ); }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1e: the flag-chain and on-line cancel macros above again, for the _CORE functions while _LIVE is off ( as Ara's )
+#define ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, bCondition, iStateID ) \
+	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && \
+		( (float)(fChangeTiming) < m_pXSkinAnimFuture->GetNowAnimationTime() || true == m_pXSkinAnimFuture->IsAnimationEnd() ) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(fInputTiming) && (float)(fInputTimingStart) <= m_pXSkinAnimFuture->GetNowAnimationTime() && true == (bCondition) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#define WALK_CANCEL_AFTER_ON_LINE_( time ) \
+	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && true == IsOnSomethingFuture() && \
+	( true == m_InputData.pureRight || true == m_InputData.pureLeft ) ) \
+	{ StateChange( USI_WAIT ); }
+#define BWALK_CANCEL_AFTER_ON_LINE_( time ) \
+	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && true == IsOnSomethingFuture() && \
+	( ( m_InputData.pureLeft == true && m_FrameDataFuture.syncData.bIsRight == true) || \
+	( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == false) ) ) \
+	{ StateChange( USI_WAIT ); }
+#define DASH_CANCEL_AFTER_ON_LINE_( time ) \
+	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && true == IsOnSomethingFuture() && \
+	( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) ) \
+	{ StateChangeDashIfPossible(); }
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1e: constants of the Grand Master states ( June 32b86080 / 32b72fe0 / 32b731a0 )
+namespace _CONST_EL_CH1E_
+{
+	const float XX_ATTACK_MP_COST			= 2.f;		// also DashComboX's MP test ( CH1d2 )
+	const float XX_ATTACK_TIME_OFFSET		= 0.3f;
+	const float XX_ATTACK_TIME_DIVISOR		= 10.f;
+	const float XX_DOWN_X_FORWARD_SPEED		= 700.f;
+	const float XX_DOWN_X_BACKWARD_SPEED	= -500.f;
+}
+using namespace _CONST_EL_CH1E_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
 {
 	{ 
@@ -8190,6 +8224,24 @@ void CX2GUEL::ProcessEndurancePowerSkill()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CX2GUEL::ESI_DASH_COMBO_SSK_ZZ_EventProcess()			/// DASH_COMBO_ZZ
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b59e30
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneZ, ESI_DASH_COMBO_SSK_ZZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		true == m_InputData.oneX, ESI_DASH_COMBO_SSK_ZZX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -8203,9 +8255,24 @@ void CX2GUEL::ESI_DASH_COMBO_SSK_ZZ_EventProcess()			/// DASH_COMBO_ZZ
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_DASH_COMBO_SSK_ZZZ_EventProcess()			/// DASH_COMBO_ZZZ
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b5a2a0
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -8217,9 +8284,24 @@ void CX2GUEL::ESI_DASH_COMBO_SSK_ZZZ_EventProcess()			/// DASH_COMBO_ZZZ
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_DASH_COMBO_SSK_ZZX_EventProcess()			/// DASH_COMBO_ZZX
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b5a5a0
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -8231,6 +8313,7 @@ void CX2GUEL::ESI_DASH_COMBO_SSK_ZZX_EventProcess()			/// DASH_COMBO_ZZX
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /** @function : ESI_DASH_JUMP_COMBO_SSK_XX_EventProcess
 	@brief : 점프 상태에서 내려오면서 입력을 받고,
@@ -8238,6 +8321,27 @@ void CX2GUEL::ESI_DASH_COMBO_SSK_ZZX_EventProcess()			/// DASH_COMBO_ZZX
 */
 void CX2GUEL::ESI_DASH_JUMP_COMBO_SSK_XX_EventProcess()		/// DASH_JUMP_COMBO_XX
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b5a8a0 ( one body for this and ESI_DASH_JUMP_COMBO_SSK_ZZX; June has no cancels here )
+	bool& bESI_DASH_JUMP_COMBO_SSK_XXX = m_FrameDataFuture.stateParam.bEventFlagList[0];
+	bool& bESI_COMBO_Z = m_FrameDataFuture.stateParam.bEventFlagList[1];
+
+	if( true == m_InputData.oneX )
+		bESI_DASH_JUMP_COMBO_SSK_XXX = true;
+	else if ( true == m_InputData.oneZ )
+		bESI_COMBO_Z = true;
+
+	if ( true == IsOnSomethingFuture() )
+	{
+		if( true == bESI_COMBO_Z )
+			StateChange( ESI_COMBO_Z );
+		else if( true == bESI_DASH_JUMP_COMBO_SSK_XXX )
+			StateChange( ESI_DASH_JUMP_COMBO_SSK_XXX );
+		else
+			StateChange( ESI_DASH_JUMP_COMBO_XX_LANDING );
+	}
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	bool& bESI_DASH_JUMP_COMBO_SSK_XXX = m_FrameDataFuture.stateParam.bEventFlagList[0];
 	bool& bESI_COMBO_Z = m_FrameDataFuture.stateParam.bEventFlagList[1];
 
@@ -8261,9 +8365,27 @@ void CX2GUEL::ESI_DASH_JUMP_COMBO_SSK_XX_EventProcess()		/// DASH_JUMP_COMBO_XX
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_DASH_JUMP_COMBO_SSK_XXX_EventProcess()		/// DASH_JUMP_COMBO_XXX
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b5a910
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == IsOnSomethingFuture() )
+			StateChange( USI_JUMP_DOWN );
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		if ( false == IsOnSomethingFuture() )
@@ -8278,6 +8400,7 @@ void CX2GUEL::ESI_DASH_JUMP_COMBO_SSK_XXX_EventProcess()		/// DASH_JUMP_COMBO_XX
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 		CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 // 크로스 슬래시
 void CX2GUEL::ESI_SI_A_SSK_CROSS_SLASH_Init()
@@ -9263,6 +9386,20 @@ void CX2GUEL::ESI_DASH_JUMP_COMBO_SGM_XZ_LOOP_EventProcess()
 // 대시 점프 콤보 XZ 다운
 void CX2GUEL::ESI_DASH_JUMP_COMBO_SGM_XZ_DOWN_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b5f1c0
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
@@ -9276,6 +9413,7 @@ void CX2GUEL::ESI_DASH_JUMP_COMBO_SGM_XZ_DOWN_EventProcess()
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 // 콤보 XX 다운 X 시작
@@ -9322,6 +9460,43 @@ void CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_StateStart()
 
 void CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b72fe0 ( the loop count cap as March; June adds the forward / backward speed while the state plays )
+	if ( m_InputData.oneX == true )
+	{
+		++m_iComboXXdownXMaxLoopCount;
+		if ( m_iComboXXdownXMaxLoopCount >= _CONST_EL_::MAX_XX_DOWN_X_LOOP_COUNT )
+			m_iComboXXdownXMaxLoopCount = _CONST_EL_::MAX_XX_DOWN_X_LOOP_COUNT;
+	}
+
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( m_iComboXXdownXMaxLoopCount > 0 )
+			StateChange( ESI_COMBO_SGM_XX_DOWN_X_LOOP );
+		else
+			StateChange( ESI_COMBO_SGM_XX_DOWN_X_END );
+	}
+	else
+	{
+		if ( true == IsOnSomethingFuture() )
+			m_PhysicParam.nowSpeed.y = 0.f;
+		m_PhysicParam.nowSpeed.x = XX_DOWN_X_FORWARD_SPEED;
+		if ( true == m_InputData.pureRight )
+		{
+			if ( false == GetIsRight() )
+				m_PhysicParam.nowSpeed.x = XX_DOWN_X_BACKWARD_SPEED;
+		}
+		else if ( true == m_InputData.pureLeft )
+		{
+			if ( true == GetIsRight() )
+				m_PhysicParam.nowSpeed.x = XX_DOWN_X_BACKWARD_SPEED;
+		}
+		else
+			m_PhysicParam.nowSpeed.x = 0.f;
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( m_InputData.oneX == true )
 	{
 		++m_iComboXXdownXMaxLoopCount;
@@ -9338,11 +9513,43 @@ void CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_EventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 // 콤보 XX 다운 X 루프
 void CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_LOOP_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b731a0 ( same speed block as the start state )
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		++m_iComboXXdownXNowLoopCount;
+
+		if ( m_iComboXXdownXNowLoopCount < m_iComboXXdownXMaxLoopCount )
+			StateChange( ESI_COMBO_SGM_XX_DOWN_X_LOOP );
+		else
+			StateChange( ESI_COMBO_SGM_XX_DOWN_X_END );
+	}
+	else
+	{
+		if ( true == IsOnSomethingFuture() )
+			m_PhysicParam.nowSpeed.y = 0.f;
+		m_PhysicParam.nowSpeed.x = XX_DOWN_X_FORWARD_SPEED;
+		if ( true == m_InputData.pureRight )
+		{
+			if ( false == GetIsRight() )
+				m_PhysicParam.nowSpeed.x = XX_DOWN_X_BACKWARD_SPEED;
+		}
+		else if ( true == m_InputData.pureLeft )
+		{
+			if ( true == GetIsRight() )
+				m_PhysicParam.nowSpeed.x = XX_DOWN_X_BACKWARD_SPEED;
+		}
+		else
+			m_PhysicParam.nowSpeed.x = 0.f;
+	}
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		++m_iComboXXdownXNowLoopCount;
@@ -9353,12 +9560,27 @@ void CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_LOOP_EventProcess()
 			StateChange( ESI_COMBO_SGM_XX_DOWN_X_END );
 	}
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 
 // 콤보 XX 다운 X 끝
 void CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_END_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1e: June 32b5f4c0
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -9370,6 +9592,7 @@ void CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_END_EventProcess()
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 // 재빠른 기상, 앞 구르기 공격
@@ -11571,6 +11794,146 @@ void CX2GUEL::CommonHyperModeFrameMove( float fTime1_, float fTime2_, bool bSoun
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1e: June 32b6ad40 ( Grand Master Z-Z-Z-X: the down-X start state )
+void CX2GUEL::ESI_COMBO_SGM_ZZZX_EventProcess()
+{
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true && CX2Unit::UC_ELESIS_GRAND_MASTER == GetUnitClass(), ESI_COMBO_SGM_XX_DOWN_X_START )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1e: June 32b522d0 ( the first 2 MP of the dash X-X attack are taken on the future frame )
+void CX2GUEL::ESI_DASH_COMBO_SGM_XX_ATTACK_StateStartFuture()
+{
+	CommonStateStartFuture();
+	UpNowMp( -XX_ATTACK_MP_COST );
+}
+
+// char-elesis CH1e: June 32b86080 ( timer times 4 to 9 chain on the previous one: kept, JUNE_BUGS 629 )
+void CX2GUEL::ESI_DASH_COMBO_SGM_XX_ATTACK_EventProcess()
+{
+	bool& bAttackKeyPressed = m_FrameDataFuture.stateParam.bEventFlagList[0];
+	bool& bAttackKeyPressedAgain = m_FrameDataFuture.stateParam.bEventFlagList[1];
+
+	if ( true == bAttackKeyPressed )
+	{
+		if ( true == m_InputData.oneX )
+			bAttackKeyPressedAgain = true;
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		bAttackKeyPressed = true;
+	}
+
+	float fEventTime = ( m_pXSkinAnimFuture->GetMaxAnimationTime() - XX_ATTACK_TIME_OFFSET ) / XX_ATTACK_TIME_DIVISOR;
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( ESI_DASH_COMBO_SGM_XX_END );
+	}
+	else
+	{
+		bool bTimerReached = m_pXSkinAnimFuture->EventTimerOneshot( fEventTime * 2.f + XX_ATTACK_TIME_OFFSET );
+		for ( int iMultiplier = 3; iMultiplier <= 9 && false == bTimerReached; ++iMultiplier )
+		{
+			fEventTime = fEventTime * static_cast<float>( iMultiplier ) + XX_ATTACK_TIME_OFFSET;
+			bTimerReached = m_pXSkinAnimFuture->EventTimerOneshot( fEventTime );
+		}
+
+		if ( true == bTimerReached )
+		{
+			if ( true == bAttackKeyPressed )
+			{
+				if ( GetNowMp() >= XX_ATTACK_MP_COST )
+				{
+					UpNowMp( -XX_ATTACK_MP_COST );
+				}
+				else
+				{
+					g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_2549 ), D3DXCOLOR(1,1,1,1),
+						D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+					StateChange( ESI_DASH_COMBO_SGM_XX_END );
+				}
+			}
+			else
+			{
+				StateChange( ESI_DASH_COMBO_SGM_XX_END );
+			}
+
+			if ( false == bAttackKeyPressedAgain )
+				bAttackKeyPressed = false;
+			bAttackKeyPressedAgain = false;
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1e: June 32b6b0a0
+void CX2GUEL::ESI_DASH_COMBO_SGM_XX_END_EventProcess()
+{
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1e: June 32b6bc30 ( one start for ESI_P_SGM_ADVANCED_KNIGHT_MASTERY and _SMALL: half of the casts play the second guard animation )
+void CX2GUEL::ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_StateStart()
+{
+	CommonStateStart();
+	if ( 0 == GetRandomInt( 0 ) % 2 )
+		m_pXSkinAnim->ChangeAnim( L"SI_P_SGM_ADVANCED_KNIGHT_MASTERY_GUARD2", false, 0.f );
+}
+
+// char-elesis CH1e: June 32b6bc80
+void CX2GUEL::ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == IsOnSomethingFuture() )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else
+		{
+			StateChange( USI_WAIT );
+		}
+	}
+	CommonEventProcess();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #endif // NEW_CHARACTER_EL
 
 

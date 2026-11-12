@@ -145,3 +145,6 @@ offset	kind	name	note
 0x8c4c	field	m_fEventTime[5].keyInputStart	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
 0x8c50	field	m_fEventTime[5].keyInputEnd	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
 0x8c54	field	m_fEventTime[5].stateChange	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x9620	field	m_iComboXXdownXNowLoopCount	CX2GUEL (June KProtectedType<int>, 12 B, March plain int); read by the Grand Master XX down-X states ( CH1e )
+0x962c	field	m_iComboXXdownXMaxLoopCount	CX2GUEL (June KProtectedType<int>, 12 B, March plain int); capped at 4 by the start state ( CH1e )
+0x9688	field	m_hXXDownXLoop	CX2GUEL effect-set handle of EffectSet_SGM_XXX_Start ( CH1e )

@@ -233,6 +233,9 @@ public:
 		ESI_DASH_JUMP_COMBO_SPK_ZX_READY,			/// char-elesis CH1d2: June script id 325 ( Pyro Knight line dash-jump Z-X ready; CH1m maps, CH1f owns the state )
 		ESI_DASH_JUMP_COMBO_SDK_XX,					/// char-elesis CH1d2: June script id 285 ( Dark Knight dash-jump X-X; CH1m maps, CH1g owns the state )
 		ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE,			/// char-elesis CH1d2: June script id 328 ( Dark Knight dash-jump Z-X charge; CH1m maps, CH1g owns the state )
+		ESI_DASH_COMBO_SGM_XX_END,					/// char-elesis CH1e: June script id 324 ( Grand Master dash X-X end; CH1m maps, CH1e owns the state )
+		ESI_P_SGM_ADVANCED_KNIGHT_MASTERY,			/// char-elesis CH1e: June script id 332 ( Advanced Knight Mastery guard; CH1m maps, CH1e owns the state )
+		ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_SMALL,	/// char-elesis CH1e: June script id 333 ( Advanced Knight Mastery guard, small; CH1m maps, CH1e owns the state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -466,6 +469,14 @@ protected:
 	void ComboXXZEventProcess();
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	bool IsInJobLine( int iJobLine_ );		/// char-elesis CH1d: June 32b64290 ( vslot 0x670 ): body in CH1i
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+	void ESI_COMBO_SGM_ZZZX_EventProcess();					/// char-elesis CH1e: June 32b6ad40
+	void ESI_DASH_COMBO_SGM_XX_ATTACK_StateStartFuture();	/// char-elesis CH1e: June 32b522d0
+	void ESI_DASH_COMBO_SGM_XX_ATTACK_EventProcess();		/// char-elesis CH1e: June 32b86080
+	void ESI_DASH_COMBO_SGM_XX_END_EventProcess();			/// char-elesis CH1e: June 32b6b0a0
+	void ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_StateStart();	/// char-elesis CH1e: June 32b6bc30 ( also _SMALL )
+	void ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_EventProcess();	/// char-elesis CH1e: June 32b6bc80 ( also _SMALL )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 	void JumpAttackZEventProcess();

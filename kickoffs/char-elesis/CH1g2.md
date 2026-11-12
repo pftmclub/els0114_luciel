@@ -62,3 +62,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1d2 (2026-11-12)
 
 - `ESI_DASH_COMBO_SCA_ZZ` (June id 299) and `ESI_DASH_COMBO_SCA_ZX_START` (304) are already in `EL_STATE_ID` under `_CORE`; June's DashComboZ reaches them with Z / X through `IsInJobLine( 3 )` (classes 35 / 125).
+
+## Amended by CH1e (2026-11-12)
+
+- A `new` row that uses the flag-chain or on-line cancel macros compiles under `_CORE` while `_LIVE` is off: `X2GUEL.cpp` repeats the macros in a `#ifdef _CORE` / `#ifndef _LIVE` block after the `_LIVE` one (as Ara's); it holds `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_`, `WALK_` / `BWALK_` / `DASH_CANCEL_AFTER_ON_LINE_` but **not** `ZX_CANCEL_AFTER_EX_ON_LINE_`: add it to that block if a `new` body needs it. The Grand Master numbers sit in `_CONST_EL_CH1E_` (a `_CONST_EL_<phase>_` namespace per phase, with `using namespace`). The new-function definitions go before `#endif // NEW_CHARACTER_EL` at the end of `X2GUEL.cpp`, their declarations after `IsInJobLine` in `X2GUEl.h`; a `bytepatch` anchor with a tab-only line loses the tab when written with the Write tool: anchor on the neighbouring lines.

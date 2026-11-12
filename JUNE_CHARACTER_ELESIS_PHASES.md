@@ -631,6 +631,34 @@ All 9 class-map rows of phase CH1d2 are written: 9 `inside` (June body in March'
 
 **Nothing to play-test.** Next: `/x2-phase char-elesis CH1e` (Sonnet 5.5 high); its kickoff already carries the CH1d / CH1d2 leads.
 
+### CH1e - Done (2026-11-12)
+
+All 21 class-map rows of phase CH1e are handled: 15 `inside` (9 with a June body under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, March's in `#else`, tag `// char-elesis CH1e: June <va>`; 6 read and found `= March`, no edit), 6 `new` (plain names under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE`), 10 `listing-only` (read with `charport_adis.py elesis --phase CH1e`; none needed "this needs Opus") and 11 carved. `_LIVE` stays `//#define`; no new `Always.h` define. Three state names join `EL_STATE_ID` under `_CORE`, June's script id in the comment (CH1m maps): `ESI_DASH_COMBO_SGM_XX_END` 324, `ESI_P_SGM_ADVANCED_KNIGHT_MASTERY` 332 and `_SMALL` 333. 21 funcmap rows `Char Elesis CH1e`; `ch1_offsets.tsv` +3 rows (`+0x9620` / `+0x962c` the two loop counters, `+0x9688` `m_hXXDownXLoop`); `JUNE_BUGS.md` row 629. No checklist row is assigned to CH1e, no state writes the state power rate or calls the buff factor, no `_WOS` / `_SUMMON` / `_BLOOD` line.
+
+| June | `CX2GUEL::` | June | `CX2GUEL::` |
+|---|---|---|---|
+| `32b59e30` `32b5a2a0` `32b5a5a0` | `ESI_DASH_COMBO_SSK_ZZ` / `ZZZ` / `ZZX` EventProcess | `32b5a8a0` `32b5a910` | `ESI_DASH_JUMP_COMBO_SSK_XX` / `XXX` EventProcess |
+| `32b5f1c0` `32b5f4c0` | `ESI_DASH_JUMP_COMBO_SGM_XZ_DOWN` / `ESI_COMBO_SGM_XX_DOWN_X_END` EventProcess | `32b72fe0` `32b731a0` | `ESI_COMBO_SGM_XX_DOWN_X_START` / `_LOOP` EventProcess |
+| `32b6ad40` `32b6b0a0` `32b522d0` `32b86080` | new: `ESI_COMBO_SGM_ZZZX_EventProcess`, `ESI_DASH_COMBO_SGM_XX_END_EventProcess`, `ESI_DASH_COMBO_SGM_XX_ATTACK_StateStartFuture` / `_EventProcess` | `32b6bc30` `32b6bc80` | new: `ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_StateStart` / `_EventProcess` ( one body for `_SMALL` too ) |
+
+**Where June differs from March** (every function read branch by branch from the raw listing):
+- **SSK_ZZ `32b59e30`:** flags 0 ( Z -> `SSK_ZZZ` ) and 1 ( X -> `SSK_ZZX` ) also fire on animation end; **ZZZ / ZZX / XXX / `SGM_XZ_DOWN` / `XX_DOWN_X_END`** = March + the `_ON_LINE_` walk / back-walk / dash cancels and `ZX_CANCEL_AFTER_EX_ON_LINE_` ( new file-local macro use; vslots 0x4b0 / 0x4b4 = `GetComboZStateID` / `GetComboXStateID` ).
+- **`32b5a8a0`:** one body for `SSK_XX` and the June-only `SSK_ZZX` ( id 321 ): March's `SSK_XX` body **without** the five cancels. March's `ESI_DASH_JUMP_COMBO_SSK_XX_EventProcess` takes it ( CH1m registers both ids on it ).
+- **`XX_DOWN_X_START` / `_LOOP` EventProcess:** June adds, while the animation plays ( the `else` of the end test ), a speed block: on the line `nowSpeed.y = 0`; `nowSpeed.x = 700`, `-500` when the held direction key is against the facing, `0` with no direction key. June's two loop counters are `KProtectedType<int>` ( `+0x9620` Now, `+0x962c` Max ); March's are plain ints, used as March ( stand-in: the type only guards memory edits ).
+- **= March (read, no edit):** `SGM_XZ_Init` `32b509a0` and `X_START_Init` `32b509e0` ( the same preload lists ), `SGM_XZ_EventProcess` `32b5f160`, `SGM_XZ_LOOP` `32b5f190`, `X_START_StateStart` `32b72ed0`, `X_START_FrameMove` `32b77380` ( `EventTimerOneshot( 0.01 )` + `EffectSet_SGM_XXX_Start` + the two delete-on lists ).
+- **New states:** `ESI_COMBO_SGM_ZZZX` = jump-down ( `y -= 30` ) / WAIT, flag 0 ( X, class 120 ) -> `ESI_COMBO_SGM_XX_DOWN_X_START`, SKILL / `_ON_LINE_` cancels. `ESI_DASH_COMBO_SGM_XX_END` = the same without a flag. `ESI_DASH_COMBO_SGM_XX_ATTACK`: `StateStartFuture` takes 2 MP; the EventProcess keeps X ( flag 0 ) and a second X ( flag 1 ), on a timer tick spends 2 MP and goes on while X was pressed ( not enough MP: `STR_ID_2549` message and `ESI_DASH_COMBO_SGM_XX_END` ), else ends; the time chain is **JUNE_BUGS 629** ( verbatim ). `ESI_P_SGM_ADVANCED_KNIGHT_MASTERY`: half of the starts play `SI_P_SGM_ADVANCED_KNIGHT_MASTERY_GUARD2`; the end falls with `y -= 45` off the line.
+- **Shared support:** the `_CORE` functions use the flag-chain / on-line macros, so Ara's second macro block ( `#ifdef _CORE` / `#ifndef _LIVE` ) is repeated for Elesis ( without the ZX macro ); the Grand Master numbers live in `_CONST_EL_CH1E_` ( `XX_ATTACK_MP_COST` 2, `XX_DOWN_X_FORWARD_SPEED` 700, `XX_DOWN_X_BACKWARD_SPEED` -500, the timer offset 0.3 / divisor 10 ); DashComboX's literal `2.0f` ( CH1d2 ) is not rewritten.
+- **Leads closed:** CH1d / CH1d2's "does the script serve Saber Knight (29)": the `SSK_*` / `SGM_XX_DOWN_X_*` / `SGM_ZZZX` tables are plain script tables with no class key ( `ELESIS_KNIGHT.lua` `10415` / `10585` / `12819` / `12990` ); which classes June registers them for is `InitStateByUnitClass` `32b864f0` ( class switch on `unit class - 0x1d` ), so **CH1m** reads the registration of ids 208 / 240 for class 29 ( lead ). Ids 332 / 333 are registered in the same function.
+- **Not found to differ / drift:** none out of scope. The Advanced Knight Mastery passive that reaches these two states is CH4.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --with ..._CORE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `files: 1 PASS, 0 PASS~, 0 DEFINE, 1 OTHER (X2GUEl.h, belongs to _CORE), 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only because `_LIVE` is `//#define` (by design). With `_CORE` as the flag ( `--with ..._LIVE` ): `define: KTDXLIB/Always.h:12637`, `files: 2 PASS`, `RESULT: PASS`. `git diff --numstat`: `X2GUEL.cpp` 363 / 0, `X2GUEl.h` 11 / 0; `bytes>=0x80` 13,134 before and after.
+- One-file `/Zs` probe of `X2GUEL.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off and with `-DSERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`. `/P` branch check: `XX_DOWN_X_FORWARD_SPEED` 1 off, 3 on; `ZX_CANCEL_AFTER_EX_ON_LINE_` expansions 0 off, 7 on; the six new function names appear in both ( `_CORE` ).
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: none of its own, the CH1g2 review covers CH1e-CH1g2 ( no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1f` ( Sonnet 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

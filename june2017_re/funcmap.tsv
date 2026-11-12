@@ -10568,3 +10568,24 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b56cc0	CX2GUEL::DashJumpComboXEventProcess	PORTED	Char Elesis CH1d2: inside, June body under JUNE_CHAR_ELESIS_LIVE; flags 4 / 1 / 2 / 0 / 3 by class compares: SDK_XX ( X, 125 ), SSK_XX ( X, 120 ), SPK_XZ ( Z, 121 ), XX ( X ), SGM_XZ ( Z, 120 ); JUNE_BUGS 628
 32b570d0	CX2GUEL::DashJumpComboXXEventProcess	PORTED	Char Elesis CH1d2: inside, June body under JUNE_CHAR_ELESIS_LIVE; = March ( bFootOnLine -> ESI_DASH_JUMP_COMBO_XX_LANDING )
 32b57100	CX2GUEL::DashJumpComboXXLandingEventProcess	PORTED	Char Elesis CH1d2: inside, June body under JUNE_CHAR_ELESIS_LIVE; adds flag 0 SSK_XXX ( X, IsInJobLine 1 ) before the animation-end WAIT; y -= 45 as March
+32b509a0	CX2GUEL::ESI_DASH_JUMP_COMBO_SGM_XZ_Init	PORTED	Char Elesis CH1e: inside, listing-only; = March ( the same four preloads; no body change )
+32b509e0	CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_Init	PORTED	Char Elesis CH1e: inside, listing-only; = March ( the same five preloads; no body change )
+32b522d0	CX2GUEL::ESI_DASH_COMBO_SGM_XX_ATTACK_StateStartFuture	PORTED	Char Elesis CH1e: new under JUNE_CHAR_ELESIS_CORE, carved; CommonStateStartFuture then UpNowMp( -2.0 ) ( vslot 0xf0 )
+32b59e30	CX2GUEL::ESI_DASH_COMBO_SSK_ZZ_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; flags 0 ( Z -> SSK_ZZZ ) / 1 ( X -> SSK_ZZX ) now also fire on animation end; + _ON_LINE_ cancels incl. ZX
+32b5a2a0	CX2GUEL::ESI_DASH_COMBO_SSK_ZZZ_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels incl. ZX
+32b5a5a0	CX2GUEL::ESI_DASH_COMBO_SSK_ZZX_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels incl. ZX
+32b5a8a0	CX2GUEL::ESI_DASH_JUMP_COMBO_SSK_XX_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; carved; one body for SSK_XX and SSK_ZZX ( id 321 ); = March without the five cancels
+32b5a910	CX2GUEL::ESI_DASH_JUMP_COMBO_SSK_XXX_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels incl. ZX
+32b5f160	CX2GUEL::ESI_DASH_JUMP_COMBO_SGM_XZ_EventProcess	PORTED	Char Elesis CH1e: inside, carved; = March ( animation end -> XZ_LOOP; no body change )
+32b5f190	CX2GUEL::ESI_DASH_JUMP_COMBO_SGM_XZ_LOOP_EventProcess	PORTED	Char Elesis CH1e: inside, carved; = March ( bFootOnLine -> XZ_DOWN; no body change )
+32b5f1c0	CX2GUEL::ESI_DASH_JUMP_COMBO_SGM_XZ_DOWN_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels incl. ZX
+32b5f4c0	CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_END_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels incl. ZX
+32b6ad40	CX2GUEL::ESI_COMBO_SGM_ZZZX_EventProcess	PORTED	Char Elesis CH1e: new under JUNE_CHAR_ELESIS_CORE, listing-only; JUMP_DOWN ( y -= 30 ) / WAIT, flag 0 ( X, class 120 ) -> ESI_COMBO_SGM_XX_DOWN_X_START, SKILL + _ON_LINE_ walk / back-walk / dash cancels
+32b6b0a0	CX2GUEL::ESI_DASH_COMBO_SGM_XX_END_EventProcess	PORTED	Char Elesis CH1e: new under JUNE_CHAR_ELESIS_CORE, listing-only; JUMP_DOWN ( y -= 30 ) / WAIT, SKILL + _ON_LINE_ walk / back-walk / dash cancels
+32b6bc30	CX2GUEL::ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_StateStart	PORTED	Char Elesis CH1e: new under JUNE_CHAR_ELESIS_CORE, carved; CommonStateStart, then GetRandomInt( 0 ) % 2 == 0 plays SI_P_SGM_ADVANCED_KNIGHT_MASTERY_GUARD2; also _SMALL ( id 333 )
+32b6bc80	CX2GUEL::ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_EventProcess	PORTED	Char Elesis CH1e: new under JUNE_CHAR_ELESIS_CORE, carved; animation end -> JUMP_DOWN ( y -= 45 ) off the line, else WAIT; also _SMALL
+32b72ed0	CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_StateStart	PORTED	Char Elesis CH1e: inside, carved; = March ( CommonStateStart, both loop counters 0; no body change )
+32b72fe0	CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; carved; March + a speed block while the animation plays ( on line y speed 0; x 700 forward, -500 backward, 0 with no direction key )
+32b731a0	CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_LOOP_EventProcess	PORTED	Char Elesis CH1e: inside, June body under JUNE_CHAR_ELESIS_LIVE; carved; March + the same speed block
+32b77380	CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_FrameMove	PORTED	Char Elesis CH1e: inside, carved; = March ( EventTimerOneshot( 0.01 ) plays EffectSet_SGM_XXX_Start, handle into the two delete-on lists, CommonFrameMove; no body change )
+32b86080	CX2GUEL::ESI_DASH_COMBO_SGM_XX_ATTACK_EventProcess	PORTED	Char Elesis CH1e: new under JUNE_CHAR_ELESIS_CORE, carved; X flags 0 / 1, timer chain ( JUNE_BUGS 629 ), each tick takes 2 MP while X was pressed ( STR_ID_2549 message and END otherwise )
