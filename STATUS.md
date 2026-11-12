@@ -360,7 +360,7 @@ Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 /
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| D3 | **play-test owed** (2026-11-12): cash-shop prelude, hit-part rate, IMMUNE_TO_HP_ATTACK, effect-hit sockets / summon socket / tally; 3 layers re-checked June; then `D3-review.md` | Opus 5.5 / high, Opus review | D2 review | `X2GameUnit.*`, `X2GUUser.*`, `X2GUNPC.*`, `X2DamageManager.*`, `X2DamageEffect.cpp`, `KTDXCollision.h` | `D3.md` |
+| D3 | **review next** (play-test passed 2026-11-12: effect-hit socket fired, party-bot HIT lines): cash-shop prelude, hit-part rate, IMMUNE_TO_HP_ATTACK, effect-tail sockets / tally; `D3-review.md` | Opus 5.5 / high, Opus review | D2 review | `X2GameUnit.*`, `X2GUUser.*`, `X2GUNPC.*`, `X2DamageManager.*`, `X2DamageEffect.cpp`, `KTDXCollision.h` | `D3.md` |
 | D4 | blocked (D3 review): `DamageReact` damage arithmetic, user and NPC | Opus 5.5 / high, Opus review | D3 review | `X2GUNPC.cpp`, `X2GUUser.*` | `D4.md` |
 | D5 | blocked (D4 review): extra damage, enchant resist, level correction | Opus 5.5 / high, Opus review | D4 review | `X2GUNPC.cpp`, `X2GUUser.*`, `X2GameUnit.*`, `DungeonEnum.h` | `D5.md` |
 | D6 | blocked (D5 review): damage smoke on every ported character; its review covers D1-D5 and retires `_DEBUG` | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |

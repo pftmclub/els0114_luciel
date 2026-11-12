@@ -708,6 +708,14 @@ peers' uncommitted char-elesis files); `EXESTR OK: 2 of 2` (`[JUNE_STATCALC] EFF
 1 s interval, `BFI_BUFF_SOCKET_PERKISAS_PERSONA`), any normal dungeon entered with the auto-party button. Gate: ranged X hits (damage effects)
 give `EFFHIT owner=<ArmeDW UID>` lines and the Perkisas buff icon; the party bots' hits log `HIT att=<hero NPC id>`.
 
+**Play-test PASSED (2026-11-12, run 23:14-23:17 on exe md5 a75da7a4; `logs.py --grep "[JUNE_STATCALC] (EFFHIT|PART)"`, `HIT` by attacker).**
+- 42 `EFFHIT owner=53` lines (ArmeDW): `DamageEffect_EnergyBall_Short` / `_Big1` / `_Big2` and `ADW_MAGICBALL_SMALL_SLOW` (`at=2` AT_COMMAND), so
+  the tail runs on her projectile hits. From 23:16:19 on, `DamageEffect_RedD_P1_sohan_AttackBox` (`at=1` AT_SPECIAL, `react=7`) also logs under
+  owner 53: the summoned Perkisas's attack, which only appears after five stacks of option 35335's buff. The socket fired from her hits.
+- Summon hits: `HIT att=1105` x131, `att=1104` x99, `att=1106` x71 (the three auto-party hero NPCs, `lv=99`) on monsters 2223 / 2224 / 2225 / 2294,
+  each with a non-zero `dmg`; ArmeDW's own `att=53` x77.
+- No `PART` line (no raid NPC in the run; expected). ErrorLog: 0 matching lines. The one unbound Lua name (`AddGroupChainQuest`) is not this phase's.
+
 ## Phase D4 - DamageReact: from the final damage to the HP change
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT`, the damage arithmetic of NPC `DamageReact` `327b1f30` and user
