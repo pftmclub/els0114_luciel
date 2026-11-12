@@ -58,3 +58,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Functions:** `awk -F'\t' '$7=="CH1g2"' june2017_re/char_elesis/ch0_class_map.tsv` = 27 (11 listing-only: col 9 `n`; 0 `inside`, 27 `new`: col 5; proposed names col 6, `?` = name by the class pattern from the body).
 - **Script states:** `awk -F'\t' '$8=="CH1g2"' june2017_re/char_elesis/ch0_state_skill.tsv` = 16.
 - CH0 split off CH1g (Crimson Avenger `SCA` line states). The review (CH1g2-review) covers CH1e-CH1g2.
+
+## Amended by CH1d2 (2026-11-12)
+
+- `ESI_DASH_COMBO_SCA_ZZ` (June id 299) and `ESI_DASH_COMBO_SCA_ZX_START` (304) are already in `EL_STATE_ID` under `_CORE`; June's DashComboZ reaches them with Z / X through `IsInJobLine( 3 )` (classes 35 / 125).

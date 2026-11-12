@@ -63,3 +63,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1d (2026-11-12)
 
 - June's ComboX reaches `ESI_COMBO_SBH_XZ` (Z) through `IsInJobLine( 2 )` (classes 30 / 121), where March tested class 121 only: check that the Pyro Knight (30) path through the script's `ESI_COMBO_SBH_XZ` table is sound (lead from CH1d; CH1f2 owns the SBH states, CH1 final's play-test presses X, Z on 30).
+
+## Amended by CH1d2 (2026-11-12)
+
+- `ESI_DASH_JUMP_COMBO_SPK_ZX_READY` (June id 325) is already in `EL_STATE_ID` under `_CORE`; June's DashJumpComboZ reaches it with X through `IsInJobLine( 2 )` (classes 30 / 121), and DashComboZ reaches `ESI_DASH_COMBO_SPK_ZZ` / `_SPK_ZX` through the same line test. DashJumpComboX reaches `ESI_DASH_JUMP_COMBO_SPK_XZ` for class 121 only (`JUNE_BUGS` 628). Lead: check that the Pyro Knight (30) path through the script's `SPK_*` tables is sound.

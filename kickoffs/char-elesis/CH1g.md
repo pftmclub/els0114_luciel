@@ -64,3 +64,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1d (2026-11-12)
 
 - `ESI_COMBO_SDK_ZZZX` (June id 283) and `ESI_COMBO_SDK_XX` (287) are already in `EL_STATE_ID` under `_CORE`. June's ComboX reaches `SDK_XX` through `IsInJobLine( 3 )` (classes 35 / 125); ComboZZZ reaches `SDK_ZZZX` for class 125 only (`JUNE_BUGS` 627, kept verbatim). Crimson Avenger has no `ESI_COMBO_SCA_*` states: every June combo state of line 3 is `SDK_*`.
+
+## Amended by CH1d2 (2026-11-12)
+
+- `ESI_DASH_JUMP_COMBO_SDK_XX` (June id 285), `ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE` (328) and `ESI_DASH_COMBO_SCA_XZ_CHARGE` (330) are already in `EL_STATE_ID` under `_CORE`. June reaches `SDK_ZX_CHARGE` from DashJumpComboZ with X through `IsInJobLine( 3 )` (classes 35 / 125), `SDK_XX` from DashJumpComboX for class 125 only (`JUNE_BUGS` 628) and `SCA_XZ_CHARGE` from DashComboX with Z for class 125.

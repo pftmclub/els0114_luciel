@@ -225,6 +225,14 @@ public:
 		ESI_COMBO_SDK_XX,							/// char-elesis CH1d: June script id 287 ( Dark Knight X-X; CH1m maps, CH1g owns the state )
 		ESI_COMBO_SGM_ZZZX,							/// char-elesis CH1d: June script id 322 ( Grand Master Z-Z-Z-X; CH1m maps, CH1e owns the state )
 		ESI_COMBO_SBH_ZZZX,							/// char-elesis CH1d: June script id 327 ( Blazing Heart Z-Z-Z-X; CH1m maps, CH1f owns the state )
+		ESI_DASH_COMBO_SCA_ZZ,						/// char-elesis CH1d2: June script id 299 ( Crimson Avenger dash Z-Z; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_ZX_START,				/// char-elesis CH1d2: June script id 304 ( Crimson Avenger dash Z-X start; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SGM_XX_ATTACK,				/// char-elesis CH1d2: June script id 323 ( Grand Master dash X-X attack; CH1m maps, CH1e owns the state )
+		ESI_DASH_COMBO_SCA_XZ_CHARGE,				/// char-elesis CH1d2: June script id 330 ( Crimson Avenger dash X-Z charge; CH1m maps, CH1g owns the state )
+		ESI_DASH_JUMP_COMBO_SSK_ZZX,				/// char-elesis CH1d2: June script id 321 ( Saber Knight line dash-jump Z-Z-X; CH1m maps, CH1e owns the state )
+		ESI_DASH_JUMP_COMBO_SPK_ZX_READY,			/// char-elesis CH1d2: June script id 325 ( Pyro Knight line dash-jump Z-X ready; CH1m maps, CH1f owns the state )
+		ESI_DASH_JUMP_COMBO_SDK_XX,					/// char-elesis CH1d2: June script id 285 ( Dark Knight dash-jump X-X; CH1m maps, CH1g owns the state )
+		ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE,			/// char-elesis CH1d2: June script id 328 ( Dark Knight dash-jump Z-X charge; CH1m maps, CH1g owns the state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

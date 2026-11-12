@@ -581,6 +581,32 @@ All 9 class-map rows of phase CH1d are written: 9 `inside` (June body in March's
 
 **Nothing to play-test.** Review: none of its own, the CH1d2 review covers CH1c-CH1d2 (no `_DEBUG` define here). Next: `/x2-phase char-elesis CH1d2` (Sonnet 5.5 high).
 
+### CH1d2 - Done (2026-11-12)
+
+All 9 class-map rows of phase CH1d2 are written: 9 `inside` (June body in March's own `CX2GUEL` function under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, March's in `#else`, tag `// char-elesis CH1d2: June <va>`), 3 `listing-only` (the three ground-dash combos, read with `charport_adis.py elesis --phase CH1d2`; none needed "this needs Opus") and 6 carved. `_LIVE` stays `//#define`; no new `Always.h` define. The dash-jump XZ fireball `32b770e0` is CH1f's (CH0). Eight state names join `EL_STATE_ID` under `_CORE`, June's script id in the comment (CH1m maps, the named phase owns the state): `ESI_DASH_COMBO_SCA_ZZ` 299 / `SCA_ZX_START` 304 (CH1g2), `ESI_DASH_COMBO_SGM_XX_ATTACK` 323 (CH1e), `ESI_DASH_COMBO_SCA_XZ_CHARGE` 330, `ESI_DASH_JUMP_COMBO_SDK_XX` 285 and `SDK_ZX_CHARGE` 328 (CH1g), `ESI_DASH_JUMP_COMBO_SSK_ZZX` 321 (CH1e), `ESI_DASH_JUMP_COMBO_SPK_ZX_READY` 325 (CH1f). 9 funcmap rows `Char Elesis CH1d2`; `JUNE_BUGS.md` row 628; no checklist row is assigned to CH1d2, no state writes the state power rate or calls the buff factor, no `_WOS` / `_SUMMON` / `_BLOOD` line.
+
+| June | `CX2GUEL::` | June | `CX2GUEL::` |
+|---|---|---|---|
+| `32b559e0` `32b56090` `32b562f0` | DashComboZ / ZZ / X EventProcess (listing-only) | `32b56710` `32b56aa0` `32b56c80` | DashJumpComboZ / ZZ / ZZZ EventProcess |
+| `32b56cc0` `32b570d0` `32b57100` | DashJumpComboX / XX / XXLanding EventProcess | | |
+
+**Where June differs from March** (every function read branch by branch from the raw listing):
+- **DashComboZ `32b559e0`:** chain order flags 4 / 5 / 1 / 2 / 0 / 3. New: flag 4 (Z) -> `SCA_ZZ` and flag 5 (X) -> `SCA_ZX_START`, both `IsInJobLine( 3 )`. The three March arms test job lines through `IsInJobLine` ( flag 1 Z -> `SSK_ZZ`: line 1; flag 2 Z -> `SPK_ZZ` and flag 3 X -> `SPK_ZX`: line 2 ) where March used `GetUnitClassLine( UCL_FIRST / UCL_SECOND )`; the `SERV_ELESIS_SECOND_CLASS_CHANGE` split is gone. Flags that fire on a time test also fire on animation end; the walk / back-walk / dash cancels test the line (`_ON_LINE_`).
+- **DashComboZZ `32b56090`:** = March + `_ON_LINE_` cancels. **DashComboX `32b562f0`:** two new arms, flag 0 X -> `SGM_XX_ATTACK` (class 120 and `GetNowMp() >= 2.0`, the 2.0 has no Enum entry) and flag 1 Z -> `SCA_XZ_CHARGE` (class 125); March had none; `_ON_LINE_` cancels, animation-end flags.
+- **DashJumpComboZ `32b56710`:** order flags 1 / 2 / 3 / 0. New: X + `IsInJobLine( 1 / 2 / 3 )` -> `SSK_ZZX` / `SPK_ZX_READY` / `SDK_ZX_CHARGE`; flag 0 Z -> `ZZ` as March. **DashJumpComboZZ `32b56aa0`:** order 1 / 0, new flag 1 X + `IsInJobLine( 1 )` -> `SSK_ZZX`, flag 0 Z -> `ZZZ`. Neither has cancels (as March). June reaches these through the animation-end flags now too.
+- **DashJumpComboX `32b56cc0`:** order flags 4 / 1 / 2 / 0 / 3, the class tests are **compares**, not job lines: flag 4 X + class 125 -> `SDK_XX`, flag 1 X + class 120 -> `SSK_XX`, flag 2 Z + class 121 -> `SPK_XZ`, flag 0 X -> `XX`, flag 3 Z + class 120 -> `SGM_XZ`. March tested the first / second class line for `SSK_XX` / `SPK_XZ`, so a Saber Knight (29) and a Pyro Knight (30) lose those two arms. **JUNE_BUGS 628**, kept verbatim.
+- **DashJumpComboXXLanding `32b57100`:** new flag 0 X + `IsInJobLine( 1 )` -> `SSK_XXX` (animation end also fires it) before the animation-end `WAIT`; the not-on-line arm is `JUMP_DOWN`, `y -= 45` (`LINE_RADIUS * 1.5f`), as March.
+- **= March:** DashJumpComboZZZ `32b56c80` (animation end and `bFootOnLine` -> `DASH_JUMP_LANDING`), DashJumpComboXX `32b570d0` (`bFootOnLine` -> `XX_LANDING`). `IsOnSomethingFuture()` stands for `bFootOnLine` (`+0x7e1c`, CH1b review).
+- **Leads:** CH1e checks that the script's `ESI_DASH_COMBO_SSK_ZZ` / `ESI_DASH_JUMP_COMBO_SSK_ZZX` tables serve Saber Knight (29) too ( both reached through line 1 ); CH1f the same for `ESI_DASH_COMBO_SPK_ZZ` / `_SPK_ZX` / `ESI_DASH_JUMP_COMBO_SPK_ZX_READY` on Pyro Knight (30). CH1 final's play-test presses dash + Z, Z, Z / X and dash-jump + X on 29 / 30.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --with ..._CORE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `files: 1 PASS, 0 PASS~, 0 DEFINE, 1 OTHER (X2GUEl.h, belongs to _CORE), 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only because `_LIVE` is `//#define` (by design). With `_CORE` as the flag (`--with ..._LIVE`): `define: KTDXLIB/Always.h:12637`, `files: 1 PASS, 1 OTHER`, `RESULT: PASS`. `git diff --numstat`: `X2GUEL.cpp` 150 / 0, `X2GUEl.h` 8 / 0; `bytes>=0x80` 13,134 before and after, LF-only lines 296 before and after.
+- One-file probe of `X2GUEL.cpp` (`census.cl_cmd`, `/c /Zs /EHsc`, no PCH): exit 0, 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`. `/P` branch check: each of the eight new state names appears 1 time off, 2 times on (`ESI_DASH_JUMP_COMBO_SSK_ZZX` 3: two arms); `IsInJobLine` 2 off, 15 on; `GetNowMp() >= 2.0f` 0 off, 1 on.
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: `kickoffs/char-elesis/CH1d2-review.md` (Opus 5.5 high, covers CH1c-CH1d2; no `_DEBUG` define exists). Next: `/x2-phase char-elesis CH1d2 review` on Opus 5.5 high.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

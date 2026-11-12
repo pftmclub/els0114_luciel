@@ -62,3 +62,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1d (2026-11-12)
 
 - `ESI_COMBO_SGM_ZZZX` (June id 322) is already in `EL_STATE_ID` under `_CORE`; June's ComboZZZ reaches it with X when the class is 120. June's ComboXX reaches `ESI_COMBO_SGM_XX_DOWN_X_START` through `IsInJobLine( 1 )` (classes 29 / 120): check whether the script's table serves Saber Knight (29) too (lead, `JUNE_CHARACTER_ELESIS_PHASES.md` "CH1d - Done").
+
+## Amended by CH1d2 (2026-11-12)
+
+- `ESI_DASH_COMBO_SGM_XX_ATTACK` (June id 323) and `ESI_DASH_JUMP_COMBO_SSK_ZZX` (321) are already in `EL_STATE_ID` under `_CORE`. June's DashComboZ reaches `ESI_DASH_COMBO_SSK_ZZ` and DashJumpComboZ / ZZ reach `SSK_ZZX` through `IsInJobLine( 1 )` (classes 29 / 120); DashComboX reaches `SGM_XX_ATTACK` for class 120 with `GetNowMp() >= 2.0`; DashJumpComboX reaches `SSK_XX` for class 120 only (`JUNE_BUGS` 628). Lead: check that the script's `SSK_*` tables serve Saber Knight (29) too (`JUNE_CHARACTER_ELESIS_PHASES.md` "CH1d2 - Done").

@@ -7196,6 +7196,31 @@ void CX2GUEL::JumpAttackXFrameMoveFuture()
 }
 void CX2GUEL::DashComboZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b559e0 ( flags 4 / 5 are the job line 3 arms, tested through IsInJobLine )
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 4, m_fEventTime[4].keyInputStart, m_fEventTime[4].keyInputEnd, m_fEventTime[4].stateChange,
+		m_InputData.oneZ == true && IsInJobLine( 3 ), ESI_DASH_COMBO_SCA_ZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 5, m_fEventTime[5].keyInputStart, m_fEventTime[5].keyInputEnd, m_fEventTime[5].stateChange,
+		m_InputData.oneX == true && IsInJobLine( 3 ), ESI_DASH_COMBO_SCA_ZX_START )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ == true && IsInJobLine( 1 ), ESI_DASH_COMBO_SSK_ZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneZ == true && IsInJobLine( 2 ), ESI_DASH_COMBO_SPK_ZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ESI_DASH_COMBO_ZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneX == true && IsInJobLine( 2 ), ESI_DASH_COMBO_SPK_ZX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -7225,9 +7250,23 @@ void CX2GUEL::DashComboZEventProcess()
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashComboZZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b56090
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -7238,9 +7277,27 @@ void CX2GUEL::DashComboZZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashComboXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b562f0 ( flag 0 also needs 2.0 MP, no Enum entry; the class tests are compares as June )
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true && CX2Unit::UC_ELESIS_GRAND_MASTER == GetUnitClass() && GetNowMp() >= 2.0f, ESI_DASH_COMBO_SGM_XX_ATTACK )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ == true && CX2Unit::UC_ELESIS_CRIMSON_AVENGER == GetUnitClass(), ESI_DASH_COMBO_SCA_XZ_CHARGE )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -7251,9 +7308,28 @@ void CX2GUEL::DashComboXEventProcess()
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashJumpComboZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b56710 ( flags 1 / 2 / 3 are the job line arms )
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() &&
+		true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && IsInJobLine( 1 ), ESI_DASH_JUMP_COMBO_SSK_ZZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneX == true && IsInJobLine( 2 ), ESI_DASH_JUMP_COMBO_SPK_ZX_READY )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneX == true && IsInJobLine( 3 ), ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ESI_DASH_JUMP_COMBO_ZZ )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() &&
 		true == IsOnSomethingFuture() )
 	{
@@ -7262,9 +7338,24 @@ void CX2GUEL::DashJumpComboZEventProcess()
 	ELSE_IF_STATE_CHANGE_ON_EX_STRUCT( 0, 0, m_InputData.oneZ == true, ESI_DASH_JUMP_COMBO_ZZ );
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashJumpComboZZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b56aa0
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() &&
+		true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && IsInJobLine( 1 ), ESI_DASH_JUMP_COMBO_SSK_ZZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ESI_DASH_JUMP_COMBO_ZZZ )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() &&
 		true == IsOnSomethingFuture() )
 	{
@@ -7273,9 +7364,20 @@ void CX2GUEL::DashJumpComboZZEventProcess()
 	ELSE_IF_STATE_CHANGE_ON_EX_STRUCT( 0, 0, m_InputData.oneZ == true, ESI_DASH_JUMP_COMBO_ZZZ )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashJumpComboZZZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b56c80
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() &&
+		true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		if ( true == IsOnSomethingFuture() )
@@ -7285,9 +7387,29 @@ void CX2GUEL::DashJumpComboZZZEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashJumpComboXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b56cc0 ( the class tests are compares as June: flag 1 Grand Master, flag 2 Blazing Heart, flags 3 / 4 as listed )
+	if ( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 4, m_fEventTime[4].keyInputStart, m_fEventTime[4].keyInputEnd, m_fEventTime[4].stateChange,
+		m_InputData.oneX == true && CX2Unit::UC_ELESIS_CRIMSON_AVENGER == GetUnitClass(), ESI_DASH_JUMP_COMBO_SDK_XX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && CX2Unit::UC_ELESIS_GRAND_MASTER == GetUnitClass(), ESI_DASH_JUMP_COMBO_SSK_XX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneZ == true && CX2Unit::UC_ELESIS_BLAZING_HEART == GetUnitClass(), ESI_DASH_JUMP_COMBO_SPK_XZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ESI_DASH_JUMP_COMBO_XX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneZ == true && CX2Unit::UC_ELESIS_GRAND_MASTER == GetUnitClass(), ESI_DASH_JUMP_COMBO_SGM_XZ )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == IsOnSomethingFuture() )
 	{
 		StateChange( USI_DASH_JUMP_LANDING );
@@ -7311,18 +7433,45 @@ void CX2GUEL::DashJumpComboXEventProcess()
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashJumpComboXXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b570d0
 	if ( true == IsOnSomethingFuture() )
 	{
 		StateChange( ESI_DASH_JUMP_COMBO_XX_LANDING );
 	}
 
 	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	if ( true == IsOnSomethingFuture() )
+	{
+		StateChange( ESI_DASH_JUMP_COMBO_XX_LANDING );
+	}
+
+	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::DashJumpComboXXLandingEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1d2: June 32b57100
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true && IsInJobLine( 1 ), ESI_DASH_JUMP_COMBO_SSK_XXX )
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -7334,6 +7483,7 @@ void CX2GUEL::DashJumpComboXXLandingEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 #ifdef ADD_CAN_NOT_ATTACK_JUMP_DOWN
 void CX2GUEL::ESI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess()
