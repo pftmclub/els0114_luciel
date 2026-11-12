@@ -1073,6 +1073,38 @@ switch are the `#else` (`_LIVE` still `//#define`d). Ara's CH1n is the template;
 
 **Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1n review` (Opus 5.5 high).
 
+### CH1n - Review (2026-11-13, Opus 5.5): pass, no code change
+
+A fresh Ghidra decompile of `32b8c470`, read against `2e92189d` and the exe bytes (`read_va`):
+- **Head.** `(int)slot < 0 || 4 < slot` -> exit (`@32b8eaa0`); PE tables `334f8238` = 50 / 52 / 54 / 56 / 58, `334f824c` = 51 ... 59, `334f8260` = 60 ... 68,
+  `334f8274` = 61 ... 69 = `_CONST_GUUSER_` normal A / hyper A / normal B / hyper B, as the port indexes them. `31fd2af0` before the vslot-0 `Init()` dropped (7i);
+  `+0x11 = 1` (normal) and the hyper word `+0x10 = 0x101` (`m_bHyperState` + the slot byte) = `IsSkillSlotState`; `31fca8e0( id, 1 )` null -> exit. Nothing else
+  runs before the memo test: no cool-time / MP / hyper-stone check (checklist L266), the dev gate stays CH1k's `IsDevUnlimitedSkillUse`.
+- **Memo arm `@32b8c5bb`.** `31fdbcc0( id )` then `32206450( memo, 1 )` (= `GetSkillTemplet`, as Ara's review); switch on the memo: `0x6d7f` / `0x6d9c` (28031 / 28060)
+  and `0x6d80` / `0x6d9d` (28032 / 28061) register, any other memo falls to `@32b8ea89` (exit), never to the type switch. Each body equals its id-switch case
+  line for line: `0x6d6a` / `0x6d90` (28010 / 28048; table `ESI_SA_SGM_JUGGERNAUT_BUSTER_START`, +0x18 `32b8ed10`, +0x28 `32b8ed20`, +0x48 `32b8fff0`, +0x38
+  `32b906e0`, states 0x101-0x103 with tail `@32b8d0f4`) and `0x6d70` / `0x6d94` (28016 / 28052; `ESI_SI_SA_SBH_BLAZING_DANCE_START`, `32b8ed50` / `32b90700` /
+  `32b8ed60` / `32b8f4e0`, states 0x116-0x119 with tail `@32b8d355`); only the EH state numbers differ. Both bodies end at the exit, as the id switch's case
+  does: the `eStateSkillID` route is exact. The four names and values match the CH1n Done note's `Enum.src.lua` lines.
+- **Types.** `SKILL_TYPE` 5 `ST_BUFF`; 6 / 7 / 13-16 active (13 = `ST_HYPER_ACTIVE_SKILL`, `FINALITY_SKILL_SYSTEM` defined); 12 `ST_RELATIONSHIP_SKILL` + id 900
+  (`SI_ETC_WS_COMMON_LOVE` is 900 under `UPGRADE_SKILL_SYSTEM_2013`, defined) -> `@32b8ea71` copies +0x34 / +0x38 / +0x44 / +0x48 to the hyper slot and exits;
+  the rest exit. Thunks: `329ccd90` -> `32a77a20` (vslot 0x5f0), `329cba40` -> `31fcbd60`, `329ccda0` -> `329cc0d0` (0x5f4), `329ccdb0` -> `329cc170` (0x5f8).
+  Strings `ESI_COMMON_BUFF` / `ESI_THROW_ITEM` on both slots. Both switches take `param_2` raw.
+- **Hyper split.** `0x6fb9` / `0x6fbc` (28601 / 28604) Ancient Fire, `0x6fba` / `0x6fbd` (28602 / 28605) `SI_HA_SCA_FATE_SMASHER`, `0x6fbb` and `== 0x6fb8` Sword
+  of Relics `@32b8e95c`, other ids above 28600 exit: the `CH3d.md` amendment matches. `CH3a.md` / `CH3b.md` amendments match the memo bodies above.
+- Nit kept: the normal-slot comment names "the one `+0x11` store"; the hyper word writes `+0x11` too. Both are `IsSkillSlotState`; no code consequence.
+
+**Checks.**
+- `ch1n_triage.py` rerun: `targets 178 rows 178 missing 0` (DIFF 69, SAME 63, n/a 46); the regenerated tsv is identical to the committed one.
+- One-file probes (`census.cl_cmd`, `/c /Zs /EHsc`) of `X2GUEL.cpp`: off, `_LIVE`, `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`: `exit 0 errors 0` each.
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --with SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE --range 2e92189d^..2e92189d --files X2Lib/X2GUEL.cpp`: `files: 1 PASS, 0 PASS~ (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`,
+  `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only for the `//#define`.
+- `flagcheck SERV_IRUHADEV_JUNE_ENUM_NAMES --range 2e92189d^..2e92189d --files X2Lib/X2SkillTree.h`: `files: 0 PASS, 1 PASS~ (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`, `RESULT: PASS`.
+- `junediverge.py --check-all`: `allow-listed: 207`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`.
+- No `_DEBUG` define to retire. Full build skipped: no play-test. `CH1o.md` checked: current.
+
+**Nothing to play-test.** Next: `/x2-phase char-elesis CH1o` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
