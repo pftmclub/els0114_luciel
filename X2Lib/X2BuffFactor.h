@@ -558,6 +558,12 @@ enum BUFF_TEMPLET_ID
 	BTI_DEBUFF_SLEEP                      = 785,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-12 // char-elesis CH1k
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_DEBUFF_UNLIMITED_BLADE_MEMO       = 393,	// June's Enum.lua
+	BTI_BUFF_BLOOD_RUNAWAY_PASSIVE        = 666,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-10-26 // June character port Phase CH1l3 (JUNE_CHARACTER_EVE_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June BTI names the Eve skill use spells
@@ -857,6 +863,16 @@ enum BUFF_FACTOR_ID
 	BFI_DEBUFF_HENIR_FIRE                 = 152,
 	BFI_DEBUFF_HENIR_WATER                = 153,
 	BFI_DEBUFF_POISON_SET_EQUIP_OPTION    = 168,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-12 // char-elesis CH1k
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June BFI names Elesis's Endurance Power, Punish and Unlimited Blade memo spell
+	BFI_BUFF_ENDURANCE_POWER              = 232,
+	BFI_DEBUFF_UNLIMITED_BLADE_MEMO       = 420,
+	BFI_BUFF_ENDURANCE_POWER_PVP          = 423,
+	BFI_BUFF_PUNISH                       = 479,
+	BFI_BUFF_PUNISH_PVP                   = 480,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };

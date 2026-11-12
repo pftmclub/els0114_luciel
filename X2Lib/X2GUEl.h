@@ -356,10 +356,22 @@ protected:
 	virtual void ShowActiveSkillCutInAndLightByScript( float fTimeToShow_, bool bOnlyLight_ );
 
 	bool CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition = CX2SkillTree::ASUT_GROUND );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	void StateChangeSpecialAttack( const CX2SkillTree::SKILL_ID eSkillID_ );	/// char-elesis CH1k: June 32b52590 ( user vslot 0x7fc )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	void StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef FIX_NO_STATE_SKILL_BUG
 	virtual bool IsValideSkillRidingOn( CX2SkillTree::SKILL_ID eSkill_ID_ );
 #endif // FIX_NO_STATE_SKILL_BUG
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+	void SpecialAttackCooldown( const int iSkillID_, const float fMpConsume_ );	/// char-elesis CH1k: June 32b73e60 ( user vslot 0x800 )
+	void ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION_StateStart();	/// char-elesis CH1k: June 32b75c90
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	virtual bool IsNotCommonMoveState();	/// char-elesis CH1k: June 32b70290 ( user vslot 0x828 )
+	virtual void ReservedSkillStart( const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	/// char-elesis CH1k: June 32057b80 @32057c4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	CX2ElesisGageData* GetELGageData() { return static_cast<CX2ElesisGageData*>( GetGageData() ); }
 	const CX2ElesisGageData* GetELGageData() const { return static_cast<const CX2ElesisGageData*>( GetGageData() ); }
@@ -1134,6 +1146,8 @@ protected:
 	float m_fDashElapsedTime;				/// char-elesis CH1j: June +0x977c ( dash time: grows while a dash state lasts, zero otherwise except in Leap Crash )
 	float m_fAdvancedKnightMasteryMPValue;	/// char-elesis CH1j: June +0x9780 ( ability 0x2b of RNSI_P_SGM_ADVANCED_KNIGHT_MASTERY; CH4a writes it )
 	float m_fDashChargeTime;				/// char-elesis CH1j: June +0x9790 ( grows while dashing, runs down afterwards; CH4a / CH4c read it )
+	USHORT m_usDignityOfGrandMasterLevel;	/// char-elesis CH1k: June +0x9796 ( level of RNSI_P_SGM_DIGNITY_OF_GRAND_MASTER; CH4a writes it )
+	float m_fPunishEffectPowerRate;			/// char-elesis CH1k: June +0x9754 ( ability 6 of RNSI_P_SCA_PUNISH, the power rate of Endurance Power's Punish effect set; CH4a / CH4c write it )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )

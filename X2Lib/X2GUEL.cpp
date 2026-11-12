@@ -267,6 +267,8 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 , m_fDashElapsedTime(0.f)
 , m_fAdvancedKnightMasteryMPValue(0.f)
 , m_fDashChargeTime(0.f)
+, m_usDignityOfGrandMasterLevel(0)	// char-elesis CH1k
+, m_fPunishEffectPowerRate(0.f)
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 , m_usMadnessLevel(0)	// char-elesis CH1h
@@ -2381,8 +2383,136 @@ CX2GUEL::~CX2GUEL(void)
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 			 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1k: helpers and constants of the skill-use functions ( June 32b84a50 / 32b73e60 / 32b80c60 )
+namespace _CONST_EL_CH1K_
+{
+	// June's pop-up line: font 3, white text with a black outline, centred
+	void PushInfoText( const int iStringID_ )
+	{
+		g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( iStringID_ ), D3DXCOLOR(1,1,1,1), D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+	}
+
+	// June 31fd0570: training game ( 0x12 ) or the photo zone ( 0x1a, June-only ); the photo zone has no March state
+	bool IsTrainingOrPhotozone()
+	{
+		return CX2Main::XS_TRAINING_GAME == g_pMain->GetNowStateID();
+	}
+
+	const float INJECTION_STIGMA_HP_COST_RATE_BLOOD_RUNAWAY	= 0.2f;	// June multiplies the HP cost by the double 0.2f
+}
+using namespace _CONST_EL_CH1K_;
+
+// char-elesis CH1k: June 32b73e60 ( user vslot 0x800, step 512 ): the MP, the finality stone and the cool time of a skill use
+void CX2GUEL::SpecialAttackCooldown( const int iSkillID_, const float fMpConsume_ )
+{
+	if ( false == IsMyUnit() )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( iSkillID_ ), true );
+	if ( NULL == GetUnit() || NULL == pSkillTemplet )
+		return;
+
+	CX2UserSkillTree& accessUserSkillTree = GetUnit()->AccessUnitData().m_UserSkillTree;
+
+	MarkSkillSlotUsed( m_iChosenSkillSlotIndex, false );
+	UpNowMp( -fMpConsume_ );
+
+	if ( CX2SkillTree::ST_HYPER_ACTIVE_SKILL == pSkillTemplet->m_eType && false == IsTrainingOrPhotozone() )
+	{
+		CX2Item* pItem = g_pData->GetMyUser()->GetSelectUnit()->GetInventory().GetItemByTID( CX2EnchantItem::ATI_HYPER_SKILL_STONE );
+		if ( NULL != pItem )
+			g_pX2Game->Handler_EGS_USE_FINALITY_SKILL_REQ( pItem->GetItemData().m_ItemUID );
+	}
+
+	int iSkillLevel = accessUserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true );
+	if ( iSkillLevel < 1 )
+		iSkillLevel = 1;
+
+	accessUserSkillTree.SetSkillCoolTimeLeft( pSkillTemplet->m_eID, GetActualCoolTime( pSkillTemplet, iSkillLevel ) );
+
+	// 608025 has no Enum entry ( a memo past March's sixteen ); June's memo test reads false
+	if ( CX2SkillTree::SI_SA_EL_UNLIMITED_BLADE == pSkillTemplet->m_eID && true == GetEqippedSkillMemo( static_cast<CX2SkillTree::SKILL_MEMO_ID>( 608025 ) )
+		&& false == HaveThisBuff( BTI_DEBUFF_UNLIMITED_BLADE_MEMO ) )
+	{
+		SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_UNLIMITED_BLADE_MEMO, 1, NULL, 0, false );
+		accessUserSkillTree.SetSkillCoolTimeLeft( pSkillTemplet->m_eID, 0.f );
+	}
+
+	GetUnit()->ApplySkillCoolTimeRateByBuff( pSkillTemplet->m_eID );
+	CX2RandomMissionManager::GetInstance()->OnSkillUse( pSkillTemplet->m_eID );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1k: June 337ad560 / 337ad590: the cut-ins of code event 0x8b3 ( GFx names without extension; the cut-in sets are CH5 )
+static const CX2GUUser::SkillCutIn s_SkillCutInSetEvent8b3[] =
+{
+	CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_CASH_21"),
+	CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_CASH_22"),
+};
+
+// char-elesis CH1k: June 32b70290 ( user vslot 0x828 ): the base test less the hyper wait ( future ) and the dash-jump power landing ( now )
+bool CX2GUEL::IsNotCommonMoveState()
+{
+	if ( false == CX2GUUser::IsNotCommonMoveState() )	// June 31fd7640
+		return false;
+
+	if ( ESI_SWORD_WAIT == m_FrameDataFuture.syncData.nowState )
+		return false;
+
+	return ESI_DASH_JUMP_POWER_LANDING != GetNowStateID();
+}
+
+// char-elesis CH1k: June 32057b80 @32057c4c-cb2: the reserved skill's state starts, so step 512 spends its MP and sets the cool time, and 0x764 refunds the memo share
+/*virtual*/ void CX2GUEL::ReservedSkillStart( const CX2SkillTree::SkillTemplet* pSkillTemplet_ )
+{
+	const int iNowStateID = GetNowStateID();
+	bool bSkillSlotState = false;	// June's state-data byte +0x11
+	for ( int i = 0; i < ARRAY_SIZE( _CONST_GUUSER_::aNormalSkillStateID ); ++i )
+	{
+		if ( _CONST_GUUSER_::aNormalSkillStateID[i] == iNowStateID || _CONST_GUUSER_::aHyperSkillStateID[i] == iNowStateID ||
+			_CONST_GUUSER_::aNormalSkillStateIDSlotB[i] == iNowStateID || _CONST_GUUSER_::aHyperSkillStateIDSlotB[i] == iNowStateID )
+			bSkillSlotState = true;
+	}
+
+	const int iSkillID = static_cast<int>( pSkillTemplet_->m_eID );
+	SpecialAttackCooldown( iSkillID, m_fReservedSkillMp );
+	SkillMemoMpRefund( iSkillID, bSkillSlotState, m_fReservedSkillMp );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 /*virtual*/ bool CX2GUEL::SpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ /*= CX2SkillTree::ASUT_GROUND */)
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b4ee20 ( user vslot 0x7f4 ): the lookup, then the use; a skill of use condition 3 / 5 gives the chosen values back
+	const float fSavedReservedMp = m_fReservedSkillMp;
+	const int iSavedSlotIndex = m_iChosenSkillSlotIndex;
+	const int iSavedSkillID = m_iChosenSkillID;
+
+	bool bUsed = false;
+	if ( true == CanUseSpecialAttack( eActiveSkillUseCondition_ ) && 0 != m_iChosenSkillID )
+	{
+		bUsed = true;
+		StateChangeSpecialAttack( static_cast<CX2SkillTree::SKILL_ID>( m_iChosenSkillID ) );
+		Send_SKILL_USE_REQ( static_cast<CX2SkillTree::SKILL_ID>( m_iChosenSkillID ) );
+	}
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( m_iChosenSkillID ), true );
+	if ( NULL != pSkillTemplet && ( CX2SkillTree::ASUT_ANYTIME == pSkillTemplet->m_eActiveSkillUseCondtion || CX2SkillTree::ASUT_ANYTIME_EXCEPT_AIR == pSkillTemplet->m_eActiveSkillUseCondtion ) )
+	{
+		m_fReservedSkillMp = fSavedReservedMp;
+		m_iChosenSkillID = iSavedSkillID;
+		m_iChosenSkillSlotIndex = iSavedSlotIndex;
+	}
+
+	if ( true == bUsed )
+	{
+		m_iNowSpecialAttack = m_iChosenSkillSlotIndex + 1;
+		return true;
+	}
+
+	m_iChosenSkillID = iSavedSkillID;
+	return false;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef SERV_IRUHADEV_JUNE_BUFF_QUICKSLOT_ITEM
 	/// June buff port Phase 7d: June EL 32b84a50 (the skill lookup its SpecialAttackEventProcess calls first) starts with
 	/// "if +0x8d78 > 0 return false": no skill while a quick-slot special item waits
@@ -2409,12 +2539,24 @@ CX2GUEL::~CX2GUEL(void)
 
 	return true;
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /** @function	: NoStateChangeActionFrameMove
 	@brief		: 스테이트의 변화가 없는 스킬 사용 시 수행되는 FrameMove
 */
 /*virtual*/ void CX2GUEL::NoStateChangeActionFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b818b0 ( user vslot 0x80c ): the base action first; Endurance Power also shows the skill names
+	UserNoStateChangeActionFrameMove();
+
+	if ( UAI_ENDURANCE_POWER == m_FrameDataNow.syncData.nowAction )
+	{
+		ProcessEndurancePowerSkill();
+		ShowSkillNameStateString( CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER );
+		ShowSkillNameStateString( CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER_UPGRADE );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	switch( m_FrameDataNow.syncData.nowAction )
 	{
 	case UAI_ENDURANCE_POWER:
@@ -2424,6 +2566,7 @@ CX2GUEL::~CX2GUEL(void)
 	default:
 		break;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
 /*virtual*/ float CX2GUEL::GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const
@@ -3576,6 +3719,19 @@ void CX2GUEL::SetSkillLevelStateData( const CX2SkillTree::SkillTemplet* pSkillTe
 }
 void CX2GUEL::ShowActiveSkillCutInAndLight( float fTimeToShow_, bool bOnlyLight_ /*= false*/ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b70af0 ( 32b70d10 ShowActiveSkillCutInAndLightByScript jumps here )
+	if ( true == m_pXSkinAnim->EventTimerOneshot( fTimeToShow_ ) && true == GetShowCutInAndChangeWorldColor() && true == GetShowActiveSkillShow() )
+	{
+		SkillCutIn cutIn = s_SkillCutInSet[m_iSkillCutInSetIndex].cutIn[0];
+
+		// not ported: the cut-in item override ( 31fd8a50, CX2CustomizeManager: backlog Stage 12 )
+		IF_EVENT_ENABLED( 0x8b3 )
+			cutIn = s_SkillCutInSetEvent8b3[ ( 0 == ( rand() & 1 ) ) ? 0 : 1 ];	// even rand() -> CASH_21
+
+		ActiveSkillShow( L"Dummy2_Lhand", cutIn.fileName.c_str(), cutIn.vSize, cutIn.vPosition, IsHyperState(), bOnlyLight_ );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
     if( m_pXSkinAnim->EventTimerOneshot( fTimeToShow_ ) )
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -3589,6 +3745,7 @@ void CX2GUEL::ShowActiveSkillCutInAndLight( float fTimeToShow_, bool bOnlyLight_
 				s_SkillCutInSet[m_iSkillCutInSetIndex].cutIn[0].vPosition, IsHyperState(), bOnlyLight_ );
 		}
 	}	
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /*virtual*/ void CX2GUEL::ShowActiveSkillCutInAndLightByScript( float fTimeToShow_, bool bOnlyLight_ )
 {
@@ -3596,6 +3753,118 @@ void CX2GUEL::ShowActiveSkillCutInAndLight( float fTimeToShow_, bool bOnlyLight_
 }
 bool CX2GUEL::CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition/* = CX2SkillTree::ASUT_GROUND*/ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b84a50 ( user vslot 0x7f8, step 510 ): chooses the skill of the pressed slot and checks that it can be used now
+	if ( true == IsQuickSlotSpecialItemWaiting() )
+		return false;
+
+	if ( NULL == GetUnit() )
+		return false;
+
+	CX2UserSkillTree& accessUserSkillTree = GetUnit()->AccessUnitData().m_UserSkillTree;
+	const CX2UserSkillTree::SkillSlotData* pSkillSlotData = NULL;
+	int iPressedSkillSlotIndex = -1;
+
+	if ( false == CommonSpecialAttackEventProcess( accessUserSkillTree, pSkillSlotData, iPressedSkillSlotIndex ) )
+		return false;
+
+	if ( NULL == pSkillSlotData )
+		return false;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( pSkillSlotData->m_eID, true );
+	if ( NULL == pSkillTemplet )
+		return false;
+
+	if ( pSkillTemplet->m_eID != pSkillSlotData->m_eID )
+	{
+		PushInfoText( 0x8bae );
+		return false;
+	}
+
+	m_iChosenSkillID = pSkillTemplet->m_eID;
+
+	int iSkillTempletLevel = accessUserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true );
+	if ( iSkillTempletLevel < 1 )
+		iSkillTempletLevel = 1;
+
+	// War Prelude is a ground skill until Dignity of Grand Master is learned
+	CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eSkillUseCondition = pSkillTemplet->m_eActiveSkillUseCondtion;
+	if ( m_usDignityOfGrandMasterLevel < 1 && ( CX2SkillTree::RNSI_SA_SGM_WAR_PRELUDE == pSkillTemplet->m_eID || CX2SkillTree::RNSI_SA_SGM_WAR_PRELUDE_UPGRADE == pSkillTemplet->m_eID ) )
+		eSkillUseCondition = CX2SkillTree::ASUT_GROUND;
+
+	if ( false == CheckSkillUseCondition( eActiveSkillUseCondition, eSkillUseCondition ) )
+		return false;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+	if ( false == CheckSummonSpecialAttack( pSkillTemplet->m_eID ) )	// June 3202daf0
+		return false;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+
+	if ( false == CheckSkillUsePVPOfficial( pSkillTemplet->m_eID ) )
+		return false;
+
+	if ( false == CheckSkillUseNotPve( pSkillTemplet->m_eID ) )
+		return false;
+
+	if ( false == CheckSkillUseNotDungeon( pSkillTemplet->m_eID ) )
+		return false;
+
+	if ( true == IsRidingKeySkillWaiting() )
+		return false;
+
+	if ( false == IsValideSkillRidingOn( pSkillTemplet->m_eID ) )
+		return false;
+
+	m_fChosenSkillMp = GetActualMPConsume( pSkillTemplet->m_eID, iSkillTempletLevel );
+	m_fMPConsume = m_fChosenSkillMp;	// stand-in: the March Rushing Sword states read it until CH2a
+
+	const float fCoolTimeLeft = pSkillSlotData->m_fCoolTimeLeft;
+
+#ifdef SERV_IRUHADEV_JUNE_DEV_UNLIMITED_SKILL
+	if ( false == IsDevUnlimitedSkillUse() )	// June vslot 0x82c answers false ( event code 10 )
+#endif SERV_IRUHADEV_JUNE_DEV_UNLIMITED_SKILL
+	{
+		if ( 0.f < fCoolTimeLeft )
+		{
+			PushInfoText( 226 );
+			return false;
+		}
+
+		if ( m_fReservedSkillMp + m_fChosenSkillMp > GetNowMp() )
+		{
+			PushInfoText( 2549 );
+			return false;
+		}
+
+		if ( CX2SkillTree::ST_HYPER_ACTIVE_SKILL == pSkillTemplet->m_eType && false == IsTrainingOrPhotozone() )
+		{
+			if ( g_pData->GetMyUser()->GetSelectUnit()->GetInventory().GetNumItemByTID( CX2EnchantItem::ATI_HYPER_SKILL_STONE ) <= 0
+				&& false == g_pData->GetMyUser()->GetSelectUnit()->IsInfinityElEssence() )
+			{
+				PushInfoText( 26119 );
+				return false;
+			}
+		}
+	}
+
+	// Injection Stigma costs HP: half the physical attack ( a fifth of that under Blood Runaway ), and the HP must stay above it
+	if ( true == CX2UISkillTreeNew::IsSameOrUpgradeSkill( pSkillTemplet->m_eID, CX2SkillTree::RNSI_A_SDK_INJECTION_STIGMA ) )
+	{
+		float fHpCost = GetLearnedSkillAbilityValue( CX2SkillTree::SA_ATK_PHYSIC_REL, pSkillTemplet->m_eID ) * GetPhysicAttackValue();
+		if ( true == HaveThisBuff( BTI_BUFF_BLOOD_RUNAWAY_PASSIVE ) )
+			fHpCost *= INJECTION_STIGMA_HP_COST_RATE_BLOOD_RUNAWAY;
+
+		if ( GetNowHp() <= fHpCost )
+		{
+			PushInfoText( 2627 );
+			return false;
+		}
+	}
+
+	m_iChosenSkillID = pSkillTemplet->m_eID;
+	m_iChosenSkillSlotIndex = iPressedSkillSlotIndex;
+	return true;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	KTDXPROFILE();
 
 	if( NULL != GetUnit() )
@@ -3731,8 +4000,36 @@ bool CX2GUEL::CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eAct
 	}
 
 	return false;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1k: June 32b52590 ( user vslot 0x7fc, step 511 ): the use of the skill the lookup chose; June's second argument is not read
+void CX2GUEL::StateChangeSpecialAttack( const CX2SkillTree::SKILL_ID eSkillID_ )
+{
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( eSkillID_, true );
+	if ( NULL == pSkillTemplet )	// June reads the templet without a test
+		return;
+
+	if ( true == SpecialAttackNoStageChange( pSkillTemplet ) )
+	{
+		SpecialAttackCooldown( pSkillTemplet->m_eID, m_fChosenSkillMp );
+		SkillMemoMpRefund( eSkillID_, true, m_fChosenSkillMp );
+		m_fChosenSkillMp = 0.0f;
+	}
+	else
+	{
+		ReserveSkillUse( pSkillTemplet->m_eID );
+
+		if ( CX2SkillTree::RNSI_SA_EL_SONIC_ASSAULT_STING_UPGRADE == pSkillTemplet->m_eID )
+			StateChange( ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_READY, false );
+		else
+			StateChangeBySkillSlot( m_iChosenSkillSlotIndex );
+	}
+
+	m_bSpecialAttackEventProcessedAtThisFrame = true;
+}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_ )
 {
 	if( NULL != GetUnit() )
@@ -3804,6 +4101,7 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 	}
 
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef FIX_NO_STATE_SKILL_BUG
 /** @function : IsValideSkillRidingOn
 	@brief : 탈 것 탑승중에 사용 할 수 있는 스킬인지 체크.
@@ -3811,6 +4109,21 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 */
 /*virtual*/ bool CX2GUEL::IsValideSkillRidingOn( CX2SkillTree::SKILL_ID eSkill_ID_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b4ef10 ( user vslot 0x818 ): no Endurance Power ( March's id and June's two ) while riding
+	if ( true == GetRidingOn() )
+	{
+		switch( eSkill_ID_ )
+		{
+		case CX2SkillTree::SI_A_EL_ENDURANCE_POWER:
+		case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER:
+		case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER_UPGRADE:
+			return false;
+		}
+	}
+
+	return true;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if( true == GetRidingOn() )
 	{
 		switch( eSkill_ID_ ) 
@@ -3828,6 +4141,7 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 	{
 		return true;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 #endif // FIX_NO_STATE_SKILL_BUG
 /*virtual*/ void CX2GUEL::ReInit( bool bTeamPos /*= false*/, int iStartPosIndex /*= -1*/ )
@@ -4199,6 +4513,20 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 	if( NULL == pSkillTemplet_ )
 		return false;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b72550 ( user vslot 0x810 ): Endurance Power ( March's id and June's two ) acts without a state change
+	switch( pSkillTemplet_->m_eID )
+	{
+	case CX2SkillTree::SI_A_EL_ENDURANCE_POWER:
+	case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER:
+	case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER_UPGRADE:
+		m_FrameDataFuture.syncData.nowAction = UAI_ENDURANCE_POWER;
+		return true;
+
+	default:
+		return false;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	switch( pSkillTemplet_->m_eID )
 	{
 	case CX2SkillTree::SI_A_EL_ENDURANCE_POWER:
@@ -4210,6 +4538,7 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 		break;
 	}
 	return true;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /*virtual*/ void CX2GUEL::COMMON_BUFF_FrameMove()
 {
@@ -8930,16 +9259,60 @@ void CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_EventProcess()
 	{
 		StateChange( GetWaitStateID() );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b59aa0 ( the walk / back-walk / dash / ZX cancels also test the line )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+		WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+		BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+		DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+		ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	CommonEventProcess();
 }
 void CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_StateStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b80840 ( Endurance Power and its memo state ): the effect set and the Punish buff factor are new
+	m_fGroggyTime = 0.f;
+	m_PhysicParam.nowSpeed.x = 0.0f;
+	m_PhysicParam.nowSpeed.y = 0.0f;
+
+	CureExtraDamage( CX2DamageManager::EDT_ENCHANT_SHOCK );
+	CureExtraDamage( CX2DamageManager::EDT_FROZEN );
+	CureExtraDamage( CX2DamageManager::EDT_ENTANGLE );
+	CureExtraDamage( CX2DamageManager::EDT_DRYAD );
+	CureExtraDamage( CX2DamageManager::EDT_STUN );
+	CureExtraDamage( CX2DamageManager::EDT_Y_PRESSED );
+	CureExtraDamage( CX2DamageManager::EDT_PANIC );
+
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_STUN );
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_PANIC );
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_COLD );
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_CONFUSION );
+	EraseBuffTempletFromGameUnit( BTI_BUFF_ENDURANCE_POWER );
+
+	if ( 0.f < m_fPunishEffectPowerRate )
+	{
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_EL_ENDURANCE_POWER_PUNISH", this, NULL, IsHyperState(), m_fPunishEffectPowerRate );
+
+		const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER, false, 0, true );
+		const bool bPvpOrPve = ( NULL != g_pX2Game && true == g_pX2Game->GetIsNowPVPCorrectionGame() );	// June 322cc1a0: PVP or PVE
+		SetBuffFactorToGameUnitByBuffFactorID( ( true == bPvpOrPve ) ? BFI_BUFF_PUNISH_PVP : BFI_BUFF_PUNISH, iSkillLevel, NULL, 0, false );
+	}
+	else
+	{
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_EL_ENDURANCE_POWER", this );
+	}
+
+	CommonStateStart();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_fGroggyTime = 0.f;
 	m_PhysicParam.nowSpeed.x = 0.0f;
 	m_PhysicParam.nowSpeed.y = 0.0f;
@@ -8965,6 +9338,7 @@ void CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_StateStart()
 //}}
 
 	CommonStateStart();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /** @function : DoStateEndurancePowerRage
 	@brief : 극기, 섬멸에 의한 슈아 팅 스테이트로 전환			
@@ -8987,8 +9361,48 @@ void CX2GUEL::DoStateEndurancePowerRage( bool bIsWayOfSword_ )
 			StateChange( ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE, false );
 	}
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1k: June 32b75c90 ( script id 207, the state DetonationStateChange enters; CH1m registers it ): the same reset as 205 / 206 and the plain effect set
+void CX2GUEL::ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION_StateStart()
+{
+	m_fGroggyTime = 0.f;
+	m_PhysicParam.nowSpeed.x = 0.0f;
+	m_PhysicParam.nowSpeed.y = 0.0f;
+
+	CureExtraDamage( CX2DamageManager::EDT_ENCHANT_SHOCK );
+	CureExtraDamage( CX2DamageManager::EDT_FROZEN );
+	CureExtraDamage( CX2DamageManager::EDT_ENTANGLE );
+	CureExtraDamage( CX2DamageManager::EDT_DRYAD );
+	CureExtraDamage( CX2DamageManager::EDT_STUN );
+	CureExtraDamage( CX2DamageManager::EDT_Y_PRESSED );
+	CureExtraDamage( CX2DamageManager::EDT_PANIC );
+
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_STUN );
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_PANIC );
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_COLD );
+	EraseBuffTempletFromGameUnit( BTI_DEBUFF_CONFUSION );
+	EraseBuffTempletFromGameUnit( BTI_BUFF_ENDURANCE_POWER );
+
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_EL_ENDURANCE_POWER", this );
+
+	CommonStateStart();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 void CX2GUEL::ProcessEndurancePowerSkill()
 {	// 극기 - 강(强)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1k: June 32b80c60: the buff factor by id and level ( the PvP-or-PvE variant in a PvP or PvE game )
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER, true );
+	if ( NULL == pSkillTemplet )
+		return;
+
+	const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true );
+	const bool bPvpOrPve = ( NULL != g_pX2Game && true == g_pX2Game->GetIsNowPVPCorrectionGame() );	// June 322cc1a0: PVP or PVE
+	SetBuffFactorToGameUnitByBuffFactorID( ( true == bPvpOrPve ) ? BFI_BUFF_ENDURANCE_POWER_PVP : BFI_BUFF_ENDURANCE_POWER, iSkillLevel, NULL, 0, false );
+
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_ELSWORD_ENDURANCE", this );
+	PlaySound( L"Elsword_Endurance.ogg" );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::SI_A_EL_ENDURANCE_POWER );
 	if( NULL != pSkillTemplet )
 	{
@@ -8999,6 +9413,7 @@ void CX2GUEL::ProcessEndurancePowerSkill()
 		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_ELSWORD_ENDURANCE", this ); 
 		PlaySound( L"Elsword_Endurance.ogg" );	
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 스킬 스테이트 함수 - 1-1차 세이버 나이트

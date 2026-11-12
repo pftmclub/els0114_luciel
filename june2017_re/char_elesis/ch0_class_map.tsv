@@ -162,7 +162,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b52540	state-fn	ESI_SA_SBH_SOUL_IGNITION.Init	-	new	ESI_SA_SBH_SOUL_IGNITION_Init	CH3b	1 states	n
 32b52550	state-fn	ESI_SA_SCA_BLOOD_FALLS.Init	-	new	ESI_SA_SCA_BLOOD_FALLS_Init	CH3c	1 states	n
 32b52560	override 0x40	Init	X2GUEl.h:259 virtual void Init( bool bUseTeamPos_, int iStartPosIndex_ );	inside	-	CH1h	base 3204ea20	n
-32b52590	override 0x7fc	SpecialAttackEventProcess part: skill use (slot 511)	- (no virtual of that name in X2GUEl.h / X2GUUser.h / X2GameUnit.h)	inside	-	CH1k	base 31aa1d30	y
+32b52590	override 0x7fc	SpecialAttackEventProcess part: skill use (slot 511)	X2GUEL.cpp CX2GUEL::StateChangeSpecialAttack	inside	-	CH1k	CH1k: inside under _LIVE (signature takes the skill id); June 0x7fc: no-stage-change cooldown + memo refund, else reserve + state by slot (Sonic Assault Sting upgrade enters ESI 318)	y
 32b52650	override 0x90	Win	X2GUEl.h:808 virtual void Win();	inside	-	CH1h	base 32014660	y
 32b52690	override 0x98	Draw	X2GUEl.h:810 virtual void Draw();	inside	-	CH1h	base 31ff17c0	y
 32b526d0	helper	reached only through callers with no phased caller 32b6de46	-	new	?	CH1o	phase unsettled: read it; name: called by 32b6de46(?)	y
@@ -413,7 +413,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b705b0	state-fn	ESI_SI_A_EL_RUSHING_SWORD.Start ESI_SI_A_EL_RUSHING_SWORD_2nd.Start ESI_SI_A_EL_RUSHING_SWORD_3rd.Start	inside X2GUEl.cpp:1218 CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_StateStart	inside	-	CH2b2	CH0 split: CH2b = Saber Knight special actives, CH2b2 = actives 28202 / 28203 / 28204	y
 32b706a0	helper	called by 32b75e80	-	new	?	CH2b	name: called by 32b75e80(helper)	y
 32b70990	helper	-	X2GUEl.h:255 virtual ~CX2GUEL	inside	-	CH1h	dtor body: CX2GUEL::~CX2GUEL (vtable store 32b709ba; the scalar deleting dtor 32b90520 calls it)	y
-32b70af0	helper	called by 32b70d10	-	new	?	CH1k	name: called by 32b70d10(ShowActiveSkillCutInAndLight)	y
+32b70af0	helper	called by 32b70d10	X2GUEL.cpp CX2GUEL::ShowActiveSkillCutInAndLight	inside	-	CH1k	CH1k: inside under _LIVE ( EventTimerOneshot gate, event 0x8b3 cut-ins ); the CH0 name was left open	y
 32b70d10	override 0x834	ShowActiveSkillCutInAndLightByScript	X2GUEl.h:299 virtual void ShowActiveSkillCutInAndLightByScript( float fTimeToShow_, bool bOnlyLight_ );	inside	-	CH1k	base 33093ad0	n
 32b70d30	state-fn	ESI_SI_A_EL_LEAP_CRASH_JUMP.StartFuture	-	new	ESI_SI_A_EL_LEAP_CRASH_JUMP_StateStartFuture	CH2b2	CH0 split: CH2b = Saber Knight special actives, CH2b2 = actives 28202 / 28203 / 28204	y
 32b70db0	state-fn	ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE.FrameMove	-	new	ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE_FrameMove	CH2a	1 states	y
@@ -439,7 +439,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b73bf0	state-fn	ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE.StartFuture	-	new	ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_StateStartFuture	CH1g	1 states	y
 32b73c90	state-fn	ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE.EventProcess	-	new	ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_EventProcess	CH1g	1 states	n
 32b73e10	override 0x4d4	DetonationStateChange	X2GUEl.h:276 virtual void DetonationStateChange( CX2DamageManager::DamageData* pDamageData );	inside	-	CH1h	base 31ff0eb0	y
-32b73e60	override 0x800	SpecialAttackEventProcess part: per-class skill use / cooldown (slot 512)	- (no virtual of that name in X2GUEl.h / X2GUUser.h / X2GameUnit.h)	inside	-	CH1k	base 31aa1d30	y
+32b73e60	override 0x800	SpecialAttackEventProcess part: per-class skill use / cooldown (slot 512)	-	new	SpecialAttackCooldown	CH1k	CH1k: new under _CORE ( MP, finality stone, cool time, random mission ); name by Ara	y
 32b73ff0	override 0x60	DamageReact	X2GUEl.h:806 virtual void DamageReact( OUT CX2DamageManager::DamageData* pDamageData_ );	inside	-	CH1h	base 320462a0	y
 32b74300	override 0xc4	HyperModeBuffEffectStart	X2GUEl.h:828 virtual void HyperModeBuffEffectStart();	inside	-	CH1h	base 31fd5cb0	n
 32b74500	override 0x250	UnSetSpecificValueByBuffTempletID	X2GUEl.h:831 virtual void UnSetSpecificValueByBuffTempletID	inside	-	CH3b0	UnSetSpecificValueByBuffTempletID (vslot 0x250)	y
@@ -453,7 +453,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b75210	state-fn	ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING.FrameMove	-	new	ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_FrameMove	CH2b2	CH0 split: CH2b = Saber Knight special actives, CH2b2 = actives 28202 / 28203 / 28204	y
 32b75580	state-fn	ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_CHARGE.FrameMove	-	new	ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_CHARGE_FrameMove	CH2a	1 states	y
 32b75760	state-fn	ESI_SI_SA_EL_WILD_SHOCK.FrameMove	-	new	ESI_SI_SA_EL_WILD_SHOCK_FrameMove	CH2a	1 states	y
-32b75c90	state-fn	ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE.Start	inside X2GUEl.cpp:2720 CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_StateStart	inside	-	CH1k	CH0 Opus: ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE (ids 205 / 207) / _MEMO (206): entered from NoStateChangeActionFrameMove 32b818b0 -> 32b80c60 (skills 28201 / 28218 have no switch state) and from DetonationStateChange (207)	y
+32b75c90	state-fn	ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE.Start	-	new	ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION_StateStart	CH1k	CH1k: new under _CORE ( script id 207 Start ); Init / EventProcess = the 205 pair	y
 32b75e80	helper	called by 32b75f70 32b762e0 32b76300	-	new	?	CH2b	name: called by 32b75f70(ESI_SI_SA_SSK_EXTINCTION_CHA) 32b762e0(ESI_SI_SA_SSK_EXTINCTION_DEG) 32b76300(ESI_SI_SA_SSK_EXTINCTION_DEG)	y
 32b75f70	state-fn	ESI_SI_SA_SSK_EXTINCTION_CHARGE.FrameMoveFuture	inside X2GUEl.cpp:767 CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_CHARGE_FrameMoveFuture	inside	-	CH2b	1 states	y
 32b75f90	state-fn	ESI_SI_SA_SSK_EXTINCTION_ATTACK.FrameMove	inside X2GUEl.cpp:775 CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_ATTACK_FrameMove	inside	-	CH2b	1 states	y
@@ -523,7 +523,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b802a0	state-fn	ESI_DASH_END.EventProcess	inside X2GUEl.cpp:2093 CX2GUEL::DashEndEventProcess	inside	-	CH1a	1 states	n
 32b805d0	state-fn	ESI_DASH_JUMP_LANDING.EventProcess	inside X2GUEl.cpp:2111 CX2GUEL::DashJumpLandingEventProcess	inside	-	CH1a	1 states	n
 32b80840	state-fn	ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE.Start ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_MEMO.Start	inside X2GUEl.cpp:2720 CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_StateStart ; inside X2GUEl.cpp:2728 CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_StateStart	inside	-	CH1k	CH0 Opus: ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE (ids 205 / 207) / _MEMO (206): entered from NoStateChangeActionFrameMove 32b818b0 -> 32b80c60 (skills 28201 / 28218 have no switch state) and from DetonationStateChange (207)	y
-32b80c60	helper	called by 32b818b0	-	new	?	CH1k	name: called by 32b818b0(NoStateChangeActionFrameMove)	y
+32b80c60	helper	called by 32b818b0	X2GUEL.cpp CX2GUEL::ProcessEndurancePowerSkill	inside	-	CH1k	CH1k: inside under _LIVE ( buff factor by id and level, PvP-or-PvE variant ); the CH0 name was left open	y
 32b80e90	state-fn	ESI_SI_SA_SBH_BLAZING_DANCE_1ST.StartFuture ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK.StartFuture ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_FRONT.StartFuture	inside X2GUEl.cpp:934 CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_1ST_StartFuture	inside	-	CH3b	3 states	y
 32b80ee0	state-fn	ESI_SI_SA_SBH_BLAZING_DANCE_FINISH.StartFuture	inside X2GUEl.cpp:962 CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_StartFuture	inside	-	CH3b	1 states	y
 32b80f20	override 0x2b8	SetDamageExceptionProcess	X2GUEl.h:912 virtual void SetDamageExceptionProcess	inside	-	CH4b	SetDamageExceptionProcess (vslot 0x2b8)	n
@@ -537,7 +537,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b81900	override 0x44	ReInit	X2GUEl.h:805 virtual void ReInit( bool bTeamPos = false, int iStartPosIndex = -1 );	inside	-	CH1h	base 32022380	n
 32b81be0	registrar	InitState part 1 (registrations + the hyper row id 23); called by the wrapper 32b87a60	X2GUEl.h:261 virtual void InitState();	inside	-	CH1m	InitState part 1 (registrations incl. the hyper row id 23); called by the wrapper 32b87a60	y
 32b84390	state-fn	SI_A_SCA_SHADOW_EDGE.FrameMove	-	new	SI_A_SCA_SHADOW_EDGE_FrameMove	CH3c	1 states	y
-32b84a50	override 0x7f8	SpecialAttackEventProcess part: skill lookup (slot 510)	- (no virtual of that name in X2GUEl.h / X2GUUser.h / X2GameUnit.h)	inside	-	CH1k	base 31aa1d30	y
+32b84a50	override 0x7f8	SpecialAttackEventProcess part: skill lookup (slot 510)	X2GUEL.cpp CX2GUEL::CanUseSpecialAttack	inside	-	CH1k	CH1k: inside under _LIVE; CheckSummonSpecialAttack under _SUMMON; Injection Stigma HP check; War Prelude ground-only until Dignity of Grand Master	y
 32b85470	state-fn	ESI_SI_A_EL_RUSHING_SWORD.EventProcess ESI_SI_A_EL_RUSHING_SWORD_2nd.EventProcess ESI_SI_A_EL_RUSHING_SWORD_3rd.EventProcess	inside X2GUEl.cpp:1221 CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_EventProcess ; inside X2GUEl.cpp:1237 CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_2nd_EventProcess ; inside X2GUEl.cpp:1246 CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_3rd_EventProcess	inside	-	CH2b2	CH0 split: CH2b = Saber Knight special actives, CH2b2 = actives 28202 / 28203 / 28204	y
 32b85aa0	state-fn	ESI_A_SGM_PROVOKE.EventProcess ESI_A_SGM_PROVOKE_REVENGE.EventProcess	inside X2GUEl.cpp:1290 CX2GUEL::ESI_A_SGM_PROVOKE_EventProcess ; inside X2GUEl.cpp:1308 CX2GUEL::ESI_A_SGM_PROVOKE_REVENGE_EventProcess	inside	-	CH3a2	CH0 split: CH3a = Grand Master special actives, CH3a2 = actives 28205 / 28206 / 28222	y
 32b86080	state-fn	ESI_DASH_COMBO_SGM_XX_ATTACK.EventProcess	-	new	ESI_DASH_COMBO_SGM_XX_ATTACK_EventProcess	CH1e	1 states	y

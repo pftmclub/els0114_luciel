@@ -12716,3 +12716,27 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE needs D2's part-rate member, June's collision helpers, the socket parity hook, the effect-tail block and the given-damage tally
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
+// Description: June character port ( Elesis ) Phase CH1k - her skill lookup's summon-limit check ( CheckSummonSpecialAttack, June 32b84a50 @32b84d19 ):
+//              waits for the summon list CH3b0 registers. Stays commented out until CH3b0; only with _LIVE.
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_SUMMON ).
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
+// Description: June character port ( Elesis ) Phase CH1k - guards only ( no new flag besides _SUMMON ): the skill-use functions call the shared skill-use helpers ( m_iChosenSkillID, ReserveSkillUse, UserNoStateChangeActionFrameMove ), the cool time and random mission hooks, the buff factor by id ( five arguments ), the learned ability value, the dev gate, the riding-key wait, the skill-name string, June's skill templet lookup and enum names
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE ) && ( !defined( SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS ) || !defined( SERV_IRUHADEV_JUNE_BUFF_NEW_SKILL ) || !defined( SERV_IRUHADEV_JUNE_RANDOM_MISSION ) || !defined( SERV_IRUHADEV_JUNE_SKILL_TEMPLET ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE needs SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS, SERV_IRUHADEV_JUNE_BUFF_NEW_SKILL, SERV_IRUHADEV_JUNE_RANDOM_MISSION, SERV_IRUHADEV_JUNE_SKILL_TEMPLET and SERV_IRUHADEV_JUNE_ENUM_NAMES
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ) && ( !defined( SERV_IRUHADEV_JUNE_DEV_UNLIMITED_SKILL ) || !defined( SERV_IRUHADEV_JUNE_BUFF_RIDING_KEY_WAIT ) || !defined( SERV_IRUHADEV_JUNE_SKILL_STATE_STRING_TIME ) || !defined( SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ) || !defined( SERV_IRUHADEV_JUNE_USER_SKILL_LEVEL_HELPERS ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ARME_CORE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_DEV_UNLIMITED_SKILL, SERV_IRUHADEV_JUNE_BUFF_RIDING_KEY_WAIT, SERV_IRUHADEV_JUNE_SKILL_STATE_STRING_TIME, SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF, SERV_IRUHADEV_JUNE_USER_SKILL_LEVEL_HELPERS and SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+//////////////////////////////////////////////////////////////////////////

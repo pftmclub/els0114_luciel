@@ -879,6 +879,38 @@ All 24 class-map rows of phase CH1h are accounted for: **8 written, 14 = March (
 
 **Nothing to play-test.** Review: none of its own, the CH1k review covers CH1h-CH1k. Next: `/x2-phase char-elesis CH1k` ( Sonnet 5.5 high ).
 
+### CH1k - Done (2026-11-12)
+
+**All 15 class-map rows of phase CH1k plus `ReservedSkillStart` accounted for: 11 written `inside` ( `_LIVE` ), 3 `new` ( 2 `_CORE`, `IsNotCommonMoveState` `_LIVE` ), 2 = March ( `32b70d10`, `32b4fd00` ), 1 `_LIVE` hook ( `ReservedSkillStart` ).** `_LIVE` stays `//#define`. New flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON` ( `//#define`, needs `_LIVE`: the `CheckSummonSpecialAttack` call of her lookup, as the kickoff asks ). funcmap rows `Char Elesis CH1k` ( 16 ); `JUNE_BUGS` 636 / 637; checklist rows L217 / L265 / L266 / L874 / L910 appended `(Elesis: CH1k)`; 6 CH0 map rows corrected ( see below ).
+
+| June | Function | Result |
+|---|---|---|
+| `32b4ee20` | SpecialAttackEventProcess ( 0x7f4 ) | **inside.** Lookup ( 0x7f8 ), use ( 0x7fc ), `Send_SKILL_USE_REQ`; use condition 3 / 5 ( anytime ) gives `m_iChosenSkillID`, slot and `m_fReservedSkillMp` back; `m_iNowSpecialAttack` = slot + 1; a failed lookup restores only the skill id |
+| `32b84a50` | CanUseSpecialAttack ( 0x7f8 ) | **inside.** Quick-slot wait, unit, slot, templet-mismatch text `0x8bae`, level, **War Prelude ( 28009 / 28047 ) is a ground skill while `+0x9796` ( Dignity of Grand Master 28416 level, `m_usDignityOfGrandMasterLevel` ) is 0**, use condition, summon ( `_SUMMON` ), PVP-official, not-PvE, not-dungeon, riding-key wait, `IsValideSkillRidingOn`, MP = `GetActualMPConsume`, dev gate around cool time ( 226 ) / MP ( reserved + chosen, 2549 ) / hyper stone ( 26119 ); then **Injection Stigma 28213: HP must stay above ability `SA_ATK_PHYSIC_REL` x physical attack ( x 0.2 with buff 666 ), text 2627**, outside the dev gate. No chain block, no FP, `ShownSkillCoolTime` is not called ( unlike Ara ) |
+| `32b52590` | StateChangeSpecialAttack ( 0x7fc ) | **inside.** Signature takes the skill id under `_LIVE`. No-stage-change: cooldown ( 0x800 ) + `SkillMemoMpRefund` + chosen MP = 0; else reserve ( 0x804 ), Sonic Assault Sting upgrade ( 28029 ) enters `ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_READY` ( 318 ), else `StateChangeBySkillSlot`; processed flag |
+| `32b73e60` | SpecialAttackCooldown ( 0x800 ) | **new `_CORE`.** Templet / unit tests first, slot used, `UpNowMp`, finality stone ( `IsTrainingOrPhotozone`, no Infinity branch ), cool time, the Unlimited Blade memo block ( dead, JUNE_BUGS 637 ), `ApplySkillCoolTimeRateByBuff`, `OnSkillUse` |
+| `32057b80` | ReservedSkillStart | **`_LIVE`.** As Ara's; `X2GUUser.h` / `.cpp` hook chain widened with `ELESIS_LIVE` ( 7 `#ifndef`s ) |
+| `32b72550` `32b4ef10` | SpecialAttackNoStageChange, IsValideSkillRidingOn | **inside.** Endurance Power ids 8207 ( March ) / 28201 / 28218 |
+| `32b70290` | IsNotCommonMoveState ( 0x828 ) | **new `_LIVE`.** Base test, less `ESI_SWORD_WAIT` ( future ) and `ESI_DASH_JUMP_POWER_LANDING` ( now ) |
+| `32b70d10` `32b70af0` | ShowActiveSkillCutInAndLightByScript, ...AndLight | `32b70d10` = March ( jumps with the same arguments ); `32b70af0` **inside** March's `ShowActiveSkillCutInAndLight`: `EventTimerOneshot` gate ( +0x24c is `m_fAnimOneshotTimer` ), event 0x8b3 cut-ins `HQ_CutIn_Elesis_CASH_21` ( even `rand()` ) / `_22` ( ctor order at `333a82f0` / `333a8393` ); cut-in item override `31fd8a50` not ported ( Stage 12 ) |
+| `32b818b0` `32b80c60` | NoStateChangeActionFrameMove ( 0x80c ), ProcessEndurancePowerSkill | **inside.** Base `32008e40` first; Endurance Power action: BFI 232 / 423 ( PvP or PvE, `GetIsNowPVPCorrectionGame` ) at the equipped templet's level ( 7ai arguments ), effect set, sound, then the name strings of 28201 and 28218 |
+| `32b80840` `32b75c90` `32b59aa0` `32b4fd00` | Endurance Power states ( 205 / 206 / 207 ) | `32b80840` **inside** ( Start of 205 / 206: March's reset, then `+0x9754` > 0 plays `EffectSet_EL_ENDURANCE_POWER_PUNISH` with it as power rate and sets BFI 479 / 480, else `EffectSet_EL_ENDURANCE_POWER` ); `32b75c90` **new `_CORE`** `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION_StateStart` ( id 207: reset + plain effect set ); `32b59aa0` **inside** ( the walk / back-walk / dash / ZX cancels carry the line test, `_ON_LINE_` macros ); `32b4fd00` = March |
+
+**Corrections to CH0's map.** `32b52590` / `32b73e60` / `32b84a50` / `32b70af0` / `32b80c60` / `32b75c90` rows now name their March pair or plain name ( `ch0_class_map.tsv` ).
+
+**Names / members.** `X2SkillTree.h` ( `JUNE_ENUM_NAMES` ): `RNSI_SA_EL_SONIC_ASSAULT_STING_UPGRADE` 28029, `RNSI_SA_SGM_WAR_PRELUDE_UPGRADE` 28047, `RNSI_A_SDK_INJECTION_STIGMA` 28213, `RNSI_A_EL_ENDURANCE_POWER_UPGRADE` 28218. `X2BuffFactor.h`: BTI 393 / 666, BFI 232 / 420 / 423 / 479 / 480 ( June names ). `X2GUEl.h` ( `_CORE` ): `m_usDignityOfGrandMasterLevel` ( +0x9796 ), `m_fPunishEffectPowerRate` ( +0x9754 ), ctor 0; both written by CH4a ( `InitPassiveSkillState` @32b88a3c / the 28413 block ). `_CONST_EL_CH1K_`: `PushInfoText`, `IsTrainingOrPhotozone`, the 0.2 rate. **Stand-in:** `m_fMPConsume = m_fChosenSkillMp` in the lookup, because March's Rushing Sword states read it until CH2a. State ids `ESI_SWORD_WAIT` / `ESI_DASH_JUMP_POWER_LANDING` compare by name ( script ids 187 / 162 ).
+
+**Routed.** CH1p: the pressed-index decode ( her lookup has none; `CommonSpecialAttackEventProcess` hands March's index ). CH4a: the writers of `+0x9794` / `+0x9796` ( `32b88a30` / `32b88a3c` ) and `+0x9754`. CH2a: Rushing Sword's states read `m_fMPConsume` ( drop the stand-in ). CH1m: register state 207 ( Init / EventProcess = the 205 pair ).
+
+**Gates.**
+- `flagcheck JUNE_CHAR_ELESIS_CORE --with _LIVE _SUMMON JUNE_ENUM_NAMES --worktree --files X2GUEL.cpp X2GUEl.h X2SkillTree.h X2BuffFactor.h`: `.cpp` PASS +415, `.h` PASS +14, the two enum headers OTHER ( enum flag ); `0 deleted line(s), 0 non-ASCII inserted, 0 EOL-mismatched, 0 #else/#endif without the flag token, 0 encoding change(s)`, `RESULT: PASS`. `X2GUUser.cpp` / `.h` ( `_LIVE`, `--files` ): PASS +17 / +17 ( `RESULT: FAIL` only for the commented-out `#define` ). `JUNE_ENUM_NAMES` on `X2SkillTree.h` / `X2BuffFactor.h`: 2 PASS~, `RESULT: PASS`. `Always.h`: +24 lines ( `_SUMMON` block, guards ), a pure appended block.
+- One-file `/c /Zs /EHsc` probes ( `census.cl_cmd`, no PCH ): `X2GUEL.cpp` 0 errors with `_LIVE` off, with `_LIVE`, and with `_LIVE + _WOS + _BLOOD + _PASSIVE + _SUMMON`; `X2GUUser.cpp` 0 errors off and with `_LIVE`. `cl /P` off / `_LIVE` / `_LIVE + _SUMMON`: `s_SkillCutInSetEvent8b3` 0 / 2 / 2, `CX2GUEL::IsNotCommonMoveState` 0 / 1 / 1, `CheckSummonSpecialAttack` 2 / 1 / 2, `ReservedSkillStart` ( `X2GUUser.cpp` ) 9 / 10.
+- `junediverge.py --check` ( the four class / user files ): `allow-listed: 7`, `RESULT: PASS` ( `X2GUEL.cpp` / `.h` alone: `allow-listed: 0` ). `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `0 A/B row(s)`.
+- `bytes>=0x80`: `X2GUEL.cpp` 13,134 before / after, `X2GUEl.h` 5,494, `X2GUUser.*` unchanged; pure insertions.
+- Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line. No `_DEBUG` define; every new block carries `// char-elesis CH1k`.
+
+**Nothing to play-test.** Next: `/x2-phase char-elesis CH1k review` ( Opus 5.5 high, covers CH1h-CH1k ), then CH1m.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

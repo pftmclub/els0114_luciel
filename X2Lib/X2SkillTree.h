@@ -2616,6 +2616,15 @@ public:
 		RNSI_A_SDK_SHADE_SCRATCH                              = 28214,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-12 // char-elesis CH1k
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names Elesis's skill-use functions spell ( values from June's Enum.lua )
+	RNSI_SA_EL_SONIC_ASSAULT_STING_UPGRADE                = 28029,
+	RNSI_SA_SGM_WAR_PRELUDE_UPGRADE                       = 28047,
+	RNSI_A_SDK_INJECTION_STIGMA                           = 28213,
+	RNSI_A_EL_ENDURANCE_POWER_UPGRADE                     = 28218,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )
