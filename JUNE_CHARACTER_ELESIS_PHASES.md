@@ -991,6 +991,8 @@ registers them too; Ara's 600 ); 639 `ESI_DASH_JUMP_COMBO_SSK_ZZX` ( 321 ) takes
 - `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h KTDXLIB/Always.h`: `allow-listed: 0`, `RESULT: PASS` ( no `CX2GUEL::ReInit` allow row needed ).
   `enumscan --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`.
 - Full build skipped: no play-test.
+- After the commit ( `65d53f82` ): `flagcheck JUNE_CHAR_ELESIS_LIVE --range 65d53f82^..65d53f82 --files X2Lib/X2GUEL.cpp`: `files: 1 PASS`, same zeros and the
+  same 424 EOL lines, `RESULT: FAIL` only for the `//#define`. `Always.h` was committed as its own 9-line hunk ( a peer's june-stat-calc D4a lines stay unstaged ).
 
 **Nothing to play-test** ( `_LIVE` is off ). Next: `/x2-phase char-elesis CH1m review` ( Opus 5.5 high ).
 
