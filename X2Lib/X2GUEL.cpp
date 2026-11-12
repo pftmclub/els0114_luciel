@@ -1772,6 +1772,229 @@ CX2GUEL::~CX2GUEL(void)
 
 /*virtual*/ void CX2GUEL::SetEquippedSkillLevel( const CX2SkillTree::SKILL_ID eSkillID_, const bool bChangeAll_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1i: June 32b4e790, 22 blocks in June's order keyed by RNSI_ ids, the upgrade swapped templet, a null templet skips its block
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_EL_SONIC_ASSAULT_STING == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_EL_SONIC_ASSAULT_STING, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_READY );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_CHARGE );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SDK_EJECTION_BUSTER == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SDK_EJECTION_BUSTER, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SDK_EJECTION_BUSTER_ATTACK );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SCA_BRANDISH_BREAKER == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SCA_BRANDISH_BREAKER, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SDK_BRANDISH_BREAKER_LOOP );
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SDK_BRANDISH_BREAKER_FINISH );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SDK_BURNING_PHANTOM == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SDK_BURNING_PHANTOM, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SDK_BURNING_PHANTOM_START );
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SDK_BURNING_PHANTOM_LOOP );
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SDK_BURNING_PHANTOM_END );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SCA_DREAD_WEAPON == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SCA_DREAD_WEAPON, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SCA_DREAD_WEAPON_LOOP );
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_SA_SCA_DREAD_WEAPON_END );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_SDK_SHADE_SCRATCH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SDK_SHADE_SCRATCH, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, SI_A_SCA_SHADE_SCRATCH_ATTACK );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SPK_SWORDFIRE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SPK_SWORDFIRE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SPK_SWORDFIRE_FLY );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SPK_SWORDFIRE_GROUND );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_DODGE_AND_SLASH );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_DODGE_AND_SLASH_ATTACK_Z );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_DODGE_AND_SLASH_BACK );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_SSK_RUSHING_SWORD == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SSK_RUSHING_SWORD, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_RUSHING_SWORD_2nd );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_RUSHING_SWORD_3rd );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SSK_EXTINCTION == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SSK_EXTINCTION, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SSK_EXTINCTION_CHARGE );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SSK_EXTINCTION_ATTACK );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SSK_EXTINCTION_DEGREE_UP );	// June script ids 220 / 221 share one name
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SSK_EXTINCTION_DEGREE_DOWN );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_SSK_LEAP_CRASH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SSK_LEAP_CRASH, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_LEAP_CRASH_JUMP );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SSK_JUDGEMENT_DRIVE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SSK_JUDGEMENT_DRIVE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SGM_JUGGERNAUT_BUSTER == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SGM_JUGGERNAUT_BUSTER, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_JUGGERNAUT_BUSTER_LOOP );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_JUGGERNAUT_BUSTER_LOOP_LAST );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_JUGGERNAUT_BUSTER_END );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SSK_CRITICAL_DIVE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SSK_CRITICAL_DIVE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_CRITICAL_DIVE_HIT );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_SGM_PROVOKE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SGM_PROVOKE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_A_SGM_PROVOKE_REVENGE );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_SGM_DRASTIC_CHARGE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SGM_DRASTIC_CHARGE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_A_SGM_DRASTIC_CHARGE_LOOP );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_A_SGM_DRASTIC_CHARGE_END );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_SBH_SCALET_ROSE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SBH_SCALET_ROSE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_SBH_SCALET_ROSE_SUCCESS );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SBH_BLAZING_DANCE_1ST );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_FRONT );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_SA_SBH_BLAZING_DANCE_FINISH );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_SBH_FLAME_SWORD == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SBH_FLAME_SWORD, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SI_A_SBH_FLAME_SWORD_FINISH );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SGM_WAR_PRELUDE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SGM_WAR_PRELUDE, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_WAR_PRELUDE );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_WAR_PRELUDE_FLY );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_WAR_PRELUDE_GROUND );
+		}
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_SGM_GIGA_BLAST == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SGM_GIGA_BLAST, true );
+		if ( NULL != pSkillTemplet )
+		{
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_GIGA_BLAST_CHARGE );
+			SetEquippedSkillLevelStateData( pSkillTemplet, ESI_SA_SGM_GIGA_BLAST_END );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == bChangeAll_ || CX2SkillTree::SI_A_EL_DODGE_AND_SLASH == eSkillID_ )
 	{/// ´åÁö&½½·¡½Ã
 		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::SI_A_EL_DODGE_AND_SLASH );
@@ -1901,6 +2124,7 @@ CX2GUEL::~CX2GUEL(void)
 		}
 	}
 #endif //SERV_ELESIS_SECOND_CLASS_CHANGE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 			 
 /*virtual*/ void CX2GUEL::CommonStateStartFuture()
@@ -4529,6 +4753,26 @@ bool CX2GUEL::CanSpecialReactProcess( CX2DamageManager::REACT_TYPE eReActType_ )
 	return true;
 }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1i: June 32b64290 ( user vslot 0x670 ): the unit is in the job line, 1 Saber Knight / Grand Master, 2 Pyro Knight / Blazing Heart, 3 Dark Knight / Crimson Avenger
+bool CX2GUEL::IsInJobLine( int iJobLine_ )
+{
+	if( NULL == GetUnit() )
+		return false;
+
+	switch( iJobLine_ )
+	{
+	case 1:
+		return ( CX2Unit::UC_ELESIS_SABER_KNIGHT == GetUnitClass() || CX2Unit::UC_ELESIS_GRAND_MASTER == GetUnitClass() );
+
+	case 2:
+		return ( CX2Unit::UC_ELESIS_PYRO_KNIGHT == GetUnitClass() || CX2Unit::UC_ELESIS_BLAZING_HEART == GetUnitClass() );
+
+	case 3:
+		return ( CX2Unit::UC_ELESIS_DARK_KNIGHT == GetUnitClass() || CX2Unit::UC_ELESIS_CRIMSON_AVENGER == GetUnitClass() );
+	}
+
+	return false;
+}
 // char-elesis CH1h: June 32b6fb80 ( vslot 0x558 )
 int CX2GUEL::GetHpTier()
 {

@@ -822,6 +822,32 @@ All 24 class-map rows of phase CH1h are accounted for: **8 written, 14 = March (
 
 **Nothing to play-test.** Review: none of its own, the CH1k review covers CH1h-CH1k. Next: `/x2-phase char-elesis CH1i` ( Sonnet 5.5 high ).
 
+### CH1i - Done (2026-11-12)
+
+**All 4 class-map rows of phase CH1i accounted for: 2 written ( 1 `inside` under `_LIVE`, 1 `new` under `_CORE` ), 2 = March ( no code ).** The five declaration-only functions ( InitPassiveSkillState `32b88300`, 0x6a0 `32b7ebe0`, 0x6a4 `32b7ee10`, 0x29c, 0x2b8 ) belong to CH4a / CH4b ( 0x29c is CH1h's ); no declaration added here. `_LIVE` stays `//#define`; no new flag. funcmap rows `Char Elesis CH1i` ( 4 ). No `JUNE_BUGS` row: every difference below is June's own state list, nothing that looked unintended.
+
+| June | Function | Result |
+|---|---|---|
+| `32b4e790` | `SetEquippedSkillLevel` ( 0x7b8, listing-only ) | **inside.** 22 blocks in June's order ( `ch0_setskilllevel_blocks.tsv` ), each `bChangeAll_ \|\| id`, `GetEquippedActiveSkillTemplet( id, true )`, null skips the block, then `SetEquippedSkillLevelStateData` per state ( June's vslot 0x7a8 ) in June's order. Ids are June's `RNSI_` names ( 21 registered in `X2SkillTree.h` under `JUNE_ENUM_NAMES`, values read from `Enum.src.lua`; `RNSI_A_EL_ENDURANCE_POWER` is CH1h's ) |
+| `32b64290` | `IsInJobLine` ( 0x670 ) | **new**, `_CORE`. No unit false; line 1 = classes 29 / 120, 2 = 30 / 121, 3 = 35 / 125 ( by `UC_ELESIS_*` names ), else false. Declared and called since CH1d |
+| `32b7f090` | `HyperModeFrameMove` ( 0x600 ) | **= March.** `CommonHyperModeFrameMove( 0.05, 0.83, false )`; the callee `32b7b820` is CH1c's |
+| `32b70130` | `CanRidingState` ( 0x628 ) | **= March.** Base `31fd7930`, else now state == 187 = `ESI_SWORD_WAIT` ( by name ) |
+
+**What June does differently from March in the 22 blocks:** June no longer sets `ESI_SI_A_EL_DODGE_AND_SLASH_SECOND`, `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_MEMO`, `ESI_SI_SA_SBH_BLAZING_DANCE_2ND` / `_3RD` / `_4TH`, and has no Snap Crasher block; it adds Sonic Assault: Sting ( memo ready / charge / fire ), Dodge and Slash back, Ejection Buster, Brandish Breaker, Burning Phantom, Dread Weapon, Shade Scratch, Swordfire fly / ground, Judgement Drive final, Blazing Dance back / front, War Prelude fly / ground, Giga Blast. The `true` argument swaps in the upgraded skill's templet.
+
+**Name mapping.** June script ids 220 / 221 carry one name ( `ESI_SI_SA_SSK_EXTINCTION_DEGREE` ) and sit where March has `_DEGREE_UP` / `_DEGREE_DOWN`: March's two members are used. June id 260 ( no registration name ) is March's `ESI_SA_SGM_WAR_PRELUDE` ( the skill's own state, the first state of block 21 before FLY / GROUND; its rebased March value is 259, one off like most members in `ch0_state_enum_names.tsv` ). **22 June-only state members** added to the tail of `EL_STATE_ID` under `_CORE` ( `X2GUEl.h`, each with its June script id and owning phase ): CH2a 311 / 318 / 319 / 320; CH2b 223; CH2c 233 / 234; CH2d 293 / 296 / 297 / 298 / 308; CH3a 334 / 335 / 336 / 337; CH3b 279 / 280; CH3c 294 / 295 / 309 / 310. C++ values follow the enum; registration is by script name ( CH1m ). `SI_SA_SDK_*` / `SI_A_SCA_*` names are June's own, as in the exe's name strings.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE --with ..._LIVE ..._WOS ..._BLOOD --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `.cpp` PASS +244, `.h` PASS +22; `files: 2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. `flagcheck SERV_IRUHADEV_JUNE_ENUM_NAMES --worktree --files X2Lib/X2SkillTree.h`: `PASS~` ( +26 ), `RESULT: PASS`. `Always.h` untouched.
+- One-file `/Zs /EHsc` probes of `X2GUEL.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off, with `_LIVE`, and with `_LIVE + _WOS + _BLOOD`. `cl /P` off / `_LIVE`: `RNSI_SA_SGM_GIGA_BLAST` 1 / 3, `ESI_SI_A_EL_DODGE_AND_SLASH_BACK` 1 / 2. First compile caught a duplicate `ESI_SA_SGM_WAR_PRELUDE` ( March has it ); the member was dropped.
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h X2Lib/X2SkillTree.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `0 A/B row(s) remain in 2 file(s)`.
+- `bytes>=0x80` before / after: `X2GUEL.cpp` 13,134 / 13,134, `X2GUEl.h` 5,494 / 5,494, `X2SkillTree.h` 23,310 / 23,310. LF-only lines: `X2GUEL.cpp` 326 -> 549 ( the 223-line June body sits after the LF-ended `{` of the function, as flagcheck's neighbour rule asks ).
+- Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line. No `_DEBUG` define; every new block carries `// char-elesis CH1i`.
+
+**Routed.** CH1o: `SetSkillLevelStateData`'s `+ 1.0` term ( checklist row 289 notes it ), the vslot 0x670 `IsInJobLine` decision. CH2a-CH3c: each owns the states listed above. The `X2GUEl.h:489` comment "body in CH1i" is stale ( the body is written ); left, comments are not rewritten.
+
+**Nothing to play-test.** Review: none of its own, the CH1k review covers CH1h-CH1k. Next: `/x2-phase char-elesis CH1j` ( Sonnet 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

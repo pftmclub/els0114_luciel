@@ -2588,6 +2588,32 @@ public:
 		RNSI_A_EL_ENDURANCE_POWER                             = 28201,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-12 // char-elesis CH1i
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		// June SKILL_ID names Elesis's SetEquippedSkillLevel keys its 22 blocks on ( values from June's Enum.lua; RNSI_A_EL_ENDURANCE_POWER is CH1h's )
+		RNSI_SA_EL_SONIC_ASSAULT_STING                        = 28003,
+		RNSI_SA_SSK_EXTINCTION                                = 28005,
+		RNSI_SA_SSK_CRITICAL_DIVE                             = 28006,
+		RNSI_SA_SSK_JUDGEMENT_DRIVE                           = 28007,
+		RNSI_SA_SGM_WAR_PRELUDE                               = 28009,
+		RNSI_SA_SGM_JUGGERNAUT_BUSTER                         = 28010,
+		RNSI_SA_SPK_SWORDFIRE                                 = 28012,
+		RNSI_SA_SBH_BLAZING_DANCE                             = 28016,
+		RNSI_SA_SDK_EJECTION_BUSTER                           = 28019,
+		RNSI_SA_SDK_BURNING_PHANTOM                           = 28021,
+		RNSI_SA_SCA_BRANDISH_BREAKER                          = 28022,
+		RNSI_SA_SCA_DREAD_WEAPON                              = 28025,
+		RNSI_SA_SGM_GIGA_BLAST                                = 28062,
+		RNSI_A_EL_DODGE_AND_SLASH                             = 28200,
+		RNSI_A_SSK_RUSHING_SWORD                              = 28202,
+		RNSI_A_SSK_LEAP_CRASH                                 = 28204,
+		RNSI_A_SGM_PROVOKE                                    = 28205,
+		RNSI_A_SGM_DRASTIC_CHARGE                             = 28206,
+		RNSI_A_SBH_FLAME_SWORD                                = 28210,
+		RNSI_A_SBH_SCALET_ROSE                                = 28211,
+		RNSI_A_SDK_SHADE_SCRATCH                              = 28214,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

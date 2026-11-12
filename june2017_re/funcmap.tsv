@@ -10719,3 +10719,7 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b81300	CX2GUEL::RemoveShadowEdgeRecord ( declared as ClearShadowEdgeRecords )	routed	Char Elesis CH1h: ReInit calls it on every record of the +0x9700 list; the loop and the record type are CH4c ( _BLOOD )
 32b7beb0	CX2GUEL::OnAttackerDamageReact_Slot4F8	routed	Char Elesis CH1h: override declared under _BLOOD; body in CH4c
 32b898a0	CX2GUEL::OnAttackerDamageReact_Slot4FC	routed	Char Elesis CH1h: override declared under _BLOOD; body in CH4c
+32b7f090	CX2GUEL::HyperModeFrameMove	= March	Char Elesis CH1i: inside: CommonHyperModeFrameMove( 0.05, 0.83, bSound 0 ) = March MODIFY_RIDING_PET_AWAKE arm; callee 32b7b820 is CH1c; no code
+32b70130	CX2GUEL::CanRidingState	= March	Char Elesis CH1i: inside: base 31fd7930 true, else the now state ( protected +0x7cbc ) == 187 ESI_SWORD_WAIT, by name; no code
+32b64290	CX2GUEL::IsInJobLine	PORTED	Char Elesis CH1i: new (_CORE), plain member until CH1o decides the vslot 0x670: no unit false; 1 -> classes 29 / 120, 2 -> 30 / 121, 3 -> 35 / 125, else false
+32b4e790	CX2GUEL::SetEquippedSkillLevel	PORTED	Char Elesis CH1i: inside, differs: 22 blocks keyed by June skill id in June order ( 28003 28019 28022 28021 28025 28214 28012 28200 28202 28005 28201 28204 28007 28010 28006 28205 28206 28211 28016 28210 28009 28062 ), templet 31fca8e0( id, 1 ), null skips; states by vslot 0x7a8 ( SetEquippedSkillLevelStateData ); June drops DODGE_AND_SLASH_SECOND, ENDURANCE_POWER_ACTIVE_MEMO, BLAZING_DANCE 2ND-4TH and the SNAP_CRASHER block
