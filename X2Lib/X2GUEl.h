@@ -245,6 +245,14 @@ public:
 		ESI_COMBO_SDK_XXXXXX,						/// char-elesis CH1g: June script id 291 ( Dark Knight X-X-X-X-X-X; CH1m maps, CH1g owns the state )
 		ESI_COMBO_SDK_XXXXXXX,						/// char-elesis CH1g: June script id 292 ( Dark Knight X-X-X-X-X-X-X; CH1m maps, CH1g owns the state )
 		ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE,			/// char-elesis CH1g: June script id 329 ( Dark Knight dash-jump Z-X fire; CH1m maps, CH1g owns the state )
+		ESI_DASH_COMBO_SCA_ZZZ_START,				/// char-elesis CH1g2: June script id 300 ( Crimson Avenger dash Z-Z-Z start; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_ZZZ_LOOP_1,				/// char-elesis CH1g2: June script id 301 ( Crimson Avenger dash Z-Z-Z loop 1; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_ZZZ_LOOP_2,				/// char-elesis CH1g2: June script id 302 ( Crimson Avenger dash Z-Z-Z loop 2; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_ZZZ_END,					/// char-elesis CH1g2: June script id 303 ( Crimson Avenger dash Z-Z-Z end; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_ZX_ATTACK,				/// char-elesis CH1g2: June script id 305 ( Crimson Avenger dash Z-X attack; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_ZX_LOOP,					/// char-elesis CH1g2: June script id 306 ( Crimson Avenger dash Z-X loop; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_ZX_END,					/// char-elesis CH1g2: June script id 307 ( Crimson Avenger dash Z-X end; CH1m maps, CH1g2 owns the state )
+		ESI_DASH_COMBO_SCA_XZ_FIRE,					/// char-elesis CH1g2: June script id 331 ( Crimson Avenger dash X-Z fire; CH1m maps, CH1g2 owns the state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -509,6 +517,33 @@ protected:
 	void ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_EventProcess();		/// char-elesis CH1g: June 32b73c90
 	void ESI_DASH_JUMP_COMBO_SDK_XXX_FrameMove();				/// char-elesis CH1g: June 32b7c0b0
 	void ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE_FrameMove();			/// char-elesis CH1g: June 32b7d550
+	void ESI_DASH_COMBO_SCA_ZZ_StateStart();					/// char-elesis CH1g2: June 32b51a20
+	void ESI_DASH_COMBO_SCA_ZZZ_START_Init();					/// char-elesis CH1g2: June 32b51a40
+	void ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_StateStart();			/// char-elesis CH1g2: June 32b51a70
+	void ESI_DASH_COMBO_SCA_ZX_START_StateStart();				/// char-elesis CH1g2: June 32b51a90
+	void ESI_DASH_COMBO_SCA_XZ_CHARGE_StateStart();				/// char-elesis CH1g2: June 32b52390
+	void ESI_DASH_COMBO_SCA_XZ_CHARGE_StateStartFuture();		/// char-elesis CH1g2: June 32b523b0
+	void ESI_DASH_COMBO_SCA_XZ_CHARGE_EventProcess();			/// char-elesis CH1g2: June 32b523d0
+	void ESI_DASH_COMBO_SCA_XZ_CHARGE_FrameMove();				/// char-elesis CH1g2: June 32b52420
+	void ESI_DASH_COMBO_SCA_ZZ_EventProcess();					/// char-elesis CH1g2: June 32b66480
+	void ESI_DASH_COMBO_SCA_ZZZ_START_EventProcess();			/// char-elesis CH1g2: June 32b667a0
+	void ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_EventProcess();			/// char-elesis CH1g2: June 32b66ac0
+	void ESI_DASH_COMBO_SCA_ZZZ_LOOP_2_EventProcess();			/// char-elesis CH1g2: June 32b66df0
+	void ESI_DASH_COMBO_SCA_ZZZ_END_EventProcess();				/// char-elesis CH1g2: June 32b67120
+	void ESI_DASH_COMBO_SCA_ZX_START_EventProcess();			/// char-elesis CH1g2: June 32b67420
+	void ESI_DASH_COMBO_SCA_ZX_ATTACK_StateStart();				/// char-elesis CH1g2: June 32b67740
+	void ESI_DASH_COMBO_SCA_ZX_ATTACK_EventProcess();			/// char-elesis CH1g2: June 32b67760
+	void ESI_DASH_COMBO_SCA_ZX_ATTACK_StateEnd();				/// char-elesis CH1g2: June 32b67790
+	void ESI_DASH_COMBO_SCA_ZX_LOOP_StateStart();				/// char-elesis CH1g2: June 32b677b0
+	void ESI_DASH_COMBO_SCA_ZX_LOOP_EventProcess();				/// char-elesis CH1g2: June 32b677d0
+	void ESI_DASH_COMBO_SCA_ZX_LOOP_StateEnd();					/// char-elesis CH1g2: June 32b67a50
+	void ESI_DASH_COMBO_SCA_ZX_END_EventProcess();				/// char-elesis CH1g2: June 32b67a70
+	void ESI_DASH_COMBO_SCA_XZ_FIRE_EventProcess();				/// char-elesis CH1g2: June 32b6b760
+	void ESI_DASH_COMBO_SCA_ZZZ_START_FrameMove();				/// char-elesis CH1g2: June 32b7c2e0
+	void ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_FrameMove();				/// char-elesis CH1g2: June 32b7c510
+	void ESI_DASH_COMBO_SCA_ZZZ_LOOP_2_FrameMove();				/// char-elesis CH1g2: June 32b7c940
+	void ESI_DASH_COMBO_SCA_ZZZ_END_FrameMove();				/// char-elesis CH1g2: June 32b7cd70
+	void ESI_DASH_COMBO_SCA_XZ_FIRE_FrameMove();				/// char-elesis CH1g2: June 32b7d920
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 	void JumpAttackZEventProcess();
@@ -1046,6 +1081,7 @@ protected:
 	UINT m_uiSPKXZReattakCount;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	float m_fDashJumpZXChargeTime;		/// char-elesis CH1g: June +0x96f4 ( Dark Knight dash-jump Z-X charge, 0 to 1 )
+	USHORT m_usDashComboZZZLoopCount;	/// char-elesis CH1g2: June +0x9758 ( Crimson Avenger dash Z-Z-Z loops counted: 0 at Z-Z, +1 per loop state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	//~ protected º¯¼ö
 

@@ -150,3 +150,4 @@ offset	kind	name	note
 0x9688	field	m_hXXDownXLoop	CX2GUEL effect-set handle of EffectSet_SGM_XXX_Start ( CH1e )
 0x961c	field	m_uiSPKXZReattakCount	CX2GUEL remaining Pyro Knight dash-jump X attacks: 2 from XZ, 5 from ZX_READY, one used per XZ_REATTACK / ZX_LOOP start ( CH1f )
 0x96f4	field	m_fDashJumpZXChargeTime	CX2GUEL Dark Knight dash-jump Z-X charge time, 0 to 1: reset by the charge state start, grows with the frame time, read by the fire state ( power x ( charge + 1 ), scale 1 + charge x 0.5 ) ( CH1g )
+0x9758	field	m_usDashComboZZZLoopCount	CX2GUEL Crimson Avenger dash Z-Z-Z loops counted ( word ): 0 at the Z-Z start, +1 at each loop state start, a Z press loops on only below 4 ( CH1g2 )

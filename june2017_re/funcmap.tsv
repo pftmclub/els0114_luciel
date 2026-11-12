@@ -10664,3 +10664,30 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32746a10 (StatCalc S33)	CX2GameEdit::SetDamageLogMICritical (Lua DamageLog_MI_CRITICAL)	ported	june-stat-calc D2b: g_pData my user (+0x68) auth level (+0x2c) >= 3 -> this +0xde = arg; bound 31d95080 @31e217c8 (xorstrings DamageLog_MI_CRITICAL); ctor 32749f30 @3274a21f = 0
 32869e10 (StatCalc S33)	CX2Inventory::GetEquippingItemByEquipPos ( pos, bFashion, bMinorUnitSlot )	ported	june-stat-calc D2b: under SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE: positions 2-14 outside fashion force the third argument to 0; 3234fe90 (second ring slot remap 0x17 -> 0x1c) and the minor-unit slot test (slot ids = June NESI_MINORUNIT_*, checked by emu_final_damage_b.py) are stand-ins: March's slot layout has neither (its NESI_ONEPIECE_FASHION is 20, June's 35). June caller census: june2017_re/statcalc/equip_by_pos_callers.tsv
 32274970 (StatCalc S33)	CX2GameUnit::GetIgnoreDefenceRate	ported	june-stat-calc D2b re-read: sum of the entries (null skipped, KProtectedType value), fcom 1.0 / test ah, 0x41 keeps the sum when below, equal or NaN, else 1.0; the port returned 1.0 for NaN: fixed under SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+32b51a20	CX2GUEL::ESI_DASH_COMBO_SCA_ZZ_StateStart	PORTED	Char Elesis CH1g2: new, carved: CommonStateStart, then the Z-Z-Z loop count ( +0x9758, word ) = 0
+32b51a40	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_START_Init	PORTED	Char Elesis CH1g2: new, listing-only: three preloads ( SA_EL_SA_SSK_SPIRAL_BLAST_01.X, SCA_Projectile001.Y, Raven_Seven_Burst_MEMO_F01.Y )
+32b51a70	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_StateStart	PORTED	Char Elesis CH1g2: new, carved: CommonStateStart, then the loop count += 1 ( shared by LOOP_1 and LOOP_2 )
+32b51a90	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_START_StateStart	PORTED	Char Elesis CH1g2: new, listing-only: CommonStateStart only ( tail jump )
+32b52390	CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_StateStart	PORTED	Char Elesis CH1g2: new, carved: CommonStateStart, then the charge time ( +0x96f4 ) = 0
+32b523b0	CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_StateStartFuture	PORTED	Char Elesis CH1g2: new, carved: CommonStateStartFuture, then the charge time = 0 ( no class-skill float write )
+32b523d0	CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_EventProcess	PORTED	Char Elesis CH1g2: new, carved: future state time >= event time 0 with Z released, or >= 3.1 -> XZ_FIRE
+32b52420	CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_FrameMove	PORTED	Char Elesis CH1g2: new, carved: CommonFrameMove, charge time += frame time, capped at 3.0
+32b66480	CX2GUEL::ESI_DASH_COMBO_SCA_ZZ_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: flag 0 Z ( no class test ) -> ZZZ_START, WAIT, SKILL and on-line walk / back-walk / dash cancels
+32b667a0	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_START_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: as ZZ, flag 0 Z -> ZZZ_LOOP_1
+32b66ac0	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: as ZZ, flag 0 Z while the loop count < 4 -> ZZZ_LOOP_2; animation end -> ZZZ_END
+32b66df0	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_2_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: as LOOP_1, flag 0 Z while the loop count < 4 -> ZZZ_LOOP_1; animation end -> ZZZ_END
+32b67120	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_END_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: animation end WAIT, SKILL and on-line walk / back-walk / dash / ZX cancels
+32b67420	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_START_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: as ZZ, flag 0 X -> ZX_ATTACK
+32b67740	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_ATTACK_StateStart	PORTED	Char Elesis CH1g2: new, carved: CommonStateStart, SetNoDetonation( true ) ( +0x6890 )
+32b67760	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_ATTACK_EventProcess	PORTED	Char Elesis CH1g2: new, carved: animation end -> ZX_LOOP
+32b67790	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_ATTACK_StateEnd	PORTED	Char Elesis CH1g2: new, carved: CommonStateEnd, SetNoDetonation( false )
+32b677b0	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_LOOP_StateStart	PORTED	Char Elesis CH1g2: new, carved: CommonStateStart, SetNoDetonation( true )
+32b677d0	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_LOOP_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: animation end with state time ( present frame ) >= 2.0 or X released -> ZX_END; SKILL and on-line walk / back-walk / dash cancels
+32b67a50	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_LOOP_StateEnd	PORTED	Char Elesis CH1g2: new, carved: CommonStateEnd, SetNoDetonation( false )
+32b67a70	CX2GUEL::ESI_DASH_COMBO_SCA_ZX_END_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: animation end WAIT, SKILL and on-line walk / back-walk / dash cancels
+32b6b760	CX2GUEL::ESI_DASH_COMBO_SCA_XZ_FIRE_EventProcess	PORTED	Char Elesis CH1g2: new, listing-only: animation end WAIT, SKILL and on-line walk / back-walk / dash cancels
+32b7c2e0	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_START_FrameMove	PORTED	Char Elesis CH1g2: new, carved: 0.43 s tick, FlushMp( 3 ) plays EffectSet_C_SCA_Dash_ZZZ, else the not-enough-MP effect at Dummy2_Lhand
+32b7c510	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_FrameMove	PORTED	Char Elesis CH1g2: new, carved: 0.01 s Uppercut effect set, 0.25 s EffectSet_C_SCA_Dash_ZZZ ( 3 MP each, else the not-enough-MP effect )
+32b7c940	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_2_FrameMove	PORTED	Char Elesis CH1g2: new, carved: 0.08 s EffectSet_C_SCA_Dash_ZZZ, 0.31 s Uppercut effect set ( 3 MP each, else the not-enough-MP effect )
+32b7cd70	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_END_FrameMove	PORTED	Char Elesis CH1g2: new, carved: 0.37 s tick, FlushMp( 3 ) plays EffectSet_C_SCA_Dash_ZZZ_Finish, else the not-enough-MP effect
+32b7d920	CX2GUEL::ESI_DASH_COMBO_SCA_XZ_FIRE_FrameMove	PORTED	Char Elesis CH1g2: new, carved: CommonFrameMove, 0.01 s tick, IsEnoughMPForAttack( 5 ) spawns DamageEffect_SCA_Dash_Combo_XZ at GetPos(): power x ( 1 + 0.5 charge ), life time x ( 1 + 0.333 charge ), scale 1 + 0.133 charge

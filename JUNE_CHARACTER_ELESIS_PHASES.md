@@ -736,6 +736,32 @@ All 18 class-map rows of phase CH1g are handled: 0 `inside`, 18 `new` (plain nam
 
 **Nothing to play-test.** Review: none of its own, the CH1g2 review covers CH1e-CH1g2 ( no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1g2` ( Sonnet 5.5 high ).
 
+### CH1g2 - Done (2026-11-12)
+
+All 27 class-map rows of phase CH1g2 are handled: 0 `inside`, 27 `new` (plain names under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE`, tag `// char-elesis CH1g2: June <va>`), 11 `listing-only` (read with `charport_adis.py elesis --phase CH1g2`; none needed "this needs Opus") and 16 carved. `_LIVE` stays `//#define`; no new `Always.h` define. Eight state names join `EL_STATE_ID` under `_CORE`, June's script id in the comment (CH1m maps): `ESI_DASH_COMBO_SCA_ZZZ_START` 300, `_ZZZ_LOOP_1` 301, `_ZZZ_LOOP_2` 302, `_ZZZ_END` 303, `_ZX_ATTACK` 305, `_ZX_LOOP` 306, `_ZX_END` 307, `_XZ_FIRE` 331 (`_ZZ` 299, `_ZX_START` 304 and `_XZ_CHARGE` 330 came from CH1d2). One new member `m_usDashComboZZZLoopCount` ( June `+0x9758`, a word; `_CORE`; `ch1_offsets.tsv` +1 row ); the numbers sit in `_CONST_EL_CH1G2_`. 27 funcmap rows `Char Elesis CH1g2`. No `JUNE_BUGS.md` row: nothing here looked unintended ( the points below are June's design, kept ). The five script states `ESI_SCA_START` / `_WIN` / `_WIN2` / `_LOSE` / `_LOSE2` run shared functions outside the Elesis range: nothing to transcribe (CH1m). No state writes the state power rate or calls the buff factor; no `_WOS` / `_SUMMON` / `_BLOOD` line; no checklist row is assigned to this phase.
+
+| June | `CX2GUEL::ESI_DASH_COMBO_SCA_` | June | `CX2GUEL::ESI_DASH_COMBO_SCA_` |
+|---|---|---|---|
+| `32b51a20` `32b51a70` `32b51a90` | `ZZ` / `ZZZ_LOOP_1` ( both loops ) / `ZX_START` `_StateStart` | `32b51a40` | `ZZZ_START_Init` ( three preloads ) |
+| `32b66480` `32b667a0` `32b66ac0` `32b66df0` `32b67120` | `ZZ` / `ZZZ_START` / `ZZZ_LOOP_1` / `ZZZ_LOOP_2` / `ZZZ_END` EventProcess | `32b67420` `32b67760` `32b677d0` `32b67a70` `32b6b760` | `ZX_START` / `ZX_ATTACK` / `ZX_LOOP` / `ZX_END` / `XZ_FIRE` EventProcess |
+| `32b67740` `32b67790` `32b677b0` `32b67a50` | `ZX_ATTACK` / `ZX_LOOP` `_StateStart` / `_StateEnd` | `32b52390` `32b523b0` `32b523d0` `32b52420` | `XZ_CHARGE` `_StateStart` / `_StateStartFuture` / `_EventProcess` / `_FrameMove` |
+| `32b7c2e0` `32b7c510` `32b7c940` `32b7cd70` | `ZZZ_START` / `ZZZ_LOOP_1` / `ZZZ_LOOP_2` / `ZZZ_END` FrameMove | `32b7d920` | `XZ_FIRE_FrameMove` |
+
+**What June does** (every function read branch by branch from the raw listing; all are new states, so there is no March body to diff):
+- **Dash Z-Z-Z chain:** `ZZ` / `ZZZ_START` / `ZZZ_LOOP_1` / `ZZZ_LOOP_2` EventProcess = the flag-chain macro ( flag 0, event time 0, the Z press with no class test ) then animation end -> `USI_WAIT`, then `SKILL_CANCEL_AFTER` and the on-line walk / back-walk / dash cancels. Targets: `ZZ` -> `ZZZ_START` -> `ZZZ_LOOP_1` <-> `ZZZ_LOOP_2`. The two loop states also test the loop count: the Z press loops on only while the count is below 4, and their animation end goes to `ZZZ_END` ( not WAIT ). The count is reset by `ZZ`'s StateStart and grows by one in each loop state's StateStart. `ZZZ_END` has no flag: animation end -> WAIT and the four cancels incl. Z-X ( `ZX_CANCEL_AFTER_EX_ON_LINE_` ).
+- **Dash Z-X chain:** `ZX_START` EventProcess = `ZZ`'s with X -> `ZX_ATTACK`; `ZX_ATTACK` ( animation end -> `ZX_LOOP` ) and `ZX_LOOP` set `SetNoDetonation( true )` in StateStart and false in StateEnd. `ZX_LOOP` ends with its animation into `ZX_END` once the **present** frame's state time reaches 2.0 or X is released ( every other state here reads the future frame ), then the on-line cancels. `ZX_END` and `XZ_FIRE` EventProcess = animation end -> WAIT and the on-line cancels.
+- **FrameMove effects:** `ZZZ_START` at 0.43 s, `ZZZ_END` at 0.37 s, `ZZZ_LOOP_1` at 0.01 / 0.25 s and `ZZZ_LOOP_2` at 0.08 / 0.31 s each spend 3 MP ( `FlushMp` ) for `EffectSet_C_SCA_Dash_ZZZ` / `_Finish` / `_Uppercut` ( LOOP_1 plays the Uppercut first, LOOP_2 last ), else the not-enough-MP effect at `Dummy2_Lhand`; `CommonFrameMove` comes last.
+- **Dash X-Z charge / fire:** `XZ_CHARGE` restarts the charge time ( `+0x96f4`, CH1g's member ) in both starts, FrameMove adds the frame time up to 3.0 ( 1.0 for the Dark Knight's ); EventProcess fires at future state time >= event time 0 with Z released, or >= 3.1. `XZ_FIRE` FrameMove ( `CommonFrameMove` first ): at 0.01 s `IsEnoughMPForAttack( 5 )` at the hand, then `DamageEffect_SCA_Dash_Combo_XZ` placed at `GetPos()` ( not the hand ): power `GetPowerRate() x ( 1 + 0.5 charge )`, life time rate `1 + 0.333 charge`, `SetScale` `1 + 0.133 charge` on all three axes ( `CreateInstance` argument map checked against the 23-argument call: reserve false / -1, force-down rate 1 ).
+- **Leads closed:** CH1d2's "`ESI_DASH_COMBO_SCA_*` states through the script's tables" ( plain tables, no class key; registration is CH1m ). Nothing out of scope found; no drift.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE --with ..._LIVE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `files: 2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. `git diff --numstat`: `X2GUEL.cpp` 393 / 0, `X2GUEl.h` 36 / 0; `bytes>=0x80` 13,134 and 5,494 before and after; `X2GUEL.cpp` LF-only lines 326 before and after.
+- One-file `/Zs` probe of `X2GUEL.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off and with `/DSERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`. `/P` check ( `_CORE` is always on ): `ESI_DASH_COMBO_SCA_XZ_FIRE_FrameMove()` 2 off / 2 on, `DamageEffect_SCA_Dash_Combo_XZ` 1 / 1, `m_usDashComboZZZLoopCount` 6 / 6.
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: `kickoffs/char-elesis/CH1g2-review.md` ( Opus 5.5 high; covers CH1e-CH1g2; no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1g2 review`.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

@@ -158,6 +158,27 @@ namespace _CONST_EL_CH1G_
 	const float DASH_JUMP_FIRE_EVENT_TIME				= 0.01f;
 }
 using namespace _CONST_EL_CH1G_;
+// char-elesis CH1g2: constants of the Crimson Avenger dash combo states ( June 32b66ac0 / 32b677d0 / 32b523d0 / 32b52420 / 32b7c2e0 / 32b7c510 / 32b7c940 / 32b7cd70 / 32b7d920 )
+namespace _CONST_EL_CH1G2_
+{
+	const USHORT DASH_COMBO_ZZZ_LOOP_MAX_COUNT				= 4;		// a Z press starts another loop only below this count
+	const float DASH_COMBO_ZZZ_MP_COST						= 3.f;
+	const float DASH_COMBO_ZZZ_START_FIRE_TIME				= 0.43f;
+	const float DASH_COMBO_ZZZ_LOOP_1_FIRST_FIRE_TIME		= 0.01f;
+	const float DASH_COMBO_ZZZ_LOOP_1_SECOND_FIRE_TIME		= 0.25f;
+	const float DASH_COMBO_ZZZ_LOOP_2_FIRST_FIRE_TIME		= 0.08f;
+	const float DASH_COMBO_ZZZ_LOOP_2_SECOND_FIRE_TIME		= 0.31f;
+	const float DASH_COMBO_ZZZ_END_FIRE_TIME				= 0.37f;
+	const float DASH_COMBO_ZX_LOOP_TIME_LIMIT				= 2.f;		// state time from which the loop ends with its animation even with X held
+	const float DASH_COMBO_XZ_CHARGE_TIME_LIMIT				= 3.f;		// the charge time stops growing here
+	const float DASH_COMBO_XZ_CHARGE_FIRE_TIME				= 3.1f;		// state time at which a held Z fires
+	const float DASH_COMBO_XZ_FIRE_EVENT_TIME				= 0.01f;
+	const float DASH_COMBO_XZ_FIRE_MP_COST					= 5.f;
+	const float DASH_COMBO_XZ_FIRE_POWER_PER_CHARGE			= 0.5f;
+	const float DASH_COMBO_XZ_FIRE_LIFE_TIME_PER_CHARGE		= 0.333f;
+	const float DASH_COMBO_XZ_FIRE_SCALE_PER_CHARGE			= 0.133f;
+}
+using namespace _CONST_EL_CH1G2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
 {
@@ -216,6 +237,9 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 , m_uiSPKXZReattakCount(0)
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_fDashJumpZXChargeTime(0.f)	// char-elesis CH1g
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+, m_usDashComboZZZLoopCount(0)	// char-elesis CH1g2
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_uiDodgeAndSlashMaxReuseCount(0)
 , m_uiDodgeAndSlashReuseCount(0)
@@ -12660,6 +12684,375 @@ void CX2GUEL::ESI_COMBO_SDK_XXXXXXX_EventProcess()
 	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
 
 	CommonEventProcess();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1g2: June 32b51a20 ( the Z-Z-Z loop count restarts with the Z-Z state )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZ_StateStart()
+{
+	CommonStateStart();
+	m_usDashComboZZZLoopCount = 0;
+}
+
+// char-elesis CH1g2: June 32b51a40
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_START_Init()
+{
+	XSkinMeshReadyInBackground( L"SA_EL_SA_SSK_SPIRAL_BLAST_01.X" );
+	XMeshReadyInBackground( L"SCA_Projectile001.Y" );
+	XMeshReadyInBackground( L"Raven_Seven_Burst_MEMO_F01.Y" );
+}
+
+// char-elesis CH1g2: June 32b51a70 ( both loop states: one more loop counted )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_StateStart()
+{
+	CommonStateStart();
+	++m_usDashComboZZZLoopCount;
+}
+
+// char-elesis CH1g2: June 32b51a90
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_START_StateStart()
+{
+	CommonStateStart();
+}
+
+// char-elesis CH1g2: June 32b52390 ( the charge time restarts with the state )
+void CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_StateStart()
+{
+	CommonStateStart();
+	m_fDashJumpZXChargeTime = 0.f;
+}
+
+// char-elesis CH1g2: June 32b523b0
+void CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_StateStartFuture()
+{
+	CommonStateStartFuture();
+	m_fDashJumpZXChargeTime = 0.f;
+}
+
+// char-elesis CH1g2: June 32b523d0 ( Z released after the first event time, or held to the fire time )
+void CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_EventProcess()
+{
+	const float fStateTime = m_FrameDataFuture.unitCondition.fStateTime;
+	if ( ( m_fEventTime[0].stateChange <= fStateTime && false == m_InputData.pureZ ) || DASH_COMBO_XZ_CHARGE_FIRE_TIME <= fStateTime )
+		StateChange( ESI_DASH_COMBO_SCA_XZ_FIRE );
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b52420 ( the charge time grows with the frame time up to its limit )
+void CX2GUEL::ESI_DASH_COMBO_SCA_XZ_CHARGE_FrameMove()
+{
+	CommonFrameMove();
+	m_fDashJumpZXChargeTime += m_fElapsedTime;
+	if ( DASH_COMBO_XZ_CHARGE_TIME_LIMIT <= m_fDashJumpZXChargeTime )
+		m_fDashJumpZXChargeTime = DASH_COMBO_XZ_CHARGE_TIME_LIMIT;
+}
+
+// char-elesis CH1g2: June 32b66480 ( Crimson Avenger dash Z-Z: Z goes on, no class test )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZ_EventProcess()
+{
+	IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneZ, ESI_DASH_COMBO_SCA_ZZZ_START )
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b667a0
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_START_EventProcess()
+{
+	IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneZ, ESI_DASH_COMBO_SCA_ZZZ_LOOP_1 )
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b66ac0 ( a Z press loops on while fewer than 4 loops were counted; the animation end finishes the combo )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_EventProcess()
+{
+	IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneZ && m_usDashComboZZZLoopCount < DASH_COMBO_ZZZ_LOOP_MAX_COUNT, ESI_DASH_COMBO_SCA_ZZZ_LOOP_2 )
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( ESI_DASH_COMBO_SCA_ZZZ_END );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b66df0
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_2_EventProcess()
+{
+	IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneZ && m_usDashComboZZZLoopCount < DASH_COMBO_ZZZ_LOOP_MAX_COUNT, ESI_DASH_COMBO_SCA_ZZZ_LOOP_1 )
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( ESI_DASH_COMBO_SCA_ZZZ_END );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b67120 ( the end of the Z-Z-Z loop: wait, then the four cancels incl. Z-X )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_END_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b67420 ( Crimson Avenger dash Z-X: X goes to the attack )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_START_EventProcess()
+{
+	IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneX, ESI_DASH_COMBO_SCA_ZX_ATTACK )
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b67740 ( no detonation while the state runs )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_ATTACK_StateStart()
+{
+	CommonStateStart();
+	SetNoDetonation( true );
+}
+
+// char-elesis CH1g2: June 32b67760
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_ATTACK_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+		StateChange( ESI_DASH_COMBO_SCA_ZX_LOOP );
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b67790
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_ATTACK_StateEnd()
+{
+	CommonStateEnd();
+	SetNoDetonation( false );
+}
+
+// char-elesis CH1g2: June 32b677b0 ( no detonation while the state runs )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_LOOP_StateStart()
+{
+	CommonStateStart();
+	SetNoDetonation( true );
+}
+
+// char-elesis CH1g2: June 32b677d0 ( the loop ends with its animation once X is released or the state time reaches its limit; the limit reads the present frame data )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_LOOP_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( DASH_COMBO_ZX_LOOP_TIME_LIMIT <= m_FrameDataNow.unitCondition.fStateTime || false == m_InputData.pureX )
+			StateChange( ESI_DASH_COMBO_SCA_ZX_END );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b67a50
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_LOOP_StateEnd()
+{
+	CommonStateEnd();
+	SetNoDetonation( false );
+}
+
+// char-elesis CH1g2: June 32b67a70
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZX_END_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b6b760
+void CX2GUEL::ESI_DASH_COMBO_SCA_XZ_FIRE_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH1g2: June 32b7c2e0 ( the Z-Z-Z effect set costs 3 MP; without it the not-enough-MP effect plays at the left hand )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_START_FrameMove()
+{
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_COMBO_ZZZ_START_FIRE_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_COMBO_ZZZ_START_FIRE_TIME ) == true && EventCheck( DASH_COMBO_ZZZ_START_FIRE_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		if ( true == FlushMp( DASH_COMBO_ZZZ_MP_COST ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_C_SCA_Dash_ZZZ", this );
+		else
+			CreateNotEnoughMPEffect( GetBonePos( L"Dummy2_Lhand" ), 0.f, 0.f, 0.f );
+	}
+
+	CommonFrameMove();
+}
+
+// char-elesis CH1g2: June 32b7c510 ( the Uppercut effect set at once, the Z-Z-Z one a quarter second later; 3 MP each )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_1_FrameMove()
+{
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_COMBO_ZZZ_LOOP_1_FIRST_FIRE_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_COMBO_ZZZ_LOOP_1_FIRST_FIRE_TIME ) == true && EventCheck( DASH_COMBO_ZZZ_LOOP_1_FIRST_FIRE_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		if ( true == FlushMp( DASH_COMBO_ZZZ_MP_COST ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_C_SCA_Dash_ZZZ_Uppercut", this );
+		else
+			CreateNotEnoughMPEffect( GetBonePos( L"Dummy2_Lhand" ), 0.f, 0.f, 0.f );
+	}
+
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_COMBO_ZZZ_LOOP_1_SECOND_FIRE_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_COMBO_ZZZ_LOOP_1_SECOND_FIRE_TIME ) == true && EventCheck( DASH_COMBO_ZZZ_LOOP_1_SECOND_FIRE_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		if ( true == FlushMp( DASH_COMBO_ZZZ_MP_COST ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_C_SCA_Dash_ZZZ", this );
+		else
+			CreateNotEnoughMPEffect( GetBonePos( L"Dummy2_Lhand" ), 0.f, 0.f, 0.f );
+	}
+
+	CommonFrameMove();
+}
+
+// char-elesis CH1g2: June 32b7c940 ( the same two effect sets in the other order and at other times )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_2_FrameMove()
+{
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_COMBO_ZZZ_LOOP_2_FIRST_FIRE_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_COMBO_ZZZ_LOOP_2_FIRST_FIRE_TIME ) == true && EventCheck( DASH_COMBO_ZZZ_LOOP_2_FIRST_FIRE_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		if ( true == FlushMp( DASH_COMBO_ZZZ_MP_COST ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_C_SCA_Dash_ZZZ", this );
+		else
+			CreateNotEnoughMPEffect( GetBonePos( L"Dummy2_Lhand" ), 0.f, 0.f, 0.f );
+	}
+
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_COMBO_ZZZ_LOOP_2_SECOND_FIRE_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_COMBO_ZZZ_LOOP_2_SECOND_FIRE_TIME ) == true && EventCheck( DASH_COMBO_ZZZ_LOOP_2_SECOND_FIRE_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		if ( true == FlushMp( DASH_COMBO_ZZZ_MP_COST ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_C_SCA_Dash_ZZZ_Uppercut", this );
+		else
+			CreateNotEnoughMPEffect( GetBonePos( L"Dummy2_Lhand" ), 0.f, 0.f, 0.f );
+	}
+
+	CommonFrameMove();
+}
+
+// char-elesis CH1g2: June 32b7cd70 ( the finishing effect set, 3 MP )
+void CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_END_FrameMove()
+{
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_COMBO_ZZZ_END_FIRE_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_COMBO_ZZZ_END_FIRE_TIME ) == true && EventCheck( DASH_COMBO_ZZZ_END_FIRE_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		if ( true == FlushMp( DASH_COMBO_ZZZ_MP_COST ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_C_SCA_Dash_ZZZ_Finish", this );
+		else
+			CreateNotEnoughMPEffect( GetBonePos( L"Dummy2_Lhand" ), 0.f, 0.f, 0.f );
+	}
+
+	CommonFrameMove();
+}
+
+// char-elesis CH1g2: June 32b7d920 ( the charged shot: 5 MP, damage, life time and size grow with the charge; it is placed at the unit, not at the hand )
+void CX2GUEL::ESI_DASH_COMBO_SCA_XZ_FIRE_FrameMove()
+{
+	CommonFrameMove();
+
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_COMBO_XZ_FIRE_EVENT_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_COMBO_XZ_FIRE_EVENT_TIME ) == true && EventCheck( DASH_COMBO_XZ_FIRE_EVENT_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		const float fChargePowerRate = 1.f + m_fDashJumpZXChargeTime * DASH_COMBO_XZ_FIRE_POWER_PER_CHARGE;
+		const float fEffectScale = 1.f + m_fDashJumpZXChargeTime * DASH_COMBO_XZ_FIRE_SCALE_PER_CHARGE;
+		const float fLifeTimeRate = 1.f + m_fDashJumpZXChargeTime * DASH_COMBO_XZ_FIRE_LIFE_TIME_PER_CHARGE;
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Dummy2_Lhand" );
+
+		if ( true == IsEnoughMPForAttack( DASH_COMBO_XZ_FIRE_MP_COST, vBonePos, 0.f, D3DXVECTOR3( 0.f, 0.f, 0.f ) ) )
+		{
+			CX2DamageEffect::CEffect* pDamageEffect = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SCA_Dash_Combo_XZ",
+				GetPowerRate() * fChargePowerRate, GetPos(), GetRotateDegree(), GetRotateDegree(), m_FrameDataNow.unitCondition.landPosition.y,
+				false, -1.f, 1.f, fLifeTimeRate );
+			if ( NULL != pDamageEffect )
+				pDamageEffect->SetScale( D3DXVECTOR3( fEffectScale, fEffectScale, fEffectScale ) );
+		}
+	}
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #endif // NEW_CHARACTER_EL
