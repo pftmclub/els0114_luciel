@@ -6768,3 +6768,11 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_elesis/ch0b_stage_li
 - **Files:** `X2DamageManager.cpp/.h`, `X2DamageEffect.cpp`, `X2GUUser.cpp/.h`, `X2GUNPC.cpp/.h`, `X2GameUnit.cpp`, `KTDXLIB/KTDXCollision.h`, `KTDXLIB/Always.h`.
 - **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE`; debug `[JUNE_STATCALC] EFFHIT` and `PART` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE` in `KTDXLIB/Always.h`, rebuild (a KTDXLIB header changes, so every project rebuilds).
+
+## NPC DamageReact from the final damage to the HP change as June's (june-stat-calc D4a, 2026-11-13)
+
+- **What:** in `CX2GUNPC::DamageReact` (June `327b1f30` @327b33f0-327b4c13): Lu/Ciel's summoned darkness passes `KeyCode` per mille of a hit to its owner (new `CX2Game::GetUnitByUIDAndType`); the Henir Nasod element NPCs and barriers (four June NPC ids registered); the Lua-forced damage `SetDamageValueByForce` (new binding); NPC Init key `NOT_APPLY_DAMAGE_IN_DUNGEON` (no damage in a dungeon game); the sub-stage ally NPC damage tally on the game; the state's `DAMAGED_FUNC` before the HP change; `GetDrainHpBuffValue` adds the drain buff to the script's `DRAIN_HP_RATE` (new `DamageData::m_fDrainHpRateFromScript`) instead of replacing it.
+- **Why:** June-only damage terms on the NPC hit path; June's NPC scripts (Nasod element AI, Eve / Add summons, Fools' Day and treasure NPCs) set keys March never read.
+- **Files:** `X2GUNPC.cpp/.h`, `X2Game.cpp/.h`, `X2DamageManager.cpp/.h`, `X2GameUnit.h`, `X2Main.cpp`, `X2UnitManager.h`, `KTDXLIB/Always.h`.
+- **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4b continues under it); debug `[JUNE_STATCALC] REACT` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` in `KTDXLIB/Always.h`, rebuild; the four NPC names stay, unused.

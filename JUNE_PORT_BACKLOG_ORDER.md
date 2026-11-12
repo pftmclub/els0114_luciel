@@ -1139,6 +1139,9 @@ june-effect C10d found two June damage steps that exist only for event dungeons.
   `AddServerPacket( 0x67f, 60 )` (March's analogue: `Send_EGS_SYNC_DUNGEON_TIMER_NOT`, `SERV_EVENT_VALENTINE_DUNGEON`, off); for
   `DI_EVENT_2017_FOOLSDAY` (41460) it clears byte `+0x64` of the now sub-stage; and the game's event object (`+0xbd8`, `32070f40` -> `322cc5a0`,
   the XMAS-2016 object of X2GUUser.cpp's fail hook) can pick the `GameFightNew` particle. CH1n2 left stand-in lines for all four.
+- **The NPC state's DIED_FUNC** (june-stat-calc D4a, 2026-11-13). June's InitState keys hold `DIED_FUNC` ( NPC `+0x848c`, beside D4a's `DAMAGED_FUNC` `+0x8488`;
+  key order inferred from `3279dc80` ), used only by `Treasure_Charger` / `_Defender` / `_Walker` ( `DI_EVENT_2017_TREASURE` ). Find its caller ( the NPC
+  die path ), then parse it beside `DAMAGED_FUNC` ( X2GUNPC.cpp, `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` shows the pattern ) when that dungeon is ported.
 **Depends on:** nothing in code. It is content, so plan it after Stage 1 has proven how a June dungeon is brought over.
 
 ### Stage 20: damage-number customization (june-effect C3e, 2026-10-09)
@@ -1154,6 +1157,11 @@ Found by june-effect C3e (funcmap row `31fe0f60 / 31fe9ff0 / 31fcfb10 (C3e)`). W
   - the readers: the `CX2Game` vslot `322cfd70` returns `+0x94bc` by UID, and the damage-number renderer that picks the font;
   - the font assets;
   - how the items are owned (inventory lookup `32869c80`).
+- **Found by june-stat-calc D4a (2026-11-13):** the renderer side. NPC `DamageReact` pushes each number through `32299d60` ( a queue at unit
+  `+0x3e78`: damage, impact point, delay 0.2 for a double hit's second number, type 0 / 1 critical / 2 double, skin from game vslots `0x22c` /
+  `0x230` = `+0x94b8` / `+0x94bc` ); its consumer `32296fe0` ( also NPC `3277dfd0`, user `3206eaf0` ) draws with the skin's PicChar ( g_pData
+  `+0x184` / `+0x194` ) and plays the critical / double-hit particles and sound. NPC Init `SHOW_DAMAGE_AT_IMPACT_POINT` ( `+0x8f88`, 23 June scripts )
+  moves the number to the impact point. March draws inline with the same values ( D4a kept it ). funcmap rows `StatCalc S33 D4a`.
 
 **Depends on:** Stage 13 (the item ids, done). It touches no other stage's files.
 

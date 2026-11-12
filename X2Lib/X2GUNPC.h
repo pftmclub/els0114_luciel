@@ -343,6 +343,9 @@ class CX2GUNPC : public CX2GameUnit
             std::vector<float>                          m_vecHintTimerEventTrigger;
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
             std::string                                m_strAttackedFunc;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+            std::string                                m_strDamagedFunc;	// june-stat-calc D4a: June InitState DAMAGED_FUNC
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
             char                                        m_acStateType[STATE_TYPE_NUMS];
 
             InitStateData()
@@ -2294,6 +2297,9 @@ class CX2GUNPC : public CX2GameUnit
 
 		void						SetKeyCode( int keyCode ){ m_KeyCode = keyCode; }
 		int							GetKeyCode(){ return m_KeyCode; }
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		void						SetDamageValueByForce( float fDamage_ ) { m_fDamageValueByForce = fDamage_; }	// june-stat-calc D4a: June 31e4d1c0 ( Lua-bound )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		void						SetFocusCamera( bool bFocusCamera ){ m_bFocusCamera = bFocusCamera; }
 		bool						GetFocusCamera(){ return m_bFocusCamera; }
 //{{oasis:±è»óÀ±////2009-10-7////
@@ -3695,6 +3701,9 @@ class CX2GUNPC : public CX2GameUnit
         int                                             m_iLua_CommonCameraMoveRefID;
         int                                             m_iLua_CommonFrameMoveRefID;
         int                                             m_iLua_AttackedFuncRefID;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+        int                                             m_iLua_DamagedFuncRefID;	// june-stat-calc D4a: June +0x8488
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef SERV_IRUHADEV_ELYSION_INVINCIBLE_ATTACK_TYPE
 		std::vector<int>								m_vecInvincibleAttackTypeNow;	/// Atlas E10: June +0x83f0, appended at every state start, never cleared
 #endif SERV_IRUHADEV_ELYSION_INVINCIBLE_ATTACK_TYPE
@@ -4686,6 +4695,10 @@ class CX2GUNPC : public CX2GameUnit
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 		bool				m_bImmuneToHpAttack;	// june-stat-calc D3: June +0x8f0c, Init IMMUNE_TO_HP_ATTACK ( default m_bHasBossGage )
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		float				m_fDamageValueByForce;		// june-stat-calc D4a: June +0x8f84 ( ctor -1 ); above -1 it replaces a hit's damage
+		bool				m_bNotApplyDamageInDungeon;	// june-stat-calc D4a: June +0x75bc ( a protected bool ), Init NOT_APPLY_DAMAGE_IN_DUNGEON
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef IMMUNITY_TIME_STOP		
 		bool						m_bImmunityTimeStop;		//Å¸ÀÓ ½ºÅé ¸é¿ª ±â´É Ãß°¡
 #endif //IMMUNITY_TIME_STOP

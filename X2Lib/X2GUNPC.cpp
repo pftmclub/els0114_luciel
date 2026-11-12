@@ -1797,6 +1797,10 @@ CX2GUNPC::CX2GUNPC( int unitIndex, int teamNum, int uid, const CX2UnitManager::N
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 , m_bImmuneToHpAttack( false )	// june-stat-calc D3: June CommonConstructor @3276337c
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+, m_fDamageValueByForce( -1.f )	// june-stat-calc D4a: June CommonConstructor @327633a7 ( 334380f0 )
+, m_bNotApplyDamageInDungeon( false )	// june-stat-calc D4a
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 {
 
 	//if( NULL == pNPCTemplet )
@@ -1956,6 +1960,10 @@ CX2GUNPC::CX2GUNPC( const CNpcCreatedInfoPtr NpcCreatedInfoPtr_
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 , m_bImmuneToHpAttack( false )	// june-stat-calc D3: June CommonConstructor @3276337c
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+, m_fDamageValueByForce( -1.f )	// june-stat-calc D4a: June CommonConstructor @327633a7 ( 334380f0 )
+, m_bNotApplyDamageInDungeon( false )	// june-stat-calc D4a
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 {
     if ( pNPCUnitInfo == NULL || pNPCUnitInfo->m_pInitData == NULL )
 		return;
@@ -2317,6 +2325,9 @@ void CX2GUNPC::CommonConstructor()
     m_iLua_CommonCameraMoveRefID = LUA_REFNIL;
     m_iLua_CommonFrameMoveRefID = LUA_REFNIL;
     m_iLua_AttackedFuncRefID = LUA_REFNIL;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+    m_iLua_DamagedFuncRefID = LUA_REFNIL;	// june-stat-calc D4a: June CommonConstructor @32762793
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
     m_kNonHostReaction.Init();
 
@@ -4515,6 +4526,9 @@ void CX2GUNPC::InitComponent()
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 		LUA_GET_VALUE( m_LuaManager, "IMMUNE_TO_HP_ATTACK", m_bImmuneToHpAttack, m_bHasBossGage );	// june-stat-calc D3: June 327a0fa0 @327a454c
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		LUA_GET_VALUE( m_LuaManager, "NOT_APPLY_DAMAGE_IN_DUNGEON", m_bNotApplyDamageInDungeon, false );	// june-stat-calc D4a: June 327a0fa0 @327ac59f
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 		if ( GetHasBossGage() )
 		{
@@ -5069,6 +5083,9 @@ out_hint:
 
         // 공격 명중시 실행할 Function 정의
         LUA_GET_VALUE_UTF8( luaManager_, "ATTACKED_FUNC",		        initState.m_strAttackedFunc,		"" );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+        LUA_GET_VALUE_UTF8( luaManager_, "DAMAGED_FUNC",		        initState.m_strDamagedFunc,		"" );	// june-stat-calc D4a: June InitState 3279dc80
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
         std::string stateName2;
 
@@ -7334,6 +7351,11 @@ void CX2GUNPC::InitState()
     if ( initStateData.m_strAttackedFunc.empty() == false )
         m_iLua_AttackedFuncRefID = m_LuaManager.MakeFunctionReference( initStateData.m_strAttackedFunc.c_str()
                 , ( m_pNPCUnitInfo->m_pLuaState != NULL ) ? false : true );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+    if ( initStateData.m_strDamagedFunc.empty() == false )	// june-stat-calc D4a: June InitState 327989e0 @32798d4d
+        m_iLua_DamagedFuncRefID = m_LuaManager.MakeFunctionReference( initStateData.m_strDamagedFunc.c_str()
+                , ( m_pNPCUnitInfo->m_pLuaState != NULL ) ? false : true );
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
     m_SmallDamageLandFront = initStateData.m_acStateType[ STATE_TYPE_SMALL_DAMAGE_LAND_FRONT ];
 	m_SmallDamageLandBack = initStateData.m_acStateType[ STATE_TYPE_SMALL_DAMAGE_LAND_BACK ];
@@ -9758,6 +9780,46 @@ bool CX2GUNPC::StateChange( const char* state, bool bDirectChange )
 #endif  X2OPTIMIZE_NPC_NONHOST_SIMULATION
 }
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+namespace _CONST_GUNPC_D4A_
+{
+	const double	OWNER_SHARE_PER_KEY_CODE	= 0.001;	// June 334bac40 ( @327b3456 )
+	const float		DAMAGE_VALUE_BY_FORCE_UNSET	= -1.f;		// June 33436c90 ( @327b35e9 )
+
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	struct DamageReactTrace	// june-stat-calc D4a: the damage after each group of June @327b33f6-327b4c11 for the REACT line
+	{
+		float fFinalDamage, fAfterOwnerShare, fBeforeCritical, fAfterCritical, fAfterDouble, fAfterDungeonGuard, fAfterAdditional, fAfterHooks;
+		bool bCritical;
+		DamageReactTrace()
+			: fFinalDamage( 0.f ), fAfterOwnerShare( 0.f ), fBeforeCritical( 0.f ), fAfterCritical( 0.f ), fAfterDouble( 0.f )
+			, fAfterDungeonGuard( 0.f ), fAfterAdditional( 0.f ), fAfterHooks( 0.f ), bCritical( false )
+		{}
+	};
+
+	inline __int64 GetDamageReactLogID( CX2GameUnit* pUnit_ )	// june-stat-calc D4a: NPC id or user UID, as the HIT line
+	{
+		if ( NULL == pUnit_ )
+			return 0;
+		return ( CX2GameUnit::GUT_NPC == pUnit_->GetGameUnitType() ) ? static_cast<__int64>( static_cast<CX2GUNPC*>( pUnit_ )->GetNPCTemplet().m_nNPCUnitID ) : pUnit_->GetUnitUID();
+	}
+
+	bool IsDamageReactLogDue( const CX2GameUnit* pAttacker_, const CX2GameUnit* pDefender_ )	// june-stat-calc D4a: one REACT line per pair, about once a second
+	{
+		static std::map< std::pair< const CX2GameUnit*, const CX2GameUnit* >, DWORD > s_mapDamageReactLogged;
+		if ( s_mapDamageReactLogged.size() > 256 )
+			s_mapDamageReactLogged.clear();
+		const DWORD dwNow = ::GetTickCount();
+		DWORD& dwLast = s_mapDamageReactLogged[ std::make_pair( pAttacker_, pDefender_ ) ];
+		if ( dwNow - dwLast < 1000 )
+			return false;
+		dwLast = dwNow;
+		return true;
+	}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+}
+using namespace _CONST_GUNPC_D4A_;
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 {
 
@@ -10781,8 +10843,65 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			CX2GageManager::GetInstance()->ShowBossGageUIByUIDAndNotShowOtherBossGageUI( GetUnitUID() );
 
 		float fFinalDamage = GetFinalDamage( pDamageData );		
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		DamageReactTrace kDamageReactTrace;	// june-stat-calc D4a: the REACT line
+		kDamageReactTrace.fFinalDamage = fFinalDamage;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		// june-stat-calc D4a: June @327b33fc-327b3485: the summoned darkness keeps ( 1 - KeyCode / 1000 ) of a hit and its owner loses that share of what it kept
+		if ( ( CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS == GetNPCTemplet().m_nNPCUnitID || CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP == GetNPCTemplet().m_nNPCUnitID )
+			&& NULL != GetNPCAI() && NULL != g_pX2Game )
+		{
+			// crash guard: June reads the ally fields of any AI; here only an ally AI ( NAT_ALLY, or 4 = sub-stage ally, no enum name ) has them
+			if ( CX2NPCAI::NAT_ALLY == GetNPCAI()->GetAIType() || 4 == static_cast<int>( GetNPCAI()->GetAIType() ) )
+			{
+				const CX2AllyNPCAI* pOwnerAllyAI = static_cast<const CX2AllyNPCAI*>( GetNPCAI() );
+				CX2GameUnit* pOwnerUnit = g_pX2Game->GetUnitByUIDAndType( pOwnerAllyAI->GetAllyUnitUID(), static_cast<int>( pOwnerAllyAI->GetAllyUnitType() ) );
+				if ( NULL != pOwnerUnit )
+				{
+					const float fOwnerShareRate = static_cast<float>( m_KeyCode * OWNER_SHARE_PER_KEY_CODE );
+					fFinalDamage = ( 1.f - fOwnerShareRate ) * fFinalDamage;
+					pOwnerUnit->UpNowHpWithText( -fFinalDamage * fOwnerShareRate );	// JUNE_BUGS: the owner's share is taken of the damage already cut
+				}
+			}
+		}
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterOwnerShare = fFinalDamage;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 		// 데미지 강제 보정(알테라 평원 보스 예외처리)
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		// june-stat-calc D4a: June @327b3491-327b35d5: the Henir element NPCs and barriers count too
+		if ( NULL != g_pX2Game )
+		{
+			CX2UnitManager::NPC_UNIT_ID eBarrierID = CX2UnitManager::NUI_NONE;
+			CX2UnitManager::NPC_UNIT_ID eHenirBarrierID = CX2UnitManager::NUI_NONE;
+			if ( CX2UnitManager::NUI_NASOD_ELEMENT_ICE == GetNPCTemplet().m_nNPCUnitID || CX2UnitManager::NUI_NASOD_ELEMENT_ICE_HENIR == GetNPCTemplet().m_nNPCUnitID )
+			{
+				eBarrierID = CX2UnitManager::NUI_BARRIERMACHINE_ICE;
+				eHenirBarrierID = CX2UnitManager::NUI_BARRIERMACHINE_ICE_HENIR;
+			}
+			else if ( CX2UnitManager::NUI_NASOD_ELEMENT_FIRE == GetNPCTemplet().m_nNPCUnitID || CX2UnitManager::NUI_NASOD_ELEMENT_FIRE_HENIR == GetNPCTemplet().m_nNPCUnitID )
+			{
+				eBarrierID = CX2UnitManager::NUI_BARRIERMACHINE_FIRE;
+				eHenirBarrierID = CX2UnitManager::NUI_BARRIERMACHINE_FIRE_HENIR;
+			}
+			if ( CX2UnitManager::NUI_NONE != eBarrierID )
+			{
+				for ( int i = 0; i < g_pX2Game->GetNPCUnitListSize(); ++i )
+				{
+					CX2GUNPC* pBarrierUnit = g_pX2Game->GetNPCUnit( i );
+					if ( NULL != pBarrierUnit && true == pBarrierUnit->GetFlag_LUA( 3 )
+						&& ( true == pBarrierUnit->IsUnitID( eBarrierID ) || true == pBarrierUnit->IsUnitID( eHenirBarrierID ) ) )
+					{
+						fFinalDamage = 1.f;
+						break;
+					}
+				}
+			}
+		}
+#else SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		if( g_pX2Game != NULL && GetNPCTemplet().m_nNPCUnitID == CX2UnitManager::NUI_NASOD_ELEMENT_ICE )
 		{
 			for( int i=0; i < g_pX2Game->GetNPCUnitListSize(); ++i)
@@ -10812,12 +10931,23 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 
 			
 
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		// june-stat-calc D4a: June @327b35db-327b35fc: a Lua-forced damage above -1 replaces the hit's damage, then the enchant resist ( slot 0x378 @327b35fe )
+		if ( DAMAGE_VALUE_BY_FORCE_UNSET < m_fDamageValueByForce )
+			fFinalDamage = m_fDamageValueByForce;
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef DUNGEON_ITEM
 		if( (CX2EnchantItem::ENCHANT_TYPE)pDamageData->m_ResistType != CX2EnchantItem::ET_NONE )
 		{
 			ApplyEnchantResist( (CX2EnchantItem::ENCHANT_TYPE)pDamageData->m_ResistType, fFinalDamage );
 		}
 #endif
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fBeforeCritical = fFinalDamage;	// june-stat-calc D4a
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		D3DXVECTOR3 numPos;
 #ifdef FIELD_BOSS_RAID // 데미지 표기 위치 변경
 		if( true == GetIsBosRaidNPC() )
@@ -10996,6 +11126,13 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			}
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterCritical = fFinalDamage;	// june-stat-calc D4a
+		kDamageReactTrace.bCritical = bShowRedPicture;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		// stand-in: Lu/Ciel not ported; June @327b39cf-327b3a8d: a hit from behind ( +0x844d clear ) sets DD +0x5c0, then a UT_LUCIEL attacker scales the damage ( char-luciel )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef ADD_BACKATTACK
 		if( bBackAttack == true && bCriticalHit == false )
 		{
@@ -11079,6 +11216,11 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			bShowRedPicture = true; // 더블어택의 경우 빨간색으로 표시!!
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterDouble = fFinalDamage;	// june-stat-calc D4a
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		bool bCanDrainHp = false;
 
 #ifdef BALANCE_BLADE_MASTER_20130117		/// 이펙트에도 피 흡수를 적용 시킬 수 있도록 수정
@@ -11165,6 +11307,14 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		}
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		// june-stat-calc D4a: June @327b41c9-327b4210: a NOT_APPLY_DAMAGE_IN_DUNGEON NPC takes no damage in a dungeon game
+		if ( true == m_bNotApplyDamageInDungeon && NULL != g_pX2Game && CX2Game::GT_DUNGEON == g_pX2Game->GetGameType() )
+			fFinalDamage = 0.f;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterDungeonGuard = fFinalDamage;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		////////////////////////// fFinalDamage의 변경은 이 위로 해주세요!!! (옵션 수치화 제외)///////////////////////////////////
 
 		//{{ kimhc // 2011-07-05 // 옵션데이타 수치화 작업
@@ -11262,6 +11412,11 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		}		
 		//}} kimhc // 2011-07-05 // 옵션데이타 수치화 작업
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterAdditional = fFinalDamage;	// june-stat-calc D4a
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef SERV_IRUHADEV_JUNE_SOCKET_COOLTIME_ON_HIT
 		/// June CX2GUNPC::DamageReact 327b1f30 @327b4484-327b452f, function scope after the gate. An attacker that is a user
 		/// with a unit, +0x7ca8 set, GetRandomFloat( 0 ) < 0.03f ( 3344f248 is a double holding 0.03f widened, 0.0299999993;
@@ -11308,6 +11463,11 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		/// before the damage number (+0x8d35 = m_bDamageOutScreen)
 		DoCustomFunctionByBuffInNpcFinalDamage( &fFinalDamage, pDamageData );
 #endif SERV_IRUHADEV_JUNE_BUFF_CUSTOM_FUNCTION
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterHooks = fFinalDamage;	// june-stat-calc D4a
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		if ( true == m_bDamageOutScreen 
 #ifdef SHOW_ONLY_MY_DAMAGE
 			&& true == bShowDamageReact
@@ -11430,6 +11590,11 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 					if ( CX2GameUnit::GUT_USER == pAllyAI->GetAllyUnitType() )
 						AddToDamagedMap( pAllyAI->GetAllyGameUnit(), fFinalDamage );
 				}
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+				// june-stat-calc D4a: June @327b4b3a-327b4b5c: a sub-stage ally NPC's ( AI type 4, no enum name ) hit is tallied on the game as an int
+				else if ( NULL != pNPC->GetNPCAI() && 4 == static_cast<int>( pNPC->GetNPCAI()->GetAIType() ) && NULL != g_pX2Game )
+					g_pX2Game->AddSubStageAllyNpcDamage( static_cast<int>( fFinalDamage ) );
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 			}	
 		}
 		
@@ -11459,7 +11624,25 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			SetHittedCount( GetHittedCount() + 1 );
 	#endif // ADD_RENA_SYSTEM
 #endif SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+			// june-stat-calc D4a: June @327b4bad-327b4bf1: the state's DAMAGED_FUNC runs before the HP change when the hit does damage
+			if ( LUA_REFNIL != m_iLua_DamagedFuncRefID && 0.f < fFinalDamage )
+				lua_tinker::call<void>( GetFunctionLuaState(), m_LuaManager.GetLuaGeneralRef(), m_iLua_DamagedFuncRefID, g_pKTDXApp, g_pX2Game, this );
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+			const float fHpBeforeReact = GetNowHp();	// june-stat-calc D4a
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 			UpNowHp( -fFinalDamage );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+			// june-stat-calc D4a: June @327b33f6-327b4c11: the damage after each group, then the HP change ( same throttle as GFD2 )
+			if ( IsDamageReactLogDue( pAttackerUnit, this ) )
+				CX2OfflineLog::Server( L"[JUNE_STATCALC] REACT att=%I64d def=%I64d gfd=%.0f share=%.0f pre=%.0f crit=%d>%.0f double=%.0f dungeon=%.0f add=%.0f hook=%.0f dmg=%.0f hp=%.0f>%.0f",
+					GetDamageReactLogID( pAttackerUnit ), GetDamageReactLogID( this ), kDamageReactTrace.fFinalDamage, kDamageReactTrace.fAfterOwnerShare,
+					kDamageReactTrace.fBeforeCritical, ( kDamageReactTrace.bCritical ? 1 : 0 ), kDamageReactTrace.fAfterCritical, kDamageReactTrace.fAfterDouble,
+					kDamageReactTrace.fAfterDungeonGuard, kDamageReactTrace.fAfterAdditional, kDamageReactTrace.fAfterHooks, fFinalDamage, fHpBeforeReact, GetNowHp() );
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 
 			UpNowMp( 3.0f );

@@ -810,6 +810,52 @@ the cut reads the listing `june2017_re/buffre/dec/320462a0.s`.
 build, no review of its own) and **D4b** (user, full build and the play-test for both); `D4-review.md` covers both. Kickoffs `D4a.md`
 (was `D4.md`), `D4b.md`, `D4-review.md`; STATUS rows updated.
 
+### Phase D4a - Done (2026-11-13)
+
+**Opus 5.5 / high. Flag `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (new; D4b continues under it).** Commit: this commit. Insert-only:
+`X2GUNPC.cpp` +183, `X2Game.cpp` +16, `Always.h` +15, `X2GUNPC.h` +13, `X2Game.h` +7, `X2DamageManager.h` +6, `X2GameUnit.h` +4, `X2Main.cpp` +3,
+`X2DamageManager.cpp` +3; June names under `SERV_IRUHADEV_JUNE_ENUM_NAMES`: `X2UnitManager.h` +7 (`NUI_BARRIERMACHINE_FIRE_HENIR` 1767, `_ICE_HENIR` 1768,
+`NUI_NASOD_ELEMENT_FIRE_HENIR` 1805, `_ICE_HENIR` 1806; free values, checked on the preprocessed enum). `dr_blocks.tsv`: every `npc` row `June` except
+the number position (`n/a`) and Stage 19's alchemy lab (`absent`). Map rows 17 (`June`), 28, 31; funcmap 16 rows `StatCalc S33 D4a`.
+
+**Ported (June `327b1f30` from @327b33f6, in June's order):**
+- @327b33fc Lu/Ciel's summoned darkness (`NUI_SI_SA_LLD_SUMMON_DARKNESS` / `_PVP`): r = `m_KeyCode` x 0.001; it keeps damage x ( 1 - r ) and its AI
+  owner (new `CX2Game::GetUnitByUIDAndType`, June slot `0xc8` `322d80a0`) loses r x the kept damage via `UpNowHpWithText` (JUNE_BUGS 640). Crash guard:
+  only an ally AI (type 1 or 4) is read. Unreachable until Lu/Ciel (Stage 8).
+- @327b3491 element NPCs: June adds the Henir ids (ice 1806 -> barriers 235 / 1768, fire 1805 -> 234 / 1767); `+0x8754` = `m_FlagList[3]`. March in `#else`.
+- @327b35db `SetDamageValueByForce` (Lua-bound `31e4d1c0`, `+0x8f84`, ctor -1): above -1 it replaces the damage, before the enchant resist. Bound in
+  X2Main.cpp; June data: `PVE_PATTRN_AI_Nasod_Element_Fire` / `_Ice`.
+- @327b35fe slot `0x378` = `ApplyEnchantResist( m_ResistType )` (`3226dd20`, = March, no override): already in place (DUNGEON_ITEM on).
+- @327b41c9 NPC Init `NOT_APPLY_DAMAGE_IN_DUNGEON` (`+0x75bc`): damage 0 in `GT_DUNGEON` (Eve's Nasod Watch / Electronic Field, Add's Surface Cutting,
+  Ferdinand). Its other reader, June's NPC `UpNowHp` override `32784200`, is routed to D5 (kickoff amended); `32778e40` has no caller.
+- @327b4b3f sub-stage ally NPC (AI type 4, no enum name): game `+0xb24` += int( damage ) (`AddSubStageAllyNpcDamage`); its readers `322dbef0` /
+  `322ef1b0` (a monster-HP damage share) are not in March: the member has no reader yet.
+- @327b4bad the state's `DAMAGED_FUNC` (InitState key, `+0x8488`) runs before `UpNowHp` when damage > 0, as March's `ATTACKED_FUNC` call. June data:
+  `FOOLSDAY_FUNMECHANIC`, `FOOLSDAY_WASH`, `Treasure_Mimic`. Its sibling `DIED_FUNC` went to backlog Stage 19.
+- `GetDrainHpBuffValue` (`32071c80`, @327b3b50) differs: June adds the buff rate to the script's `DRAIN_HP_RATE` (DD `+0x4e4`, copied at load
+  `3263afdf`); March overwrote it. New `DamageData::m_fDrainHpRateFromScript`; `june_march_divergent.tsv` row, replaced (both DamageReacts call it).
+
+**Re-read, = June (no code):** GetFinalDamage call; critical (rate + DD `+0x5d4`, WayOfSword, anti-critical clamp, `32273480` makes no roll, the
+`GetRandomFloat( 1 )` test, `GetCriticalDamageRate` by jump table `327b5390`); `ApplyHeadShotDamage` `322978e0`; double attack; HP and MP drain;
+additional defence, k, Add stasis, slots `0x4f8` / `0x4fc`; socket cool time; `322cfca0` + slot `0x304` and slot 6 in place; tally; hitted count.
+`ADD_BACKATTACK` is undefined (`cl /EP`): March's x1.5 / x1.1 are already dead code. The number shown = March's value; June's number queue
+`32299d60` (skins, delay, critical / double particles) and `SHOW_DAMAGE_AT_IMPACT_POINT` are display: backlog Stage 20 bullet.
+
+**Class hand-off.** The cut's "state 10" is `GetUnitType() == UT_LUCIEL`: @327b39cf a hit from behind sets DD `+0x5c0`, then Lu/Ciel's members
+`+0x95f8` / `+0x9600` / `32ae5120` (ORIAX buffs -> `+0x9604`) scale it: `stand-in: Lu/Ciel not ported` comment, checklist 7aw.
+
+**Debug line** (`_DEBUG`, same throttle as `GFD2`): `[JUNE_STATCALC] REACT att= def= gfd= share= pre= crit=<0/1>><after> double= dungeon= add= hook=
+dmg= hp=<before>><after>` (after GetFinalDamage, the owner share, before the critical, after it, after x2, after the dungeon guard, after the
+additional damage, after the hooks; then the HP change).
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT --worktree --files <10 files>`: 8 PASS, 0 PASS~, 0 DEFINE, 2 OTHER (Always.h, the
+enum header under `JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL -> `RESULT: PASS`. `junediverge --check <9 files>`: `RESULT: PASS`.
+`enumscan --reuse --check <8 files>`: 0 A/B rows. Probes (`/Zs`, US_SERVICE): `X2GUNPC`, `X2Game`, `X2DamageManager`, `X2Main`, `X2GameUnit` 0 errors,
+no new warnings. The `#error` guard first named `X2OPTIMIZE_NPC_NONHOST_SIMULATION` (KTDX.h defines it after Always.h): dropped.
+**Build.** Full build skipped: no play-test (D4b builds and hands off the play-test for both sides; its kickoff lists D4a's checks).
+
+**Bookkeeping.** `dr_blocks.tsv`, map, funcmap, divergence row, JUNE_BUGS 640, checklist 7aw, backlog Stages 19 / 20, D4b and D5 kickoffs, `MODS.md`.
+
 ## Phase D5 - Extra damage, enchant resist and level correction
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE`: `LevelCorrectionExtraDamage` NPC `32760210` and the user's twin (June's

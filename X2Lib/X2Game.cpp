@@ -268,6 +268,9 @@ m_fStateStringTime( 0.0f ),		/// June ctor 32306600 @323076e6
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_MEMORIZE
 m_fMemoRiseTimer( 0.0f ),		/// June ctor @323076da
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_MEMORIZE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+m_iSubStageAllyNpcDamage( 0 ),	// june-stat-calc D4a
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 m_bSkipKeyPressed( false ),
 m_pNPCFunc( NULL ),
 m_pDLGMissionOpening( NULL ),
@@ -12400,6 +12403,19 @@ void CX2Game::PvpAmusementHalveDamage( const CX2DamageManager::DamageData* pDama
 	*pfDamage_ *= 0.5f;
 }
 #endif SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+// june-stat-calc D4a: June CX2Game vslot 0xc8 ( 322d80a0 ): the unit list entry that has this UID and game unit type
+CX2GameUnit* CX2Game::GetUnitByUIDAndType( const UidType uidUnit_, const int iGameUnitType_ ) const
+{
+	for ( std::vector<CX2GameUnit*>::const_iterator it = m_UnitList.begin(); it != m_UnitList.end(); ++it )
+	{
+		CX2GameUnit* pGameUnit = *it;
+		if ( NULL != pGameUnit && pGameUnit->GetUnitUID() == uidUnit_ && iGameUnitType_ == static_cast<int>( pGameUnit->GetGameUnitType() ) )
+			return pGameUnit;
+	}
+	return NULL;
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 void CX2Game::CheckQuickSlotItemSpecialAbility( const CX2Item::ItemTemplet* pItemTemplet_, CX2GUUser* pUser_, bool* pbAllow_, bool* pbWaitingAck_ )
 {
 	if ( NULL == pItemTemplet_ )

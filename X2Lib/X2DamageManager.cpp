@@ -705,6 +705,9 @@ bool CX2DamageManager::SetDamageDataFromLUA( DamageData* pDamageData, KLuaManage
 		LUA_GET_VALUE( luaManager, "NO_DAMAGE",				pDamageData->m_bNoDamage,			false );		
 #endif
 		LUA_GET_VALUE( luaManager, "DRAIN_HP_RATE",			pDamageData->m_fDrainHpRate,		0.f );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		pDamageData->m_fDrainHpRateFromScript = pDamageData->m_fDrainHpRate;	// june-stat-calc D4a: June @3263afdd-3263afdf
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 #ifdef SERV_ADD_ARME_BATTLE_MAGICIAN
 		LUA_GET_VALUE( luaManager, "DRAIN_MP_REACT",			pDamageData->m_fDrainMpByReact,		0.f );

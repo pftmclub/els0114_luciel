@@ -2956,6 +2956,13 @@ class CX2UnitManager
 			// char-ara CH2b0: the raid NPC June's lock-on still targets ( 3200fa20 @3200fb44 )
 			NUI_RAID_RED_DRAGON_PHASE3_2            = 2101,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			// june-stat-calc D4a: the Henir element NPCs and barriers of NPC DamageReact 327b1f30 @327b34a7-327b35d0
+			NUI_BARRIERMACHINE_FIRE_HENIR           = 1767,
+			NUI_BARRIERMACHINE_ICE_HENIR            = 1768,
+			NUI_NASOD_ELEMENT_FIRE_HENIR            = 1805,
+			NUI_NASOD_ELEMENT_ICE_HENIR             = 1806,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 //}}
 //}} robobeg : 2013-02-27

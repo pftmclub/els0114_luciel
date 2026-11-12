@@ -1248,6 +1248,9 @@ class CX2DamageManager
 
 			float					m_fDrainHpRate;		// 타격시 데미지의 얼마를 hp로 환원
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+			float					m_fDrainHpRateFromScript;	// june-stat-calc D4a: June DD +0x4e4, DRAIN_HP_RATE as loaded ( 3263afdf )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 			std::vector<std::wstring>	m_vecHitParticleName;
 
 #ifdef NO_DETONATION
@@ -1583,6 +1586,9 @@ class CX2DamageManager
 #endif
 				m_bHitedManaDamage	= false;
 				m_fDrainHpRate		= 0.f;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+				m_fDrainHpRateFromScript	= 0.f;	// june-stat-calc D4a: June SimpleInit @31f8f1da
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 				m_vecHitParticleName.clear();
 

@@ -34,6 +34,16 @@ Port the damage arithmetic of user `DamageReact` `320462a0` from the `GetFinalDa
 - The HP-rate overwrite (`@32049727`) keeps June's order verbatim; `322cfca0` and the tutorial clamp: check their place only.
 - `REACT` debug lines as D4a's.
 
+Amended 2026-11-13 by D4a (read its Done note first):
+- The cut's "state 10" is unit type 10: `31e4d0e0` = `GetUnitType`, 10 = `UT_LUCIEL`. `32048cdb` and the `32aebaf0` multiply are Lu/Ciel's: write a
+  `stand-in: Lu/Ciel not ported` comment as D4a did (checklist 7aw); DD `+0x5c0` is read only by Lu/Ciel `32b3d380`.
+- Slot `0x378` (`@320489f3`) is `ApplyEnchantResist( DD +0x4fc m_ResistType, &damage )` (`3226dd20`, = March): check only its place.
+- `GetDrainHpBuffValue` (`32071c80`) is already replaced by D4a (divergence row); check only its place in the user order.
+- The `REACT` line: copy D4a's trace (`_CONST_GUNPC_D4A_` in X2GUNPC.cpp) into a `_CONST_GUUSER_D4B_` namespace with the user's groups.
+- Play-test both sides: D4a added no hand-off of its own. NPC lines to see: `[JUNE_STATCALC] REACT att= def=` per monster, `dmg` = `hp` drop; a
+  Henir Nasod element (1805 / 1806) takes 1 while its barrier (1767 / 1768) has flag 3; Eve's Electronic Field or Nasod Watch takes 0 in a dungeon;
+  `DAMAGED_FUNC` runs on Treasure_Mimic / FOOLSDAY NPCs if a reachable dungeon spawns them (else say so).
+
 Gate: the play-test of the phase section, for both sides (ten logged hits each way; a unit with damage-reduction sockets and one
 without): `REACT`'s HP change equals the `GFD` damage after the listed reductions. Full build, `DEPLOY OK`, `EXESTR OK` for the `REACT` tag.
 

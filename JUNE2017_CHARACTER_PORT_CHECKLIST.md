@@ -1062,3 +1062,12 @@ Divergent row `ResetAnimSpeed` (`tools/data/june_march_divergent.tsv`) tracks th
 - **Add** (Stage 7) / **Ain** (Stage 8): June's user float `+0x92a0` (ctor `3203e850`, reset by the base `InitPassiveSkillState` `31fe19d0`, added by Add `32a1ccb0`
   / Ain `32a4f760` passives) multiplies after the world rate; March lacks the member.
 - **Lu/Ciel** (Stage 8): the future animation is `+0x8e90 ? +0x8e84 : m_pXSkinAnimFuture` (dual body, 7o).
+
+### 7aw. Lu/Ciel's damage scale in both DamageReacts (from june-stat-calc D4a)
+
+June's NPC `DamageReact` (`327b1f30` @`327b39cf`-`327b3a8d`) and user `DamageReact` (`320462a0` @`32048cdb`) set DamageData `+0x5c0` = 1 on a hit
+from behind (defender `+0x844d` `bAttackerFront` clear), then for a user attacker of unit type `UT_LUCIEL` (`31e4d0e0` == 10): AT_SPECIAL x `+0x95f8`
+(unless the skill templet's category `32070510` is 5), any other attack x `32ae5120` (`BTI_BUFF_POWER_OF_ORIAX` 464 or `_MEMO` 520 -> `+0x9604`, else 1.0),
+and skill 30205 (`0x75fd`) x `+0x9600`. The three floats are Lu/Ciel class members (ctor `32b1c54b`: 1.0 each). `DD +0x5c0`'s only reader is `32b3d380` (CH4a).
+- **Lu/Ciel** (Stage 8): the NPC side is a `stand-in: Lu/Ciel not ported` comment under `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (X2GUNPC.cpp);
+  the port adds the DamageData byte, the three members and the multiply on both sides (user side: D4b's stand-in).

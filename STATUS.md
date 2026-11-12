@@ -359,8 +359,8 @@ Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 /
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| D4a | **ready**: NPC `DamageReact` damage arithmetic (cut 2026-11-12: 10 absent / mixed, 9 to re-read); probe build, no review of its own | Opus 5.5 / high | D4 cut | `X2GUNPC.*` | `D4a.md` |
-| D4b | blocked (D4a): user `DamageReact` damage arithmetic (10 absent / mixed, 16 to re-read), socket-reduction body; full build + play-test for both | Opus 5.5 / high; review `D4-review.md` Opus 5.5 / high | D4a | `X2GUUser.*` | `D4b.md` |
+| D4a | done 2026-11-13: NPC `DamageReact` damage section = June (owner share, Henir elements, forced damage, dungeon guard, ally tally, DAMAGED_FUNC, drain base); probe build; play-test with D4b | Opus 5.5 / high | D4 cut | `X2GUNPC.*` | `D4a.md` |
+| D4b | **ready**: user `DamageReact` damage arithmetic (10 absent / mixed, 16 to re-read), socket-reduction body; full build + play-test for both | Opus 5.5 / high; review `D4-review.md` Opus 5.5 / high | D4a | `X2GUUser.*` | `D4b.md` |
 | D5 | blocked (D4 review): extra damage, enchant resist, level correction | Opus 5.5 / high, Opus review | D4 review | `X2GUNPC.cpp`, `X2GUUser.*`, `X2GameUnit.*`, `DungeonEnum.h` | `D5.md` |
 | D6 | blocked (D5 review): damage smoke on every ported character; its review covers D1-D5 and retires `_DEBUG` | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |
 | S0 | ready: stat-sheet and resource map (read-only); runs beside anything | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0.md` |

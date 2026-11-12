@@ -4421,7 +4421,11 @@ public:
 
 			if( NULL != pDamageData_ && fDrainHpRate > 0.f && pDamageData_->attackType != CX2DamageManager::AT_SPECIAL )
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+				pDamageData_->m_fDrainHpRate = pDamageData_->m_fDrainHpRateFromScript + fDrainHpRate;	// june-stat-calc D4a: June 32071c80 adds to the script's DRAIN_HP_RATE
+#else SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 				pDamageData_->m_fDrainHpRate = fDrainHpRate;
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 				return fDrainHpRate;
 			}
 

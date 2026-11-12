@@ -1242,6 +1242,10 @@ class CX2Game : public CKTDXStage
 		/// effect completion C10e: June 322cfca0( DamageData, float* damage ), called from the user and NPC DamageReact
 		void						PvpAmusementHalveDamage( const CX2DamageManager::DamageData* pDamageData_, float* pfDamage_ );
 #endif SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		CX2GameUnit*				GetUnitByUIDAndType( const UidType uidUnit_, const int iGameUnitType_ ) const;	// june-stat-calc D4a: June vslot 0xc8 ( 322d80a0 )
+		void						AddSubStageAllyNpcDamage( const int iDamage_ ) { m_iSubStageAllyNpcDamage += iDamage_; }	// june-stat-calc D4a: June +0xb24; readers 322dbef0 / 322ef1b0 not ported
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef SERV_IRUHADEV_JUNE_SKIP_START
 		/// effect completion C3p: June's skip-the-start ( ESC ) list at game +0xb40 ( bool armed, bool sent, vector of NPC UIDs ).
 		void						SkipStartReset();							/// 322d8010
@@ -2058,6 +2062,9 @@ protected:
 		std::map< int, std::vector< CKTDGParticleSystem::CParticleEventSequenceHandle > >	m_mapMemoRiseParticle;	/// June +0xb28
 		float						m_fMemoRiseTimer;		/// June +0xb38
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_MEMORIZE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		int							m_iSubStageAllyNpcDamage;	// june-stat-calc D4a: June +0xb24, the damage sub-stage ally NPCs ( AI type 4 ) deal
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		InfoTextManager				m_InfoTextManager;			/// 마나가 부족 하다는 등 화면 가운데에 나오는 메시지
 		bool						m_bSkipKeyPressed;			/// 튜토리얼에서 사용
 		

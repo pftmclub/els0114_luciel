@@ -4530,6 +4530,9 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2GUNPC>( L, "GetUnitCondition_bHit",		&CX2GUNPC::GetUnitCondition_bHit);
 	lua_tinker::class_def<CX2GUNPC>( L, "SetKeyCode",					&CX2GUNPC::SetKeyCode);
 	lua_tinker::class_def<CX2GUNPC>( L, "GetKeyCode",					&CX2GUNPC::GetKeyCode);
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+	lua_tinker::class_def<CX2GUNPC>( L, "SetDamageValueByForce",		&CX2GUNPC::SetDamageValueByForce);	// june-stat-calc D4a: June 31e4d1c0, bound @31e043de
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 	lua_tinker::class_def<CX2GUNPC>( L, "SetFlag_LUA",					&CX2GUNPC::SetFlag_LUA);
 	lua_tinker::class_def<CX2GUNPC>( L, "GetFlag_LUA",					&CX2GUNPC::GetFlag_LUA);
 	lua_tinker::class_def<CX2GUNPC>( L, "SetInt_LUA",					&CX2GUNPC::SetInt_LUA);

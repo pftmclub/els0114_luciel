@@ -12719,6 +12719,21 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
+// Date: 2026-11-13
+// Description: june-stat-calc D4a - NPC DamageReact from GetFinalDamage to UpNowHp as June 327b1f30 @327b33f0-327b4c13: Lu/Ciel's
+//              summoned darkness passes KeyCode per mille of a hit to its owner, the Henir element NPCs and barriers, the Lua-forced
+//              damage (SetDamageValueByForce) before the enchant resist, NOT_APPLY_DAMAGE_IN_DUNGEON, the sub-stage ally NPC tally,
+//              the state's DAMAGED_FUNC before the HP change, and GetDrainHpBuffValue adds the buff rate to the script's DRAIN_HP_RATE
+//              (June 32071c80). With _DEBUG: the per-hit "[JUNE_STATCALC] REACT" line.
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ) && !( defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) && defined( SERV_IRUHADEV_ELYSION_SCRIPT_B ) && defined( BALANCE_BLADE_MASTER_20130117 ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT needs June's enum names, UpNowHpWithText and GetDrainHpBuffValue
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
 // Date: 2026-11-12
 // Description: June character port ( Elesis ) Phase CH1k - her skill lookup's summon-limit check ( CheckSummonSpecialAttack, June 32b84a50 @32b84d19 ):
 //              waits for the summon list CH3b0 registers. Stays commented out until CH3b0; only with _LIVE.
