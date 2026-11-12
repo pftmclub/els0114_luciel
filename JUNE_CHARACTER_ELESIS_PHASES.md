@@ -684,6 +684,32 @@ All 14 class-map rows of phase CH1f are handled: 9 `inside` (5 with a June body 
 
 **Nothing to play-test.** Review: none of its own, the CH1g2 review covers CH1e-CH1g2 ( no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1f2` ( Sonnet 5.5 high ).
 
+### CH1f2 - Done (2026-11-12)
+
+All 25 class-map rows of phase CH1f2 are handled: 25 `inside` (9 with a June body under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, March's in `#else`, tag `// char-elesis CH1f2: June <va>`; 16 read and found `= March`, no edit), 0 `new`, 16 `listing-only` (read with `charport_adis.py elesis --phase CH1f2`; none needed "this needs Opus") and 9 carved. `_LIVE` stays `//#define`; no new `Always.h` define, no new `EL_STATE_ID` name (`ESI_COMBO_SBH_ZZZX` runs CH1f's `32b5ced0` / `32b76a60`). One constant namespace `_CONST_EL_CH1F2_` ( `XZ_FIRE_MP_COST` = 2 ) under `_CORE`. 25 funcmap rows `Char Elesis CH1f2`; `JUNE_BUGS.md` row 632; `ch1_offsets.tsv` needs no row. No checklist row is assigned to CH1f2, no state writes the state power rate or calls the buff factor, no `_WOS` / `_SUMMON` / `_BLOOD` line. The five script states `ESI_SBH_START` / `_WIN` / `_WIN2` / `_LOSE` / `_LOSE2` run shared functions outside the Elesis range: nothing to transcribe (CH1m); `ESI_COMBO_SBH_ZZZX` is CH1f's.
+
+| June | `CX2GUEL::` | June | `CX2GUEL::` |
+|---|---|---|---|
+| `32b61350` `32b61660` `32b61970` | `ESI_COMBO_SBH_XZ` / `XZZ` / `XZZZ` EventProcess (June bodies) | `32b61bd0` `32b61fe0` `32b623f0` | `ESI_DASH_COMBO_SBH_X` / `XX` / `XXX` EventProcess (June bodies) |
+| `32b78390` `32b785b0` `32b78920` | `ESI_COMBO_SBH_XZ` / `XZZ` / `XZZZ` FrameMove (June bodies) | `32b62520` | `= March`: `SBH_XXXZ` EventProcess |
+| `32b51070` `32b51090` `32b510f0` `32b51110` `32b511d0` `32b51290` `32b51350` | `= March`: the seven `_Init` preload lists | `32b6f710` `32b6f750` `32b6f790` `32b6f7e0` | `= March`: the four dash `_FrameMoveFuture` |
+| `32b78b40` `32b78e80` `32b791c0` `32b79500` | `= March`: the four dash `_FrameMove` | | |
+
+**Where June differs from March** (every function read branch by branch from the raw listing):
+- **`SBH_XZ` / `XZZ` EventProcess:** the Z press ( flag 0 ) tests only `oneZ`: March also required the Blazing Heart class. The flag also fires on animation end; + the `_ON_LINE_` walk / back-walk / dash cancels. The entrance `ESI_COMBO_SBH_XZ` is `IsInJobLine( 2 )` ( classes 30 / 121, CH1d ), so a Pyro Knight gets the whole X Z Z Z chain: **JUNE_BUGS 632**, kept verbatim. `SBH_XZZZ` = March + the `_ON_LINE_` cancels.
+- **Dash X / XX EventProcess:** flags 0 ( X ) and 1 ( Z ) also fire on animation end; + `_ON_LINE_` cancels; the dash end ( dash / `DASH_JUMP_LANDING` / `WAIT` ) is March's. **`XXX`:** flag 0 ( Z -> `XXXZ` ) fires on animation end; no cancels ( March's are commented out ). **`XXXZ`** = March ( `JUMP_DOWN` with `y -= 30` is `LINE_RADIUS`; June's constant is the double 30.0 ).
+- **`SBH_XZ` / `XZZ` / `XZZZ` FrameMove:** June adds the new fireball effect sets: `XZ` and `XZZZ` multiply `fMagic` by the fire ball rate ( as March ), then `FlushMp( 2 )` ( vslot `0xe4`, arg 2 unused ) plays `EffectSet_SBH_Combo_XZ_Fire_NEW` / `_XZZZ_Fire_NEW` ( hyper flag, `GetPowerRate() * GetFireBallPowerRate()` ); `XZZ` plays March's `EffectSet_Elesis_SBH_Combo_XZZ` first, then the 2 MP `EffectSet_SBH_Combo_XZZ_Fire_NEW`. A failed `FlushMp` plays nothing. The `*_Fire_NEW` sets and their `DamageEffect_SBH_Combo_XZ_Fire_NEW_*` rows are in June's `EffectSet` / `DamageEffect` data ( staged by CH0b ).
+- **= March (read, no edit):** the seven Init preload lists ( compared by string and call kind: equal ), the four dash FrameMoveFutures ( `CommonFrameMoveFuture`, `passiveSpeed.x = GetDashSpeed()`; `XXX` also `m_fDashComboStartDelay` = 0.5 = `SBM_DASH_COMBO_DELAY_TIME` ), the four dash FrameMoves ( 0.135 / 0.363 / 0.492 / 0.27 s; MP 4 = `SPK_DASH_JUMP_XZ_MP_COST`; the effect-set names compared against the exe strings ).
+- **Leads closed:** CH1d's "SBH_XZ through the script's tables": the states are plain tables with no class key ( CH1f's finding ), so JUNE_BUGS 632 is reached on a Pyro Knight. Nothing out of scope found; no drift.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE --with ..._LIVE --worktree --files X2Lib/X2GUEL.cpp`: `files: 1 PASS`, `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`, `RESULT: PASS`. With `_LIVE` as the flag: `1 PASS`, `RESULT: FAIL` only because `_LIVE` is `//#define` ( by design ). `git diff --numstat`: `X2GUEL.cpp` 178 / 0; `bytes>=0x80` 13,134 before and after; LF-only lines 326 before and after.
+- One-file `/Zs` probe of `X2GUEL.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off and with `/DSERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`. `/P` region check ( the ten SBH functions ): `Fire_NEW` 0 off, 3 on; `XZ_FIRE_MP_COST` 0 off, 3 on; `FlushMp(` 3 off, 6 on.
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: none of its own, the CH1g2 review covers CH1e-CH1g2 ( no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1g` ( Sonnet 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

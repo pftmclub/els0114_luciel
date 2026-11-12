@@ -10608,3 +10608,28 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b76da0	CX2GUEL::ESI_DASH_COMBO_SPK_ZZZ_FrameMove	PORTED	Char Elesis CH1f: inside, carved; = March ( EventTimerOneshot 0.266, FlushMp 6 -> EffectSet_A_EL_Dash_Combo_ZZZ, else _FAIL; no body change )
 32b770e0	CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_XZ_FrameMove	PORTED	Char Elesis CH1f: inside, June body under JUNE_CHAR_ELESIS_LIVE, carved; the SERV_IRUHADEV_JUNE_EL_DASHJUMP_XZ_FIREBALL damage effect ( 4 MP via vslot 0x6f0, 0.2 s, SPK / SBH by +0x95f8 ) as the state's own body; March's effect set in #else; also the _REATTACK state
 32b7d2b0	CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_FrameMove	PORTED	Char Elesis CH1f: new under JUNE_CHAR_ELESIS_CORE, carved; = the XZ fireball body with 2 MP, a 0.1 s timer and DamageEffect_Elesis_SPK / SBH_DashJump_Combo_ZX
+32b51070	CX2GUEL::ESI_COMBO_SBH_XZ_Init	PORTED	Char Elesis CH1f2: inside, listing-only; = March ( one texture preload, same list ); no body change
+32b51090	CX2GUEL::ESI_COMBO_SBH_XZZ_Init	PORTED	Char Elesis CH1f2: inside, listing-only; = March ( six preloads, same list ); no body change
+32b510f0	CX2GUEL::ESI_COMBO_SBH_XZZZ_Init	PORTED	Char Elesis CH1f2: inside, listing-only; = March ( one texture preload, same list ); no body change
+32b51110	CX2GUEL::ESI_DASH_COMBO_SBH_X_Init	PORTED	Char Elesis CH1f2: inside, listing-only; = March ( fifteen preloads, same list ); no body change
+32b511d0	CX2GUEL::ESI_DASH_COMBO_SBH_XX_Init	PORTED	Char Elesis CH1f2: inside, listing-only; = March ( fifteen preloads, same list ); no body change
+32b51290	CX2GUEL::ESI_DASH_COMBO_SBH_XXX_Init	PORTED	Char Elesis CH1f2: inside, listing-only; = March ( fifteen preloads, same list ); no body change
+32b51350	CX2GUEL::ESI_DASH_COMBO_SBH_XXXZ_Init	PORTED	Char Elesis CH1f2: inside, listing-only; = March ( ten preloads, same list ); no body change
+32b61350	CX2GUEL::ESI_COMBO_SBH_XZ_EventProcess	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; the Z press ( flag 0 -> SBH_XZZ ) has no class test and also fires on animation end; + _ON_LINE_ cancels; JUNE_BUGS 632
+32b61660	CX2GUEL::ESI_COMBO_SBH_XZZ_EventProcess	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; the Z press ( flag 0 -> SBH_XZZZ ) has no class test and also fires on animation end; + _ON_LINE_ cancels; JUNE_BUGS 632
+32b61970	CX2GUEL::ESI_COMBO_SBH_XZZZ_EventProcess	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + the _ON_LINE_ walk / back-walk / dash cancels
+32b61bd0	CX2GUEL::ESI_DASH_COMBO_SBH_X_EventProcess	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; flags 0 ( X -> SBH_XX ) and 1 ( Z -> SBH_XXXZ ) also fire on animation end; + _ON_LINE_ cancels
+32b61fe0	CX2GUEL::ESI_DASH_COMBO_SBH_XX_EventProcess	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; flags 0 ( X -> SBH_XXX ) and 1 ( Z -> SBH_XXXZ ) also fire on animation end; + _ON_LINE_ cancels
+32b623f0	CX2GUEL::ESI_DASH_COMBO_SBH_XXX_EventProcess	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; carved; flag 0 ( Z -> SBH_XXXZ ) also fires on animation end; no cancels ( as March's commented ones )
+32b62520	CX2GUEL::ESI_DASH_COMBO_SBH_XXXZ_EventProcess	PORTED	Char Elesis CH1f2: inside, carved; = March ( dash / LANDING / JUMP_DOWN with y -= 30 / WAIT; no flags, no cancels )
+32b6f710	CX2GUEL::ESI_DASH_COMBO_SBH_X_FrameMoveFuture	PORTED	Char Elesis CH1f2: inside, carved; = March; CommonFrameMoveFuture, passiveSpeed.x = GetDashSpeed()
+32b6f750	CX2GUEL::ESI_DASH_COMBO_SBH_XX_FrameMoveFuture	PORTED	Char Elesis CH1f2: inside, carved; = March; CommonFrameMoveFuture, passiveSpeed.x = GetDashSpeed()
+32b6f790	CX2GUEL::ESI_DASH_COMBO_SBH_XXX_FrameMoveFuture	PORTED	Char Elesis CH1f2: inside, carved; = March; passiveSpeed.x = GetDashSpeed(), then m_fDashComboStartDelay = 0.5 ( SBM_DASH_COMBO_DELAY_TIME )
+32b6f7e0	CX2GUEL::ESI_DASH_COMBO_SBH_XXXZ_FrameMoveFuture	PORTED	Char Elesis CH1f2: inside, carved; = March; CommonFrameMoveFuture, passiveSpeed.x = GetDashSpeed()
+32b78390	CX2GUEL::ESI_COMBO_SBH_XZ_FrameMove	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; carved; fMagic *= fire ball rate, then FlushMp( 2 ) ( _CONST_EL_CH1F2_ ) plays EffectSet_SBH_Combo_XZ_Fire_NEW
+32b785b0	CX2GUEL::ESI_COMBO_SBH_XZZ_FrameMove	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; carved; March's EffectSet_Elesis_SBH_Combo_XZZ, then FlushMp( 2 ) plays EffectSet_SBH_Combo_XZZ_Fire_NEW
+32b78920	CX2GUEL::ESI_COMBO_SBH_XZZZ_FrameMove	PORTED	Char Elesis CH1f2: inside, June body under JUNE_CHAR_ELESIS_LIVE; carved; fMagic *= fire ball rate, then FlushMp( 2 ) plays EffectSet_SBH_Combo_XZZZ_Fire_NEW
+32b78b40	CX2GUEL::ESI_DASH_COMBO_SBH_X_FrameMove	PORTED	Char Elesis CH1f2: inside, carved; = March ( 0.135 s, FlushMp( 4 ), Dash_Combo_X / XZZ_FAIL )
+32b78e80	CX2GUEL::ESI_DASH_COMBO_SBH_XX_FrameMove	PORTED	Char Elesis CH1f2: inside, carved; = March ( 0.363 s, FlushMp( 4 ), Dash_Combo_XX / XZZ_FAIL )
+32b791c0	CX2GUEL::ESI_DASH_COMBO_SBH_XXX_FrameMove	PORTED	Char Elesis CH1f2: inside, carved; = March ( 0.492 s, FlushMp( 4 ), Dash_Combo_XXX / XZZ_FAIL )
+32b79500	CX2GUEL::ESI_DASH_COMBO_SBH_XXXZ_FrameMove	PORTED	Char Elesis CH1f2: inside, carved; = March ( 0.27 s, EffectSet_Elesis_SBH_Combo_XXXZ )
