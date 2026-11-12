@@ -922,6 +922,50 @@ only in the unregistered 2017 event dungeons 41460 / 41470: not reachable offlin
 **Play-test PASSED (retest 2026-11-13 05:12-05:14, same exe):** Raven99 (49) 12 logged hits, 5 with `pre` = exactly 0.500 x `gfd` (option 41149;
 e.g. `gfd=20820 pre=10410 ... dmg=10410 hp=179286>168876`), HP change = `dmg` on all 15 lines. Run 1's 0 / 11 was chance. D4 review next.
 
+### Phase D4 review - Done (2026-11-13)
+
+**Opus 5.5 / high. Covers D4a (`3812c4cd`) and D4b (`c0a28ccc`). Verdict: pass, no code change.** No transcription error found.
+
+**Ledger.** The cut note's check prints `npc True 327b33f0 327b4c13 22` and `user True 32048435 32049b70 29`. States: npc 20 `June`, 1 `absent`
+(Stage 19's alchemy lab), 1 `n/a`; user 22 `June`, 6 `absent` (each a one-line stand-in or a routed write, as D4b lists), 1 `n/a`.
+
+**Re-read against `unpacked_x2.exe`** (`disasm_range.py`, the `.s` listings):
+- NPC @327b33fc: ids 0x772 / 0x791 = 1906 / 1937 (June `Enum.src.lua`); owner via game slot `0xc8` with ( `+0x78` / `+0x7c` UID, `+0x80` type );
+  r = float( `+0x874c` x 0.001 ), damage = ( 1 - r ) x damage, then the owner gets -damage x r (`322780b0`). Same as the port (JUNE_BUGS 640).
+- NPC @327b3491: ice 233 / 1806 checks barriers 235 / 1768, fire 232 / 1805 checks 234 / 1767, each with `+0x8754` == 1 -> 1.0. All six values
+  match June's `Enum.src.lua`.
+- NPC @327b35db: `+0x8f84` replaces the damage only when > -1 (`test ah,0x41`); its writers are the ctor @327633a7 and the Lua setter `31e4d1c0`.
+  The other `+0x8f84` hit (`31fde67f`) belongs to a user-class ref-counted member, not this one. Slot `0x378` = `3226dd20` = `ApplyEnchantResist` (funcmap).
+- NPC @327b41c9: the protected byte `+0x75bc` == 1 and game type (slot `0x10c`) == 2 -> 0. Its place (after the MP drain, before the
+  additional defence) is the port's.
+- NPC @327b4b3a: AI `+0x38` == 4 -> game `+0xb24` += `_ftol2`( damage ) (truncation = the port's cast). @327b4bad: `+0x8488` != -1 and damage > 0
+  (`test ah,5; jp`) -> the call with ( app, game, this ), after the hitted count and before `UpNowHp` (slot `0xec`).
+- User @32048446: DD `+0x8` == 1 (`AT_SPECIAL`); `GetSkillTemplet( +0x590, 1 )`; null, or `32070510` != 5 -> x `+0x8e94`. `32070510`'s jump
+  table (`3207054c`) maps only `m_eType` 13 to 5, and `ST_HYPER_ACTIVE_SKILL` = 13, so the port's direct type test is exact. June's
+  `GetSkillTemplet` second argument is the level gate (`IsEnableCode` 0x910 / 0x911, server code events never set offline) = March's one-argument
+  call here. `+0x8e94` scan of the exe: user writes only at ctor @32040e56 and Lu/Ciel `InitPassiveSkillState` @32b45e7b (1.0) / @32b45ec0
+  (Nobility). The `3276` / `3277` / `327a` hits are an NPC member at the same offset.
+- User @32049359: `31f8ae70` returns ( type == 1 ), so provoke runs on every type but AT_SPECIAL. The rest of the gate (`+0x967c` cleared first,
+  `+0x4dc`, HP / MP up <= 0, RT 7 / 10, hit type 26, hold / grab / riding / attacker front, set back to 1 on success) = March's block.
+- User @320475c1: unit `+0xaf0` type 8 (UT_ELESIS), reaction 1 / 2, then `32b524f0` -> `+0x9175` = 1 @320476af. Matches the stand-in comment.
+- User @3204968f: game `+0xbbc` = the 2017 treasure event manager (funcmap rows 2062 / 2063; `32d5c800` = "attacker in its unit list") ->
+  max HP x 0.1 and slots `0x11c` / `0x120`. Stand-in correct, Stage 19.
+- Order: `322cfca0` @32049683, then the treasure block, then `32273e80` @32049727, then slot `0x304`. That is the port's order. The tutorial clamp stays after `UpNowHp`.
+- `GetSocketReducedDamagePercent` `32000320` @3200034b and `GetBasicReducedDamagePercent` `3201aff0` @3201b026: `322cc1c0` (game type == 4 =
+  `GT_PVE`) is the first test, -> 0. Both heads = the port. Both divergence rows are closed.
+- **`GetSocketReducedDamagePercentInCase` left in place: enough.** The US_SERVICE preprocessor output (`.build/enumscan/X2GuEve.i`, 2026-11-13,
+  includes `X2GUUser.h`) has no declaration of it: `Always_US.h:4` undefines `ADJUST_SECRET_ITEM_OPTION` after `Always.h:703` defines it.
+  So it has no live caller. Deleting it would only break insert-only.
+
+**Gates.** `flagcheck --range 3812c4cd^..3812c4cd`: 8 PASS, 1 DEFINE, 1 OTHER (`X2UnitManager.h`, `JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted -> `RESULT: PASS`.
+`flagcheck --range c0a28ccc^..c0a28ccc`: 2 PASS, 1 DEFINE, 0 FAIL, 0 deleted -> `RESULT: PASS`. No later commit touches the flag
+(`git log -S`). `junediverge --check-all`: allow-listed 207, `RESULT: PASS`. `_STATCALC_DEBUG` stays on (D6 review retires it).
+**Build.** Full build skipped: no play-test (no code change).
+
+**Play-test log** (still on disk; the run is after the deploy, md5 798e1d60): 15 `REACT` lines. HP change = `dmg` on all 15 (script check). Raven99 (49),
+hit by NPC 530: 12 lines, 5 with `pre` / `special` = 0.5000 (option 41149), 7 at 1.0000, no critical. Run 1's 170 lines were overwritten by the
+retest. D4b's note recorded them: user ArmeDW `pre = gfd` x 23, NPC 232 / 233 forced 1, Eve summons 0.
+
 ## Phase D5 - Extra damage, enchant resist and level correction
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE`: `LevelCorrectionExtraDamage` NPC `32760210` and the user's twin (June's
