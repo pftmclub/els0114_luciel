@@ -1152,6 +1152,44 @@ elesis --phase CH1o`, `disasm_range.py`, `vtslot.py`, `dispsweep.py` with a "`mo
 
 **Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1o review` (Opus 5.5 high).
 
+### CH1o - Review (2026-11-13, Opus 5.5): pass, no code change
+
+Read from the exe bytes (`disasm_range.py`, raw table reads, `vtslot.py`, `dispsweep.py` filtered to "`mov r, [r+slot]` then `call r`", an E8 / E9 scan):
+- **0x83c `32b732e0` = `ChangeDamageData`.** id / 100 - 0xa4, `> 0x11` out; jump table `32b734ac` = { `32b7332b`, `32b734a3` }, byte table `32b734b4` = 0 at
+  164 / 169 / 173-175 / 177 / 178 / 181 = March `IsFirstStrikeRelateState`'s 8 names (March 118 ... 135 = June - 46 for all 8 and for 205 / 206 -> 159 / 160,
+  `enumprobe`). `31fceab0( 0x6ef1 )` `jle` = level > 0 (`GetSkillLevelValue`, one overload under `_DIVERGE_SKILL_LEVEL_VALUE`); `+0x9660` raw, x 0.5
+  (`0x3342ebc8` = 0.5) when the state is 0xae = `ESI_JUMP_ATTACK_X`, added to `+0x7c0`; `+0x9668` / `+0x9664` "> 0 else 1.0" (`test ah, 0x41`) = the two March
+  getters; `+0x798` is a protected member written only when changed (no semantic difference); `g_pMain +0x8c == 9` -> ( r - 1 ) x 0.5 + 1 (`fsub st(1)`,
+  `fxch`, `fmul`, `faddp`) into `+0x3d8`. `SetDamageData` `31fcd280`: four 0x83c dispatches, one before each `ret 4` = March's single call after the
+  force-down block. The C++ matches.
+- **0x534.** `3208e8c0`: `bFuture` != 0 -> `+0x7cb0`, else `+0x7cbc`; both paths ask the same 15 getters in the same order; user bases return 0x1a-0x1f and
+  0x22-0x2a (0x47c / 0x480 = 0x20 / 0x21 skipped) = March 25-30, 33-41 = `USI_DAMAGE_SMALL_FRONT` .. `USI_DAMAGE_REVENGE` minus the two STANDUP; across all
+  15 slots only `CX2GULuciel` differs from `CX2GUUser`. `32b90430`: base call, `true` -> 1; `bFuture` set -> 0; now == 0xce / 0xcd (206 / 205) -> 1. `vtslot
+  0x534`: only Ain `32a50f40` and Elesis `32b90430` override. Four dispatches: `CommonStateStart @32057d8a` (push 0), Elesis `GetActualCoolTime @32b7ef2c`
+  (push 0), and two the Done note did not list, both on `this` in their own class: Ain `32a50a00 @32a50af6` (pushes its argument) and Rose `32a705f0
+  @32a709ad` (push 1). The Elesis override is still reached only with `false`, so "no JUNE_BUGS row" holds; funcmap `3208e8c0` row gets the two callers
+  (note for the Ain and Rose ports).
+- **`CommonStateStart @32057c23-32057ddd`.** Match path: `+0x8eac` == now skill (vslot 0x524), templet `31fca8e0( id, 1 )` non-null, vslot 0x810 false; it
+  ends `jmp 32057ddf`, so `32057d88` is the plain else. Else: vslot 0x534( 0 ) false -> out; reserved 0 -> clear; `fld +0x8ea8; fldz; fucompp; test ah,
+  0x44; jnp` -> MP == 0 clears, != 0 or NaN goes on (= `0.f != m_fReservedSkillMp`); `31fca8e0( reserved, 1 )` null -> clear; `+0x98` 6 / 7 (`ASUT_DAMAGE`
+  / `_EXCEPT_AIR`, `enumprobe` 6 / 7) -> keep; else vslot 0x808 `ClearSkillUseReserve`. The C++ matches. Its guard is the complement of the buff port's
+  match test, which uses `GetSkillTemplet` (June: the equipped templet) and leaves out vslot 0x810 (its comment says why); the two differ only when the
+  reserved skill is unequipped inside the 1 s window: noted, not routed.
+- **`SetSkillLevelStateData`** = `3201f850` (null templet / `+0x867c` return, `32890620( id, 0, 0, 1 )` floored at 1, byte `+4`, `32071720` -> `+8`, id
+  `+0xc`, `( 3201ad10 + 1.0 ) x +8`) = the C++. E8 callers of `3201f850`: `3202821e` (the 0x7a8 wrapper) and other class ranges; none in Elesis's.
+- **No-code verdicts hold.** `32b526d0`: `+0x84` null return, then the 7 names (`DamageImpact` / `Core` / `Slash` / `Red` / `RingRed` / `CoreRed` /
+  `SlashRed`) = March's list. `32b903c0` / `32b903d0` = `sub ecx, 0x1a0 / 0x190; jmp 32b90520`. 0x558: 7 displacement sites, 0 dispatches; `32b6fb80` has no
+  E8 / E9 caller and one pointer (the vtable). 0x670: 135 dispatches, all in class code (`329d4073` .. `32cf9347`), none in the engine.
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --range 86094940^..86094940 --files` the four: `files: 4 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0
+ERROR`, 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 `#else/#endif` without the token, 0 encoding changes; RESULT FAIL only for `define: NOT FOUND`
+(`//#define`). `flagcheck SERV_IRUHADEV_JUNE_ENUM_NAMES --range 86094940^..86094940 --files X2Lib/X2SkillTree.h`: `1 PASS~`, `RESULT: PASS`.
+`junediverge.py --check-all`: `allow-listed: 207`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `0 A/B row(s)`. Probes
+(`census.cl_cmd`, `/c /Zs /EHsc`, no PCH): `X2GUEL.cpp` off / `_LIVE` / `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`, `X2GUUser.cpp` off / `_LIVE`:
+exit 0, 0 errors x5. No `_DEBUG` define. Full build skipped: no play-test.
+
+**Nothing to play-test.** CH1p kickoff checked (unchanged). Next: `/x2-phase char-elesis CH1p` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
