@@ -859,7 +859,7 @@ After commit `3812c4cd`: `flagcheck --range 3812c4cd^..3812c4cd`: 8 PASS, 1 DEFI
 
 ### Phase D4b - Done (2026-11-13)
 
-**Opus 5.5 / high. Flag `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4a's; two description lines added).** Commit: this commit. Insert-only:
+**Opus 5.5 / high. Flag `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4a's; two description lines added).** Commit: `c0a28ccc`. Insert-only:
 `X2GUUser.cpp` +133, `X2GUUser.h` +3, `Always.h` +2. `dr_blocks.tsv`: user 29 rows, 22 `June`, 6 `absent` (each a one-line stand-in or a routed
 write), 1 `n/a` (number display). Map rows 18 / 19 / 20 / 28 `June`, 31 re-checked; funcmap 10 rows `StatCalc S33 D4b`; divergence rows
 `GetBasicReducedDamagePercent` and `GetSocketReducedDamagePercentInCase` closed (`replace`, ported under the flag).
@@ -901,7 +901,7 @@ additional defence, after the additional attack + provoke zero, after the PvP ha
 **Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT --worktree --files X2GUUser.cpp X2GUUser.h Always.h`: 2 PASS, 1 DEFINE, 0 OTHER,
 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL -> `RESULT: PASS`. `junediverge --check X2GUUser.cpp X2GUUser.h`: `RESULT: PASS`. `enumscan --reuse --check`:
 the 2 rows left are older lines (`X2GUUser.h:2561-2562`, NPC ids), not this phase's.
-After commit: see the follow-up commit for the `flagcheck --range` line.
+After commit `c0a28ccc`: `flagcheck --range c0a28ccc^..c0a28ccc`: 2 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted -> `RESULT: PASS`.
 **Build.** `DEPLOY OK: X2_offline.exe is 26,366,976 B, dated 2026-11-13 00:59:45, md5 798e1d603edc6201a12db70400e4528d, equal to X2/US_SERVICE/x2.exe (2026-11-13 00:59:38); built at main 79ef54ec + 3 uncommitted code file(s).`
 `EXESTR OK: 2 of 2 found in X2_offline.exe, 26366976 B, dated 2026-11-13 00:59:45, md5 798e1d603edc6201a12db70400e4528d` (the user `REACT ... special=` and D4a's NPC `REACT ... share=` lines).
 
