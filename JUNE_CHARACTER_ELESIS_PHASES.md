@@ -1234,7 +1234,8 @@ ground with 28210 `RNSI_A_SBH_FLAME_SWORD`; June's Flame Sword state has no tabl
 **Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `X2GUEL.cpp` PASS +72, `X2GUUser.cpp`
 PASS +5; `files: 2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`, `0 deleted line(s), 0 non-ASCII inserted, 6 EOL-mismatched, 0 #else/#endif without the
 flag token, 0 encoding change(s)`; RESULT FAIL only for `define: NOT FOUND` (`//#define`). The 6 EOL lines are the two trios before Extinction charge /
-degree up: they take their anchor's CRLF after a studio LF-only `{`. `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `allow-listed: 7`,
+degree up: they take their anchor's CRLF after a studio LF-only `{`. After the commit (`9884a6be`), `--range 9884a6be^..9884a6be` with the same `--files`:
+the same tallies, FAIL only for the `//#define`. `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `allow-listed: 7`,
 `RESULT: PASS`. `enumscan.py --check` the two: `0 A/B row(s)`. One-file probes (`census.cl_cmd`, `/c /Zs /EHsc`, no PCH): both files off / `_LIVE` / `_LIVE` +
 `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`: exit 0, 0 errors x6 (38 / 39 warnings, unchanged). No `_DEBUG` define. Full build skipped: no play-test. No
 `JUNE_BUGS` row; no funcmap row (the key calls are partial; the owning phases mark the functions PORTED).
