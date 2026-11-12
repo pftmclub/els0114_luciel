@@ -52,3 +52,11 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L259, L331, L728, L965, L988.
 - **`ch0_classn.tsv` rows:** 4 (filter on its `proposed_phase` column).
 - `SI_HA_SCA_FATE_SMASHER` (bare `SI_`) is here. `TranscendCheck` (`Handlers_Quest.cpp`) refuses 120 / 121 / 125 today (error 1726): her allow-list rows; June's level-70 `LevelUpEvent.lua` row.
+
+## Amended by CH1n (2026-11-13)
+
+- **Hyper split** (`32b8c470`, in the type switch's active arm before the id switch; CH1n's head leaves a `break;` there): `28600 < id` -> switch (d):
+  28601 / 28604 `ESI_SI_HA_SBH_ANCIENT_FIRE` (Init `32b8f1c0`, EventProcess `32b8f930`, + `32b90840`), 28602 / 28605 table `SI_HA_SCA_FATE_SMASHER` (bare
+  `SI_`, Init `32b8f1d0`, + `32b8f940`), 28603 -> the Sword of Relics block; any other id above 28600 returns (`@32b8ea89`). `28600 ==` id ->
+  `ESI_HA_SGM_SWORD_OF_RELICS` (Init `32b8f1b0`, + `32b8f920`, `@32b8e95c`). Below 28600 -> the id switch. The three blocks end in the shared tails
+  `@32b8c8ac` / `@32b8c90b` / `@32b8e9fe` (read them in the listing for the slot each pointer lands in).

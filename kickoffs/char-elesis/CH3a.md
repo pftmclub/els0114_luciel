@@ -53,3 +53,10 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Skill ids** (13): 28008, 28009, 28010, 28011, 28039, 28040, 28046, 28047, 28048, 28049, 28062, 28227, 28228.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52.
 - CH0 split by skill: CH3a = 28008-28011, 28039, 28040, 28062 (special actives), CH3a2 = 28205 / 28206 / 28222.
+
+## Amended by CH1n (2026-11-13)
+
+- **Memo arm.** `SetEquippedSkillFuncBySkillSlotIndex`'s `_LIVE` head keys the id switch on `eStateSkillID`: transcended Juggernaut Buster (memo 28031 / 28060,
+  June `@32b8c5bb` -> `32b8c5c2`) sets it to `RNSI_SA_SGM_JUGGERNAUT_BUSTER`, because June's memo body is the 28010 / 28048 case body (shared tail `@32b8d0f4`).
+  Write that case under `_LIVE` as `case RNSI_SA_SGM_JUGGERNAUT_BUSTER: case RNSI_SA_SGM_JUGGERNAUT_BUSTER_UPGRADE:` (June `32b8cf8c`): the memo route then needs
+  nothing more. A case body that reads `eSkillID_` gets the raw id (the base skill), as June's `param_2`.

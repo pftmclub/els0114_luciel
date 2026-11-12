@@ -1029,6 +1029,48 @@ inserted, 424 EOL-mismatched, 0 #else/#endif without the flag token, 0 encoding 
 `_LIVE`, `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`: exit 0, 0 errors each. No `_DEBUG` define to retire. Full build skipped: no play-test ( no code
 change ). `CH1n.md` checked. Nothing to play-test. Next: `/x2-phase char-elesis CH1n` ( Opus 5.5 high ).
 
+### CH1n - Done (2026-11-13)
+
+**Slot head (`32b8c470`), inside, `_LIVE`.** June's head sits in March's own `SetEquippedSkillFuncBySkillSlotIndex` up to the id switch; March's head and type
+switch are the `#else` (`_LIVE` still `//#define`d). Ara's CH1n is the template; read from a fresh decompile and the exe bytes:
+- Bounds `0 > slot || 4 < slot`; PE tables `334f8238` / `334f8260` (normal A / B) and `334f824c` / `334f8274` (hyper A / B) = {50..58} / {60..68} / {51..59} /
+  {61..69} = `_CONST_GUUSER_`. `31fd2af0` dropped (7i); the one `+0x11 = 1` store (head) = `IsSkillSlotState`; hyper word `+0x10 = 0x101` = `m_bHyperState`.
+  `31fca8e0( id, 1 )` = `GetEquippedActiveSkillTemplet( id, true )`; batch `3207c1a0` / `31fdf970` = anti-tamper, as Ara's.
+- **Memo arm `@32b8c5bb` (Elesis differs from Ara).** `31fdbcc0( id )` (`GetTranscendenceMemoSkillID`), `32206450( memo, 1 )` non-null -> a 31-entry switch on the
+  memo from 28031: 28031 / 28060 (`RNSI_SA_SGM_JUGGERNAUT_BUSTER_TRANS` / `_TRANS_UPGRADE`) -> `32b8c5c2`, 28032 / 28061 (`RNSI_SA_SBH_BLAZING_DANCE_TRANS` /
+  `_TRANS_UPGRADE`) -> `32b8c72f`; the other 27 and any memo outside the table return. Both bodies are the id switch's 28010 / 28048 and 28016 / 28052 case
+  bodies (same strings, thunks and ids 257-259 / 278-281; the compiler shares their tails `@32b8d0f4` / `@32b8d355`). Written as a local `eStateSkillID`: the memo
+  arm sets it to `RNSI_SA_SGM_JUGGERNAUT_BUSTER` / `RNSI_SA_SBH_BLAZING_DANCE` and skips the type switch; the id switch line takes it under `_LIVE` (`switch (
+  eSkillID_ )` in `#else`). So CH3a / CH3b write each body once (kickoffs amended). Four names registered in `X2SkillTree.h` under `JUNE_ENUM_NAMES` (June
+  `Enum.src.lua` l.16175 / l.15246 / l.15045 / l.14874).
+- **Types** (raw `[templet +4]`, 12 entries from 5): 5 buff = `ESI_COMMON_BUFF` on both (FM `329ccd90` -> vslot 0x5f0 = her `32b6def0` `COMMON_BUFF_FrameMove`, EP
+  `329cba40` -> `31fcbd60`); 6 / 7 / 13-16 active; 12 + id 900 = `ESI_THROW_ITEM` (`329ccda0` / `329ccdb0`, vslots 0x5f4 / 0x5f8, not overridden); 8-11 and 17 / 18
+  return. Both switches take `param_2` raw (no `GetUpgradeBaseSkillID`), as Ara's.
+- **Hyper split = CH3d** (kickoff amended with the shape): `28600 < id` -> switch (d) 28601-28605 (Ancient Fire, Fate Smasher, 28603 -> Sword of Relics), other
+  ids above 28600 return; `== 28600` Sword of Relics. The active arm `break`s to the id switch, as Ara's. June's id switch has no default (exit).
+- No cool-time / MP / hyper-stone block in `32b8c470` (checklist L266): the dev free-skill gate stays CH1k's (`X2GUEL.cpp` `IsDevUnlimitedSkillUse`). She has no
+  second skill switch (0x68c is the base's): nothing for `InitAquiredActiveSkillState`.
+
+**Base callbacks.** `june2017_re/char_elesis/ch1n_triage.py` (Ara's, with her range and Ara's triage added) joins every callback target outside her range in
+`ch0_reg.tsv` with the earlier triages -> `ch1n_user_callback_triage.tsv`: `targets 178 rows 178 missing 0` (63 SAME; DIFF 69: 16 ported for every class, 5 kept,
+48 Stage 17; 46 `n/a`: 19 shared `InitEventStates`, 14 riding / empty, 3 PvP amusement, 3 dance, 5 bounding, 1 wait-state-change, 1 vslot 0x600 thunk = her own
+`HyperModeFrameMove`, CH1i). Nothing new: no `X2GUUser` site needs her `_LIVE`.
+
+**Not ported here, routed:** hyper split (CH3d), the case bodies (their state phases: CH2a-CH3d), the memo bodies (= CH3a's 28010 and CH3b's 28016 cases).
+
+**Checks.**
+- One-file probes (`census.cl_cmd`, `/c /Zs /EHsc`, no PCH) of `X2GUEL.cpp`: off, `_LIVE`, `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`: `exit 0 errors 0` each.
+- `cl /P` off / `_LIVE`: `switch ( eStateSkillID )` 0 / 1, `RNSI_SA_SGM_JUGGERNAUT_BUSTER_TRANS_UPGRADE:` 0 / 1, `iSlotIndex_ > 4 )` 0 / 1.
+- `git diff --patience --numstat`: `X2GUEL.cpp` 87 / 0, `X2SkillTree.h` 9 / 0; bytepatch: high bytes unchanged (13134 / 23310), EOLs kept (CRLF / LF).
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --with SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE --worktree --files X2Lib/X2GUEL.cpp`: `files: 1 PASS, 0 PASS~ (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`;
+  `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only for the `//#define`.
+- `flagcheck SERV_IRUHADEV_JUNE_ENUM_NAMES --worktree --files X2Lib/X2SkillTree.h`: `files: 0 PASS, 1 PASS~ (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`, `RESULT: PASS`.
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2SkillTree.h`: `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`.
+- Checklist marked `(Elesis: CH1n)`: L266 (no check here), L332 (memo arm), L443 (head), L447 (store dropped), L741 (types 14-16). Funcmap row `Elesis CH1n`.
+  No JUNE_BUGS row. Full build skipped: no play-test.
+
+**Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1n review` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

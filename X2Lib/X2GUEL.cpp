@@ -958,6 +958,88 @@ CX2GUEL::~CX2GUEL(void)
 }
 /*virtual*/ void CX2GUEL::SetEquippedSkillFuncBySkillSlotIndex( const CX2SkillTree::SKILL_ID eSkillID_, const int iSlotIndex_, const bool bSlotB_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1n: June 32b8c470 up to its id switch; its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
+	if ( iSlotIndex_ < 0 || iSlotIndex_ > 4 )
+		return;
+
+	const int iNormalStateID = ( false == bSlotB_ ? _CONST_GUUSER_::aNormalSkillStateID[iSlotIndex_] : _CONST_GUUSER_::aNormalSkillStateIDSlotB[iSlotIndex_] );	// June 334f8238 / 334f8260
+	UserUnitStateData& normalStateData = m_StateList[ iNormalStateID ];
+	normalStateData.Init();		// June's 31fd2af0 snapshot before it is the engine's ( checklist 7i )
+	normalStateData.stateID = iNormalStateID;	// June's +0x11 = 1 store is IsSkillSlotState ( X2GUUser.cpp )
+
+	const int iHyperStateID = ( false == bSlotB_ ? _CONST_GUUSER_::aHyperSkillStateID[iSlotIndex_] : _CONST_GUUSER_::aHyperSkillStateIDSlotB[iSlotIndex_] );	// June 334f824c / 334f8274
+	UserUnitStateData& hyperStateData = m_StateList[ iHyperStateID ];
+	hyperStateData.Init();
+	hyperStateData.m_bHyperState = true;	// June word +0x10 = 0x101
+	hyperStateData.stateID = iHyperStateID;
+
+	const CX2SkillTree::SkillTemplet* pSkillTempletEquipped = GetEquippedActiveSkillTemplet( eSkillID_, true );
+	if ( NULL == pSkillTempletEquipped )
+		return;
+
+	CX2SkillTree::SKILL_ID eStateSkillID = eSkillID_;	// the id switch key: June's memo arm jumps into the 28010 / 28016 case bodies ( @32b8d0f4 / @32b8d355 )
+	const int iTranscendenceSkillID = GetTranscendenceMemoSkillID( eSkillID_ );
+	if ( 0 != iTranscendenceSkillID && NULL != g_pData->GetSkillTree()->GetSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( iTranscendenceSkillID ) ) )
+	{
+		switch ( iTranscendenceSkillID )	// June @32b8c5bb: 28031-28061, only these two skills register, every other transcended skill returns
+		{
+		case CX2SkillTree::RNSI_SA_SGM_JUGGERNAUT_BUSTER_TRANS:
+		case CX2SkillTree::RNSI_SA_SGM_JUGGERNAUT_BUSTER_TRANS_UPGRADE:
+			eStateSkillID = CX2SkillTree::RNSI_SA_SGM_JUGGERNAUT_BUSTER;	// June 32b8c5c2 = the 28010 / 28048 case's registration
+			break;
+
+		case CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE_TRANS:
+		case CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE_TRANS_UPGRADE:
+			eStateSkillID = CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE;	// June 32b8c72f = the 28016 / 28052 case's registration
+			break;
+
+		default:
+			return;
+		}
+	}
+	else
+	{
+		switch ( pSkillTempletEquipped->m_eType )
+		{
+		case CX2SkillTree::ST_BUFF:
+			{
+				m_LuaManager.MakeTableReference( "ESI_COMMON_BUFF", normalStateData.stateID );
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, COMMON_BUFF_FrameMove );	// June 329ccd90 = vslot 0x5f0 ( 32b6def0 )
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );	// June 329cba40 = 31fcbd60
+
+				m_LuaManager.MakeTableReference( "ESI_COMMON_BUFF", hyperStateData.stateID );
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+			} return;
+
+		case CX2SkillTree::ST_ACTIVE:
+		case CX2SkillTree::ST_SPECIAL_ACTIVE:
+		case CX2SkillTree::ST_HYPER_ACTIVE_SKILL:
+		case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_1:
+		case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_2:
+		case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_3:
+			break;	// June's hyper split ( 28600 and up ) is CH3d's; its id switch takes the raw id, March's cases until CH2-CH3
+
+		case CX2SkillTree::ST_RELATIONSHIP_SKILL:
+			{
+				if ( CX2SkillTree::SI_ETC_WS_COMMON_LOVE == eSkillID_ )
+				{
+					m_LuaManager.MakeTableReference( "ESI_THROW_ITEM", normalStateData.stateID );
+					normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, COMMON_RELATIONSHIP_SKILL_FrameMove );		// June 329ccda0 = vslot 0x5f4
+					normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_RELATIONSHIP_SKILL_EventProcess );	// June 329ccdb0 = vslot 0x5f8
+
+					m_LuaManager.MakeTableReference( "ESI_THROW_ITEM", hyperStateData.stateID );
+					hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+					hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+				}
+			} return;
+
+		default:
+			return;
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( iSlotIndex_ < 0 || iSlotIndex_ >= ARRAY_SIZE( _CONST_GUUSER_::aNormalSkillStateID ) )
 		return;
 
@@ -1022,13 +1104,18 @@ CX2GUEL::~CX2GUEL(void)
 			return;
 		} break;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////// 여기서 부터 ACTIVE, SPECIAL ACTIVE 스킬//////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma region ACTIVE, SPECIAL ACTIVE 스킬
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	switch ( eStateSkillID )	// char-elesis CH1n: June's raw id, or the memo arm's skill
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	switch ( eSkillID_ )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	{
 	case CX2SkillTree::SI_SA_SSK_SPIRAL_BLAST:
 		{	/// 스파이럴 블래스트

@@ -2625,6 +2625,15 @@ public:
 	RNSI_A_EL_ENDURANCE_POWER_UPGRADE                     = 28218,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH1n
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names Elesis's memo arm @32b8c5bb compares ( values from June's Enum.lua )
+	RNSI_SA_SGM_JUGGERNAUT_BUSTER_TRANS                   = 28031,
+	RNSI_SA_SBH_BLAZING_DANCE_TRANS                       = 28032,
+	RNSI_SA_SGM_JUGGERNAUT_BUSTER_TRANS_UPGRADE           = 28060,
+	RNSI_SA_SBH_BLAZING_DANCE_TRANS_UPGRADE               = 28061,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

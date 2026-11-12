@@ -53,3 +53,10 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Skill ids** (13): 28015, 28016, 28017, 28018, 28041, 28042, 28051, 28052, 28053, 28054, 28063, 28231, 28232.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L685, L908.
 - CH0 split by skill: CH3b = 28015-28018, 28041, 28042, 28063 (special actives), CH3b2 = 28210 / 28211 / 28223. Wall of Prominence `32b7a0a0` is here (its spawn written by CH3b0).
+
+## Amended by CH1n (2026-11-13)
+
+- **Memo arm.** `SetEquippedSkillFuncBySkillSlotIndex`'s `_LIVE` head keys the id switch on `eStateSkillID`: transcended Blazing Dance (memo 28032 / 28061,
+  June `@32b8c5bb` -> `32b8c72f`) sets it to `RNSI_SA_SBH_BLAZING_DANCE`, because June's memo body is the 28016 / 28052 case body (shared tail `@32b8d355`:
+  START, then `1ST` 278, `ATTACK_BACK` 279, `ATTACK_FRONT` 280, `FINISH` 281). Write that case under `_LIVE` as `case RNSI_SA_SBH_BLAZING_DANCE: case
+  RNSI_SA_SBH_BLAZING_DANCE_UPGRADE:` (June `32b8d2c6`): the memo route then needs nothing more.

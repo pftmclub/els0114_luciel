@@ -107,7 +107,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH1n | **ready** (CH1m review passed 2026-11-13): base callbacks + skill-slot head | Opus 5.5 / high, Opus review | CH1m review | `X2GUEL.*`, `X2GUUser.*` | `CH1n.md` |
+| CH1n | **done 2026-11-13, review ready**: slot head + memo arm under `_LIVE`, 4 `_TRANS` names, callbacks 178 / 178 known; full build skipped: no play-test | Opus 5.5 / high, Opus review | CH1m review | `X2GUEL.*`, `X2SkillTree.h` | `CH1n.md`, `CH1n-review.md` |
 | CH1o | blocked (CH1n review): virtuals under `_LIVE`, the 0x83c hook | Opus 5.5 / high, Opus review | CH1n review | `X2GUEL.*`, `X2GUUser.*` | `CH1o.md` |
 | CH1p | blocked (CH1o review): pressed index (7ag), hooks, June-only script keys, reserved-buff ids | Opus 5.5 / high, Opus review | CH1o review | `X2GUEL.*`, `X2GUUser.*`, Always.h | `CH1p.md` |
 | CH1q | blocked (CH1p review): Way of the Sword class side + gauge twins, flag `_WOS` | Opus 5.5 / high, Opus review | CH1p review | `X2GUEL.*`, `X2GageData.*`, `X2GageUI.*`, `X2GUUser.cpp`, `X2DamageEffect.cpp` | `CH1q.md` |
