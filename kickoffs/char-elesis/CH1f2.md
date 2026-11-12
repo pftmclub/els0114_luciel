@@ -66,3 +66,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1e (2026-11-12)
 
 - A `new` row that uses the flag-chain or on-line cancel macros compiles under `_CORE` while `_LIVE` is off: `X2GUEL.cpp` repeats the macros in a `#ifdef _CORE` / `#ifndef _LIVE` block after the `_LIVE` one (as Ara's); it holds `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_`, `WALK_` / `BWALK_` / `DASH_CANCEL_AFTER_ON_LINE_` but **not** `ZX_CANCEL_AFTER_EX_ON_LINE_`: add it to that block if a `new` body needs it. The Grand Master numbers sit in `_CONST_EL_CH1E_` (a `_CONST_EL_<phase>_` namespace per phase, with `using namespace`). The new-function definitions go before `#endif // NEW_CHARACTER_EL` at the end of `X2GUEL.cpp`, their declarations after `IsInJobLine` in `X2GUEl.h`; a `bytepatch` anchor with a tab-only line loses the tab when written with the Write tool: anchor on the neighbouring lines.
+
+## Amended by CH1f (2026-11-12)
+
+- `ESI_COMBO_SBH_ZZZX` (June id 327) runs June's `ESI_DASH_COMBO_SPK_ZX` EventProcess `32b5ced0` and FrameMove `32b76a60`, both written in CH1f (the March `ESI_DASH_COMBO_SPK_ZX_*` functions): CH1f2 writes no second copy; CH1m registers the state on them. `m_uiSPKXZReattakCount` ( `+0x961c` ) is the Pyro Knight dash-jump X-attack counter ( 2 / 5 ); the Z-X states of the Blazing Heart line ( `ESI_DASH_JUMP_COMBO_SPK_ZX_READY` / `_LOOP` ) are CH1f's.
+- New constants of one phase live in `_CONST_EL_CH1F_` style namespaces ( `X2GUEL.cpp` right after `using namespace _CONST_EL_CH1E_;` ). An inserted `#endif` before a closing `}` that is LF inside a CRLF function gets the wrong EOL ( `flagcheck` counts it ): anchor `insert_after` on the CRLF line above it ( CH1f's `SPK_ZZ` EventProcess ).

@@ -148,3 +148,4 @@ offset	kind	name	note
 0x9620	field	m_iComboXXdownXNowLoopCount	CX2GUEL (June KProtectedType<int>, 12 B, March plain int); read by the Grand Master XX down-X states ( CH1e )
 0x962c	field	m_iComboXXdownXMaxLoopCount	CX2GUEL (June KProtectedType<int>, 12 B, March plain int); capped at 4 by the start state ( CH1e )
 0x9688	field	m_hXXDownXLoop	CX2GUEL effect-set handle of EffectSet_SGM_XXX_Start ( CH1e )
+0x961c	field	m_uiSPKXZReattakCount	CX2GUEL remaining Pyro Knight dash-jump X attacks: 2 from XZ, 5 from ZX_READY, one used per XZ_REATTACK / ZX_LOOP start ( CH1f )

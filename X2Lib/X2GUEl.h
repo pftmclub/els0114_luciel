@@ -236,6 +236,7 @@ public:
 		ESI_DASH_COMBO_SGM_XX_END,					/// char-elesis CH1e: June script id 324 ( Grand Master dash X-X end; CH1m maps, CH1e owns the state )
 		ESI_P_SGM_ADVANCED_KNIGHT_MASTERY,			/// char-elesis CH1e: June script id 332 ( Advanced Knight Mastery guard; CH1m maps, CH1e owns the state )
 		ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_SMALL,	/// char-elesis CH1e: June script id 333 ( Advanced Knight Mastery guard, small; CH1m maps, CH1e owns the state )
+		ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP,			/// char-elesis CH1f: June script id 326 ( Pyro Knight line dash-jump Z-X loop; CH1m maps, CH1f owns the state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -477,6 +478,11 @@ protected:
 	void ESI_DASH_COMBO_SGM_XX_END_EventProcess();			/// char-elesis CH1e: June 32b6b0a0
 	void ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_StateStart();	/// char-elesis CH1e: June 32b6bc30 ( also _SMALL )
 	void ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_EventProcess();	/// char-elesis CH1e: June 32b6bc80 ( also _SMALL )
+	void ESI_DASH_JUMP_COMBO_SPK_ZX_READY_StateStartFuture();	/// char-elesis CH1f: June 32b52300
+	void ESI_DASH_JUMP_COMBO_SPK_ZX_READY_EventProcess();		/// char-elesis CH1f: June 32b6b320
+	void ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_StateStartFuture();	/// char-elesis CH1f: June 32b52320
+	void ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_EventProcess();		/// char-elesis CH1f: June 32b6b350
+	void ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_FrameMove();			/// char-elesis CH1f: June 32b7d2b0
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 	void JumpAttackZEventProcess();

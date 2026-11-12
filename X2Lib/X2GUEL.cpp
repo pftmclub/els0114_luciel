@@ -113,6 +113,14 @@ namespace _CONST_EL_CH1E_
 	const float XX_DOWN_X_BACKWARD_SPEED	= -500.f;
 }
 using namespace _CONST_EL_CH1E_;
+// char-elesis CH1f: constants of the Pyro Knight line dash-jump Z-X states ( June 32b52300 / 32b7d2b0 )
+namespace _CONST_EL_CH1F_
+{
+	const UINT DASH_JUMP_ZX_LOOP_COUNT		= 5;
+	const float DASH_JUMP_ZX_LOOP_MP_COST	= 2.f;
+	const float DASH_JUMP_ZX_LOOP_EVENT_TIME	= 0.1f;
+}
+using namespace _CONST_EL_CH1F_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
 {
@@ -8993,10 +9001,25 @@ void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_EventProcess()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CX2GUEL::ESI_DASH_COMBO_SPK_ZX_EventProcess()			// ESI_DASH_COMBO_SPK_ZX
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1f: June 32b5ced0 ( also the body of ESI_COMBO_SBH_ZZZX; CH1m registers it )
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )	{		StateChange( USI_WAIT );	}	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )	WALK_CANCEL_AFTER( m_fWalkCancelAfter )	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_DASH_COMBO_SPK_ZX_FrameMove()
 {
@@ -9015,6 +9038,22 @@ void CX2GUEL::ESI_DASH_COMBO_SPK_ZX_FrameMove()
 }
 void CX2GUEL::ESI_DASH_COMBO_SPK_ZZ_EventProcess()			// DASH_COMBO_ZZ
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1f: June 32b5d1d0
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneZ, ESI_DASH_COMBO_SPK_ZZZ )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -9027,9 +9066,24 @@ void CX2GUEL::ESI_DASH_COMBO_SPK_ZZ_EventProcess()			// DASH_COMBO_ZZ
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_DASH_COMBO_SPK_ZZZ_EventProcess()			// DASH_COMBO_ZZZ
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1f: June 32b5d590
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -9041,6 +9095,7 @@ void CX2GUEL::ESI_DASH_COMBO_SPK_ZZZ_EventProcess()			// DASH_COMBO_ZZZ
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_DASH_COMBO_SPK_ZZZ_FrameMove()
 {
@@ -9059,6 +9114,26 @@ void CX2GUEL::ESI_DASH_COMBO_SPK_ZZZ_FrameMove()
 }
 void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_XZ_EventProcess()		// DASH_JUMP_COMBO_XZ
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1f: June 32b5d890 ( the Z press re-attacks while June's counter ( 2 from the start state ) lasts, also at animation end )
+	if ( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.oneZ && 0 < m_uiSPKXZReattakCount, ESI_DASH_JUMP_COMBO_SPK_XZ_REATTACK )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	if ( true == IsOnSomethingFuture() )
 	{
 		StateChange( USI_DASH_JUMP_LANDING );
@@ -9075,9 +9150,37 @@ void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_XZ_EventProcess()		// DASH_JUMP_COMBO_XZ
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 		CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_XZ_FrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1f: June 32b770e0 ( the fireball damage effect of SERV_IRUHADEV_JUNE_EL_DASHJUMP_XZ_FIREBALL, as the state's own body )
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( 0.2f ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( 0.2f ) == true && EventCheck( 0.2f, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Dummy2_Lhand" );
+		if( true == IsEnoughMPForAttack( _CONST_EL_::SPK_DASH_JUMP_XZ_MP_COST, vBonePos, 0.f, D3DXVECTOR3( 0.f, 0.f, -45.f ) ) )
+		{
+			D3DXVECTOR3 vRotateDegree = GetRotateDegree();
+			vRotateDegree.z = -45.f;
+
+			const WCHAR* pwszDamageEffectName = L"DamageEffect_Elesis_SPK_DashJump_Combo_XZ";
+#ifdef SERV_ELESIS_SECOND_CLASS_CHANGE
+			if( true == m_bIsLearnUnextinguishableFire )
+				pwszDamageEffectName = L"DamageEffect_Elesis_SBH_DashJump_Combo_XZ";
+#endif SERV_ELESIS_SECOND_CLASS_CHANGE
+
+			g_pX2Game->GetDamageEffect()->CreateInstance( this, pwszDamageEffectName, GetPowerRate() * GetFireBallPowerRate(),
+				vBonePos, vRotateDegree, vRotateDegree, m_FrameDataNow.unitCondition.landPosition.y );
+		}
+	}
+
+	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
     if( m_pXSkinAnim->EventTimerOneshot( 0.2f ) )
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -9123,6 +9226,7 @@ void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_XZ_FrameMove()
 	}
 
 	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /** @function : ESI_DASH_JUMP_COMBO_SPK_ZX_StartFurture
 	@brief : ESI_DASH_JUMP_COMBO_SPK_ZX 이후 추가 X공격(파이어볼) 구현을 위한 함수
@@ -11932,6 +12036,82 @@ void CX2GUEL::ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_EventProcess()
 		}
 	}
 	CommonEventProcess();
+}
+
+// char-elesis CH1f: June 32b52300 ( the dash-jump Z-X ready state: no dash attack, 5 X attacks )
+void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_ZX_READY_StateStartFuture()
+{
+	m_bIsDashAttackPossible = false;
+	m_uiSPKXZReattakCount = DASH_JUMP_ZX_LOOP_COUNT;
+	CommonStateStartFuture();
+}
+
+// char-elesis CH1f: June 32b6b320
+void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_ZX_READY_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+		StateChange( ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP );
+	CommonEventProcess();
+}
+
+// char-elesis CH1f: June 32b52320 ( each loop uses one of the X attacks )
+void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_StateStartFuture()
+{
+	--m_uiSPKXZReattakCount;
+	CommonStateStartFuture();
+}
+
+// char-elesis CH1f: June 32b6b350 ( a second X press inside the key window loops again while X attacks are left )
+void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_EventProcess()
+{
+	bool& bLoopAgain = m_FrameDataFuture.stateParam.bEventFlagList[0];
+
+	if ( true == bLoopAgain
+		&& ( m_fEventTime[0].stateChange < m_pXSkinAnimFuture->GetNowAnimationTime() || true == m_pXSkinAnimFuture->IsAnimationEnd() ) )
+	{
+		StateChange( ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP );
+		bLoopAgain = false;
+	}
+	else if ( m_pXSkinAnimFuture->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= m_pXSkinAnimFuture->GetNowAnimationTime()
+		&& true == m_InputData.oneX && 0 < m_uiSPKXZReattakCount )
+	{
+		bLoopAgain = true;
+	}
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() && true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	CommonEventProcess();
+}
+
+// char-elesis CH1f: June 32b7d2b0 ( the dash-jump XZ fireball with the Z-X damage effects, half the MP and a 0.1 s timer )
+void CX2GUEL::ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_FrameMove()
+{
+#ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+    if( m_pXSkinAnim->EventTimerOneshot( DASH_JUMP_ZX_LOOP_EVENT_TIME ) )
+#else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	if( m_pXSkinAnim->EventTimer( DASH_JUMP_ZX_LOOP_EVENT_TIME ) == true && EventCheck( DASH_JUMP_ZX_LOOP_EVENT_TIME, false ) == true )
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Dummy2_Lhand" );
+		if( true == IsEnoughMPForAttack( DASH_JUMP_ZX_LOOP_MP_COST, vBonePos, 0.f, D3DXVECTOR3( 0.f, 0.f, -45.f ) ) )
+		{
+			D3DXVECTOR3 vRotateDegree = GetRotateDegree();
+			vRotateDegree.z = -45.f;
+
+			const WCHAR* pwszDamageEffectName = L"DamageEffect_Elesis_SPK_DashJump_Combo_ZX";
+#ifdef SERV_ELESIS_SECOND_CLASS_CHANGE
+			if( true == m_bIsLearnUnextinguishableFire )
+				pwszDamageEffectName = L"DamageEffect_Elesis_SBH_DashJump_Combo_ZX";
+#endif SERV_ELESIS_SECOND_CLASS_CHANGE
+
+			g_pX2Game->GetDamageEffect()->CreateInstance( this, pwszDamageEffectName, GetPowerRate() * GetFireBallPowerRate(),
+				vBonePos, vRotateDegree, vRotateDegree, m_FrameDataNow.unitCondition.landPosition.y );
+		}
+	}
+
+	CommonFrameMove();
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #endif // NEW_CHARACTER_EL
