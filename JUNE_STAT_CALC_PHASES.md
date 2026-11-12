@@ -910,6 +910,15 @@ After commit `c0a28ccc`: `flagcheck --range c0a28ccc^..c0a28ccc`: 2 PASS, 1 DEFI
 jtCodeEmpress (unit 27): Electronic Field 25020 in slot 5, Dimension Link Sentry 25000 (level 1) in slot 6. Henir element NPCs 1805 / 1806 spawn in no
 dungeon: the element check uses Altera Plain Normal 30270 (232 / 233 + barriers 234 / 235, last stage). `DAMAGED_FUNC` NPCs (3112 / 3113 / 3134) appear
 only in the unregistered 2017 event dungeons 41460 / 41470: not reachable offline.
+**Play-test run 1 (2026-11-13 05:02-05:09, exe md5 798e1d60; `logs.py --grep "\[JUNE_STATCALC\] REACT"`): 170 REACT lines, 3 of 4 checks pass.**
+- HP change = `dmg` on every line: 38 user (Raven99 49 x 11, ArmeDW 53 x 23, jtCodeEmpress 27 x 4), 132 NPC (15 ids incl. 1466, 530, 232 / 233 / 234).
+- Nasod elements 232 / 233 with barriers up: `pre=1` (forced 1), then `add=` lifts it by the attacker's additional damage (e.g. `pre=1 ... add=266
+  dmg=266`), June's order (the barrier test sits before the additional-damage step). The hand-off's "takes 1" was too strict.
+- Eve summons: Electronic Field 1622 and Nasod Watch 384 `dmg=0`, HP unchanged (`NOT_APPLY_DAMAGE_IN_DUNGEON`).
+- ArmeDW (no reduction set): `pre = gfd` on all 23; `guard < double` on all 23 (her additional defence).
+- **Open:** Raven99's set option 41149 (0.5 at 30 %) shows on none of 11 logged hits (`pre = gfd`; about 2 % if it works). Static checks hold: kim
+  set 1365 grants 41149 at 4 parts, pieces carry set 1365, live `OptionItemData` has 41149 (`DUNGEON_ONLY` read by `X2SocketItem.cpp:559`).
+  Retest with 30+ logged hits before the review; none -> trace `InitSetItemOptions` / `GetBasicReducedDamagePercent` at runtime.
 
 ## Phase D5 - Extra damage, enchant resist and level correction
 
