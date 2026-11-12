@@ -77,3 +77,10 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L1016.
 - **`ch0_classn.tsv` rows:** 25 (filter on its `proposed_phase` column).
 - `june2017_re/char_elesis/ch0_classn.tsv` (49 rows; current lines: compatibility arms `X2Unit.h:2085-2151`, Elesis helpers `:2731-2802` (only `GetThirdLine...` gains 35 / 125), gauge arm `X2GageManager.cpp:205-220`, portraits `X2Data.cpp:2925-2936` (indices 57 / 58), stat chart `:3876-3891` (June `3254ee40`: 35 / 125 = 2, 1, 1)). **Stat rows: nothing to write**: the flat `StatTable.lua` (e37c9211) already has 35 / 120 / 121 / 125. Dropped: `X2ComboTree.cpp:302` (June loads no combo tree), the lobby particles (no `SDK_` / `SCA_` rows). Covered by Ara CHNa: the socket bound, `GetClassLevel`, `CorrelateUnitClassTemplet`, class arithmetic (+3 optional bound sites). `TranscendCheck` refuses 120 / 121 / 125 / 35 today (CH3d). June's compat: 35 accepts item classes {8, 35}, 125 {8, 35, 125}.
+
+## Amended by CH1m (2026-11-13)
+
+- **Three of the `X2GUEL.cpp` class switches are CH1m's, not CHNa's:** `ParseCommonRandomState` (the task's `:213`), the `InitState` cut-in switch (`:249`)
+  and `InitStateByUnitClass` (`:2747`) carry June's bodies under `_LIVE` with the 35 / 125 arms already (June `31feaac0` by class name; cut-in table
+  `32b87fec`: 35 -> 0, 125 -> 3; part 2 `32b864f0`: 35 / 125 register the SCA / SDK states). CHNa only checks in play that a 35 and a 125 unit reach them
+  (`[JUNE_CHAR] ELESIS DATA` state count, a Dark Knight dash Z-Z).

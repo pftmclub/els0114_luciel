@@ -107,7 +107,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH1m | **ready**: registration under `_LIVE` | Opus 5.5 / high, Opus review | CH1k review | `X2GUEL.*` | `CH1m.md` |
+| CH1m | **review ready** (done 2026-11-13: InitState / both parts / InitStateID / ParseCommonRandomState under `_LIVE`, 153 ids; no play-test) | Opus 5.5 / high, Opus review | CH1k review | `X2GUEL.*` | `CH1m-review.md` |
 | CH1n | blocked (CH1m review): base callbacks + skill-slot head | Opus 5.5 / high, Opus review | CH1m review | `X2GUEL.*`, `X2GUUser.*` | `CH1n.md` |
 | CH1o | blocked (CH1n review): virtuals under `_LIVE`, the 0x83c hook | Opus 5.5 / high, Opus review | CH1n review | `X2GUEL.*`, `X2GUUser.*` | `CH1o.md` |
 | CH1p | blocked (CH1o review): pressed index (7ag), hooks, June-only script keys, reserved-buff ids | Opus 5.5 / high, Opus review | CH1o review | `X2GUEL.*`, `X2GUUser.*`, Always.h | `CH1p.md` |

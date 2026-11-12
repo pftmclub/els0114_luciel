@@ -938,6 +938,62 @@ No drift found. No `_DEBUG` define to retire. One lead for CH1m: its kickoff's R
 
 **Nothing to play-test.** Next: `/x2-phase char-elesis CH1m` ( Opus 5.5 high ).
 
+### CH1m - Done (2026-11-13)
+
+All three class-map rows are `inside`, under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` ( still `//#define` ) with March's bodies in the `#else`: wrapper `32b87a60`
+-> `InitState`, part 1 `32b81be0` -> `InitStateCommon`, part 2 `32b864f0` -> `InitStateByUnitClass`. Two more March functions take June's body under the same
+flag: `InitStateID` ( June inlines it ) and `ParseCommonRandomState` ( `ch0_classn` row: June's reader is the base `31feaac0` by class name ). No new flag.
+
+**How it was derived.** `june2017_re/char_elesis/ch1m_gen.py` ( Ara's generator, Elesis's names ) writes the C++ from CH0's listing-checked `ch0_reg.tsv`;
+`ch1m_spec.py` makes the bytepatch spec. Fresh decompiles of the three functions and `charport_adis.py elesis 32b864f0` read against it. Ids: the `June script
+id N` member, else March's registration of the table, else the member of that name: **153 ids, one member each, both ways** ( `ch1m_idmap.tsv` ); one hand
+pair, 227 / 228 -> `ESI_DASH_JUMP_COMBO_SPK_XZ` / `_REATTACK` ( March registers that one table for both members too; June's StartFutures `32b50500` /
+`32b50520` = March's two ). Every callback resolved ( 0 unresolved ).
+
+**InitState `32b87a60`:** cut-in from the byte table `32b87fec` / jump table `32b87fd8` ( read from the exe ): 120 -> 1, 121 -> 2, 125 -> 3, **every other class
+-> 0** ( 8 / 29 / 30 / 35 and the 111 others; unlike Ara's, no class keeps the index ). Then `cmp [esi+0x4088], 0xbb` @32b87af5: `m_CommonState.m_Wait` goes
+to `USI_WAIT` unless it is `ESI_SWORD_WAIT` ( written into March's `InitStateID` ). Then part 1, `InitEventStates` ( 3202b110 ), part 2, `InitStateCommonRandom`
+( 31fe22d0 ): the C++ keeps March's order ( part 2 before the event states ); part 2's ids ( 208-333 ) do not meet 111-116. START ( Start / EventProcess / End ),
+WIN ( `WinStateStart`, `RandomLoseEventProcess` ), LOSE, `InitWaitStateChange( "ESI_WAIT_STATE_CHANGE" )` @32b87ed1 ( 7h ), vslot 0x690, 0x684( 0 ),
+`31fd8f00`. `31fc93d0` ( empty stub ) not called.
+
+**InitStateCommon `32b81be0`** ( no class test, 111 names ): hyper id 23 = `GetHyperModeTableName( false )` ( `ESI_HYPER_MODE`, `ESI_EGM_` / `ESI_EBH_` /
+`ESI_ECA_HYPER_MODE` for a transcended 120 / 121 / 125 ), FrameMove = Elesis vslot 0x600 `HyperModeFrameMove` ( thunk `32adf320` ), End = base 0x604. No
+berserk table ( id 155 is `ESI_STANDUP_ROLLING_FRONT_BACK` here ). Bounding = `InitBoundingStates( "ESI_" )` at June's place ( @1115, 7l ). No skill-chain
+lookup ( `32d3ee60` ) in either part. Left out, a comment line each ( as the six earlier ports ): phoenix run 123-126 ( PvP ), dance 127-129 ( Stage 10 ),
+riding 93-96 ( Stage 17; March does not register them either ); empty targets `3202a7d0` ( die end ) and `32002f70` ( riding X FrameMove ). 207 registers the
+205 table `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE` with the CH1k pair ( Init / EventProcess of 205, its own `_DETONATION_StateStart` ).
+
+**InitStateByUnitClass `32b864f0`:** one switch, no fall-through: 29 / 120 -> SGM + SSK ( 19 ), 30 / 121 -> SBH + SPK ( 15 ), 35 / 125 -> SCA + SDK ( 23 ); 8 and
+every other class register nothing. So a Saber Knight also gets the Grand Master states, a Pyro Knight the Blazing Heart ones and a Dark Knight the Crimson
+Avenger ones, as June. The three tail rows ( 321 / 326 / 329 ) jump to the shared `31fd89b0` call @32b87203; listing read for 321.
+
+**`ParseCommonRandomState`:** `ParseCommonRandomStateByUnitClass()` ( June `31feaac0`, Arme's / Ara's ): `GetUnitClassName` gives `ELESIS_KNIGHT` ...
+`ELESIS_CRIMSON_AVENGER`, the seven tables of June's `INIT_COMMON_RANDOM_STATE` ( `ELESIS_KNIGHT.src.lua:317-495` ); March's `EL_*` names are gone with
+March's script. CHNa kickoff amended ( the `:213` / `:249` / `:2747` switches are done here ).
+
+**JUNE_BUGS 638-639:** 638 `ESI_STANDUP_ATTACK_FRONT_NO_DOWN` / `_BACK_NO_DOWN` / `ESI_WALL_LANDING` have no table in June's or March's script ( March
+registers them too; Ara's 600 ); 639 `ESI_DASH_JUMP_COMBO_SSK_ZZX` ( 321 ) takes `SSK_XX`'s EventProcess `32b5a8a0` ( `mov eax, 0x32b8fd40` @32b868e1 ). Row
+626 ( `ESI_RIDING_DAMAGE_BACK` ) stands. The 5 `USI_EVENT_*` names with no table are the base `InitEventStates`, every class alike ( rows 157 / 158 ).
+
+**Always.h:** +9, guards only: `_LIVE` needs `ARME_LIVE` ( `ParseCommonRandomStateByUnitClass` ), `HYPER_MODE_FIX` ( hyper StartFutures ), `COMMON_RANDOM_STATE`,
+`EVENT_STATES`, `WAIT_STATE_CHANGE`, `BOUNDING_STATE` ( the `_LIVE` probe compiles them ). Checklist L431 / L475 / L512 marked `(Elesis: CH1m)`; funcmap rows
+`32b87a60` / `32b81be0` / `32b864f0` PORTED.
+
+**Checks.**
+- One-file `/c /Zs /EHsc` probes ( `census.cl_cmd`, no PCH ) of `X2GUEL.cpp`: off, `-D_LIVE`, `_LIVE + _WOS + _BLOOD + _PASSIVE + _SUMMON`: exit 0, 0 errors each.
+- `cl /P` off / `_LIVE`: `InitWaitStateChange( "ESI_WAIT_STATE_CHANGE" )` 0 / 1, `InitBoundingStates( "ESI_" )` 0 / 1, `m_iSkillCutInSetIndex = 3` 0 / 1,
+  `ESI_SWORD_WAIT != m_CommonState.m_Wait` 0 / 1, `"ESI_DASH_JUMP_COMBO_SSK_ZZX"` 0 / 1, `"EL_KNIGHT"` 1 / 0, `m_StateList[...] = stateData;` 141 / 174.
+- `git diff --patience --numstat`: `X2GUEL.cpp` 1237 / 0, `Always.h` 9 / 0; encodings and high-byte counts unchanged ( bytepatch before / after ).
+- `flagcheck JUNE_CHAR_ELESIS_LIVE --worktree --files X2Lib/X2GUEL.cpp`: `files: 1 PASS`, `0 deleted, 0 non-ASCII inserted, 424 EOL-mismatched, 0 #else/#endif
+  without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only for the `//#define`. The 424 are the `InitStateByUnitClass` block: March's `{` above it
+  is the file's one LF-only line there, the block keeps the CRLF of the lines it sits in.
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h KTDXLIB/Always.h`: `allow-listed: 0`, `RESULT: PASS` ( no `CX2GUEL::ReInit` allow row needed ).
+  `enumscan --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`.
+- Full build skipped: no play-test.
+
+**Nothing to play-test** ( `_LIVE` is off ). Next: `/x2-phase char-elesis CH1m review` ( Opus 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

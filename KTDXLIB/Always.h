@@ -12740,3 +12740,12 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_DEV_UNLIMITED_SKILL, SERV_IRUHADEV_JUNE_BUFF_RIDING_KEY_WAIT, SERV_IRUHADEV_JUNE_SKILL_STATE_STRING_TIME, SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF, SERV_IRUHADEV_JUNE_USER_SKILL_LEVEL_HELPERS and SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: June character port ( Elesis ) Phase CH1m - guards only ( no new flag ): the registration calls the shared registrars ( GetHyperModeTableName, StartStateStart, InitEventStates, RandomLoseEventProcess, InitWaitStateChange, InitBoundingStates, ParseCommonRandomStateByUnitClass ) and the hyper StartFuture callbacks
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE ) || !defined( HYPER_MODE_FIX ) || !defined( SERV_IRUHADEV_JUNE_COMMON_RANDOM_STATE ) || !defined( SERV_IRUHADEV_JUNE_EVENT_STATES ) || !defined( SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE ) || !defined( SERV_IRUHADEV_JUNE_BOUNDING_STATE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE ( ParseCommonRandomStateByUnitClass ), HYPER_MODE_FIX, SERV_IRUHADEV_JUNE_COMMON_RANDOM_STATE, SERV_IRUHADEV_JUNE_EVENT_STATES, SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE and SERV_IRUHADEV_JUNE_BOUNDING_STATE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+//////////////////////////////////////////////////////////////////////////
