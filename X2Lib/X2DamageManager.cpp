@@ -1192,9 +1192,56 @@ static void GuildSkillChanceToReverse( const CX2DamageManager::DamageData* pDama
 }
 #endif SERV_IRUHADEV_JUNE_BUFF_GUILD_REVERSE
 //}}
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+// june-stat-calc D3: June 32621f40: the hit NPC's part rate, from its now-state DAMAGE_RATE_OF_PART list and the hit datum's name
+void CX2DamageManager::SetDefenderDamageRateOfPart( CX2GameUnit* pDefender_ )
+{
+	if ( NULL == pDefender_ || CX2GameUnit::GUT_NPC != pDefender_->GetGameUnitType() )
+		return;
+	CX2GUNPC* pDefenderNPC = dynamic_cast<CX2GUNPC*>( pDefender_ );
+	if ( NULL == pDefenderNPC )
+		return;
+
+	pDefenderNPC->SetDamageRateOfPart( 1.f );
+	const std::vector<CX2GUNPC::StateData::DamageRateOfPart>& vecDamageRateOfPart = pDefenderNPC->GetNowStateData().m_vecDamageRateOfPart;
+	const wstring& wstrHitPartName = m_pCollision->GetCollisionDataName();
+	for ( UINT uiIndex = 0; uiIndex < vecDamageRateOfPart.size(); ++uiIndex )
+	{
+		if ( vecDamageRateOfPart[uiIndex].m_wstrPartName != wstrHitPartName )
+			continue;
+
+		pDefenderNPC->SetDamageRateOfPart( vecDamageRateOfPart[uiIndex].m_fRate );
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		static DWORD s_dwPartRateLogged = 0;
+		if ( ::GetTickCount() - s_dwPartRateLogged >= 1000 )
+		{
+			s_dwPartRateLogged = ::GetTickCount();
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] PART npc=%d part=%s rate=%.2f", static_cast<int>( pDefenderNPC->GetNPCTemplet().m_nNPCUnitID ),
+				wstrHitPartName.c_str(), vecDamageRateOfPart[uiIndex].m_fRate );
+		}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		break;
+	}
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 bool CX2DamageManager::DamageCheck( DamageData* pDamageData, bool bAttackOnlyThisUnit, UidType attackUnitUID )
 {
 	bool retval = false;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	// june-stat-calc D3: June 3262f5a0: no hit from a user in the cash shop ( +0x91e4 ), nor from an NPC whose owner is
+	if ( null != pDamageData->optrAttackerGameUnit )
+	{
+		CX2GameUnit* pCashShopAttacker = pDamageData->optrAttackerGameUnit.GetObservable();
+		if ( CX2GameUnit::GUT_USER == pCashShopAttacker->GetGameUnitType() && true == static_cast<CX2GUUser*>( pCashShopAttacker )->GetEnterCashShop() )
+			return false;
+		if ( CX2GameUnit::GUT_NPC == pCashShopAttacker->GetGameUnitType() )
+		{
+			CX2GUUser* pAttackerOwner = static_cast<CX2GUNPC*>( pCashShopAttacker )->GetOwnerGameUnit();
+			if ( NULL != pAttackerOwner && true == pAttackerOwner->GetEnterCashShop() )
+				return false;
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 	
 
 
@@ -2180,6 +2227,9 @@ bool CX2DamageManager::UnitToUnit( DamageData* pDamageData, bool bAttackOnlyThis
 			}
 			else
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+				SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @32625439, before the dodge roll
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
 				{
 					bCheckMiss = true;
@@ -2397,6 +2447,9 @@ static bool EffectCollisionDataCheck( CKTDXCollision* pCollision_, const CKTDXCo
 			{
 				if( false == pColB->m_bEnable )
 					continue;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+				pCollision_->SetCollisionDataName( pColB->m_Name );	// june-stat-calc D3: June @3262c18d / @32611f53 / @32625ef0 / @32628ba4 / @32641c83
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 				const bool	bLineB		= ( CKTDXCollision::CT_LINE == pColB->m_CollisionType );
 				const float	fRadiusB	= pColB->GetScaleRadius();
@@ -3050,6 +3103,9 @@ bool CX2DamageManager::EffectToUnit( DamageData* pDamageData )
 			}
 			else
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+				SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @3262f184, before the dodge roll
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
 				{
 					bCheckMiss = true;
@@ -3518,6 +3574,9 @@ bool CX2DamageManager::MeshToUnit( DamageData* pDamageData )
 			}
 			else
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+				SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @3262861c, before the dodge roll
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
 				{
 					bCheckMiss = true;
@@ -3788,6 +3847,9 @@ bool CX2DamageManager::CollisionDataToUnit( DamageData* pDamageData )
 				}
 				else
 				{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+					SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @3262b358, before the dodge roll
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 					if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
 					{
 						bMiss = true;

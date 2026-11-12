@@ -2245,7 +2245,12 @@ bool CX2GameUnit::CanApplyHpRateDamage( const CX2DamageManager::DamageData* pDam
 		return false;
 	if ( true == pDefenderNPC->GetIsBosRaidNPC() || true == pDefenderNPC->GetIsMiddleBosRaidNPC() )
 		return false;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	if ( true == pDefenderNPC->GetImmuneToHpAttack() )	// june-stat-calc D3: June vslot 0x430 @32272745
+		return false;
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 	// stand-in: IMMUNE_TO_HP_ATTACK ( NPC +0x8f0c, vslot 0x430, default the boss gauge ) is D3's
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 	if ( true == pDefenderNPC->GetIsMainBoss() )
 		return false;
 	return ( false == pDefenderNPC->GetIsBosRaidNPC() && false == pDefenderNPC->GetIsMiddleBosRaidNPC() );	// June @3227275b: monster grade not 1 or 2

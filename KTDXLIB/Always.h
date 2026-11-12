@@ -12688,3 +12688,19 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE needs the BBT 108 / 109 terms, the memo level-damage rate and June's PvP channel names ( D2b )
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
+// Description: june-stat-calc D3 - the hit pipeline before the formula, as June. DamageCheck's prelude (June 3262f5a0: no hit from a
+//              user in the cash shop or from an NPC whose owner is), the hit part (June keeps the last tested datum's name on the
+//              collision object; 32621f40 sets the hit NPC's DAMAGE_RATE_OF_PART from its now-state list before the dodge roll),
+//              IMMUNE_TO_HP_ATTACK (NPC Init key, the boss gauge by default; CanApplyHpRateDamage tests it), CEffect::AttackResult's
+//              tail (June 31f885bd: the owner's on-hit sockets, the summon socket off special attacks, the given-damage tally on a
+//              user hit; the same tally in CX2GUUser::AttackResult) and AddGivenDamamge's overflow guard (June 31f8df30).
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE ) && !( defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) && defined( SERV_IRUHADEV_JUNE_COLLISION ) && defined( SERV_IRUHADEV_JUNE_SOCKET_PARITY ) && defined( UPGRADE_RAVEN ) && defined( DUNGEON_RANK_NEW ) && defined( MODIFY_SET_DAMAGE_DATA ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE needs D2's part-rate member, June's collision helpers, the socket parity hook, the effect-tail block and the given-damage tally
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+//////////////////////////////////////////////////////////////////////////

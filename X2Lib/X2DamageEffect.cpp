@@ -6144,6 +6144,28 @@ void CX2DamageEffect::CEffect::AttackResult()
 	{
 		CX2GUUser* pGUUser = static_cast<CX2GUUser*>( pOwnerGameUnit );
 		pGUUser->AttackResultByType(m_DamageData);
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+		// june-stat-calc D3: June 31f885e5-31f88664: the owner's on-hit sockets, its summon socket off special attacks, the given-damage tally on a user hit
+		pGUUser->ProcessSocketEffectByAttackSuccess( m_DamageData );
+		if ( CX2DamageManager::AT_SPECIAL != m_DamageData.attackType )
+			pGUUser->ProcessSummonNpcSocket();
+		CX2GameUnit* pGivenDamageDefender = m_DamageData.optrDefenderGameUnit.GetObservable();
+		if ( NULL != pGivenDamageDefender && CX2GameUnit::GUT_USER == pGivenDamageDefender->GetGameUnitType() )
+		{
+			const float fGivenDamage = pGivenDamageDefender->GetFinalDamage( &m_DamageData );
+			if ( NULL != g_pX2Game )
+				pGUUser->AddGivenDamamge( static_cast<int>( fGivenDamage ) );
+		}
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		static DWORD s_dwEffectHitLogged = 0;
+		if ( ::GetTickCount() - s_dwEffectHitLogged >= 1000 )
+		{
+			s_dwEffectHitLogged = ::GetTickCount();
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] EFFHIT owner=%I64d effect=%s at=%d react=%d", pGUUser->GetUnitUID(), GetName(),
+				static_cast<int>( m_DamageData.attackType ), static_cast<int>( m_DamageData.reActResult ) );
+		}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 #ifdef PVP_ZOOM_CAMERA
 		pGUUser->SetSubZoomCameraTimer();

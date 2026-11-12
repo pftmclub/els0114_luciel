@@ -209,6 +209,10 @@ class CKTDXCollision
 	public:
 		CKTDXCollision(void);
 		~CKTDXCollision(void);
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+		void			SetCollisionDataName( const wstring& wstrName_ ) { m_wstrCollisionDataName = wstrName_; }	// june-stat-calc D3: June CKTDXCollision +0
+		const wstring&	GetCollisionDataName() const { return m_wstrCollisionDataName; }
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 //{{ robobeg : 2008-11-04
 		//__forceinline bool CollisionDataCheck( vector<CollisionData*>& dataListA, vector<CollisionData*>& dataListB, CKTDXCollision::CollisionType &collType, D3DXVECTOR3* impactPoint = NULL )
@@ -2150,5 +2154,10 @@ class CKTDXCollision
 
             return false;
         }
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	private:
+		wstring			m_wstrCollisionDataName;	// june-stat-calc D3: June +0, the name of the last enabled defender datum a hit test tried
+	public:
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 };
 

@@ -654,6 +654,60 @@ prelude, and the two dispatch gaps (`CEffect::AttackResult` tail: the owner's on
 **Done gate.** Map rows `June`; gates PASS; `DEPLOY OK`; play-test: a damage effect's hit (an arrow or a fireball) fires the attacker's
 on-hit socket effect, and a summoned NPC's hit on a monster logs `HIT` with the summon as attacker.
 
+### Phase D3 - Done (2026-11-12)
+
+**Opus 5.5 / high. Flag `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE`** (guard: D2's flag, `JUNE_COLLISION`, `JUNE_SOCKET_PARITY`,
+`UPGRADE_RAVEN`, `DUNGEON_RANK_NEW`, `MODIFY_SET_DAMAGE_DATA`). Map: the 8 D3 rows `June`, one row routed to S0 (below).
+
+**Re-checked, no code.** Base `322990e0`, user `32045340` and NPC `32759f30` read term by term against the flagged bodies: all June
+(the user layer's magic-only conversion needs `FIX_EXPLOSIVE_NASOD_HAND` and `RAVEN_SECOND_CLASS_CHANGE`, both ON by `flagprobe.py`; the NPC
+layer's user-owner guard is no deviation, since March owners are `CX2GUUser` by type). `UnitToUnit`'s NPC `AttackResultByType`: `ADD_RENA_SYSTEM`
+is **ON**, so March already calls it (char-raven CH1q's "off" was wrong); the user branch's `31fcd620` is the `ProcessVPP` delegate (`+0x8db8`).
+
+**Ported.**
+- **`DamageCheck` prelude** (`3262f5a0`): attacker `+0x91e4` = `CX2GUUser::m_bEnterCashShop` (writer `SetEnterCashShop` `32044a80`). A user
+  attacker in the cash shop, or an NPC attacker whose owner (`32759f00`) is, gets no hit; before AreaHit. New `GetEnterCashShop()`.
+- **Hit part.** June's `CKTDXCollision` keeps a wstring at `+0`: every collision helper copies the B datum's `m_Name` into it right after the
+  `m_bEnable` skip (`@3262c18d`, `@32611f53`, `@32625ef0`, `@32628ba4`, `@32641c83`; the C8a note "nothing reads it" is answered by
+  `32621f40`). Ported as `SetCollisionDataName` in `EffectCollisionDataCheck`, which all five C8b drivers share. In `CollisionDataToUnit` B
+  is the attack's manual datum, so that path keys on the attacker's datum name: `JUNE_BUGS.md` row 634 (latent).
+- **`SetDefenderDamageRateOfPart`** (`32621f40`): NPC defender, rate reset to 1.0, then the first `{ part, rate }` of the now-state list
+  whose part equals the hit name. Called in the non-heal branch before each of the four dodge rolls (`@32625439`, `@3262f184`,
+  `@3262861c`, `@3262b358`). Loader: `StateData::m_vecDamageRateOfPart` after `FURY_DATA` (`32784c00 @32796718-3279680d`: clear,
+  `[1]` name, `[2]` rate default 1.0, pushed even when a read fails). Data: `RAID_ELTRION_MK2_PHASE1 / 2 / 3` only.
+- **`IMMUNE_TO_HP_ATTACK`**: `CX2GUNPC::m_bImmuneToHpAttack` (ctor false `@3276337c`), read after `SET_NUM_OF_GAGE` with
+  `m_bHasBossGage` as the default (`327a0fa0 @327a454c`), tested after `GetIsMiddleBosRaidNPC()` in `CanApplyHpRateDamage`
+  (`@32272745`; vslot `0x430` has no override, `vtslot.py`). The D2b stand-in comment stays in the `#else`.
+- **`CEffect::AttackResult` tail** (`31f885bd-31f88669`), user owner, after `AttackResultByType`: `ProcessSocketEffectByAttackSuccess`
+  (vslot `0x3f0`, made public), then unless `AT_SPECIAL` the summon socket (`32008280` = March's inline block of `CX2GUUser::AttackResult`,
+  moved whole into `ProcessSummonNpcSocket()`, which both call), then for a user defender `GetFinalDamage` (vslot `0x70`) truncated into
+  the owner's `AddGivenDamamge` when `g_pX2Game` exists. June's `CX2GUUser::AttackResult` has the same tally (`@32014215-32014277`):
+  ported there too. A user defender means PvP, so the tally has no offline reach. March's dead `PVP_ZOOM_CAMERA` (OFF) is untouched.
+- **`AddGivenDamamge`** = June `31f8df30`: add only when the tally is below `INT_MAX - x`. Divergence row `AddGivenDamamge` (`replace`,
+  ported); its other callers are the NPC `DamageReact` tallies (`327b1f30 @327b4d13 / @327b4ef6`).
+
+**Routed (not this plan's damage track).** The four dodge rolls also offset the random index by the attacker's (or NPC attacker's
+owner's) `GetRandomInt( 0 )` when the NPC defender's June-only templet byte `+0xe8` is set (`@326253e2`, `@326285b9`, `@3262b2fe`,
+`@3262f11a`). March's `NPCUnitTemplet` has no such field: map row (phase S0), S0 kickoff amended, with `CalcHitDodgePercent` `32610a00`.
+The NPC attacker's `AdjustDamageDataBeforeDamageReact` forward (`32778fe0`) stays routed to char-luciel CH1k.
+
+**Numbers.** `emu_final_damage_b.py`: its port model gained the immunity test; `OK: 3739 input sets, 0 mismatch(es), 0 static mismatch(es)`,
+192 HP-gate sets with `IMMUNE_TO_HP_ATTACK` now compared.
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE --worktree --files <10 files>`: 9 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted,
+0 non-ASCII, 12 EOL-mismatched inserted lines (the dodge sites sit in `X2DamageManager.cpp`'s mixed CRLF / LF region) -> `RESULT: PASS`.
+`junediverge --check <10 files>`: `RESULT: PASS`. `enumscan`: 0 rows in this phase's hunks (3 old rows elsewhere in the files).
+`/Zs` probes (`X2DamageManager`, `X2DamageEffect`, `X2GUUser`, `X2GUNPC`, `X2GameUnit`): 0 errors.
+**Build.** `DEPLOY OK: X2_offline.exe is 26,362,368 B, dated 2026-11-12 23:08:43, md5 a75da7a4a3404e19c4b69a91c5a8860d` (built at `681c0fb5` plus
+peers' uncommitted char-elesis files); `EXESTR OK: 2 of 2` (`[JUNE_STATCALC] EFFHIT owner=`, `[JUNE_STATCALC] PART npc=`, wide), `EXESTR OK: 2 of 2`
+(`IMMUNE_TO_HP_ATTACK`, `DAMAGE_RATE_OF_PART`, narrow).
+**Debug** (`_STATCALC_DEBUG`): `[JUNE_STATCALC] EFFHIT owner= effect= at= react=` (the tail ran for a damage effect, about once a second),
+`[JUNE_STATCALC] PART npc= part= rate=` (a listed part was hit).
+
+**Play-test owed.** ArmeDW (unit 53, Dimension Witch 99) with `Perkisas: Staff of Greed` 30391 (socket option 35335: SIEE 13, 20 % per hit,
+1 s interval, `BFI_BUFF_SOCKET_PERKISAS_PERSONA`), any normal dungeon entered with the auto-party button. Gate: ranged X hits (damage effects)
+give `EFFHIT owner=<ArmeDW UID>` lines and the Perkisas buff icon; the party bots' hits log `HIT att=<hero NPC id>`.
+
 ## Phase D4 - DamageReact: from the final damage to the HP change
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT`, the damage arithmetic of NPC `DamageReact` `327b1f30` and user

@@ -1222,6 +1222,15 @@ class CX2GUNPC : public CX2GameUnit
             float                       m_fAttackPowerRateFury;	/// June effect completion C4c: June StateData +0x414, FURY_DATA.ATTACK_POWER_RATE_FURY (1.0)
             float                       m_fAnimSpeedRateFury;	/// June StateData +0x418, FURY_DATA.ANIM_SPEED_RATE_FURY (1.0)
 #endif SERV_IRUHADEV_JUNE_NPC_FURY_MODE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+            struct DamageRateOfPart	// june-stat-calc D3: June StateData +0x41c entry ( 0x20 B: rate, part name )
+            {
+                float                   m_fRate;
+                wstring                 m_wstrPartName;
+                DamageRateOfPart() : m_fRate( 1.f ), m_wstrPartName() {}
+            };
+            std::vector<DamageRateOfPart>   m_vecDamageRateOfPart;
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
             StateData()
                 :
@@ -3350,6 +3359,10 @@ class CX2GUNPC : public CX2GameUnit
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	float GetDamageRateOfPart() const { return m_fDamageRateOfPart; }	// june-stat-calc D2b: June +0x8fd4, read by GetFinalDamage @32286455
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	void SetDamageRateOfPart( const float fDamageRateOfPart_ ) { m_fDamageRateOfPart = fDamageRateOfPart_; }	// june-stat-calc D3: written by CX2DamageManager 32621f40
+	bool GetImmuneToHpAttack() const { return m_bImmuneToHpAttack; }	// june-stat-calc D3: June vslot 0x430 32755a80 ( +0x8f0c )
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 //#ifdef FIX_NPC_SHOW_OBJECT
 //	bool GetShowObjectCurrentState() const { return m_bShowObjectCurrentState; }
@@ -4670,6 +4683,9 @@ class CX2GUNPC : public CX2GameUnit
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		float				m_fDamageRateOfPart;	// june-stat-calc D2b: June +0x8fd4, the hit part's DAMAGE_RATE_OF_PART ( its writer 32621f40 is D3's )
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+		bool				m_bImmuneToHpAttack;	// june-stat-calc D3: June +0x8f0c, Init IMMUNE_TO_HP_ATTACK ( default m_bHasBossGage )
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 #ifdef IMMUNITY_TIME_STOP		
 		bool						m_bImmunityTimeStop;		//타임 스톱 면역 기능 추가
 #endif //IMMUNITY_TIME_STOP

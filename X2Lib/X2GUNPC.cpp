@@ -1794,6 +1794,9 @@ CX2GUNPC::CX2GUNPC( int unitIndex, int teamNum, int uid, const CX2UnitManager::N
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 , m_fDamageRateOfPart( 1.f )	// june-stat-calc D2b: June CommonConstructor 32762670 @327633dd / @32763427
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+, m_bImmuneToHpAttack( false )	// june-stat-calc D3: June CommonConstructor @3276337c
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 {
 
 	//if( NULL == pNPCTemplet )
@@ -1950,6 +1953,9 @@ CX2GUNPC::CX2GUNPC( const CNpcCreatedInfoPtr NpcCreatedInfoPtr_
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 , m_fDamageRateOfPart( 1.f )	// june-stat-calc D2b: June CommonConstructor 32762670 @327633dd / @32763427
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+, m_bImmuneToHpAttack( false )	// june-stat-calc D3: June CommonConstructor @3276337c
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 {
     if ( pNPCUnitInfo == NULL || pNPCUnitInfo->m_pInitData == NULL )
 		return;
@@ -4506,6 +4512,9 @@ void CX2GUNPC::InitComponent()
 		LUA_GET_VALUE( m_LuaManager, "SET_HAS_BOSS_GAGE",				m_bHasBossGage,			m_bHasBossGage	);	/// 보스 체력 게이지 설정
 		LUA_GET_VALUE( m_LuaManager, "SET_NUM_OF_GAGE",					m_usNumOfGage,			m_usNumOfGage	);	/// 보스 체력 게이지 바 갯수 설정
 #endif // SERV_NEW_DEFENCE_DUNGEON
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+		LUA_GET_VALUE( m_LuaManager, "IMMUNE_TO_HP_ATTACK", m_bImmuneToHpAttack, m_bHasBossGage );	// june-stat-calc D3: June 327a0fa0 @327a454c
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 		if ( GetHasBossGage() )
 		{
@@ -7238,6 +7247,24 @@ void    CX2GUNPC::LoadStateData( StateData& nowStateData, InitData& OutInit_, KL
 		luaManager_.EndTable();
 	}
 #endif SERV_IRUHADEV_JUNE_NPC_FURY_MODE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	// june-stat-calc D3: June 32784c00 @32796718-3279680d: { [1] part name, [2] rate ( 1.0 ) } entries
+	nowStateData.m_vecDamageRateOfPart.clear();
+	if ( luaManager_.BeginTable( "DAMAGE_RATE_OF_PART" ) == true )
+	{
+		int iPartIndex = 1;
+		while ( luaManager_.BeginTable( iPartIndex ) == true )
+		{
+			StateData::DamageRateOfPart kDamageRateOfPart;
+			luaManager_.GetValue( 1, kDamageRateOfPart.m_wstrPartName );
+			luaManager_.GetValue( 2, kDamageRateOfPart.m_fRate );
+			nowStateData.m_vecDamageRateOfPart.push_back( kDamageRateOfPart );
+			luaManager_.EndTable();
+			++iPartIndex;
+		}
+		luaManager_.EndTable();
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 }
 

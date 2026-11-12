@@ -1946,6 +1946,9 @@ class CX2DamageManager
 #endif //ADD_MEMO_1ST_CLASS
 
 		bool DamageCheck( DamageData* pDamageData, bool bAttackOnlyThisUnit = false, UidType attackUnitUID = -1 );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+		void SetDefenderDamageRateOfPart( CX2GameUnit* pDefender_ );	// june-stat-calc D3: June 32621f40
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 		wstring GetExtraDamageName( CX2DamageManager::EXTRA_DAMAGE_TYPE extraDamageType, bool bTwoLine = false );
 

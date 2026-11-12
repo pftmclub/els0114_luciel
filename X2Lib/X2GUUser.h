@@ -2886,7 +2886,11 @@ public:
 		int		GetUsingSkillCount( void );
 		void	CountUsedSkill( int iSlotNumber_ );
 		int		GetTotalGivenDamamge( void ) { return m_iTotalGivenDamamge; }
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+		void	AddGivenDamamge( IN int iGivenDamage_ ) { if ( m_iTotalGivenDamamge < INT_MAX - iGivenDamage_ ) m_iTotalGivenDamamge += iGivenDamage_; }	// june-stat-calc D3: June 31f8df30 skips an add past INT_MAX
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 		void	AddGivenDamamge( IN int iGivenDamage_ ) { m_iTotalGivenDamamge += iGivenDamage_; }
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 #endif DUNGEON_RANK_NEW
 		//}} JHKang / °­Á¤ÈÆ / 2011/02/14 / ´øÀü ·©Å© °³¼± °ü·Ã
 
@@ -3099,6 +3103,10 @@ public:
 			UpdatePassiveAndActiveSkillState();
 		}
 		void SetEnterCashShop(bool bVal);
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+		bool GetEnterCashShop() const { return m_bEnterCashShop; }	// june-stat-calc D3: June +0x91e4, read by DamageCheck 3262f5a0
+		void ProcessSummonNpcSocket();	// june-stat-calc D3: June 32008280
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 #ifdef SERV_9TH_NEW_CHARACTER // ±èÅÂÈ¯
 		bool GetHasHyperModeItem() const { return m_bHasHyperModeItem; }
@@ -4108,8 +4116,14 @@ public:
 		void	CheckSocketCoolTime( const float fElapsedTime_ );
 		/// June 322a7c30 (CX2GameUnit): the unit's buff of this BTI has reached its templet's accumulation limit (only when the limit is above 1)
 		bool	IsBuffAtAccumulationLimit( const BUFF_TEMPLET_ID eBuffTempletID_ ) const;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	public:		// june-stat-calc D3: CEffect::AttackResult calls it on the owner ( June 31f885e7 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 		/// June slot 252 (3202ab70, called at the end of AttackResult): SIEE 13, 14 and 16 on a successful non-special hit
 		void	ProcessSocketEffectByAttackSuccess( CX2DamageManager::DamageData& kDamageData_ );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	protected:
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 		/// June slot 334 (3208eb60): the Future (true) or Now state is one of CX2GUUser's ten hit-reaction states (slots 283-297)
 		bool	IsSocketDownTargetState( const bool bFuture_ ) const;
 		/// June 3202b9a0: the own unit's SIEE 19 (return from death) gate in UpNowHp / SetNowHp

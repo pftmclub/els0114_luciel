@@ -6760,3 +6760,11 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_elesis/ch0b_stage_li
 - **Files:** `X2GameUnit.cpp/.h`, `X2GUNPC.cpp/.h`, `X2Inventory.cpp/.h`, `X2GameEdit.cpp/.h`, `X2Main.cpp` (Lua bind), `DungeonEnum.h` and `X2SkillTree.h` (June names under `SERV_IRUHADEV_JUNE_ENUM_NAMES`), `KTDXLIB/Always.h`.
 - **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` (D2a's); debug `[JUNE_STATCALC] GFD2` and `LVD` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` in `KTDXLIB/Always.h` (D2a and D2b together), rebuild; the four dungeon names and the skill name stay, unused. Save: Raven99 was set transcended for the play-test (`python tools/elsdb.py settranscend Raven99 0` undoes it).
+
+## The hit pipeline before the damage formula as June's (june-stat-calc D3, 2026-11-12)
+
+- **What:** `DamageCheck` refuses a hit from a user in the cash shop, or from an NPC whose owner is (June `3262f5a0`); the collision object keeps the name of the last enabled defender box a hit test tried, and the new `CX2DamageManager::SetDefenderDamageRateOfPart` (June `32621f40`) sets the hit NPC's part rate from its state's new `DAMAGE_RATE_OF_PART` list before each dodge roll; NPC Init key `IMMUNE_TO_HP_ATTACK` (default: the boss gauge) and its test in `CanApplyHpRateDamage`; `CEffect::AttackResult` now also runs the owner's on-hit sockets, its summon socket (off special attacks; March's block moved into `CX2GUUser::ProcessSummonNpcSocket`) and the given-damage tally on a user hit (the same tally in `CX2GUUser::AttackResult`); `AddGivenDamamge` skips an add past `INT_MAX`.
+- **Why:** a damage effect's hit (an arrow, a fireball) never fired the attacker's on-hit sockets in March, and the part rate and HP-attack immunity that D2b's formula reads had no writer.
+- **Files:** `X2DamageManager.cpp/.h`, `X2DamageEffect.cpp`, `X2GUUser.cpp/.h`, `X2GUNPC.cpp/.h`, `X2GameUnit.cpp`, `KTDXLIB/KTDXCollision.h`, `KTDXLIB/Always.h`.
+- **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE`; debug `[JUNE_STATCALC] EFFHIT` and `PART` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE` in `KTDXLIB/Always.h`, rebuild (a KTDXLIB header changes, so every project rebuilds).

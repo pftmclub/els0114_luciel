@@ -15454,6 +15454,9 @@ void CX2GUUser::AttackResult()
 	ELSWORD_VIRTUALIZER_END
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	ProcessSummonNpcSocket();	// june-stat-calc D3: June 32012b50 @320141ef
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 	if( NULL != g_pX2Game && true == g_pX2Game->IsHost() )
 	{
 		if( m_fSummonNpcCoolTime <= 0.f )
@@ -15472,6 +15475,7 @@ void CX2GUUser::AttackResult()
 		}	
 	}
 
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 #ifdef SERV_NEW_DEFENCE_DUNGEON // 적용날짜: 2013-04-14
 	/// 일반 공격 타격시 이펙트 셋 생성하는 함수 검사
 	PlayEffectSetNormalAttackByBuff( m_DamageData.attackType );
@@ -15480,9 +15484,42 @@ void CX2GUUser::AttackResult()
 	/// June buff port 16-step3b4: June AttackResult 32012b50 calls slot 252 with m_DamageData (@32014204) right after this
 	ProcessSocketEffectByAttackSuccess( m_DamageData );
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+	// june-stat-calc D3: June 32014215-32014277: a hit on a user adds its damage to the given-damage tally
+	CX2GameUnit* pGivenDamageDefender = m_DamageData.optrDefenderGameUnit.GetObservable();
+	if ( NULL != pGivenDamageDefender && CX2GameUnit::GUT_USER == pGivenDamageDefender->GetGameUnitType() )
+	{
+		const float fGivenDamage = pGivenDamageDefender->GetFinalDamage( &m_DamageData );
+		if ( NULL != g_pX2Game )
+			AddGivenDamamge( static_cast<int>( fGivenDamage ) );
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 
 }
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+// june-stat-calc D3: June 32008280 = March's summon socket block of AttackResult; CEffect::AttackResult calls it too
+void CX2GUUser::ProcessSummonNpcSocket()
+{
+	if( NULL != g_pX2Game && true == g_pX2Game->IsHost() )
+	{
+		if( m_fSummonNpcCoolTime <= 0.f )
+		{
+			for(UINT i=0; i<m_vecSummonNpcSocket.size(); ++i)
+			{
+				CX2GUUser::SummonNpcSocket tSummonNpc = m_vecSummonNpcSocket[i];
+				if( GetRandomFloat(i) <= tSummonNpc.m_fSummonRate )
+				{
+					m_fSummonNpcCoolTime = tSummonNpc.m_fSummonNpcCoolTime;
+					g_pX2Game->CreateNPCReq( tSummonNpc.m_iNpcId, GetUnitLevel(), true, GetPos(),
+						GetIsRight(), 0.f, true, -1, (CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID() );
+					break;
+				}
+			}
+		}
+	}
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 /** @function : AttackResultPlayEffect
 	@brief : 데미지 데이터의 reActResult 타입에 따라 다른 이펙트를 보여주는 함수\n
 	각 캐릭터 클래스의 AttackResult를 공통으로 묶어서 이곳으로 옮김

@@ -110,10 +110,12 @@ def port_ignore_cap_clamps(s):
     return s > 1.0
 
 
-def port_gate(skill, npc, gage, name, grade, main_boss):
+def port_gate(skill, npc, gage, name, grade, immune, main_boss):
     if skill != SUPERSONIC or not npc:
         return True
     if gage or name or grade in (1, 2):
+        return False
+    if immune:                                             # D3: GetImmuneToHpAttack (June vslot 0x430 32755a80)
         return False
     if main_boss:
         return False
@@ -377,14 +379,12 @@ def main():
         s = f32(s)
         check("ignore-defence cap sum=%r" % s, june_ignore_cap_clamps(e, s), port_ignore_cap_clamps(s))
 
-    standin = 0
+    immune_sets = 0
     for skill, npc, gage, name, grade, immune, main_boss in itertools.product((SUPERSONIC, 24403, 0), (True, False), (0, 1), (0, 1),
                                                                                (0, 1, 2, 3), (0, 1), (0, 1)):
         j = june_gate(e, skill, npc, gage, name, grade, immune, main_boss)
-        p = port_gate(skill, npc, gage, name, grade, main_boss)
-        if immune and j != p:
-            standin += 1                                   # IMMUNE_TO_HP_ATTACK: D3 ports the key and the member
-            continue
+        p = port_gate(skill, npc, gage, name, grade, immune, main_boss)
+        immune_sets += immune
         check("hp gate skill=%d npc=%d gage=%d name=%d grade=%d immune=%d main=%d" % (skill, npc, gage, name, grade, immune, main_boss), j, p)
 
     rn = len(review_inputs())
@@ -423,7 +423,7 @@ def main():
     sbad = statics(e)
     print("EMU_FINAL_DAMAGE_B review sets: %d of the %d input sets below" % (rn, n))
     print("EMU_FINAL_DAMAGE_B %s: %d input sets, %d mismatch(es), %d static mismatch(es); %d XS_PVE_GAME set(s) not compared (no March state), "
-          "%d IMMUNE_TO_HP_ATTACK set(s) left to D3" % ("OK" if bad == 0 and sbad == 0 else "FAIL", n, bad, sbad, gap, standin))
+          "%d HP-gate set(s) with IMMUNE_TO_HP_ATTACK compared (D3)" % ("OK" if bad == 0 and sbad == 0 else "FAIL", n, bad, sbad, gap, immune_sets))
 
 
 if __name__ == "__main__":
