@@ -1145,6 +1145,9 @@ elesis --phase CH1o`, `disasm_range.py`, `vtslot.py`, `dispsweep.py` with a "`mo
   `_CHAR_ARME_CORE` (`ASUT_DAMAGE`), `_DIVERGE_SKILL_LEVEL_VALUE`, `_BUFF_NEW_FINALIZER`, `SERV_ADD_LUNATIC_PSYKER`.
 - One-file probes (`census.cl_cmd`, `/c /Zs /EHsc`, no PCH): `X2GUEL.cpp` off / `_LIVE` / `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`, `X2GUUser.cpp`
   off / `_LIVE`: exit 0, 0 errors x5. `cl /P` off / `_LIVE`: `IsDamageState` 0 / 4 in both files, the reservation test 0 / 1, the power-rate term 0 / 1.
+- After the commit (`86094940`), the same flagcheck `--range 86094940^..86094940 --files` the four: `files: 4 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0
+  ERROR`, 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 `#else/#endif` without the token, 0 encoding changes; RESULT FAIL only for the `//#define`.
+  `SERV_IRUHADEV_JUNE_ENUM_NAMES` on `X2SkillTree.h`: `1 PASS~`, `RESULT: PASS`.
 - No `_DEBUG` define. Full build skipped: no play-test.
 
 **Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1o review` (Opus 5.5 high).
