@@ -58,3 +58,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Functions:** `awk -F'\t' '$7=="CH1e"' june2017_re/char_elesis/ch0_class_map.tsv` = 21 (10 listing-only: col 9 `n`; 15 `inside`, 6 `new`: col 5; proposed names col 6, `?` = name by the class pattern from the body).
 - **Script states:** `awk -F'\t' '$8=="CH1e"' june2017_re/char_elesis/ch0_state_skill.tsv` = 27.
 - **`ch0_classn.tsv` rows:** 2 (filter on its `proposed_phase` column).
+
+## Amended by CH1d (2026-11-12)
+
+- `ESI_COMBO_SGM_ZZZX` (June id 322) is already in `EL_STATE_ID` under `_CORE`; June's ComboZZZ reaches it with X when the class is 120. June's ComboXX reaches `ESI_COMBO_SGM_XX_DOWN_X_START` through `IsInJobLine( 1 )` (classes 29 / 120): check whether the script's table serves Saber Knight (29) too (lead, `JUNE_CHARACTER_ELESIS_PHASES.md` "CH1d - Done").

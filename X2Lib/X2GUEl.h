@@ -220,6 +220,12 @@ public:
 
 		//하이퍼 액티브
 		ESI_SI_HA_SBH_ANCIENT_FIRE,					/// 에인션트 파이어
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+		ESI_COMBO_SDK_ZZZX,							/// char-elesis CH1d: June script id 283 ( Dark Knight Z-Z-Z-X; CH1m maps, CH1g owns the state )
+		ESI_COMBO_SDK_XX,							/// char-elesis CH1d: June script id 287 ( Dark Knight X-X; CH1m maps, CH1g owns the state )
+		ESI_COMBO_SGM_ZZZX,							/// char-elesis CH1d: June script id 322 ( Grand Master Z-Z-Z-X; CH1m maps, CH1e owns the state )
+		ESI_COMBO_SBH_ZZZX,							/// char-elesis CH1d: June script id 327 ( Blazing Heart Z-Z-Z-X; CH1m maps, CH1f owns the state )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -450,6 +456,9 @@ protected:
 	void ComboXXEventProcess();
 	void ComboXXXEventProcess();
 	void ComboXXZEventProcess();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+	bool IsInJobLine( int iJobLine_ );		/// char-elesis CH1d: June 32b64290 ( vslot 0x670 ): body in CH1i
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 	void JumpAttackZEventProcess();
 	void JumpAttackZFrameMoveFuture();

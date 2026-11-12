@@ -60,3 +60,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L499.
 - **`ch0_classn.tsv` rows:** 3 (filter on its `proposed_phase` column).
 - CH0 split by job line: CH1g = Dark Knight (`SDK`), CH1g2 = Crimson Avenger (`SCA`). Every state name is a new `EL_STATE_ID` member with June's id (`june2017_re/char_elesis/ch0_state_enum_names.tsv`: June's USI_END is 152, March 100; 134 registered names missing in C++, 37 of the 79 shared ones off by 1-2 after the rebase: register by June's id, never by March's order).
+
+## Amended by CH1d (2026-11-12)
+
+- `ESI_COMBO_SDK_ZZZX` (June id 283) and `ESI_COMBO_SDK_XX` (287) are already in `EL_STATE_ID` under `_CORE`. June's ComboX reaches `SDK_XX` through `IsInJobLine( 3 )` (classes 35 / 125); ComboZZZ reaches `SDK_ZZZX` for class 125 only (`JUNE_BUGS` 627, kept verbatim). Crimson Avenger has no `ESI_COMBO_SCA_*` states: every June combo state of line 3 is `SDK_*`.

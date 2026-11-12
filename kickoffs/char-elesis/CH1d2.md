@@ -59,3 +59,9 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Script states:** `awk -F'\t' '$8=="CH1d2"' june2017_re/char_elesis/ch0_state_skill.tsv` = 9.
 - **`ch0_classn.tsv` rows:** 2 (filter on its `proposed_phase` column).
 - The dash-jump XZ fireball `32b770e0` (`SERV_IRUHADEV_JUNE_EL_DASHJUMP_XZ_FIREBALL`) is an `SPK` state: CH1f writes it.
+
+## Amended by CH1d (2026-11-12)
+
+- `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE` is defined now (`Always.h`; `_LIVE` needs it). `bool IsInJobLine( int )` is declared under it in `X2GUEl.h` (June `32b64290`, body CH1i; line 1 = classes 29 / 120, 2 = 30 / 121, 3 = 35 / 125): call it where the listing does `call [vslot 0x670]`, never compare classes in its place.
+- File-local `_ON_LINE_` cancel macros (walk / bwalk / dash / ZX) and `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_` sit at the top of `X2GUEL.cpp` under `_LIVE`: reuse them. CH1d's nine combo functions (`ComboZ`-`ComboXXZ` EventProcess, `X2GUEL.cpp` ~6703-7085) are the worked example for the chain shape (flag order, class tests, `m_fEventTime[n]`).
+- June-only state names a combo needs go into `EL_STATE_ID` under `_CORE` (end of the enum) with `/// char-elesis <phase>: June script id N ( ...; CH1m maps, CH1x owns the state )`; the four CH1d added are `ESI_COMBO_SDK_ZZZX`, `ESI_COMBO_SDK_XX`, `ESI_COMBO_SGM_ZZZX`, `ESI_COMBO_SBH_ZZZX`.

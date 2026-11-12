@@ -10550,3 +10550,12 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b4f2b0	CX2GUEL::StandUpAttackBackNoDownEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
 32b81200	CX2GUEL::RidingHyperModeFrameMove	PORTED	Char Elesis CH1c: inside, June body under JUNE_CHAR_ELESIS_LIVE; CommonHyperModeFrameMove( 0, 0.1, true ), = March; listing-only; ESI_RIDING_HYPER_MODE FrameMove
 32b7b820	CX2GUEL::CommonHyperModeFrameMove	PORTED	Char Elesis CH1c: inside (CH0 listed it new; March has it, same 3 args), June body under JUNE_CHAR_ELESIS_LIVE; = March + awakening effect-set stand-ins (32011d20 / 31fd66b0 / 32011f50, _CONST_EL_CH1C_), the trace only when the set is absent; two independent timers, no third
+32b53a00	CX2GUEL::ComboZEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + flag 0 also fires on animation end ( _OR_ANIMATION_END_ ), walk / bwalk / dash cancels test the line ( _ON_LINE_ )
+32b53d50	CX2GUEL::ComboZZEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; as 32b53a00 ( target ESI_COMBO_ZZZ )
+32b540a0	CX2GUEL::ComboZZZEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; chain order flags 2 / 0 / 3 / 4 / 1: adds SDK_ZZZX ( class 125, X ), SGM_ZZZX ( 120, X ), SBH_ZZZX ( 121, X ); JUNE_BUGS 627
+32b54680	CX2GUEL::ComboZZZZEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March ( 550 air speed, BALANCE_PATCH_20131107 live ) + _ON_LINE_ cancels
+32b54910	CX2GUEL::ComboZZZXEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels
+32b54b90	CX2GUEL::ComboXEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; flags 2 / 0 / 1: adds SDK_XX ( X + IsInJobLine 3 ), SBH_XZ by IsInJobLine 2 ( March: class 121 only )
+32b55040	CX2GUEL::ComboXXEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; SGM_XX_DOWN_X_START by IsInJobLine 1 ( March: class 120 only )
+32b554e0	CX2GUEL::ComboXXXEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels
+32b55760	CX2GUEL::ComboXXZEventProcess	PORTED	Char Elesis CH1d: inside, June body under JUNE_CHAR_ELESIS_LIVE; listing-only; = March + _ON_LINE_ cancels

@@ -59,3 +59,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Script states:** `awk -F'\t' '$8=="CH1f"' june2017_re/char_elesis/ch0_state_skill.tsv` = 11.
 - **`ch0_classn.tsv` rows:** 2 (filter on its `proposed_phase` column).
 - CH0 split by job line: CH1f = Pyro Knight (`SPK`), CH1f2 = Blazing Heart (`SBH`). `32b770e0` (`ESI_DASH_JUMP_COMBO_SPK_XZ_FrameMove`) is here: June's whole function under `_LIVE`, the `SERV_IRUHADEV_JUNE_EL_DASHJUMP_XZ_FIREBALL` block stays in the `#else` (Z records it superseded).
+
+## Amended by CH1d (2026-11-12)
+
+- June's ComboX reaches `ESI_COMBO_SBH_XZ` (Z) through `IsInJobLine( 2 )` (classes 30 / 121), where March tested class 121 only: check that the Pyro Knight (30) path through the script's `ESI_COMBO_SBH_XZ` table is sound (lead from CH1d; CH1f2 owns the SBH states, CH1 final's play-test presses X, Z on 30).

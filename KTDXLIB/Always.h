@@ -12628,3 +12628,14 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #endif SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
+// Description: June character port ( Elesis ) Phase CH1d - June-only class-core pieces March's CX2GUEL lacks ( IsInJobLine declared, four June state
+//              names in EL_STATE_ID ), compiled in every build and referenced by nothing until CH1i / CH1m. Revert: undefine the flag ( JUNE_CHAR_ELESIS_CORE ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE ( the June state names and IsInJobLine its bodies use )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+//////////////////////////////////////////////////////////////////////////

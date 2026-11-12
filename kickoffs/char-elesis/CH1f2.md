@@ -58,3 +58,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Functions:** `awk -F'\t' '$7=="CH1f2"' june2017_re/char_elesis/ch0_class_map.tsv` = 25 (16 listing-only: col 9 `n`; 25 `inside`, 0 `new`: col 5; proposed names col 6, `?` = name by the class pattern from the body).
 - **Script states:** `awk -F'\t' '$8=="CH1f2"' june2017_re/char_elesis/ch0_state_skill.tsv` = 13.
 - CH0 split off CH1f (Blazing Heart `SBH` line states).
+
+## Amended by CH1d (2026-11-12)
+
+- `ESI_COMBO_SBH_ZZZX` (June id 327) is already in `EL_STATE_ID` under `_CORE`; June's ComboZZZ reaches it with X when the class is 121 (CH1d). `ESI_COMBO_SBH_XZ` is reached through `IsInJobLine( 2 )` (classes 30 / 121).
