@@ -275,6 +275,52 @@ def statics(e):
     return bad
 
 
+def review_inputs():
+    """D2 review: 50 more sets - level gaps around the 5 / 6 / 7 edge, 0 and huge power, NaN and edge multipliers, state defence, part rate, shield r"""
+    out = []
+    nan = math.nan
+    # level rows: lvf, lv_def, pvp, user, dtype, power, memo, melee, m, def_user, u    (14)
+    for lvf, lv_def, pvp, user, dtype in ((60.0, 74, False, True, 0), (60.0, 78, False, True, 1), (50.0, 73, False, False, 2),
+                                          (40.0, 66, False, True, 0), (70.0, 76, False, True, 1), (70.0, 77, False, True, 2),
+                                          (80.0, 60, False, True, 0), (60.0, 74, True, True, 2), (50.0, 73, True, True, 0),
+                                          (70.0, 77, True, False, 1)):
+        out.append(("level", (lvf, lv_def, pvp, user, dtype, 1.0, 1.0, True, 1.0, False, 1.0)))
+    out.append(("level", (60.0, 74, False, True, 0, 0.0, 1.0, True, 1.15, False, 1.2)))     # power 0
+    out.append(("level", (70.0, 76, False, True, 1, 1.0, 0.0, False, 1.3, True, 0.3)))      # memo 0
+    out.append(("level", (60.0, 74, False, True, 0, 1e30, 1.0, True, 1.0, False, 1.0)))     # huge power
+    out.append(("level", (60.0, 78, False, True, 1, 1.0, 1e30, False, 0.7, True, 1.05)))    # huge memo
+    # sum rows: fin, wos, d, m, u, melee, def_user    (7)
+    out.append(("sum", (12345.6, 1.0000001, 1.0, 1.0, 1.0, True, False)))
+    out.append(("sum", (12345.6, 1.0, 1.0000001, 1.0, 1.0, True, True)))
+    out.append(("sum", (987654.25, 1.0, 1.0, 1.0000001, 0.5, False, False)))
+    out.append(("sum", (12345.6, 0.5, 0.5, 1.0, 1.0, False, True)))
+    out.append(("sum", (12345.6, 1.0, nan, 1.0, 1.0, True, False)))                         # NaN defence-rate multiplier
+    out.append(("sum", (12345.6, 1.0, 1.0, nan, 1.0, True, True)))                          # NaN melee / magic multiplier
+    out.append(("sum", (12345.6, 1.0, 1.0, 1.0, nan, False, False)))                        # NaN user multiplier
+    # state rows: fin, pen, ign, reduce, guard, guard_pct, recv    (reduce and guard % are ints in June)    (8)
+    out.append(("state", (54321.0, 0, 0, 100, 0, 0, 2.5)))
+    out.append(("state", (54321.0, 0, 0, 101, 0, 0, 1.0)))
+    out.append(("state", (1000.5, 0, 0, 0, 0, 0, 0.0)))
+    out.append(("state", (1000.5, 0, 0, 99, 0, 0, 2.5)))
+    out.append(("state", (54321.0, 0, 0, 2147483647, 0, 0, 1.0)))                           # 0x7fffffff
+    out.append(("state", (54321.0, 0, 0, 1, 1, 99, 1.0)))                                   # 1 + 99 = 100 exactly
+    out.append(("state", (54321.0, 0, 0, -1, 1, 100, 0.0)))
+    out.append(("state", (54321.0, 1, 0, 100, 1, 100, 2.5)))                                # penetrated: no state defence
+    # part rows: fin, v    (5)
+    for fin, v in ((1000.5, 1.0), (1000.5, 1.0000001), (7654321.0, 0.9999999), (1000.5, nan), (7654321.0, 3.0)):
+        out.append(("part", (fin, v)))
+    # shield rows: state name, fin, r    (14)
+    for name, rs in (("XS_PVP_GAME", (0.0, 0.9999999, 1.0, nan)), ("XS_DUNGEON_GAME", (0.0, 0.9999999, 1.0, nan)),
+                     ("XS_TRAINING_GAME", (0.9999999, nan)), ("XS_BATTLE_FIELD", (0.0, nan)), ("XS_VILLAGE_MAP", (0.9999999, nan))):
+        for r in rs:
+            out.append(("shield", (name, 1000.5, r)))
+    # ignore-defence cap sums    (2)
+    out.append(("ignore", (0.9999999,)))
+    out.append(("ignore", (-float("inf"),)))
+    assert len(out) == 50, len(out)
+    return out
+
+
 def main():
     e = Emu()
     e.mu.mem_map(GMAIN_PAGE, 0x1000)
@@ -341,7 +387,41 @@ def main():
             continue
         check("hp gate skill=%d npc=%d gage=%d name=%d grade=%d immune=%d main=%d" % (skill, npc, gage, name, grade, immune, main_boss), j, p)
 
+    rn = len(review_inputs())
+    jidx = {name: k for k, name in jnames.items()}
+    for group, a in review_inputs():
+        if group == "level":
+            lvf, lv_def, pvp, user, dtype, power, memo, melee, m, def_user, u = a
+            vals = dict(drate=f32(1.25), prate=f32(0.6), physic=f32(1.8), magic=f32(2.3), atk=f32(41234.5))
+            j = june_level(e, lvf, lv_def, pvp, vals["drate"], vals["prate"], user, f32(power), f32(memo), dtype, vals["physic"],
+                           vals["magic"], vals["atk"], melee, f32(m), def_user, f32(u))
+            p = port_level(lvf, lv_def, pvp, vals["drate"], vals["prate"], user, f32(power), f32(memo), dtype, vals["physic"],
+                           vals["magic"], vals["atk"], f32(m), f32(u))
+        elif group == "sum":
+            fin, wos, d, m, u, melee, def_user = a
+            fin, wos, d, m, u = f32(fin), f32(wos), f32(d), f32(m), f32(u)
+            j, p = june_sum(e, fin, wos, d, melee, m, def_user, u), port_sum(fin, wos, d, m, u)
+        elif group == "state":
+            fin, pen, ign, rp, guard, gp, recv = a
+            fin, recv = f32(fin), f32(recv)
+            j = june_state(e, fin, pen, ign, rp & 0xffffffff, guard, gp, recv)
+            p = port_state(fin, pen, ign, rp, guard, gp, recv)
+        elif group == "part":
+            fin, v = f32(a[0]), f32(a[1])
+            j, p = june_part(e, fin, v), port_part(fin, v)
+        elif group == "shield":
+            name, fin, r = a
+            fin, r = f32(fin), f32(r)
+            j, p = june_shield(e, fin, r, jidx[name]), port_shield(fin, r, name if name in MARCH_STATES else None)
+        else:
+            s = f32(a[0])
+            j, p = june_ignore_cap_clamps(e, s), port_ignore_cap_clamps(s)
+        check("review %s %r" % (group, a), j, p)
+        if isinstance(j, float) and not same(j, p):
+            print("  bits june=%08x port=%08x" % (fbits(j), fbits(p)))
+
     sbad = statics(e)
+    print("EMU_FINAL_DAMAGE_B review sets: %d of the %d input sets below" % (rn, n))
     print("EMU_FINAL_DAMAGE_B %s: %d input sets, %d mismatch(es), %d static mismatch(es); %d XS_PVE_GAME set(s) not compared (no March state), "
           "%d IMMUNE_TO_HP_ATTACK set(s) left to D3" % ("OK" if bad == 0 and sbad == 0 else "FAIL", n, bad, sbad, gap, standin))
 

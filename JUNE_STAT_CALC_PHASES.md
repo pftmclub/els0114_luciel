@@ -547,6 +547,99 @@ Units 25 (jtLordKnight), 49 (Raven99, transcended), 53 (ArmeDW) on 1466 / 530-53
   checks whether its debuff was on the target).
 - Incoming: 77 / 530 / 531 / 532 / 1470 -> 25 / 49 / 53 all non-zero except one 1470 hit with `motion=0`.
 
+### Phase D2 - Review (2026-11-12, covers D2a `3973df2a` and D2b `2ec41be0`)
+
+**Opus 5.5 / high. Verdict: pass. No transcription error, no code change.** Every range was read against June's `disasm_range.py`
+listing of `32284aa0-32286c48`.
+
+- **D2b level-damage path (@32285dc4-32286063): June.**
+  - The level is 18.0 (`33458e68`) in a damage-free game, otherwise the attacker's level. The attacker level is truncated (`32fe25f0`)
+    before the PvP channel test can reset the level to 18.
+  - `322cc1a0` = `GetIsNowPVPCorrectionGame()`. The channel test checks 0xc / 0xd / 0xe, class 0xb, then 0xf, the port's order.
+  - Level gap: `f32( n x 0.1 )`. June's `334395e8` holds the double of 0.1f (0.10000000149011612), so the port's `0.1f` is exact. The
+    original emulation levels never hit a gap where 0.1 and 0.1f round apart (n = 9); the review sets add one.
+  - Fixed part: DT_PHYSIC `[esp+0x4c]` (DD `+0x38`, `damage.fPhysic`) x `[esp+0x20]` (`fAttackPower`); DT_MAGIC `[esp+0x50]`
+    (DD `+0x3c`); otherwise 2000.0 (`33474b4c`).
+  - The `pow` result is stored as a float. Then `( sq x 35.0 x corr x power + fix ) x game`. These are rounded to float:
+    `f32( ( M - 1 ) x F )`, `f32( U - 1 )` and `f32( ( U - 1 ) x F )`. Sum `( U + M ) + F`; the floor of 1 lets NaN through.
+- **D2b main path: June.**
+  - Sum (@3228619f-3228626a): `f32( F + D )`, then `+ ( U + M )`.
+  - State defence: capped at 100, `( 100 - r ) / 100`, vslot `0x2ac` called, then `R x f32( rate x F )`. `vtslot.py 0x2ac CX2GU`: base
+    `3208e1b0` (`fld1`); only Add `329d4870` and Ain `32a3d540` override it.
+  - Part rate: `fcom 1.0; test ah, 0x41`. Applied only above 1.0; NaN skips it.
+  - Space of Thought: `32863880` on the dungeon id, then `32696fa0` / `32680cb0`. The port's stand-in returns `false`.
+  - Shield: the byte table `32286c98` sends states 9 / 11 / 18 / 21 / 23 to `1 - r`. June's `Enum.lua` names them `XS_PVP_GAME` /
+    `_DUNGEON_GAME` / `_TRAINING_GAME` / `_BATTLE_FIELD` / `_PVE_GAME`. In March they are 9 / 11 / 17 / 24 (no PvE state), so matching by name is right.
+  - `322726f0` tests, in order: `+0x8aeb` (HasBossGage), `+0x8ae9` (ShowBossName), vslot `0x3c8` (`32755a60`, grade == 1), vslot `0x3cc`
+    (`32755a70`, grade == 2), `0x430`, `+0x8e80` (IsMainBoss), then `( +0x8f08 - 1 ) > 1`. The port's last line calls March's two grade
+    getters (`m_eMonsterGrade` vs `MG_BOSS_NPC` 1 / `MG_MIDDLE_BOSS_NPC` 2; no override), which is the same test.
+  - Order after the shield: HP rate on the defender optr after my-HP-few, the 0 floor (NaN kept), `3227c940`, then the dev log.
+  - Dev log:
+    - Gate: game edit `+0x43c`, byte `+0xde` == 1.
+    - Values: `int( 100 - p x 100 )`, `_ftol2` (64-bit) of the defence, and `int( ( 1 - p ) x defence )`. The defence there is already
+      reduced by `p`, a June quirk that was kept.
+    - Output: `CPT_SYSTEM` = 2, white. June's `AddChatLog` has an 8th argument (0); March's has 7.
+    - Toggle `32746a10`: auth level `>= 3` (`XUAL_DEV`). The ctor stores `bl` = 0.
+- **`GetEquippingItemByEquipPos` (`32869e10`): June.**
+  - The third argument is forced to 0 for positions 2..14 (`EP_WEAPON_HAND`..`EP_DEFENCE_TEMP3`). Accessories skip the fashion test.
+  - Slot ids 0x14..0x2a go through the minor-slot table, which must equal the third argument. March has no minor range, so the port returns
+    the first match for `false` and NULL for `true`, as June does when no minor slots exist.
+  - Census: 21 sites push a constant 0. The 13 register sites are Lu / Ciel UI, June-only positions (0x17 / 0x1c / 0x26), or position 2
+    with `bFashion` and the third argument in one register (forced to 0 anyway).
+  - All 43 live March callers pass 2 arguments, so their meaning is unchanged.
+- **`GetIgnoreDefenceRate`:** `fcom 1.0; test ah, 0x41; jne keep`, so a NaN sum is kept (port: `fSum > 1 ? 1 : fSum`).
+- **D2a's two named calls:** `IsSuperArmor()` stands in for vslot 153( 1 ) (divergence row 468, `out`). `XS_PVE_GAME` 23 gets no case
+  because March has no such state.
+
+**Leads from D2b's play-test.**
+- **`hook=1.0` on Pointed Stiletto: June behaviour.**
+  - June's bonus (`3229a5e9`) needs the target to already carry one of the skill's two buff factors, `BFI_DEBUFF_SI_A_RST_CUT_TENDON` or
+    `BFI_DEBUFF_BLEEDING` (`NewSkillTempletVer2.src.lua`, 24222). The skill does not apply either of them itself.
+  - None of the four hits (1466 x 2, 530, 1470) had Cut Tendon or Bleeding before it. The run's only `EffectSet_DEBUFF_BLEEDING_01`
+    (18:44:50, a stage-1 uid) was never followed by a stiletto hit.
+- **Boss 1470 `boss=0`: June's test is false too.**
+  - `+0xdc` is the spawn's `m_cMonsterGrade` (`323752f0`, written only for an ExtraNPCStat ID). 1470 has that row
+    (`NewNPCStat.src.lua:14850`).
+  - The stage script places it with grade 3: `[OFFLINE_GRADE] dungeon=33031 stage=2 ... npc=1470 grade=3 bossGauge=0` (three copies),
+    and `3 != 1`.
+- **Level path reach: re-proved.**
+  - June's exe (ASCII and UTF-16, either case) and `xorstrings.tsv` contain no `EffectSet_Aisha_ABM_EnergySpurt_MEMO`,
+    `ABM_EnergySpurt_MEMO`, `EnergySpurt_MEMO` or `ABM_ENERGYSPURT_MEMO`.
+  - In `june_src_fixed` the MEMO set appears only at its own definition (`EffectSet.src.lua:18193`), and `Arme_VioletMage.src.lua:9968`
+    plays the plain set.
+  - Both `ABM_ENERGYSPURT` and `_MEMO` carry `LEVEL_DAMAGE` (`DamageEffect.src.lua:14017` / `14070`). The plain one is reached only by
+    `BOT_EffectSet_Aisha_ABM_EnergySpurt` (a PvP hero).
+
+**Play-test lines** (run 18:36-18:45, exe md5 463c23d2): 214 `GFD2` lines, matching 214 `HIT` lines.
+- An independent script check found 0 off for `base = motion x drate`, `stated = reduce x state x recv`, and `shield after = armor x ( 1 - r )`
+  (`armor` when `r >= 1`).
+- All 15 `dmg=0` lines have `motion=0`: D1's lead is the damage data, not a D2 range.
+
+**Numbers.**
+- `EMU_FINAL_DAMAGE_A OK: 861 input sets, 0 mismatch(es)`.
+- `EMU_FINAL_DAMAGE_B OK: 3737 input sets, 0 mismatch(es), 0 static mismatch(es)`, including 50 review sets (`review_inputs()`):
+  - level gaps 6 / 7 / 14 / 18 / 23 / 26 and one negative gap; power and memo at 0 and 1e30;
+  - NaN and 1.0000001 multipliers;
+  - reduce 99 / 100 / 101 / INT_MAX / -1; received rate 0 and 2.5;
+  - part rate 1.0 / 1.0000001 / 0.9999999 / NaN / 3.0;
+  - shield 0 / 0.9999999 / 1.0 / NaN in June's states and the village.
+- `EMU_DEFENCE OK: 939 input sets, 0 mismatch(es)`.
+
+**Hygiene.**
+- `flagcheck --range 3973df2a^..3973df2a --with SERV_IRUHADEV_JUNE_STATCALC_DEBUG`: `files: 4 PASS, 0 PASS~, 1 DEFINE, 1 OTHER, 0 FAIL`.
+  The OTHER is `X2DamageManager.h`, under `JUNE_ENUM_NAMES`.
+- `2ec41be0^..2ec41be0`: `files: 8 PASS, 1 PASS~, 1 DEFINE, 2 OTHER, 0 FAIL`. The PASS~ is one blank line in `X2GameEdit.cpp`; the two OTHER
+  are `DungeonEnum.h` and `X2SkillTree.h`, under `JUNE_ENUM_NAMES`.
+- Both runs: `in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s),
+  0 #else/#endif without the flag token, 0 encoding change(s)` and `RESULT: PASS`.
+- `git log -S SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE 2ec41be0..HEAD`: empty.
+- `junediverge --check-all`: `allow-listed: 207`, `RESULT: PASS`.
+- Ledger: 55 rows, 54 `June` and 1 `class: char-rose`.
+
+**Build.** Full build skipped: no code change, no play-test. The debug define stays on until the D6 review. The D3 kickoff already carries
+both D2b writer items (`32621f40` / `DAMAGE_RATE_OF_PART` and `IMMUNE_TO_HP_ATTACK`). After D3, the 2 `IMMUNE_TO_HP_ATTACK` emulation sets
+must compare.
+
 ## Phase D3 - The hit pipeline before the formula
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE`: `SetDamageExceptionProcess` base `322990e0` (damage terms only; its MP
