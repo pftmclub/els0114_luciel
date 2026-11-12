@@ -388,6 +388,22 @@ June-side gap is a `JUNE_BUGS.md` row).
 **Done gate:** the stage list re-runs 0 `missing` / `march-copy`; in game one Elesis per March job tier, village and dungeon, no new `KEM_ERROR` /
 `Motion Error` / missing texture or mesh against the pre-CH0b log (the KEM 433 frame warning gone); a costume, a weapon and three skills look right.
 
+### CH0b - Done (2026-11-12)
+
+Sonnet 5.5. No C++, no flag (`_ASSET` not needed: CH0 found no March reader a June asset breaks, and the play-test checks that). Full build skipped: no code change. **Copied (CLAUDE.md 2026-11-10, no ask):** 30 `COPY OK`; `kom.py status`: 0 need a pack, 0 need a copy.
+- **Reference:** `ErrorLog.txt` (307,614 B) saved as `data\ErrorLog_pre_CH0b_elesis.txt` before staging.
+- **Staged:** `kom.py stage-june --jobs 8 june2017_re/char_elesis/ch0b_stage_list.tsv`: `STAGE-JUNE OK: 28 kom(s), 6452 staged (6314 new, 138 replaced, 0 identical), 0 refused, 34s` (the dry run matched CH0). The 138 replaced March files are backed up under `kom_backup_stage_june/20261112_144313` and listed in `june2017_re/char_elesis/ch0b_replaced.tsv` (data021 1, data033 4 = `Motion_EL_Common` / `_Field` / `_Emotion` / `_PK`, data044 1, data052 9, data063 8, data130 30, data143 80, data145 5). New kom **data206** (57 June-only motions). Held, not staged (`ch1_held_motions.tsv`): `MOTION_EL_GM.x`, `Motion_EL_BH.x`; March's copies stay for CH1 final.
+- **Lua:** `adopt-june data034` (`DLG_1ST_` / `DLG_2ND_Class_Change_Guide_Elesis` new, `Class_Change_Guide_Elesis` replaced) and `adopt-june data217` (`DLG_Class_Change_Elesis_SK` / `_PK` / `_GM` / `_BH` replace March's in data034; `_DK` / `_CA` new in data217): both `ADOPT-JUNE OK (bytecode)`, 9 staged, 0 refused (backups `20261112_144330` / `_144334`). `luabind.py check` over the 9: 0 unbound, ENUM 0 missing each; `luasrc.py ledger --check` PASS (0 FAIL, 0 WARN); `core --check` PASS. Not touched, as the kickoff says: `LevelUpEvent.lua` (CHNb), `DLG_Unit_Create_ClassChange_Button_Elesis.lua` (CH5).
+- **Packed:** `kom.py pack` x30 (28 + data034 + data217), 30 `PACK OK`, 0 removed entries in any (`vs live: ... -0 removed`).
+- **Done-gate re-run:** `stage-june --dry-run` over the same list: `6452 staged (0 new, 0 replaced, 6452 identical), 0 refused`. 0 `missing` / `march-copy`.
+- **Skill icons:** `skillicons.py check 106 900 28000-28064 28200-28236 28400-28420 28600-28605`: was 75 misses on 12 files; now 131 skills, 0 misses, 2 known June gaps, `RESULT: PASS`. Gap: 28208 / 28229 (`SI_A_SPK_AVATAR_OF_THE_FIRE`, tree picture) is absent from June's own `DLG_Elesis_SKILL_ScreenShot_02.TET` (staged sheet identical to June's; June has 15 pieces, none of them it): `JUNE_BUGS.md` row 625 + two `skillicons_june_gaps.tsv` rows.
+- **Not staged, June's own gaps (CH0):** `HQ_CutIn_Ara_normal.tga`, `HQ_CutIn_Ara_Rage.tga`, `ELISIS_RIDING_RAMIEL_SWORD_TRACE.DDS`, `SA_EL_MEGA_SLASH_TRACE` exist in no June kom; nothing to stage.
+- **Save:** untouched. Every March class has a unit (20 `wewe` 8 lv7, 40 `SaberT` 29 lv70, 21 `eresisu` 30 lv77, 29 `ElesisGM` 120 lv80, 30 `ElesisBH` 121 lv80); 35 / 125 wait for CHNa.
+- **Side note, not acted on:** `kom.py pack` reported ~118 changed entries in data145 and ~119 in datai008 against the live kom although this stage replaced only 5 / 0 files there: the live koms were older than `kom_contents` for those files (an earlier plan's staging, never copied), now in sync. Nothing was removed.
+- **MODS.md:** "Stage 7 Elesis, CH0b" section with the backups and the revert.
+- **Play-test (user) is the gate** (below). Log tag `[JUNE_CHAR]` has no lines (no code); the check is `ErrorLog.txt` against `ErrorLog_pre_CH0b_elesis.txt` (`KEM_ERROR`, `Motion Error`, missing texture / mesh, and whether the KEM 433 frame warning on her part meshes is gone). Her class script and combat motions are still March's, so she plays as before; her June meshes / textures / sounds / icons load.
+- **Drift:** none new.
+
 ## Phase CH1 - Deploy unit: June script, motions and the class core
 
 **Groups** (CH0's map fills the counts and the exact function lists; the kickoffs carry the filters):

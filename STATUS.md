@@ -121,7 +121,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH0b | **ready**: every June Elesis asset staged, packed, copied (6,452-row list; GM / BH motions held); char-ara gate dropped (user 2026-11-12) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
+| CH0b | **staged, packed, copied 2026-11-12; user owes the play-test, then "check logs"** (6,452 files, 28 koms + 2 Lua koms; GM / BH motions held for CH1) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
 | CH1a | **ready**: movement and slot-head states; no review of its own; char-ara gate dropped (user 2026-11-12) | Sonnet 5.5 / high | CH0 | `X2GUEL.*`, Always.h | `CH1a.md` |
 | CH1b | blocked (CH1a): reactions; review covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUEL.*` | `CH1b.md` |
 | CH1c | blocked (CH1b review): riding, pepper run, dance | Sonnet 5.5 / high | CH1b review | `X2GUEL.*` | `CH1c.md` |

@@ -6719,3 +6719,9 @@ No flag, no exe change (data only). User decision: June's route.
 - **Why:** June's monster defence (`NewNPCStat.lua` / `NewNPCStatFormula.lua`, live since the ExtraNPCStat port) is built for this curve; read through March's line it made secret-dungeon monsters take a fifth of the damage at `k = 1.0` and none from about `k = 1.2`. Normal dungeons shift by a few percent each way (June's balance). Damage taken by the player changes too.
 - **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE`; debug `SERV_IRUHADEV_JUNE_STATCALC_DEBUG` (`[JUNE_STATCALC] HIT` lines in `offline_server.log`, retired by the D6 review).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE` (and `_DEBUG`, which needs it) in `KTDXLIB/Always.h`, rebuild.
+
+## Stage 7 Elesis, CH0b: June assets staged (data only, 2026-11-12)
+
+No flag, no exe change. `kom.py stage-june june2017_re/char_elesis/ch0b_stage_list.tsv`: 6,452 June files byte-exact in 28 koms (6,314 new, 138 replaced; the 138 March copies are backed up under `kom_backup_stage_june/20261112_144313` and listed in `june2017_re/char_elesis/ch0b_replaced.tsv`: data021 1, data033 4, data044 1, data052 9, data063 8, data130 30, data143 80, data145 5). `adopt-june` (bytecode): `DLG_1ST_Class_Change_Guide_Elesis` / `DLG_2ND_Class_Change_Guide_Elesis` (new, data034), `Class_Change_Guide_Elesis` (data034, replaced), `DLG_Class_Change_Elesis_SK` / `_PK` / `_GM` / `_BH` (data034, replaced), `DLG_Class_Change_Elesis_DK` / `_CA` (new, data217); backups `kom_backup_stage_june/20261112_144330` and `_144334`. New kom **data206** (57 June-only motions). Held for CH1 final: `MOTION_EL_GM.x`, `Motion_EL_BH.x` (March's copies untouched). 30 koms packed and copied.
+
+**Revert.** Restore the replaced files from the three backup folders, `kom.py pack` / `copy` the koms; `data206.kom` and `data217.kom` can be deleted from the game dir if they were not there before.
