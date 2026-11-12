@@ -782,6 +782,34 @@ owns it.
 **Done gate.** Map rows `June`; gates PASS; `DEPLOY OK`; play-test: for ten logged hits each way, `REACT`'s HP change equals the `GFD`
 damage after the listed reductions, on a unit with damage-reduction sockets and one without.
 
+### Phase D4 - Cut (2026-11-12)
+
+Read-only, as the kickoff orders: cut both sections, count, split, stop. No client code, no flag; full build skipped: no play-test.
+flagcheck / junediverge: not applicable (no source touched).
+
+**The sections were longer than D0 said.** D0's end points (`@327b3da5`, `@32048fab`) are the attacker's HP-drain `UpNowHp`, not the
+defender's. The defender's are `@327b4c11` (NPC) and `@32049b30` (user, then the tutorial clamp to `32049b70`). Map rows 17 / 18 corrected.
+
+**Ledger** `june2017_re/statcalc/dr_blocks.tsv` (columns `side range computes march_lines state flag phase note`): NPC 22 contiguous
+ranges `327b33f0-327b4c13` (2 `June`, 6 `absent`, 4 `mixed`, 9 `unknown` = claimed by an older flag, not re-read, 1 `n/a` = number
+position); user 29 ranges `32048435-32049b70` (3 `June`, 5 `absent`, 5 `mixed`, 16 `unknown`). Check, from the Trunk:
+`python -c "import csv;r=list(csv.reader(open('june2017_re/statcalc/dr_blocks.tsv'),delimiter='\t'))[1:];[print(k,all(a[1]==b[0] for a,b in zip(s,s[1:])),s[0][0],s[-1][1],len(s)) for k in('npc','user') for s in[[x[1].split('-') for x in r if x[0]==k]]]"`
+prints `npc True 327b33f0 327b4c13 22` and `user True 32048435 32049b70 29`. User `DamageReact` has no decompile (Ghidra's fails):
+the cut reads the listing `june2017_re/buffre/dec/320462a0.s`.
+
+**Findings for the porting phases.**
+- Both sides call vslot `0x378( DD, &damage )` when DD `+0x4fc` is set (`@327b35fe`, `@320489f3`), and both have a state-10 skill-templet
+  multiply plus skill 30205 after the critical block (`327b39cf`, `32048cdb`) where March has its back-attack `x1.1`.
+- NPC-only: ids `0x772` / `0x791` damage scale, the element pair's two extra id pairs, a fixed damage `+0x8f84`, a protected flag `+0x75bc`
+  that zeroes damage in game type 2, a `+0x38 == 4` tally case, a `+0x8488` call before `UpNowHp`.
+- User-only: an attack-type-1 skill-templet multiply right after `GetFinalDamage`, a `+0x9175` branch beside Ara's quicken guard, June's own
+  Elesis provoke gate, a state-10 / `32aebaf0` multiply, a max-HP block (`3204968f`) before the HP-rate overwrite.
+- `DI_EVENT_ALCHEMY_LAB` (41350) is not in the live `DungeonData.lua`: owner backlog Stage 19 (already listed there); map row 21 says so.
+
+**Sizing.** 20 `absent` / `mixed` blocks (10 a side, Stage 19's not counted) plus 25 `unknown`: split by side into **D4a** (NPC, probe
+build, no review of its own) and **D4b** (user, full build and the play-test for both); `D4-review.md` covers both. Kickoffs `D4a.md`
+(was `D4.md`), `D4b.md`, `D4-review.md`; STATUS rows updated.
+
 ## Phase D5 - Extra damage, enchant resist and level correction
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE`: `LevelCorrectionExtraDamage` NPC `32760210` and the user's twin (June's

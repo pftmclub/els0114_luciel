@@ -1,0 +1,52 @@
+side	range	computes	march_lines	state	flag	phase	note
+npc	327b33f0-327b33fc	GetFinalDamage (vslot 0x70 @327b33f6) into the damage local	X2GUNPC.cpp:10783	June	-	D4a	D4 cut: read
+npc	327b33fc-327b3491	NPC 0x772 / 0x791 with +0x7c98 set and manager vslot 200 non-zero: damage x ( 1 - +0x874c x 334bac40 ), then 322780b0	none	absent	-	D4a	ids and +0x874c to name from June's Enum / NPC templet
+npc	327b3491-327b35db	element pair (32530a80 gate): 0xe9 / 0x70e while an 0xeb / 0x6e8 has +0x8754 set, 0xe8 / 0x70d while an 0xea / 0x6e7 has it -> damage 1.0	X2GUNPC.cpp:10786-10811	mixed	-	D4a	March: ICE / FIRE pair only, GetFlag_LUA(3); June adds the 0x70e / 0x70d / 0x6e8 / 0x6e7 ids
+npc	327b35db-327b35fe	+0x8f84 above 33436c90 -> damage = +0x8f84	none	absent	-	D4a	member unidentified (fixed damage taken)
+npc	327b35fe-327b361b	DD +0x4fc non-zero -> vslot 0x378( DD, &damage )	none	absent	-	D4a	same call in user DamageReact @320489f3; identify slot 0x378 base and overrides
+npc	327b361b-327b368b	damage number position: +0x8f88 (boss raid) -> impact point, else head frame or pos +y	X2GUNPC.cpp:10821-10841	n/a	-	-	display position, not damage arithmetic
+npc	327b368b-327b39cf	attacker block: 322978e0 (head shot), rate vslot 0x1d4 + DD +0x5d4, way of the sword vslot 0x78, anti-critical +0x4154, threshold 32273480, roll vslot 0x1cc, critical damage	X2GUNPC.cpp:10849-10997	unknown	SERV_IRUHADEV_JUNE_SOCKET_PARITY, _JUNE_BUFF_CUSTOM_FUNCTION	D4a	claimed June (map rows 17, 28); re-read; ADD_BACKATTACK x1.5 has no June counterpart here: resolve its state with cl /P
+npc	327b39cf-327b3a91	+0x844d clear: DD +0x5c0 = 1; user attacker in state 10: attack type 1 -> skill templet (32206450, 32070510 != 5) x attacker +0x9458, else x 32ae5120; skill 30205 (0x75fd) x attacker +0x9460	none	absent	-	D4a	March back-attack x1.1 (10999-11011) sits here: June has none
+npc	327b3a91-327b3b39	double attack (BBT 56 / 75, skills 8021 / 8025 / 8026 with Shade the Illusion) and x2	X2GUNPC.cpp:11013-11080	unknown	SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY, _JUNE_BUFF_NEW_SKILL	D4a	claimed June; re-read
+npc	327b3b39-327b3b57	attacker 32071c80 (GetDrainHpBuffValue)	X2GUNPC.cpp:11084-11091	unknown	-	D4a	re-read
+npc	327b3b57-327b3dab	HP drain (DD +0x4e0, NCT_BASIC, attacker gage +0xc04): text, attacker UpNowHp @327b3da5	X2GUNPC.cpp:11093-11126	unknown	-	D4a	D0 took this attacker UpNowHp for the section end; the defender's is @327b4c11
+npc	327b3dab-327b41c9	MP drain (DD +0x574 / +0x578): attacker UpNowMp + text, own UpNowMp x -1 + text	X2GUNPC.cpp:11128-11166	unknown	-	D4a	re-read
+npc	327b41c9-327b4214	protected byte +0x75bc == 1 and game type (vslot 0x10c) 2 -> damage 0	none	absent	-	D4a	member unidentified
+npc	327b4214-327b42a0	additional defence (not level damage DD +0x57c, not IGNORE_DEFENCE_DECLINE DD +0x534)	X2GUNPC.cpp:11171-11185	unknown	SERV_IRUHADEV_JUNE_BUFF_NEW_STAT	D4a	claimed June; re-read
+npc	327b42a0-327b4484	additional attack k (78 result, options), double add, Add stasis vslot 0x6d4, user-attacker vslots 0x4f8 / 0x4fc	X2GUNPC.cpp:11186-11262	unknown	SERV_IRUHADEV_JUNE_SOCKET_PARITY, _JUNE_DAMAGE_REACT_HOOKS	D4a	claimed June; re-read
+npc	327b4484-327b452f	socket cool time on hit (+0x7ca8, 3 % roll, -5 s)	X2GUNPC.cpp:11265-11296	unknown	SERV_IRUHADEV_JUNE_SOCKET_COOLTIME_ON_HIT	D4a	claimed June (C10e); re-read
+npc	327b452f-327b47a4	DI_EVENT_ALCHEMY_LAB (0xa186) gimmick	none	absent	-	backlog Stage 19	41350 not in the live DungeonData.lua; owner Stage 19 (JUNE_PORT_BACKLOG_ORDER.md, June event dungeons)
+npc	327b47a4-327b4802	322cfca0 (PvP amusement halving), attacker vslot 0x304	X2GUNPC.cpp:11297-11304	June	SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS	D4a	map row 31 (D0 review); place in June's order re-checked by D4a
+npc	327b4802-327b480f	322757b0 custom function slot 6 with the final damage	X2GUNPC.cpp:11306-11310	unknown	SERV_IRUHADEV_JUNE_BUFF_CUSTOM_FUNCTION	D4a	re-read
+npc	327b480f-327b4b12	damage number (+0x8d35): double half and SetDoubleAttack, combo manager vslot 0x230 / 0x22c by attacker kind, 32299d60 draw, state 0x12 with 322ccf50 -> 327be120	X2GUNPC.cpp:11311-11390	mixed	-	D4a	March: training combo only; June adds the combo manager calls and the state 0x12 branch
+npc	327b4b12-327b4b82	attacker tally: user -> 322915c0 (AddToDamagedMap); ally NPC (+0x38 1, +0x80 0) -> 31f8b590 then 322915c0; +0x38 == 4 -> manager +0xb24 += int( damage )	X2GUNPC.cpp:11420-11434	mixed	-	D4a	June adds the +0x38 == 4 case
+npc	327b4b82-327b4c13	local unit: hitted count (not NFT bomb, not DT_BUFF); +0x8488 != -1 and damage > 0 -> 327c2860( 32757540(...) ); UpNowHp( -damage ) @327b4c11	X2GUNPC.cpp:11441-11462	mixed	SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY	D4a	the +0x8488 call is absent in March; after it: D3's tallies @327b4d13 / @327b4ef6
+user	32048435-32048446	GetFinalDamage (vslot 0x70 @3204843b)	X2GUUser.cpp:10777	June	-	D4b	D4 cut: read
+user	32048446-3204847e	attack type 1: skill templet (32206450, 32070510 == 5) multiplier	none	absent	-	D4b	pairs with the NPC's state-10 block; identify
+user	3204847e-32048645	Raven parry (+0x9172): damage x 3344af88, effect set at an offset (33437830, 33472990, 3342f360)	X2GUUser.cpp:10779-10809	unknown	-	D4b	March: x ( 1 - 0.75 ); compare the constant
+user	32048645-320487fe	Eve maneuver parry (+0x929c), same shape	X2GUUser.cpp:10811-10837	unknown	-	D4b	re-read
+user	320487fe-320488a2	basic reduction vslot 0x348; NPC attacker: monster-attack term, boss 32071bf0, +0x52fc 32071b30; cap 1.0	X2GUUser.cpp:10838-10875	unknown	SERV_IRUHADEV_JUNE_SOCKET_PARITY	D4b	claimed June (map row 18); vslot 0x348 vs GetBasicReducedDamagePercent 3201aff0 (map row 19)
+user	320488a2-320489c6	penetrate (DD +0x4c5) subtract; bone shield (time, count) or 32028ba0 socket effect	X2GUUser.cpp:10876-10894	unknown	-	D4b	re-read
+user	320489c6-320489f3	IsMyUnit (vslot 0x198): hitted count (not NFT bomb, not DT_BUFF)	X2GUUser.cpp:10897-10918	unknown	SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY	D4b	claimed June; re-read
+user	320489f3-32048a10	DD +0x4fc non-zero -> vslot 0x378( DD, &damage )	none	absent	-	D4b	same as the NPC's @327b35fe
+user	32048a10-32048cdb	number position, attacker block: head shot 322978e0, rate, threshold 32273480, critical damage (32070de0 / 32070e00 / 32071ad0 / 32071ab0)	X2GUUser.cpp:10927-11085	unknown	SERV_IRUHADEV_JUNE_SOCKET_PARITY	D4b	claimed June @32048a0e-32048cd7; re-read
+user	32048cdb-32048d86	+0x80cd; user attacker in state 10: attack type 1 skill templet x attacker member or 32ae5120; skill 30205 x +0x95f8 / +0x9600	none	absent	-	D4b	March back-attack x1.1 (11087-11101) sits here
+user	32048d86-32048e0c	double attack and x2	X2GUUser.cpp:11104-11146	unknown	SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY	D4b	claimed June; re-read
+user	32048e0c-32048e21	attacker 32071c80 (GetDrainHpBuffValue)	X2GUUser.cpp:11150-11157	unknown	-	D4b	re-read
+user	32048e21-32048fc6	HP drain: text, attacker UpNowHp @32048fab	X2GUUser.cpp:11159-11185	unknown	-	D4b	D0 took this attacker UpNowHp for the section end; the defender's is @32049b30
+user	32048fc6-320492a3	MP drain (DD +0x574 / +0x578), three texts	X2GUUser.cpp:11187-11209	unknown	-	D4b	re-read
+user	320492a3-320492e3	+0x9173 -> damage x 334350e8; +0x9175 branch	X2GUUser.cpp:11211-11221	mixed	-	D4b	March: Ara quicken guard x 0 only; +0x9175 absent
+user	320492e3-32049405	Elesis provoke: type 0xb with 32a7ff70, type 8 class 0x78, 32610800, the reaction tests, +0x967c, x 334350e8	X2GUUser.cpp:11223-11255	mixed	-	D4b	June's unit / class gate differs; Elesis part with char-elesis (checklist 7b)
+user	32049405-32049466	additional defence	X2GUUser.cpp:11261-11276	unknown	SERV_IRUHADEV_JUNE_BUFF_NEW_STAT	D4b	claimed June; re-read
+user	32049466-3204957e	additional attack k (32071b90 / b10 / b50 / af0, 0.01), double add, provoke zero	X2GUUser.cpp:11278-11332	unknown	SERV_IRUHADEV_JUNE_SOCKET_PARITY	D4b	claimed June; re-read
+user	3204957e-3204963f	Add stasis (vslot 0x6d4), user-attacker vslots 0x4f8 / 0x4fc	X2GUUser.cpp:11335-11362	unknown	SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS	D4b	claimed June; re-read
+user	3204963f-32049683	state 10 -> damage x 334411a8 term; 32aebaf0 x 33449128	none	absent	-	D4b	identify 32aebaf0
+user	32049683-3204968f	322cfca0 (PvP amusement halving)	X2GUUser.cpp:11364-11365	June	SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS	D4b	map row 31
+user	3204968f-3204971b	31aadcb0, game +0xbbc 32d5c800 -> max HP x 334395e8 with vslots 0x11c / 0x120 (33437778)	none	absent	-	D4b	identify (a damage cap by max HP?)
+user	3204971b-3204972e	HP-rate overwrite 32273e80 (@32049727)	X2GUUser.cpp:11369-11375	unknown	SERV_IRUHADEV_JUNE_HP_RATE_DAMAGE	D4b	June's order kept verbatim (funcmap 32049727)
+user	3204972e-32049779	attacker vslot 0x304; damage shown, double x 0.5	X2GUUser.cpp:11376-11390	unknown	SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS	D4b	re-read
+user	32049779-32049998	damage number, combo manager vslots 0x230 / 0x22c by attacker kind, 32299d60 draw	X2GUUser.cpp:11391-11425	mixed	-	D4b	June adds the combo manager calls
+user	32049998-32049a1f	class hooks: UT_ADD vslot 0x6d8, class 0x7a vslot 0x6f8, type 8 vslots 0x730 / 0x734	X2GUUser.cpp:11429-11486	mixed	-	D4b	March: QA cheat, ProcessSkillAtDie / Ara resurrection, Add stasis / reverse reactor; class bodies stay with their ports
+user	32049a1f-32049b13	IsMyUnit: NPC attacker -> 32759f00, 320832a0; damage count; Add DP (0x6e4 / 0x6bc / 0x6e8); random mission (31fdcb70, 32676150, 326765d0, 32679970); type 0xc -> 32622e80	X2GUUser.cpp:11488-11579	mixed	SERV_IRUHADEV_JUNE_RANDOM_MISSION	D4b	the NPC-attacker calls and the type 0xc call are absent in March
+user	32049b13-32049b32	UpNowHp( -damage ) @32049b30	X2GUUser.cpp:11580	unknown	-	D4b	re-read
+user	32049b32-32049b70	tutorial clamp: state 0x12 or g_pMain +0x16a, HP <= 0 -> 1	X2GUUser.cpp:11584-11600	June	SERV_IRUHADEV_JUNE_TUTORIAL_MODE	D4b	Buff 14c (D0 review); section end

@@ -356,11 +356,12 @@ Plan `JUNE_STAT_CALC_PHASES.md` - branch `main` - log tag `[JUNE_STATCALC]` (`of
 
 **Scope:** every stat and damage formula becomes June's whole calculation. Damage track D0-D6 runs now (user 2026-11-12: secret-dungeon monsters take 0 or tiny damage; cause = March's straight-line defence formula reading June's monster defence, fix = D1). Stat-sheet and resource track S1-S4 / R1: code after Stages 7 and 8 (user 2026-10-27). D1-D5 all edit `X2GameUnit.cpp` / `X2GUNPC.cpp` / `X2GUUser.cpp`: one at a time, and not beside a char-port phase that edits the same file.
 
-Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 / 31 / 32 were already ported, set June; march_lines remapped past D1), D1 (2026-11-12, reviewed: compiled rate and floor = June's instructions; level gap none, re-proved; 939 emu sets; play-test passed), D2a + D2b (2026-11-12, reviewed in `D2-review`: no transcription error; hook 1.0 and boss 1470 = June; 50 emu review sets), D3 (2026-11-12, reviewed: all 8 items = June's exe, no code change; play-test passed).
+Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 / 31 / 32 were already ported, set June; march_lines remapped past D1), D1 (2026-11-12, reviewed: compiled rate and floor = June's instructions; level gap none, re-proved; 939 emu sets; play-test passed), D2a + D2b (2026-11-12, reviewed in `D2-review`: no transcription error; hook 1.0 and boss 1470 = June; 50 emu review sets), D3 (2026-11-12, reviewed: all 8 items = June's exe, no code change; play-test passed), D4 cut (2026-11-12: `dr_blocks.tsv`, 51 blocks; split into D4a / D4b).
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| D4 | **ready**: `DamageReact` damage arithmetic, user and NPC | Opus 5.5 / high, Opus review | D3 review | `X2GUNPC.cpp`, `X2GUUser.*` | `D4.md` |
+| D4a | **ready**: NPC `DamageReact` damage arithmetic (cut 2026-11-12: 10 absent / mixed, 9 to re-read); probe build, no review of its own | Opus 5.5 / high | D4 cut | `X2GUNPC.*` | `D4a.md` |
+| D4b | blocked (D4a): user `DamageReact` damage arithmetic (10 absent / mixed, 16 to re-read), socket-reduction body; full build + play-test for both | Opus 5.5 / high; review `D4-review.md` Opus 5.5 / high | D4a | `X2GUUser.*` | `D4b.md` |
 | D5 | blocked (D4 review): extra damage, enchant resist, level correction | Opus 5.5 / high, Opus review | D4 review | `X2GUNPC.cpp`, `X2GUUser.*`, `X2GameUnit.*`, `DungeonEnum.h` | `D5.md` |
 | D6 | blocked (D5 review): damage smoke on every ported character; its review covers D1-D5 and retires `_DEBUG` | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |
 | S0 | ready: stat-sheet and resource map (read-only); runs beside anything | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0.md` |
