@@ -180,6 +180,20 @@ namespace _CONST_EL_CH1G2_
 }
 using namespace _CONST_EL_CH1G2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1h: constants of the HP tier ( June 32b6fb80 ) and of Chivalry's debuff immunity ( June 32b6fc40 )
+namespace _CONST_EL_CH1H_
+{
+	const float HP_TIER_3_BELOW_RATE			= 0.3f;
+	const float HP_TIER_2_BELOW_RATE			= 0.5f;
+	const float HP_TIER_1_BELOW_RATE			= 0.7f;
+	const float CHIVALRY_DEBUFF_IMMUNE_HP_RATE	= 0.15f;	// June multiplies the max HP by the double 0.15f
+}
+using namespace _CONST_EL_CH1H_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
 {
 	{ 
@@ -241,6 +255,10 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_usDashComboZZZLoopCount(0)	// char-elesis CH1g2
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+, m_usMadnessLevel(0)	// char-elesis CH1h
+, m_bIsMadnessActive(false)
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 , m_uiDodgeAndSlashMaxReuseCount(0)
 , m_uiDodgeAndSlashReuseCount(0)
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
@@ -444,6 +462,74 @@ CX2GUEL::~CX2GUEL(void)
 }
 /*virtual*/ void CX2GUEL::InitComponent()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1h: June 32b81710
+	CX2GUUser::InitComponent();
+
+	if( true == IsMyUnit() )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+		// PvP or PvE both start the Way of the Sword from zero ( June tests game type 1 or 4 )
+		if( true == g_pX2Game->GetIsNowPVPCorrectionGame() )
+		{
+			static_cast<CX2ElesisGageData*>(m_pGageData)->SetWayOfSwordPoint( 0.f );
+			static_cast<CX2ElesisGageData*>(m_pGageData)->SetWayOfSwordState( 0 );
+		}
+		m_FrameDataFuture.syncData.m_CannonBallCount = GetWayOfSwordState();
+
+		switch ( GetWayOfSwordState() )
+		{
+		case WSS_VIGOR:
+			{
+				Start_SwordmanVigor();
+			} break;
+		case WSS_DESTRUCTION:
+			{
+				Start_SwordmanDestruction();
+			} break;
+		default:
+			break;
+		}
+
+		// June 324943c0 / 32489220 / vslot 0x5c ( 32e69e70 ): the gauge refresh after the mode start
+		const CX2MyGageUI* pMyGageUI = CX2GageManager::GetInstance()->GetMyGageUI();
+		if( NULL != pMyGageUI )
+		{
+			const_cast<CX2MyGageUI*>( pMyGageUI )->RefreshWayOfSwordUI();
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+		ASSERT( NULL != g_pX2Game );
+		switch ( g_pX2Game->GetGameType() )
+		{
+		case CX2Game::GT_PVP:
+			{
+				static_cast<CX2ElesisGageData*>(m_pGageData)->SetWayOfSwordPoint( 0.f );
+				static_cast<CX2ElesisGageData*>(m_pGageData)->SetWayOfSwordState( 0 );
+				m_FrameDataFuture.syncData.m_CannonBallCount = GetWayOfSwordState();
+			} break;
+
+		default:
+			{
+				m_FrameDataFuture.syncData.m_CannonBallCount = GetWayOfSwordState();
+			} break;
+		}
+
+		switch ( GetWayOfSwordState() )
+		{
+		case WSS_VIGOR:
+			{
+				Start_SwordmanVigor();
+			} break;
+		case WSS_DESTRUCTION:
+			{
+				Start_SwordmanDestruction();
+			} break;
+		default:
+			break;
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CX2GUUser::InitComponent();
 
 #ifdef ELSWORD_WAY_OF_SWORD // 검의 길
@@ -480,6 +566,7 @@ CX2GUEL::~CX2GUEL(void)
 		}
 	}
 #endif // ELSWORD_WAY_OF_SWORD
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /*virtual*/ void CX2GUEL::InitPassiveSkillState()
 {
@@ -1895,6 +1982,18 @@ CX2GUEL::~CX2GUEL(void)
 
 /*virtual*/ void CX2GUEL::DetonationStateChange( CX2DamageManager::DamageData* pDamageData )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1h: June 32b73e10 ( the Destruction detonation enters its own Endurance Power state, not DoStateEndurancePowerRage )
+	if( WSS_DESTRUCTION == GetWayOfSwordState() )
+	{
+		StateChange( ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION, true );
+		SetNowChargeMpForDetonation( 0.f );
+	}
+	else
+	{
+		CX2GUUser::DetonationStateChange( pDamageData );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef ELSWORD_WAY_OF_SWORD // 검의 길 섬멸 기폭
 	if( WSS_DESTRUCTION == GetWayOfSwordState() )
 	{ // 섬멸 게이지로 기폭 시 슈아팅
@@ -1906,6 +2005,7 @@ CX2GUEL::~CX2GUEL(void)
 	{
 		CX2GUUser::DetonationStateChange( pDamageData );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 			 
 /*virtual*/ RENDER_HINT	CX2GUEL::CommonRender_Prepare()
@@ -3381,6 +3481,108 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 #endif // FIX_NO_STATE_SKILL_BUG
 /*virtual*/ void CX2GUEL::ReInit( bool bTeamPos /*= false*/, int iStartPosIndex /*= -1*/ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1h: June 32b81900
+	CX2GUUser::ReInit( bTeamPos, iStartPosIndex );
+
+	if( true == IsMyUnit() )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+		// the point moves one step toward the centre first ( June 334355b0 = 1.0 )
+		const int iWayOfSwordState = GetWayOfSwordState();
+		if( WSS_DESTRUCTION == iWayOfSwordState )
+			SetWayOfSwordPoint( static_cast<float>( GetWayOfSwordPoint() + 1.0 ) );
+		else if( WSS_VIGOR == iWayOfSwordState )
+			SetWayOfSwordPoint( static_cast<float>( GetWayOfSwordPoint() - 1.0 ) );
+
+		// only a PvP game ( type 1, not 4 ) resets the losing team; every other game falls into the TOWARD branch
+		if( CX2Game::GT_PVP == g_pX2Game->GetGameType() &&
+			( ( CX2Room::TN_RED == GetTeam() && g_pX2Game->GetRedTeamKill() > g_pX2Game->GetBlueTeamKill() ) ||
+			  ( CX2Room::TN_BLUE == GetTeam() && g_pX2Game->GetRedTeamKill() < g_pX2Game->GetBlueTeamKill() ) ) )
+		{
+			if( WSS_VIGOR == iWayOfSwordState )
+			{
+				End_SwordmanVigor();
+			}
+			else if( WSS_DESTRUCTION == iWayOfSwordState )
+			{
+				End_SwordmanDestruction();
+			}
+			SetWayOfSwordPoint( 0 );
+			SetWayOfSwordState( static_cast<int>( WSS_CENTER ) );
+		}
+		else
+		{
+			if( WSS_VIGOR == iWayOfSwordState )
+			{
+				End_SwordmanVigor();
+				SetWayOfSwordState( static_cast<int>( WSS_TOWARD_VIGOR ) );
+			}
+			else if( WSS_DESTRUCTION == iWayOfSwordState )
+			{
+				End_SwordmanDestruction();
+				SetWayOfSwordState( static_cast<int>( WSS_TOWARD_DESTRUCTION ) );
+			}
+		}
+		m_FrameDataFuture.syncData.m_CannonBallCount = GetWayOfSwordState();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+		if( CX2Game::GT_PVP == g_pX2Game->GetGameType() )
+		{
+			const WAY_OF_SWORD_STATE eWayOfSwordState = static_cast<const WAY_OF_SWORD_STATE>( GetWayOfSwordState() );
+
+			if( GetTeam() == CX2Room::TN_RED && g_pX2Game->GetRedTeamKill() > g_pX2Game->GetBlueTeamKill() ||
+				GetTeam() == CX2Room::TN_BLUE && g_pX2Game->GetRedTeamKill() < g_pX2Game->GetBlueTeamKill() )
+			{
+				if( eWayOfSwordState == WSS_VIGOR )
+				{
+					End_SwordmanVigor();
+				}
+				else if( eWayOfSwordState == WSS_DESTRUCTION )
+				{
+					End_SwordmanDestruction();
+				}
+				SetWayOfSwordPoint( 0 );
+				SetWayOfSwordState( static_cast<int>( WSS_CENTER ) );
+			}
+			else
+			{
+				if( eWayOfSwordState == WSS_VIGOR )
+				{
+					End_SwordmanVigor();
+					SetWayOfSwordState( static_cast<int>( WSS_TOWARD_VIGOR ) );
+				}
+				else if( eWayOfSwordState == WSS_DESTRUCTION )
+				{
+					End_SwordmanDestruction();
+					SetWayOfSwordState( static_cast<int>( WSS_TOWARD_DESTRUCTION ) );
+				}
+			}
+			m_FrameDataFuture.syncData.m_CannonBallCount = GetWayOfSwordState();
+		}
+		else
+		{
+			switch ( GetWayOfSwordState() )
+			{
+			case WSS_VIGOR:
+				{
+					Start_SwordmanVigor();
+				} break;
+			case WSS_DESTRUCTION:
+				{
+					Start_SwordmanDestruction();
+				} break;
+			default:
+				break;
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+	// every unit, after the Way of the Sword block ( June 32b81b85 )
+	ClearShadowEdgeRecords();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CX2GUUser::ReInit( bTeamPos, iStartPosIndex );
 #ifdef ELSWORD_WAY_OF_SWORD // 검의 길
 	// 대전 중 지고 있다면 검의길 효과 초기화 
@@ -3438,9 +3640,69 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 	}
 #endif // ELSWORD_WAY_OF_SWORD
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /*virtual*/ void CX2GUEL::DamageReact( OUT CX2DamageManager::DamageData* pDamageData_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1h: June 32b73ff0
+	KTDXPROFILE();
+
+	if( NULL == pDamageData_ )
+		return;
+
+	if( WSS_DESTRUCTION == GetWayOfSwordState() &&
+		true == IsDamagedReaction( pDamageData_ ) &&
+		CX2DamageManager::DT_BUFF != pDamageData_->damageType &&
+		true == DamageFlushMp() &&
+		false == g_pMain->GetIsPlayingTutorial() )	// June +0x16a of g_pMain
+	{
+		DetonationStateChange( pDamageData_ );
+	}
+	else if( true == m_bIsActiveEndurancePower &&
+			 true == CanSpecialReactProcess( pDamageData_->reActType ) &&
+			 false == IsSuperArmor() )
+	{
+		// the upgraded Endurance Power ( the base skill is deleted once it is learned ) has its own state
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER, true );
+		if( NULL != pSkillTemplet && 0 != pSkillTemplet->m_iDeleteSkillIDByUpgrade )
+			StateChange( ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_MEMO, true );
+		else
+			StateChange( ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE, true );
+	}
+	else
+	{
+		CX2GUUser::DamageReact( pDamageData_ );
+		CX2GUUser::DamageReactStateChange( pDamageData_, -1, -1 );
+	}
+
+	if(	IsMyUnit() == true &&
+		pDamageData_->reActResult != CX2DamageManager::RT_REVENGE &&
+		true == CanSpecialReactProcess(pDamageData_->reActType) )
+	{
+		const int iWayOfSwordState = GetWayOfSwordState();
+		if( WSS_VIGOR != iWayOfSwordState )
+		{
+			float fWSPGain = g_pData->GetDamageManager()->CalcWayOfSwordPointOnDamageReact( pDamageData_->damage.GetAllDamage(), iWayOfSwordState );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+			fWSPGain = static_cast<float>( fWSPGain * static_cast<double>( GetWayOfSwordPointMultiplier() ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+			if( 0 < m_usMadnessLevel && true == m_bIsMadnessActive )
+				fWSPGain += fWSPGain;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+
+			SetWayOfSwordPoint( GetWayOfSwordPoint() + fWSPGain );
+		}
+	}
+
+	if( true == m_bIsProvokeStateChange && CX2DamageManager::DT_BUFF != pDamageData_->damageType )
+	{
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_CSI_CIP_IRON_WILL", this );
+		StateChange( ESI_A_SGM_PROVOKE_REVENGE, true );
+		m_bIsProvokeStateChange = false;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	KTDXPROFILE();
 
 	if( WSS_DESTRUCTION == GetWayOfSwordState() && // 섬멸 상태 일 때 기폭 예외처리
@@ -3489,6 +3751,7 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 		SetIsProvokeStateChange( false );
 	}
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /*virtual*/ void CX2GUEL::Win()
 {
@@ -3670,6 +3933,25 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 }
 /*virtual*/ void CX2GUEL::HyperModeBuffEffectStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1h: June 32b74300; the hyper boost handles are skipped for a transcended unit ( unit +0x3c ) or an awakening effect set
+	CX2GUUser::HyperModeBuffEffectStart();
+
+	if( ( NULL != GetUnit() && 0 != GetUnit()->GetUnitData().m_iUnitClassTran ) || true == _CONST_EL_CH1C_::ElesisAwakeningEffectSetPresent() )
+		return;
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostRFoot )
+		m_hHyperBoostRFoot	= g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this,  L"HyperBoostRight",	0, 0, 0, 0, 0);
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostLFoot )
+		m_hHyperBoostLFoot	= g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this,  L"HyperBoostLeft",	0, 0, 0, 0, 0);
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostRArm )
+		m_hHyperBoostRArm	= g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this,  L"HyperBoostRight",	0, 0, 0, 0, 0);
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostLArm )
+		m_hHyperBoostLArm	= g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this,  L"HyperBoostLeft",	0, 0, 0, 0, 0);
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CX2GUUser::HyperModeBuffEffectStart();
 
 	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostRFoot )
@@ -3683,6 +3965,7 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 
 	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostLArm )
 		m_hHyperBoostLArm	= g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this,  L"HyperBoostLeft",	0, 0, 0, 0, 0);
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /** @function	: SetSpecificValueByBuffTempletID
 	@brief		: 각 유닛마다 특정 버프가 실행 될 때 셋팅해야 하는 함수 실행(ex: 매지컬메이크업이 시전중이라는 플래그 설정 등...)
@@ -4245,6 +4528,61 @@ bool CX2GUEL::CanSpecialReactProcess( CX2DamageManager::REACT_TYPE eReActType_ )
 
 	return true;
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1h: June 32b6fb80 ( vslot 0x558 )
+int CX2GUEL::GetHpTier()
+{
+	if( NULL == GetGageData() )	// June reads 1.0 / 1.0 without a gage data
+		return 0;
+
+	const float fHpRate = GetNowHp() / GetMaxHp();
+	if( fHpRate < HP_TIER_3_BELOW_RATE )
+		return 3;
+	if( HP_TIER_2_BELOW_RATE > fHpRate )
+		return 2;
+	if( fHpRate < HP_TIER_1_BELOW_RATE )
+		return 1;
+	return 0;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+// char-elesis CH1h: June 32b6fc40 ( vslot 0x29c ); Chivalry: at or under 15 % of the max HP the listed debuffs get no duration
+/*virtual*/ float CX2GUEL::GetReduceDebuffDurationRate( BUFF_TEMPLET_ID eBuffTempletID_ )
+{
+	if( 0 < m_uiChivalryLevel && GetNowHp() <= static_cast<double>( GetMaxHp() ) * static_cast<double>( CHIVALRY_DEBUFF_IMMUNE_HP_RATE ) )
+	{
+		switch( eBuffTempletID_ )
+		{
+		case BTI_DEBUFF_STUN:
+		case BTI_BUFF_TROCKTA_MAGICATTACKB_STUN:
+		case BTI_STONE_GOD_ANGER:
+		case BTI_DEBUFF_FATE_SPACE:
+		case BTI_DEBUFF_RAINCOAT_CAT_STEB1_ATTACK_A:
+		case BTI_DEBUFF_RAINCOAT_CAT_STEB2_ATTACK_A:
+		case BTI_DEBUFF_RAINCOAT_CAT_STEB3_ATTACK_A:
+		case BTI_DEBUFF_ANCIENT_FIRE:
+		case BTI_DEBUFF_POWER_STUN:
+		case BTI_DEBUFF_ERDA_RAUL:
+		case BTI_DEBUFF_SLEEP:
+		case BTI_DEBUFF_CONFUSION:
+		case BTI_DEBUFF_PANIC:
+		case BTI_DEBUFF_PANDEMONIUM_FEAR:
+		case BTI_DEBUFF_SUPPRESSION:
+		case BTI_DEBUFF_AGING:
+		case BTI_DEBUFF_BLEEDING:
+		case BTI_DEBUFF_WOUND:
+		case BTI_DEBUFF_BLIND:
+		case BTI_DEBUFF_BLIND_SMOKE:
+		case BTI_DEBUFF_MOVE_JUMP_SLOWDOWN:
+		case BTI_DEBUFF_MOTION_SLOWDOWN:
+			return 0.f;
+		default:
+			break;
+		}
+	}
+	return 1.f;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 /** @function : GetFinalDamage_WayOfSword
 	@brief : -GetFinalDamage 계산 할 때 검의길 타입에 따라 데미지 변경 시켜 주기 위한 함수
 			 -엘소드와 엘리시스가 다른 동작을 할 수 있도록 virtual 함수로 변경

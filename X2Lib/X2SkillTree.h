@@ -2582,6 +2582,12 @@ public:
 		RNSI_P_SCA_MADNESS                                    = 28420,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-12 // char-elesis CH1h
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		// June SKILL_ID name Elesis's damage reaction reads ( value from June's Enum.lua )
+		RNSI_A_EL_ENDURANCE_POWER                             = 28201,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

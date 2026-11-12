@@ -10691,3 +10691,31 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b7c940	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_LOOP_2_FrameMove	PORTED	Char Elesis CH1g2: new, carved: 0.08 s EffectSet_C_SCA_Dash_ZZZ, 0.31 s Uppercut effect set ( 3 MP each, else the not-enough-MP effect )
 32b7cd70	CX2GUEL::ESI_DASH_COMBO_SCA_ZZZ_END_FrameMove	PORTED	Char Elesis CH1g2: new, carved: 0.37 s tick, FlushMp( 3 ) plays EffectSet_C_SCA_Dash_ZZZ_Finish, else the not-enough-MP effect
 32b7d920	CX2GUEL::ESI_DASH_COMBO_SCA_XZ_FIRE_FrameMove	PORTED	Char Elesis CH1g2: new, carved: CommonFrameMove, 0.01 s tick, IsEnoughMPForAttack( 5 ) spawns DamageEffect_SCA_Dash_Combo_XZ at GetPos(): power x ( 1 + 0.5 charge ), life time x ( 1 + 0.333 charge ), scale 1 + 0.133 charge
+32b4ef40	CX2GUEL::InitEffect	= March	Char Elesis CH1h: inside: base, CreateMajorParticleArray (vslot 0x540), CreateMinorParticleArray (vslot 0x548); no code
+32b4ef70	CX2GUEL::CreateMinorParticleArray	= March	Char Elesis CH1h: inside: tail jump to the base; no code
+32b52560	CX2GUEL::Init	= March	Char Elesis CH1h: inside: base Init, m_bNeedToUpdateWeaponEffect (+0x41f8) = 1, vslot 0x634 UpdateEquipCollisionData; no code
+32b52650	CX2GUEL::Win	= March	Char Elesis CH1h: inside: base Win, StateChange( GetWinStateID() ): riding USI_RIDING_WAIT_HABIT ( 75 ) else USI_WIN ( 11 ), by name; no code
+32b52690	CX2GUEL::Draw	= March	Char Elesis CH1h: inside: base Draw, the same Win state; no code
+32b527b0	CX2GUEL::SetWayOfSwordState	= March	Char Elesis CH1h: new in the map, March has it (X2GUEL.cpp SetWayOfSwordState): null-checked, changed flag only when the value differs; no code
+32b6de60	CX2GUEL::Lose	= March	Char Elesis CH1h: inside: base Lose, my unit with HP > 0: StateChange( GetLoseStateID() ): riding USI_RIDING_WAIT ( 76 ) else USI_LOSE ( 12 ), by name; no code
+32b6def0	CX2GUEL::COMMON_BUFF_FrameMove	= March	Char Elesis CH1h: inside: EventTimerOneshot( 0.2 ) crash camera + clear screen, else EventTimerOneshot( 0.25 ) ProcessAcceleraterBuff, then CommonFrameMove (vslot 0x7cc); no code
+32b6e500	CX2GUEL::CanSpecialReactProcess	= March	Char Elesis CH1h: new in the map, March has it: HP > 0, not invincible ( vslot 0x180 ), react type not NO_DAMAGE / DUMMY_DAMAGE / SENSOR; no code
+32b6fb80	CX2GUEL::GetHpTier	PORTED	Char Elesis CH1h: new, listing-only: vslot 0x558 ( base 3231f510 = 0 ), same body as 32b6fa50; HP share under 0.3 / 0.5 / 0.7 -> 3 / 2 / 1 else 0; compiled under _CORE, referenced by nothing until CH1o / CH4c
+32b6fc40	CX2GUEL::GetReduceDebuffDurationRate	PORTED	Char Elesis CH1h: vslot 0x29c, listing-only: Chivalry learned ( +0x95d0 ) and HP at or under 15 % of the max ( double 0.15f ): 0.0 for six BTI groups ( 32d40b80 / ba0 / bc0 / be0 / c00 / c20 ) and six single BTIs, else 1.0; virtual declared under _LIVE; seven BTI names registered
+32b70300	CX2GUEL::InitEnchantWeaponEffectUnitSpecific	= March	Char Elesis CH1h: inside: InitEnchantParticleForSword on every weapon; no code
+32b70330	CX2GUEL::CreateMajorParticleArray	= March	Char Elesis CH1h: inside: base, then DamageImpact / Core / Slash / Red ( 2 each ) and RingRed / CoreRed / SlashRed ( 1 each ), trigger wait on; same names, counts and enum order; no code
+32b70990	CX2GUEL::~CX2GUEL	= March	Char Elesis CH1h: dtor body: vtable resets, KProtectedType members, the two vectors ( +0x96a0 / +0x9700 ) freed; members destroy themselves; offset map in ch1_offsets.tsv
+32b70ee0	CX2GUEL::CX2GUEL	= March	Char Elesis CH1h: ctor: every plain store read ( x87 stack traced ); the declared members already hold June values; MemoConditionElesis ( +0x7d10 ) is CH4b; offset map in ch1_offsets.tsv; the +0x97aa / +0x97ac Madness members under _BLOOD
+32b73e10	CX2GUEL::DetonationStateChange	PORTED	Char Elesis CH1h: inside, carved: Destruction -> StateChange( ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION ( script id 207 ), true ) + SetNowChargeMpForDetonation( 0 ); else the base
+32b73ff0	CX2GUEL::DamageReact	PORTED	Char Elesis CH1h: inside, carved: null guard; Destruction detonation adds DT_BUFF and tutorial tests; Endurance Power picks the upgrade state by RNSI_A_EL_ENDURANCE_POWER ( 28201 ) m_iDeleteSkillIDByUpgrade; base + DamageReactStateChange( -1, -1 ); Way of the Sword gain x vslot 0x720 getter ( _WOS ), doubled under Madness ( _BLOOD ); Provoke revenge plays EffectSet_CSI_CIP_IRON_WILL and skips DT_BUFF
+32b74300	CX2GUEL::HyperModeBuffEffectStart	PORTED	Char Elesis CH1h: inside: the four hyper boost handles only for a non-transcended unit ( unit +0x3c ) and no awakening effect set ( stand-in false )
+32b81710	CX2GUEL::InitComponent	PORTED	Char Elesis CH1h: inside, carved: my unit; PvP-or-PvE ( type 1 or 4 ) resets point and state, sync field stored, Start Vigor / Destruction, then RefreshWayOfSwordUI ( vslot 0x5c of the gauge UI ); the block under _WOS, March block kept in its #else
+32b81900	CX2GUEL::ReInit	PORTED	Char Elesis CH1h: inside: my unit nudges the point 1.0 toward the centre, PvP type 1 only resets the losing team, every other game ends the mode and re-enters TOWARD; sync field after both ( _WOS ); the Shadow Edge list clear ( 32b81300 per record ) under _BLOOD as ClearShadowEdgeRecords ( body CH4c )
+32b900e0	std::copy of 0x20-byte records	= March	Char Elesis CH1h: compiler: ReInit tail ( vector erase of the Shadow Edge list ); no code
+32b90410	CX2GUEL::GetComboXStateID	= March	Char Elesis CH1h: vslot 0x4b4: returns ESI_COMBO_X ( June 169 / 0xa9 ); no code
+32c69f70	CX2GUEL::GetComboZStateID	= March	Char Elesis CH1h: vslot 0x4b0 ( folded stub ): returns ESI_COMBO_Z ( June 164 / 0xa4 ); no code
+32b90420	CX2GUEL::GetSpecialItemUsableExtraStateID	PORTED	Char Elesis CH1h: vslot 0x4ac: returns ESI_SWORD_WAIT ( June 187 / 0xbb ); declared under _LIVE
+32b90520	CX2GUEL::scalar deleting destructor	= March	Char Elesis CH1h: compiler: destructor, then operator delete; no code
+32b81300	CX2GUEL::RemoveShadowEdgeRecord ( declared as ClearShadowEdgeRecords )	routed	Char Elesis CH1h: ReInit calls it on every record of the +0x9700 list; the loop and the record type are CH4c ( _BLOOD )
+32b7beb0	CX2GUEL::OnAttackerDamageReact_Slot4F8	routed	Char Elesis CH1h: override declared under _BLOOD; body in CH4c
+32b898a0	CX2GUEL::OnAttackerDamageReact_Slot4FC	routed	Char Elesis CH1h: override declared under _BLOOD; body in CH4c

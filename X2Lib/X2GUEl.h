@@ -253,6 +253,7 @@ public:
 		ESI_DASH_COMBO_SCA_ZX_LOOP,					/// char-elesis CH1g2: June script id 306 ( Crimson Avenger dash Z-X loop; CH1m maps, CH1g2 owns the state )
 		ESI_DASH_COMBO_SCA_ZX_END,					/// char-elesis CH1g2: June script id 307 ( Crimson Avenger dash Z-X end; CH1m maps, CH1g2 owns the state )
 		ESI_DASH_COMBO_SCA_XZ_FIRE,					/// char-elesis CH1g2: June script id 331 ( Crimson Avenger dash X-Z fire; CH1m maps, CH1g2 owns the state )
+		ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION,	/// char-elesis CH1h: June script id 207 ( the Destruction detonation enters it, DetonationStateChange 32b73e10; Start 32b75c90; CH1m maps, CH1k owns the state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -487,6 +488,23 @@ protected:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	bool IsInJobLine( int iJobLine_ );		/// char-elesis CH1d: June 32b64290 ( vslot 0x670 ): body in CH1i
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+	int GetHpTier();	/// char-elesis CH1h: June 32b6fb80 ( vslot 0x558, base 3231f510 = 0; same body as 32b6fa50 ): 0 / 1 / 2 / 3 as the HP share falls under 70 / 50 / 30 %
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	virtual float GetReduceDebuffDurationRate( BUFF_TEMPLET_ID eBuffTempletID_ );	/// char-elesis CH1h: June 32b6fc40 ( vslot 0x29c )
+#ifdef SERV_IRUHADEV_JUNE_BUFF_QUICKSLOT_ITEM
+	virtual int GetSpecialItemUsableExtraStateID() { return ESI_SWORD_WAIT; }		/// char-elesis CH1h: June 32b90420 ( vslot 0x4ac )
+#endif SERV_IRUHADEV_JUNE_BUFF_QUICKSLOT_ITEM
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	float GetWayOfSwordPointMultiplier() const;	/// char-elesis CH1h: June 32b903e0 ( vslot 0x720, +0x9714 ): body in CH1q
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+	void ClearShadowEdgeRecords();	/// char-elesis CH1h: June 32b81900 tail ( RemoveShadowEdgeRecord 32b81300 on each record of the +0x9700 list, then the list is cleared ): body in CH4c
+	virtual void OnAttackerDamageReact_Slot4F8( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH1h: June 32b7beb0: body in CH4c
+	virtual void OnAttackerDamageReact_Slot4FC( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH1h: June 32b898a0: body in CH4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	void ESI_COMBO_SGM_ZZZX_EventProcess();					/// char-elesis CH1e: June 32b6ad40
 	void ESI_DASH_COMBO_SGM_XX_ATTACK_StateStartFuture();	/// char-elesis CH1e: June 32b522d0
@@ -1083,6 +1101,10 @@ protected:
 	float m_fDashJumpZXChargeTime;		/// char-elesis CH1g: June +0x96f4 ( Dark Knight dash-jump Z-X charge, 0 to 1 )
 	USHORT m_usDashComboZZZLoopCount;	/// char-elesis CH1g2: June +0x9758 ( Crimson Avenger dash Z-Z-Z loops counted: 0 at Z-Z, +1 per loop state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )
+	bool m_bIsMadnessActive;			/// char-elesis CH1h: June +0x97ac ( set while the HP share is under the Madness threshold; CH4c writes it )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	//~ protected º¯¼ö
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®

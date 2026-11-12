@@ -546,6 +546,18 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_SPECTEROFTHUNDER             = 424,	// June's Enum.lua; Ara's Specter of Thunder chance buff
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-12 // char-elesis CH1h
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June BTI names the debuff lists of Elesis's Chivalry ( GetReduceDebuffDurationRate ) spell; values from June's Enum.lua
+	BTI_BUFF_TROCKTA_MAGICATTACKB_STUN    = 172,
+	BTI_STONE_GOD_ANGER                   = 184,
+	BTI_DEBUFF_FATE_SPACE                 = 254,
+	BTI_DEBUFF_ANCIENT_FIRE               = 304,
+	BTI_DEBUFF_POWER_STUN                 = 319,
+	BTI_DEBUFF_ERDA_RAUL                  = 449,
+	BTI_DEBUFF_SLEEP                      = 785,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-10-26 // June character port Phase CH1l3 (JUNE_CHARACTER_EVE_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June BTI names the Eve skill use spells

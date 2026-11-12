@@ -12643,6 +12643,30 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-12
+// Description: June character port ( Elesis ) Phase CH1h - her Way of the Sword class side: June's InitComponent / ReInit blocks and the gain getter in
+//              DamageReact ( the lines that call a June piece CH1q has not written ). Stays commented out until CH1q; only with _LIVE.
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_WOS ).
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
+// Description: June character port ( Elesis ) Phase CH1h - her blood lines ( the Shadow Edge list clear in ReInit, the Madness doubling in DamageReact, the
+//              two attacker hit hooks ): declared here, bodies in CH4c. Stays commented out until CH4c; only with _LIVE.
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_BLOOD ).
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
 // Description: june-stat-calc D2a / D2b - CX2GameUnit::GetFinalDamage as June 32284aa0 from entry to return. D2a (up to @32285ccf):
 //              the attacker-skill hook (June 3229a530: Raven, Rena, Ace in the Hole, Ara), the user passives on June's skill ids
 //              (Confidence / Pride Victory, Manaflow Overdrive, Sharpen Arrow), the world-mission epsilon, the socket stat rates by
