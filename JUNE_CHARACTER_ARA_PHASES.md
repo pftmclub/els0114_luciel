@@ -2600,6 +2600,18 @@ the class-path flag `SERV_IRUHADEV_JUNE_CLASS_PATH` named as Elesis's and Add's 
 defined; checklist rows marked `(Ara: CHn)`; the Aisha plan's "Template for Stage 7" gets an Ara row (what she took against this plan, and what CH-N
 took: the template block is rewritten from it); backlog Stage 7 note; the `stage7-plan` row points at the next character (`char-elesis`, CH-N reused).
 
+### Z - Done (2026-11-12, Sonnet 5.5)
+
+Docs only: no code, no flag, no build ("full build skipped: no play-test"; the deployed exe is CH6's `9104634a`).
+- `MODS.md` "June character: Ara, the whole port": flags, files, data, revert order (exe + data036 + data033 / motion koms together), `JUNE_CLASS_PATH` and `JUNE_CLASS_CHANGE_GUIDE` named as Elesis's and Add's base, the flat StatTable (no Ara rows needed).
+- No `SERV_IRUHADEV_JUNE_CHAR_ARA_*_DEBUG` is defined (`Always.h`: `_FP_DEBUG`, `_SKILL_DEBUG`, `_PASSIVE_DEBUG`, `_CLASS_DEBUG` all `//#define`).
+- Checklist rows carry `(Ara: CHn)` marks in every section Ara touched (checked by grep: sections 1, 3, 7 and the registration / key lists).
+- Aisha plan: "What Ara took" paragraph added; "Phase CH-N" block rewritten from CHNa / CHNb / CHNb2.
+- **`IsStateRegistered` stand-in kept, not retired.** Its debug line is compiled out, so the walk logs cannot show a refusal either way; CH6's scan found every chain state registered, so the guard never fires and removing it needs a code edit and a play-test build for no gain. It stays inside `_SKILL` (listed in `MODS.md`).
+- Backlog Stage 7 note, `stage7-plan` row 6, `STATUS.md` (block moved to `STATUS_ARCHIVE.md`, *Closed plans* row). Elesis's gates on char-ara were dropped by the user the same day (kickoff amended): nothing unblocked here.
+- Owed to the user: the awakened end-of-dungeon picture re-test on 34 / 124 (CH6 note; one dungeon with 3 beads).
+- Routed out (no new plan): `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` -> Stage 9; `BBT_CHANGE_NOW_HP_PER_SECOND`, `BFT_TIME`, `IMMUNITY_EDT_LIST_AT_THIS_STATE` -> Stage 2 (no June reader); class-change guide cases 1551 / 1552 and the 34 / 124 cash-shop change-item maps -> Stage 9; Asura berserk face KEM 433 lines = June's own data.
+
 ## Play-test hand-off (every phase)
 
 Dev console first; copy-ready lines with real values (unit, class, skill id and slot, `/additem`, `/qdone`); per check: where / paste /

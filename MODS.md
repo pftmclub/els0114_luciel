@@ -6636,6 +6636,26 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_ARA_SKILL` ( no new define; `_SKILL_DEBUG` stays 
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ARA_TRANSCEND` ( and the `_SKILL` cases with `_SKILL` ), `python tools/build.py --deploy`; restore `data036.kom` from `kom_backup_tools/data036.kom.20261112_090326` for the LevelUpEvent row.
 - **Save.** Units 98 / 48 / 104 set transcendence 1 with A-5 / B-5 slots for the play-test ( backup `db_backup/els_db_20261112_090317_pre_pre_ara_ch3d.sql` ).
 
+### June character: Ara, the whole port (char-ara, closed 2026-11-12)
+
+Plan `JUNE_CHARACTER_ARA_PHASES.md` (CH0-CH6, CHNa / CHNb / CHNb2, Z; 119 commits from 2026-11-10 before Z); per-phase entries are the `Stage 7 Ara` sections above. All seven classes (7, 28, 31, 118, 119 + the June-only Little Specter 34 and Asura 124) run on June's class core, force power / berserk (March's live code, June's rework), Specter states and tails, skills, passives, cut-in table, class path and transcendence rows. CH6 walk PASSED (units 96-99, 102-110, 135-141; the becoming-transcended transition on 139 / 140 / 141; 0 KEM_ERROR, 0 Motion Error).
+
+| Flag (all in `KTDXLIB/Always.h`) | What it holds |
+|---|---|
+| `SERV_IRUHADEV_JUNE_CHAR_ARA_CORE`, `_LIVE`, `_FP`, `_SPECTER` | class core (inert until LIVE); LIVE is the switch (June's bodies inside March's `CX2GUAra` functions, March's in `#else`); FP = force power / berserk; SPECTER = Specter states and tails (`_FP` / `_SPECTER` need `_LIVE`; `_LIVE` needs `JUNE_CHAR_CHAIN_ANIM_SPEED`) |
+| `SERV_IRUHADEV_JUNE_CHAR_ARA_SKILL`, `_LOCKON`, `_STACK`, `_TRANSCEND` | skill states CH2 / CH3 (incl. the `IsStateRegistered` chain guard); June `ProcessLockOn`; add-N-stacks path; 118 / 119 / 124 transcended hyper actives, allow-list, pictures |
+| `SERV_IRUHADEV_JUNE_CHAR_ARA_PASSIVE`, `_UI`, `_CLASS` | CH4a-CH4b passives, 0x780 hook, death gate; CH5 cut-in table and lobby orb retirement; 34 / 124 gauge arm, creation screen third line, portraits, awakened end picture |
+| `SERV_IRUHADEV_JUNE_CLASS_PATH`, `SERV_IRUHADEV_JUNE_CLASS_CHANGE_GUIDE` | **class-generic, the base Elesis (35 / 125) and Add (33 / 36 / 123 / 126) reuse:** the June-only class path (skill-level socket bound, `GetClassLevel`, third-line table) and the level-15 / level-35 guide dialogs and `UICustomEventProc` |
+| `SERV_IRUHADEV_JUNE_CHAR_SPECTER_STATE`, `SERV_IRUHADEV_JUNE_CHAR_CHAIN_ANIM_SPEED`, `SERV_IRUHADEV_JUNE_USER_LANDING_PREDICTION` | class-agnostic engine pieces CH1 / CH1g added |
+
+No `SERV_IRUHADEV_JUNE_CHAR_ARA_*_DEBUG` flag is defined (`_FP_DEBUG`, `_SKILL_DEBUG`, `_PASSIVE_DEBUG`, `_CLASS_DEBUG` all commented out, retired in their reviews). Stand-in kept: `CX2GUAra::IsStateRegistered` (CH2dx, inside `_SKILL`) refuses a chain step into an unregistered state; CH6 showed every chain state registered, so it never fires. JUNE_BUGS rows for Ara: 582-622 (grep `Ara`).
+
+**Stat rows:** none written for 34 / 124. The user's flat StatTable (one curve for all 123 ids, `statflat.py check`: 12177 rows, 123 classes) is already packed in the live data036, so `StatTable.lua` carries 34 / 124 and the type-fallback path is not reached.
+
+**Data (one deploy unit):** CH0b staged 5,886 June files byte-exact into 34 koms (5,562 new, 324 replaced; backup `kom_backup_stage_june/20261110_164654`; new `data205` and `data217`); CH1 final adopted `Ara_Martial_Artist.lua` as June's bytecode and replaced `Motion_Ara_LD.x` / `_SD.x` in data033 (backup `kom_backup_stage_june/20261111_121404`); data036 core-list source: `Enum.lua` (USER_STATE_ID, ARA_STATE_ID, 24 `LUEMCUM_*` names, `CUSTOM_RENDER_STATE`), `UnitTemplet.lua` (Ara's blocks plus 34 / 124), `LevelUpEvent.lua` (`TYPE6`, level 15 / 35 guides); `CorrelateUnitClassTemplet.lua` June's bytecode; data034 class-change guides; data215 transcended portrait pairs; data057 `character_info_07` texture + TET; `X2OfflineClassChangeSeed.h` unchanged (the quest route does not read it).
+
+**Revert, in this order:** (1) comment out `SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE` (the other Ara flags then compile March's code; `_FP` / `_SPECTER` / `_SKILL` / `_PASSIVE` / `_TRANSCEND` go with it); keep `JUNE_CLASS_PATH` / `JUNE_CLASS_CHANGE_GUIDE` while Elesis / Add are ported on them; (2) restore data036 from the `kom_backup_tools/data036.kom.*` backups and `kom.py copy data036`; (3) restore data033 and the replaced motion / texture files from the `kom_backup_stage_june` backups above, `kom.py pack` / `copy` the koms; (4) `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Exe, data036, data033 and the motion koms must change together. Save: units 96-110 and 135-141 were added for the walk.
+
 ## June villages and rest areas, Lanox rest NPCs, field-name banner, Sander sign board (W3, 2026-11-12)
 
 No flag, no exe change (data only). Requested by the user in one message; kom copies done, play-test owed.

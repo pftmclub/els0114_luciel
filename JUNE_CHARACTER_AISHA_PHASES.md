@@ -2426,23 +2426,28 @@ CH0 decides the adoption needs a reader fix) and `SERV_IRUHADEV_JUNE_CHAR_ARME_U
 - **Deploy:** `DEPLOY OK: X2_offline.exe is 25,654,784 B, dated 2026-10-21 11:59:12, md5 d02432b4d8c591804a7cb8d78cc85663, equal to X2/US_SERVICE/x2.exe (2026-10-21 11:59:04); built at main 40c1064f + 5 uncommitted code file(s)`
   (the uncommitted files are the running CH2a's). User owes nothing.
 
-## Phase CH-N - A June-only later class path (template; not run for Aisha)
+## Phase CH-N - A June-only later class path (rewritten by char-ara Z, 2026-11-12, from what Ara's CHNa / CHNb / CHNb2 took)
 
-Written here so Stage 7 does not rediscover it. The first character with a templet-backed June-only class runs it as its own phase. The
-candidates are Ara 34 / 124, Elesis 35 / 125 and Add 33 / 36 / 123 / 126. Third jobs (`UC_150`-`UC_186`) are out of scope (Context).
-
-- **Class enum.** The C++ `UNIT_CLASS` entry, flag-gated. `Enum.lua` already has 31 June names (S3). `UNIT_CLASS` is client-side (`X2Unit.h`),
-  but check every struct that carries a class for `UC_END`-sized arrays (the socket loader drops classes >= `UC_END` 124).
-- **Templet and motions.** The June `UnitTemplet` row (CH5's adoption), the new motion file (e.g. `Motion_Ara_LS.x`), and the job start / win /
-  lose state blocks.
-- **Job change.** June's class-change route for the new class: the quest (`CJT_*`, quest-system Q1), the cash item, and the emulator's
-  class-generic handlers (`Handlers_Quest.cpp:555-590`, `Handlers_Shop.cpp`). Add the class to `X2OfflineClassChangeSeed.h` / `X2OfflineLuaEnumSeed.h`.
-- **Skills.** Tree rows for the class: `s3_reform_ids_no_state.tsv` has none for June-only classes, so regenerate it with the class added.
-  Free rows go to `SeedJuneAutoLearn` (`X2OfflineJuneSkillAutoLearn.h`, `tools/data/june_skill_autolearn.tsv`).
-- **Stat rows (open decision, backlog "Open decisions that gate stages").** A2's permission does not extend to a new class ID. First look for
-  June data (June binary, June server Lua, the live DB). If there is none, ask the user, then use A2's generator (`june2017_re/cap99_gen.py`)
-  only with their yes. Until then the loader falls back to the base class's rows and logs it.
-- **Starter items.** None needed: a later path is reached by job change, not creation.
+Ara ran it first (34 / 124); Elesis (35 / 125) and Add (33 / 36 / 123 / 126) reuse it under the class-generic flags `SERV_IRUHADEV_JUNE_CLASS_PATH` and
+`SERV_IRUHADEV_JUNE_CLASS_CHANGE_GUIDE`. Third jobs (`UC_150`-`UC_186`) are out of scope (Context). Three phases, in this order:
+- **CHNa, the class itself (Opus, user play-test).** The `UNIT_CLASS` entry flag-gated (`_ENUM_NAMES`), then, **first**, the class's arm in
+  `X2GageManager.cpp` (June `3248e290`): without it `CX2GU<Class>`'s `static_cast` to the gauge data reads a smaller object and crashes. Then
+  `GetX2UnitClassCompatibility` (item classes), `GetUnitClassByTierAndLine` / the third-line table (June `3234b390`), `GetClassLevel` (June
+  `3234c170`), the portraits (`GetCharacterImageName` index rows decoded from June `31ee0de0`'s static initializers; stage the portrait
+  sheets with `kom.py stage-june`, 22 files for Ara), the stat chart, and the socket loader bound (`X2SocketItem.cpp`: `> UC_AIN_ANGEL`, not
+  `>= UC_END`; 996 rows dropped before). `CorrelateUnitClassTemplet.lua` is June's bytecode (`adopt-june`). A creation-screen sheet March also has
+  (`..._character_info_07`) is replaced by June's whole (class name, story text and radar chart read from it). `createchar.py` CLASSES + PARENT
+  gain the class. Stat rows: follow the user's flat StatTable (`statflat.py check`), no per-class rows. Play-test: creation screen (model, costume, chart),
+  a dungeon; a debug line per arm, retired in the review.
+- **CHNb, job change and the guides (Opus, user play-test).** The quest route is June's `FieldQuest.lua` (no change; `Handlers_Quest.cpp` turn-in takes
+  any class). `LevelUpEvent.lua` (core-list source): level-15 / level-35 rows open June's `DLG_1ST_` / `DLG_2ND_Class_Change_Guide_<Class>` dialogs. The buttons
+  send June-only messages: `luabind.py check` on the dialogs, add the `LUEMCUM_*` members to `Enum.lua` and `X2LVUpEventMgr.h`, port `UICustomEventProc` whole
+  (`327127a0`), `OpenClassChangeGuideItem` (`3222a4f0`) and the class -> change-item map. Routed to Stage 9: cases 1551 / 1552 and the cash-shop change-item maps.
+- **CHNb2, the guide's `CheckLevel` helper (`32713c10`).** Word-wrap of the class descriptions and the 2ND guide fill (name, line portrait, rebound buttons,
+  skill / command lists). Plan it with CHNb for the next class: the placeholders ("Primary Skill") show until it lands.
+- **Skills, transcendence and the end picture.** The class's skills go in CH2 / CH3 (Ara: CH2d, CH3c). Its transcended pair `TR_<CLASS>_*` goes in CH3d's
+  `GetCharacterImageName` overload. **Check `SetDungeonClearTexture` (`X2StateDungeonGame.cpp`) for the new class ids: the awakened (`IsFullHyperMode()`) picture
+  fell into `default` for 34 / 124** (CH6 walk fix).
 
 ## Phase CH6 - Whole-character walk and gap reruns
 
@@ -2577,6 +2582,10 @@ The new characters (Stage 8) follow the same asset rule: every June asset of the
 **What Rena took (2026-11-07 .. 2026-11-10, 95 commits).** Planned at 17 CH1 sub-phases up front; the run ended at 22 (CH1a-CH1q with the d2 / f2 / g2 / g3 / q2 splits, plus the CH1 deploy unit), CH2 at 5 (a-d, d0), CH3 at 6 (a, b, b2, c, c0, d), CH4 at 2 (a, b), CH5 and CH6 at 1 each, Z docs only. 33 kickoffs planned, 71 files by the end (reviews per CH stage from 2026-11-10).
 - Lessons: (1) natural force was March's dormant `ADD_RENA_SYSTEM` code; decision 1 = (a) kept it as the base and it fitted two sub-phases (CH1q, CH1q2) with a `ServerDefine.h` second home. (2) The trap summons (4 June `CreateNPCReq` sites) needed their own spawn-rule phase before the skills (CH2d0), and a 2083 NPC row plus only-target hits on NPCs needed CH3b2. (3) Reviews fixed a real defect in CH1f, CH1h, CH1o and CH3b2; keep them. (4) The Night Watcher hook was March's own `UpdateStartOfDelayedFiring` chain (CH3c0, no code). (5) CH6 reran the scans (`no_state` 260 -> 61 rows, 35 ids, 0 unexplained) and walked the transition on 102 / 103 / 114. (6) Every `_DEBUG` flag was retired in its review; none left at Z. (7) A skill-phase review per CH stage (not per phase) kept the review cost down.
 - Model choices: Opus for CH0, the engine and shared-code phases and their reviews, and the uncarved reads; Sonnet for the transcriptions, CH5, CH6 and Z.
+
+**What Ara took (2026-11-10 .. 2026-11-12, 120 commits).** Planned at 17 CH1 sub-phases up front (38 kickoffs); the run ended at 20 CH1 sub-phases (CH1a-CH1q2 with the d2 / h2 splits, plus the CH1 deploy unit), CH2 at 9 (a, b, b2, c, c2, d, dx, d2, d3), CH3 at 6 (a, a2, b, c, c2, d), CH4 at 2 (a, b), CH5, CH6, CHNa, CHNb and CHNb2 (CH-N, first run), Z docs only; 66 kickoff files (47 phases, 19 reviews). Reviews per CH stage from the start.
+- Lessons: (1) CH-N took three phases, not one: CHNa (class enum, gauge arm, creation-screen third line, portraits, socket bound, `GetClassLevel`), CHNb (job change by quest, level-15 / level-35 guides, `UICustomEventProc` whole) and CHNb2 (the guide's `CheckLevel` helper); a June-only class crashed on the gauge `static_cast` before anything else, so the gauge arm is the first CHNa item. (2) The user's flat StatTable made the stat-row decision moot; ask it at planning, not at CHNa. (3) `luabind.py check` found the guide dialogs' June-only messages and `Enum.lua` gaps: run it on every dialog a class path adds. (4) A sheet March also has (`character_info_07`) is replaced by June's whole, not patched (rule 2026-10-19). (5) The walk found one defect: the awakened end-of-dungeon picture of the June-only classes fell into `default` in `SetDungeonClearTexture`; check that switch for every new class id. (6) A chain step into an unregistered state plays blank (CH2dx): the `IsStateRegistered` stand-in guard covers a stage until its states land. (7) Every `_DEBUG` flag was retired in its stage review; none left at Z.
+- Model choices: Opus for CH0, the engine pieces (CH1q, CH1q2, CH2b0, CH2c0), CH-N and every review; Sonnet for the transcriptions, CH5, CH6 and Z.
 
 What differs per character, as known on 2026-10-22 (gap = June attacks whose damage is numerical-only; `l.` = checklist line):
 
