@@ -418,7 +418,7 @@ Full rows in `STATUS_ARCHIVE.md`.
 | char-elsword | `JUNE_CHARACTER_ELSWORD_PHASES.md` | cut-in item override -> Stage 12; camera keys -> Stage 9; Wind Slicer icon gap = June (`JUNE_BUGS` 520) |
 | char-raven | `JUNE_CHARACTER_RAVEN_PHASES.md` | Shadow Step base-id question (`JUNE_BUGS` 559, the user's call); skill icon misses = June (`JUNE_BUGS` 535 / 552) |
 | char-rena | `JUNE_CHARACTER_RENA_PHASES.md` | skill icon gaps = June (`JUNE_BUGS` 561 / 576); camera pair -> Stage 9; `IMMUNITY_EDT_LIST_AT_THIS_STATE` -> Stage 2 |
-| char-ara | `JUNE_CHARACTER_ARA_PHASES.md` | awakened end-picture re-test on 34 / 124 (user); camera pair -> Stage 9; `IMMUNITY_EDT_LIST_AT_THIS_STATE`, `BBT_CHANGE_NOW_HP_PER_SECOND`, `BFT_TIME` -> Stage 2; guide cases 1551 / 1552, 34 / 124 cash-shop change items -> Stage 9 |
+| char-ara | `JUNE_CHARACTER_ARA_PHASES.md` | camera pair -> Stage 9; `IMMUNITY_EDT_LIST_AT_THIS_STATE`, `BBT_CHANGE_NOW_HP_PER_SECOND`, `BFT_TIME` -> Stage 2; guide cases 1551 / 1552, 34 / 124 cash-shop change items -> Stage 9 |
 | june-enum-names | `JUNE_ENUM_NAMES_PHASES.md` | - |
 | june-march-divergence | `JUNE_MARCH_DIVERGENCE_PHASES.md` | june-engine R6c / R12c / R14c / R15, june-charinfo C4 add-on, Stage 36, Stage 9 (Korean-sound option) |
 | june-charinfo | `JUNE_CHARINFO_PHASES.md` | Customize -> Stage 12, Resonance -> Stage 30, Achievement -> Stage 31, Lu/Ciel and Rose switching -> Stage 8 (STUB clicks); light option, cursor modes -> Stage 9 |
