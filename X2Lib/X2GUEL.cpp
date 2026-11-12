@@ -10075,7 +10075,11 @@ void CX2GUEL::ESI_SI_A_EL_DODGE_AND_SLASH_StartFuture()
 {
 	CommonStateStartFuture();
 	// 스킬키 재입력 체크를 위해 입력한 스킬키에 대한 정보 설정
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );	// char-elesis CH1p: June 32b72740 @32b7275e: the held key in June's slot space ( A 0-4, B 5-9 )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.InitCurrentSkillKeyManager( m_iNowSpecialAttack - 1 );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	// 재사용 횟수 초기화
 	m_uiDodgeAndSlashReuseCount = m_uiDodgeAndSlashMaxReuseCount;
@@ -10083,14 +10087,22 @@ void CX2GUEL::ESI_SI_A_EL_DODGE_AND_SLASH_StartFuture()
 void CX2GUEL::ESI_SI_A_EL_DODGE_AND_SLASH_EventProcess()
 {
 	// 스킬 슬롯 체인지 사용 여부 체크
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b727f0 @32b727fe: a slot swap moves the held key by 5, not March's 4
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.CheckSkillSlotSwap();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
 	}
 	else if ( m_uiDodgeAndSlashReuseCount > 0 &&
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+			  true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) )	// char-elesis CH1p: June 32b727f0 @32b72852
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 			  true == m_sCurrentSkillKeyManager.IsPressedCurrentSkillKey(m_InputData) )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	{
 		StateChange( ESI_SI_A_EL_DODGE_AND_SLASH_SECOND );
 	}
@@ -10187,7 +10199,11 @@ void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_EventProcess()
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_StartFuture()
 {
 	CommonStateStartFuture();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );	// char-elesis CH1p: June 32b72cc0 @32b72d5c
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.InitCurrentSkillKeyManager( m_iNowSpecialAttack - 1 );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_Init()
 {
@@ -10202,7 +10218,11 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_Init()
 }
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b85470 @32b854b9
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.CheckSkillSlotSwap();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
@@ -10210,7 +10230,11 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_EventProcess()
 	}
 	// 스크립트에서 SKILL_CANCEL_AFTER로 지정된 시간 이후, 스킬 키가 입력 되면 처리
 	else if( m_fSkillCancelAfter >= 0.f && m_fSkillCancelAfter < m_pXSkinAnimFuture->GetNowAnimationTime() &&
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) )	// char-elesis CH1p: June 32b85470 @32b8551f
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		true == m_sCurrentSkillKeyManager.IsPressedCurrentSkillKey(m_InputData) )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	{ 
 		// MP체크
 		if ( GetNowMp() < m_fMPConsume )		
@@ -10266,7 +10290,11 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_2nd_StartFuture()
 
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_2nd_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b85470 @32b854b9 ( the 2nd state shares the function )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.CheckSkillSlotSwap();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
@@ -10274,7 +10302,11 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_2nd_EventProcess()
 	}
 	// 스크립트에서 SKILL_CANCEL_AFTER로 지정된 시간 이후, 스킬 키가 입력 되면 처리
 	else if( m_fSkillCancelAfter >= 0.f && m_fSkillCancelAfter < m_pXSkinAnimFuture->GetNowAnimationTime() &&
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) )	// char-elesis CH1p: June 32b85470 @32b8551f
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		true == m_sCurrentSkillKeyManager.IsPressedCurrentSkillKey(m_InputData) )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	{ 
 		// MP체크
 		if ( GetNowMp() < m_fMPConsume )
@@ -11178,7 +11210,11 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_START_Start()
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_START_StartFuture()
 {
 	// 익스팅션 충전 완료를 체크하기 위한 스킬 키 설정
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );	// char-elesis CH1p: June 32b5b870 @32b5b883
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.InitCurrentSkillKeyManager( m_iNowSpecialAttack - 1 );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	
 #ifdef FIX_NOT_DRAWING_EXTINCTION_GUIDE_UI
 	DestoryExctionUIEffect();	
@@ -11214,14 +11250,22 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_CHARGE_FrameMoveFuture()
 }
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_CHARGE_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b5bbe0 @32b5bbeb
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.CheckSkillSlotSwap();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	// 최대 충전 시간 초과 시 공격 모션으로 변경
 	if( m_fExtinctionRemainTime >= _CONST_EL_::MAX_EXTINCTION_CHARGE_TIME )
 	{
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_ATTACK );		
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	else if( true == m_kSkillSlotKey.IsKeyReleased( m_InputData ) )	// char-elesis CH1p: June 32b5bbe0 @32b5bc22
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	else if( true == m_sCurrentSkillKeyManager.IsUnpressedCurrentSkillKey( m_InputData ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	{
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_ATTACK );
 	}
@@ -11327,14 +11371,22 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_DEGREE_UP_FrameMove()	// 각도 조절
 }
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_DEGREE_UP_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b5c0c0 @32b5c0cb
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.CheckSkillSlotSwap();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	// 최대 충전 시간 초과 시 공격 모션으로 변경
 	if( m_fExtinctionRemainTime >= _CONST_EL_::MAX_EXTINCTION_CHARGE_TIME )
 	{
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_ATTACK );		
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	else if( true == m_kSkillSlotKey.IsKeyReleased( m_InputData ) )	// char-elesis CH1p: June 32b5c0c0 @32b5c103
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	else if( true == m_sCurrentSkillKeyManager.IsUnpressedCurrentSkillKey( m_InputData ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	{
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_ATTACK );
 	}
@@ -11390,14 +11442,22 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_DEGREE_DOWN_FrameMoveFuture()
 }
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_DEGREE_DOWN_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b5c400 @32b5c40b
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.CheckSkillSlotSwap();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	// 최대 충전 시간 초과 시 공격 모션으로 변경
 	if( m_fExtinctionRemainTime >= _CONST_EL_::MAX_EXTINCTION_CHARGE_TIME )
 	{
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_ATTACK );		
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	else if( true == m_kSkillSlotKey.IsKeyReleased( m_InputData ) )	// char-elesis CH1p: June 32b5c400 @32b5c443
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	else if( true == m_sCurrentSkillKeyManager.IsUnpressedCurrentSkillKey( m_InputData ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	{
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_ATTACK );
 	}
@@ -12411,7 +12471,11 @@ void CX2GUEL::ESI_A_SGM_DRASTIC_CHARGE_START_EventProcess()
 
 void CX2GUEL::ESI_A_SGM_DRASTIC_CHARGE_START_StartFurture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );	// char-elesis CH1p: June 32b50be0 @32b50bf1
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.InitCurrentSkillKeyManager( m_iNowSpecialAttack - 1 );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CommonStateStartFuture();
 }
 
@@ -12419,7 +12483,11 @@ void CX2GUEL::ESI_A_SGM_DRASTIC_CHARGE_START_StartFurture()
 // 드래스틱 차지 루프
 void CX2GUEL::ESI_A_SGM_DRASTIC_CHARGE_LOOP_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b5fe60 @32b5fe6d
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.CheckSkillSlotSwap();		// 스킬 슬롯이 변경되었는가?
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )									// Animation End 일 때
 	{
@@ -12433,7 +12501,11 @@ void CX2GUEL::ESI_A_SGM_DRASTIC_CHARGE_LOOP_EventProcess()
 
 	else if ( m_fDrasticChargeNowLoopTime >= _CONST_EL_::MIN_DRASTIC_CHARGE_LOOP_TIME )	// 최소 시간을 지나갔다면
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		if ( true == m_kSkillSlotKey.IsKeyReleased( m_InputData ) ||	// char-elesis CH1p: June 32b5fe60 @32b5fedb
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		if ( true == m_sCurrentSkillKeyManager.IsUnpressedCurrentSkillKey( m_InputData ) || 	// 키 입력이 입력되지 않았거나 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 			 m_fDrasticChargeLoopDecreaseMPValue > GetNowMp() )								// 마나가 적을 경우
 		{
 			StateChange( ESI_A_SGM_DRASTIC_CHARGE_END );									// End 로 진행

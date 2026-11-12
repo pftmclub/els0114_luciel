@@ -107,7 +107,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH1p | **ready** (CH1o review passed 2026-11-13): pressed index (7ag), hooks, June-only script keys, reserved-buff ids | Opus 5.5 / high, Opus review | CH1o review | `X2GUEL.*`, `X2GUUser.*`, Always.h | `CH1p.md` |
+| CH1p | **done 2026-11-13, review next** (`CH1p-review.md`): UT_ELESIS in the shared reader, 18 held-key calls on June's 0-9 key; keys / hooks / buffs = no code | Opus 5.5 / high, Opus review | CH1o review | `X2GUEL.*`, `X2GUUser.*`, Always.h | `CH1p.md` |
 | CH1q | blocked (CH1p review): Way of the Sword class side + gauge twins, flag `_WOS` | Opus 5.5 / high, Opus review | CH1p review | `X2GUEL.*`, `X2GageData.*`, `X2GageUI.*`, `X2GUUser.cpp`, `X2DamageEffect.cpp` | `CH1q.md` |
 | CH1 | blocked (CH1q review, CH0b): `_LIVE` on, June script, play-test on 8 / 29 / 30 / 120 / 121 | Opus 5.5 / high, Opus review, user play-test | CH1q review, CH0b | Always.h, data036, motion koms | `CH1.md` |
 | CH5 | blocked (CH1 review): `UnitTemplet` rows, cut-in table, creation screen (Grand Master, Blazing Heart) | Sonnet 5.5 / high, Opus review, user play-test | CH1 review | `UnitTemplet.lua`, `X2GUEL.cpp` cut-ins, `X2StateCreateUnit.*`, `X2UnitViewerUI.*`, data034 | `CH5.md` |

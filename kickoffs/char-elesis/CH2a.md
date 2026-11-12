@@ -53,3 +53,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Skill ids** (14): 28000, 28001, 28002, 28003, 28004, 28026, 28027, 28028, 28029, 28030, 28200, 28201, 28217, 28218.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52, L331, L728.
 - **`ch0_wos.tsv` rows:** 2 (filter on its `proposed_phase` column).
+
+## Amended by CH1p (2026-11-13): held skill keys
+
+Dodge and Slash (`32b72740` StartFuture, `32b727f0` EventProcess) already reads June's `m_kSkillSlotKey` (`Set`, `FollowSlotSwap`, `IsKeyPressedOnce`) under `_LIVE`, March's `CurrentSkillKeyManager` call in `#else` at each spot: transcribe the rest of both bodies around those lines. June-only key reads to add with their states: Attack Z `32b6eaa0` (`IsKeyPressedOnce` @32b6eaf1), Sonic Assault memo `32b4f800` / `32b4f840` (new).

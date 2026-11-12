@@ -1190,6 +1190,57 @@ exit 0, 0 errors x5. No `_DEBUG` define. Full build skipped: no play-test.
 
 **Nothing to play-test.** CH1p kickoff checked (unchanged). Next: `/x2-phase char-elesis CH1p` (Opus 5.5 high).
 
+### CH1p - Done (2026-11-13)
+
+**Her pressed index is June's 0-9 everywhere it is read; one shared reader joined, 18 held-key calls moved, no new flag.** All under
+`SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` (still `//#define`), March's code in `#else`, every block tagged `// char-elesis CH1p`. Read from the exe bytes
+(`dispsweep.py 8ac0 8b58 88bc 8ea0 8ea4 8ea8` filtered to `32b4e770-32b90b6f`, `funcdis.py` at each hit) and the `.i` of `X2GUEL.cpp`, `_LIVE` off / on.
+
+**7ag, the pressed-index space.**
+- **Class side: June's already (CH1k).** `CanUseSpecialAttack` `32b84a50` stores the 0-9 slot in `m_iChosenSkillSlotIndex` (`+0x8ea4`, `@32b8545c`);
+  `SpecialAttackEventProcess` `32b4ee20` writes `m_iNowSpecialAttack = slot + 1` (`+0x88bc`, `@32b4eec3`). March's `> 3` / `- 4` decode and `CountUsedSkill`
+  sit only in the `#else` of `CanUseSpecialAttack` / `StateChangeSpecialAttack`. She has no `GetPressedSkillState` caller; `+0x8ac0` has no hit in her range.
+- **Shared reader.** `CommonSpecialAttackEventProcess` (June `31fcadd0`): `UT_ELESIS` joins the June set (`X2GUUser.cpp`, a new outer `_LIVE` level over
+  Ara's chain; the stand-in comment now names Add only).
+- **`CurrentSkillKeyManager` (March 4 + 4) fed June's 0-9: replaced at every call.** June's `+0x8b58` is `CX2GUUser::m_kSkillSlotKey` (Eve CH1j20). The 23
+  `lea ecx, [r+0x8b58]` sites in her range call only `31fce6d0` `Set`, `31fce670` `FollowSlotSwap`, `31fc89a0` `IsKeyReleased`, `31fc8900` `IsKeyPressedOnce`:
+  March's `InitCurrentSkillKeyManager` / `CheckSkillSlotSwap` (swap step 4, June 5) / `IsPressedCurrentSkillKey` / `IsUnpressedCurrentSkillKey` one for one.
+  Each of March's 18 calls takes June's call at the same spot: Dodge and Slash `32b72740` / `32b727f0`; Rushing Sword `32b72cc0` / `32b85470` (1st start, 1st and
+  2nd event process); Extinction `32b5b870` start, `32b5bbe0` charge, `32b5c0c0` degree up (goes to state 0xdd, the down state), `32b5c400` degree down;
+  Drastic Charge `32b50be0` start, `32b5fe60` loop. `Set`'s argument is `[+0x88bc] - 1` (`dec`, `@32b72756`). The rest of each body is CH2a / CH2b / CH2b2 /
+  CH3a2's; kickoffs amended. `.i`: `m_sCurrentSkillKeyManager.` 18 off / 0 with `_LIVE`, `m_kSkillSlotKey.` 0 / 18.
+- **Other `+0x8b58` users** are June-only reads in states March gives no key test: Judgement Drive `32b50430` / `32b50480` (CH2b), Attack Z `32b6eaa0` and
+  Sonic Assault memo `32b4f800` / `32b4f840` (CH2a), Ejection Buster `32b51b90` (CH2d), Provoke `32b50b00` / `32b85aa0` (CH3a2), Rushing Sword 3rd (CH2b2);
+  `32b4f660` / `32b4f6d0` are dead (CH0). Checklist 7ag gets an Elesis paragraph.
+- **Guard** in `Always.h` (+9, pure insertion): `_LIVE` needs `JUNE_SKILL_SLOT_10`, `JUNE_CHAR_EVE_CORE` (`SkillSlotKey`) and `JUNE_CHAR_CHUNG_CORE`
+  (`IsKeyPressedOnce`); the `_LIVE` probes prove all three are defined there.
+
+**Hooks 7h / 7l / 7o / 7p / 7x.** 7h `InitWaitStateChange( "ESI_WAIT_STATE_CHANGE" )` (`X2GUEL.cpp:472`) and 7l `InitBoundingStates( "ESI_" )` (`:3183`) are
+CH1m's. 7o `SET_LIMIT_MAX_G_SPEED` x1 (reader `X2GUUser.cpp:16745`), 7p `TIME_STOP_IMMUNE_STATE` x3 (`:18385`), 7x `AT_COMMAND` x60 / `AT_SPECIAL` x11 are
+script data `ELESIS_KNIGHT.lua` brings in CH1 final; their readers are live and class-generic.
+
+**The script keys CH0 gave this phase** (all "both", March reads them): the four `EFFECT_SET_LIST_*` variants in `LoadEffectSetFromScript`
+(`JUNE_EFFECT_SET_LIST_VARIANTS`, `X2GUUser.cpp:50101-50143`, called from `CommonStateStart`; she has no override); `IGNORE_DEFENCE_DECLINE` / `IGNORE_STATE_DEFENCE`
+in `SetDamageDataFromLUA` (`X2DamageManager.cpp:755` under `JUNE_BUFF_NEW_STAT`, `:766` under `UPGRADE_RAVEN`, both defined); `RELATIVE_SKILL_LEARN_CHECK` in
+`ParsingBuffFactorID` (`X2GUUser.cpp:48935`) and the damage manager (`:5338`, `:5483`). No reader to write, so no `CH1p0`.
+
+**Reserved buffs (7ai).** S3e's `ParsingBuffFactorID` (June `31fe32d0`, whole) takes the skill from `BUFF_FACTOR_RELATIVE_SKILL_ID`, and her states carry
+June ids through CH1i's `SetEquippedSkillLevel`: nothing to write. June's script keys Endurance Power `_ACTIVE` (`BFI_BUFF_SUPER_ARMOR`) / `_MEMO`
+(`BFI_ELESIS_ENDURANCE_MEMO`) with relative 0, Dodge and Slash / Rushing Sword x3 with 28402 `RNSI_P_SGM_AGILITY_MASTERY` + learn check, Sword Fire fly /
+ground with 28210 `RNSI_A_SBH_FLAME_SWORD`; June's Flame Sword state has no table. **The `[JUNE_SKILL] SBUF` lines are gone**: skill-system Z
+(`66669d39`) removed `SERV_IRUHADEV_JUNE_SKILL_DEBUG`. The CH1 kickoff is amended: CH1 adds a temporary `[JUNE_CHAR] ELESIS SKILL SBUF` line under
+`_DEBUG` and tests these states plus a held B-slot key skill.
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `X2GUEL.cpp` PASS +72, `X2GUUser.cpp`
+PASS +5; `files: 2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`, `0 deleted line(s), 0 non-ASCII inserted, 6 EOL-mismatched, 0 #else/#endif without the
+flag token, 0 encoding change(s)`; RESULT FAIL only for `define: NOT FOUND` (`//#define`). The 6 EOL lines are the two trios before Extinction charge /
+degree up: they take their anchor's CRLF after a studio LF-only `{`. `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `allow-listed: 7`,
+`RESULT: PASS`. `enumscan.py --check` the two: `0 A/B row(s)`. One-file probes (`census.cl_cmd`, `/c /Zs /EHsc`, no PCH): both files off / `_LIVE` / `_LIVE` +
+`_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`: exit 0, 0 errors x6 (38 / 39 warnings, unchanged). No `_DEBUG` define. Full build skipped: no play-test. No
+`JUNE_BUGS` row; no funcmap row (the key calls are partial; the owning phases mark the functions PORTED).
+
+**Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1p review` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

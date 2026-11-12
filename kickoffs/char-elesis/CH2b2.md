@@ -54,3 +54,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52.
 - **`ch0_wos.tsv` rows:** 1 (filter on its `proposed_phase` column).
 - CH0 split off CH2b: actives 28202 Rushing Sword, 28203 Power Break, 28204 Leap Crash (+ their upgrades).
+
+## Amended by CH1p (2026-11-13): held skill keys
+
+Rushing Sword (`32b72cc0` StartFuture, `32b85470` EventProcess, shared by 1st / 2nd / 3rd) already reads June's `m_kSkillSlotKey` (`Set`, `FollowSlotSwap`, `IsKeyPressedOnce`) under `_LIVE` in March's 1st StartFuture and 1st / 2nd EventProcess, March's `CurrentSkillKeyManager` call in `#else` at each spot: transcribe the rest around those lines; March's 3rd EventProcess reads no key, June's does.

@@ -53,3 +53,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Skill ids** (9): 28005, 28006, 28007, 28033, 28036, 28045, 28219, 28225, 28226.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52, L908.
 - CH0 split by skill: CH2b = 28005 / 28006 / 28007 (special actives), CH2b2 = 28202 / 28203 / 28204.
+
+## Amended by CH1p (2026-11-13): held skill keys
+
+Extinction (`32b5b870` StartFuture, `32b5bbe0` charge, `32b5c0c0` degree up, `32b5c400` degree down) already reads June's `m_kSkillSlotKey` (`Set`, `FollowSlotSwap`, `IsKeyReleased`) under `_LIVE`, March's `CurrentSkillKeyManager` call in `#else` at each spot: transcribe the rest of the bodies around those lines. June-only key reads to add: Judgement Drive `32b50430` / `32b50480` (`Set`, `FollowSlotSwap`, `IsKeyReleased`; March's states read no key).

@@ -53,3 +53,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Skill ids** (3): 28205, 28206, 28222.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52, L430.
 - CH0 split off CH3a: actives 28205 Provoke, 28206 Drastic Charge, 28222 Upper Slash.
+
+## Amended by CH1p (2026-11-13): held skill keys
+
+Drastic Charge (`32b50be0` StartFuture, `32b5fe60` loop) already reads June's `m_kSkillSlotKey` (`Set`, `FollowSlotSwap`, `IsKeyReleased`) under `_LIVE`, March's `CurrentSkillKeyManager` call in `#else` at each spot: transcribe the rest around those lines. June-only key reads to add: Provoke `32b50b00` (`Set`) / `32b85aa0` (`IsKeyPressedOnce`; March's states read no key).

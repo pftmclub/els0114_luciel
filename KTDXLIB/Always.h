@@ -12766,3 +12766,12 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE ( ParseCommonRandomStateByUnitClass ), HYPER_MODE_FIX, SERV_IRUHADEV_JUNE_COMMON_RANDOM_STATE, SERV_IRUHADEV_JUNE_EVENT_STATES, SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE and SERV_IRUHADEV_JUNE_BOUNDING_STATE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: June character port ( Elesis ) Phase CH1p - guard only ( no new flag ): her pressed index is June's 0-9 ( SkillSlotKey, IsKeyPressedOnce ) and the shared reader's five-entry slot tables
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ) && ( !defined( SERV_IRUHADEV_JUNE_SKILL_SLOT_10 ) || !defined( SERV_IRUHADEV_JUNE_CHAR_EVE_CORE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_CHUNG_CORE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_SKILL_SLOT_10 ( five-entry slot state tables ), SERV_IRUHADEV_JUNE_CHAR_EVE_CORE ( SkillSlotKey ) and SERV_IRUHADEV_JUNE_CHAR_CHUNG_CORE ( SkillSlotKey::IsKeyPressedOnce )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+//////////////////////////////////////////////////////////////////////////
