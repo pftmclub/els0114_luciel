@@ -848,6 +848,37 @@ All 24 class-map rows of phase CH1h are accounted for: **8 written, 14 = March (
 
 **Nothing to play-test.** Review: none of its own, the CH1k review covers CH1h-CH1k. Next: `/x2-phase char-elesis CH1j` ( Sonnet 5.5 high ).
 
+### CH1j - Done (2026-11-12)
+
+**All 14 class-map rows of phase CH1j accounted for: 7 written ( all `inside`, `_LIVE` ), 7 = March ( no code ).** No function was genuinely `new`: the 7 helper rows CH0 left as `new` are March namesakes ( `ch0_class_map.tsv` rows corrected ). `_LIVE` stays `//#define`. New flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` ( `//#define`, needs `_LIVE`, Always.h ). funcmap rows `Char Elesis CH1j` ( 20 ); `JUNE_BUGS` 635.
+
+| June | Function | Result |
+|---|---|---|
+| `32b70180` | CommonStateStartFuture ( 0x7c0 ) | **inside.** Base first; `m_bIsDashAttackPossible` = now state is neither `ESI_DASH_JUMP_COMBO_SPK_XZ` nor `_XZ_REATTACK` ( June ids 227 / 228 ); in `ESI_SI_SA_SPK_SWORDFIRE_FLY` / `_GROUND` / `ESI_SI_SA_SPK_ETERNAL_FIRE` ( 233 / 234 / 236 ) with Blaze Absolu learned ( new `m_usBlazeAbsoluLevel`, +0x97a4 ) `ResetAnimSpeed( m_fAnimSpeed, true, true )` |
+| `32b70220` | CommonStateStart ( 0x7c4 ) | **inside.** Base first, the same anim reset ( bFuture = true: JUNE_BUGS 635 ) |
+| `32b88070` | CommonFrameMove ( 0x7cc ) | **inside.** June's order: base, `WayOfSwordStateChange`, Gale, Chivalry, Drastic / XX-down-X / Snap Crasher stops, Stigma, Fire Blossoms, dash combo delay, Ancient Fire; then the new part: `BloodRunawayProc_FrameMove` ( `32b734d0` ) and `ShadowEdgeRecordFrameMove` ( `32b813d0` ), dash time `m_fDashElapsedTime` ( +0x977c; grows in a dash state, zero otherwise except in Leap Crash 28204 / 28226 ), passive MP rate ( `m_fAdvancedKnightMasteryMPValue` +0x9780 over max( 1, MP ) into `SetAdditionalMPChangeRateByPassive` ), `m_fDashChargeTime` ( +0x9790; grows while dashing, runs down by the frame time after ), `32b7e580` / `32b7e740`, `32b7e9a0`, tail `32b6ff20` |
+| `32b4edc0` | CommonRender_Prepare ( 0x7e8 ) | **inside.** Vigor `CTT_SKYBLUE`, Destruction `CTT_SCARLET` on `m_RenderParam.cartoonTexType` only ( March also set the render type and outline colour ), then the base |
+| `32b7ac20` | ChivalryProc_FrameMove | **inside, differs:** the defence condition is 0.25 when `g_pMain` is in `XS_PVP_GAME` ( +0x8c == 9 ), else 0.5; the attack half = March ( 0.5 ) |
+| `32b7b5f0` | DrasticChargeProc_FrameMove | **inside, differs:** `RNSI_A_SGM_DRASTIC_CHARGE` ( 28206 ) and `_UPGRADE` ( 28228 ) keep the loop effects; March tested 8215 only |
+| `32b87520` | FireBlossomsProc_FrameMove | **inside, differs:** the enchant is read inline from the Blaze / Frozen / Poison timers ( longest wins, ties Blaze then Frozen ), Shock not read; rest = March |
+| `32b4eda0` `32b4edb0` `32b724b0` | CommonStateEndFuture / CommonStateEnd / CommonFrameMoveFuture | **= March** ( base tail jumps; Way of the Sword state into `m_CannonBallCount` ) |
+| `32b6e050` `32b7b6c0` `32b7b760` `32b901c0` | Gale / XX-down-X / Snap Crasher / `IsDashState` | **= March** ( states 240-242 = the three `ESI_COMBO_SGM_XX_DOWN_X_*`, skill 8216 ) |
+
+**Corrections to CH0's map.** `32b734d0` is the Blood Runaway tick ( skill 28414 ), not Fire Blossoms ( that is `32b87520` ): now a `new` row `BloodRunawayProc_FrameMove`, CH4a. `32b7e580` is the Grand Master transcendence tick ( skill 28415 ), a passive: moved CH4c -> CH4a as `GrandMasterTranscendenceProc_FrameMove`. Both, with `ApplyGrandMasterAura`, are declared under `_PASSIVE`; `ShadowEdgeRecordFrameMove`, `TranscendenceBerserkerFrameMove`, `MadnessFrameMove` under `_BLOOD` ( `// June <va>: body in <phase>` ). CH4a / CH4c kickoffs carry an "Amended by CH1j" section. `WayOfSwordStateChange` and `GaleBuffFrameMove` are called by name outside `_WOS`: they are March functions, CH1q replaces the first's body in place.
+
+**Names.** `X2SkillTree.h` ( `JUNE_ENUM_NAMES` ): `RNSI_A_SSK_LEAP_CRASH_UPGRADE` 28226, `RNSI_A_SGM_DRASTIC_CHARGE_UPGRADE` 28228 ( values from `Enum.src.lua` ). `X2GUEl.h` ( `_CORE` ): 4 members with constructor values, see the list above. `_CONST_EL_CH1J_`: the two defence rates.
+
+**Gates.**
+- `flagcheck ..._CORE --with _LIVE _WOS _BLOOD _PASSIVE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `.cpp` PASS +151, `.h` PASS +12; `files: 2 PASS, 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched, 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. `X2SkillTree.h` ( `JUNE_ENUM_NAMES` ) PASS +2. `Always.h`: +12 lines ( the `_PASSIVE` block ), verdict OTHER.
+- One-file `/c /Zs /EHsc` probes of `X2GUEL.cpp`: 0 errors with `_LIVE` off, with `_LIVE`, and with `_LIVE + _WOS + _BLOOD + _PASSIVE`. `cl /P` off / `_LIVE`: `m_usBlazeAbsoluLevel` 2 / 4, `RNSI_A_SGM_DRASTIC_CHARGE_UPGRADE` 1 / 2, `m_fDashChargeTime` 2 / 7. All flags the bodies test resolved ON by `cl /P` ( `BALANCE_PATCH_20131107`, `SERV_ELESIS_SECOND_CLASS_CHANGE`, `SERV_ELSWORD_INFINITY_SWORD`, `ELSWORD_WAY_OF_SWORD` ).
+- `junediverge.py --check` on the three class files: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check`: `0 A/B row(s)`.
+- `bytes>=0x80` before / after: `X2GUEL.cpp` 13,134 / 13,134, `X2GUEl.h` 5,494 / 5,494, `X2SkillTree.h` 23,310 / 23,310, `Always.h` 38,738 / 38,738; pure insertions ( `git diff --numstat` 151 / 12 / 2, 0 deleted ).
+- Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line. No `_DEBUG` define; every new block carries `// char-elesis CH1j`.
+
+**Routed.** CH4a: the three `_PASSIVE` bodies and the writers of `m_usBlazeAbsoluLevel` ( `32b88cdd` ), `m_fAdvancedKnightMasteryMPValue` ( `32b88689`, ability 0x2b of 28404 ), `m_fDashChargeTime`'s thresholds. CH1k: the readers of `m_fDashElapsedTime` ( `32b70d72`, `32b7527e` ) sit in its range.
+
+**Nothing to play-test.** Review: none of its own, the CH1k review covers CH1h-CH1k. Next: `/x2-phase char-elesis CH1k` ( Sonnet 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

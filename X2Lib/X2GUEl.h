@@ -519,6 +519,11 @@ protected:
 	virtual int GetSpecialItemUsableExtraStateID() { return ESI_SWORD_WAIT; }		/// char-elesis CH1h: June 32b90420 ( vslot 0x4ac )
 #endif SERV_IRUHADEV_JUNE_BUFF_QUICKSLOT_ITEM
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	void BloodRunawayProc_FrameMove();				/// char-elesis CH1j: June 32b734d0 ( per-frame Blood Runaway upkeep, called by CommonFrameMove ): body in CH4a
+	void GrandMasterTranscendenceProc_FrameMove();	/// char-elesis CH1j: June 32b7e580 ( RNSI_P_SGM_TRANSCENDENCE ): body in CH4a
+	void ApplyGrandMasterAura();					/// char-elesis CH1j: June 32b7e740 ( Dignity of Grand Master aura ): body in CH4a
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	float GetWayOfSwordPointMultiplier() const;	/// char-elesis CH1h: June 32b903e0 ( vslot 0x720, +0x9714 ): body in CH1q
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
@@ -526,6 +531,9 @@ protected:
 	void ClearShadowEdgeRecords();	/// char-elesis CH1h: June 32b81900 tail ( RemoveShadowEdgeRecord 32b81300 on each record of the +0x9700 list, then the list is cleared ): body in CH4c
 	virtual void OnAttackerDamageReact_Slot4F8( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH1h: June 32b7beb0: body in CH4c
 	virtual void OnAttackerDamageReact_Slot4FC( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH1h: June 32b898a0: body in CH4c
+	void ShadowEdgeRecordFrameMove();		/// char-elesis CH1j: June 32b813d0 ( per-frame upkeep of the Shadow Edge records, called by CommonFrameMove ): body in CH4c
+	void TranscendenceBerserkerFrameMove();	/// char-elesis CH1j: June 32b7e9a0 ( RNSI_P_SCA_TRANSCENDENCE ): body in CH4c
+	void MadnessFrameMove();				/// char-elesis CH1j: June 32b6ff20 ( RNSI_P_SCA_MADNESS, tail-jumped from CommonFrameMove ): body in CH4c
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	void ESI_COMBO_SGM_ZZZX_EventProcess();					/// char-elesis CH1e: June 32b6ad40
@@ -1122,6 +1130,10 @@ protected:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	float m_fDashJumpZXChargeTime;		/// char-elesis CH1g: June +0x96f4 ( Dark Knight dash-jump Z-X charge, 0 to 1 )
 	USHORT m_usDashComboZZZLoopCount;	/// char-elesis CH1g2: June +0x9758 ( Crimson Avenger dash Z-Z-Z loops counted: 0 at Z-Z, +1 per loop state )
+	USHORT m_usBlazeAbsoluLevel;			/// char-elesis CH1j: June +0x97a4 ( level of RNSI_P_SBH_BLAZE_ABSOLU; CH4a writes it )
+	float m_fDashElapsedTime;				/// char-elesis CH1j: June +0x977c ( dash time: grows while a dash state lasts, zero otherwise except in Leap Crash )
+	float m_fAdvancedKnightMasteryMPValue;	/// char-elesis CH1j: June +0x9780 ( ability 0x2b of RNSI_P_SGM_ADVANCED_KNIGHT_MASTERY; CH4a writes it )
+	float m_fDashChargeTime;				/// char-elesis CH1j: June +0x9790 ( grows while dashing, runs down afterwards; CH4a / CH4c read it )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )

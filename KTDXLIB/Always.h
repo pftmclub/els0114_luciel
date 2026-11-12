@@ -12667,6 +12667,18 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-12
+// Description: June character port ( Elesis ) Phase CH1j - her passive ticks CommonFrameMove calls ( Blood Runaway, the Grand Master transcendence and aura ):
+//              declared here, bodies in CH4a. Stays commented out until CH4a; only with _LIVE.
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_PASSIVE ).
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
 // Description: june-stat-calc D2a / D2b - CX2GameUnit::GetFinalDamage as June 32284aa0 from entry to return. D2a (up to @32285ccf):
 //              the attacker-skill hook (June 3229a530: Raven, Rena, Ace in the Hole, Ara), the user passives on June's skill ids
 //              (Confidence / Pride Victory, Manaflow Overdrive, Sharpen Arrow), the world-mission epsilon, the socket stat rates by

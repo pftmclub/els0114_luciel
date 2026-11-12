@@ -49,3 +49,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **`ch0_wos.tsv` rows:** 2 (filter on its `proposed_phase` column).
 - **`ch0_blood.tsv` rows:** 19 (filter on its `proposed_phase` column).
 - `june2017_re/char_elesis/ch0_blood.tsv` (30 rows): 0x4f8 `OnAttackerDamageReact_Slot4F8` = Dark Force HP intake in Vigor (getter 0x724), 0x4fc `_Slot4FC` = Judgment bleeding heal (BFI 465, BTI 99, chance `+0x974c`), 0x734 `OnDefenderDamageReact` = Blood Revenge (BFI 464; `+0x9740` / `+0x9744`; **add the two base virtuals and their calls**: the June user DamageReact `320462a0` calls 0x730 @`320499f7` and 0x734 @`32049a0c`; March has neither, while 0x4f8 / 0x4fc are already called, `X2GUUser.cpp:11355`), Blood Runaway `32b87880`, Madness `32b6ff20`, transcendence berserker `32b7e9a0`, the Shadow Edge list (0x730 `32b816a0` discards its lookup: June no-op kept verbatim; `32b81220` / `32b81300` / `32b813d0`). No split (10 functions + the base hooks).
+
+## Amended by CH1j (2026-11-12)
+
+- `32b7e580` moved to CH4a ( it is the Grand Master transcendence passive, not a blood function ): `awk -F'	' '$7=="CH4c"' june2017_re/char_elesis/ch0_class_map.tsv` lists 10 rows. CH1j declared `ShadowEdgeRecordFrameMove` `32b813d0`, `TranscendenceBerserkerFrameMove` `32b7e9a0` and `MadnessFrameMove` `32b6ff20` under `_BLOOD` and calls them from `CommonFrameMove` ( `32b6ff20` last ); write the bodies in place of the declarations.
+- `m_fDashChargeTime` ( +0x9790 ) belongs to the Grand Master transcendence tick ( CH4a ), not to a blood function.

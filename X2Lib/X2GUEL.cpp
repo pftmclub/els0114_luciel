@@ -191,6 +191,15 @@ namespace _CONST_EL_CH1H_
 }
 using namespace _CONST_EL_CH1H_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1j: constants of Chivalry's defence check ( June 32b7ac20 )
+namespace _CONST_EL_CH1J_
+{
+	const float CHIVALRY_DEFENCE_HP_RATE		= 0.5f;
+	const float CHIVALRY_DEFENCE_HP_RATE_PVP	= 0.25f;	// in a PvP game state
+}
+using namespace _CONST_EL_CH1J_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
@@ -254,6 +263,10 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_usDashComboZZZLoopCount(0)	// char-elesis CH1g2
+, m_usBlazeAbsoluLevel(0)	// char-elesis CH1j
+, m_fDashElapsedTime(0.f)
+, m_fAdvancedKnightMasteryMPValue(0.f)
+, m_fDashChargeTime(0.f)
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 , m_usMadnessLevel(0)	// char-elesis CH1h
@@ -2130,11 +2143,40 @@ CX2GUEL::~CX2GUEL(void)
 /*virtual*/ void CX2GUEL::CommonStateStartFuture()
 {
 	KTDXPROFILE();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1j: June 32b70180 ( the base runs first )
 	CX2GUUser::CommonStateStartFuture();
+	m_bIsDashAttackPossible = ( ESI_DASH_JUMP_COMBO_SPK_XZ != GetNowStateID() && ESI_DASH_JUMP_COMBO_SPK_XZ_REATTACK != GetNowStateID() );
+	switch( GetNowStateID() )
+	{
+	case ESI_SI_SA_SPK_SWORDFIRE_FLY:
+	case ESI_SI_SA_SPK_SWORDFIRE_GROUND:
+	case ESI_SI_SA_SPK_ETERNAL_FIRE:
+		if( 0 < m_usBlazeAbsoluLevel )
+			ResetAnimSpeed( m_fAnimSpeed, true, true );
+		break;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CX2GUUser::CommonStateStartFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 /*virtual*/ void CX2GUEL::CommonStateStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1j: June 32b70220 ( the base runs first; the reset passes bFuture = true as in the future state )
 	CX2GUUser::CommonStateStart();
+	switch( GetNowStateID() )
+	{
+	case ESI_SI_SA_SPK_SWORDFIRE_FLY:
+	case ESI_SI_SA_SPK_SWORDFIRE_GROUND:
+	case ESI_SI_SA_SPK_ETERNAL_FIRE:
+		if( 0 < m_usBlazeAbsoluLevel )
+			ResetAnimSpeed( m_fAnimSpeed, true, true );
+		break;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	CX2GUUser::CommonStateStart();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 			 
 /*virtual*/ void CX2GUEL::CommonFrameMoveFuture()
@@ -2149,6 +2191,81 @@ CX2GUEL::~CX2GUEL(void)
 /*virtual*/ void CX2GUEL::CommonFrameMove()
 {
 	KTDXPROFILE();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1j: June 32b88070 ( base, Way of the Sword, the per-frame passives, then the dash timers and the passive / blood ticks )
+	CX2GUUser::CommonFrameMove();
+
+#ifdef ELSWORD_WAY_OF_SWORD
+	WayOfSwordStateChange();	// June 32b7f370: body in CH1q
+	GaleBuffFrameMove();		// June 32b6e050 = March
+#endif // ELSWORD_WAY_OF_SWORD
+
+	ChivalryProc_FrameMove();	// June 32b7ac20
+
+#ifdef SERV_ELESIS_SECOND_CLASS_CHANGE
+	DrasticChargeProc_FrameMove();	// June 32b7b5f0
+	XX_DOWN_XProc_FrameMove();		// June 32b7b6c0 = March
+	SnapCrasherProc_FrameMove();	// June 32b7b760 = March
+	StigmaOfFireProc_FrameMove();	// June inline @32b880ce = March
+	FireBlossomsProc_FrameMove();	// June 32b87520
+
+	if( 0.0f <= m_fDashComboStartDelay )
+		m_fDashComboStartDelay -= m_fElapsedTime;
+
+	if( 0.0f < m_fAncientFireRenderTime )
+	{
+		m_fAncientFireRenderTime -= m_fElapsedTime;
+
+		if( m_fAncientFireRenderTime <= 0.0f )
+		{
+			SetLayer(XL_UNIT_0);
+			m_bSetCustomRenderParam = false;
+			SetAlphaObject(false);
+			m_fAncientFireRenderTime = -1.f;
+		}
+	}
+#endif // SERV_ELESIS_SECOND_CLASS_CHANGE
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	BloodRunawayProc_FrameMove();	// June 32b734d0: body in CH4a
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+	ShadowEdgeRecordFrameMove();	// June 32b813d0: body in CH4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+
+	// June @32b88185: the dash time runs while a dash state lasts and stays through Leap Crash
+	if( true == IsDashState() )
+		m_fDashElapsedTime += m_fElapsedTime;
+	else if( CX2SkillTree::RNSI_A_SSK_LEAP_CRASH != GetNowStateSkillID() && CX2SkillTree::RNSI_A_SSK_LEAP_CRASH_UPGRADE != GetNowStateSkillID() )
+		m_fDashElapsedTime = 0.f;
+
+	// June @32b881bf: Advanced Knight Mastery's value over the current MP ( at least 1 ) is the passive MP change rate
+	{
+		const float fNowMp = GetNowMp();
+		const float fMpDivisor = ( 1.0f <= fNowMp ? fNowMp : 1.0f );
+		SetAdditionalMPChangeRateByPassive( m_fAdvancedKnightMasteryMPValue / fMpDivisor );
+	}
+
+	// June @32b8828d: the charge time grows while dashing and runs down by the frame time afterwards
+	if( true == IsDashState() )
+		m_fDashChargeTime += m_fElapsedTime;
+	else if( 0.0f != m_fDashChargeTime )
+	{
+		if( 0.0f <= m_fDashChargeTime )
+			m_fDashChargeTime -= m_fElapsedTime;
+		else
+			m_fDashChargeTime = 0.0f;
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	GrandMasterTranscendenceProc_FrameMove();	// June 32b7e580: body in CH4a
+	ApplyGrandMasterAura();						// June 32b7e740: body in CH4a
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+	TranscendenceBerserkerFrameMove();			// June 32b7e9a0: body in CH4c
+	MadnessFrameMove();							// June 32b6ff20: body in CH4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CX2GUUser::CommonFrameMove();
 
 #ifdef ELSWORD_WAY_OF_SWORD // 검의 길
@@ -2190,6 +2307,7 @@ CX2GUEL::~CX2GUEL(void)
 	}
 
 #endif //SERV_ELESIS_SECOND_CLASS_CHANGE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 			 
 /*virtual*/ void CX2GUEL::CommonStateEndFuture()
@@ -2235,6 +2353,14 @@ CX2GUEL::~CX2GUEL(void)
 /*virtual*/ RENDER_HINT	CX2GUEL::CommonRender_Prepare()
 {
 	KTDXPROFILE();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1j: June 32b4edc0 ( only the cartoon texture is set: no render type, no outline colour )
+	if( WSS_VIGOR == GetWayOfSwordState() )
+		m_RenderParam.cartoonTexType = CKTDGXRenderer::CTT_SKYBLUE;
+	else if( WSS_DESTRUCTION == GetWayOfSwordState() )
+		m_RenderParam.cartoonTexType = CKTDGXRenderer::CTT_SCARLET;
+	return CX2GUUser::CommonRender_Prepare();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 #ifdef ELSWORD_WAY_OF_SWORD // 검의 길
 	if( GetWayOfSwordState() == WSS_VIGOR )
@@ -2252,6 +2378,7 @@ CX2GUEL::~CX2GUEL(void)
 #endif // ELSWORD_WAY_OF_SWORD
 
 	return CX2GUUser::CommonRender_Prepare();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 			 
 /*virtual*/ bool CX2GUEL::SpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ /*= CX2SkillTree::ASUT_GROUND */)
@@ -12142,7 +12269,12 @@ void CX2GUEL::ChivalryProc_FrameMove()
 
 	// 방어력 버프 적용 여부 체크
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		// char-elesis CH1j: June 32b7ac20 ( in a PvP game state the defence buff condition is 0.25 )
+		if( ( CX2Main::XS_PVP_GAME == g_pMain->GetNowStateID() ? CHIVALRY_DEFENCE_HP_RATE_PVP : CHIVALRY_DEFENCE_HP_RATE ) >= ( GetNowHp() / GetMaxHp() ) )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		if(  _CONST_EL_::CHIVALRY_BUFF_CONDITION_HP_RATE >= (GetNowHp() / GetMaxHp()) )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		{
 			// 방어력 버프 적용
 			if( 0 < m_uiChivalryDefenceBuffFactorID )
@@ -12237,12 +12369,24 @@ void CX2GUEL::FireBlossomsProc_FrameMove()
 			EraseBuffTempletFromGameUnit( m_eFireBlossomsSaveDebuffID );
 			bUse = true;		
 		}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		// char-elesis CH1j: June 32b87520 ( the weapon enchant is read inline from the Blaze, Frozen and Poison timers; the Shock enchant is not looked at )
+		else if( 0.f < m_ExtraDamagePack.m_EnchantBlaze.m_fTime || 0.f < m_ExtraDamagePack.m_EnchantFrozen.m_fTime || 0.f < m_ExtraDamagePack.m_EnchantPoison.m_fTime )
+		{
+			CX2DamageManager::EXTRA_DAMAGE_TYPE eEnchantType = CX2DamageManager::EDT_ENCHANT_BLAZE;
+			if( m_ExtraDamagePack.m_EnchantBlaze.m_fTime < m_ExtraDamagePack.m_EnchantFrozen.m_fTime || m_ExtraDamagePack.m_EnchantBlaze.m_fTime < m_ExtraDamagePack.m_EnchantPoison.m_fTime )
+				eEnchantType = ( m_ExtraDamagePack.m_EnchantFrozen.m_fTime < m_ExtraDamagePack.m_EnchantPoison.m_fTime ) ? CX2DamageManager::EDT_ENCHANT_POISON : CX2DamageManager::EDT_ENCHANT_FROZEN;
+			AccessExtraDamagePack().Init( eEnchantType );
+			bUse = true;
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		else if( CX2DamageManager::EDT_NONE != GetApplyWeaponExtraDamageType() )
 		{
 			// BuffTempletID가 설정안된 상태라면 현재 내 유닛에 적용된 무기 속성 체크
 			AccessExtraDamagePack().Init( GetApplyWeaponExtraDamageType() );
 			bUse = true;
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		else
 		{
 			// 새롭게 BuffTempletID가 설정되지 않았고, 무기속성도 걸리지 않았다면
@@ -12501,8 +12645,15 @@ void CX2GUEL::DrasticChargeProc_FrameMove()
 {
 	switch ( GetNowStateSkillID() )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		// char-elesis CH1j: June 32b7b5f0 ( the upgraded skill keeps the loop effects too )
+		case CX2SkillTree::RNSI_A_SGM_DRASTIC_CHARGE :
+		case CX2SkillTree::RNSI_A_SGM_DRASTIC_CHARGE_UPGRADE :
+			break;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 		case CX2SkillTree::SI_A_SGM_DRASTIC_CHARGE :
 			break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 
 		default:
 			{

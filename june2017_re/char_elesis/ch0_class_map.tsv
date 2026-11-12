@@ -375,7 +375,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b6de40	not-Elesis	called only from outside the range: 31fef55f	-	-	-	n/a	shared / folded code	y
 32b6de60	override 0x94	Lose	X2GUEl.h:809 virtual void Lose();	inside	-	CH1h	base 31ff15d0	n
 32b6def0	override 0x5f0	COMMON_BUFF_FrameMove	X2GUEl.h:821 virtual void COMMON_BUFF_FrameMove();	inside	-	CH1h	base 31aa1d30	y
-32b6e050	helper	called by 32b88070	-	new	?	CH1j	name: called by 32b88070(CommonFrameMove)	y
+32b6e050	helper	called by 32b88070	X2GUEL.cpp:4486 CX2GUEL::GaleBuffFrameMove	inside	-	CH1j	CH1j: = March ( Vigor, combo count change, every 5th hit BFI 245 ): no code; the CH0 name was left open	y
 32b6e0c0	helper	-	-	new	?	CH1a	CH0 Opus: ESI_CAN_NOT_ATTACK_JUMP_DOWN / ESI_SWORD_WAIT (wait / jump movement states; 32b6e0c0 = PlayAnimationSwordWaitStart, June 0.15 threshold when +0x95d0 > 0); name: called by 32b700d0(ESI_SWORD_WAIT.StartFuture) 32b70100(ESI_SWORD_WAIT.Start)	y
 32b6e500	helper	called by 32b73ff0	-	new	?	CH1h	name: called by 32b73ff0(DamageReact)	y
 32b6e570	state-fn	ESI_JUMP_READY.EventProcess	inside X2GUEl.cpp:2054 CX2GUEL::JumpReadyEventProcess	inside	-	CH1a	1 states	n
@@ -432,7 +432,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b72fe0	state-fn	ESI_COMBO_SGM_XX_DOWN_X_START.EventProcess	inside X2GUEl.cpp:2789 CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_START_EventProcess	inside	-	CH1e	1 states	y
 32b731a0	state-fn	ESI_COMBO_SGM_XX_DOWN_X_LOOP.EventProcess	inside X2GUEl.cpp:2797 CX2GUEL::ESI_COMBO_SGM_XX_DOWN_X_LOOP_EventProcess	inside	-	CH1e	1 states	y
 32b732e0	override 0x83c	?	- (name unsettled)	new	?	CH1o	vslot 0x83c override (name unsettled); name: virtual 0x83c (base vslot 0x83c override (name unsettled)); not named by any sibling class map, funcmap or X2GUUser.h; read the body	y
-32b734d0	helper	blood function (no phased caller in the class map)	X2GUEL.cpp:9347 CX2GUEL::FireBlossomsProc_FrameMove	inside	-	CH4a	CH0 Opus: per-frame passive tick (March twin FireBlossomsProc_FrameMove X2GUEL.cpp:9347; BFI 666 under 50% HP, debuff cleanse)	y
+32b734d0	helper	blood function (no phased caller in the class map)	-	new	BloodRunawayProc_FrameMove	CH4a	CH1j: per-frame Blood Runaway tick ( RNSI_P_SCA_BLOOD_RUNAWAY 28414 ), NOT the Fire Blossoms twin ( that is 32b87520 ); declared by CH1j under _PASSIVE, body CH4a	y
 32b737a0	state-fn	SI_SA_SDK_BRANDISH_BREAKER_START.Start SI_SA_SDK_BRANDISH_BREAKER_LOOP.Start SI_SA_SDK_BRANDISH_BREAKER_FINISH.Start	-	new	SI_SA_SDK_BRANDISH_BREAKER_START_StateStart	CH3c	3 states	y
 32b73940	state-fn	SI_SA_SDK_BRANDISH_BREAKER_LOOP.Start	-	new	SI_SA_SDK_BRANDISH_BREAKER_LOOP_StateStart	CH3c	1 states	y
 32b73ae0	state-fn	SI_SA_SDK_BURNING_PHANTOM_LOOP.FrameMove	-	new	SI_SA_SDK_BURNING_PHANTOM_LOOP_FrameMove	CH2d	1 states	y
@@ -486,11 +486,11 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b7a520	state-fn	ESI_SI_SA_SBH_BLAZING_DANCE_START.StartFuture ESI_SI_SA_SBH_BLAZING_DANCE_1ST.StartFuture ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK.StartFuture +2	inside X2GUEl.cpp:934 CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_1ST_StartFuture ; inside X2GUEl.cpp:962 CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_StartFuture	inside	-	CH3b	5 states	y
 32b7a5f0	state-fn	ESI_SI_SA_SBH_BLAZING_DANCE_FINISH.FrameMoveFuture	inside X2GUEl.cpp:965 CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_FrameMoveFuture	inside	-	CH3b	1 states	y
 32b7a7a0	state-fn	ESI_SI_HA_SBH_ANCIENT_FIRE.FrameMove	inside X2GUEl.cpp:974 CX2GUEL::ESI_SI_HA_SBH_ANCIENT_FIRE_FrameMove	inside	-	CH3d	1 states	y
-32b7ac20	helper	called by 32b88070	-	new	?	CH1j	name: called by 32b88070(CommonFrameMove)	y
+32b7ac20	helper	called by 32b88070	X2GUEL.cpp:12113 CX2GUEL::ChivalryProc_FrameMove	inside	-	CH1j	CH1j: = March except the defence condition is 0.25 in a PvP game state	y
 32b7ad80	helper	called by 32b80e90 32b80ee0	-	new	?	CH3b	name: called by 32b80e90(ESI_SI_SA_SBH_BLAZING_DANCE_) 32b80ee0(ESI_SI_SA_SBH_BLAZING_DANCE_)	y
-32b7b5f0	helper	called by 32b88070	-	new	?	CH1j	name: called by 32b88070(CommonFrameMove)	y
-32b7b6c0	helper	called by 32b88070	-	new	?	CH1j	name: called by 32b88070(CommonFrameMove)	y
-32b7b760	helper	called by 32b88070	-	new	?	CH1j	name: called by 32b88070(CommonFrameMove)	y
+32b7b5f0	helper	called by 32b88070	X2GUEL.cpp:12500 CX2GUEL::DrasticChargeProc_FrameMove	inside	-	CH1j	CH1j: = March except the upgraded skill ( 28228 ) keeps the loop effects too	y
+32b7b6c0	helper	called by 32b88070	X2GUEL.cpp:12525 CX2GUEL::XX_DOWN_XProc_FrameMove	inside	-	CH1j	CH1j: = March ( states 240-242 = ESI_COMBO_SGM_XX_DOWN_X_START / LOOP / END ): no code	y
+32b7b760	helper	called by 32b88070	X2GUEL.cpp:12548 CX2GUEL::SnapCrasherProc_FrameMove	inside	-	CH1j	CH1j: = March ( skill 8216 ): no code	y
 32b7b820	helper	called by 32b7f090 32b81200	-	new	?	CH1c	name: called by 32b7f090(HyperModeFrameMove) 32b81200(ESI_RIDING_HYPER_MODE.FrameM)	y
 32b7bad0	override 0x734	?	- (name unsettled)	new	OnDefenderDamageReact	CH4c	vslot 0x734 override (name unsettled); name: CH0 Opus: vslot 0x734, defender side Blood Revenge (BFI 464, +0x9740 / +0x9744); CH4c adds the base virtual beside OnAttackerDamageReact_Slot4F8 / _Slot4FC	y
 32b7beb0	override 0x4f8	?	- (name unsettled)	new	OnAttackerDamageReact_Slot4F8	CH4c	vslot 0x4f8 override (name unsettled); name: CH0 Opus: X2GUUser.h:3414 hook (C10e); Dark Force HP intake in Vigor	y
@@ -506,7 +506,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b7d920	state-fn	ESI_DASH_COMBO_SCA_XZ_FIRE.FrameMove	-	new	ESI_DASH_COMBO_SCA_XZ_FIRE_FrameMove	CH1g2	CH0 split: CH1g = Dark Knight (SDK), CH1g2 = Crimson Avenger (SCA) line states	y
 32b7db80	state-fn	ESI_SI_A_SPK_AVATAR_OF_THE_FIRE.FrameMove	-	new	ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_FrameMove	CH2c	1 states	y
 32b7e3b0	helper	blood function (no phased caller in the class map)	-	new	HealByBurningPhantomOnAttack	CH4a	CH0 Opus: Burning Phantom heal delegate (trigger 9), pushed by InitPassiveSkillState; name: CH0 Opus: delegate, damage trigger 9	y
-32b7e580	helper	-	-	new	?	CH4c	CH0 Opus: Blood Runaway helper (counts units in range with CX2Game 322d4a60, June-only): CommonFrameMove (CH1j) declares it; name: called by 32b88070(CommonFrameMove)	y
+32b7e580	helper	-	-	new	GrandMasterTranscendenceProc_FrameMove	CH4a	CH1j: RNSI_P_SGM_TRANSCENDENCE 28415 tick ( dash charge time +0x9790, enemies near, BFI 907 / 908 ), a passive not a blood skill: moved CH4c -> CH4a, declared by CH1j under _PASSIVE	y
 32b7e740	helper	blood function (no phased caller in the class map)	-	new	ApplyGrandMasterAura	CH4a	CH0 Opus: Grand Master aura BFI 909 / 910 (Dignity of Grand Master): passive, not blood; name: CH0 Opus: BFI 909 / 910 Dignity of Grand Master aura	y
 32b7e9a0	helper	blood function (no phased caller in the class map)	-	new	TranscendenceBerserkerFrameMove	CH4c	CH0 Opus blood map (ch0_blood.tsv): transcendence berserker chain (BFI 911/912/913), called under CommonFrameMove: CH1j declares it; name: CH0 Opus: Crimson Avenger transcendence, BFI 911 / 912 / 913 stacks by nearby enemies (ch0_blood.tsv)	y
 32b7ebe0	override 0x6a0	GetActualMPConsume	X2GUEl.h:282 virtual float GetActualMPConsume	inside	-	CH4b	GetActualMPConsume (vslot 0x6a0)	y
@@ -543,7 +543,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b86080	state-fn	ESI_DASH_COMBO_SGM_XX_ATTACK.EventProcess	-	new	ESI_DASH_COMBO_SGM_XX_ATTACK_EventProcess	CH1e	1 states	y
 32b864f0	registrar	InitState part 2 (registrations); called by the wrapper 32b87a60	X2GUEl.h:261 virtual void InitState();	inside	-	CH1m	InitState part 2 (registrations); called by the wrapper 32b87a60	y
 32b872d0	helper	-	-	new	?	CH4a	CH0 Opus: InitPassiveSkillState delegate, pushed through the thunk-table adapter 32b90ab0 @32b88c21 (push edx; call; ret); the builder read the adapter call as 32b8c470's; name: called by 32b90ab0(helper)	y
-32b87520	helper	called by 32b88070	-	new	?	CH1j	name: called by 32b88070(CommonFrameMove)	y
+32b87520	helper	called by 32b88070	X2GUEL.cpp:12223 CX2GUEL::FireBlossomsProc_FrameMove	inside	-	CH1j	CH1j: the real Fire Blossoms twin ( CH0 listed 32b734d0 ); differs: the weapon enchant is read inline from three timers, no Shock	y
 32b87880	helper	blood function (no phased caller in the class map)	none in March: Elesis Blood Runaway hit block	inside	-	CH4c	CH0 Opus blood map (ch0_blood.tsv): Blood Runaway delegate (BFI 462 / 659, BTI 426); pushed by InitPassiveSkillState: CH4a declares it	y
 32b87a60	override 0x7a4 + registrar	InitState	X2GUEl.h:261 virtual void InitState();	inside	-	CH1m	InitState (vslot 0x7a4): the wrapper (START / WIN / LOSE roll rows 9 / 11 / 12 + id 130, then 32b81be0 + 3202b110 + 32b864f0)	y
 32b88070	override 0x7cc	CommonFrameMove	X2GUEl.h:271 virtual void CommonFrameMove();	inside	-	CH1j	base 32063650	y
@@ -580,7 +580,7 @@ june_fn	kind	name_or_states	march_pair	inside_new	proposed_name	phase	note	carve
 32b90140	thunk	jmp 32b700d0	-	-	-	n/a	not ported	n
 32b90150	thunk	jmp 32b70100	-	-	-	n/a	not ported	n
 32b90160	helper	called by 32b902c0	-	new	?	CH3c	name: called by 32b902c0(helper)	y
-32b901c0	helper	called by 32b88070 32b90b60	CX2GUUser::IsDashState()	new	?	CH1j	also called from outside the class: 32d08ba4; name: called by 32b88070(CommonFrameMove) 32b90b60(dead); also called from outside the class: 32d08ba4	y
+32b901c0	helper	called by 32b88070 32b90b60	CX2GUUser::IsDashState()	inside	-	CH1j	CH1j: = March CX2GUUser::IsDashState ( vslots 0x440-0x44c = USI_DASH / DASH_END / DASH_JUMP / DASH_JUMP_LANDING ): no code	y
 32b902c0	helper	called by 32b904c0	-	new	?	CH3c	name: called by 32b904c0(helper)	y
 32b903a0	thunk	jmp 32b704c0	-	-	-	n/a	not ported	n
 32b903b0	thunk	jmp 32b705b0	-	-	-	n/a	not ported	n
