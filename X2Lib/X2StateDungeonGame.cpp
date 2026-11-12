@@ -6584,6 +6584,22 @@ void CX2StateDungeonGame::DungeonEndingEvent::SetDungeonClearTexture( CKTDGUISta
 				CX2Data::GetCharacterImageName( fileName, pieceName, g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass, CX2Data::CIT_DungeonClear );
 		} break;
 #endif //SERV_ARA_CHANGE_CLASS_SECOND
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+	case CX2Unit::UC_ARA_LITTLE_SPECTER:	// char-ara CH6: awakened end-of-dungeon picture, as the other Ara jobs
+		{
+			if ( pMyUser->IsFullHyperMode() )
+				fileName = L"HQ_Dungeon_Clear_Ara_Little_Specter_Rage.tga";
+			else
+				CX2Data::GetCharacterImageName( fileName, pieceName, g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass, CX2Data::CIT_DungeonClear );
+		} break;
+	case CX2Unit::UC_ARA_ASURA:
+		{
+			if ( pMyUser->IsFullHyperMode() )
+				fileName = L"HQ_Dungeon_Clear_Ara_Asura_Rage.tga";
+			else
+				CX2Data::GetCharacterImageName( fileName, pieceName, g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass, CX2Data::CIT_DungeonClear );
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
 	default:
 		CX2Data::GetCharacterImageName( fileName, pieceName, g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass, CX2Data::CIT_DungeonClear );
 		break;

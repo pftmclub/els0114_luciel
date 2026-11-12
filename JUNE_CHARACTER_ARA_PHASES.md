@@ -2590,6 +2590,8 @@ picture, the new skill-tree rows, the HUD portrait, and surviving a relog. A def
 Failures go back to the owning phase's flag (`JUNE_CHAR_ARA_*`).
 
 **Carried to Z:** the `CX2GUAra::IsStateRegistered` chain guard (CH3 registered every chain state): Z retires it if the walk shows no refusal.
+**Walk result (2026-11-12): passed** (user), job-change guides not re-checked (passed in CHNb). One defect found: on 34 / 124 in awakening mode (3 beads) the end-of-dungeon picture was the normal one. **Fix (flag `SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS`, `X2StateDungeonGame.cpp` `DungeonEndingEvent::SetDungeonClearTexture`):** two cases, `UC_ARA_LITTLE_SPECTER` / `UC_ARA_ASURA`, choose `HQ_Dungeon_Clear_Ara_Little_Specter_Rage.tga` / `HQ_Dungeon_Clear_Ara_Asura_Rage.tga` under `IsFullHyperMode()` like the other Ara jobs (they had fallen into `default`). Textures were staged in CH0b. flagcheck `--worktree` PASS, `junediverge --check` PASS, `enumscan` 0.
+DEPLOY OK: X2_offline.exe is 26,330,624 B, dated 2026-11-12 15:26:53, md5 9104634a1be91fe6b89c8d474658a3dd. EXESTR OK: 2 of 2 found in X2_offline.exe (both Rage names, wide). Play-test owed: awakened end picture on 34 / 124.
 
 ## Phase Z - Close-out
 
