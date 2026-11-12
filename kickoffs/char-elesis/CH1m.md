@@ -49,3 +49,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L431, L475, L512.
 - **`ch0_classn.tsv` rows:** 2 (filter on its `proposed_phase` column).
 - `june2017_re/char_elesis/ch0_reg.tsv` 177 registrations (`32b81be0` 111, `32b864f0` 57, wrapper 4, `3202b110` 5), `ch0c_listing_check` 177 / 177. June registers 9 names her script has no table for (`ESI_RIDING_DAMAGE_BACK`, `ESI_STANDUP_ATTACK_FRONT_NO_DOWN` / `_BACK_NO_DOWN`, `ESI_WALL_LANDING`, 5 `USI_EVENT_*`); the script defines `ESI_RIDING_DAMAGE_FRONT` twice. `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE` is registered twice (205, 207). No berserk table; hyper tables `ESI_HYPER_MODE`, `ESI_EGM_` / `ESI_EBH_` / `ESI_ECA_HYPER_MODE`.
+
+## Amended by CH1k review (2026-11-12)
+
+- June's `ReInit` `32b81900` tests game type 1 only (`GetGameType()` vslot 0x10c, `dec eax ; jne` at `@32b819b3`); the CH1h body (`X2GUEL.cpp`, `CX2GUEL::ReInit`) writes `CX2Game::GT_PVP ==`. `junediverge --check-all` passes today with no `CX2GUEL` allow row: add the row only if this phase's run flags it.
+- State 207 `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION`: Start `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE_DETONATION_StateStart` (CH1k, `_CORE`); Init / EventProcess are the 205 pair (`ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_Init` / `_EventProcess`).

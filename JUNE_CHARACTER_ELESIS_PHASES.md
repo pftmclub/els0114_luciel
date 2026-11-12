@@ -911,6 +911,33 @@ All 24 class-map rows of phase CH1h are accounted for: **8 written, 14 = March (
 
 **Nothing to play-test.** Next: `/x2-phase char-elesis CH1k review` ( Opus 5.5 high, covers CH1h-CH1k ), then CH1m.
 
+### CH1k - Review (2026-11-12; covers CH1h-CH1k)
+
+**Verdict: pass, no code change.** All 57 class-map rows ( CH1h 24, CH1i 4, CH1j 14, CH1k 15 ) plus `ReservedSkillStart` were read against `charport_adis.py elesis --phase <p>`. Every written listing-only row ( carved `n` ) was read branch by branch from the raw listing: ReInit, HyperModeBuffEffectStart, GetHpTier, GetReduceDebuffDurationRate, the 0x4ac getter, SetEquippedSkillLevel, IsInJobLine, SpecialAttackEventProcess, the use `32b52590`, IsValideSkillRidingOn, SpecialAttackNoStageChange and the Endurance Power EventProcess. So were the "= March" listing-only rows ( Init, Lose, the enchant / particle arrays, GetComboXStateID, the three tail jumps, HyperModeFrameMove, CommonFrameMoveFuture ). Every transcription equals June, and every `inside` row's `#else` is March's body.
+
+| Spot check (kickoff) | June | result |
+|---|---|---|
+| Lookup `32b84a50` | quick-slot wait `0 < +0x8d78`, unit, `CommonSpecialAttackEventProcess`, slot, templet ( swap 1 ), mismatch text `0x8bae`, `m_iChosenSkillID` written before the level ( `GetSkillLevel( id, 0, 0, 1 )`, floor 1 ) and the use condition, `word +0x9796 < 1` and id `0x6d69` / `0x6d8f` -> condition 1 = `ASUT_GROUND`, summon `3202daf0`, `3202cba0` / `3202d140` / `3202d3c0`, riding-key wait, vslot 0x818, MP = vslot 0x6a0 ( id, level, 1 ) | = port |
+| Dev gate | vslot 0x82c `jne` skips all three: cool time `fcomp 0.0` / `test 0x41` ( fails when left > 0, text 226 ), MP `reserved + chosen > now` ( 2549 ), type `0xd` = `ST_HYPER_ACTIVE_SKILL` + not training / photo zone + no stone 130208 + no Infinity essence ( 26119 ) | = port |
+| Injection Stigma | outside the gate: `31edf560( id, 0x6e35 )`, ability 7 = `SA_ATK_PHYSIC_REL` x `+0x4424`, buff `0x29a` = `BTI_BUFF_BLOOD_RUNAWAY_PASSIVE` x double 0.2f, fails when `now HP <= cost` ( text `0xa43` = 2627 ); success writes skill id and pressed slot | = port |
+| `32b4ee20` / `32b52590` / `32b73e60` | saved MP / slot / id restored for condition 3 or 5 after either outcome, `m_iNowSpecialAttack = slot + 1`, failure restores the id only; use: vslot 0x810, cooldown ( templet id ) + refund ( argument id, 1, MP ), MP 0, else reserve, 28029 -> state `0x13e` ( false ), slot change; cooldown: `IsMyUnit`, templet / unit, slot mark, `UpNowMp( -mp )`, stone `GetItemByTID`, `SetSkillCoolTimeLeft( id, 0x6a4( templet, level, 0 ), 1 )`, 8003 / memo 608025 / BTI 393 -> BFI 420 ( raw `420, 0, 1, 0, 0` ), `3235a710`, `31fcd3d0` | = port |
+| `32b80c60` / `32b80840` / `32b75c90` / `32b59aa0` | BFI `0x1a7` / `0xe8` and `0x1e0` / `0x1df` on `322cc1a0`, raw `( BFI, 0, level, 0, 0 )` = C++ `( BFI, level, NULL, 0, false )`; the Punish set passes hyper ( state byte +0x10 ), power `+0x9754`, life time -1, and the plain sets use every default ( hyper 0, -1 / -1 ); id 207 = 205's reset + plain set; walk / back-walk / dash / ZX cancels all test `bFootOnLine` ( `+0x7e1c` ) | = port |
+| `32b70af0` | `m_fAnimOneshotTimer < t` then `EventTimer( t )` ( = `EventTimerOneshot` ), `GetShowCutInAndChangeWorldColor` before `GetShowActiveSkillShow`, set index x 0x90 ( cut-in 0 ), event 0x8b3: even `rand()` -> `337ad560` = CASH_21; bone `Dummy2_Lhand`, hyper = state byte +0x10 | = port |
+| CH1h | ReInit: point +-1.0 by the saved state, `GetGameType() == 1` only ( `@32b819b3` ), team kills `+0x4a4` / `+0x4a8`, `32b74930` / `32b74bf0` = End Vigor / Destruction, sync field after both, Shadow Edge loop for every unit; DamageReact: null first, DT_BUFF + tutorial `+0x16a`, upgrade test templet `+0x178`, gain x vslot 0x720 as a double, Madness `2 x gain`; Chivalry tables read from the exe ( `3373daa4` 11 ids, then 61 / 53, 184 / 223 / 161 / 40, singles 99 / 31 / 38 / 87 / 58 / 85: 22 unique ) at `now <= max x 0.15` | = port |
+| CH1i / CH1j | 22 blocks: skill ids, script ids ( `0x13e`-`0x151` ) and per-block counts equal `ch0_setskilllevel_blocks.tsv` and the code; IsInJobLine 29 / 120, 30 / 121, 35 / 125; CommonFrameMove order, dash time kept in 28204 / 28226, MP divisor `max( 1, MP )`, charge time `> 0` runs down and `< 0` -> 0; JUNE_BUGS 635 ( `ResetAnimSpeed( speed, 1, 1, 1.0 )` at `32b70281` ) | = port |
+| `ReservedSkillStart` chain | `X2GUUser.h` / `.cpp`: one call and one declaration, each under `ELESIS_LIVE` with seven `#ifndef`s ( Arme, Eve, Chung, Elsword, Raven, Rena, Ara ) | ok |
+| JUNE_BUGS 635 / 636 / 637 | each row says what the code does ( 636 the null guard on a latent read, 637 the dead memo block ) | ok |
+
+No drift found. No `_DEBUG` define to retire. One lead for CH1m: its kickoff's ReInit question is settled, since June tests game type 1 only ( kickoff amended ).
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --with _CORE _SUMMON _WOS _BLOOD _PASSIVE --range b907661f^..HEAD --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `files: 8 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` ( b907661f / 681c0fb5 / 26d3db94 / 3ea67745: `.cpp` +338 / +244 / +151 / +415, `.h` +22 / +22 / +12 / +14 ), `0 deleted, 0 non-ASCII inserted, 0 EOL-mismatched, 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only for `define: NOT FOUND` ( `_LIVE` is `//#define` ). Same on `X2GUUser.cpp` / `.h`: 2 PASS ( +17 / +17 ), same single FAIL reason. `JUNE_ENUM_NAMES` on `X2SkillTree.h` / `X2BuffFactor.h`: 1 PASS, 5 PASS~, `RESULT: PASS`.
+- `junediverge.py --check-all`: `allow-listed: 207`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `0 A/B row(s) remain in 2 file(s)`.
+- One-file `/c /Zs /EHsc` probes ( `census.cl_cmd`, no PCH ): `X2GUEL.cpp` 0 errors off, with `_LIVE`, and with `_LIVE + _WOS + _BLOOD + _PASSIVE + _SUMMON`; `X2GUUser.cpp` 0 errors off and with `_LIVE`.
+- Full build skipped: no play-test.
+
+**Nothing to play-test.** Next: `/x2-phase char-elesis CH1m` ( Opus 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
