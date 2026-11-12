@@ -237,6 +237,14 @@ public:
 		ESI_P_SGM_ADVANCED_KNIGHT_MASTERY,			/// char-elesis CH1e: June script id 332 ( Advanced Knight Mastery guard; CH1m maps, CH1e owns the state )
 		ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_SMALL,	/// char-elesis CH1e: June script id 333 ( Advanced Knight Mastery guard, small; CH1m maps, CH1e owns the state )
 		ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP,			/// char-elesis CH1f: June script id 326 ( Pyro Knight line dash-jump Z-X loop; CH1m maps, CH1f owns the state )
+		ESI_COMBO_SDK_ZZZXX,						/// char-elesis CH1g: June script id 284 ( Dark Knight Z-Z-Z-X-X; CH1m maps, CH1g owns the state )
+		ESI_DASH_JUMP_COMBO_SDK_XXX,				/// char-elesis CH1g: June script id 286 ( Dark Knight dash-jump X-X-X; CH1m maps, CH1g owns the state )
+		ESI_COMBO_SDK_XXX,							/// char-elesis CH1g: June script id 288 ( Dark Knight X-X-X; CH1m maps, CH1g owns the state )
+		ESI_COMBO_SDK_XXXX,							/// char-elesis CH1g: June script id 289 ( Dark Knight X-X-X-X; CH1m maps, CH1g owns the state )
+		ESI_COMBO_SDK_XXXXX,						/// char-elesis CH1g: June script id 290 ( Dark Knight X-X-X-X-X; CH1m maps, CH1g owns the state )
+		ESI_COMBO_SDK_XXXXXX,						/// char-elesis CH1g: June script id 291 ( Dark Knight X-X-X-X-X-X; CH1m maps, CH1g owns the state )
+		ESI_COMBO_SDK_XXXXXXX,						/// char-elesis CH1g: June script id 292 ( Dark Knight X-X-X-X-X-X-X; CH1m maps, CH1g owns the state )
+		ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE,			/// char-elesis CH1g: June script id 329 ( Dark Knight dash-jump Z-X fire; CH1m maps, CH1g owns the state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -483,6 +491,24 @@ protected:
 	void ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_StateStartFuture();	/// char-elesis CH1f: June 32b52320
 	void ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_EventProcess();		/// char-elesis CH1f: June 32b6b350
 	void ESI_DASH_JUMP_COMBO_SPK_ZX_LOOP_FrameMove();			/// char-elesis CH1f: June 32b7d2b0
+	void ESI_DASH_JUMP_COMBO_SDK_XXX_Init();					/// char-elesis CH1g: June 32b519f0
+	void ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_StateStart();		/// char-elesis CH1g: June 32b52330
+	void ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_FrameMove();			/// char-elesis CH1g: June 32b52350
+	void ESI_COMBO_SDK_ZZZX_EventProcess();						/// char-elesis CH1g: June 32b64310
+	void ESI_COMBO_SDK_ZZZXX_EventProcess();					/// char-elesis CH1g: June 32b64660
+	void ESI_DASH_JUMP_COMBO_SDK_XX_EventProcess();				/// char-elesis CH1g: June 32b648e0
+	void ESI_DASH_JUMP_COMBO_SDK_XXX_EventProcess();			/// char-elesis CH1g: June 32b64bd0
+	void ESI_COMBO_SDK_XX_EventProcess();						/// char-elesis CH1g: June 32b64ee0
+	void ESI_COMBO_SDK_XXX_EventProcess();						/// char-elesis CH1g: June 32b652d0
+	void ESI_COMBO_SDK_XXXX_EventProcess();						/// char-elesis CH1g: June 32b656c0
+	void ESI_COMBO_SDK_XXXXX_EventProcess();					/// char-elesis CH1g: June 32b65ab0
+	void ESI_COMBO_SDK_XXXXXX_EventProcess();					/// char-elesis CH1g: June 32b65ea0
+	void ESI_COMBO_SDK_XXXXXXX_EventProcess();					/// char-elesis CH1g: June 32b66200
+	void ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE_EventProcess();		/// char-elesis CH1g: June 32b6b460
+	void ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_StateStartFuture();	/// char-elesis CH1g: June 32b73bf0
+	void ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_EventProcess();		/// char-elesis CH1g: June 32b73c90
+	void ESI_DASH_JUMP_COMBO_SDK_XXX_FrameMove();				/// char-elesis CH1g: June 32b7c0b0
+	void ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE_FrameMove();			/// char-elesis CH1g: June 32b7d550
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 
 	void JumpAttackZEventProcess();
@@ -1018,6 +1044,9 @@ protected:
 	// ESI_DASH_JUMP_COMBO_SPK_XZ
 	bool m_bIsDashAttackPossible;		// 대시 공격 불가 상태 // 대점ZX 연속 사용 하는 것을 막기 위한 코드
 	UINT m_uiSPKXZReattakCount;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+	float m_fDashJumpZXChargeTime;		/// char-elesis CH1g: June +0x96f4 ( Dark Knight dash-jump Z-X charge, 0 to 1 )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	//~ protected 변수
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트

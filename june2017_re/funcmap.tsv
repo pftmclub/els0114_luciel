@@ -10633,3 +10633,21 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b78e80	CX2GUEL::ESI_DASH_COMBO_SBH_XX_FrameMove	PORTED	Char Elesis CH1f2: inside, carved; = March ( 0.363 s, FlushMp( 4 ), Dash_Combo_XX / XZZ_FAIL )
 32b791c0	CX2GUEL::ESI_DASH_COMBO_SBH_XXX_FrameMove	PORTED	Char Elesis CH1f2: inside, carved; = March ( 0.492 s, FlushMp( 4 ), Dash_Combo_XXX / XZZ_FAIL )
 32b79500	CX2GUEL::ESI_DASH_COMBO_SBH_XXXZ_FrameMove	PORTED	Char Elesis CH1f2: inside, carved; = March ( 0.27 s, EffectSet_Elesis_SBH_Combo_XXXZ )
+32b519f0	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_XXX_Init	PORTED	Char Elesis CH1g: new, listing-only: two preloads ( SA_EL_SA_SSK_SPIRAL_BLAST_01.X, SCA_Projectile001.Y )
+32b52330	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_StateStart	PORTED	Char Elesis CH1g: new, listing-only: CommonStateStart, then the charge time ( +0x96f4 ) = 0
+32b52350	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_FrameMove	PORTED	Char Elesis CH1g: new, carved: CommonFrameMove, charge time += frame time, capped at 1.0
+32b64310	CX2GUEL::ESI_COMBO_SDK_ZZZX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: jump-down / WAIT, flag 0 X -> SDK_ZZZXX with no class test, cancels
+32b64660	CX2GUEL::ESI_COMBO_SDK_ZZZXX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: jump-down / WAIT, SKILL and on-line walk / back-walk / dash cancels
+32b648e0	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_XX_EventProcess	PORTED	Char Elesis CH1g: new, carved: X / Z flags with no key window, on the line COMBO_Z / SDK_XXX / XX_LANDING; cancels after it ( JUNE_BUGS 633 )
+32b64bd0	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_XXX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: animation end JUMP_DOWN / WAIT, cancels incl. ZX on the line
+32b64ee0	CX2GUEL::ESI_COMBO_SDK_XX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: flag 0 X -> SDK_XXX ( event time 0 ), flag 1 Z -> SDK_XXXXXXX ( event time 1 ), WAIT, jump-down, cancels
+32b652d0	CX2GUEL::ESI_COMBO_SDK_XXX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: flag 0 X -> SDK_XXXX, flag 1 Z -> SDK_XXXXXXX ( both event time 0 ), WAIT, jump-down, cancels
+32b656c0	CX2GUEL::ESI_COMBO_SDK_XXXX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: flag 0 X -> SDK_XXXXX, flag 1 Z -> SDK_XXXXXXX ( both event time 0 ), WAIT, jump-down, cancels
+32b65ab0	CX2GUEL::ESI_COMBO_SDK_XXXXX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: flag 0 X -> SDK_XXXXXX, flag 1 Z -> SDK_XXXXXXX ( both event time 0 ), WAIT, jump-down, cancels
+32b65ea0	CX2GUEL::ESI_COMBO_SDK_XXXXXX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: flag 0 X or Z -> SDK_XXXXXXX, WAIT, jump-down, cancels
+32b66200	CX2GUEL::ESI_COMBO_SDK_XXXXXXX_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: WAIT, jump-down, SKILL and on-line walk / back-walk / dash cancels
+32b6b460	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: animation end on the line -> JUMP_LANDING, cancels incl. ZX on the line
+32b73bf0	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_StateStartFuture	PORTED	Char Elesis CH1g: new, carved: CommonStateStartFuture, charge time = 0, class-skill float ( Future +0x7ed8 ) = 0 when different ( checklist 7n L499 )
+32b73c90	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE_EventProcess	PORTED	Char Elesis CH1g: new, listing-only: state time >= 3.0 or X released -> class-skill float 0 ( facing key held ) / -45, then SDK_ZX_FIRE
+32b7c0b0	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_XXX_FrameMove	PORTED	Char Elesis CH1g: new, carved: 0.01 s tick, FlushMp( 3 ) plays EffectSet_C_SCA_Dash_ZZZ_Uppercut, else the not-enough-MP effect at Dummy2_Lhand
+32b7d550	CX2GUEL::ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE_FrameMove	PORTED	Char Elesis CH1g: new, carved: 0.01 s tick, IsEnoughMPForAttack( 5 ), EffectSet_SDK_Dash_Jump_Combo_ZX ( aimed down, -45 ) or _Front, power x ( charge + 1 ), scale 1 + charge x 0.5

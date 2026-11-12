@@ -710,6 +710,32 @@ All 25 class-map rows of phase CH1f2 are handled: 25 `inside` (9 with a June bod
 
 **Nothing to play-test.** Review: none of its own, the CH1g2 review covers CH1e-CH1g2 ( no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1g` ( Sonnet 5.5 high ).
 
+### CH1g - Done (2026-11-12)
+
+All 18 class-map rows of phase CH1g are handled: 0 `inside`, 18 `new` (plain names under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE`, tag `// char-elesis CH1g: June <va>`), 13 `listing-only` (read with `charport_adis.py elesis --phase CH1g`; none needed "this needs Opus") and 5 carved. `_LIVE` stays `//#define`; no new `Always.h` define. Eight state names join `EL_STATE_ID` under `_CORE`, June's script id in the comment (CH1m maps): `ESI_COMBO_SDK_ZZZXX` 284, `ESI_DASH_JUMP_COMBO_SDK_XXX` 286, `ESI_COMBO_SDK_XXX` .. `_XXXXXXX` 288-292, `ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE` 329. One new member `m_fDashJumpZXChargeTime` ( June `+0x96f4`, `_CORE`; `ch1_offsets.tsv` +1 row ). 18 funcmap rows `Char Elesis CH1g`; `JUNE_BUGS.md` row 633. The five script states `ESI_SDK_START` / `_WIN` / `_WIN2` / `_LOSE` / `_LOSE2` run shared functions outside the Elesis range: nothing to transcribe (CH1m). Checklist row 7n L499 ( the class-skill float writer `32b73bf0` / reader `32b7d550` ) is written here; no state writes the state power rate or calls the buff factor, no `_WOS` / `_SUMMON` / `_BLOOD` line.
+
+| June | `CX2GUEL::` | June | `CX2GUEL::` |
+|---|---|---|---|
+| `32b64310` `32b64660` | `ESI_COMBO_SDK_ZZZX` / `ZZZXX` EventProcess | `32b648e0` `32b64bd0` | `ESI_DASH_JUMP_COMBO_SDK_XX` / `XXX` EventProcess |
+| `32b64ee0` `32b652d0` `32b656c0` `32b65ab0` | `ESI_COMBO_SDK_XX` / `XXX` / `XXXX` / `XXXXX` EventProcess | `32b65ea0` `32b66200` | `ESI_COMBO_SDK_XXXXXX` / `XXXXXXX` EventProcess |
+| `32b519f0` `32b7c0b0` | `ESI_DASH_JUMP_COMBO_SDK_XXX` `_Init` / `_FrameMove` | `32b52330` `32b73bf0` `32b52350` `32b73c90` | `ESI_DASH_JUMP_COMBO_SDK_ZX_CHARGE` `_StateStart` / `_StateStartFuture` / `_FrameMove` / `_EventProcess` |
+| `32b6b460` `32b7d550` | `ESI_DASH_JUMP_COMBO_SDK_ZX_FIRE` `_EventProcess` / `_FrameMove` | | |
+
+**What June does** (every function read branch by branch from the raw listing; all are new states, so there is no March body to diff):
+- **Ground combo chain:** `SDK_ZZZX` ( X, no class test, to `SDK_ZZZXX` ) and `ZZZXX` ( end ) = jump-down ( `y -= LINE_RADIUS` ) before the animation-end WAIT, then the `_ON_LINE_` cancels. `SDK_XX` .. `SDK_XXXXX`: flag 0 ( X ) goes up one hit and flag 1 ( Z ) jumps to the last hit `SDK_XXXXXXX`; both flags also fire on animation end; `XX` reads its Z window from event time 1, `XXX` / `XXXX` / `XXXXX` from event time 0; here WAIT comes before the jump-down. `SDK_XXXXXX` has one flag ( X or Z ) to the last hit; `SDK_XXXXXXX` has no flag. No Z-X cancel in any of them.
+- **Dash-jump X-X-X:** `SDK_XX` sets flag 0 / 1 on `oneX` / `oneZ` with no key window and, on the line, goes to `ESI_COMBO_Z` / `SDK_XXX` / `ESI_DASH_JUMP_COMBO_XX_LANDING`; the cancels after it are dead ( **JUNE_BUGS 633**, kept ). `SDK_XXX` = the Saber Knight `XXX` body ( animation end JUMP_DOWN / WAIT, `_ON_LINE_` cancels incl. Z-X ); its FrameMove ticks at 0.01 s, `FlushMp( 3 )` plays `EffectSet_C_SCA_Dash_ZZZ_Uppercut`, else the not-enough-MP effect at `Dummy2_Lhand` ( 0, 0, 0 ).
+- **Dash-jump Z-X charge and fire:** `ZX_CHARGE` start ( both frames ) zeroes `m_fDashJumpZXChargeTime`, the future start also the class-skill float; FrameMove adds the frame time up to 1.0; EventProcess fires at state time 3.0 or when X is released: the class-skill float becomes 0 with the facing key held, else -45 ( set only when different ), then `ZX_FIRE`. `ZX_FIRE` EventProcess: animation end on the line -> `USI_JUMP_LANDING`, then the cancels incl. Z-X. FrameMove ( 0.01 s ): `IsEnoughMPForAttack( 5 )` at `Dummy2_Lhand` ( rotation -45 when aimed down ), then `EffectSet_SDK_Dash_Jump_Combo_ZX` ( float < 0 ) or `_ZX_Front`, power `GetPowerRate() x ( charge + 1 )`, scale `1 + charge x 0.5` on all three axes, no hyper flag.
+- **Shared support:** `X2GUEL.cpp` gains `IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_` ( the flag-chain macro that starts with `if` ) in both macro blocks and `ZX_CANCEL_AFTER_EX_ON_LINE_` in the `_CORE` / `#ifndef _LIVE` block; the numbers sit in `_CONST_EL_CH1G_`. `GetClassSkillFloat()` / `SetClassSkillFloat()` ( engine C3e-1 ) carry the class-skill float; no engine edit.
+- **Leads closed:** CH1d / CH1d2's "`SDK_*` states of line 3 are plain script tables" ( no class key; registration is CH1m ). Nothing out of scope found; no drift.
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE --with ..._LIVE --worktree --files X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `files: 2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. `git diff --numstat`: `X2GUEL.cpp` 370 / 0, `X2GUEl.h` 29 / 0; `bytes>=0x80` 13,134 and 5,494 before and after; `X2GUEL.cpp` LF-only lines 326 before and after.
+- One-file `/Zs` probe of `X2GUEL.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off and with `/DSERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`. `/P` check: `ESI_COMBO_SDK_XXXXXXX_EventProcess()` 2 off / 2 on, `EffectSet_SDK_Dash_Jump_Combo_ZX_Front` 1 / 1, `m_fDashJumpZXChargeTime` 9 / 9 ( `_CORE` is always on ).
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: none of its own, the CH1g2 review covers CH1e-CH1g2 ( no `_DEBUG` define here ). Next: `/x2-phase char-elesis CH1g2` ( Sonnet 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
