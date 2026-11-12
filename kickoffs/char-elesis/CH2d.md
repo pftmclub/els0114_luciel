@@ -55,3 +55,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **`ch0_wos.tsv` rows:** 1 (filter on its `proposed_phase` column).
 - **`ch0_blood.tsv` rows:** 1 (filter on its `proposed_phase` column).
 - The 11 bare `SI_` Dark Knight tables are here (registered only through the skill switch). The bleeding self-damage helper `32b89470` (min(final damage, HP - 10% max HP), x0.2 under BTI 666) is first called here (10 callers in CH2d / CH3c).
+
+## Amended by CH1p review (2026-11-13): held skill keys
+
+June-only key read to add with its states: Ejection Buster `32b51b90` (charge / attack StartFuture: `m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 )` @32b51bab, `31fce6d0`; March's states read no key). No `FollowSlotSwap` / `IsKeyReleased` site in its range: check where the charge's release is read before transcribing.

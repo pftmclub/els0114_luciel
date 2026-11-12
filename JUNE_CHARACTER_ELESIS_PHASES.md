@@ -1242,6 +1242,35 @@ the same tallies, FAIL only for the `//#define`. `junediverge.py --check X2Lib/X
 
 **Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1p review` (Opus 5.5 high).
 
+### CH1p - Review (2026-11-13, Opus 5.5): pass, no code change
+
+Read from the exe bytes (`dispsweep.py 8b58` and `8ac0 88bc 8ea0 8ea4 8ea8` filtered to `32b4e770-32b90b6f`, `funcdis.py --func` at each hit) and the `.i` of both files:
+- **The 18 key calls.** 29 `lea ecx, [r+0x8b58]` sites in her range (the Done note says 23: a miscount, the list is complete). The 16 under March's states call
+  exactly what CH1p wrote: `Set` `31fce6d0` @32b7275e / @32b72d5c / @32b5b883 / @32b50bf1, `FollowSlotSwap` `31fce670` @32b727fe / @32b854b9 / @32b5bbeb /
+  @32b5c0cb / @32b5c40b / @32b5fe6d, `IsKeyPressedOnce` `31fc8900` @32b72852 / @32b8551f, `IsKeyReleased` `31fc89a0` @32b5bc22 / @32b5c103 / @32b5c443 / @32b5fedb.
+  Every `Set` takes `[+0x88bc]` then `dec` (Drastic Charge's before `CommonStateStartFuture`, as written). `32b85470` is the one EventProcess of Rushing Sword
+  1st / 2nd / 3rd (`ch0_class_map.tsv:541`), so 16 sites = March's 18 calls. Extinction: charge goes to 0xdb attack / 0xdc on up / 0xdd on down; `32b5c0c0`
+  goes to 0xdd (= degree up -> down, March `:11396`) and `32b5c400` to 0xdc (= degree down). `.i`: `m_sCurrentSkillKeyManager.` 18 / 0, `m_kSkillSlotKey.` 0 / 18.
+- **The other sites** are June-only reads owned by later phases: `32b4f800` / `32b4f840` / `32b6eaa0` CH2a, `32b50430` / `32b50480` CH2b, `32b50b00` /
+  `32b85aa0` CH3a2, `32b51b90` (Ejection Buster, `Set` only) CH2d, `32b4f660` / `32b4f6d0` dead. **Fix (bookkeeping):** CH2d's kickoff was not amended;
+  this review adds its held-key note. `+0x88bc` hits = the `Set` argument reads above plus CH1k's write @32b4eec3; `+0x8ea0` / `+0x8ea4` / `+0x8ea8` only in
+  `32b4ee20`, `32b84a50`, `32b73e60` (CH1k); `+0x8ac0` none.
+- **Shared reader.** `.i` off: `bMarchSlotIndex` without `UT_ELESIS`; `_LIVE`: the same line plus `UT_ELESIS`; the other three uses unchanged. Eve / Arme /
+  Chung / Elsword / Raven / Rena / Ara `_LIVE` are all `#define`d (`Always.h:9642`-`12193`), so the new outer level drops no class.
+- **No-code verdicts hold.** The `> 3` / `- 4` decode (`X2GUEL.cpp:5265`) and `CountUsedSkill` (`:5377`) sit only in `#else`; no `GetPressedSkillState` or
+  `LoadEffectSetFromScript` in her files; `JUNE_EFFECT_SET_LIST_VARIANTS` (`Always.h:10242`), `JUNE_BUFF_NEW_STAT` (`:4769`), `UPGRADE_RAVEN` (`:3242`)
+  defined, readers at the cited lines. June's script: `BFI_BUFF_SUPER_ARMOR` / `BFI_ELESIS_ENDURANCE_MEMO` (`ELESIS_KNIGHT.src.lua:10381` / `:10404`),
+  `BUFF_FACTOR_RELATIVE_SKILL_ID = 28402` + `RELATIVE_SKILL_LEARN_CHECK` (`:8766`, `:8840`, `:9196`), `RNSI_A_SBH_FLAME_SWORD` (`:14560`) = the CH1 amendment.
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --range 9884a6be^..9884a6be --files X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: `X2GUEL.cpp` PASS +72
+(`eol! 6`, the studio LF-only lines CH1p named), `X2GUUser.cpp` PASS +5; `files: 2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`, 0 deleted, 0
+non-ASCII, 0 `#else/#endif` without the token, 0 encoding changes; RESULT FAIL only for `define: NOT FOUND` (`//#define`). `Always.h`: 0 deleted lines.
+`junediverge.py --check-all`: `allow-listed: 207`, `RESULT: PASS`. `enumscan.py --check` the two: `0 A/B row(s)`. Probes (`census.cl_cmd`, `/c /Zs /EHsc`, no
+PCH): both files off / `_LIVE` / `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`: exit 0, 0 errors x6 (38 / 39 warnings, unchanged). No `_DEBUG` define.
+Full build skipped: no play-test.
+
+**Nothing to play-test.** CH1q kickoff checked (unchanged). Next: `/x2-phase char-elesis CH1q` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
