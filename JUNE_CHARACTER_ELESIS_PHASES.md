@@ -996,6 +996,39 @@ registers them too; Ara's 600 ); 639 `ESI_DASH_JUMP_COMBO_SSK_ZZX` ( 321 ) takes
 
 **Nothing to play-test** ( `_LIVE` is off ). Next: `/x2-phase char-elesis CH1m review` ( Opus 5.5 high ).
 
+### CH1m - Review (2026-11-13, Opus 5.5)
+
+**Pass, no code change.** Commit `65d53f82` read against fresh `charport_adis.py elesis` listings of `32b87a60` / `32b81be0` / `32b864f0` and the exe bytes.
+- **Generator.** `ch1m_gen.py` rerun: both `.inc` files = the `_LIVE` branches line for line ( only the spec's 4 header lines differ ); `idmap.tsv` = `ch1m_idmap.tsv`
+  ( 153 ids, no duplicate either way ). It prints one `UNRESOLVED ID MULTI` line for June 205 ( 205 and 207 share the table `..._ACTIVE` ); the idmap settles
+  it as 205 `_ACTIVE` / 207 `_DETONATION`. 227 / 228 both `MakeTableReference( "ESI_DASH_JUMP_COMBO_SPK_XZ" )`; 207 = 205's table + the CH1k pair.
+- **Independent listing walk.** Every `31fd89b0` call in the listings ( id push, table string, thunk stores since the last inlined `Init` ) against `ch0_reg.tsv`:
+  part 1 111 / 111 and part 2 57 / 57, ids, tables and thunks equal ( id 23's table is the `31fdd490` return ). Part 2 jump table `32b8725c` / byte table
+  `32b8726c`: 29 / 120 -> SGM + SSK ( 19 ), 30 / 121 -> SBH + SPK ( 15 ), 35 / 125 -> SCA + SDK ( 23 ), the other 91 classes -> `32b8720e` ( epilogue ). 321 and
+  326 `jmp 32b87203`, 329 falls into it; after that call the epilogue, so no fall-through = the C++'s `} break;` groups.
+- **Wrapper.** Byte table `32b87fec` ( 0x76 bytes, classes 8-125 ): 8 / 29 / 30 / 35 -> 0, 120 -> 1, 121 -> 2, 125 -> 3, the other 111 -> 4; jump table
+  `32b87fd8`: 0 and 4 both `32b87aef` ( `mov [esi+0x8ac8], ebx`, `ebx` = 0 ); null unit or class outside 8-125 -> 0. `cmp [esi+0x4088], 0xbb` @32b87af5 ( id 187
+  = `ESI_SWORD_WAIT` ), else 0xd. Slots ( struct +0x28 / +0x48 / +0x58 = Start / EventProcess / End ): START `329cb6e0` / `329cb6f0` / `329cb1b0`, WIN `329cb700` /
+  `320718d0`, LOSE `329cb710` ( the thunks Ara's review resolved ). `PUSH 0x82` @32b87ed1 with `334fd4dc` "ESI_WAIT_STATE_CHANGE", EventProcess `329cb720`.
+  Tail vslot 0x690, 0x684( ebx = 0 ), `31fd8f00`. June calls `31fc93d0` ( bare `RET` ) first in the wrapper and in part 2; the C++ leaves it out ( the Done
+  note's "not called" means the C++ ). Order: part 2's ids are 208-333 and the event states sit in the `USI_` range, so `InitEventStates` after part 2 changes
+  nothing.
+- **Part 1.** Id 23: thunk `32bd5f20` -> `32adf320` ( `mov eax,[ecx]; jmp [eax+0x600]` ) -> Elesis vtable `334fa61c` +0x600 = `32b7f090` `HyperModeFrameMove`;
+  `329cc5a0` -> `329cc0e0` ( `jmp [eax+0x604]` ) -> +0x604 = `3201b8e0`, base `HyperModeEnd`; StartFuture / Start / EventProcess = base `31fc8050` / `31ffd490` /
+  `31fcc300` = the C++. Bounding 120-122 sit after dance 127-129 and before `ESI_RIDING_START` ( 72 ) = `InitBoundingStates( "ESI_" )`'s place; its three
+  callbacks match ( EventProcess; EventProcess; StartFuture / Start / EventProcess ). Left out 123-126, 127-129, 93-96 = the comment lines. No `32d3ee60` in either part.
+- **`ParseCommonRandomState`.** `CX2GUUser::ParseCommonRandomStateByUnitClass` ( `X2GUUser.cpp:6030`, `ARME_LIVE` ) reads `INIT_COMMON_RANDOM_STATE[ GetUnitClassName ]`;
+  `GetUnitClassName` ( `X2UISkillTreeNew2015.cpp:5614`-`5678`, `JUNE_ENUM_NAMES` branch ) gives the seven names, equal to the seven keys of
+  `ELESIS_KNIGHT.src.lua:317`-`495`.
+- **JUNE_BUGS 638-639.** `PUSH 0xa0` @32b83d37, `0xa1` @32b83d68, `0xa3` @32b83de3; none of the three names occurs in `ELESIS_KNIGHT.src.lua`. 321: `mov eax,
+  0x32b8fd40` @32b868e1, `32b8fd40` = `jmp 32b5a8a0`, the same thunk as 211 ( `SSK_XX` ); the C++ names `ESI_DASH_JUMP_COMBO_SSK_XX_EventProcess` on both. Both stand.
+
+Gates. `flagcheck JUNE_CHAR_ELESIS_LIVE --range 65d53f82^..65d53f82 --files X2Lib/X2GUEL.cpp`: `files: 1 PASS` ( +1237, `eol! 424` ), `0 deleted, 0 non-ASCII
+inserted, 424 EOL-mismatched, 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only for the `//#define`. `junediverge.py --check-all`:
+`allow-listed: 207`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`. Probes `/c /Zs /EHsc` of `X2GUEL.cpp` ( `census.cl_cmd`, no PCH ): off,
+`_LIVE`, `_LIVE` + `_WOS` + `_BLOOD` + `_PASSIVE` + `_SUMMON`: exit 0, 0 errors each. No `_DEBUG` define to retire. Full build skipped: no play-test ( no code
+change ). `CH1n.md` checked. Nothing to play-test. Next: `/x2-phase char-elesis CH1n` ( Opus 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
