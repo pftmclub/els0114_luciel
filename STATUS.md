@@ -107,8 +107,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH1c | **ready**: riding, pepper run, dance (use the `_ON_LINE_` cancel macros where June tests the line; CH1b review) | Sonnet 5.5 / high | CH1b review (done) | `X2GUEL.*` | `CH1c.md` |
-| CH1d | blocked (CH1c): ground combos | Sonnet 5.5 / high | CH1c | `X2GUEL.*` | `CH1d.md` |
+| CH1d | **ready**: ground combos (CH1c done) | Sonnet 5.5 / high | CH1c done | `X2GUEL.*` | `CH1d.md` |
 | CH1d2 | blocked (CH1d): dash and dash / jump combos; review covers CH1c-CH1d2 | Sonnet 5.5 / high, Opus review | CH1d | `X2GUEL.*` | `CH1d2.md` |
 | CH1e | blocked (CH1d2 review): Saber Knight / Grand Master lines | Sonnet 5.5 / high | CH1d2 review | `X2GUEL.*` | `CH1e.md` |
 | CH1f | blocked (CH1e): Pyro Knight line (SPK; CH0 split) | Sonnet 5.5 / high | CH1e | `X2GUEL.*` | `CH1f.md` |
@@ -146,7 +145,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH6 | blocked (CH4c review, CH5 review, CHNb review): scans rerun + user walk incl. both job changes, the creation screen and the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH4c, CH5, CHNb reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, template paragraph, `stage7-plan` -> `char-add` | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
 
-Done: CH0 (2026-11-12; maps + asset list, 5 splits, no code). CH1a (2026-11-12; 33 rows, 2 June differences, `_LIVE` stays off; no play-test, full build skipped). CH1b (2026-11-12; 23 rows, `_LIVE` stays off; no play-test, full build skipped). CH1b review (2026-11-12; covers CH1a-CH1b; pass after one fix: June's walk / bwalk / dash / ZX cancels need the line test, `_ON_LINE_` macros; full build skipped: no play-test).
+Done: CH0 (2026-11-12; maps + asset list, 5 splits, no code). CH1a (2026-11-12; 33 rows, 2 June differences, `_LIVE` stays off; no play-test, full build skipped). CH1b (2026-11-12; 23 rows, `_LIVE` stays off; no play-test, full build skipped). CH1b review (2026-11-12; covers CH1a-CH1b; pass after one fix: June's walk / bwalk / dash / ZX cancels need the line test, `_ON_LINE_` macros; full build skipped: no play-test).. CH1c (2026-11-12; 2 rows inside, `CommonHyperModeFrameMove` was `new` in the map but March has it; JUNE_BUGS 626; no play-test, full build skipped)
 
 Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for 35 / 120 / 121 / 125 follow Ara's rule (CHNa writes, user packs); CH0: moot, the flat StatTable (e37c9211) already has their rows.
 

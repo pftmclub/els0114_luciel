@@ -10548,3 +10548,5 @@ Rena +0x97e0	CX2GULire_ElvenRanger::m_fOpenMindMpPerNaturalForce	PORTED	Char Ren
 32b53980	CX2GUEL::StandUpAttackBackNoDownEventProcess	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b53900; = March
 32b4f270	CX2GUEL::StandUpAttackFrontNoDownEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
 32b4f2b0	CX2GUEL::StandUpAttackBackNoDownEnd	PORTED	Char Elesis CH1b: inside, June body under JUNE_CHAR_ELESIS_LIVE; as 32b4f0d0; = March
+32b81200	CX2GUEL::RidingHyperModeFrameMove	PORTED	Char Elesis CH1c: inside, June body under JUNE_CHAR_ELESIS_LIVE; CommonHyperModeFrameMove( 0, 0.1, true ), = March; listing-only; ESI_RIDING_HYPER_MODE FrameMove
+32b7b820	CX2GUEL::CommonHyperModeFrameMove	PORTED	Char Elesis CH1c: inside (CH0 listed it new; March has it, same 3 args), June body under JUNE_CHAR_ELESIS_LIVE; = March + awakening effect-set stand-ins (32011d20 / 31fd66b0 / 32011f50, _CONST_EL_CH1C_), the trace only when the set is absent; two independent timers, no third

@@ -11126,12 +11126,62 @@ void CX2GUEL::SnapCrasherProc_FrameMove()
 #endif //MODIFY_SET_DAMAGE_DATA
 
 #ifdef MODIFY_RIDING_PET_AWAKE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+namespace _CONST_EL_CH1C_
+{
+	// char-elesis CH1c: June 32011d20 / 31fd66b0 / 32011f50 ( the awakening effect-set family ); stand-in: not ported ( Stage 12 ), June's empty-name default
+	void ElesisAwakeningEffectBegin()			{}
+	bool ElesisAwakeningEffectSetPresent()		{ return false; }
+	void ElesisAwakeningEffectPlay()			{}
+}
+using namespace _CONST_EL_CH1C_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 void CX2GUEL::RidingHyperModeFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1c: June 32b81200
+	CommonHyperModeFrameMove( 0.f, 0.1f, true );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CommonHyperModeFrameMove(0.f, 0.1f, true);
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 void CX2GUEL::CommonHyperModeFrameMove( float fTime1_, float fTime2_, bool bSound_ /*= false*/ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	// char-elesis CH1c: June 32b7b820, two independent timers; the trace only without the awakening set
+	g_pX2Game->GetWorld()->SetWorldColor( 0xff222222 );
+
+	if( true == m_pXSkinAnim->EventTimerOneshot( fTime1_ ) )
+	{
+		ShowMinorParticleHyperModeChange();
+	}
+
+	if( true == m_pXSkinAnim->EventTimerOneshot( fTime2_ ) )
+	{
+		ElesisAwakeningEffectBegin();
+		if( true == ElesisAwakeningEffectSetPresent() )
+			ElesisAwakeningEffectPlay();
+
+		ShowMinorParticleHyperModeShock();
+
+		UpDownCrashCamera( 30.0f, 0.4f );
+		g_pKTDXApp->GetDGManager()->ClearScreen();
+
+		if( false == ElesisAwakeningEffectSetPresent() )
+			ShowMinorParticleHyperModeTrace();
+
+		ApplyHyperModeBuff();
+
+		if( true == bSound_ )
+		{
+			PlaySound( L"Energy.ogg" );
+			PlaySound( L"Break.ogg" );
+			PlaySound( L"Change.ogg" );
+		}
+	}
+
+	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	g_pX2Game->GetWorld()->SetWorldColor( 0xff222222 );
 
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -11165,6 +11215,7 @@ void CX2GUEL::CommonHyperModeFrameMove( float fTime1_, float fTime2_, bool bSoun
 		}
 	}
 	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 }
 #endif //MODIFY_RIDING_PET_AWAKE
 

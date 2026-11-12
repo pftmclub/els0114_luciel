@@ -530,6 +530,31 @@ Verdict: **pass after one fix.** All 56 functions are `inside` under `SERV_IRUHA
 
 No `JUNE_BUGS` row, no `_DEBUG` define to retire. Next: `/x2-phase char-elesis CH1c` (Sonnet 5.5 high).
 
+### CH1c - Done (2026-11-12)
+
+The class map gives phase CH1c **2 rows**, both written, both `inside` (June body in March's own `CX2GUEL` function under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, March's in `#else`, tag `// char-elesis CH1c`). No `_CORE` (no `new` row remains), no `_WOS` / `_SUMMON` / `_BLOOD` line. `_LIVE` stays `//#define`. 2 funcmap rows `Char Elesis CH1c`; `JUNE_BUGS.md` row 626; no checklist row to mark (no state writes the state power rate or calls the buff factor).
+
+| June | `CX2GUEL::` | map column | what |
+|---|---|---|---|
+| `32b81200` | RidingHyperModeFrameMove | `inside`, listing-only | `CommonHyperModeFrameMove( 0, 0.1, true )`, = March (read from `charport_adis.py elesis`) |
+| `32b7b820` | CommonHyperModeFrameMove | CH0 said `new`, `?` | **`inside`**: March has it (`X2GUEL.cpp:11133`, same three arguments, `ret 0xc`); Elsword's CH1c made the same correction |
+
+**The other 35 states of the kickoff list are base callbacks.** Riding (27 `ESI_RIDING*`), pepper run (5), dance (3) and the three phoenix-run states have no function in her range: June's thunks `329cb180`-`329cc960` jump to `CX2GUUser` functions that March's `InitState` registers already, so nothing is transcribed (registration is CH1m). `ESI_RIDING_DIE` uses CH1b's DieFront functions; `ESI_RIDING_HYPER_MODE`'s Start / EventProcess / End are base callbacks too.
+
+**Where `32b7b820` differs from March** (read from the raw listing):
+- **Awakening effect-set family:** June calls `32011d20` (begin), `31fd66b0` (present test) and `32011f50` (play, only when present) before the shock particle, and plays the trace `31ffda00` only when the set is absent. File-local stand-ins in `_CONST_EL_CH1C_` ( `ElesisAwakeningEffectBegin` / `SetPresent` = false / `Play`; "not ported ( Stage 12 ), June's empty-name default" ), as Chung / Rena / Raven / Elsword / Eve / Ara. With the stand-in the trace still plays, as March.
+- **= March:** world colour `0xff222222` (inlined `SetWorldColor`), **two independent `EventTimerOneshot` timers** (a plain `if` for each, no `else if`, no third timer: the listing falls through from the first block), `ShowMinorParticleHyperModeChange` / `Shock` with the default bone `Dummy1_Rhand`, `UpDownCrashCamera( 30, 0.4 )`, `ClearScreen` (inlined), `ApplyHyperModeBuff` (vslot 0xc0), the three sounds when `bSound`, tail vslot 0x7cc `CommonFrameMove`.
+- **Caller:** the ordinary `HyperModeFrameMove` `32b7f090` (CH1i) calls the same helper (`CommonHyperModeFrameMove( 0.05, 0.83 )` in March), so the awakening stand-in applies to every Elesis awakening once `_LIVE` is on.
+- **`JUNE_BUGS` 626:** `ESI_RIDING_DAMAGE_FRONT` is defined twice in her script (lines 6945 / 6951, second wins) and `ESI_RIDING_DAMAGE_BACK` has no table; kept verbatim (CH1 adopts the script as is).
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --worktree --files X2Lib/X2GUEL.cpp`: `files: 1 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only because `_LIVE` is `//#define` (by design). `git diff --numstat`: 51 / 0; `bytes>=0x80` 13,134 before and after.
+- One-file `/Zs` probe of `X2GUEL.cpp` (`census.cl_cmd`, no PCH): 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`; the `/P` output has `ElesisAwakeningEffectBegin` 2 times with the flag on, 0 off.
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: none of its own, the CH1d2 review covers CH1c-CH1d2 (no `_DEBUG` define here). Next: `/x2-phase char-elesis CH1d` (Sonnet 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
