@@ -416,6 +416,59 @@ play-test on three characters (one physical, one magical, one with a ported tran
 level-damage skill against a normal-dungeon monster, a secret-dungeon monster and a boss, each `GFD` line's product equal to the damage
 number on screen.
 
+### Phase D2a - Done (2026-11-12)
+
+**Opus 5.5 / xhigh. Flag `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` (`KTDXLIB/Always.h`, three `#error` dependency guards); D2b continues
+under it.** Commit: this commit. Insert-only: `X2GameUnit.cpp` +366, `X2GameUnit.h` +3, `X2GUUser.h` +6, `X2GUUser.cpp` +3,
+`X2DamageManager.h` +6 (`DTT_ACEINTHEHOLE_FINAL` 36 / `_2ND` 43 under `SERV_IRUHADEV_JUNE_ENUM_NAMES`, June's `Enum.lua` values).
+No review of its own: `D2-review.md` (written by D2b) covers D2a. Full build skipped: no play-test (D2b's play-test covers both halves).
+
+**Ported (every `gfd_blocks.tsv` range before `32285ccf` is now `June`):**
+- @32284d76: `CX2GameUnit::ModifyAttackRateByAttackerSkill` (June `3229a530`, vslot `0x6c`; `vtslot.py 0x6c`: no class overrides it),
+  called on the hit unit with both rates 1.0. Raven: Pointed Stiletto on a unit with its debuff, Devastating Strike on super armour
+  (`EffectSet_SA_ENW_Predator_Lucky` on the hit unit, x 1.2f); Rena: Rage Fungus while the lock count is within `SA_EFFECTIVE_COUNT`;
+  any user attacker: Ace in the Hole's triggers (36 / 43) on a unit with its debuff; Ara: Specter of Thunder sets `m_bIgnoreStateDefence`
+  when awakened with Spiritism Weird Fox learned. Every June block needs a user attacker, so the port returns early for any other.
+- @32284db2-3228509f: the passives on June's ids. Confidence Victory (24403) at the hit unit's HP <= 0.3f; Pride Victory (24408) when
+  the attacker's own HP rate is **at or above** its `SA_MAX_HP_REL` value (`fld threshold; fcompp; jp skip`: D0's "<=" was wrong);
+  Manaflow Overdrive (22410) with no HP gate, `GetSkillLevel( id, false, 0, true )`; Sharpen Arrow (23411) writer.
+- Vslot `0x784` = `CX2GUUser` `3208e200`: reads `+0x9494`, which only the ctor writes (0); its setter `3208e230` (vslot `0x844`) has no
+  call site and no vcall thunk. Ported as `m_fManaflowMpInSkillState` + getter, so Manaflow gives no bonus in a skill state (`JUNE_BUGS` 630).
+- @3228509f: world-mission rates `- 1 + (double)5e-8f` (`CalculateWorldBuffIncreasingRate`, `_CONST_GAMEUNIT_D2A_`, not an edit of
+  `KTDXCommonFunc.h`); June tests vslot `0x10c` == 1, so `GT_PVP != GetGameType()` stays (not the `322cc1a0` idiom).
+- @32285189: socket stat rates in `XS_PVP_GAME`, `XS_DUNGEON_GAME`, `XS_TRAINING_GAME`, `XS_BATTLE_FIELD` (by name), no pet test.
+  **Not registered: `XS_PVE_GAME` 23** (the kickoff asked for it): March's 23 is `XS_ARCADE_ROOM`, and March has no PvE game state, so by
+  name there is no case to add; offline has neither PvP nor PvE.
+- @322855a6: `CalcExtraAttackPower` as June `3226e530`: no `EDT_EVENT_SMASH_3` case, then one discarded `GetRandomFloat( 4 + j )` per
+  record of the attacker's `m_vecSecondExtraDamage` (DD `+0x3b4`; a table lookup, no side effect). Its weapon read keeps March's 2-argument
+  `GetEquippingItemByEquipPos`: the third argument is D2b's (its kickoff lists this caller).
+- @322857fb: March's 4-argument `AT_NORMAL` call is gone. The base is empty; Eve's and Ara's 4-argument overrides are empty under
+  `JUNE_CHAR_EVE_LIVE` / `JUNE_CHAR_ARA_PASSIVE` (their June 3-argument slots hold the bodies); no other class overrides it.
+
+**Stand-in:** June's `IsSuperArmor( 1 )` also needs a user's AnimStop marker `+0x8080` clear (June-only, left unported by Buff Phase 4b-i).
+It matters only for a user defender, which only PvP reaches. Divergence row `IsSuperArmor` (verdict `out`) records it.
+
+**Emulation** `june2017_re/statcalc/emu_final_damage_a.py` (Unicorn, FPCW 0x027F, calls stubbed): `EMU_FINAL_DAMAGE_A OK: 861 input
+sets, 0 mismatch(es), 0 table mismatch(es); 12 XS_PVE_GAME set(s) not compared (no March state)`. World-mission ranges, the Manaflow
+multiplier, the Confidence / Pride / Rage Fungus gates, the socket block on every June state, `3226e530`'s three jump tables.
+
+**Debug line** (`_DEBUG`, printed beside each `HIT` line, same throttle): `[JUNE_STATCALC] GFD att= def= skill= patk=<in>><out>
+matk= pdef= mdef= hook=<p>/<m> conf= pride= mana= sharpen= world=<atk>/<def> socket=<patk>/<matk>/<pdef>/<mdef> extra=`. `skill` is
+`m_iAppliedSkillID`; `<out>` is the value after this half's multipliers (before the memo / endurance terms). D2b extends it.
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE --worktree --files <6 files>`: 4 PASS, 1 DEFINE, 1 OTHER
+(`X2DamageManager.h`: the two DTT names under `SERV_IRUHADEV_JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL, 0 tok ->
+`RESULT: PASS`. `junediverge --check <6 files>`: `RESULT: PASS`. `enumscan --check`: 0 rows in this phase's hunks (2 older class-B rows,
+`X2GUUser.h:2561-2562`). Probe: `/Zs` of `X2GameUnit.cpp` and `X2GUUser.cpp` with X2Lib's US_SERVICE defines: 0 errors (0 warnings in
+`X2GameUnit.cpp`); `/P` shows the June code compiled in and March's 4-argument call gone.
+
+**Bookkeeping.** `gfd_blocks.tsv` 9 rows -> `June`; map rows (hook, extra-damage sum, unit hooks, whole function); funcmap 5 rows
+(`StatCalc S33`); divergence rows `CalcExtraAttackPower` (`replace`, ported) and `IsSuperArmor` (`out`); `JUNE_BUGS` 630; `MODS.md`.
+
+**How to see it in game (D2b's play-test):** a Raven's Devastating Strike on a super-armoured boss plays the Predator Lucky effect and its
+`GFD hook=1.2000/1.2000`; a Rena's Rage Fungus or Ace in the Hole shows `hook=` above 1; a Dimension Witch's combo hit shows `mana=` above
+1 and her skill hit `mana=1.0000`; a Night Watcher with Sharpen Arrow shows its `sharpen=` value (applied to `HIT`'s defence on command hits).
+
 ## Phase D3 - The hit pipeline before the formula
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE`: `SetDamageExceptionProcess` base `322990e0` (damage terms only; its MP

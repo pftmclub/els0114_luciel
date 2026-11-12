@@ -137,6 +137,12 @@ class CX2DamageManager
 			DTT_AISHA_STICK_ATTACK                = 17,	// June's Enum.lua; Open Mind's trigger ( OpenMindAttackResult, June 32ce9f90 )
 #endif SERV_IRUHADEV_ENUM_GATE_AISHA_TRIGGER
 //}}
+//{{ Iruha : 2026-11-12 // june-stat-calc D2a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			DTT_ACEINTHEHOLE_FINAL                = 36,	// june-stat-calc D2a: June's Enum.lua; Ace in the Hole's triggers ( ModifyAttackRateByAttackerSkill, June 3229a530 )
+			DTT_ACEINTHEHOLE_2ND                  = 43,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 		};
 #endif
 

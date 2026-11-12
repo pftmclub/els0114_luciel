@@ -4396,6 +4396,9 @@ public:
 		virtual void ModifyFinalDamageByGameUnitType( CX2DamageManager::DamageData* pDamageData_, float& fAttackerPhysicDamage_, float& fAttackerMagicDamage_ ) {}	/// June unit vslot 0x3ac ( base 33108560, empty )
 		virtual void ModifySpecialFinalDamageByGameUnitType( CX2DamageManager::DamageData* pDamageData_, float& fAttackerPhysicDamage_, float& fAttackerMagicDamage_ ) {}	/// June unit vslot 0x3b0 ( base 33108560, empty )
 #endif SERV_IRUHADEV_JUNE_FINAL_DAMAGE_UNIT_HOOK
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		virtual void ModifyAttackRateByAttackerSkill( CX2DamageManager::DamageData* pDamageData_, float* pfPhysicRate_, float* pfMagicRate_ );	// june-stat-calc D2a: June 3229a530 ( vslot 0x6c, GetFinalDamage @32284d98 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 		bool	ApplyDrainHpBuff()
 		{

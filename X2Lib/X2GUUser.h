@@ -1852,6 +1852,9 @@ public:
 		int							GetFutureStateID() const { return m_FutureStateData.stateID; }
 		CX2SkillTree::SKILL_ID		GetNowStateSkillID() const { return m_NowStateData.m_eSkillID; }
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		float						GetManaflowMpInSkillState() const { return m_fManaflowMpInSkillState; }	// june-stat-calc D2a: June 3208e200 ( vslot 0x784; only GetFinalDamage reads it )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SERV_ADD_LUNATIC_PSYKER // 김태환
 #ifdef SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 		CX2SkillTree::SKILL_ID		GetFutureStateSkillID() const { return m_itFutureStateData->second.m_eSkillID; }
@@ -5084,6 +5087,9 @@ public:
 	KProtectedType<bool> m_bInstanceKill;
 	bool HaveInstanceKillDebuff() const;	/// June CX2GUUser slot 200 (31fe4150); base and NPC return false
 #endif SERV_IRUHADEV_JUNE_BUFF_INSTANCE_KILL
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	float m_fManaflowMpInSkillState;	// june-stat-calc D2a: June +0x9494 ( ctor 0; its setter 3208e230, vslot 0x844, has no caller )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE //김창한
 	bool		m_bSetCustomRenderParam;			/// 정의한 m_RenderParam의 값을 그대로 적용할 수 있게하기 위한 변수.

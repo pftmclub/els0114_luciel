@@ -2096,8 +2096,182 @@ float CX2GameUnit::CalcLevelFactorForFinalDamage( CX2GameUnit* pAttacker )
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+// june-stat-calc D2a: GetFinalDamage's local helpers
+namespace _CONST_GAMEUNIT_D2A_
+{
+	const float WORLD_BUFF_RATE_EPSILON = 0.00000005f;	// June 3346ed68 ( (double)5e-8f ); March's CalculateIncreasingRate adds 5e-5
+	const float DEVASTATING_STRIKE_SUPER_ARMOR_RATE = 1.2f;	// June 3346f488 ( (double)1.2f )
+	const float CONFIDENCE_VICTORY_HP_RATE = 0.3f;	// June 3343bd78 ( (double)0.3f ); March's SI_ block used 0.2
+	const float MANAFLOW_OVERDRIVE_MP_RATE = 0.06f;	// June 3343bd90 ( (double)0.06f )
+	const float SMASH_ATTACK_POWER_RATE = 0.2f;	// June 334411a8 ( (double)0.2f )
+	const float SMASH_EVENT_ATTACK_POWER_RATE = 0.4f;	// June 33487220 ( (double)0.4f )
+
+	inline float CalculateWorldBuffIncreasingRate( const float fRate_ ) { return fRate_ - 1.f + WORLD_BUFF_RATE_EPSILON; }	// June @322850f1-32285105
+
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	struct FinalDamageTrace	// june-stat-calc D2a: the multipliers of June @32284d76-322852db for the GFD line
+	{
+		float fPhysicAttackIn, fMagicAttackIn, fPhysicDefenceIn, fMagicDefenceIn;
+		float fPhysicAttackOut, fMagicAttackOut, fPhysicDefenceOut, fMagicDefenceOut;
+		float fHookPhysicRate, fHookMagicRate, fConfidenceRate, fPrideRate, fManaflowRate, fSharpenRate;
+		float fWorldAttackRate, fWorldDefenceRate, fSocketPhysicAttackRate, fSocketMagicAttackRate, fSocketPhysicDefenceRate, fSocketMagicDefenceRate;
+		FinalDamageTrace()
+			: fPhysicAttackIn( 0.f ), fMagicAttackIn( 0.f ), fPhysicDefenceIn( 0.f ), fMagicDefenceIn( 0.f )
+			, fPhysicAttackOut( 0.f ), fMagicAttackOut( 0.f ), fPhysicDefenceOut( 0.f ), fMagicDefenceOut( 0.f )
+			, fHookPhysicRate( 1.f ), fHookMagicRate( 1.f ), fConfidenceRate( 1.f ), fPrideRate( 1.f ), fManaflowRate( 1.f ), fSharpenRate( 1.f )
+			, fWorldAttackRate( 0.f ), fWorldDefenceRate( 0.f ), fSocketPhysicAttackRate( 0.f ), fSocketMagicAttackRate( 0.f ), fSocketPhysicDefenceRate( 0.f ), fSocketMagicDefenceRate( 0.f )
+		{}
+	};
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+}
+using namespace _CONST_GAMEUNIT_D2A_;
+
+// june-stat-calc D2a: June 3229a530 ( vslot 0x6c; no class overrides it ): the hit unit scales the attack by the attacker's skill
+/*virtual*/ void CX2GameUnit::ModifyAttackRateByAttackerSkill( CX2DamageManager::DamageData* pDamageData_, float* pfPhysicRate_, float* pfMagicRate_ )
+{
+	if ( null == pDamageData_->optrAttackerGameUnit )
+		return;
+
+	CX2GameUnit* pAttacker = pDamageData_->optrAttackerGameUnit.GetObservable();
+	// june-stat-calc D2a: every June block needs a user attacker ( @3229a5b6, @3229a768, @3229a819 / @3229a882, @3229a8fb )
+	if ( NULL == pAttacker || CX2GameUnit::GUT_USER != pAttacker->GetGameUnitType() )
+		return;
+
+	CX2GUUser* pUser = static_cast<CX2GUUser*>( pAttacker );
+	const CX2Unit::UNIT_TYPE eAttackerUnitType = pUser->GetUnitType();
+
+	// june-stat-calc D2a: June @3229a5e0: Raven's Pointed Stiletto on a unit with its debuff, Devastating Strike on super armour
+	if ( CX2Unit::UT_RAVEN == eAttackerUnitType )
+	{
+		if ( CX2SkillTree::RNSI_A_RBM_POINTED_STILETTO == pDamageData_->m_iAppliedSkillID )
+		{
+			const BUFF_TEMPLET_ID eStilettoBuff = pUser->GetSkillBuffTempletID( CX2SkillTree::RNSI_A_RBM_POINTED_STILETTO, 0, true );
+			const BUFF_TEMPLET_ID eStilettoSecondBuff = pUser->GetSkillBuffTempletID( CX2SkillTree::RNSI_A_RBM_POINTED_STILETTO, 1, true );
+			if ( true == HaveThisBuff( eStilettoBuff ) || true == HaveThisBuff( eStilettoSecondBuff ) )
+			{
+				const float fStilettoRate = pUser->GetLearnedSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, CX2SkillTree::RNSI_A_RBM_POINTED_STILETTO );
+				*pfPhysicRate_ *= fStilettoRate;
+				*pfMagicRate_ *= fStilettoRate;
+			}
+		}
+
+		// june-stat-calc D2a: stand-in: June vslot 153( 1 ) also needs a user's AnimStop marker +0x8080 clear ( not ported; an NPC ignores it )
+		if ( true == IsSuperArmor() && CX2SkillTree::RNSI_SA_RRF_DEVASTATING_STRIKE == pDamageData_->m_iAppliedSkillID )
+		{
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_ENW_Predator_Lucky", this );
+			*pfPhysicRate_ *= DEVASTATING_STRIKE_SUPER_ARMOR_RATE;
+			*pfMagicRate_ *= DEVASTATING_STRIKE_SUPER_ARMOR_RATE;
+		}
+	}
+
+	// june-stat-calc D2a: June @3229a785: Rena's Rage Fungus while its target locks stay within SA_EFFECTIVE_COUNT
+	if ( CX2Unit::UT_LIRE == eAttackerUnitType && CX2SkillTree::RNSI_SA_RNW_RAGE_FUNGUS == pDamageData_->m_iAppliedSkillID )
+	{
+		if ( static_cast<CX2GULire_ElvenRanger*>( pAttacker )->GetRageFungusTargetLockCount() <= pUser->GetLearnedSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_COUNT, CX2SkillTree::RNSI_SA_RNW_RAGE_FUNGUS ) )
+		{
+			const float fRageFungusRate = pUser->GetLearnedSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, CX2SkillTree::RNSI_SA_RNW_RAGE_FUNGUS );
+			*pfPhysicRate_ *= fRageFungusRate;
+			*pfMagicRate_ *= fRageFungusRate;
+		}
+	}
+
+	// june-stat-calc D2a: June @3229a7ef: Ace in the Hole's two triggers on a unit with its debuff ( no unit-type test )
+	bool bAceInTheHoleDebuffed = false;
+	if ( true == pDamageData_->IsAttackTrigger( CX2DamageManager::DTT_ACEINTHEHOLE_FINAL ) )
+		bAceInTheHoleDebuffed = ( true == HaveThisBuff( pUser->GetSkillBuffTempletID( CX2SkillTree::RNSI_SA_RGA_ACEINTHEHOLE, 0, true ) ) || true == HaveThisBuff( pUser->GetSkillBuffTempletID( CX2SkillTree::RNSI_SA_RGA_ACEINTHEHOLE, 1, true ) ) );
+	else if ( true == pDamageData_->IsAttackTrigger( CX2DamageManager::DTT_ACEINTHEHOLE_2ND ) )
+		bAceInTheHoleDebuffed = HaveThisBuff( pUser->GetSkillBuffTempletID( CX2SkillTree::RNSI_SA_RGA_ACEINTHEHOLE, 0, true ) );
+	if ( true == bAceInTheHoleDebuffed )
+	{
+		const float fAceInTheHoleRate = pUser->GetLearnedSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, CX2SkillTree::RNSI_SA_RGA_ACEINTHEHOLE );
+		*pfPhysicRate_ *= fAceInTheHoleRate;
+		*pfMagicRate_ *= fAceInTheHoleRate;
+	}
+
+	// june-stat-calc D2a: June @3229a8e3: awakened Ara with Spiritism Weird Fox makes Specter of Thunder ignore state defence
+	if ( ( CX2SkillTree::RNSI_SA_ALS_SPECTER_OF_THUNDER == pDamageData_->m_iAppliedSkillID || CX2SkillTree::RNSI_SA_ALS_SPECTER_OF_THUNDER_UPGRADE == pDamageData_->m_iAppliedSkillID )
+		 && CX2Unit::UT_ARA == eAttackerUnitType && 0 < pUser->GetSkillLevelValue( CX2SkillTree::RNSI_P_ASR_SPIRITISM_WEIRD_FOX ) && 0.f < pAttacker->GetRemainHyperModeTime() )
+		pDamageData_->m_bIgnoreStateDefence = true;
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 float CX2GameUnit::CalcExtraAttackPower( CX2DamageManager::DamageData* pAttDamageData, CX2GameUnit* pAttacker, CX2Stat* pAttackerStat )
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	// june-stat-calc D2a: June 3226e530: no EDT_EVENT_SMASH_3 case ( June's 66 is EDT_BEDCLOTHES_FEATHER ), then a roll per second-list record
+	if ( NULL == pAttDamageData || CX2DamageManager::AT_SPECIAL == pAttDamageData->attackType )
+		return 0.f;
+
+	const CX2DamageManager::DamageData& damageData = pAttacker->GetDamageData();
+	float fExtraAttackPower = 0.f;
+	for ( int i = 0; i < static_cast<int>( damageData.m_MultipleExtraDamage.size() ); ++i )
+	{
+		const CX2DamageManager::ExtraDamageData& multipleExtraDamageData = damageData.m_MultipleExtraDamage[i];
+		if ( GetRandomFloat( CKTDXRandomNumbers::SRO_ATTACK_EXTRA_DAMAGE_MULTIPLE + i ) >= multipleExtraDamageData.m_fRate )
+			continue;
+
+		float fSmashAttackPower = 0.f;
+		switch( multipleExtraDamageData.m_ExtraDamageType )
+		{
+		case CX2DamageManager::EDT_FIRE_SMASH:
+		case CX2DamageManager::EDT_COLD_SMASH:
+		case CX2DamageManager::EDT_EVENT_SMASH:
+		case CX2DamageManager::EDT_EVENT_SMASH_2:
+		case CX2DamageManager::EDT_CAMILLA_SMASH:
+			{
+				switch( pAttacker->GetGameUnitType() )
+				{
+				case CX2GameUnit::GUT_USER:
+					{
+						CX2Item* pItem = static_cast<CX2GUUser*>( pAttacker )->GetUnit()->GetInventory().GetEquippingItemByEquipPos( CX2Unit::EP_WEAPON_HAND, false );
+						fSmashAttackPower = GetItemAttackPower( pAttacker, pItem, CX2DamageManager::DT_MIX );
+					} break;
+
+				case CX2GameUnit::GUT_NPC:
+					{
+						fSmashAttackPower = pAttackerStat->GetStat().m_fAtkPhysic + pAttackerStat->GetStat().m_fAtkMagic;
+					} break;
+				}
+			} break;
+		}
+
+		switch( multipleExtraDamageData.m_ExtraDamageType )
+		{
+		case CX2DamageManager::EDT_FIRE_SMASH:
+			ApplyEnchantResist( CX2EnchantItem::ET_BLAZE, fSmashAttackPower );
+			break;
+		case CX2DamageManager::EDT_COLD_SMASH:
+			ApplyEnchantResist( CX2EnchantItem::ET_WATER, fSmashAttackPower );
+			break;
+		case CX2DamageManager::EDT_EVENT_SMASH:
+		case CX2DamageManager::EDT_EVENT_SMASH_2:
+		case CX2DamageManager::EDT_CAMILLA_SMASH:
+			ApplyEnchantResist( CX2EnchantItem::ET_DARK, fSmashAttackPower );
+			break;
+		}
+
+		switch( multipleExtraDamageData.m_ExtraDamageType )
+		{
+		case CX2DamageManager::EDT_FIRE_SMASH:
+		case CX2DamageManager::EDT_COLD_SMASH:
+			fSmashAttackPower *= SMASH_ATTACK_POWER_RATE;
+			break;
+		case CX2DamageManager::EDT_EVENT_SMASH:
+		case CX2DamageManager::EDT_EVENT_SMASH_2:
+		case CX2DamageManager::EDT_CAMILLA_SMASH:
+			fSmashAttackPower *= SMASH_EVENT_ATTACK_POWER_RATE;
+			break;
+		}
+
+		fExtraAttackPower += fSmashAttackPower;
+	}
+
+	// june-stat-calc D2a: June @3226e6e1: one roll per record of the attacker's second extra-damage list, its result unused
+	for ( int i = 0; i < static_cast<int>( damageData.m_vecSecondExtraDamage.size() ); ++i )
+		GetRandomFloat( CKTDXRandomNumbers::SRO_ATTACK_EXTRA_DAMAGE_MULTIPLE + i );
+
+	return fExtraAttackPower;
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	if( NULL == pAttDamageData )
 		return 0.f;
 
@@ -2219,6 +2393,7 @@ float CX2GameUnit::CalcExtraAttackPower( CX2DamageManager::DamageData* pAttDamag
 
 
 	return fExtraAttackPower;
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 }
 
 
@@ -2763,6 +2938,104 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	if ( CX2GameUnit::GUT_USER == pDefender->GetGameUnitType() )
 		static_cast<CX2GUUser*>( pDefender )->ChangeFinalDamageAsDefender( &fPhysicDefence, &fMagicDefence );
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_LIVE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	FinalDamageTrace kFinalDamageTrace;
+	kFinalDamageTrace.fPhysicAttackIn = fPhysicAttack;
+	kFinalDamageTrace.fMagicAttackIn = fMagicAttack;
+	kFinalDamageTrace.fPhysicDefenceIn = fPhysicDefence;
+	kFinalDamageTrace.fMagicDefenceIn = fMagicDefence;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+	// june-stat-calc D2a: June @32284d76-32284db2: this ( the hit unit ) scales both attacks by the attacker's skill
+	{
+		float fAttackerSkillPhysicRate = 1.f;
+		float fAttackerSkillMagicRate = 1.f;
+		ModifyAttackRateByAttackerSkill( pAttDamageData, &fAttackerSkillPhysicRate, &fAttackerSkillMagicRate );
+		fPhysicAttack *= fAttackerSkillPhysicRate;
+		fMagicAttack *= fAttackerSkillMagicRate;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kFinalDamageTrace.fHookPhysicRate = fAttackerSkillPhysicRate;
+		kFinalDamageTrace.fHookMagicRate = fAttackerSkillMagicRate;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+	}
+
+	// june-stat-calc D2a: June @32284db2-3228509f: a user attacker's passives on June's skill ids ( March keyed SI_ 4412 / 2414 / 3411 )
+	if ( CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() )
+	{
+		const CX2UserSkillTree& cUserSkillTree = static_cast<CX2GUUser*>( pAttacker )->GetUnit()->GetUnitData().m_UserSkillTree;
+
+		// june-stat-calc D2a: June @32284db2: Confidence Victory while the hit unit's HP is at or below 0.3
+		const int iConfidenceLevel = cUserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_RRF_CONFIDENCE_VICTORY, true, 0, true );
+		if ( 0 < iConfidenceLevel )
+		{
+			const CX2SkillTree::SkillTemplet* pConfidenceTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_RRF_CONFIDENCE_VICTORY );
+			if ( NULL != pConfidenceTemplet && false == IsSamef( pDefender->GetMaxHp(), 0.f ) && 0.f < pDefender->GetNowHp()
+				 && pDefender->GetNowHp() / pDefender->GetMaxHp() <= CONFIDENCE_VICTORY_HP_RATE )
+			{
+				const float fConfidenceRate = pConfidenceTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iConfidenceLevel, false );
+				fPhysicAttack *= fConfidenceRate;
+				fMagicAttack *= fConfidenceRate;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+				kFinalDamageTrace.fConfidenceRate = fConfidenceRate;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+			}
+		}
+
+		// june-stat-calc D2a: June @32284e96: Pride Victory while the attacker's own HP is at or above its SA_MAX_HP_REL value ( none in March )
+		const int iPrideLevel = cUserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_RBM_PRIDE_VICTORY, true, 0, true );
+		if ( 0 < iPrideLevel )
+		{
+			const CX2SkillTree::SkillTemplet* pPrideTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_RBM_PRIDE_VICTORY );
+			if ( NULL != pPrideTemplet )
+			{
+				const float fPrideHpRate = pPrideTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MAX_HP_REL, iPrideLevel, false );
+				if ( false == IsSamef( pAttacker->GetMaxHp(), 0.f ) && 0.f < pAttacker->GetNowHp()
+					 && pAttacker->GetNowHp() / pAttacker->GetMaxHp() >= fPrideHpRate )
+				{
+					const float fPrideRate = pPrideTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iPrideLevel, false );
+					fPhysicAttack *= fPrideRate;
+					fMagicAttack *= fPrideRate;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+					kFinalDamageTrace.fPrideRate = fPrideRate;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+				}
+			}
+		}
+
+		// june-stat-calc D2a: June @32284f6f: Manaflow Overdrive with no HP gate ( March's SI_ block needed HP above 0.9 )
+		const int iManaflowLevel = cUserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_ADW_MANAFLOW_OVERDRIVE, false, 0, true );
+		if ( 0 < iManaflowLevel )
+		{
+			const CX2SkillTree::SkillTemplet* pManaflowTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_ADW_MANAFLOW_OVERDRIVE );
+			if ( NULL != pManaflowTemplet && false == IsSamef( pAttacker->GetMaxHp(), 0.f ) )
+			{
+				float fManaflowMp = pAttacker->GetNowMp();
+				// june-stat-calc D2a: June @32284fdb: in a skill state June reads a member only the ctor writes ( 0 ), JUNE_BUGS
+				if ( CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() && CX2SkillTree::SI_NONE != static_cast<CX2GUUser*>( pAttacker )->GetNowStateSkillID() )
+					fManaflowMp = static_cast<CX2GUUser*>( pAttacker )->GetManaflowMpInSkillState();
+				const float fAtkPhysicRel = 1.f + ( fManaflowMp / pAttacker->GetMaxMp() ) * MANAFLOW_OVERDRIVE_MP_RATE * pManaflowTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_PHYSIC_REL, iManaflowLevel, false );
+				fPhysicAttack *= fAtkPhysicRel;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+				kFinalDamageTrace.fManaflowRate = fAtkPhysicRel;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+			}
+		}
+
+#ifdef SERV_TRAPPING_RANGER_TEST
+		// june-stat-calc D2a: June @32285055: Sharpen Arrow's defence rate ( its AT_COMMAND reader is D1's )
+		const int iSharpenLevel = cUserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_RNW_SHARPEN_ARROW, true, 0, true );
+		if ( 0 < iSharpenLevel )
+		{
+			const CX2SkillTree::SkillTemplet* pSharpenTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_RNW_SHARPEN_ARROW );
+			if ( NULL != pSharpenTemplet )
+				fSharpenDamageRate = pSharpenTemplet->GetSkillAbilityValue( CX2SkillTree::SA_UNFIXED_DEFENSE_REL, iSharpenLevel, false );
+		}
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kFinalDamageTrace.fSharpenRate = fSharpenDamageRate;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_TRAPPING_RANGER_TEST
+	}
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 	// 공격자의 스킬에 의한 공격자의 공격력 stat 증가
 	if( CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() )
@@ -2877,10 +3150,36 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 		
 #endif	SERV_TRAPPING_RANGER_TEST
 	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 	//{{ kimhc // 2011.4.24 // 월드버프 2단계, 드래곤의 숨결 & 월드 버프 3단계 엘의 축복
 #ifdef	SERV_INSERT_GLOBAL_SERVER
 	// PVP가 아닌 경우에 적용
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	// june-stat-calc D2a: June @3228509f: game type 1 by vslot 0x10c ( not 322cc1a0 ); the rates add 5e-8
+	if ( NULL != g_pData->GetWorldMissionManager() && CX2Game::GT_PVP != g_pX2Game->GetGameType() )
+	{
+		if ( false == g_pData->GetWorldMissionManager()->IsNullWorldBuffDragonBreath() && CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() )
+		{
+			const float fIncreaseRateAtk = CalculateWorldBuffIncreasingRate( g_pData->GetWorldMissionManager()->GetDragonBreathAttackStatRateIncreased() );
+			fPhysicAttack += fPhysicAttack * fIncreaseRateAtk;
+			fMagicAttack += fMagicAttack * fIncreaseRateAtk;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+			kFinalDamageTrace.fWorldAttackRate = fIncreaseRateAtk;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		}
+
+		if ( false == g_pData->GetWorldMissionManager()->IsNULLWorldBuffElBless() && CX2GameUnit::GUT_USER == GetGameUnitType() )
+		{
+			const float fIncreaseRateDef = CalculateWorldBuffIncreasingRate( g_pData->GetWorldMissionManager()->GetElBlessDefenceStatRateIncreased() );
+			fPhysicDefence += fPhysicDefence * fIncreaseRateDef;
+			fMagicDefence += fMagicDefence * fIncreaseRateDef;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+			kFinalDamageTrace.fWorldDefenceRate = fIncreaseRateDef;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		}
+	}
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	if ( NULL != g_pData->GetWorldMissionManager() && CX2Game::GT_PVP != g_pX2Game->GetGameType() )
 	{
 		// 월드버프 2단계, 드래곤의 숨결이 적용 중이고 공격자가 USER인 경우
@@ -2901,10 +3200,61 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 			fMagicDefence += fMagicDefence * fIncreaseRateDef;
 		}		
 	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #endif	SERV_INSERT_GLOBAL_SERVER
 	//}} kimhc // 2011.4.24 // 월드버프 2단계, 드래곤의 숨결 & 월드 버프 3단계 엘의 축복
 
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	// june-stat-calc D2a: June @32285189: June's states 9 / 11 / 18 / 21 / 23 by name, no pet test; its 23 XS_PVE_GAME is not a March state
+	switch( g_pMain->GetNowStateID() )
+	{
+	case CX2Main::XS_PVP_GAME:
+	case CX2Main::XS_DUNGEON_GAME:
+	case CX2Main::XS_TRAINING_GAME:
+	case CX2Main::XS_BATTLE_FIELD:
+		{
+			if ( CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() )
+			{
+				const float fIncreaseAtkPhysicRate = static_cast<CX2GUUser*>( pAttacker )->GetSocketData().m_Stat.m_ExtraStat.m_fIncreaseAtkPhysicRate;
+				if ( 0.f != fIncreaseAtkPhysicRate )
+					fPhysicAttack += fPhysicAttack * fIncreaseAtkPhysicRate;
+
+				const float fIncreaseAtkMagicRate = static_cast<CX2GUUser*>( pAttacker )->GetSocketData().m_Stat.m_ExtraStat.m_fIncreaseAtkMagicRate;
+				if ( 0.f != fIncreaseAtkMagicRate )
+					fMagicAttack += fMagicAttack * fIncreaseAtkMagicRate;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+				kFinalDamageTrace.fSocketPhysicAttackRate = fIncreaseAtkPhysicRate;
+				kFinalDamageTrace.fSocketMagicAttackRate = fIncreaseAtkMagicRate;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+			}
+
+			if ( CX2GameUnit::GUT_USER == GetGameUnitType() )
+			{
+				const float fIncreaseDefPhysicRate = m_SocketData.m_Stat.m_ExtraStat.m_fIncreaseDefPhysicRate;
+				if ( 0.f != fIncreaseDefPhysicRate )
+					fPhysicDefence += fPhysicDefence * fIncreaseDefPhysicRate;
+
+				const float fIncreaseDefMagicRate = m_SocketData.m_Stat.m_ExtraStat.m_fIncreaseDefMagicRate;
+				if ( 0.f != fIncreaseDefMagicRate )
+					fMagicDefence += fMagicDefence * fIncreaseDefMagicRate;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+				kFinalDamageTrace.fSocketPhysicDefenceRate = fIncreaseDefPhysicRate;
+				kFinalDamageTrace.fSocketMagicDefenceRate = fIncreaseDefMagicRate;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+			}
+		} break;
+
+	default:
+		break;
+	}
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	kFinalDamageTrace.fPhysicAttackOut = fPhysicAttack;
+	kFinalDamageTrace.fMagicAttackOut = fMagicAttack;
+	kFinalDamageTrace.fPhysicDefenceOut = fPhysicDefence;
+	kFinalDamageTrace.fMagicDefenceOut = fMagicDefence;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef PET_AURA_SKILL
 	switch( g_pMain->GetNowStateID() )
 	{
@@ -2955,6 +3305,7 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 		break;
 	}
 #endif	PET_AURA_SKILL
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SERV_IRUHADEV_JUNE_SOCKET_PARITY
 	/// June buff port 16-step3b2 item 1: June GetFinalDamage @322852db..32285481 (after the pet-aura block, before the
 	/// defence-memo x2; run under Unicorn) multiplies a user attacker's physic and magic attack by three socket terms in turn:
@@ -3228,12 +3579,16 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	CX2DamageEffect::CEffect::ApplyDivideDamageFromRange( *pAttDamageData, fAttackerPhysicDamage, fAttackerMagicDamage );
 #endif defined( SERV_IRUHADEV_JUNE_DAMAGE_MATH ) && defined( SERV_IRUHADEV_JUNE_DAMAGEEFFECT_RUNTIME )
 	
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	// june-stat-calc D2a: June @322857fb calls only the DamageData slots; Eve's and Ara's 4-argument overrides are empty under their June flags
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	if ( CX2DamageManager::AT_NORMAL == pAttDamageData->attackType )
 #ifdef BALANCE_CODE_NEMESIS_20121213
 		pAttacker->ModifyFinalDamageByGameUnitType( pAttDamageData->damageType, fAttackerPhysicDamage, fAttackerMagicDamage, pAttDamageData->fForceDownValue );
 #else
 		pAttacker->ModifyFinalDamageByGameUnitType( pAttDamageData->damageType, fAttackerPhysicDamage, fAttackerMagicDamage );
 #endif //BALANCE_CODE_NEMESIS_20121213
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SERV_IRUHADEV_JUNE_FINAL_DAMAGE_UNIT_HOOK
 	/// June 32284aa0 @322857fb: March's AT_NORMAL call above stays for the classes not yet on June's slots
 	if ( CX2DamageManager::AT_SPECIAL == pAttDamageData->attackType )
@@ -4039,6 +4394,17 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 			CX2OfflineLog::Server( L"[JUNE_STATCALC] HIT att=%I64d lv=%d def=%I64d dlv=%d dt=%d atk=%.0f defence=%.0f rate=%.4f march=%.4f dmg=%.0f",
 				iHitAttackerID, pAttacker->GetUnitLevel(), iHitDefenderID, iDefenderLevel, static_cast<int>( pAttDamageData->damageType ),
 				fAttackPower, fDefencePower, fDefencePowerRate, fMarchDefencePowerRate, fFinalDamage );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+			// june-stat-calc D2a: June @32284d76-322855bf: each attack and defence multiplier, the attacks and defences before and after them
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] GFD att=%I64d def=%I64d skill=%d patk=%.0f>%.0f matk=%.0f>%.0f pdef=%.0f>%.0f mdef=%.0f>%.0f hook=%.4f/%.4f conf=%.4f pride=%.4f mana=%.4f sharpen=%.4f world=%.6f/%.6f socket=%.4f/%.4f/%.4f/%.4f extra=%.0f",
+				iHitAttackerID, iHitDefenderID, pAttDamageData->m_iAppliedSkillID,
+				kFinalDamageTrace.fPhysicAttackIn, kFinalDamageTrace.fPhysicAttackOut, kFinalDamageTrace.fMagicAttackIn, kFinalDamageTrace.fMagicAttackOut,
+				kFinalDamageTrace.fPhysicDefenceIn, kFinalDamageTrace.fPhysicDefenceOut, kFinalDamageTrace.fMagicDefenceIn, kFinalDamageTrace.fMagicDefenceOut,
+				kFinalDamageTrace.fHookPhysicRate, kFinalDamageTrace.fHookMagicRate, kFinalDamageTrace.fConfidenceRate, kFinalDamageTrace.fPrideRate,
+				kFinalDamageTrace.fManaflowRate, kFinalDamageTrace.fSharpenRate, kFinalDamageTrace.fWorldAttackRate, kFinalDamageTrace.fWorldDefenceRate,
+				kFinalDamageTrace.fSocketPhysicAttackRate, kFinalDamageTrace.fSocketMagicAttackRate, kFinalDamageTrace.fSocketPhysicDefenceRate,
+				kFinalDamageTrace.fSocketMagicDefenceRate, fExtraAttackPower );
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		}
 	}
 #endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE

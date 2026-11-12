@@ -12639,3 +12639,22 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE ( the June state names and IsInJobLine its bodies use )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
+// Description: june-stat-calc D2a / D2b - CX2GameUnit::GetFinalDamage as June 32284aa0 from entry to return. D2a (up to @32285ccf):
+//              the attacker-skill hook (June 3229a530: Raven, Rena, Ace in the Hole, Ara), the user passives on June's skill ids
+//              (Confidence / Pride Victory, Manaflow Overdrive, Sharpen Arrow), the world-mission epsilon, the socket stat rates by
+//              June's game states, CalcExtraAttackPower as June 3226e530, no March 4-argument unit hook. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) && !( defined( SERV_IRUHADEV_JUNE_FINAL_DAMAGE_UNIT_HOOK ) && defined( SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE ) && defined( SERV_IRUHADEV_JUNE_CHAR_ARA_PASSIVE ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE needs the June unit hook and Eve's / Ara's June overrides ( it drops March's 4-argument call )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE ) && defined( SERV_IRUHADEV_JUNE_CHAR_RENA_TRAP ) && defined( SERV_IRUHADEV_JUNE_CHAR_RENA_CORE ) && defined( SERV_IRUHADEV_JUNE_DIVERGE_SKILL_LEVEL_VALUE ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE needs the user skill helpers its attacker-skill hook calls
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) && !( defined( SERV_IRUHADEV_JUNE_SKILL_TEMPLET ) && defined( SERV_IRUHADEV_JUNE_SOCKET_EDT ) && defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE needs June's skill templet calls, the second extra-damage list and June's enum names
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+//////////////////////////////////////////////////////////////////////////

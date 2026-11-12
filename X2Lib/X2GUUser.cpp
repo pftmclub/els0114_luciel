@@ -826,6 +826,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 , m_fCommandHitTime( 0.f )
 #endif SERV_IRUHADEV_JUNE_SOCKET_EDT
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+, m_fManaflowMpInSkillState( 0.f )		// june-stat-calc D2a: June @32041e2c
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
 , m_fDashJumpDownAccelRate( 1.2f )		/// June @32040f01
 , m_fDashJumpSpeedRate( 1.6f )			/// June @32040f15
