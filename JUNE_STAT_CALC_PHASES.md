@@ -919,6 +919,8 @@ only in the unregistered 2017 event dungeons 41460 / 41470: not reachable offlin
 - **Open:** Raven99's set option 41149 (0.5 at 30 %) shows on none of 11 logged hits (`pre = gfd`; about 2 % if it works). Static checks hold: kim
   set 1365 grants 41149 at 4 parts, pieces carry set 1365, live `OptionItemData` has 41149 (`DUNGEON_ONLY` read by `X2SocketItem.cpp:559`).
   Retest with 30+ logged hits before the review; none -> trace `InitSetItemOptions` / `GetBasicReducedDamagePercent` at runtime.
+**Play-test PASSED (retest 2026-11-13 05:12-05:14, same exe):** Raven99 (49) 12 logged hits, 5 with `pre` = exactly 0.500 x `gfd` (option 41149;
+e.g. `gfd=20820 pre=10410 ... dmg=10410 hp=179286>168876`), HP change = `dmg` on all 15 lines. Run 1's 0 / 11 was chance. D4 review next.
 
 ## Phase D5 - Extra damage, enchant resist and level correction
 
