@@ -141,23 +141,27 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH0 | **ready** (read-only): Add map, creation-screen map first, assets list, DP / nasod / Crest / summon / CH-N maps, stat rows | Opus 5.5 / high | - | `june2017_re/char_add/`, funcmap, kickoffs | `CH0.md` |
-| CH0c | blocked (CH0): Add on the creation screen (9 / 32 / 122), create path, stat rows 9 / 32 / 122 | Opus 5.5 / high, Opus review, user play-test | CH0, char-ara CHNa review | `X2StateCreateUnit.*`, emulator, `StatTable.lua` (user packs), koms | `CH0c.md` |
-| CH0b | blocked (CH0, char-elesis CH6 walk): every June Add asset staged, packed, copied | Sonnet 5.5 / high, user play-test | CH0, char-elesis CH6 | koms, save | `CH0b.md` |
+| CH0c | **ready**: lift the US limit for `UT_ADD` (create screen + 7 shop combos), June's 6-button class dialog + `character_info_09`, emulator comments; no stat rows | Opus 5.5 / high, Opus review, user play-test | CH0 (done), char-ara CHNa review (done) | `X2StateCreateUnit.*`, `X2UIPersonalShopBoard.cpp`, koms | `CH0c.md` |
+| CH0b | blocked (char-elesis CH6 walk): 7,686 June Add assets staged (new kom data207), packed, copied; PT / LP motions held for CH1 | Sonnet 5.5 / high, user play-test | CH0 (done), char-elesis CH6 | koms, save | `CH0b.md` |
 | CH1a | blocked (CH0, char-elesis Z): movement and slot-head states; no review of its own | Sonnet 5.5 / high | CH0, char-elesis Z | `X2GUAdd.*`, Always.h | `CH1a.md` |
 | CH1b | blocked (CH1a): reactions; review covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUAdd.*` | `CH1b.md` |
 | CH1c | blocked (CH1b review): riding, pepper run, dance; no review of its own | Sonnet 5.5 / high | CH1b review | `X2GUAdd.*` | `CH1c.md` |
-| CH1d | blocked (CH1c): ground combos; no review of its own | Sonnet 5.5 / high | CH1c | `X2GUAdd.*` | `CH1d.md` |
+| CH1d0 | blocked (CH1c): the 12 June engine helpers Sonnet phases call (line-map snap `32294530`, line-side test, CEffect / mesh / user accessors) | Opus 5.5 / high, Opus review | CH1c | engine files (`X2GameUnit.*`, `X2DamageEffect.*`, `X2GUUser.*`, `X2Game.*`, KTDXLIB mesh) | `CH1d0.md` |
+| CH1d | blocked (CH1d0 review): ground combos incl. the untagged nasod-armor combos; no review of its own | Sonnet 5.5 / high | CH1d0 review | `X2GUAdd.*` | `CH1d.md` |
 | CH1d2 | blocked (CH1d): dash and dash / jump combos; review covers CH1c-CH1d2 | Sonnet 5.5 / high, Opus review | CH1d | `X2GUAdd.*` | `CH1d2.md` |
 | CH1e | blocked (CH1d2 review): Psychic Tracer / Lunatic Psyker lines; no review of its own | Sonnet 5.5 / high | CH1d2 review | `X2GUAdd.*` | `CH1e.md` |
-| CH1f | blocked (CH1e): Arc Tracer / Mastermind lines; no review of its own | Sonnet 5.5 / high | CH1e | `X2GUAdd.*` | `CH1f.md` |
-| CH1g | blocked (CH1f): Time Tracer / Diabolic Esper lines; review covers CH1e-CH1g | Sonnet 5.5 / high, Opus review | CH1f | `X2GUAdd.*` | `CH1g.md` |
-| CH1h | blocked (CH1g review): carved overrides below 0x600; no review of its own | Sonnet 5.5 / high | CH1g review | `X2GUAdd.*` | `CH1h.md` |
-| CH1h2 | blocked (CH1h): listing-only overrides below 0x600; no review of its own | Sonnet 5.5 / high | CH1h | `X2GUAdd.*` | `CH1h2.md` |
-| CH1i | blocked (CH1h2): overrides 0x600-0x7bc incl. training values 0x6c4 / 0x6f4; no review of its own | Sonnet 5.5 / high | CH1h2 | `X2GUAdd.*` | `CH1i.md` |
-| CH1j | blocked (CH1i): Common* overrides; no review of its own | Sonnet 5.5 / high | CH1i | `X2GUAdd.*` | `CH1j.md` |
-| CH1k | blocked (CH1j): skill-use overrides + `ReservedSkillStart` (DP cost); no review of its own | Sonnet 5.5 / high | CH1j | `X2GUAdd.*`, `X2GUUser.*` | `CH1k.md` |
-| CH1k2 | blocked (CH1k): overrides from 0x810; review covers CH1h-CH1k2 | Sonnet 5.5 / high, Opus review | CH1k | `X2GUAdd.*` | `CH1k2.md` |
+| CH1f | blocked (CH1e): Arc Tracer / Mastermind line states (41); no review of its own | Sonnet 5.5 / high | CH1e | `X2GUAdd.*` | `CH1f.md` |
+| CH1f2 | blocked (CH1f): container helpers of the CH1f states (21); no review of its own | Sonnet 5.5 / high | CH1f | `X2GUAdd.*` | `CH1f2.md` |
+| CH1g | blocked (CH1f2): Time Tracer / Diabolic Esper lines; review covers CH1e-CH1g | Sonnet 5.5 / high, Opus review | CH1f2 | `X2GUAdd.*` | `CH1g.md` |
+| CH1h | blocked (CH1g review): carved overrides below 0x600, ctor / dtor (25); no review of its own | Sonnet 5.5 / high | CH1g review | `X2GUAdd.*` | `CH1h.md` |
+| CH1h2 | blocked (CH1h): listing-only overrides 0x30-0xc4 incl. DamageReact (27); no review of its own | Sonnet 5.5 / high | CH1h | `X2GUAdd.*` | `CH1h2.md` |
+| CH1h3 | blocked (CH1h2): container helpers of the ctor / dtor / CH1h overrides (33); no review of its own | Sonnet 5.5 / high | CH1h2 | `X2GUAdd.*` | `CH1h3.md` |
+| CH1h4 | blocked (CH1h3): listing-only overrides 0x1d8-0x5ff incl. AttackResultByType (30); review covers CH1h-CH1h4 | Sonnet 5.5 / high, Opus review | CH1h3 | `X2GUAdd.*` | `CH1h4.md` |
+| CH1i | blocked (CH1h4 review): overrides 0x600-0x7bc, SetEquippedSkillLevel (28); no review of its own | Sonnet 5.5 / high | CH1h4 review | `X2GUAdd.*` | `CH1i.md` |
+| CH1j | blocked (CH1i): Common* overrides + CommonFrameMove helpers (50); no review of its own | Sonnet 5.5 / high | CH1i | `X2GUAdd.*` | `CH1j.md` |
+| CH1j2 | blocked (CH1j): container helpers of CommonFrameMove (21); review covers CH1i-CH1j2 | Sonnet 5.5 / high, Opus review | CH1j | `X2GUAdd.*` | `CH1j2.md` |
+| CH1k | blocked (CH1j2 review): skill-use overrides + `ReservedSkillStart` (DP cost); no review of its own | Sonnet 5.5 / high | CH1j2 review | `X2GUAdd.*`, `X2GUUser.*` | `CH1k.md` |
+| CH1k2 | blocked (CH1k): overrides from 0x810 (7); review covers CH1k-CH1k2 | Sonnet 5.5 / high, Opus review | CH1k | `X2GUAdd.*` | `CH1k2.md` |
 | CH1m | blocked (CH1k2 review): registration under `_LIVE` | Opus 5.5 / high, Opus review | CH1k2 review | `X2GUAdd.*` | `CH1m.md` |
 | CH1n | blocked (CH1m review): base callbacks + skill-slot head `32a28e00` | Opus 5.5 / high, Opus review | CH1m review | `X2GUAdd.*`, `X2GUUser.*` | `CH1n.md` |
 | CH1o | blocked (CH1n review): virtuals incl. vslot 0x524 `32a315a0`, `SetSkillLevelStateData` | Opus 5.5 / high, Opus review | CH1n review | `X2GUAdd.*`, `X2GUUser.*` | `CH1o.md` |
@@ -166,24 +170,27 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 | CH1q2 | blocked (CH1q review): nasod armor / barrier / Phase Shift, flag `_NASOD` | Opus 5.5 / high, Opus review | CH1q review | `X2GUAdd.*`, `X2GUUser.*` | `CH1q2.md` |
 | CH1 | blocked (CH1q2 review, CH0b): `_LIVE` on, June script + enum gate, play-test on 9 / 32 / 122 | Opus 5.5 / high, Opus review, user play-test | CH1q2 review, CH0b | Always.h, data036, motion koms | `CH1.md` |
 | CH5 | blocked (CH1 review): 3 `UnitTemplet` rows + 4 new rows, cut-ins, tree-UI icon pieces | Sonnet 5.5 / high, Opus review, user play-test | CH1 review | `UnitTemplet.lua`, `X2GUAdd.cpp` cut-ins, `X2UnitViewerUI.*`, tree UI | `CH5.md` |
-| CHNa | blocked (CH5 review, char-elesis CHNa review): 33 / 36 / 123 / 126 load and play (end markers, gauge, stat rows, units, creation entries) | Opus 5.5 / high, Opus review, user play-test | CH5 review, char-elesis CHNa review | `X2Unit.h`, `X2GageManager.cpp`, `X2StateCreateUnit.*`, emulator, `StatTable.lua` (user packs) | `CHNa.md` |
+| CHNa | blocked (CH5 review, char-elesis CHNa review): 33 / 36 / 123 / 126 load and play (compatibility, line helpers, gauge, chart, portraits, units, creation entries; no stat rows) | Opus 5.5 / high, Opus review, user play-test | CH5 review, char-elesis CHNa review | `X2Unit.h`, `X2GageManager.cpp`, `X2StateCreateUnit.*`, emulator, `StatTable.lua` (user packs) | `CHNa.md` |
 | CHNb | blocked (CHNa review): job changes 33 -> 123 and 36 -> 126 (quests 35540-35594), class-change dialogs | Opus 5.5 / high, Opus review, user play-test | CHNa review | `FieldQuest.lua`, `LevelUpEvent.lua`, `Handlers_Quest.cpp` | `CHNb.md` |
-| CH2a0 | blocked (CH1 review): Crest of Time + death-prevention engine, flag `JUNE_USER_CREST_OF_TIME`, every class's 0x740 / 0x744 base call | Opus 5.5 / high, Opus review | CH1 review | `X2GUUser.*`, the class files' snapshot pairs | `CH2a0.md` |
-| CH2b0 | blocked (CH1 review): six summon sites, Apocalypse binders, flag `_SUMMON` | Opus 5.5 / high, Opus review | CH1 review | `X2GUAdd.*`, `X2UnitManager.h`, NPC Lua | `CH2b0.md` |
-| CH2a | blocked (CH1 review): Nasod Ruler (9) skills; no review of its own | Sonnet 5.5 / high, user play-test | CH1 review | `X2GUAdd.*` | `CH2a.md` |
+| CH2a0 | blocked (CH1 review; before CH2d): Crest of Time + death-prevention engine, flag `JUNE_USER_CREST_OF_TIME`, every class's 0x740 / 0x744 base call | Opus 5.5 / high, Opus review | CH1 review | `X2GUUser.*`, the class files' snapshot pairs | `CH2a0.md` |
+| CH2b0 | blocked (CH1 review; before CH2a): five live summon sites (Particle Prism first), Apocalypse binders, `PlayEffectSet_CustomSet_LUA`, flag `_SUMMON` | Opus 5.5 / high, Opus review | CH1 review | `X2GUAdd.*`, `X2UnitManager.h`, NPC Lua | `CH2b0.md` |
+| CH2a | blocked (CH2b0 review): Nasod Ruler (9) skills; no review of its own | Sonnet 5.5 / high, user play-test | CH1 review, CH2b0 review | `X2GUAdd.*` | `CH2a.md` |
 | CH2b | blocked (CH2a): Psychic Tracer (32) skills; no review of its own | Sonnet 5.5 / high, user play-test | CH2a | `X2GUAdd.*` | `CH2b.md` |
 | CH2c | blocked (CH2b, CHNb review): Arc Tracer (33) skills; no review of its own | Sonnet 5.5 / high, user play-test | CH2b, CHNb review | `X2GUAdd.*` | `CH2c.md` |
-| CH2d | blocked (CH2c): Time Tracer (36) skills; CH2 stage review (CH2a-CH2d) | Sonnet 5.5 / high, Opus review, user play-test | CH2c | `X2GUAdd.*` | `CH2d.md` |
+| CH2d | blocked (CH2c, CH2a0 review): Time Tracer (36) skills; CH2 stage review (CH2a-CH2d) | Sonnet 5.5 / high, Opus review, user play-test | CH2c, CH2a0 review | `X2GUAdd.*` | `CH2d.md` |
 | CH3a | blocked (CH2d review): Lunatic Psyker (122) skills; no review of its own | Sonnet 5.5 / high, user play-test | CH2d review | `X2GUAdd.*` | `CH3a.md` |
 | CH3b | blocked (CH3a, CHNb review): Mastermind (123) skills incl. Apocalypse; no review of its own | Sonnet 5.5 / high, user play-test | CH3a, CHNb review, CH2b0 review | `X2GUAdd.*` | `CH3b.md` |
-| CH3c | blocked (CH3b): Diabolic Esper (126) skills; no review of its own | Sonnet 5.5 / high, user play-test | CH3b | `X2GUAdd.*` | `CH3c.md` |
-| CH3d | blocked (CH3c): hyper actives + transcendence rows 122 / 123 / 126; CH3 stage review (CH3a-CH3d) | Opus 5.5 / high, Opus review, user play-test | CH3c | `X2GUAdd.*`, `Handlers_Quest.cpp`, data036 | `CH3d.md` |
+| CH3c | blocked (CH3b): Diabolic Esper (126) special actives; no review of its own | Sonnet 5.5 / high, user play-test | CH3b | `X2GUAdd.*` | `CH3c.md` |
+| CH3c2 | blocked (CH3c): Diabolic Esper (126) actives (Mind Break, Force Finger, Reverse Field); no review of its own | Sonnet 5.5 / high, user play-test | CH3c | `X2GUAdd.*` | `CH3c2.md` |
+| CH3d | blocked (CH3c2): hyper actives + transcendence rows 122 / 123 / 126; CH3 stage review (CH3a-CH3d) | Opus 5.5 / high, Opus review, user play-test | CH3c2 | `X2GUAdd.*`, `Handlers_Quest.cpp`, data036 | `CH3d.md` |
 | CH4a | blocked (CH3d review): passives, delegate lists `32a1ccb0`, `+0x92a0` rate; no review of its own | Opus 5.5 / high, user play-test | CH3d review | `X2GUAdd.*`, `X2GUUser.*` | `CH4a.md` |
 | CH4b | blocked (CH4a): overrides + memo; CH4 stage review (CH4a-CH4b) | Opus 5.5 / high, Opus review, user play-test | CH4a | `X2GUAdd.*`, `X2GUUser.*` | `CH4b.md` |
 | CH6 | blocked (CH4b, CH5, CHNb, CH0c reviews): scans rerun + user walk incl. creation screen, all job changes, the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH4b, CH5, CHNb, CH0c reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, template paragraph, **closes Stage 7** (unparks char-luciel) | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
 
-Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for all seven Add classes are derived (class 9 from June's `UT_ADD` row by Lu/Ciel's formula; first jobs = 9; second jobs = 9 with their own level 1); CH0c writes 9 / 32 / 122, CHNa the rest; the user packs `StatTable.lua`.
+Done: CH0 (2026-11-13; maps + asset list, 5 splits + new Opus CH1d0, no code).
+
+Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for all seven Add classes are derived (class 9 from June's `UT_ADD` row by Lu/Ciel's formula; first jobs = 9; second jobs = 9 with their own level 1); CH0c writes 9 / 32 / 122, CHNa the rest; the user packs `StatTable.lua`. **Moot (CH0, 2026-11-13):** the flat `StatTable.lua` (e37c9211) already has all seven Add classes; CH0c and CHNa write no stat rows.
 
 ## class-guides - June class-change guides for the March characters
 

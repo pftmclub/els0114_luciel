@@ -52,7 +52,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **19** functions (2 listing-only; 8 `inside`, 11 `new`), filter `awk -F'\t' '$7=="CH1e"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 14 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- `APT` / `ALP` combo states. `ANSI_APT_DASH_JUMP_COMBO_ZX_LANDING` (id 270) is a `~` registration row (passed the listing check).

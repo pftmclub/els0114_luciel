@@ -38,7 +38,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **1** functions (1 listing-only; 0 `inside`, 1 `new`), filter `awk -F'\t' '$7=="CH4b"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L955, L957, L332, L952, L1007.
+- 0x73c `329d46b0` (L955); specialization B reader `32a01ca2` in `32a01b40` (L957; CH1q transcribes the function, CH4b checks the reader); memo consumers `31fdbbb0` (L332).

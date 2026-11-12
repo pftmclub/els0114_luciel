@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-add CH2a0` |
 | Plan doc | `JUNE_CHARACTER_ADD_PHASES.md` (branch `main`) |
-| Depends on | CH1 review; before the skill phase CH0 names for skills 207 / 29212 / 29230 |
+| Depends on | CH1 review; before CH2d (Seal of Time 29213 / 29231, `ANSI_SA_COMMON_CREST_OF_TIME`, classes 36 / 126) |
 | Flag | `SERV_IRUHADEV_JUNE_USER_CREST_OF_TIME` (class-generic; + `..._CREST_DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ADD CREST`) |
 | Review | `kickoffs/char-add/CH2a0-review.md` (Opus 5.5 high; the phase writes it when done) |
@@ -44,7 +44,7 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L261, L309, L314, L359, L733, L789, L117, L178, L727, L787, L865.
+- `june2017_re/char_add/ch0_crest.tsv`. **Correction:** Crest of Time is cast by `RNSI_SA_COMMON_CREST_OF_TIME` 29213 / `_UPGRADE` 29231 ("Seal of Time", type 5, classes 36 / 126; type-5 compares at `32a28f4f` / `32a28f56` -> `32a28f90`), first in **CH2d**: CH2a0 runs before CH2d. The plan's "207 / 29212 / 29230" were a state id (207 = `ANSI_SA_APT_STASIS_FIELD_ACTIVE`), Space Crack and Countdown Bomb upgrade. Stand-ins to restore: Chung (`X2GUChung.cpp:38551-38578`), Elsword (`X2GUElsword_SwordMan.cpp:700-715`), Rena (`X2GULire_ElvenRanger.cpp:34468-34480`), Ara (`X2GUAra.cpp:13044-13059`), Elesis if her pair has landed, Add's pair from CH1q. Aisha's class already handles `UAI_CREST_OF_TIME_REVIVAL` 0x29 (`X2GUArme_VioletMage.cpp:33430`): check whether June handles it in the base.

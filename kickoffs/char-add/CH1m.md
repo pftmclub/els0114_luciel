@@ -36,7 +36,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **3** functions (0 listing-only; 3 `inside`, 0 `new`), filter `awk -F'\t' '$7=="CH1m"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L480.
+- `june2017_re/char_add/ch0_reg.tsv`: 195 rows = registrar `32a1e4f0` 118 + `32a24c20` 68 + InitState body `32a25a90` 4 (no wrapper) + base `3202b110` 5; `ch0c_listing_check` **194 / 194** (one identical pair, id 198 `ANSI_COMBO_NASOD_ARMOR_LANDING` at lines 136 / 237 of `32a24c20`). Hand rows: `~` ids 270 / 237 / 265; roll ids 9 / 11 / 12 (`pppuVar5`); hyper id 23 (`puVar4`, Start `32a31190`); id 130 `ANSI_WAIT_STATE_CHANGE`. June registers 5 names with no table (ids 86, 164, 279, 285, 286) and 5 `USI_EVENT_*` (111-116). `ADD_NASODRULER_STATE_ID` lacks 159 of June's 220 names; all 61 shared names differ in raw value, 27 still differ after the USI_END rebase (100 -> 152): register by June's id (`ch0_state_enum_names.tsv`). March's `InitStateByUnitClass` (`:2314`) and `ParseCommonRandomState` (`:272-298`) class switches follow June's registration.

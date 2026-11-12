@@ -1,0 +1,17 @@
+june_va	kind	owner_class	role	march_site	state_today	phase	note
+3201ffb0	base hook	CX2GUUser	slot-250 buff pre-apply hook (BTI 436 / 926 / 807)	none	not ported	CH2a0	249 bytes; 32d58dc0 / 320841e0 / 32086e70
+32009780	base vslot 0x740	CX2GUUser	Crest of Time snapshot (HP / MP into +0x92a4..+0x92c4)	none	not ported	CH2a0	322cc1a0 PvP/PvE test inside (GetIsNowPVPCorrectionGame idiom per junediverge --list)
+3204da60	base vslot 0x744	CX2GUUser	Crest of Time restore (buff factors re-applied, levelled clone)	none	not ported	CH2a0	609 bytes; HaveThisBuff, GetBuffFactorPtr, SetGameUnitBuffFactor
+320072d0	base	CX2GUUser	death-prevention gate in UpNowHp / SetNowHp (after the BBT 101 refusal, before the base call)	X2GUUser UpNowHp / SetNowHp	not ported	CH2a0	also skills 27409 / 23402; calls Ara's ProcessResurrection 32bc5a50 (Ara has it)
+3202b9a0	base	CX2GUUser	trigger: vslot 0x19c, socket effect 0x13 (32028ba0 ProcessSocketEffectEx), sets +0x8e78 = 1	none	not ported	CH2a0	49 bytes
+-	user action	CX2GUUser	UAI_CREST_OF_TIME_REVIVAL (0x29): revival effect set, erase BTI 436 / 926, SetForceInvincible( 1.0 )	X2GUArme_VioletMage.cpp:33430 (Aisha's class copy, char-arme)	ported in Aisha only	CH2a0	CH2a0 checks whether June handles 0x29 in the base; if so it moves / widens there (Aisha's stays or calls it)
+329e2f80	override 0x740	Add	StoreGageSnapshot: base 32009780, DP -> +0x92ac, mutation -> +0x92b0	none (Add)	not ported	CH1q	written by CH1q with the base call as a labelled stand-in if CH2a0 has not run; CH2a0 restores it
+329e3000	override 0x744	Add	RestoreGageSnapshot: SetDPValue( +0x92ac ), SetMutationCount( +0x92b0 ), base 3204da60	none (Add)	not ported	CH1q	as above
+32bed760 / 32bf4600	override pair	Chung	cannon ball counts	X2GUChung.cpp:38551-38578, .h:693-694	base call left out (labelled stand-in)	CH2a0	restore the base calls; the clear reaches m_iSnapshotCannonBallCount / Ex
+32d058a0 / 32d058d0	override pair	Elsword	way of the sword point	X2GUElsword_SwordMan.cpp:700-715, .h:494-495	base call left out (labelled stand-in)	CH2a0	restore
+32c852f0 / 32c89230	override pair	Rena	natural force count	X2GULire_ElvenRanger.cpp:34468-34480, .h:1934	base call left out (labelled stand-in)	CH2a0	restore
+32ba4840 / 32ba7b50	override pair	Ara	force power	X2GUAra.cpp:13044-13059, .h:608-609	base call left out (labelled stand-in)	CH2a0	restore
+32b6ac80 / 32b6acb0	override pair	Elesis	plain snapshot	not written yet (char-elesis class code in progress)	open	CH2a0	if her port lands them first: restore the base call; else a note in her plan
+-	override pair	Ain / Rose / Lu/Ciel	own overrides	classes not ported	n/a	-	Stage 8 / char-luciel
+-	base only	Eve / Raven / Aisha	keep the base	-	base not ported	CH2a0	nothing class-side
+29213 / 29231	skill	Add (36 / 126)	RNSI_SA_COMMON_CREST_OF_TIME / _UPGRADE (type 5, "Seal of Time"): skill switch type-5 compares at 32a28f4f / 32a28f56 -> 32a28f90 ANSI_SA_COMMON_CREST_OF_TIME	none in March	not ported	CH2d (cast); CH2a0 before it	the plan's "skills 207, 29212, 29230" is wrong: 0xcf pushes at 329d1730 / 32a28350 / 32a288d0 are state id 207 (ANSI_SA_APT_STASIS_FIELD_ACTIVE), 29212 is RNSI_A_ATT_SPACE_CRACK, 29230 RNSI_A_AMM_COUNTDOWN_BOMB_DYNAMO_UPGRADE; BTI 436 / 926 are not immediates in Add's range (the buff comes from the script / templet)

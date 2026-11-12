@@ -36,7 +36,9 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **10** functions (3 listing-only; 2 `inside`, 8 `new`), filter `awk -F'\t' '$7=="CH1q2"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 1 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L383, L385, L427, L483, L490.
+- `june2017_re/char_add/ch0_nasod.tsv` (10 rows). Corrections: slots 0x4c4 `329e7d60` / 0x4c8 `32a047a0` are **effect-set name hooks** (Phantom Seek `_Enhanced` with memo 29418; Supersonic, Reverse Circle, Void Field, Maximum Strike, Spear Dynamo, Pion Rusing, QuickSilver Strike variants), not barrier logic; they sit around each play in `32007570` with the `POSSIBLE_NASOD_BARRIER` flag. `PlayLoopSound` `329e2660` is June's already (`JUNE_SOUND_AUTO_RELEASE`, C9h-7a): confirm only. DieDamageEffectProc adds 29216 `RNSI_A_AN_PHASE_SHIFT_UPGRADE`. 0x4bc is CH1o's.

@@ -7,7 +7,7 @@
 | Depends on | CH0 (and its amendments), char-elesis Z, the previous CH1 sub-phase. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` (`new` rows, compiled) and `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` (`inside` rows; `//#define` until CH1 final) |
 | Log tag | none (nothing runs until `_LIVE`; no play-test) |
-| Review | none of its own: the CH1k2 review covers it (its `_DEBUG` define stays on) |
+| Review | none of its own: the CH1j2 review covers it (its `_DEBUG` define stays on) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 
@@ -52,7 +52,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **50** functions (4 listing-only; 8 `inside`, 42 `new`), filter `awk -F'\t' '$7=="CH1j"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L286, L259.
+- CH0 split: CH1j = the Common* overrides (0x7c0, 0x7c4 CommonStateStart `329ff970` (repeats the dynamo-factory test, then vslot 0x524), 0x7c8, 0x7cc CommonFrameMove `32a24560`, 0x7d4, 0x7d8, 0x7dc, 0x7e8) and their non-container helpers (50); CH1j2 = the container helpers (21). `329fdbe0` (CommonFrameMove helper) calls `3201ad10` (checklist L286): transcribe the call with it.

@@ -1,0 +1,152 @@
+29000	Energy Boom	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_ENERGY_BOOM	NO_TEXTURE
+29001	Void Breaker	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_VOID_BREAKER	NO_TEXTURE
+29002	Particle Accelerator	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_PARTICLE_ACCELERATOR	NO_TEXTURE
+29003	Particle Prism	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_PARTICLE_PRISM	NO_TEXTURE
+29004	Neutron Bomb	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_NEUTRON_BOMB	NO_TEXTURE
+29005	Quake Buster	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_QUAKE_BUSTER	NO_TEXTURE
+29006	Pulse Cannon	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_PULSE_CANNON	NO_TEXTURE
+29007	Stasis Field	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_STASIS_FIELD	NO_TEXTURE
+29008	Conqueror	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_CONQUERER	NO_TEXTURE
+29009	Psychic Storm	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_ALP_PSYCHIC_STORM	NO_TEXTURE
+29010	EMP Shock	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_EMP_SHOCK	NO_TEXTURE
+29011	Quicksilver Accel	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_ALP_QUICKSILVER_ACCEL	NO_TEXTURE
+29012	Panzer Buster	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_PANZER_BUSTER	NO_PIECE
+29012	Panzer Buster	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_PANZER_BUSTER	NO_TEXTURE
+29013	Install\n- Drone Activator	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR	NO_PIECE
+29013	Install\n- Drone Activator	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR	NO_TEXTURE
+29014	Psionic Generator	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_PSIONIC_GENERATOR	NO_PIECE
+29014	Psionic Generator	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_PSIONIC_GENERATOR	NO_TEXTURE
+29015	Phantom Seeker	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_PHANTOM_SEEKER	NO_PIECE
+29015	Phantom Seeker	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_PHANTOM_SEEKER	NO_TEXTURE
+29016	Install - Starfall	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_AMM_INSTALLATION_STAR_FALL	NO_TEXTURE
+29016	Install - Starfall	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_AMM_INSTALLATION_STAR_FALL	NO_TEXTURE
+29017	Install - Ultimate Fury	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_AMM_INSTALLATION_ULTIMATE_FURY	NO_TEXTURE
+29017	Install - Ultimate Fury	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_AMM_INSTALLATION_ULTIMATE_FURY	NO_TEXTURE
+29018	Install\n- Shooting Chaser	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AMM_INSTALLATION_SHOOTING_CHASER	NO_PIECE
+29018	Install\n- Shooting Chaser	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_AMM_INSTALLATION_SHOOTING_CHASER	NO_TEXTURE
+29019	Gravity Buster	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_GRAVITY_BURSTER	NO_TEXTURE
+29019	Gravity Buster	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_GRAVITY_BURSTER	NO_TEXTURE
+29020	Reverse Circle	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_REVERSE_CIRCLE	NO_TEXTURE
+29020	Reverse Circle	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_REVERSE_CIRCLE	NO_TEXTURE
+29021	Stardust Shower	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_STARDUST_SHOWER	NO_TEXTURE
+29021	Stardust Shower	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_ATT_STARDUST_SHOWER	NO_TEXTURE
+29022	Maximum Strike	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_MAXIMUM_STRIKE	NO_TEXTURE
+29022	Maximum Strike	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_ATT_MAXIMUM_STRIKE	NO_TEXTURE
+29023	Void Field	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_VOID_FIELD	NO_TEXTURE
+29023	Void Field	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_ATT_VOID_FIELD	NO_TEXTURE
+29024	Moonlight Rhapsody	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_MOONLIGHT_RHAPSODY	NO_TEXTURE
+29024	Moonlight Rhapsody	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_MOONLIGHT_RHAPSODY	NO_TEXTURE
+29025	Reverse Stigma	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_REVERSE_STIGMA	NO_TEXTURE
+29025	Reverse Stigma	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_REVERSE_STIGMA	NO_TEXTURE
+29026	#Cffcc00[Enhanced]#CX\nEnergy Boom	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_ENERGY_BOOM	NO_TEXTURE
+29027	#Cffcc00[Enhanced]#CX\nVoid Breaker	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_VOID_BREAKER	NO_TEXTURE
+29028	#Cffcc00[Enhanced]#CX\nParticle Accelerator	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_PARTICLE_ACCELERATOR	NO_TEXTURE
+29029	#Cffcc00[Enhanced]#CX\nParticle Prism	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_PARTICLE_PRISM	NO_TEXTURE
+29030	#Cffcc00[Enhanced]#CX\nNeutron Bomb	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_AN_NEUTRON_BOMB	NO_TEXTURE
+29031	#Cffcc00[Enhanced]#CX\nQuake Buster	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_QUAKE_BUSTER	NO_TEXTURE
+29032	#Cffcc00[Enhanced]#CX\nPanzer Buster	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_PANZER_BUSTER	NO_PIECE
+29032	#Cffcc00[Enhanced]#CX\nPanzer Buster	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_PANZER_BUSTER	NO_TEXTURE
+29033	#Cffcc00[Enhanced]#CX\nGravity Buster	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_GRAVITY_BURSTER	NO_TEXTURE
+29033	#Cffcc00[Enhanced]#CX\nGravity Buster	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_GRAVITY_BURSTER	NO_TEXTURE
+29034	#Cffcc00[Enhanced]#CX\nPulse Cannon	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_PULSE_CANNON	NO_TEXTURE
+29035	#Cffcc00[Enhanced]#CX\nInstall - Drone Activator	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR	NO_PIECE
+29035	#Cffcc00[Enhanced]#CX\nInstall - Drone Activator	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR	NO_TEXTURE
+29036	#Cffcc00[Enhanced]#CX\nReverse Circle	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_REVERSE_CIRCLE	NO_TEXTURE
+29036	#Cffcc00[Enhanced]#CX\nReverse Circle	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_REVERSE_CIRCLE	NO_TEXTURE
+29037	Psion Rush	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ALP_PION_RUSING	NO_TEXTURE
+29037	Psion Rush	image	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ALP_PION_RUSING	NO_TEXTURE
+29038	Quicksilver Strike	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ALP_QUICKSILVER_STRIKE	NO_TEXTURE
+29038	Quicksilver Strike	image	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ALP_QUICKSILVER_STRIKE	NO_TEXTURE
+29039	Install - Charged Impulser	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_AMM_CHARGED_IMPULSAR	NO_TEXTURE
+29039	Install - Charged Impulser	image	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_AMM_CHARGED_IMPULSAR	NO_TEXTURE
+29040	Force Field	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_AMM_FORCE_FILED	NO_TEXTURE
+29040	Force Field	image	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_AMM_FORCE_FILED	NO_TEXTURE
+29041	Void Impact	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_VOID_IMPACT	NO_TEXTURE
+29041	Void Impact	image	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_VOID_IMPACT	NO_TEXTURE
+29042	Moonlight Breaker	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ADE_MOONLIGHT_BREAKER	NO_TEXTURE
+29042	Moonlight Breaker	image	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ADE_MOONLIGHT_BREAKER	NO_TEXTURE
+29043	#Cffcc00[Enhanced]#CX Stasis Field	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_STASIS_FIELD	NO_TEXTURE
+29044	#Cffcc00[Enhanced]#CX Conqueror	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_CONQUERER	NO_TEXTURE
+29045	#Cffcc00[Enhanced]#CX Psychic Storm	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_ALP_PSYCHIC_STORM	NO_TEXTURE
+29046	#Cffcc00[Enhanced]#CX EMP Shock	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_SA_APT_EMP_SHOCK	NO_TEXTURE
+29047	#Cffcc00[Enhanced]#CX Quicksilver Accel	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_ALP_QUICKSILVER_ACCEL	NO_TEXTURE
+29048	#Cffcc00[Enhanced]#CX Psionic Generator	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_PSIONIC_GENERATOR	NO_PIECE
+29048	#Cffcc00[Enhanced]#CX Psionic Generator	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_PSIONIC_GENERATOR	NO_TEXTURE
+29049	#Cffcc00[Enhanced]#CX Phantom Seeker	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AAT_PHANTOM_SEEKER	NO_PIECE
+29049	#Cffcc00[Enhanced]#CX Phantom Seeker	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_SA_AAT_PHANTOM_SEEKER	NO_TEXTURE
+29050	#Cffcc00[Enhanced]#CX Install - Starfall	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_AMM_INSTALLATION_STAR_FALL	NO_TEXTURE
+29050	#Cffcc00[Enhanced]#CX Install - Starfall	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_AMM_INSTALLATION_STAR_FALL	NO_TEXTURE
+29051	#Cffcc00[Enhanced]#CX Install - Ultimate Fury	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_AMM_INSTALLATION_ULTIMATE_FURY	NO_TEXTURE
+29051	#Cffcc00[Enhanced]#CX Install - Ultimate Fury	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_AMM_INSTALLATION_ULTIMATE_FURY	NO_TEXTURE
+29052	#Cffcc00[Enhanced]#CX Install - Shooting Chaser	icon	DLG_SKILL_ADD_Active_02.tga	SI_SA_AMM_INSTALLATION_SHOOTING_CHASER	NO_PIECE
+29052	#Cffcc00[Enhanced]#CX Install - Shooting Chaser	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_AMM_INSTALLATION_SHOOTING_CHASER	NO_TEXTURE
+29053	#Cffcc00[Enhanced]#CX Stardust Shower	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_STARDUST_SHOWER	NO_TEXTURE
+29053	#Cffcc00[Enhanced]#CX Stardust Shower	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_ATT_STARDUST_SHOWER	NO_TEXTURE
+29054	#Cffcc00[Enhanced]#CX Maximum Strike	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_MAXIMUM_STRIKE	NO_TEXTURE
+29054	#Cffcc00[Enhanced]#CX Maximum Strike	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_ATT_MAXIMUM_STRIKE	NO_TEXTURE
+29055	#Cffcc00[Enhanced]#CX Void Field	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ATT_VOID_FIELD	NO_TEXTURE
+29055	#Cffcc00[Enhanced]#CX Void Field	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_ATT_VOID_FIELD	NO_TEXTURE
+29056	#Cffcc00[Enhanced]#CX Moonlight Rhapsody	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_MOONLIGHT_RHAPSODY	NO_TEXTURE
+29056	#Cffcc00[Enhanced]#CX Moonlight Rhapsody	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_MOONLIGHT_RHAPSODY	NO_TEXTURE
+29057	#Cffcc00[Enhanced]#CX Reverse Stigma	icon	DLG_SKILL_ADD_Active_03.tga	SI_SA_ADE_REVERSE_STIGMA	NO_TEXTURE
+29057	#Cffcc00[Enhanced]#CX Reverse Stigma	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_SA_ADE_REVERSE_STIGMA	NO_TEXTURE
+29058	Supersonic	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ALP_SUPERSONIC	NO_TEXTURE
+29059	Extreme Chaser	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_AMM_EXTREME_CHASER	NO_TEXTURE
+29060	Dimension Breaker	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_SA_ADE_DIMENSION_BREAKER	NO_TEXTURE
+29201	Phase Shift	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_AN_PHASE_SHIFT	NO_TEXTURE
+29202	Particle Shot	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_AN_PULSE_BULLET	NO_TEXTURE
+29203	Dynamo Configuration\n- Dissolver	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_APT_DESOLVER_DYNAMO	NO_TEXTURE
+29204	Dynamo Configuration - Pylon	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_APT_PYLON_DYNAMO	NO_TEXTURE
+29205	Dynamo Configuration\n- Magnetron	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_APT_MAGNETRON_DYNAMO	NO_TEXTURE
+29206	Rush Twirl	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_ALP_TWIRL_RUSH	NO_TEXTURE
+29207	Psionic Beat	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_ALP_PSIONIC_BEAT	NO_TEXTURE
+29208	Dynamo Configuration\n- Rushing Drones	icon	DLG_SKILL_ADD_Active_02.tga	SI_A_AAT_RUSHING_DRONE_DYNAMO	NO_PIECE
+29208	Dynamo Configuration\n- Rushing Drones	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_AAT_RUSHING_DRONE_DYNAMO	NO_TEXTURE
+29209	Dynamo Configuration\n- Fission Shot	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_AMM_DIVIDING_MISSILE_DYNAMO	NO_TEXTURE
+29209	Dynamo Configuration\n- Fission Shot	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_AMM_DIVIDING_MISSILE_DYNAMO	NO_TEXTURE
+29210	Dynamo Configuration\n- Flick Disc	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_AMM_FLICK_DISC_DYNAMO	NO_TEXTURE
+29210	Dynamo Configuration\n- Flick Disc	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_AMM_FLICK_DISC_DYNAMO	NO_TEXTURE
+29211	Dynamo Configuration\n- Delayed Explosion	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_AMM_COUNTDOWN_BOMB_DYNAMO	NO_TEXTURE
+29211	Dynamo Configuration\n- Delayed Explosion	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_AMM_COUNTDOWN_BOMB_DYNAMO	NO_TEXTURE
+29212	Dynamo Configuration\n- Space Crack	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_ATT_SPACE_CRACK	NO_TEXTURE
+29212	Dynamo Configuration\n- Space Crack	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_ATT_SPACE_CRACK	NO_TEXTURE
+29213	Seal of Time	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_COMMON_CREST_OF_TIME	NO_TEXTURE
+29214	Mind Break	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_AN_MIND_BREAK	NO_TEXTURE
+29215	Force Finger	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_ADE_FORCE_FINGER	NO_TEXTURE
+29215	Force Finger	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_ADE_FORCE_FINGER	NO_TEXTURE
+29216	#Cffcc00[Enhanced]#CX\nPhase Shift	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_AN_PHASE_SHIFT	NO_TEXTURE
+29217	#Cffcc00[Enhanced]#CX\nParticle Shot	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_AN_PULSE_BULLET	NO_TEXTURE
+29218	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Dissolver	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_APT_DESOLVER_DYNAMO	NO_TEXTURE
+29219	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Rushing Drones	icon	DLG_SKILL_ADD_Active_02.tga	SI_A_AAT_RUSHING_DRONE_DYNAMO	NO_PIECE
+29219	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Rushing Drones	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_AAT_RUSHING_DRONE_DYNAMO	NO_TEXTURE
+29220	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Space Crack	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_ATT_SPACE_CRACK	NO_TEXTURE
+29220	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Space Crack	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_ATT_SPACE_CRACK	NO_TEXTURE
+29221	Dynamo Configuration - Railgun	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_A_ALP_SPEAR_DYNAMO	NO_TEXTURE
+29221	Dynamo Configuration - Railgun	image	DLG_SKILL_ADD_Active_04.tga	RNSI_A_ALP_SPEAR_DYNAMO	NO_TEXTURE
+29222	Dynamo Configuration - Synapse Break	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_A_AMM_AIMING_NOVA	NO_TEXTURE
+29222	Dynamo Configuration - Synapse Break	image	DLG_SKILL_ADD_Active_04.tga	RNSI_A_AMM_AIMING_NOVA	NO_TEXTURE
+29223	Dynamo Configuration'- Reverse Field	icon	DLG_SKILL_ADD_Active_04.tga	RNSI_A_ADE_REVERSE_FIELD	NO_TEXTURE
+29223	Dynamo Configuration'- Reverse Field	image	DLG_SKILL_ADD_Active_04.tga	RNSI_A_ADE_REVERSE_FIELD	NO_TEXTURE
+29224	#Cffcc00[Enhanced]#CX Dynamo Configuration - Pylon	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_APT_PYLON_DYNAMO	NO_TEXTURE
+29225	#Cffcc00[Enhanced]#CX Dynamo Configuration - Magnetron	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_APT_MAGNETRON_DYNAMO	NO_TEXTURE
+29226	#Cffcc00[Enhanced]#CX Rush Twirl	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_ALP_TWIRL_RUSH	NO_TEXTURE
+29227	#Cffcc00[Enhanced]#CX Psionic Beat	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_A_ALP_PSIONIC_BEAT	NO_TEXTURE
+29228	#Cffcc00[Enhanced]#CX Dynamo Configuration - Fission Shot	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_AMM_DIVIDING_MISSILE_DYNAMO	NO_TEXTURE
+29228	#Cffcc00[Enhanced]#CX Dynamo Configuration - Fission Shot	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_AMM_DIVIDING_MISSILE_DYNAMO	NO_TEXTURE
+29229	#Cffcc00[Enhanced]#CX Dynamo Configuration - Flick Disc	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_AMM_FLICK_DISC_DYNAMO	NO_TEXTURE
+29229	#Cffcc00[Enhanced]#CX Dynamo Configuration - Flick Disc	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_AMM_FLICK_DISC_DYNAMO	NO_TEXTURE
+29230	#Cffcc00[Enhanced]#CX Dynamo Configuration - Delayed Explosion	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_AMM_COUNTDOWN_BOMB_DYNAMO	NO_TEXTURE
+29230	#Cffcc00[Enhanced]#CX Dynamo Configuration - Delayed Explosion	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_AMM_COUNTDOWN_BOMB_DYNAMO	NO_TEXTURE
+29231	#Cffcc00[Enhanced]#CX Seal of Time	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_SA_COMMON_CREST_OF_TIME	NO_TEXTURE
+29232	#Cffcc00[Enhanced]#CX Mind Break	image	DLG_Add_SKILL_ScreenShot_01.tga	SI_A_AN_MIND_BREAK	NO_TEXTURE
+29233	#Cffcc00[Enhanced]#CX Force Finger	icon	DLG_SKILL_ADD_Active_03.tga	SI_A_ADE_FORCE_FINGER	NO_TEXTURE
+29233	#Cffcc00[Enhanced]#CX Force Finger	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_A_ADE_FORCE_FINGER	NO_TEXTURE
+29600	Dooms Day	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_HA_ALP_DOOMS_DAY	NO_TEXTURE
+29601	Apocalypse	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_HA_AMM_APOCALYPSE	NO_TEXTURE
+29602	Paranoia	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_HA_ADE_PARANOIA	NO_TEXTURE
+29603	#Cffcc00[Enhanced]#CX\nDooms Day	image	DLG_Add_SKILL_ScreenShot_02.tga	SI_HA_ALP_DOOMS_DAY	NO_TEXTURE
+29604	#Cffcc00[Enhanced]#CX\nApocalypse	image	DLG_Add_SKILL_ScreenShot_03.tga	SI_HA_AMM_APOCALYPSE	NO_TEXTURE
+29605	#Cffcc00[Enhanced]#CX\nParanoia	image	DLG_Add_SKILL_ScreenShot_04.tga	SI_HA_ADE_PARANOIA	NO_TEXTURE
+skills 123, misses 149, known June gaps 0, sheets 7
+stage: python tools/kom.py stage-june DLG_Add_SKILL_ScreenShot_01.tet DLG_Add_SKILL_ScreenShot_01.tga DLG_Add_SKILL_ScreenShot_02.tet DLG_Add_SKILL_ScreenShot_02.tga DLG_Add_SKILL_ScreenShot_03.tet DLG_Add_SKILL_ScreenShot_03.tga DLG_Add_SKILL_ScreenShot_04.tet DLG_Add_SKILL_ScreenShot_04.tga DLG_SKILL_ADD_Active_02.tet DLG_SKILL_ADD_Active_02.tga DLG_SKILL_ADD_Active_03.tet DLG_SKILL_ADD_Active_03.tga DLG_SKILL_ADD_Active_04.tet DLG_SKILL_ADD_Active_04.tga
+RESULT: FAIL

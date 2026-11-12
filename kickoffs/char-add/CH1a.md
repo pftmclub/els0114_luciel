@@ -52,7 +52,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **32** functions (15 listing-only; 30 `inside`, 2 `new`), filter `awk -F'\t' '$7=="CH1a"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 25 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 1: 900 SI_ETC_WS_COMMON_LOVE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L431.
+- `ANSI_CAN_NOT_ATTACK_JUMP_DOWN` has two tables in June's script (lines 4343 / 4348; the second wins). `ANSI_THROW_ITEM` = skill 900 (type 12). The four hyper tables (`ANSI_HYPER_MODE`, `_ALP_`, `_AMM_`, `_ADE_HYPER_MODE`) come from the base hyper row id 23 (registrar `32a1e4f0` @832, Start `32a31190`).

@@ -40,7 +40,7 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L888, L908, L602, L632.
+- `june2017_re/char_add/ch0_unittemplet_add.tsv`: June's 9 / 32 / 122 rows add only `m_fLobbyRotationY` (30 / 50 / 5) and, for 122, `m_HyperCutIn = "HQ_Cutin_ALP_Transcendence"`; the four new rows: 33 (`STR_ID_30383` / `30381`), 123 (`30386` / `30384`), 36 (`31923` / `31924`), 126 (`31925` / `31926`), every string present. **CHNa needs these rows** (live `UnitTemplet.lua` has none for 33 / 36 / 123 / 126). Cut-in switch `X2GUAdd.cpp:305-320` (9 / 32 -> set 0, default -> 122 set 1); lobby particles `X2UnitViewerUI.cpp:775` / `:2624` (ALP only).

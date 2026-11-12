@@ -40,7 +40,9 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **14** functions (4 listing-only; 1 `inside`, 13 `new`), filter `awk -F'\t' '$7=="CH4a"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Skill ids: 22: 106 RNSI_P_COMMON_HYPER_AURA, 29400 RNSI_P_APT_NASOD_ARMOR_MODE, 29401 RNSI_P_APT_DUST_STORM, 29402 RNSI_P_ALP_BODY_OF_TRANSCENDENCE, 29403 RNSI_P_ALP_POWER_EXCHANGER, 29404 RNSI_P_ALP_FANTASY_TRACER, 29405 RNSI_P_AAT_NASOD_ARMOR_MODE, 29406 RNSI_P_AAT_HIDDEN_MEMORY, 29407 RNSI_P_AMM_ENHANCED_DYNAMO_FACTORY_TRANSFORM, 29408 RNSI_P_AMM_NEW_UPDATE, 29409 RNSI_P_AMM_TRANSFORM_OFENCE_MODE, 29410 RNSI_P_ATT_NASOD_ARMOR_MODE, 29411 RNSI_P_ADE_CONTROL_TIME, 29412 RNSI_P_ADE_MIND_CONTROL, 29413 RNSI_P_ADE_MIND_CIRCLE, 29414 RNSI_P_ADE_ESP, 29415 RNSI_P_ALP_TRANSCENDENCE, 29416 RNSI_P_ALP_ENERGY_AMPLIFY, 29417 RNSI_P_AMM_TRANSCENDENCE, 29418 RNSI_P_AMM_ENHANCED_ARTIFICIAL_INTELLIGENCE, 29419 RNSI_P_ADE_TRANSCENDENCE, 29420 RNSI_P_ADE_TIME_TROUBLE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L254, L936, L1068.
+- 14 functions incl. InitPassiveSkillState `32a1ccb0` (0x690) and the 4 delegate adapters `32a2b340`, `32a309a0`, `32a309b0`, `32a309c0` (delegates `329d4190`, `32a04ce0`, `32a01d20`, `32a01dd0`); 22 passive skill ids with no state. `june2017_re/char_add/ch0_passive_ids.tsv`: 36 `SI_*` reads, 25 differ (9xxx -> 29xxx); spelling `SI_SA_APT_CONQUEROR` vs June `RNSI_SA_APT_CONQUERER`; `SI_SA_AHM_CHAIN_LIGHTNING` (an Aisha id) is read; `SI_A_AN_PULSE_BULLET`, `SI_HA_ALP_DOOMS_DAY`, `SI_P_AN_CHARGED_IMPULSAR` are not live in the `.i`. `+0x92a0` (L1068).

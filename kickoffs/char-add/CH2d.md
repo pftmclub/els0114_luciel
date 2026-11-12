@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, high** effort, then type `/x2-phase char-add CH2d` |
 | Plan doc | `JUNE_CHARACTER_ADD_PHASES.md` (branch `main`) |
-| Depends on | CH2c, CHNb review. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
+| Depends on | CH2c, CHNb review, CH2a0 review (Seal of Time 29213 / 29231 casts the Crest of Time buff). One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_SKILL` (+ `..._SKILL_DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ADD SKILL`), `[JUNE_SKILL]` (`--grep NUM`) |
 | Review | `kickoffs/char-add/CH2d-review.md` (Opus 5.5 high; covers CH2a-CH2d and every incidental shared-file hunk; the phase writes it when done) |
@@ -44,7 +44,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **24** functions (2 listing-only; 0 `inside`, 24 `new`), filter `awk -F'\t' '$7=="CH2d"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 8 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 10: 29019 RNSI_SA_ADE_GRAVITY_BURSTER, 29020 RNSI_SA_ADE_REVERSE_CIRCLE, 29021 RNSI_SA_ATT_STARDUST_SHOWER, 29033 RNSI_SA_ADE_GRAVITY_BURSTER_UPGRADE, 29036 RNSI_SA_ADE_REVERSE_CIRCLE_UPGRADE, 29053 RNSI_SA_ATT_STARDUST_SHOWER_UPGRADE, 29212 RNSI_A_ATT_SPACE_CRACK, 29213 RNSI_SA_COMMON_CREST_OF_TIME, 29220 RNSI_A_ATT_SPACE_CRACK_UPGRADE, 29231 RNSI_SA_COMMON_CREST_OF_TIME_UPGRADE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L309, L314, L359, L733, L789, L117, L178, L727, L787, L865.
+- Skill ids and their states: `awk -F'\t' '$6=="CH2d"' june2017_re/char_add/ch0_state_skill.tsv` (part 2); the state functions: `awk -F'\t' '$7=="CH2d"' june2017_re/char_add/ch0_class_map.tsv`.

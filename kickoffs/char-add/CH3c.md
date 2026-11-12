@@ -44,7 +44,11 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **46** functions (4 listing-only; 0 `inside`, 46 `new`), filter `awk -F'\t' '$7=="CH3c"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 15 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 11: 29022 RNSI_SA_ATT_MAXIMUM_STRIKE, 29023 RNSI_SA_ATT_VOID_FIELD, 29024 RNSI_SA_ADE_MOONLIGHT_RHAPSODY, 29025 RNSI_SA_ADE_REVERSE_STIGMA, 29041 RNSI_SA_ADE_VOID_IMPACT, 29042 RNSI_SA_ADE_MOONLIGHT_BREAKER, 29054 RNSI_SA_ATT_MAXIMUM_STRIKE_UPGRADE, 29055 RNSI_SA_ATT_VOID_FIELD_UPGRADE, 29056 RNSI_SA_ADE_MOONLIGHT_RHAPSODY_UPGRADE, 29057 RNSI_SA_ADE_REVERSE_STIGMA_UPGRADE, 29060 RNSI_SA_ADE_DIMENSION_BREAKER.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L309, L314, L359, L733, L789, L117, L178, L727, L787, L865.
+- CH0 split: CH3c = the special actives (46), CH3c2 = the actives `RNSI_A_*` (Mind Break, Force Finger, Reverse Field; 16). Void Impact's spawn (`329fe650`) is CH2b0's; the dead tables `ANSI_SA_ATT_VOID_IMPACT`, `ANSI_SA_ATT_STARDUST_SHOWER_*`, `ANSI_A_ADE_FORCE_NOVA`, `ANSI_SA_ADE_DIMENSION_BREAKER_END` have no registration.
+- Skill ids and their states: `awk -F'\t' '$6=="CH3c"' june2017_re/char_add/ch0_state_skill.tsv` (part 2); the state functions: `awk -F'\t' '$7=="CH3c"' june2017_re/char_add/ch0_class_map.tsv`.

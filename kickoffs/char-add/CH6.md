@@ -39,7 +39,6 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- S3 baseline `june2017_re/char_add/ch0_s3_baseline.txt`: 261 tree rows (9: 15, 32 / 33 / 36: 29, 122 / 123 / 126: 53), 254 no_state, 7 has_state (id 900 per class). Rerun and compare.

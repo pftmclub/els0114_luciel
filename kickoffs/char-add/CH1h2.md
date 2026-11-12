@@ -7,7 +7,7 @@
 | Depends on | CH0 (and its amendments), char-elesis Z, the previous CH1 sub-phase. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` (`new` rows, compiled) and `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` (`inside` rows; `//#define` until CH1 final) |
 | Log tag | none (nothing runs until `_LIVE`; no play-test) |
-| Review | none of its own: the CH1k2 review covers it (its `_DEBUG` define stays on) |
+| Review | none of its own: the CH1h4 review covers it (its `_DEBUG` define stays on) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 
@@ -52,7 +52,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **27** functions (8 listing-only; 7 `inside`, 20 `new`), filter `awk -F'\t' '$7=="CH1h2"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L292, L478.
+- CH0 split by vslot: CH1h2 = listing-only overrides 0x30-0xc4 (0x30 NotifyDGManagerChanged, 0x40 Init `329ea8b0`, 0x44 ReInit `329ffcd0`, 0x5c StateChange `329d40f0`, 0x60 DamageReact `32a07fc0` (ResponseEmergency byte `+0x8fc2` @32a080fe L292; super-armour vslot 0x81c @32a080cc L478; March's UT_ADD damage block `X2GUUser.cpp:11572-11585` follows it), 0x94 Lose, 0xb4 GetHyperModeTime `32a31590`, 0xc4 HyperModeBuffEffectStart) and their helpers (27); CH1h4 takes 0x1d8-0x54c. Declarations only: 0x2a4 / 0x324 / 0x560 (CH1q), 0x3e0 (CH1q2).

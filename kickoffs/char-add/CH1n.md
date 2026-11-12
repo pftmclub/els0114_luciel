@@ -36,7 +36,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **1** functions (1 listing-only; 1 `inside`, 0 `new`), filter `awk -F'\t' '$7=="CH1n"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L447, L442.
+- `june2017_re/char_add/ch0_skill_switches.tsv` (255 rows) / `ch0_skill_listing_rows.tsv` (151): frame skill id `[esp+0xa8]`, slot `[esp+0xac]`, hyper flag `[esp+0xb0]`; (a) type - 5 at `32a28f41` (12 entries: 5 -> COMMON_BUFF / Crest compares, 12 -> THROW_ITEM, 6 / 7 / 13-16 -> (b)), (b) ids 29000-29233 at `32a29015` (234 entries, 53 targets), (c) 29601-29605 at `32a2af8e`; compares 29213 / 29231 (Crest), 29600 (Doom's Day), 900. No memo (V) switch; hyper copy `329cc2c0` (10 sites); 35 extra states via `31fd89b0`. 106 and the type-8 passives reach no state.

@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, high** effort, then type `/x2-phase char-add CH1d` |
 | Plan doc | `JUNE_CHARACTER_ADD_PHASES.md` (branch `main`) |
-| Depends on | CH0 (and its amendments), char-elesis Z, the previous CH1 sub-phase. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
+| Depends on | CH0 (and its amendments), char-elesis Z, CH1d0 review (the engine helpers it calls). One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` (`new` rows, compiled) and `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` (`inside` rows; `//#define` until CH1 final) |
 | Log tag | none (nothing runs until `_LIVE`; no play-test) |
 | Review | none of its own: the CH1d2 review covers it (its `_DEBUG` define stays on) |
@@ -52,7 +52,9 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **45** functions (1 listing-only; 33 `inside`, 12 `new`), filter `awk -F'\t' '$7=="CH1d"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 25 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L675.
+- Calls `32293d70` (line-side test): CH1d0 writes it first. The untagged nasod-armor combos (`ANSI_COMBO_NASOD_ARMOR_*`, 11 tables) are here; their nasod lines go under `_NASOD` inside the `_LIVE` body. March's class tests in `NasodArmorComboZZEventProcess` / `NasodArmorComboXEventProcess` (`X2GUAdd.cpp:5798` / `:5910`) follow June's bodies.

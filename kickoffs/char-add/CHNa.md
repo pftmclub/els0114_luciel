@@ -47,10 +47,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L1024.
+- `june2017_re/char_add/ch0_classn.tsv` (48 rows; owners: Ara CHNa 4, Ara CHNb 3, Add CHNa 7, CHNb 3, CH5 3, others, 18 need nothing; Elesis's CHNa has not landed). Bounds: `UC_VALIDE_END` 123, `UC_END` 124 (cl /P): 123 passes `< UC_END`, 126 fails both, but after Ara's CHNa no refusing test remains. CHNa sites: `GetX2UnitClassCompatibility` (`X2Unit.h:2154-2192`, arms for 9 / 32 / 122 only; June `31ed6500`), the second / third line helpers `X2Unit.h:2826-2852` (assert-only), `CreateMyGageUI` (`X2GageManager.cpp:219-232`: the four must get `CX2AddGageData`, `CX2GUAdd` casts it), the stat chart (`X2StateCreateUnit.cpp:3892-3905`), `GetCharacterImageName` (`X2Data.cpp:2821`), `RotateYSelectCharacterType` (`X2Data.cpp:3835-3843`), `tools/createchar.py` (CLASSES / PARENT / PROMO). **No stat rows** (flat table). Needs CH5's UnitTemplet rows first. June's case lists `3248e290`, `3254ee40`, `31ee0de0` were not read in CH0.
 
 ## Amended by char-ara CHNa (2026-11-11)
 

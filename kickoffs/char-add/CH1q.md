@@ -36,7 +36,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **22** functions (8 listing-only; 2 `inside`, 20 `new`), filter `awk -F'\t' '$7=="CH1q"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L253, L260, L263, L264, L281, L282, L288, L415, L983.
+- `june2017_re/char_add/ch0_dp.tsv` (35 rows; 22 class-map functions): not split. Verdicts: UpNowDPValue outer `329e5b00` adds a spend factor `1 - protected float +0x6c50` (the plan said +0x6bb0) then `329e3060`; the body `329e56c0` equals March's buff-port R1 edit (`JUNE_BUFF_NEW_STAT`); ChangeMaxCharacterAddResource 0x324 is a new override (gain gauge max x rate); 0x6c8 / 0x6cc are Get / SetIsFormationMode; CanHyperMode 0x560 -> vslot 0x6d0 GetPossibleChangeFormationMode (virtual in June); 0x740 / 0x744 = StoreGageSnapshot / RestoreGageSnapshot (DP to `+0x92ac`, mutation to `+0x92b0`; base call per CH2a0). **Gauge:** `CX2AddGageData` vtable `3349b1e4` (22 slots, ctor `324989c0`); June keeps an Add gauge UI with no RTTI name: InitUI `32e6e0c0` (vtable `335335b0`) loads `DLG_Add_DP_And_Mutation.lua` (June's already in March) = March `CX2AddMyGageUI::InitUI` (`X2GageUI.cpp:4956`). The emulator has no DP code and needs none. `32d27770` (riding-pet wait-state getter: `+0x548` when byte `+0x5a0` is set, else `+0x4e4`; March reads `m_WaitState`, `X2GUUser.cpp:49277`) differs: a divergent row and the replacement here, or the March read kept with the reason.

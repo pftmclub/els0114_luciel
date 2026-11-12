@@ -1,0 +1,127 @@
+# skill ids: 123 distinct (Add tree rows of the s3 run, family X2GUAdd.cpp); June names: Enum.src.lua SKILL_ID (2407 names); March C++: X2SkillTree.h SKILL_ID live branch via cl /P (1541 names); core: live data036_kom/Enum.lua SKILL_ID (805 names)
+# tally: core:absent 66, core:name 57, lookalike 22, name 8, none 93
+# cpp_enum: name = same name+value live; lookalike = RNSI_ -> SI_ name live; value-only = other live name at the value; none = no live member at the value. cpp_state: live / DEAD-BRANCH / COMMENTED / absent
+kind	june_name	june_value	june_enum_line	cpp_enum	cpp_h_line	cpp_state	core_enum_lua	core_line	skill_type	tree_classes	templet_name	note
+skill	RNSI_P_COMMON_HYPER_AURA	106	15375	name	2291	live	absent		1	122,123,126	Awakened One	march live names at value: RNSI_P_COMMON_HYPER_AURA
+skill	SI_ETC_WS_COMMON_LOVE	900	16050	name	132	live	absent		12	9,32,33,36,122,123,126	Extreme Heavenly Love	march live names at value: SI_ETC_WS_COMMON_LOVE
+skill	RNSI_SA_AN_ENERGY_BOOM	29000	15398	lookalike		absent	name	12476	14	9,32,33,36,122,123,126	Energy Boom	
+skill	RNSI_SA_AN_VOID_BREAKER	29001	16640	lookalike		absent	name	12480	15	9,32,33,36,122,123,126	Void Breaker	
+skill	RNSI_SA_AN_PARTICLE_ACCELERATOR	29002	14772	lookalike		absent	name	12478	16	9,32,33,36,122,123,126	Particle Accelerator	
+skill	RNSI_SA_AN_PARTICLE_PRISM	29003	16012	name	1720	live	name	12479	14	9,32,33,36,122,123,126	Particle Prism	march live names at value: RNSI_SA_AN_PARTICLE_PRISM
+skill	RNSI_SA_AN_NEUTRON_BOMB	29004	14387	lookalike		absent	name	12477	16	9,32,33,36,122,123,126	Neutron Bomb	
+skill	RNSI_SA_APT_QUAKE_BUSTER	29005	16226	lookalike		absent	name	12484	15	32,122	Quake Buster	
+skill	RNSI_SA_APT_PULSE_CANNON	29006	14948	lookalike		absent	name	12483	14	32,122	Pulse Cannon	
+skill	RNSI_SA_APT_STASIS_FIELD	29007	14485	lookalike		absent	name	12485	16	32,122	Stasis Field	
+skill	RNSI_SA_APT_CONQUERER	29008	14484	none		absent	name	12481	16	122	Conqueror	
+skill	RNSI_SA_ALP_PSYCHIC_STORM	29009	16328	lookalike		absent	name	12456	15	122	Psychic Storm	
+skill	RNSI_SA_APT_EMP_SHOCK	29010	15779	lookalike		absent	name	12482	15	122	EMP Shock	
+skill	RNSI_SA_ALP_QUICKSILVER_ACCEL	29011	14599	lookalike		absent	name	12457	14	122	Quicksilver Accel	
+skill	RNSI_SA_AAT_PANZER_BUSTER	29012	16128	none		absent	name	12383	15	33,123	Panzer Buster	
+skill	RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR	29013	15572	none		absent	name	12382	14	33,123	Install\n- Drone Activator	
+skill	RNSI_SA_AAT_PSIONIC_GENERATOR	29014	14397	none		absent	name	12385	16	33,123	Psionic Generator	
+skill	RNSI_SA_AAT_PHANTOM_SEEKER	29015	15393	none		absent	name	12384	16	123	Phantom Seeker	
+skill	RNSI_SA_AMM_INSTALLATION_STAR_FALL	29016	16492	none		absent	name	12474	15	123	Install - Starfall	
+skill	RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY	29017	15501	none		absent	name	12475	15	123	Install - Ultimate Fury	
+skill	RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER	29018	15549	none		absent	name	12473	14	123	Install\n- Shooting Chaser	
+skill	RNSI_SA_ADE_GRAVITY_BURSTER	29019	16279	none		absent	name	12390	15	36,126	Gravity Buster	
+skill	RNSI_SA_ADE_REVERSE_CIRCLE	29020	15207	none		absent	name	12393	14	36,126	Reverse Circle	
+skill	RNSI_SA_ATT_STARDUST_SHOWER	29021	14746	none		absent	name	12504	16	36,126	Stardust Shower	
+skill	RNSI_SA_ATT_MAXIMUM_STRIKE	29022	14386	none		absent	name	12503	16	126	Maximum Strike	
+skill	RNSI_SA_ATT_VOID_FIELD	29023	14881	none		absent	name	12505	15	126	Void Field	
+skill	RNSI_SA_ADE_MOONLIGHT_RHAPSODY	29024	16380	name	1722	live	name	12392	15	126	Moonlight Rhapsody	march live names at value: RNSI_SA_ADE_MOONLIGHT_RHAPSODY
+skill	RNSI_SA_ADE_REVERSE_STIGMA	29025	15362	none		absent	name	12394	14	126	Reverse Stigma	
+skill	RNSI_SA_AN_ENERGY_BOOM_UPGRADE	29026	16464	none		absent	absent		14	9,32,33,36,122,123,126	#Cffcc00[Enhanced]#CX\nEnergy Boom	
+skill	RNSI_SA_AN_VOID_BREAKER_UPGRADE	29027	15451	none		absent	absent		15	9,32,33,36,122,123,126	#Cffcc00[Enhanced]#CX\nVoid Breaker	
+skill	RNSI_SA_AN_PARTICLE_ACCELERATOR_UPGRADE	29028	14290	none		absent	absent		16	9,32,33,36,122,123,126	#Cffcc00[Enhanced]#CX\nParticle Accelerator	
+skill	RNSI_SA_AN_PARTICLE_PRISM_UPGRADE	29029	15718	name	1721	live	absent		14	9,32,33,36,122,123,126	#Cffcc00[Enhanced]#CX\nParticle Prism	march live names at value: RNSI_SA_AN_PARTICLE_PRISM_UPGRADE
+skill	RNSI_SA_AN_NEUTRON_BOMB_UPGRADE	29030	15772	none		absent	absent		16	9,32,33,36,122,123,126	#Cffcc00[Enhanced]#CX\nNeutron Bomb	
+skill	RNSI_SA_APT_QUAKE_BUSTER_UPGRADE	29031	15678	none		absent	absent		15	32,122	#Cffcc00[Enhanced]#CX\nQuake Buster	
+skill	RNSI_SA_AAT_PANZER_BUSTER_UPGRADE	29032	14361	none		absent	absent		15	33,123	#Cffcc00[Enhanced]#CX\nPanzer Buster	
+skill	RNSI_SA_ADE_GRAVITY_BURSTER_UPGRADE	29033	16091	none		absent	absent		15	36,126	#Cffcc00[Enhanced]#CX\nGravity Buster	
+skill	RNSI_SA_APT_PULSE_CANNON_UPGRADE	29034	14347	none		absent	absent		14	32,122	#Cffcc00[Enhanced]#CX\nPulse Cannon	
+skill	RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR_UPGRADE	29035	16325	none		absent	absent		14	33,123	#Cffcc00[Enhanced]#CX\nInstall - Drone Activator	
+skill	RNSI_SA_ADE_REVERSE_CIRCLE_UPGRADE	29036	15864	none		absent	absent		14	36,126	#Cffcc00[Enhanced]#CX\nReverse Circle	
+skill	RNSI_SA_ALP_PION_RUSING	29037	15834	none		absent	name	12455	14	122	Psion Rush	
+skill	RNSI_SA_ALP_QUICKSILVER_STRIKE	29038	16429	none		absent	name	12458	15	122	Quicksilver Strike	
+skill	RNSI_SA_AMM_CHARGED_IMPULSAR	29039	15388	none		absent	name	12470	14	123	Install - Charged Impulser	
+skill	RNSI_SA_AMM_FORCE_FILED	29040	15005	none		absent	name	12472	15	123	Force Field	
+skill	RNSI_SA_ADE_VOID_IMPACT	29041	14951	none		absent	name	12395	14	126	Void Impact	
+skill	RNSI_SA_ADE_MOONLIGHT_BREAKER	29042	14683	none		absent	name	12391	15	126	Moonlight Breaker	
+skill	RNSI_SA_APT_STASIS_FIELD_UPGRADE	29043	15055	none		absent	absent		16	32,122	#Cffcc00[Enhanced]#CX Stasis Field	
+skill	RNSI_SA_APT_CONQUERER_UPGRADE	29044	15056	none		absent	absent		16	122	#Cffcc00[Enhanced]#CX Conqueror	
+skill	RNSI_SA_ALP_PSYCHIC_STORM_UPGRADE	29045	15057	none		absent	absent		15	122	#Cffcc00[Enhanced]#CX Psychic Storm	
+skill	RNSI_SA_APT_EMP_SHOCK_UPGRADE	29046	15744	none		absent	absent		15	122	#Cffcc00[Enhanced]#CX EMP Shock	
+skill	RNSI_SA_ALP_QUICKSILVER_ACCEL_UPGRADE	29047	15058	none		absent	absent		14	122	#Cffcc00[Enhanced]#CX Quicksilver Accel	
+skill	RNSI_SA_AAT_PSIONIC_GENERATOR_UPGRADE	29048	14514	none		absent	absent		16	33,123	#Cffcc00[Enhanced]#CX Psionic Generator	
+skill	RNSI_SA_AAT_PHANTOM_SEEKER_UPGRADE	29049	16584	none		absent	absent		16	123	#Cffcc00[Enhanced]#CX Phantom Seeker	
+skill	RNSI_SA_AMM_INSTALLATION_STAR_FALL_UPGRADE	29050	15063	none		absent	absent		15	123	#Cffcc00[Enhanced]#CX Install - Starfall	
+skill	RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY_UPGRADE	29051	16462	none		absent	absent		15	123	#Cffcc00[Enhanced]#CX Install - Ultimate Fury	
+skill	RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER_UPGRADE	29052	16034	none		absent	absent		14	123	#Cffcc00[Enhanced]#CX Install - Shooting Chaser	
+skill	RNSI_SA_ATT_STARDUST_SHOWER_UPGRADE	29053	15903	none		absent	absent		16	36,126	#Cffcc00[Enhanced]#CX Stardust Shower	
+skill	RNSI_SA_ATT_MAXIMUM_STRIKE_UPGRADE	29054	15064	none		absent	absent		16	126	#Cffcc00[Enhanced]#CX Maximum Strike	
+skill	RNSI_SA_ATT_VOID_FIELD_UPGRADE	29055	15065	none		absent	absent		15	126	#Cffcc00[Enhanced]#CX Void Field	
+skill	RNSI_SA_ADE_MOONLIGHT_RHAPSODY_UPGRADE	29056	15736	none		absent	absent		15	126	#Cffcc00[Enhanced]#CX Moonlight Rhapsody	
+skill	RNSI_SA_ADE_REVERSE_STIGMA_UPGRADE	29057	15067	none		absent	absent		14	126	#Cffcc00[Enhanced]#CX Reverse Stigma	
+skill	RNSI_SA_ALP_SUPERSONIC	29058	15170	name	2978	live	name	12459	16	122	Supersonic	march live names at value: RNSI_SA_ALP_SUPERSONIC
+skill	RNSI_SA_AMM_EXTREME_CHASER	29059	15172	none		absent	name	12471	16	123	Extreme Chaser	
+skill	RNSI_SA_ADE_DIMENSION_BREAKER	29060	14531	none		absent	name	12389	16	126	Dimension Breaker	
+skill	RNSI_A_AN_PHASE_SHIFT	29201	15816	lookalike		absent	name	12162	6	9,32,33,36,122,123,126	Phase Shift	
+skill	RNSI_A_AN_PULSE_BULLET	29202	16153	none		absent	name	12163	6	9,32,33,36,122,123,126	Particle Shot	
+skill	RNSI_A_APT_DESOLVER_DYNAMO	29203	14914	lookalike		absent	name	12164	6	32,122	Dynamo Configuration\n- Dissolver	
+skill	RNSI_A_APT_PYLON_DYNAMO	29204	16623	lookalike		absent	name	12166	6	32,33,36,122,123,126	Dynamo Configuration - Pylon	
+skill	RNSI_A_APT_MAGNETRON_DYNAMO	29205	16486	lookalike		absent	name	12165	6	32,122	Dynamo Configuration\n- Magnetron	
+skill	RNSI_A_ALP_TWIRL_RUSH	29206	16077	lookalike		absent	name	12150	6	122	Rush Twirl	
+skill	RNSI_A_ALP_PSIONIC_BEAT	29207	14368	lookalike		absent	name	12148	6	122	Psionic Beat	
+skill	RNSI_A_AAT_RUSHING_DRONE_DYNAMO	29208	15576	none		absent	name	12118	6	33,123	Dynamo Configuration\n- Rushing Drones	
+skill	RNSI_A_AMM_DIVIDING_MISSILE_DYNAMO	29209	15957	none		absent	name	12159	6	33,123	Dynamo Configuration\n- Fission Shot	
+skill	RNSI_A_AMM_FLICK_DISC_DYNAMO	29210	15832	none		absent	name	12160	6	123	Dynamo Configuration\n- Flick Disc	
+skill	RNSI_A_AMM_COUNTDOWN_BOMB_DYNAMO	29211	15560	none		absent	name	12158	6	123	Dynamo Configuration\n- Delayed Explosion	
+skill	RNSI_A_ATT_SPACE_CRACK	29212	16168	none		absent	name	12174	6	36,126	Dynamo Configuration\n- Space Crack	
+skill	RNSI_SA_COMMON_CREST_OF_TIME	29213	15710	none		absent	name	12879	5	36,126	Seal of Time	
+skill	RNSI_A_AN_MIND_BREAK	29214	14654	lookalike		absent	name	12161	6	126	Mind Break	
+skill	RNSI_A_ADE_FORCE_FINGER	29215	15510	none		absent	name	12121	6	126	Force Finger	
+skill	RNSI_A_AN_PHASE_SHIFT_UPGRADE	29216	15662	none		absent	absent		6	9,32,33,36,122,123,126	#Cffcc00[Enhanced]#CX\nPhase Shift	
+skill	RNSI_A_AN_PULSE_BULLET_UPGRADE	29217	14398	none		absent	absent		6	9,32,33,36,122,123,126	#Cffcc00[Enhanced]#CX\nParticle Shot	
+skill	RNSI_A_APT_DESOLVER_DYNAMO_UPGRADE	29218	15121	none		absent	absent		6	32,122	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Dissolver	
+skill	RNSI_A_AAT_RUSHING_DRONE_DYNAMO_UPGRADE	29219	14435	none		absent	absent		6	33,123	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Rushing Drones	
+skill	RNSI_A_ATT_SPACE_CRACK_UPGRADE	29220	16648	none		absent	absent		6	36,126	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Space Crack	
+skill	RNSI_A_ALP_SPEAR_DYNAMO	29221	14312	none		absent	name	12149	6	122	Dynamo Configuration - Railgun	
+skill	RNSI_A_AMM_AIMING_NOVA	29222	15866	none		absent	name	12157	6	123	Dynamo Configuration - Synapse Break	
+skill	RNSI_A_ADE_REVERSE_FIELD	29223	14734	none		absent	name	12122	6	126	Dynamo Configuration'- Reverse Field	
+skill	RNSI_A_APT_PYLON_DYNAMO_UPGRADE	29224	15158	none		absent	absent		6	32,33,36,122,123,126	#Cffcc00[Enhanced]#CX Dynamo Configuration - Pylon	
+skill	RNSI_A_APT_MAGNETRON_DYNAMO_UPGRADE	29225	14297	none		absent	absent		6	32,122	#Cffcc00[Enhanced]#CX Dynamo Configuration - Magnetron	
+skill	RNSI_A_ALP_TWIRL_RUSH_UPGRADE	29226	15070	none		absent	absent		6	122	#Cffcc00[Enhanced]#CX Rush Twirl	
+skill	RNSI_A_ALP_PSIONIC_BEAT_UPGRADE	29227	15461	none		absent	absent		6	122	#Cffcc00[Enhanced]#CX Psionic Beat	
+skill	RNSI_A_AMM_DIVIDING_MISSILE_DYNAMO_UPGRADE	29228	16586	none		absent	absent		6	33,123	#Cffcc00[Enhanced]#CX Dynamo Configuration - Fission Shot	
+skill	RNSI_A_AMM_FLICK_DISC_DYNAMO_UPGRADE	29229	15072	none		absent	absent		6	123	#Cffcc00[Enhanced]#CX Dynamo Configuration - Flick Disc	
+skill	RNSI_A_AMM_COUNTDOWN_BOMB_DYNAMO_UPGRADE	29230	16564	none		absent	absent		6	123	#Cffcc00[Enhanced]#CX Dynamo Configuration - Delayed Explosion	
+skill	RNSI_SA_COMMON_CREST_OF_TIME_UPGRADE	29231	15075	none		absent	absent		5	36,126	#Cffcc00[Enhanced]#CX Seal of Time	
+skill	RNSI_A_AN_MIND_BREAK_UPGRADE	29232	15076	none		absent	absent		6	126	#Cffcc00[Enhanced]#CX Mind Break	
+skill	RNSI_A_ADE_FORCE_FINGER_UPGRADE	29233	15078	none		absent	absent		6	126	#Cffcc00[Enhanced]#CX Force Finger	
+skill	RNSI_P_APT_NASOD_ARMOR_MODE	29400	14475	lookalike		absent	absent		8	32,122	Nasod Armor Mode - Battle Gear	
+skill	RNSI_P_APT_DUST_STORM	29401	14321	lookalike		absent	name	12356	8	32,122	Particle Storm	
+skill	RNSI_P_ALP_BODY_OF_TRANSCENDENCE	29402	14473	lookalike		absent	absent		8	122	Body of Transcendence	
+skill	RNSI_P_ALP_POWER_EXCHANGER	29403	14471	lookalike		absent	absent		8	122	Output Exchange	
+skill	RNSI_P_ALP_FANTASY_TRACER	29404	16025	lookalike		absent	absent		8	122	Fantasy Tracer	
+skill	RNSI_P_AAT_NASOD_ARMOR_MODE	29405	15255	none		absent	absent		8	33,123	Nasod Armor Mode - Transform	
+skill	RNSI_P_AAT_HIDDEN_MEMORY	29406	15262	none		absent	absent		8	33,123	Hidden Records	
+skill	RNSI_P_AMM_ENHANCED_DYNAMO_FACTORY_TRANSFORM	29407	16089	none		absent	absent		8	123	Dynamo Factory'- Enhanced Transformation	
+skill	RNSI_P_AMM_NEW_UPDATE	29408	14644	none		absent	absent		8	123	New Update!	
+skill	RNSI_P_AMM_TRANSFORM_OFENCE_MODE	29409	15011	none		absent	absent		8	123	Transformation: Offensive Mode	
+skill	RNSI_P_ATT_NASOD_ARMOR_MODE	29410	15937	none		absent	absent		8	36,126	Nasod Armor Mode - Overlimit	
+skill	RNSI_P_ADE_CONTROL_TIME	29411	14993	none		absent	absent		8	36,126	Time Control	
+skill	RNSI_P_ADE_MIND_CONTROL	29412	16292	none		absent	absent		8	126	Mind Control	
+skill	RNSI_P_ADE_MIND_CIRCLE	29413	15776	none		absent	absent		8	126	Mind Circle	
+skill	RNSI_P_ADE_ESP	29414	14634	none		absent	absent		8	126	ESP	
+skill	RNSI_P_ALP_TRANSCENDENCE	29415	14302	none		absent	absent		8	122	Awakened Will: Lunatic Psyker	
+skill	RNSI_P_ALP_ENERGY_AMPLIFY	29416	14956	none		absent	absent		8	122	Amplify Energy	
+skill	RNSI_P_AMM_TRANSCENDENCE	29417	14614	none		absent	absent		8	123	Awakened Will: Mastermind	
+skill	RNSI_P_AMM_ENHANCED_ARTIFICIAL_INTELLIGENCE	29418	14960	none		absent	absent		8	123	A.I. Upgrade	
+skill	RNSI_P_ADE_TRANSCENDENCE	29419	15579	none		absent	absent		8	126	Awakened Will: Diabolic Esper	
+skill	RNSI_P_ADE_TIME_TROUBLE	29420	14961	none		absent	absent		8	126	Time Interference	
+skill	RNSI_HA_ALP_DOOMS_DAY	29600	15885	none		absent	name	12325	13	122	Dooms Day	
+skill	RNSI_HA_AMM_APOCALYPSE	29601	16382	name	1723	live	name	12326	13	123	Apocalypse	march live names at value: RNSI_HA_AMM_APOCALYPSE
+skill	RNSI_HA_ADE_PARANOIA	29602	15195	none		absent	name	12321	13	126	Paranoia	
+skill	RNSI_HA_ALP_DOOMS_DAY_UPGRADE	29603	15683	none		absent	absent		13	122	#Cffcc00[Enhanced]#CX\nDooms Day	
+skill	RNSI_HA_AMM_APOCALYPSE_UPGRADE	29604	16216	name	2971	live	absent		13	123	#Cffcc00[Enhanced]#CX\nApocalypse	march live names at value: RNSI_HA_AMM_APOCALYPSE_UPGRADE
+skill	RNSI_HA_ADE_PARANOIA_UPGRADE	29605	14494	none		absent	absent		13	126	#Cffcc00[Enhanced]#CX\nParanoia	

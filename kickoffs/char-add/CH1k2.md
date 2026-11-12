@@ -7,7 +7,7 @@
 | Depends on | CH0 (and its amendments), char-elesis Z, the previous CH1 sub-phase. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` (`new` rows, compiled) and `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` (`inside` rows; `//#define` until CH1 final) |
 | Log tag | none (nothing runs until `_LIVE`; no play-test) |
-| Review | `kickoffs/char-add/CH1k2-review.md` (Opus 5.5 high; covers CH1h, CH1h2, CH1i, CH1j, CH1k, CH1k2; the phase writes it when done) |
+| Review | `kickoffs/char-add/CH1k2-review.md` (Opus 5.5 high; covers CH1k, CH1k2; the phase writes it when done) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 
@@ -52,7 +52,7 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **7** functions (4 listing-only; 3 `inside`, 4 `new`), filter `awk -F'\t' '$7=="CH1k2"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- 7 rows: 0x810 `329e8960`, 0x818 `329d4250`, 0x828 `329e6100`, 0x834 `329e80f0`, 0x84c `329d49b0`, 0x854 `329ff960` (listing-only) and one helper. The review covers CH1k-CH1k2 (CH1h-CH1h4 and CH1i-CH1j2 have their own).

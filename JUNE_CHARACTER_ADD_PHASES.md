@@ -304,6 +304,74 @@ range's end (`32a316dd` vs the helpers `32a31740`-`32a317d0` and the gauge-data 
 and every skill id mapped; the 58 listing-only overrides have rows; assets union routes a / b / c and the motion kom is named; the motion question
 answered; the DP, nasod, Crest, summon, CH-N and creation maps exist; the enum-gate gaps listed; kickoffs amended; open questions listed.
 
+### CH0 - Done (2026-11-13)
+
+Read-only: no flag, no build, no code. Outputs in `june2017_re/char_add/` (tables in the tsvs; per-phase detail in each kickoff's "Amended by CH0").
+
+**Tooling.** Elesis's builders copied with Add's range / vtable / registrars (`ch0_build_vtable.py`, `ch0_skill_listing_emu.py`,
+`ch0_setskilllevel_blocks.py`, `ch0_march_live_states.py`, `ch0_build_state_skill.py`, `ch0_build_state_enum_names.py`, `ch0_build_keys.py`,
+`ch0_build_class_map.py` + `ch0_make_hand_names.py`, `ch0_unmapped_callees.py`, `ch0_build_enum_names.py`, `ch0_passive_ids.py`,
+`ch0_build_unittemplet.py`, `ch0_numtables.py`, `ch0_build_checklist_rows.py`, `ch0_build_classn*.py`, `ch0_funcmap_rows.py`,
+`ch0_amend_kickoffs.py`) + new `ch0_apply_splits.py` (the splits, idempotent, run after the builders). The class-map pointer scan now covers third
+address bytes 9c-a3. `charport_adis.py` gained `add` (`0x329cf870`-`0x32a31735`); `char_eve/ch0_build_assets.py` gained `add` (+ an optional
+`token_exclude`; Ara's outputs byte-identical, Elesis's identical but one `set()`-order note); `s3_no_state.py` `TSV_MISSING_CLASSES` gained
+`X2GUAdd.cpp`: `--append-missing` appended 164 rows (33 / 36: 29, 123 / 126: 53), the old tsv a byte prefix of the new one.
+
+**Step 0.** **Range end is `32a31734`**, not `32a316dd`: six jmp thunks after the dtor (`32a316e0`-`32a31730`) are Add's; `32a31740`-`32a317d0` and
+`32a31900`+ are other classes' gauge accessors / shared gauge virtuals. Vtable `334daaec`: 98 overrides, all in range, 58 listing-only (97 functions:
+0x6dc / 0x6e4 share `32a31560`). InitState body `32a25a90` (no wrapper) -> registrars `32a1e4f0` (118) / `32a24c20` (68) + base `3202b110`:
+`ch0_reg.tsv` 195 rows, **`ch0c_listing_check` 194 / 194** (one identical pair), `~` rows ids 270 / 237 / 265. `32a28e00`: switches (a) type - 5, (b)
+29000-29233 (234 entries, 53 targets), (c) 29601-29605; compares 29213 / 29231 (Crest), 29600, 900; no memo switch, no second function
+(`ch0_skill_switches.tsv` 255, `ch0_skill_listing_rows.tsv` 151). SetEquippedSkillLevel `329d1730` (0x7b8): 18 blocks, 32 state calls.
+
+**Maps.**
+- `ch0_class_map.tsv` 1,403 starts (733 carved, 670 listing-only): state-fn 484, thunk 489, helper 258, override 97, dead 59, not-Add 14, registrar 2.
+  Per phase (functions; thunks / dead out): CH1a 32, CH1b 28, CH1c 2, CH1d 45, CH1d2 27, CH1e 19, CH1f 41, CH1f2 21, CH1g 35, CH1h 25, CH1h2 27,
+  CH1h3 33, CH1h4 30, CH1i 28, CH1j 50, CH1j2 21, CH1k 30, CH1k2 7, CH1m 3, CH1n 1, CH1o 2, CH1q 22, CH1q2 10, CH2a 34, CH2b 29, CH2c 35, CH2d 24,
+  CH3a 47, CH3b 45, CH3c 46, CH3c2 16, CH3d 11, CH4a 14, CH4b 1. 294 `new` rows keep `?` with a hint (the owning phase names them).
+- `ch0_state_skill.tsv`: **328 / 328** tables (311 mapped, 11 dead data, 6 `INIT_*`; 326 names: `ANSI_CAN_NOT_ATTACK_JUMP_DOWN` and
+  `ANSI_RIDING_DAMAGE_FRONT` appear twice), **123 / 123 skill ids**, 0 UNASSIGNED, no March-only state, no state id in a `UCHAR`. Prefixes: SA 67,
+  A 30, HA 3, CAN 2, COMMON 1 (`ANSI_COMMON_BUFF`), DP 1 (`ANSI_DP_BARRIER_ACTIVE`), P 0. `ADD_NASODRULER_STATE_ID` lacks 159 of June's 220
+  names; 27 of the 61 shared ones differ after the USI_END rebase (`ch0_state_enum_names.tsv`).
+- `ch0_keys.tsv` 222 (both 206, june-only 8, neither 4, march-only-site 4), every key owned. **Enum gate PASS today** (`luabind.py check
+  Add_NasodRuler`: 0 unbound, 0 enum missing; `CAMERA_TYPE.CT_PARTS_LOOK_TRACKINGT` is nil in June too).
+- `ch0_enum_names.tsv`: 115 of 123 ids need a C++ member. `ch0_passive_ids.tsv`: 36 `SI_*` reads, 25 differ. `ch0_unittemplet_add.tsv`: 9 / 32 / 122
+  differ only by June's additions; the 4 new rows' strings all present. Numerical rows: 140 `c1a` rows, 55 ids (`plan_numerical_rows.tsv`; the script
+  has no `NUMERICAL_DATA_INDEX`, so `ch0_numtables.json` is empty). S3: `ch0_s3_baseline.txt` 261 rows, 254 no_state.
+- `ch0_checklist_rows.tsv`: 87 rows (56 Part A + 31 Part B), 80 phase, 7 n/a; checklist lines moved +3..+15 (re-anchored by text). L361 (plan
+  l.358) Class column corrected: `RNSI_SA_ALP_SUPERSONIC` 29058 is Add's (CH3a).
+- **Creation screen** (`ch0_create.tsv`, first): March already has every Add piece; only `X2StateCreateUnit.cpp:132-135` and seven
+  `X2UIPersonalShopBoard.cpp` blocks hide him (US `iLimitType` 8 by `cl /P`); the emulator creates class 9 with his beginner gear. CH0c: lift per type,
+  June's 6-button `DLG_Unit_Create_ClassChange_Button_Add.lua`, June's `character_info_09` texture.
+- **DP** (`ch0_dp.tsv`, CH1q not split): slots 0x6c4 / 0x6f4 are SetDPValue / SetMutationCount (**the training keys' slots: settled**; the backlog's
+  `329e2170` / `329e20e0` are the getters); the outer UpNowDPValue adds `1 - +0x6c50` to spends; the body equals the buff port's R1 edit; June keeps an
+  Add gauge UI without RTTI (`32e6e0c0`, vtable `335335b0`). **Nasod** (`ch0_nasod.tsv`): 0x4c4 / 0x4c8 are effect-set name hooks, not barrier logic;
+  PlayLoopSound is June's already. **Crest** (`ch0_crest.tsv`): cast by 29213 / 29231 (Time Tracer line) -> CH2a0 before CH2d; four classes'
+  stand-ins to restore. **Summons** (`ch0_summon.tsv`): five live sites (`329f350a` is dead code), Particle Prism first -> CH2b0 before CH2a;
+  `PlayEffectSet_CustomSet_LUA` unbound in the Charged Impulsar scripts. **CH-N** (`ch0_classn.tsv` 48, `ch0_classn_route.tsv`): Add CHNa 7, CHNb 3,
+  CH5 3, Ara covers 7, 18 need nothing; CHNa needs CH5's four `UnitTemplet` rows; quests and the class grant confirmed.
+
+**Assets.** `ch0_assets.tsv` 11,602 rows; **`ch0b_stage_list.tsv` 7,686**: `STAGE-JUNE DRY RUN: 29 kom(s), 7686 staged (7637 new, 49 replaced, 0
+identical), 0 refused`; new kom **data207** (57 June-only motions), class motions -> data033. **Motion question:** `Motion_ADD_PT.X` (5 names renamed
+into `Motion_ADD.x`) and `Motion_ADD_LP.x` (Twirl Rush moved to `_PT`) are **held for CH1** (`ch1_held_motions.tsv`); `Motion_ADD.x`, `_Common`,
+`_Field`, `_Lobby`, `Motion_Add_Emotion.x` go now. Closure 8,394 rows (195 missing files: 186 in the list, 9 in no June kom). Icons: 149 misses on
+7 sheets, all in the list.
+
+**Item 6.** `ch0_unmapped_identified.tsv` 58 rows: 45 same, 11 june-only, 1 differs, 1 unknown. **New phase CH1d0** (Opus, before CH1d): the 12
+non-`same` engine helpers Sonnet phases call (`32294530` line-map snap ~14 KB, `32293d70`, `31f63f20`, `31f63d30` / `31f63d40`, `31fcefa0`,
+`322d58c0`, five accessors); `32d27770` (differs) goes to CH1q. `funcmap.tsv`: 153 rows `Char Add CH0` (11 addresses already had rows).
+
+**Splits and kickoffs.** CH1f -> CH1f / CH1f2, CH1h -> CH1h / CH1h3, CH1h2 -> CH1h2 / CH1h4 (vslot 0x1d8+), CH1j -> CH1j / CH1j2 (the container
+helpers at `0x32a2c000`+ go to each second half), CH3c -> CH3c / CH3c2 (actives); CH3a (47) and CH3b (45) stay whole. Reviews: CH1g (CH1e-CH1g),
+CH1h4 (CH1h-CH1h4), CH1j2 (CH1i-CH1j2), CH1k2 (CH1k-CH1k2); CH1d0 its own. Every kickoff CH0b-Z has "Amended by CH0".
+
+**Plan-doc inconsistencies.** Stat rows are moot (flat `StatTable.lua` e37c9211 has all 7 classes: Context "Stat rows", CH0 item 12, Open decision 1,
+CH0c / CHNa stat-row items); `CommonFrameMove` is `:1281` (`:1258` is CommonFrameMoveFuture); `32a23b90` is the dtor body, not a second ctor;
+123 passes `< UC_END` (only 126 fails both) and no refusing test remains after Ara's CHNa; Crest skills are 29213 / 29231, not 207 / 29212 / 29230;
+Apocalypse spawns in `329f5200`, not `329f5190`; the 0x4c4 / 0x4c8 slots are not nasod-barrier code; the UpNowDPValue spend factor reads `+0x6c50`
+(not `+0x6bb0`); stale March lines in checklist rows (UpNowDPValue `:9100`, SetNasodArmorAttackTarget `:9863`, ApplyHyperModeBuff `:9532`).
+**Drift:** none. **Open for the user:** none.
+
 ## Phase CH0c - Add on the creation screen (March classes)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE`. Sub-tag `CREATE`. After CH0 and char-ara's CHNa

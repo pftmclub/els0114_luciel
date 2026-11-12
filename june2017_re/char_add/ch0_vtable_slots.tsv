@@ -1,0 +1,101 @@
+slot_off	vt_entry	fn	base_fn	name	src	march
+0x0	334daaec	32a316c0	3208f650	~CX2GUAdd (scalar deleting dtor)	CONF: sibling class maps slot 0x0; slot-0 dtor 32b90520	X2GUAdd.h:511 virtual ~CX2GUAdd(void);
+0x28	334dab14	329e5bf0	31ff1950	NotifyShowObjectChanged	CONF: char_ara class map 0x28	- (CX2GUAdd does not declare it in March; X2GUUser.h:1635 virtual void NotifyShowObjectChanged();)
+0x30	334dab1c	329e2ed0	31fd56e0	NotifyDGManagerChanged	CONF: char_ara class map 0x30	- (CX2GUAdd does not declare it in March; X2GUUser.h:1639 virtual void NotifyDGManagerChanged( CKTDGManager& refInManager_ );)
+0x3c	334dab28	329cf870	31fee090	InitComponent	CONF: char_ara class map 0x3c	X2GUAdd.h:523 virtual void InitComponent();
+0x40	334dab2c	329ea8b0	3204ea20	Init	CONF: char_ara class map 0x40	X2GUAdd.h:520 virtual void Init( bool bUseTeamPos_, int iStartPosIndex_ );
+0x44	334dab30	329ffcd0	32022380	ReInit	CONF: char_ara class map 0x44	X2GUAdd.h:1064 virtual void ReInit( bool bTeamPos = false, int iStartPosIndex = -1 );
+0x48	334dab34	329d1be0	32012760	InitEffect	CONF: char_ara class map 0x48	X2GUAdd.h:1071 virtual void InitEffect();
+0x5c	334dab48	329d40f0	320348c0	StateChange	CONF: char_luciel class map 0x5c	X2GUAdd.h:1111 virtual bool StateChange( int state, bool bDirectChange = false );
+0x60	334dab4c	32a07fc0	320462a0	DamageReact	CONF: char_ara class map 0x60	X2GUAdd.h:1065 virtual void DamageReact( OUT CX2DamageManager::DamageData* pDamageData_ );
+0x90	334dab7c	329d5050	32014660	Win	CONF: char_ara class map 0x90	X2GUAdd.h:1067 virtual void Win();
+0x94	334dab80	329e41e0	31ff15d0	Lose	CONF: char_ara class map 0x94	X2GUAdd.h:1068 virtual void Lose();
+0x98	334dab84	329d5090	31ff17c0	Draw	CONF: char_ara class map 0x98	X2GUAdd.h:1069 virtual void Draw();
+0xb4	334daba0	32a31590	31fd1c00	GetHyperModeTime	CONF: char_raven class map 0xb4	X2GUAdd.h:1161 virtual float GetHyperModeTime() const { return 9999999.f; }
+0xc0	334dabac	329e2410	32298590	ApplyHyperModeBuff	CONF: char_ara class map 0xc0	X2GUAdd.h:1103 virtual void ApplyHyperModeBuff();
+0xc4	334dabb0	329e5940	31fd5cb0	HyperModeBuffEffectStart	CONF: char_ara class map 0xc4	X2GUAdd.h:1089 virtual void HyperModeBuffEffectStart();
+0xd0	334dabbc	329ffba0	322984c0	?	HINT: base 322984c0; 38 insns; calls 324943c0 32489200 32fe243e	- (name unsettled)
+0x1d8	334dacc4	329e5fe0	3208e5a0	?	HINT: base 3208e5a0; 13 insns; calls -	- (name unsettled)
+0x24c	334dad38	329d5190	3204b5e0	SetSpecificValueByBuffTempletID	CONF: char_ara class map 0x24c	X2GUAdd.h:1091 virtual void SetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ );
+0x250	334dad3c	329ffeb0	3202ed60	UnSetSpecificValueByBuffTempletID	CONF: char_ara class map 0x250	X2GUAdd.h:1092 virtual void UnSetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ );
+0x29c	334dad88	329d4730	3208dd70	?	HINT: base 3208dd70; 19 insns; calls -	- (name unsettled)
+0x2a0	334dad8c	329e21f0	3208ddc0	?	HINT: base 3208ddc0; 92 insns; calls 329d3fe0 328911c0	- (name unsettled)
+0x2a4	334dad90	329e5b00	33093ad0	?	HINT: base 33093ad0; 41 insns; calls 329e56c0 329e3060	- (name unsettled)
+0x2ac	334dad98	329d4870	3208e1b0	?	HINT: base 3208e1b0; 26 insns; calls -	- (name unsettled)
+0x2b8	334dada4	329e4a50	32045340	SetDamageExceptionProcess	CONF: char_raven class map 0x2b8	X2GUAdd.h:1100 virtual void SetDamageExceptionProcess( OUT CX2DamageManager::DamageData* pDamageData_ ,OUT float& fPowerRate);
+0x2c4	334dadb0	329f73a0	3208ddc0	?	HINT: base 3208ddc0; 38 insns; calls 329f7370	- (name unsettled)
+0x324	334dae10	329e31e0	3208ddc0	ChangeMaxCharacterAddResource	CONF: char_ara class map 0x324	- (CX2GUAdd does not declare it in March; X2GameUnit.h:3819 virtual void ChangeMaxCharacterAddResource( const float fRate_ ) {})
+0x338	334dae24	329fe0c0	32014810	DyingStart	CONF: funcmap 32014810 CX2GUUser::DyingStart	- (CX2GUAdd does not declare it in March; X2GUUser.h:3761 virtual void DyingStart();)
+0x3a8	334dae94	329d5240	31fd4460	ApplyRenderParam	CONF: char_ara class map 0x3a8	X2GUAdd.h:1093 virtual void ApplyRenderParam( CKTDGXRenderer::RenderParam* pRenderParam_ );
+0x3d8	334daec4	329e58d0	3208dd70	?	HINT: base 3208dd70; 19 insns; calls -	- (name unsettled)
+0x3dc	334daec8	329f9a30	3208ddc0	?	HINT: base 3208ddc0; 128 insns; calls 31aad500 31f64190 31aa1670	- (name unsettled)
+0x3e0	334daecc	329d4640	331a4950	?	HINT: base 331a4950; 7 insns; calls -	- (name unsettled)
+0x4b8	334dafa4	329d49e0	3208dd70	?	HINT: base 3208dd70; 4 insns; calls -	- (name unsettled)
+0x4bc	334dafa8	329e65c0	31e4c550	?	HINT: base 31e4c550; 24 insns; calls -	- (name unsettled)
+0x4c0	334dafac	329e7ca0	31f3f070	?	HINT: base 31f3f070; 49 insns; calls 32076c90 3227b860 3229e160	- (name unsettled)
+0x4c4	334dafb0	329e7d60	3208ddc0	?	HINT: base 3208ddc0; 50 insns; calls 32076c90 31c1c1a0 31c1c1a0	- (name unsettled)
+0x4c8	334dafb4	32a047a0	33093ad0	?	HINT: base 33093ad0; 318 insns; calls 31aad500 322ceae0 321d97c0	- (name unsettled)
+0x4d4	334dafc0	329d1ba0	31ff0eb0	DetonationStateChange	CONF: char_elesis class map 0x4d4	X2GUAdd.h:539 virtual void DetonationStateChange( CX2DamageManager::DamageData* pDamageData );
+0x4e0	334dafcc	32a28860	320144d0	AttackResultByType	CONF: char_ara class map 0x4e0	- (CX2GUAdd does not declare it in March; X2GUUser.h:1584 virtual void AttackResultByType( CX2DamageManager::DamageData &pDamageData );)
+0x500	334dafec	329e5bb0	3208dd70	?	HINT: base 3208dd70; 17 insns; calls -	- (name unsettled)
+0x524	334db010	32a315a0	3208e410	GetNowStateSkillID	CONF: funcmap 3208e410 CX2GUUser::GetNowStateSkillID	- (no virtual of that name in X2GUAdd.h / X2GUUser.h / X2GameUnit.h)
+0x540	334db02c	329e7080	32012800	CreateMajorParticleArray	CONF: char_ara class map 0x540	X2GUAdd.h:1073 virtual void CreateMajorParticleArray();
+0x548	334db034	329d1c10	32012920	CreateMinorParticleArray	CONF: char_ara class map 0x548	X2GUAdd.h:1074 virtual void CreateMinorParticleArray();
+0x54c	334db038	329e6180	31aa1d30	InitEnchantWeaponEffectUnitSpecific	CONF: char_ara class map 0x54c	X2GUAdd.h:1095 virtual void InitEnchantWeaponEffectUnitSpecific();
+0x560	334db04c	32a31550	31fd4730	CanHyperMode	CONF: funcmap 31fd4730 CX2GUUser::CanHyperMode	- (CX2GUAdd does not declare it in March; X2GUUser.h:3371 virtual bool CanHyperMode())
+0x5f0	334db0dc	329e4270	31aa1d30	COMMON_BUFF_FrameMove	CONF: char_ara class map 0x5f0	X2GUAdd.h:1080 virtual void COMMON_BUFF_FrameMove();
+0x600	334db0ec	329ffe90	31aa1d30	HyperModeFrameMove	CONF: char_ara class map 0x600	X2GUAdd.h:1082 virtual void HyperModeFrameMove();
+0x628	334db114	329e6010	31fd7930	CanRidingState	CONF: char_ara class map 0x628	X2GUAdd.h:1056 virtual bool CanRidingState();
+0x630	334db11c	329e5c80	3201c3a0	UpdateNotRenderingOtherEquipList	CONF: char_ara class map 0x630	- (CX2GUAdd does not declare it in March; X2GUUser.h:2659 virtual void UpdateNotRenderingOtherEquipList();)
+0x658	334db144	329e6430	330fb7d0	?	HINT: base 330fb7d0; 29 insns; calls -	- (name unsettled)
+0x670	334db15c	329e3190	331a4950	?	HINT: base 331a4950; 19 insns; calls -	- (name unsettled)
+0x684	334db170	329e3230	31fd8f60	InitEquippedActiveSkillState	CONF: char_eve class map 0x684	- (CX2GUAdd does not declare it in March; X2GUUser.h:3036 virtual void InitEquippedActiveSkillState( bool bOnlySkillLevel = false );)
+0x688	334db174	329e2770	31fcd740	?	HINT: base 31fcd740; 15 insns; calls 31fcd740	- (name unsettled)
+0x690	334db17c	32a1ccb0	31fe19d0	InitPassiveSkillState	CONF: char_ara class map 0x690	X2GUAdd.h:524 virtual void InitPassiveSkillState();
+0x698	334db184	329fe0f0	320118e0	?	HINT: base 320118e0; 29 insns; calls 31aad500	- (name unsettled)
+0x6a0	334db18c	329e8130	31fd1840	GetActualMPConsume	CONF: char_ara class map 0x6a0	X2GUAdd.h:545 virtual float GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const;
+0x6a4	334db190	329e6610	31fd1920	GetActualCoolTime	CONF: char_raven class map 0x6a4	- (CX2GUAdd does not declare it in March; X2GUUser.h:3277 virtual float GetActualCoolTime( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_, IN int iSkillLevel ) const;)
+0x6bc	334db1a8	329e4bb0	3208ddc0	?	HINT: base 3208ddc0; 109 insns; calls 328912a0	- (name unsettled)
+0x6c4	334db1b0	329e21d0	3208ddc0	?	HINT: base 3208ddc0; 8 insns; calls 3230f050	- (name unsettled)
+0x6c8	334db1b4	329e2340	31e4c550	?	HINT: base 31e4c550; 5 insns; calls -	- (name unsettled)
+0x6cc	334db1b8	329e2360	3208ddc0	?	HINT: base 3208ddc0; 13 insns; calls -	- (name unsettled)
+0x6d0	334db1bc	32a21d70	331a4950	?	HINT: base 331a4950; 277 insns; calls 31aad340 31aad500 3230eff0	- (name unsettled)
+0x6d4	334db1c0	329e25b0	3208ddc0	?	HINT: base 3208ddc0; 9 insns; calls -	- (name unsettled)
+0x6d8	334db1c4	329e25e0	3208ddc0	?	HINT: base 3208ddc0; 10 insns; calls -	- (name unsettled)
+0x6dc	334db1c8	32a31560	31e4c550	?	HINT: base 31e4c550; 2 insns; calls -	- (name unsettled)
+0x6e0	334db1cc	32a31570	3208ddc0	?	HINT: base 3208ddc0; 3 insns; calls -	- (name unsettled)
+0x6e4	334db1d0	32a31560	31e4c550	?	HINT: base 31e4c550; 2 insns; calls -	- (name unsettled)
+0x6e8	334db1d4	32a31580	3208ddc0	?	HINT: base 3208ddc0; 3 insns; calls -	- (name unsettled)
+0x6ec	334db1d8	329e73a0	31fdaf30	SetCustomAnimName	CONF: funcmap 31fdaf30 CX2GUUser::SetCustomAnimName	X2GUAdd.h:1112 virtual void SetCustomAnimName( IN const UserUnitStateData& UserStateData, IN OUT wstring& wstrAnimName );
+0x6f0	334db1dc	329e29f0	32007e90	IsEnoughMPForAttack	CONF: funcmap 32007e90 CX2GUUser::IsEnoughMPForAttack	- (no virtual of that name in X2GUAdd.h / X2GUUser.h / X2GameUnit.h)
+0x6f4	334db1e0	329e2130	3208ddc0	?	HINT: base 3208ddc0; 16 insns; calls -	- (name unsettled)
+0x6f8	334db1e4	329f8180	3208ddc0	?	HINT: base 3208ddc0; 124 insns; calls 329f7df0 31aad340 31aad500	- (name unsettled)
+0x71c	334db208	329d45f0	331a4950	?	HINT: base 331a4950; 6 insns; calls -	- (name unsettled)
+0x738	334db224	329d46a0	3208e1b0	?	HINT: base 3208e1b0; 2 insns; calls -	- (name unsettled)
+0x73c	334db228	329d46b0	3208dd70	?	HINT: base 3208dd70; 2 insns; calls -	- (name unsettled)
+0x740	334db22c	329e2f80	32009780	?	HINT: base 32009780; 36 insns; calls 32009780 3230eff0	- (name unsettled)
+0x744	334db230	329e3000	3204da60	?	HINT: base 3204da60; 25 insns; calls -	- (name unsettled)
+0x7a4	334db290	32a25a90	31aa1d30	InitState	CONF: char_ara class map 0x7a4	X2GUAdd.h:522 virtual void InitState();
+0x7b4	334db2a0	32a28e00	31aa1d30	SetEquippedSkillFuncBySkillSlotIndex	CONF: char_ara class map 0x7b4	X2GUAdd.h:525 virtual void SetEquippedSkillFuncBySkillSlotIndex( const CX2SkillTree::SKILL_ID eSkillID_, const int iSlotIndex_, const bool bSlotB_ );
+0x7b8	334db2a4	329d1730	31aa1d30	SetEquippedSkillLevel	CONF: char_ara class map 0x7b8	X2GUAdd.h:526 virtual void SetEquippedSkillLevel( const CX2SkillTree::SKILL_ID eSkillID_, const bool bChangeAll_ );
+0x7c0	334db2ac	329d4e00	320506f0	CommonStateStartFuture	CONF: char_ara class map 0x7c0	X2GUAdd.h:528 virtual void CommonStateStartFuture();
+0x7c4	334db2b0	329ff970	32057b80	CommonStateStart	CONF: char_ara class map 0x7c4	X2GUAdd.h:529 virtual void CommonStateStart();
+0x7c8	334db2b4	329ffad0	32061bf0	CommonFrameMoveFuture	CONF: char_ara class map 0x7c8	X2GUAdd.h:531 virtual void CommonFrameMoveFuture();
+0x7cc	334db2b8	32a24560	32063650	CommonFrameMove	CONF: char_ara class map 0x7cc	X2GUAdd.h:532 virtual void CommonFrameMove();
+0x7d4	334db2c0	329e8740	31fe7610	CommonEventProcess	CONF: char_raven class map 0x7d4	X2GUAdd.h:537 virtual void CommonEventProcess();
+0x7d8	334db2c4	329d1b80	31fdd8e0	CommonStateEndFuture	CONF: char_ara class map 0x7d8	X2GUAdd.h:534 virtual void CommonStateEndFuture();
+0x7dc	334db2c8	329d1b90	32015250	CommonStateEnd	CONF: char_ara class map 0x7dc	X2GUAdd.h:535 virtual void CommonStateEnd();
+0x7e8	334db2d4	329d1bb0	31fd07b0	CommonRender_Prepare	CONF: char_ara class map 0x7e8	X2GUAdd.h:541 virtual RENDER_HINT CommonRender_Prepare();
+0x7f4	334db2e0	32a07b60	31aa1d30	SpecialAttackEventProcess	CONF: char_ara class map 0x7f4	X2GUAdd.h:543 virtual bool SpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ = CX2SkillTree::ASUT_GROUND );
+0x7f8	334db2e4	32a20e70	31aa1d30	SpecialAttackEventProcess part: skill lookup (slot 510)	CONF: char_chung vtable names, same slot (funcmap 32bd8790 note: slot 510 / 511 / 512 parts of SpecialAttackEventProcess)	- (no virtual of that name in X2GUAdd.h / X2GUUser.h / X2GameUnit.h)
+0x7fc	334db2e8	32a1e3c0	31aa1d30	SpecialAttackEventProcess part: skill use (slot 511)	CONF: char_chung vtable names, same slot (funcmap 32bd8790 note: slot 510 / 511 / 512 parts of SpecialAttackEventProcess)	- (no virtual of that name in X2GUAdd.h / X2GUUser.h / X2GameUnit.h)
+0x800	334db2ec	32a07dc0	31aa1d30	SpecialAttackEventProcess part: per-class skill use / cooldown (slot 512)	CONF: char_chung vtable names, same slot (funcmap 32bd8790 note: slot 510 / 511 / 512 parts of SpecialAttackEventProcess)	- (no virtual of that name in X2GUAdd.h / X2GUUser.h / X2GameUnit.h)
+0x80c	334db2f8	32a28350	32008e40	NoStateChangeActionFrameMove	CONF: char_ara class map 0x80c	X2GUAdd.h:544 virtual void NoStateChangeActionFrameMove();
+0x810	334db2fc	329e8960	31aa1d30	SpecialAttackNoStageChange	CONF: char_ara class map 0x810	X2GUAdd.h:1079 virtual bool SpecialAttackNoStageChange( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_ );
+0x818	334db304	329d4250	32ec5990	IsValideSkillRidingOn	CONF: char_elesis class map 0x818	X2GUAdd.h:573 virtual bool IsValideSkillRidingOn( CX2SkillTree::SKILL_ID eSkill_ID_ );
+0x828	334db314	329e6100	31fd7640	IsNotCommonMoveState	CONF: char_ara class map 0x828	- (CX2GUAdd does not declare it in March; X2GUUser.h:3466 virtual bool IsNotCommonMoveState();)
+0x834	334db320	329e80f0	33093ad0	ShowActiveSkillCutInAndLightByScript	CONF: char_ara class map 0x834	X2GUAdd.h:562 virtual void ShowActiveSkillCutInAndLightByScript( float fTimeToShow_, bool bOnlyLight_ );
+0x84c	334db338	329d49b0	31fcefa0	?	HINT: base 31fcefa0; 12 insns; calls 31fcefa0	- (name unsettled)
+0x854	334db340	329ff960	31f3f070	?	HINT: base 31f3f070; 87 insns; calls 32057b80 329f8680 31aad340	- (name unsettled)
+# Add vtable CX2GUAdd 334daaec: 544 slots (0x0-0x87c); in-range entries (target in 329cf870-32a31734): 98 (overrides 98, unnamed 40)
+# base_fn = CX2GUUser vtable 334781f4 (544 slots)

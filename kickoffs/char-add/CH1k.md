@@ -52,7 +52,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **30** functions (3 listing-only; 5 `inside`, 25 `new`), filter `awk -F'\t' '$7=="CH1k"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L256, L265, L268, L217, L266, L737.
+- 0x7f4 SpecialAttackEventProcess `32a07b60`, 0x7f8 slot-510 lookup `32a20e70` (L265 / L268; dev free-skill gate L266), 0x7fc `32a1e3c0`, 0x800 skill use `32a07dc0` (DP or MP), 0x80c NoStateChangeActionFrameMove `32a28350` (pushes state 207 = `ANSI_SA_APT_STASIS_FIELD_ACTIVE`). Read `32a07dc0` and GetActualDPConsume `329e7820` (`ch0_dp.tsv`) before writing ReservedSkillStart.

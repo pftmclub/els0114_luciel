@@ -44,7 +44,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **45** functions (9 listing-only; 0 `inside`, 45 `new`), filter `awk -F'\t' '$7=="CH3b"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 10 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 16: 29015 RNSI_SA_AAT_PHANTOM_SEEKER, 29016 RNSI_SA_AMM_INSTALLATION_STAR_FALL, 29017 RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY, 29018 RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER, 29039 RNSI_SA_AMM_CHARGED_IMPULSAR, 29040 RNSI_SA_AMM_FORCE_FILED, 29049 RNSI_SA_AAT_PHANTOM_SEEKER_UPGRADE, 29050 RNSI_SA_AMM_INSTALLATION_STAR_FALL_UPGRADE, 29051 RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY_UPGRADE, 29052 RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER_UPGRADE, 29059 RNSI_SA_AMM_EXTREME_CHASER, 29210 RNSI_A_AMM_FLICK_DISC_DYNAMO, 29211 RNSI_A_AMM_COUNTDOWN_BOMB_DYNAMO, 29222 RNSI_A_AMM_AIMING_NOVA, 29229 RNSI_A_AMM_FLICK_DISC_DYNAMO_UPGRADE, 29230 RNSI_A_AMM_COUNTDOWN_BOMB_DYNAMO_UPGRADE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L309, L314, L359, L733, L789, L117, L178, L727, L787, L865.
+- Skill ids and their states: `awk -F'\t' '$6=="CH3b"' june2017_re/char_add/ch0_state_skill.tsv` (part 2); the state functions: `awk -F'\t' '$7=="CH3b"' june2017_re/char_add/ch0_class_map.tsv`.

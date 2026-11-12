@@ -52,7 +52,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **28** functions (3 listing-only; 27 `inside`, 1 `new`), filter `awk -F'\t' '$7=="CH1b"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 68 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Every job-tagged START / WIN / LOSE table (36: APT / ALP / AAT / AMM / ATT / ADE x START, WIN, WIN2, LOSE, LOSE2) is here, rolled by `INIT_COMMON_RANDOM_STATE` (ids 9 / 11 / 12). June registers `ANSI_RIDING_DAMAGE_BACK` (id 86) and `ANSI_WALL_LANDING` (164) with no script table (`ANSI_RIDING_DAMAGE_FRONT` has two tables, lines 6024 / 6031).

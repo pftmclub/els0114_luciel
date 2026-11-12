@@ -36,7 +36,7 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L184, L818.
+- Keys (`june2017_re/char_add/ch0_keys.tsv`, 222): the 4 June-only `INIT_COMPONENT` keys are InitComponent's (CH1h); `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` are Stage 9; `BBT_CHANGE_NOW_HP_PER_SECOND` / `BFT_TIME` (pepper-run tables) and the neither keys `DASHL_CANCEL_AFTER`, `HEAD_IK` (March reader commented), `SPEED_y`, `SOUND_SET3_RATE` / `SOUND_SET4_RATE` have no reader on either side: n/a. `POSSIBLE_NASOD_BARRIER` is CH1q2's. `CUSTOM_RENDER_STATE` is CH1 final's labelled stand-in. CH1p keeps 7ag and the hooks.

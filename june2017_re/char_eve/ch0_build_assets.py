@@ -292,6 +292,50 @@ CHARS = {
              'npc-lua (check ledger)', '-', 'NPC / shadow / bot copy of the character'),
         ],
     ),
+    'add': dict(
+        owner='char-add',
+        script='Add_NasodRuler', lo=0x329cf870, hi=0x32a316dd,
+        unit_type=9, unit_type_name='UT_ADD',
+        unit_classes=[9, 32, 122, 33, 123, 36, 126],                 # Nasod Ruler, Psychic Tracer, Lunatic Psyker, Arc Tracer, Mastermind, Time Tracer, Diabolic Esper
+        tokens=['add'],                                              # whole token, any case (Mesh_ADD_AC_*, AddVoice_*, ADD_*, HQ_CutIn_Add_*)
+        token_exclude=re.compile(r'(?i)^(Sander_|Besma_|Ruben_|sand_|RedDragon_|Elysion_|ELSION_|Henir_|LDN_|NUI_|Photo_|Item_Drop_|Time_Boss_|OutRing_|DM_|'
+                                 r'CutScene_AlteraCenter|DLG_AddSocket|DLG_Addsoket|DLG_Friend_Add|DLG_Messenger_Add|Buff_|SA_LDN_)|'
+                                 r'(water|alpha|floor|color|colorb|uv)_?add|add_?(color|colorb)'),        # "add" as a blend word / Add Friend / Add Socket / other bosses' effects
+        abbr=['AN', 'APT', 'ALP', 'AAT', 'AMM', 'ATT', 'ADE'],       # Nasod Ruler, Psychic Tracer, Lunatic Psyker, Arc Tracer, Mastermind, Time Tracer, Diabolic Esper; whole upper-case token
+        abbr_exclude=re.compile(r'(?i)(^|_)pet_|_EVENT_|^HQ_Shop_Pet|^Motion_NPC_Event_'),
+        short_re=re.compile(r'(?!)'),
+        job_re=re.compile(r'(?i)nasod[_ ]?ruler|psychic[_ ]?tracer|lunatic[_ ]?psyker|arc[_ ]?tracer|master[_ ]?mind|time[_ ]?tracer|diabolic[_ ]?esper|'
+                          r'crest[_ ]?of[_ ]?time|moonlight[_ ]?rhapsody'),
+        lua_script='Add_NasodRuler',
+        skill_lua=['SI_HA_APOCALYPSE', 'SA_ATT_STARDUST_SHOWER', 'SA_ATT_VOID_IMPACT', 'SA_AMM_CHARGED_IMPULSAR', 'SA_AMM_CHARGED_IMPULSAR_ENHANCE'],     # summon NPC scripts (NPCTemplet LUA_FILE_NAME of NUI_SI_HA_APOCALYPSE 1604, the SA_ATT / SA_AMM NPCs)
+        extra_lua=['SI_HA_APOCALYPSE', 'SA_ATT_STARDUST_SHOWER', 'SA_ATT_VOID_IMPACT', 'SA_AMM_CHARGED_IMPULSAR', 'SA_AMM_CHARGED_IMPULSAR_ENHANCE',
+                   'DLG_Transcendental_Change_Guide_Add', 'DLG_1ST_Class_Change_Guide_Add', 'DLG_2ND_Class_Change_Guide_Add', 'Class_Change_Guide_Add',
+                   'DLG_Class_Change_Add_AT', 'DLG_Class_Change_Add_DE', 'DLG_Class_Change_Add_LP', 'DLG_Class_Change_Add_MM', 'DLG_Class_Change_Add_PT',
+                   'DLG_Class_Change_Add_TT', 'DLG_Unit_Create_ClassChange_Button_Add', 'DLG_Add_DP_And_Mutation', 'DLG_UI_An', 'DLG_UI_An_WithAP'],
+        skill_icon_ranges=[(106, 106), (900, 900), (29000, 29060), (29201, 29233), (29400, 29420), (29600, 29605)],
+        motion_glob=re.compile(r'(?i)^Motion_ADD(_(Common|Field|Lobby|Emotion|LP|PT|AT|MM|TT|DE))?\.'),
+        march_motion_koms=('data033', 'data012'),
+        held_motions=['Motion_ADD_PT.X', 'Motion_ADD_LP.x'],         # March's Add_NasodRuler.lua plays names these two drop (ch0_motion_question.tsv): copied with the script in CH1
+        tutorial_re=re.compile(r'(?i)^tuto'),
+        owner_rules=[
+            (r'(?i)^DLG_Unit_Create_ClassChange_Button_Add', 'char-add', 'CH5', 'class-select button dialog (adopt-june, not stage-june)'),
+            (r'(?i)^DLG_PVP_Game_Damaged_Add|^DLG_UI_JUMPING_(EVENT|SYSTEM)_ADD|^DLG_Unit_(Create|Select)_',
+             'stage9-ui', '-', 'jumping / unit / PvP dialog'),
+            (r'(?i)^DLG_(1ST|2ND)_Class_Change_Guide_Add', 'char-add', 'CH5', 'class-change guide dialog (June-only; adopt-june, not stage-june)'),
+            (r'(?i)^(DLG_)?Class_Change_(Guide_)?Add|^DLG_Class_Change_Add_', 'char-add', 'CH0b-adopt', 'class-change dialog Lua (adopt-june, not stage-june: June bytecode fails the pack gate)'),
+            (r'(?i)^DLG_Class_Change_', 'stage9-ui', '-', 'class-change dialog'),
+            (r'(?i)^DLG_Add_DP_And_Mutation|^DLG_UI_An(_WithAP)?\.', 'char-add', 'CH1q', 'DP / mutation dialog Lua (adopt-june, not stage-june)'),
+            (r'(?i)^DLG_Transcendental_Change_Guide_Add', 'char-add', 'CH3d', 'transcendence guide (Stage 6 pattern)'),
+            (r'(?i)^(PET_|Pet_|HQ_Shop_Pet)', 'stage17-pet', '-', 'pet asset'),
+            (r'(?i)^Motion_EVENT_', 'june-dungeons', '-', 'event NPC motion, not the character'),
+            (r'(?i)^POPUP_TR_(L_PSYKER|MASTERMIND|D_ESPER)\.', 'char-add', 'CH0b', 'transcendence guide picture named by DLG_Transcendental_Change_Guide_Add'),
+            (r'(?i)^POPUP_TR_', 'stage6-transcendence', '-', 'transcendence job popup UI'),
+            (r'(?i)(^|_)ADD_CENTER_|^Add_Center_|^Dungeon_(Tutorial_)?Add|^Motion_Time\d*_Add|^Time\d*_Stage\d+_(AP_)?Add|^Motion_Tutorial_Add|^Tutotial_Add|^Tutorial_Add|'
+             r'^(MOTION_)?HAMEL_SUMMON_DUMMY_ADD|^NUI_HAMEL_SHADOW_ADD', 'june-dungeons', '-', 'dungeon / boss / summon copy of the character'),
+            (r'(?i)^((NPC_|Npc_)Add|.*_SHADOW_ADD|TIME_ADD|PVP_BOT_ADD|APINK_ANGEL_\d+_ADD|EVENT_.*ADD|ADD_EVENT|CSM_Add|(HQ_)?UI_NPC_EVENT_)',
+             'npc-lua (check ledger)', '-', 'NPC / shadow / bot / event copy of the character'),
+        ],
+    ),
 }
 
 FILE_EXT = ('.dds', '.tga', '.bmp', '.png', '.jpg', '.jpeg', '.x', '.y', '.xet', '.ksm', '.ogg', '.wav', '.mp3', '.tet', '.gfx',
@@ -501,7 +545,7 @@ def main():
         ts = toks(nm)
         tl = [t.lower() for t in ts]
         base = nm.rsplit('.', 1)[0] if '.' in nm else nm
-        if any(t in tokset for t in tl):
+        if any(t in tokset for t in tl) and not (C.get('token_exclude') is not None and C['token_exclude'].search(nm)):
             add(nm, 'a', 'token ' + '/'.join(t for t in ts if t.lower() in tokset))
             continue
         if C.get('name_re') is not None and C['name_re'].search(nm):

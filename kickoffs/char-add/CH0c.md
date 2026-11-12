@@ -55,10 +55,15 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Map: `june2017_re/char_add/ch0_create.tsv` (22 items; raw June / March pairs and decompile notes in `ch0_create_raw.tsv`). Under ~25 functions: no split.
+- **Stat rows: none to write.** The flat `StatTable.lua` (e37c9211) already has 99 rows for 9 / 32 / 33 / 36 / 122 / 123 / 126; decision 1 is moot.
+- Code: lift the US limit for `UT_ADD` only, under `_CREATE`, at `X2StateCreateUnit.cpp:132-135` (AddCreateUnitSlot) and the seven `X2UIPersonalShopBoard.cpp` combo blocks (:662, :713, :768, :815, :862, :909, :956); leave the default-select switch `:175-220` (lifting the constant would open the screen on Add; June selects Ain). Check `X2UIItemExchangeShop.h:11-21` (US 8 slots per set) against June and include Add's slot if June shows it.
+- June and March agree on every Add piece of the screen (SelectAdd `32555320` / `:2346`, buttons, stand mesh `32551e30`, dummy `3255b800`, stat chart, flag colour, background, voice files, movies): no transcription expected; read SelectAdd once against the June decompile (scratch dumps are gone with the CH0 session: re-pull).
+- Data: adopt June's `DLG_Unit_Create_ClassChange_Button_Add.lua` (6 radio buttons + `ClassChange_ID` 3 pictures, March 2 + 1; `luabind.py check` 22 calls, 0 unbound, 0 enum missing); the four June-only buttons are harmless until CHNa (lines 2 / 3 return UC_NONE, `SelectUpperClass` returns at `:3403`). Stage June's `DLG_UI_Common_Texture_GUI_character_info_09.tga` / `.TET` (data057; same size, different bytes). Keep March's `DLG_Unit_Create_Unit_Button_New.lua` (Add's slot exists, only hidden; June's layout comes with Lu/Ciel NU4).
+- Open checks in the phase: does June's `SelectUpperClass` `325519d0` write the selected class (`+0x2c0`) that its create request `325584f0` sends (March sends the unit type; for base Add both are 9); March's voice format `L"%d.ogg "` has a trailing space (`:4050`): the play-test listens for the create voice.
+- Emulator: nothing refuses class 9 (`Handlers_Unit.cpp:311` / `:330`); `SeedBeginnerGear` gives 112991-112995 and costume 41757-41761 (`X2OfflineInventory.cpp:1236`): update the stale "unreachable" comments at `:1213` / `:1236`.
 
 ## Amended by char-ara CHNa (2026-11-11)
 

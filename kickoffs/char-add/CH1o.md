@@ -36,7 +36,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **2** functions (2 listing-only; 0 `inside`, 2 `new`), filter `awk -F'\t' '$7=="CH1o"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L269, L289, L442, L621.
+- 0x524 `32a315a0` (listing-only, 70 bytes) and the four `329cc340` callers: `32a10c80` (`ANSI_SA_ALP_QUICKSILVER_ACCEL_BACK.FrameMove`), `32a26480` (`ANSI_SA_ADE_REVERSE_STIGMA.FrameMove`), `32a26be0` x2 (`ANSI_A_AN_MIND_BREAK.FrameMove`). 0x4bc IsSkillUseCountExcludedState `329e65c0`: indices 0x123-0x126 / 0x12b = state ids 291-294 / 299, all `ANSI_AAT_CREATE_DYNAMO_FACTORY`. SetSkillLevelStateData term L289.

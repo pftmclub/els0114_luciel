@@ -7,7 +7,7 @@
 | Depends on | CH0 (and its amendments), char-elesis Z, the previous CH1 sub-phase. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` (`new` rows, compiled) and `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` (`inside` rows; `//#define` until CH1 final) |
 | Log tag | none (nothing runs until `_LIVE`; no play-test) |
-| Review | none of its own: the CH1k2 review covers it (its `_DEBUG` define stays on) |
+| Review | none of its own: the CH1j2 review covers it (its `_DEBUG` define stays on) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 
@@ -52,7 +52,7 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **28** functions (15 listing-only; 5 `inside`, 23 `new`), filter `awk -F'\t' '$7=="CH1i"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- 0x600 HyperModeFrameMove `329ffe90`; 0x7b8 SetEquippedSkillLevel `329d1730` (18 blocks, 32 vslot-0x7a8 state calls, no member write: `june2017_re/char_add/ch0_setskilllevel_blocks.tsv`); 0x6d4 / 0x6d8 SetStasisfieldHitValue / DamageValue `329e25b0` / `329e25e0`; 0x6dc-0x6e8 the UpDPBy*ThisFrame accessors (June keeps March's bug: both getters read the attack flag `+0x95f5`). **Training keys settled:** slot 0x6c4 = `329e21d0` SetDPValue and 0x6f4 = `329e2130` SetMutationCount (clamp 0..6); the backlog's `329e2170` / `329e20e0` are GetMaxDPValue / GetMutationCount. All four are CH1q's (DP), declared here. 0x690 (CH4a), 0x73c (CH4b), 0x6c8 / 0x6cc / 0x6d0 / 0x740 / 0x744 (CH1q) are declarations.

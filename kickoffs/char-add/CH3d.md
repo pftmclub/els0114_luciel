@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-add CH3d` |
 | Plan doc | `JUNE_CHARACTER_ADD_PHASES.md` (branch `main`) |
-| Depends on | CH3c. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
+| Depends on | CH3c2. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_SKILL` and `SERV_IRUHADEV_JUNE_CHAR_ADD_TRANSCEND` (+ `..._DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ADD SKILL`) |
 | Review | `kickoffs/char-add/CH3d-review.md` (Opus 5.5 high; covers CH3a-CH3d and every incidental shared-file hunk; the phase writes it when done) |
@@ -44,7 +44,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **11** functions (2 listing-only; 5 `inside`, 6 `new`), filter `awk -F'\t' '$7=="CH3d"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 3 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 6: 29600 RNSI_HA_ALP_DOOMS_DAY, 29601 RNSI_HA_AMM_APOCALYPSE, 29602 RNSI_HA_ADE_PARANOIA, 29603 RNSI_HA_ALP_DOOMS_DAY_UPGRADE, 29604 RNSI_HA_AMM_APOCALYPSE_UPGRADE, 29605 RNSI_HA_ADE_PARANOIA_UPGRADE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L242, L309, L314, L359, L733, L789, L997, L117, L178, L600, L727, L787, L865, L971.
+- Hyper actives: 29600 / 29603 Doom's Day (122), 29601 / 29604 Apocalypse (123, spawn via CH2b0), 29602 / 29605 (126). Transcendence: `TranscendCheck` (`Handlers_Quest.cpp:1416-1451`) has no Add block; the transcend image prefix (`X2Data.cpp:3054-3091`) has no Add arm; Add's `+0x3c` readers `329e23a0`, `329e6f30` (L997).

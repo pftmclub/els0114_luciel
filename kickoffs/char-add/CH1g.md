@@ -7,7 +7,7 @@
 | Depends on | CH0 (and its amendments), char-elesis Z, the previous CH1 sub-phase. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` (`new` rows, compiled) and `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` (`inside` rows; `//#define` until CH1 final) |
 | Log tag | none (nothing runs until `_LIVE`; no play-test) |
-| Review | `kickoffs/char-add/CH1g-review.md` (Opus 5.5 high; covers CH1e-CH1g; the phase writes it when done) |
+| Review | `kickoffs/char-add/CH1g-review.md` (Opus 5.5 high; covers CH1e, CH1f, CH1f2, CH1g; the phase writes it when done) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 
@@ -52,7 +52,8 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **35** functions (2 listing-only; 0 `inside`, 35 `new`), filter `awk -F'\t' '$7=="CH1g"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 26 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- `ATT` / `ADE` states; the ADE formation-mode combos (`ANSI_ADE_COMBO_XXXZ_` / `XXXX_FORMATION_MODE` / `_NO_FORMATION_MODE`) carry DP lines under `_DP`. `ANSI_ADE_COMBO_XXXX_FORMATION_MODE` (id 265) is a `~` row. June registers `ANSI_ADE_COMBO_ZZXXX` (285) / `_END` (286) with no table.

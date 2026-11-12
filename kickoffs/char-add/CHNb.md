@@ -42,7 +42,6 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- `june2017_re/char_add/ch0_classn_route.tsv`: Arc Tracer 35540-35543 (`CJT_JOB_SECOND`, from 9 at 15), Mastermind 35550-35554 (from 33 at 35), Time Tracer 35580-35583 (`CJT_JOB_THIRD`), Diabolic Esper 35590-35594 (from 36); level-35 chains are `CJT_NONE` and only the fifth quest grants the class. `Handlers_Quest.cpp:586-625` grants any class; auto-learn rows exist for all four. `X2OfflineClassChangeSeed.h` has no Add rows; `GetClassChangeDialogName` (`X2StateClassChange.cpp:304-380`) already has 33 / 36 / 123 / 126. `LevelUpEvent.lua`: level 15 needs only the dialog name; level 35 lacks Arc / Time Tracer and the guide; no level-70 row. March lacks `DLG_1ST_` / `2ND_Class_Change_Guide_Add`, `DLG_Class_Change_Add_AT` / `MM` / `TT` / `DE` (CH0b stages them).

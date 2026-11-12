@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, high** effort, then type `/x2-phase char-add CH2a` |
 | Plan doc | `JUNE_CHARACTER_ADD_PHASES.md` (branch `main`) |
-| Depends on | CH1 review (and CH2a0 / CH2b0 reviews if CH0 put a Crest or summon cast here). One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
+| Depends on | CH1 review, CH2b0 review (Particle Prism 29003 / 29029 summons NPC 1576 / 1577). One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_SKILL` (+ `..._SKILL_DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ADD SKILL`), `[JUNE_SKILL]` (`--grep NUM`) |
 | Review | none of its own: the CH2d review covers it (its `_DEBUG` define stays on) |
@@ -44,7 +44,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **34** functions (3 listing-only; 30 `inside`, 4 `new`), filter `awk -F'\t' '$7=="CH2a"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 11 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 14: 29000 RNSI_SA_AN_ENERGY_BOOM, 29001 RNSI_SA_AN_VOID_BREAKER, 29002 RNSI_SA_AN_PARTICLE_ACCELERATOR, 29003 RNSI_SA_AN_PARTICLE_PRISM, 29004 RNSI_SA_AN_NEUTRON_BOMB, 29026 RNSI_SA_AN_ENERGY_BOOM_UPGRADE, 29027 RNSI_SA_AN_VOID_BREAKER_UPGRADE, 29028 RNSI_SA_AN_PARTICLE_ACCELERATOR_UPGRADE, 29029 RNSI_SA_AN_PARTICLE_PRISM_UPGRADE, 29030 RNSI_SA_AN_NEUTRON_BOMB_UPGRADE, 29201 RNSI_A_AN_PHASE_SHIFT, 29202 RNSI_A_AN_PULSE_BULLET, 29216 RNSI_A_AN_PHASE_SHIFT_UPGRADE, 29217 RNSI_A_AN_PULSE_BULLET_UPGRADE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L309, L314, L359, L689, L733, L789, L117, L178, L727, L787, L865.
+- Skill ids and their states: `awk -F'\t' '$6=="CH2a"' june2017_re/char_add/ch0_state_skill.tsv` (part 2); the state functions: `awk -F'\t' '$7=="CH2a"' june2017_re/char_add/ch0_class_map.tsv`.

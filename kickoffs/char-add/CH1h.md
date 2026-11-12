@@ -7,7 +7,7 @@
 | Depends on | CH0 (and its amendments), char-elesis Z, the previous CH1 sub-phase. One at a time with CH1-CH4: they all edit `X2GUAdd.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` (`new` rows, compiled) and `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` (`inside` rows; `//#define` until CH1 final) |
 | Log tag | none (nothing runs until `_LIVE`; no play-test) |
-| Review | none of its own: the CH1k2 review covers it (its `_DEBUG` define stays on) |
+| Review | none of its own: the CH1h4 review covers it (its `_DEBUG` define stays on) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 
@@ -52,7 +52,7 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **25** functions (1 listing-only; 9 `inside`, 16 `new`), filter `awk -F'\t' '$7=="CH1h"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- CH0 split: CH1h = carved overrides below 0x600 + ctor `32a22170` (vtable stores 334daaec / 334daae4) + **dtor body `32a23b90`** (the plan called it a second ctor) + scalar deleting dtor `32a316c0` + secondary-vtable adjustors `32a31530` / `32a31540` (25); CH1h3 = their container helpers (33). InitComponent `329cf870` reads the four June-only `INIT_COMPONENT` keys (`DP_RATE_BY_FORMATION_MODE_USE_MP_3RD_LINE_SKILL`, `DP_USE_RATE_WITH_FORMATION`, `VOID_IMPACT_UP_ANGLE` / `_DOWN_ANGLE`; DP reads under `_DP`). Unnamed for this phase to name by body: 0x2a0 `329e21f0`, 0x3dc `329f9a30`, 0x4c0 `329e7ca0`, 0xd0 `329ffba0`. 0xc0 ApplyHyperModeBuff and 0x2c4 / 0x3e0 / 0x4c4 / 0x4c8 / 0x4bc are not here (CH1q / CH1q2 / CH1o).

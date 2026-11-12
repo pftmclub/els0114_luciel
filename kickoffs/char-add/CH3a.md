@@ -44,7 +44,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **47** functions (8 listing-only; 27 `inside`, 20 `new`), filter `awk -F'\t' '$7=="CH3a"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 18 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 16: 29008 RNSI_SA_APT_CONQUERER, 29009 RNSI_SA_ALP_PSYCHIC_STORM, 29010 RNSI_SA_APT_EMP_SHOCK, 29011 RNSI_SA_ALP_QUICKSILVER_ACCEL, 29037 RNSI_SA_ALP_PION_RUSING, 29038 RNSI_SA_ALP_QUICKSILVER_STRIKE, 29044 RNSI_SA_APT_CONQUERER_UPGRADE, 29045 RNSI_SA_ALP_PSYCHIC_STORM_UPGRADE, 29046 RNSI_SA_APT_EMP_SHOCK_UPGRADE, 29047 RNSI_SA_ALP_QUICKSILVER_ACCEL_UPGRADE, 29058 RNSI_SA_ALP_SUPERSONIC, 29206 RNSI_A_ALP_TWIRL_RUSH, 29207 RNSI_A_ALP_PSIONIC_BEAT, 29221 RNSI_A_ALP_SPEAR_DYNAMO, 29226 RNSI_A_ALP_TWIRL_RUSH_UPGRADE, 29227 RNSI_A_ALP_PSIONIC_BEAT_UPGRADE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L309, L314, L359, L361, L733, L789, L117, L178, L727, L787, L865.
+- Skill ids and their states: `awk -F'\t' '$6=="CH3a"' june2017_re/char_add/ch0_state_skill.tsv` (part 2); the state functions: `awk -F'\t' '$7=="CH3a"' june2017_re/char_add/ch0_class_map.tsv`.

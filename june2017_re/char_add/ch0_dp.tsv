@@ -1,0 +1,35 @@
+june_va	vslot	carved	role	march_pair	verdict	phase	note
+329e5b00	0x2a4	n	UpNowDPValue (outer)	X2GUAdd.cpp:9100 CX2GUAdd::UpNowDPValue	differs	CH1q	val==0 returns; val<0: result x (1 - protected float +0x6c50), val>0: x 1; then 329e3060 (add to gauge DP + clamp); March has no +0x6c50 term (plan said +0x6bb0: the listing reads +0x6c50)
+329e56c0	-	y	UpNowDPValue rate body	X2GUAdd.cpp:9110-9154 (inlined in March)	same as March with SERV_IRUHADEV_JUNE_BUFF_NEW_STAT	CH1q	gain: 1 + (rate - 1) + 329e5140 when g_pData->GetMyUser()->GetSelectUnit(); spend: val x (1 - ((1 - +0x9614) + hyper-time socket x 0.01) - (1 - rate)) = March's R1 edit (JUNE_BUFF_NEW_STAT); CH1q writes June's split (inside, the R1 edit becomes June's body)
+329e5140	-	y	GetEffectiveIncreaseDPValue	X2GUAdd.h:1150 GetEffectiveIncreaseDPValue	check	CH1q	(+0x960c - const) + protected float +0x648c: CH1q compares with March's body
+329e5180	-	y	GetEffectiveDecreaseDPConsume	X2GUAdd.h:1151 GetEffectiveDecreaseDPConsume	differs	CH1q	(1 - +0x9614) + protected +0x6540 x 0.01 (BBT 76 store); March under JUNE_BUFF_NEW_STAT computes the same inline in UpNowDPValue only
+329e3060	-	n	add to DP + clamp (SetDPValue tail)	X2GUAdd.cpp:9157-9165 (inlined)	same shape	CH1q	reads gauge DP 3230eff0, adds, clamps to max +0x11c, SetDPValue
+329e31e0	0x324	n	ChangeMaxCharacterAddResource( rate )	X2GameUnit.h:3819 (base; Ara / Chung override; Add none)	new override	CH1q	UpNowDPValue( gauge max +0x11c x rate, 1.0 ) through vslot 0x2a4
+329e21d0	0x6c4	n	SetDPValue	X2GUAdd.h:1139 SetDPValue (virtual)	check	CH1q	gauge +0xc04 -> 3230f050( v ); the training key F6 calls this slot (backlog's 329e2170 is GetMaxDPValue)
+329e2130	0x6f4	n	SetMutationCount	X2GUAdd.h:1133 SetMutationCount (virtual)	check	CH1q	gauge +0x111 = 1 (changed), +0x114 = clamp( v, 0, 6 ); the training key F7 calls this slot (backlog's 329e20e0 is GetMutationCount)
+329e2170	-	y	GetMaxDPValue	X2GUAdd.h:1137 GetMaxDPValue	same	CH1q	gauge +0x11c or 0
+329e20e0	-	y	GetMutationCount	X2GUAdd.h:1131 GetMutationCount	check	CH1q	gauge +0x114 clamped 0..6 on read
+329e2340	0x6c8	n	GetIsFormationMode	X2GUAdd.h:1159 GetIsFormationMode	same	CH1q	gauge byte +0x110
+329e2360	0x6cc	n	SetIsFormationMode	X2GUAdd.h:1160 SetIsFormationMode	check	CH1q	stores +0x110; on true copies +0x95c0 to gauge +0x120 (UAI_RELEASE_FORMATION_MODE, checklist l.260)
+32a31550	0x560	n	CanHyperMode	-	new override	CH1q	returns vslot 0x6d0( true ); checklist l.261 (five vslot-343 callers)
+32a21d70	0x6d0	y	GetPossibleChangeFormationMode( bOutputInformation )	X2GUAdd.h:1162 (non-virtual in March)	differs	CH1q	June makes it virtual; 0x1b4-byte frame (DisplayAddMPInformation texts)
+32a08580	-	n	FormationModeStart (formation entry)	X2GUAdd.h:700 FormationModeStart	differs	CH1q	Fantasy Tracer refund from DP actually spent; cost without March's decrease term (JUNE_BUFF_PORT_ARCHIVE.md:1711-1719); 31fc8c20 transcended-awakening call
+32a08150	-	y	hyper StateStart (ANSI_HYPER_MODE family)	X2GUAdd.cpp HyperMode StateStart	differs	CH1q	+0x9330 countdown (checklist l.968), 31fc8c20, riding StateChange, effect-set family 32011d20
+329e2410	0xc0	y	ApplyHyperModeBuff	X2GUAdd.cpp:9532 ApplyHyperModeBuff	differs	CH1q	BFI 846 transcended else 315; skills 29401 / 29406 / 29411 (Dust Storm / Hidden Memory / Control Time passives); checklist l.285 port whole; RidingHyperModeEnd row 371
+329e59f0	-	y	spec A reader (skill-slot key release)	-	new	CH1q	checklist l.278; 31fc89a0 / 31fce670 key helpers, 32007c40
+32a01b40	-	y	DP gain / spec B reader (contains 32a01ca2)	-	check	CH1q	DisplayAddMPInformation; 329fbaa0; called from 32a08580, 32a08150, 32a07dc0, summon 32a05470
+32a07dc0	0x800	y	skill use (DP or MP consume)	X2GUAdd.h:1147 ConsumeMPorDP (+ base skill-use)	differs	CH1k	CH1k reads it before ReservedSkillStart; DP-cost skills spend DP here
+329e7820	-	y	GetActualDPConsume	X2GUAdd.h:1144 GetActualDPConsume	differs	CH1k	the only false caller of the June MP-consume base 31fd1840; CH1k reads it, CH1q owns the DP math
+329e2f80	0x740	n	StoreGageSnapshot (Crest of Time)	-	new override	CH1q	base 32009780 then DP -> +0x92ac, mutation -> +0x92b0 (clamp 0..6); base call per CH2a0 (stand-in until then)
+329e3000	0x744	y	RestoreGageSnapshot	-	new override	CH1q	vslot 0x6c4( +0x92ac ), 0x6f4( +0x92b0 ), base 3204da60
+3349b1e4	vtable	-	CX2AddGageData vtable (22 slots; RTTI 33734c08, COL 33618d40)	X2GageData.h:911 CX2AddGageData	check	CH1q	ctor 324989c0 (inline copy at 329ffc6a); slots 0x2c / 0x30 shared base gauge virtuals; 0x34+ in 32a32470..32a35ff0: CH1q diffs against March's class
+32e6e0c0	gauge UI	y	Add gauge UI InitUI (vtable 335335b0, no RTTI)	X2GageUI.cpp:4956 CX2AddMyGageUI::InitUI	check	CH1q	loads DLG_Add_DP_And_Mutation.lua (june-bytes in March), g_pStatic_DP_Gage / Mutation_Gage, FormationConsumeDPGuide; June keeps the class, only its RTTI name is gone
+-	item	-	SAT_ADD_DP_PERCENT_UP (item 100001054)	-	check	CH1q	checklist l.412
+-	shared	-	PartyFeverAllUser DP step	divergent row 113	differs	CH1q	june_march_divergent.tsv row 113
+-	shared	-	ConvertAndAdd 0.5 question	checklist l.279	check	CH1q	CH1q answers it against June
+-	emulator	-	DP answer	X2Lib/Offline: no DP / AddResource / formation handling	n/a	CH1q	DP is client-side; nothing to answer (CH1q confirms no packet needs it)
+329e25b0	0x6d4	n	SetStasisfieldHitValue	X2GUAdd.h:1185	check	CH1i	+0x9738 += v while +0x9734 > 0 (Stasis Field, APT)
+329e25e0	0x6d8	n	SetStasisfieldDamageValue	X2GUAdd.h:1186	check	CH1i	+0x973c += v x 5.0 while +0x9734 > 0
+32a31560	0x6dc / 0x6e4	n	GetUpDPByAttackThisFrame / GetUpDPByDamageThisFrame	X2GUAdd.h:1152 / :1154 (inline)	same	CH1i	both slots read +0x95f5: March's own bug (the damage getter returns the attack flag) is June's too
+32a31570	0x6e0	n	SetUpDPByAttackThisFrame	X2GUAdd.h:1153 (inline)	same	CH1i	+0x95f5
+32a31580	0x6e8	n	SetUpDPByDamageThisFrame	X2GUAdd.h:1155 (inline)	same	CH1i	+0x95f6

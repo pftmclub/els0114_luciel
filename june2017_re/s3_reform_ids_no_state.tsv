@@ -2216,3 +2216,167 @@ UC_ELESIS_CRIMSON_AVENGER	125	X2GUEL.cpp	106	RNSI_P_COMMON_HYPER_AURA	Awakened O
 UC_ELESIS_CRIMSON_AVENGER	125	X2GUEL.cpp	28044	RNSI_SA_SCA_SHADE	Shade	15	1	16	1	n	n	no_state			n	n			
 UC_ELESIS_CRIMSON_AVENGER	125	X2GUEL.cpp	28420	RNSI_P_SCA_MADNESS	Berserk	1	1	16	4	n	n	no_state			n	n			
 UC_ELESIS_CRIMSON_AVENGER	125	X2GUEL.cpp	28064	RNSI_SA_SCA_BLOOD_FALLS	Blood Falls	16	1	17	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29000	RNSI_SA_AN_ENERGY_BOOM	Energy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29026	RNSI_SA_AN_ENERGY_BOOM_UPGRADE	#Cffcc00[Enhanced]#CX\nEnergy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29201	RNSI_A_AN_PHASE_SHIFT	Phase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29216	RNSI_A_AN_PHASE_SHIFT_UPGRADE	#Cffcc00[Enhanced]#CX\nPhase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	900	SI_ETC_WS_COMMON_LOVE	Extreme Heavenly Love	12	2	0	4	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29027	RNSI_SA_AN_VOID_BREAKER_UPGRADE	#Cffcc00[Enhanced]#CX\nVoid Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29001	RNSI_SA_AN_VOID_BREAKER	Void Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29028	RNSI_SA_AN_PARTICLE_ACCELERATOR_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29002	RNSI_SA_AN_PARTICLE_ACCELERATOR	Particle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29003	RNSI_SA_AN_PARTICLE_PRISM	Particle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29029	RNSI_SA_AN_PARTICLE_PRISM_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29208	RNSI_A_AAT_RUSHING_DRONE_DYNAMO	Dynamo Configuration\n- Rushing Drones	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29219	RNSI_A_AAT_RUSHING_DRONE_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Rushing Drones	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29012	RNSI_SA_AAT_PANZER_BUSTER	Panzer Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29032	RNSI_SA_AAT_PANZER_BUSTER_UPGRADE	#Cffcc00[Enhanced]#CX\nPanzer Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29405	RNSI_P_AAT_NASOD_ARMOR_MODE	Nasod Armor Mode - Transform	8	4	3	3	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29004	RNSI_SA_AN_NEUTRON_BOMB	Neutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29030	RNSI_SA_AN_NEUTRON_BOMB_UPGRADE	#Cffcc00[Enhanced]#CX\nNeutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29202	RNSI_A_AN_PULSE_BULLET	Particle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29217	RNSI_A_AN_PULSE_BULLET_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29013	RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR	Install\n- Drone Activator	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29035	RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR_UPGRADE	#Cffcc00[Enhanced]#CX\nInstall - Drone Activator	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29204	RNSI_A_APT_PYLON_DYNAMO	Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29224	RNSI_A_APT_PYLON_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29209	RNSI_A_AMM_DIVIDING_MISSILE_DYNAMO	Dynamo Configuration\n- Fission Shot	6	1	6	4	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29228	RNSI_A_AMM_DIVIDING_MISSILE_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Fission Shot	6	1	6	4	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29014	RNSI_SA_AAT_PSIONIC_GENERATOR	Psionic Generator	16	1	7	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29048	RNSI_SA_AAT_PSIONIC_GENERATOR_UPGRADE	#Cffcc00[Enhanced]#CX Psionic Generator	16	1	7	1	n	n	no_state			n	n			
+UC_ADD_ARC_TRACER	33	X2GUAdd.cpp	29406	RNSI_P_AAT_HIDDEN_MEMORY	Hidden Records	8	4	8	3	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29026	RNSI_SA_AN_ENERGY_BOOM_UPGRADE	#Cffcc00[Enhanced]#CX\nEnergy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29000	RNSI_SA_AN_ENERGY_BOOM	Energy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29201	RNSI_A_AN_PHASE_SHIFT	Phase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29216	RNSI_A_AN_PHASE_SHIFT_UPGRADE	#Cffcc00[Enhanced]#CX\nPhase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	900	SI_ETC_WS_COMMON_LOVE	Extreme Heavenly Love	12	2	0	4	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29001	RNSI_SA_AN_VOID_BREAKER	Void Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29027	RNSI_SA_AN_VOID_BREAKER_UPGRADE	#Cffcc00[Enhanced]#CX\nVoid Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29002	RNSI_SA_AN_PARTICLE_ACCELERATOR	Particle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29028	RNSI_SA_AN_PARTICLE_ACCELERATOR_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29003	RNSI_SA_AN_PARTICLE_PRISM	Particle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29029	RNSI_SA_AN_PARTICLE_PRISM_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29212	RNSI_A_ATT_SPACE_CRACK	Dynamo Configuration\n- Space Crack	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29220	RNSI_A_ATT_SPACE_CRACK_UPGRADE	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Space Crack	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29019	RNSI_SA_ADE_GRAVITY_BURSTER	Gravity Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29033	RNSI_SA_ADE_GRAVITY_BURSTER_UPGRADE	#Cffcc00[Enhanced]#CX\nGravity Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29410	RNSI_P_ATT_NASOD_ARMOR_MODE	Nasod Armor Mode - Overlimit	8	4	3	3	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29004	RNSI_SA_AN_NEUTRON_BOMB	Neutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29030	RNSI_SA_AN_NEUTRON_BOMB_UPGRADE	#Cffcc00[Enhanced]#CX\nNeutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29202	RNSI_A_AN_PULSE_BULLET	Particle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29217	RNSI_A_AN_PULSE_BULLET_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29020	RNSI_SA_ADE_REVERSE_CIRCLE	Reverse Circle	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29036	RNSI_SA_ADE_REVERSE_CIRCLE_UPGRADE	#Cffcc00[Enhanced]#CX\nReverse Circle	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29204	RNSI_A_APT_PYLON_DYNAMO	Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29224	RNSI_A_APT_PYLON_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29213	RNSI_SA_COMMON_CREST_OF_TIME	Seal of Time	5	1	6	4	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29231	RNSI_SA_COMMON_CREST_OF_TIME_UPGRADE	#Cffcc00[Enhanced]#CX Seal of Time	5	1	6	4	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29021	RNSI_SA_ATT_STARDUST_SHOWER	Stardust Shower	16	1	7	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29053	RNSI_SA_ATT_STARDUST_SHOWER_UPGRADE	#Cffcc00[Enhanced]#CX Stardust Shower	16	1	7	1	n	n	no_state			n	n			
+UC_ADD_TIME_TRACER	36	X2GUAdd.cpp	29411	RNSI_P_ADE_CONTROL_TIME	Time Control	8	4	8	3	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29000	RNSI_SA_AN_ENERGY_BOOM	Energy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29026	RNSI_SA_AN_ENERGY_BOOM_UPGRADE	#Cffcc00[Enhanced]#CX\nEnergy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29216	RNSI_A_AN_PHASE_SHIFT_UPGRADE	#Cffcc00[Enhanced]#CX\nPhase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29201	RNSI_A_AN_PHASE_SHIFT	Phase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	900	SI_ETC_WS_COMMON_LOVE	Extreme Heavenly Love	12	2	0	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29001	RNSI_SA_AN_VOID_BREAKER	Void Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29027	RNSI_SA_AN_VOID_BREAKER_UPGRADE	#Cffcc00[Enhanced]#CX\nVoid Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29028	RNSI_SA_AN_PARTICLE_ACCELERATOR_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29002	RNSI_SA_AN_PARTICLE_ACCELERATOR	Particle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29029	RNSI_SA_AN_PARTICLE_PRISM_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29003	RNSI_SA_AN_PARTICLE_PRISM	Particle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29208	RNSI_A_AAT_RUSHING_DRONE_DYNAMO	Dynamo Configuration\n- Rushing Drones	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29219	RNSI_A_AAT_RUSHING_DRONE_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Rushing Drones	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29012	RNSI_SA_AAT_PANZER_BUSTER	Panzer Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29032	RNSI_SA_AAT_PANZER_BUSTER_UPGRADE	#Cffcc00[Enhanced]#CX\nPanzer Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29405	RNSI_P_AAT_NASOD_ARMOR_MODE	Nasod Armor Mode - Transform	8	4	3	3	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29030	RNSI_SA_AN_NEUTRON_BOMB_UPGRADE	#Cffcc00[Enhanced]#CX\nNeutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29004	RNSI_SA_AN_NEUTRON_BOMB	Neutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29217	RNSI_A_AN_PULSE_BULLET_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29202	RNSI_A_AN_PULSE_BULLET	Particle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29013	RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR	Install\n- Drone Activator	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29035	RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR_UPGRADE	#Cffcc00[Enhanced]#CX\nInstall - Drone Activator	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29204	RNSI_A_APT_PYLON_DYNAMO	Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29224	RNSI_A_APT_PYLON_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29209	RNSI_A_AMM_DIVIDING_MISSILE_DYNAMO	Dynamo Configuration\n- Fission Shot	6	1	6	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29228	RNSI_A_AMM_DIVIDING_MISSILE_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Fission Shot	6	1	6	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29014	RNSI_SA_AAT_PSIONIC_GENERATOR	Psionic Generator	16	1	7	0	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29048	RNSI_SA_AAT_PSIONIC_GENERATOR_UPGRADE	#Cffcc00[Enhanced]#CX Psionic Generator	16	1	7	0	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29210	RNSI_A_AMM_FLICK_DISC_DYNAMO	Dynamo Configuration\n- Flick Disc	6	1	7	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29229	RNSI_A_AMM_FLICK_DISC_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Flick Disc	6	1	7	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29015	RNSI_SA_AAT_PHANTOM_SEEKER	Phantom Seeker	16	1	7	2	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29049	RNSI_SA_AAT_PHANTOM_SEEKER_UPGRADE	#Cffcc00[Enhanced]#CX Phantom Seeker	16	1	7	2	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29407	RNSI_P_AMM_ENHANCED_DYNAMO_FACTORY_TRANSFORM	Dynamo Factory'- Enhanced Transformation	8	4	7	3	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29406	RNSI_P_AAT_HIDDEN_MEMORY	Hidden Records	8	4	8	3	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29016	RNSI_SA_AMM_INSTALLATION_STAR_FALL	Install - Starfall	15	1	9	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29050	RNSI_SA_AMM_INSTALLATION_STAR_FALL_UPGRADE	#Cffcc00[Enhanced]#CX Install - Starfall	15	1	9	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29017	RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY	Install - Ultimate Fury	15	1	9	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29051	RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY_UPGRADE	#Cffcc00[Enhanced]#CX Install - Ultimate Fury	15	1	9	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29211	RNSI_A_AMM_COUNTDOWN_BOMB_DYNAMO	Dynamo Configuration\n- Delayed Explosion	6	1	10	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29230	RNSI_A_AMM_COUNTDOWN_BOMB_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Delayed Explosion	6	1	10	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29018	RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER	Install\n- Shooting Chaser	14	1	11	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29052	RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER_UPGRADE	#Cffcc00[Enhanced]#CX Install - Shooting Chaser	14	1	11	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29408	RNSI_P_AMM_NEW_UPDATE	New Update!	8	4	12	3	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29409	RNSI_P_AMM_TRANSFORM_OFENCE_MODE	Transformation: Offensive Mode	8	4	12	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29604	RNSI_HA_AMM_APOCALYPSE_UPGRADE	#Cffcc00[Enhanced]#CX\nApocalypse	13	1	13	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29601	RNSI_HA_AMM_APOCALYPSE	Apocalypse	13	1	13	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29039	RNSI_SA_AMM_CHARGED_IMPULSAR	Install - Charged Impulser	14	1	14	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29417	RNSI_P_AMM_TRANSCENDENCE	Awakened Will: Mastermind	8	1	14	3	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29222	RNSI_A_AMM_AIMING_NOVA	Dynamo Configuration - Synapse Break	6	1	15	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	106	RNSI_P_COMMON_HYPER_AURA	Awakened One	1	1	15	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29040	RNSI_SA_AMM_FORCE_FILED	Force Field	15	1	16	1	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29418	RNSI_P_AMM_ENHANCED_ARTIFICIAL_INTELLIGENCE	A.I. Upgrade	8	1	16	4	n	n	no_state			n	n			
+UC_ADD_MASTERMIND	123	X2GUAdd.cpp	29059	RNSI_SA_AMM_EXTREME_CHASER	Extreme Chaser	16	1	17	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29000	RNSI_SA_AN_ENERGY_BOOM	Energy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29026	RNSI_SA_AN_ENERGY_BOOM_UPGRADE	#Cffcc00[Enhanced]#CX\nEnergy Boom	14	1	0	0	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29201	RNSI_A_AN_PHASE_SHIFT	Phase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29216	RNSI_A_AN_PHASE_SHIFT_UPGRADE	#Cffcc00[Enhanced]#CX\nPhase Shift	6	1	0	2	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	900	SI_ETC_WS_COMMON_LOVE	Extreme Heavenly Love	12	2	0	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29027	RNSI_SA_AN_VOID_BREAKER_UPGRADE	#Cffcc00[Enhanced]#CX\nVoid Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29001	RNSI_SA_AN_VOID_BREAKER	Void Breaker	15	1	1	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29028	RNSI_SA_AN_PARTICLE_ACCELERATOR_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29002	RNSI_SA_AN_PARTICLE_ACCELERATOR	Particle Accelerator	16	1	2	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29003	RNSI_SA_AN_PARTICLE_PRISM	Particle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29029	RNSI_SA_AN_PARTICLE_PRISM_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Prism	14	1	3	0	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29212	RNSI_A_ATT_SPACE_CRACK	Dynamo Configuration\n- Space Crack	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29220	RNSI_A_ATT_SPACE_CRACK_UPGRADE	#Cffcc00[Enhanced]#CX\nDynamo Configuration - Space Crack	6	1	3	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29019	RNSI_SA_ADE_GRAVITY_BURSTER	Gravity Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29033	RNSI_SA_ADE_GRAVITY_BURSTER_UPGRADE	#Cffcc00[Enhanced]#CX\nGravity Buster	15	1	3	2	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29410	RNSI_P_ATT_NASOD_ARMOR_MODE	Nasod Armor Mode - Overlimit	8	4	3	3	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29030	RNSI_SA_AN_NEUTRON_BOMB_UPGRADE	#Cffcc00[Enhanced]#CX\nNeutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29004	RNSI_SA_AN_NEUTRON_BOMB	Neutron Bomb	16	1	4	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29217	RNSI_A_AN_PULSE_BULLET_UPGRADE	#Cffcc00[Enhanced]#CX\nParticle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29202	RNSI_A_AN_PULSE_BULLET	Particle Shot	6	1	4	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29020	RNSI_SA_ADE_REVERSE_CIRCLE	Reverse Circle	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29036	RNSI_SA_ADE_REVERSE_CIRCLE_UPGRADE	#Cffcc00[Enhanced]#CX\nReverse Circle	14	1	5	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29204	RNSI_A_APT_PYLON_DYNAMO	Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29224	RNSI_A_APT_PYLON_DYNAMO_UPGRADE	#Cffcc00[Enhanced]#CX Dynamo Configuration - Pylon	6	1	6	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29213	RNSI_SA_COMMON_CREST_OF_TIME	Seal of Time	5	1	6	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29231	RNSI_SA_COMMON_CREST_OF_TIME_UPGRADE	#Cffcc00[Enhanced]#CX Seal of Time	5	1	6	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29021	RNSI_SA_ATT_STARDUST_SHOWER	Stardust Shower	16	1	7	0	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29053	RNSI_SA_ATT_STARDUST_SHOWER_UPGRADE	#Cffcc00[Enhanced]#CX Stardust Shower	16	1	7	0	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29214	RNSI_A_AN_MIND_BREAK	Mind Break	6	1	7	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29232	RNSI_A_AN_MIND_BREAK_UPGRADE	#Cffcc00[Enhanced]#CX Mind Break	6	1	7	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29022	RNSI_SA_ATT_MAXIMUM_STRIKE	Maximum Strike	16	1	7	2	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29054	RNSI_SA_ATT_MAXIMUM_STRIKE_UPGRADE	#Cffcc00[Enhanced]#CX Maximum Strike	16	1	7	2	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29412	RNSI_P_ADE_MIND_CONTROL	Mind Control	8	4	7	3	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29411	RNSI_P_ADE_CONTROL_TIME	Time Control	8	4	8	3	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29023	RNSI_SA_ATT_VOID_FIELD	Void Field	15	1	9	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29055	RNSI_SA_ATT_VOID_FIELD_UPGRADE	#Cffcc00[Enhanced]#CX Void Field	15	1	9	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29024	RNSI_SA_ADE_MOONLIGHT_RHAPSODY	Moonlight Rhapsody	15	1	9	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29056	RNSI_SA_ADE_MOONLIGHT_RHAPSODY_UPGRADE	#Cffcc00[Enhanced]#CX Moonlight Rhapsody	15	1	9	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29215	RNSI_A_ADE_FORCE_FINGER	Force Finger	6	1	10	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29233	RNSI_A_ADE_FORCE_FINGER_UPGRADE	#Cffcc00[Enhanced]#CX Force Finger	6	1	10	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29025	RNSI_SA_ADE_REVERSE_STIGMA	Reverse Stigma	14	1	11	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29057	RNSI_SA_ADE_REVERSE_STIGMA_UPGRADE	#Cffcc00[Enhanced]#CX Reverse Stigma	14	1	11	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29413	RNSI_P_ADE_MIND_CIRCLE	Mind Circle	8	4	12	3	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29414	RNSI_P_ADE_ESP	ESP	8	4	12	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29605	RNSI_HA_ADE_PARANOIA_UPGRADE	#Cffcc00[Enhanced]#CX\nParanoia	13	1	13	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29602	RNSI_HA_ADE_PARANOIA	Paranoia	13	1	13	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29041	RNSI_SA_ADE_VOID_IMPACT	Void Impact	14	1	14	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29419	RNSI_P_ADE_TRANSCENDENCE	Awakened Will: Diabolic Esper	8	1	14	3	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29223	RNSI_A_ADE_REVERSE_FIELD	Dynamo Configuration'- Reverse Field	6	1	15	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	106	RNSI_P_COMMON_HYPER_AURA	Awakened One	1	1	15	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29042	RNSI_SA_ADE_MOONLIGHT_BREAKER	Moonlight Breaker	15	1	16	1	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29420	RNSI_P_ADE_TIME_TROUBLE	Time Interference	8	1	16	4	n	n	no_state			n	n			
+UC_ADD_DIABOLIC_ESPER	126	X2GUAdd.cpp	29060	RNSI_SA_ADE_DIMENSION_BREAKER	Dimension Breaker	16	1	17	1	n	n	no_state			n	n			

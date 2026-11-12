@@ -1,0 +1,39 @@
+fn	phase	why	march_pair
+32a28e00	CH1n	SetEquippedSkillFuncBySkillSlotIndex (vslot 0x7b4): skill-state switch, head with CH1n, case bodies by their state	X2GUAdd.h:525 virtual void SetEquippedSkillFuncBySkillSlotIndex
+32a315a0	CH1o	vslot 0x524 GetNowStateSkillID (brief role exception)	
+329e65c0	CH1o	vslot 0x4bc IsSkillUseCountExcludedState (brief role exception)	
+329e5b00	CH1q	vslot 0x2a4 UpNowDPValue (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e31e0	CH1q	vslot 0x324 ChangeMaxCharacterAddResource (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+32a31550	CH1q	vslot 0x560 CanHyperMode (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e2410	CH1q	vslot 0xc0 ApplyHyperModeBuff (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e21d0	CH1q	vslot 0x6c4 SetDPValue (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e2340	CH1q	vslot 0x6c8 GetIsFormationMode (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e2360	CH1q	vslot 0x6cc SetIsFormationMode (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+32a21d70	CH1q	vslot 0x6d0 GetPossibleChangeFormationMode (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e2130	CH1q	vslot 0x6f4 SetMutationCount (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e2f80	CH1q	vslot 0x740 StoreGageSnapshot (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e3000	CH1q	vslot 0x744 RestoreGageSnapshot (DP / formation / hyper / gauge; brief role exception, coordinator names)	
+329e56c0	CH1q	helper: DP helper (non-override; brief / coordinator)	
+329e5140	CH1q	helper: DP helper (non-override; brief / coordinator)	
+329e5180	CH1q	helper: DP helper (non-override; brief / coordinator)	
+32a08580	CH1q	helper: DP helper (non-override; brief / coordinator)	
+329e59f0	CH1q	helper: DP helper (non-override; brief / coordinator)	
+32a01b40	CH1q	helper: DP helper (non-override; brief / coordinator)	
+329e7820	CH1q	helper: DP helper (non-override; brief / coordinator)	
+32a08150	CH1q	helper: DP helper (non-override; brief / coordinator)	
+329e2170	CH1q	helper: GetMaxDPValue (non-override; brief / coordinator)	
+329e20e0	CH1q	helper: GetMutationCount (non-override; brief / coordinator)	
+329e3060	CH1q	helper: DP add + clamp (non-override; brief / coordinator)	
+329f73a0	CH1q2	vslot 0x2c4 override (nasod; brief role exception)	
+329d4640	CH1q2	vslot 0x3e0 override (nasod; brief role exception)	
+329e7d60	CH1q2	vslot 0x4c4 override (nasod; brief role exception)	
+32a047a0	CH1q2	vslot 0x4c8 override (nasod; brief role exception)	
+329f63a0	CH1q2	helper: SetNasodArmorAttackTarget (non-override; brief)	
+329f7370	CH1q2	helper: nasod (non-override; brief)	
+329e2660	CH1q2	helper: PlayLoopSound (non-override; brief)	
+32a1ccb0	CH4a	InitPassiveSkillState (vslot 0x690): passive delegate lists	X2GUAdd.h:524 virtual void InitPassiveSkillState();
+329d46b0	CH4b	vslot 0x73c (brief role exception)	
+32a22170	CH1h	ctor: CX2GUAdd::CX2GUAdd (vtable stores 334daaec / 334daae4 / 334daadc at 32a221d6; its only caller 32a24539 is the unit factory)	X2GUAdd.h constructor
+32a23b90	CH1h	dtor body: CX2GUAdd::~CX2GUAdd (vtable stores at 32a23bbc; the scalar deleting dtor 32a316c0 calls it; the brief called it a ctor)	X2GUAdd.h:511 virtual ~CX2GUAdd(void);
+32a31530	CH1h	secondary-vtable destructor adjustor (sub ecx, 0x190; jmp 32a316c0); stored at vtable 334daae4	
+32a31540	CH1h	secondary-vtable destructor adjustor (sub ecx, 0x1a0; jmp 32a316c0); stored at vtable 334daadc	

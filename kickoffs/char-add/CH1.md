@@ -44,7 +44,6 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Enum gate today: `luabind.py check Add_NasodRuler` = **PASS** (0 methods unbound, 0 enum missing; `CAMERA_TYPE.CT_PARTS_LOOK_TRACKINGT` is nil in June too: June's typo, not a gap). Copy the held motions (`Motion_ADD_PT.X`, `Motion_ADD_LP.x`, `june2017_re/char_add/ch1_held_motions.tsv`) with the script. `CUSTOM_RENDER_STATE` x7: labelled stand-in (no reader in June class code either; june-engine R5).

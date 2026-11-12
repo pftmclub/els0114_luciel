@@ -44,7 +44,10 @@ Call a March function from June code only if June's namesake does the same; othe
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
 Phase tag (user, 2026-11-09): every edited or new code block carries a one-line `// char-add <phase>` comment (at the start of an existing one-line comment, never a second line).
 
+## Amended by CH0 (2026-11-13)
 
-## Amended by CH0
-
-(CH0 fills this: the filter with real column numbers, the function / state / skill counts and June addresses, checklist rows, any split.)
+- Class map: **29** functions (3 listing-only; 26 `inside`, 3 `new`), filter `awk -F'\t' '$7=="CH2b"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
+- Script states: 11 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
+- Skill ids: 12: 29005 RNSI_SA_APT_QUAKE_BUSTER, 29006 RNSI_SA_APT_PULSE_CANNON, 29007 RNSI_SA_APT_STASIS_FIELD, 29031 RNSI_SA_APT_QUAKE_BUSTER_UPGRADE, 29034 RNSI_SA_APT_PULSE_CANNON_UPGRADE, 29043 RNSI_SA_APT_STASIS_FIELD_UPGRADE, 29203 RNSI_A_APT_DESOLVER_DYNAMO, 29204 RNSI_A_APT_PYLON_DYNAMO, 29205 RNSI_A_APT_MAGNETRON_DYNAMO, 29218 RNSI_A_APT_DESOLVER_DYNAMO_UPGRADE, 29224 RNSI_A_APT_PYLON_DYNAMO_UPGRADE, 29225 RNSI_A_APT_MAGNETRON_DYNAMO_UPGRADE.
+- Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L309, L314, L359, L733, L789, L117, L178, L727, L787, L865.
+- Skill ids and their states: `awk -F'\t' '$6=="CH2b"' june2017_re/char_add/ch0_state_skill.tsv` (part 2); the state functions: `awk -F'\t' '$7=="CH2b"' june2017_re/char_add/ch0_class_map.tsv`.
