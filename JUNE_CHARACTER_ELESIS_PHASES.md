@@ -1068,6 +1068,8 @@ switch are the `#else` (`_LIVE` still `//#define`d). Ara's CH1n is the template;
 - `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2SkillTree.h`: `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`.
 - Checklist marked `(Elesis: CH1n)`: L266 (no check here), L332 (memo arm), L443 (head), L447 (store dropped), L741 (types 14-16). Funcmap row `Elesis CH1n`.
   No JUNE_BUGS row. Full build skipped: no play-test.
+- After the commit ( `2e92189d` ): `flagcheck JUNE_CHAR_ELESIS_LIVE --with JUNE_CHAR_ELESIS_CORE --range 2e92189d^..2e92189d --files X2Lib/X2GUEL.cpp`: `files: 1 PASS, 0 PASS~ (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`,
+  same zeros, `RESULT: FAIL` only for the `//#define`; `JUNE_ENUM_NAMES --range 2e92189d^..2e92189d --files X2Lib/X2SkillTree.h`: `files: 0 PASS, 1 PASS~ (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`, `RESULT: PASS`.
 
 **Nothing to play-test** (`_LIVE` is off). Next: `/x2-phase char-elesis CH1n review` (Opus 5.5 high).
 
