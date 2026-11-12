@@ -47,6 +47,11 @@ your own to `emu_final_damage_b.py` (`review_inputs()`, as D1's review did). Rea
 for the named monsters only: each `GFD2` chain must multiply out to its `dmg`, and the `dmg=0` lead from D1 must be explained by a
 named block (or the note must say no D2 range gives it).
 
+Leads from D2b's play-test ("Phase D2b - Done", play-test paragraph): `hook=1.0000` on every Raven99 line although Pointed Stiletto was
+used (was its debuff on the target? read 3229a530's Raven block against the logged hits); boss 1470 logs `boss=0` (`IsSocketBossGrade()`;
+not D2b's code, but say whether June's `templet +0xdc == 1` is true for it); the level-damage path had no reach (only the memo effect set has
+`LEVEL_DAMAGE` and June never plays it): re-prove that June names `EffectSet_Aisha_ABM_EnergySpurt_MEMO` nowhere (xorstrings too).
+
 Fix clear transcription errors under the same flag (then `tools/build.py --deploy`); design questions go to the user. The debug define is
 not retired here. Write "Phase D2 - Review" into the plan doc, update the D2a / D2b / D3 STATUS rows, check the D3 kickoff (D2b added two
 writer items to it), and commit with explicit pathspecs.

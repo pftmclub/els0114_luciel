@@ -531,6 +531,22 @@ line before the block), 1 DEFINE, 2 OTHER (the two enum headers, `SERV_IRUHADEV_
 `NUI_ELDER_SECRET_PUNCH_BOSS` 1470, k 1.2). Gate: each `GFD2` chain multiplies out to its `dmg`, the `LVD` line for Energy Spurt, `dmg` = the number
 on screen for a non-critical hit.
 
+**Play-test PASSED (2026-11-12, run 18:36-18:45 on exe md5 463c23d2; `logs.py --tag JUNE_STATCALC`: 214 `HIT`, 214 `GFD`, 214 `GFD2`, 0 `LVD`).**
+Units 25 (jtLordKnight), 49 (Raven99, transcended), 53 (ArmeDW) on 1466 / 530-532 (secret, k 1.0), 1470 (boss, k 1.2), 75-82 / 100 (normal).
+- Every `GFD2` chain is consistent: `base` = `motion x drate` and `dmg` = the `HIT` line's `dmg` on all 214 lines (script check, 0 off).
+- **D1's `dmg=0` lead, explained:** all 15 zero hits have `motion=0`: the damage data's own motion power is 0 (Lord Knight Grand Cross 21058's
+  extra hits, Raven 24013, one boss 1470 magic hit). Not a formula: every multiplier after it is normal (`state=1.0000`, `recv=1.0000`).
+- **Energy Spurt (22025) took the main path, as June does:** June's class script plays `EffectSet_Aisha_ABM_EnergySpurt`, whose damage effect
+  is `DamageEffect_SA_ADW_Energy_Spurt` (no `LEVEL_DAMAGE`); only `ABM_ENERGYSPURT_MEMO` has it, and nothing in June's exe (plain or xorstring)
+  or scripts names `EffectSet_Aisha_ABM_EnergySpurt_MEMO`. Its hits ignore defence (`defence=0`, `drate=1.0000`) for 1.37-1.52M. The
+  level-damage path has no player reach in June's data: `emu_final_damage_b.py` is its proof (only `BOT_EffectSet_Aisha_ABM_EnergySpurt`, a
+  PvP-hero bot, may still reach `ABM_ENERGYSPURT`).
+- Boss 1470 takes `state=0.3000` (its 70 % reduce) and `boss=0` (`IsSocketBossGrade()` false for it, unchanged by D2b: a lead for the review).
+- D2a: Pride Victory `pride=1.1500` on 54 Raven99 lines; Manaflow `mana=1.0003-1.1998` on ArmeDW combo hits (her skill-state hits 1.0000,
+  except four from damage effects still alive after the state); `hook=1.0000` on every line (Pointed Stiletto was used 4 times; the review
+  checks whether its debuff was on the target).
+- Incoming: 77 / 530 / 531 / 532 / 1470 -> 25 / 49 / 53 all non-zero except one 1470 hit with `motion=0`.
+
 ## Phase D3 - The hit pipeline before the formula
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE`: `SetDamageExceptionProcess` base `322990e0` (damage terms only; its MP
