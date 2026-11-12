@@ -607,6 +607,30 @@ All 9 class-map rows of phase CH1d2 are written: 9 `inside` (June body in March'
 
 **Nothing to play-test.** Review: `kickoffs/char-elesis/CH1d2-review.md` (Opus 5.5 high, covers CH1c-CH1d2; no `_DEBUG` define exists). Next: `/x2-phase char-elesis CH1d2 review` on Opus 5.5 high.
 
+### CH1d2 - Review (2026-11-12; covers CH1c-CH1d2)
+
+**Verdict: pass, no code change.** All 20 functions (CH1c 2, CH1d 9, CH1d2 9) were read against `charport_adis.py elesis <va>`; every transcription equals June. One bookkeeping fix: `june2017_re/char_elesis/ch1_offsets.tsv` gains 14 `field` rows (`+0x7d88` / `+0x7d89` = `bEventFlagList[3]` / `[4]`, `+0x8c28`-`+0x8c54` = `m_fEventTime[2..5]`), so later listings name the flag slots and times the dash / combo chains read (they printed bare before; the existing rows were right).
+
+| June | checked | result |
+|---|---|---|
+| `32b559e0` DashComboZ | flag order 4 / 5 / 1 / 2 / 0 / 3 (slots `+0x7d89` `+0x7d8a` `+0x7d86` `+0x7d87` `+0x7d85` `+0x7d88`), times `+0x8c40` / `+0x8c4c` / `+0x8c1c` / `+0x8c28` / `+0x8c10` / `+0x8c34` (index x 12), keys Z / X / Z / Z / Z / X, `IsInJobLine` (vslot 0x670) 3 / 3 / 1 (`push ebx`, ebx = 1) / 2 / none / 2, targets 0x12b / 0x130 / 0xd0 / 0xe1 / 0xb0 / 0xe0; the job-line call only in the key arm; the shared June `SKILL_CANCEL_AFTER` (line test, hyper arm, quick-slot wait) and the three `_ON_LINE_` cancels | = June |
+| `32b562f0` DashComboX | flag 0: X, `GetUnit()` non-null, class `0x78`, vslot 0xd8 `GetNowMp()` `fcomp 2.0` / `test ah, 1` / `jne` skip (so MP >= 2.0); flag 1: Z, class `0x7d`; targets 0x143 / 0x14a | = June |
+| `32b56cc0` DashJumpComboX | landing on `bFootOnLine == 1` first; order 4 / 1 / 2 / 0 / 3, keys X / X / Z / X / Z, compares `0x7d` / `0x78` / `0x79` / none / `0x78`; targets 0x11d / 0xd3 / 0xe3 / 0xb6 / 0xed; tail `jmp` CommonEventProcess, no cancels | = June; `JUNE_BUGS` 628 stands beside 627 |
+| `32b56710` / `32b56aa0` | else-if chains (each `StateChange` jumps to the tail); order 1 / 2 / 3 / 0 and 1 / 0; `IsInJobLine` 1 / 2 / 3 and 1; targets 0x141 / 0x145 / 0x148 / 0xb3 and 0x141 / 0xb4 | = June |
+| `32b57100` XXLanding | `bFootOnLine == 0` -> `JUMP_DOWN` + `y -= 45.0` (double); flag 0 X + `IsInJobLine( 1 )` -> 0xd4; then animation end -> `WAIT` | = June |
+| `32b56c80` / `32b570d0` / `32b56090` | landing on animation end and line / XX landing / cancels only | = June |
+| CH1d nine | ZZZ order 2 / 0 / 3 / 4 / 1 with compares `0x7d` / - / `0x78` / `0x79` / - (targets 0x11b / 0xa7 / 0x142 / 0x147 / 0xa8); ComboX order 2 / 0 / 1 with `IsInJobLine` 3 / - / 2 and animation end tested before the line; ComboXX flag 2 `pureDown` + X + `IsInJobLine( 1 )`; ZZZZ's 550 after the `y -= 30`; animation-end counts per function (Z / ZZ 2, ZZZ 6, X / XX 4, XXX / XXZ 1) match the macro use; every cancel tests `bFootOnLine` | = June |
+| CH1c | `32b81200` = `CommonHyperModeFrameMove( 0, 0.1, true )`; `32b7b820`: world colour 0.1333 x 3 / 1.0 = `0xff222222`, two independent one-shot timers, `32011d20` / `31fd66b0` / `32011f50` before the shock, the trace only when `31fd66b0` is false, camera 30 / 0.4, three sounds on `bSound`, vslot 0x7cc tail; the `_CONST_EL_CH1C_` stand-ins sit inside `MODIFY_RIDING_PET_AWAKE` with both callers | = June |
+| `EL_STATE_ID` | the 12 `_CORE` names (CH1d 283 / 287 / 322 / 327, CH1d2 299 / 304 / 323 / 330 / 321 / 325 / 285 / 328) against `ch0_state_skill.tsv` registrations | all ids match |
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --with ..._CORE --range 57c3cd0e^..25ae9270`: `files: 3 PASS, 0 PASS~, 1 DEFINE, 2 OTHER (other flags), 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only because `_LIVE` is `//#define` (`Always.h:12624`, by design; `_CORE` defined at 12637, both `#error` guards present). The two OTHER rows are `X2GUEl.h`'s `_CORE` hunks.
+- `junediverge.py --check-all`: `allow-listed: 206`, `RESULT: PASS`.
+- One-file `cl /Zs /Y-` probe of `X2GUEL.cpp` (US_SERVICE defines and includes): exit 0, 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`; the `/EP` output grows 15,923,614 -> 15,935,824 bytes with the flag.
+- No code changed, no `_DEBUG` define exists to retire. Full build skipped: no play-test.
+
+**Nothing to play-test.** Next: `/x2-phase char-elesis CH1e` (Sonnet 5.5 high); its kickoff already carries the CH1d / CH1d2 leads.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
