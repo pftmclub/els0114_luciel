@@ -716,6 +716,56 @@ give `EFFHIT owner=<ArmeDW UID>` lines and the Perkisas buff icon; the party bot
   each with a non-zero `dmg`; ArmeDW's own `att=53` x77.
 - No `PART` line (no raid NPC in the run; expected). ErrorLog: 0 matching lines. The one unbound Lua name (`AddGroupChainQuest`) is not this phase's.
 
+### Phase D3 - Review (2026-11-12, covers `617950eb`)
+
+**Opus 5.5 / high. Verdict: pass. No transcription error, no code change.** Each item was read against June's `disasm_range.py` listing.
+
+- **`DamageCheck` prelude (`3262f5a0-3262f658`): June.** Attacker optr DD `+0xc`. Type `+0x264` == 0 (user) and byte `+0x91e4` set, or
+  type == 1 (NPC) and `32759f00`'s owner (`+0x8d5c` observer, unwrapped, no type test) has `+0x91e4` set -> `ret 0x10` with false, before
+  the `hitType == 0x23` (AreaHit) test. March's live `CX2GUUser* GetOwnerGameUnit()` (`X2OPTIMIZE_UNITTYPE_BUG_FIX`) is the same read.
+- **Hit name: June.** All five copies are `31f54910( B, 0, -1 )` (wstring assign of B's `m_Name` at datum `+0`) right after B's
+  `m_bEnable` (`+0x1c`) skip: `@32611f53` UnitToUnit test `32611970`, `@32625ef0` MeshToUnit, `@32628ba4` CollisionDataToUnit,
+  `@3262c18d` EffectToUnit, `@32641c83` UnitToEffect. In CollisionDataToUnit B is DD `+0x1c` (`pCollisionData`, the manual datum), so
+  June keys on the attacker's datum there too (`JUNE_BUGS` 634 stands). June writes that one outside the defender loop and the port inside
+  it; the value is the same and is only read after a hit, so nothing differs.
+- **`SetDefenderDamageRateOfPart` = `32621f40`: June.** `+0x264 == 1`, dynamic cast to `CX2GUNPC`, `fld1` to `+0x8fd4` before
+  `31e8a990` (now state) `+0x41c`; `32640af0` is a first-match `wstring::compare == 0` over 0x20-byte entries, rate at `+0`. The four
+  sites (`@32625439`, `@3262f184`, `@3262861c`, `@3262b358`) each follow the `+0x504` / `+0x508` / `+0x588` <= 0 heal test and precede
+  vslot `0x1cc` (the dodge roll), as ported. The `+0xe8` offset between them stays S0's.
+- **Loader (`@32796718-3279680d`): June.** `3238bd20` clear before `BeginTable( "DAMAGE_RATE_OF_PART" )`. Each row starts fresh
+  (`fld1`, name = `3344f1f4` = L""), then `[1]` and `[2]`. `32fea820` leaves the float alone on a failed read (third argument unused), and
+  the row is pushed (`327c7340`) anyway. One `LoadStateData` in March, string in the exe.
+- **`IMMUNE_TO_HP_ATTACK`: June.** Init reads `+0x8aeb` (HAS_BOSS_GAGE), `+0x8aec` (NUM_OF_GAGE), then `+0x8f0c` (`@327a454c`) with
+  `+0x8aeb` as the failure default, then the `GetHasBossGage()` test (`@327a4586`). Ctor `@3276337c` stores 0. Getter vslot `0x430` =
+  `32755a80` (`+0x8f0c`). In `322726f0` the order is `+0x8aeb`, `+0x8ae9`, `0x3c8`, `0x3cc`, `0x430` (`@32272745`), `+0x8e80`, grade, as ported.
+- **`CEffect::AttackResult` tail (`31f885bd-31f88669`): June.** Owner type 0, then vslot `0x4e0` (AttackResultByType), `0x3f0`
+  (CEffect `+0x200` = DD), and `32008280` unless DD `+8` == 1 (`AT_SPECIAL`). The defender `[esp+0x40]` is stored `@31f859ac` from
+  CEffect `+0x670` = DD `+0x470` (funcmap row 1261). Then type 0, vslot `0x70` before the g_pX2Game holder test (`3372c0fc`), `_ftol2`,
+  `31f8df30`. The tail sits after the force-die particle loops, March's place for the `UPGRADE_RAVEN` block.
+- **`32008280` = March's summon block.** Checks the game holder, IsHost (`+0x2c0/4` == `+0x2b8/c`), cool time `+0x8d7c` <= 0, then the
+  12-byte entries, with `GetRandomFloat( i ) <= rate`. On a pass it sets the cool time and calls `CreateNPCReq( id, level (vslot 0x20c),
+  true, pos, right, 0.f, true, -1, team, NAT_ALLY, uid )`; June's extra trailing `-1, 0, 0, 0` are its defaults. User `32012b50`:
+  `0x4dc`, `32008280` (`@320141ef`), `32275cf0`, `0x3f0`, then the tally on `+0x810` (DD `+0x3a0` + `0x470`), as ported.
+- **`AddGivenDamamge` = `31f8df30`: June.** `ebx = 0x7fffffff - x; cmp ebx, tally; jle skip`, then a store only when the sum changed.
+  Divergence row correct. (A negative `x` wraps in June and skips; the port's `INT_MAX - x` compiles to the same subtraction.)
+- **Re-checks.** NPC `32759f30`: base first, then the owner's vslot `0x758` behind the `+0x867c` / `+0xaf0` tests. Base `322990e0`:
+  `+0x6574 != +0x6578 -> DD +0x2f`; melee (DD `+0x2c`) reads the `+0x594c` protected multiplier, range `+0x5a00`. User `32045340`: base
+  first, `+0x8b62 = 0` before the `+0x4108` (-1 or attack type) gate. All match. `flagprobe`: `ADD_RENA_SYSTEM`, `FIX_EXPLOSIVE_NASOD_HAND`,
+  `RAVEN_SECOND_CLASS_CHANGE` ON, `PVP_ZOOM_CAMERA` OFF.
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE --range 617950eb^..617950eb --with SERV_IRUHADEV_JUNE_STATCALC_DEBUG`:
+`files: 9 PASS, 0 PASS~ (blank/marker only), 1 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`;
+`in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 12 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`;
+`RESULT: PASS` (the 12 EOL lines are the dodge sites in `X2DamageManager.cpp`'s mixed region; the `#else` paths are March's bodies).
+`git log -S SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE 617950eb..HEAD`: none. `junediverge --check-all`: `allow-listed: 207`, `RESULT: PASS`.
+**Numbers.** `emu_final_damage_b.py`: `OK: 3739 input sets, 0 mismatch(es), 0 static mismatch(es); 12 XS_PVE_GAME set(s) not compared
+(no March state), 192 HP-gate set(s) with IMMUNE_TO_HP_ATTACK compared (D3)`.
+**Play-test log re-read** (one run, 23:14-23:17, exe md5 a75da7a4): 53 `EFFHIT owner=53` lines (44 `at=2`, 9 `at=1` Perkisas
+`RedD_P1_sohan_AttackBox`; the Done note's 42 was an early count), 0 `PART`, `HIT att=1105` x133 / `1104` x101 / `1106` x72 / `53` x79.
+Conclusion unchanged.
+**Build.** Full build skipped: no code change, no play-test. The debug define stays on until the D6 review. D4 kickoff: one bullet added
+(the NPC `DamageReact` tallies already reach June's `AddGivenDamamge`).
+
 ## Phase D4 - DamageReact: from the final damage to the HP change
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT`, the damage arithmetic of NPC `DamageReact` `327b1f30` and user
