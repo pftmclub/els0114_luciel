@@ -12614,3 +12614,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_STATCALC_DEBUG needs SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE
 #endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-12
+// Description: June character port ( Elesis ) Phase CH1a - Elesis runs on June's class core: June's bodies inside March's own CX2GUEL functions.
+//              Stays commented out until CH1's final sub-phase ships it with June's ELESIS_KNIGHT.lua and motions ( one deploy unit ).
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_LIVE ).
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifndef SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK ( IsQuickSlotSpecialItemWaiting, CanHyperMode )
+#endif SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+//////////////////////////////////////////////////////////////////////////

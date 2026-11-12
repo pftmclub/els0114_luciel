@@ -444,6 +444,35 @@ piece CH1q / CH3b0 / CH4c has not written yet; March's live Way of the Sword cal
 of the Sword gauge fills both ways, vigor and destruction start and end as June, and the state survives a stage change; each skill cast twice
 shows its cool time and spends MP; `charport_scan.py` / `charport_keys.py ELESIS_KNIGHT` show nothing new.
 
+### CH1a - Done (2026-11-12)
+
+All 33 class-map rows of phase CH1a are written, all `inside`: June's body in March's own `CX2GUEL` function under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, March's in `#else`, tag `// char-elesis CH1a: June <va>` in each block. 18 were `listing-only` (no Ghidra function) and were read with `charport_adis.py elesis --phase CH1a`; none needed "this needs Opus". No `_CORE` (no `new` row), no `_WOS` / `_SUMMON` / `_BLOOD` line: March's live `GetWayOfSwordState()` calls stay March's.
+`Always.h` gets `_LIVE` as `//#define` with one guard (needs `SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK`, as Ara). New: `june2017_re/char_elesis/ch1_offsets.tsv` (Ara's class-agnostic rows + `+0x95d0` / `+0x9618` / `+0x96e4`); 33 funcmap rows `Char Elesis CH1a`; checklist L259 marked (none of these states writes the state power rate). No `JUNE_BUGS` row: nothing here is a June defect.
+
+| June | `CX2GUEL::` | June | `CX2GUEL::` |
+|---|---|---|---|
+| `32b4f000` `32b529b0` `32b7f820` | Wait StartFuture / Start / EventProcess | `32b7fad0` | Walk EventProcess |
+| `32b6e570` `32b4f030` `32b529e0` `32b7fd00` | JumpReady / JumpUp / JumpDown / JumpLanding EventProcess | `32b80020` | Dash EventProcess |
+| `32b6e620` `32b52ac0` `32b802a0` | DashEnd StartFuture / FrameMove / EventProcess | `32b6e660` `32b805d0` | DashJump / DashJumpLanding EventProcess |
+| `32b4f2f0` `32b4f320` `32b75000` | DashJumpPowerLanding StartFuture / Start / EventProcess | `32b6e980` `32b4f340` `32b6ea10` `32b4f380` | JumpAttackZ EventProcess / FrameMoveFuture, JumpAttackX EventProcess / FrameMoveFuture |
+| `32b53800` `32b4f1d0` `32b53880` `32b4f210` `32b4f250` | StandUpAttack Front EventProcess / End, Back EventProcess / End / StateEndFuture (the four `QUICK` states register the same callbacks) | `32b700d0` `32b70100` `32b7f580` | SwordWait StartFuture / Start / EventProcess |
+| `32b6e0c0` | PlayAnimationSwordWaitStart | `32b57240` `32b5f7c0` `32b5fac0` | CAN_NOT_ATTACK_JUMP_DOWN EventProcess, QUICK_STANDUP_ATTACK_FRONT / BACK_ADVANCED EventProcess |
+
+**Where June differs from March** (the other 31 are March's logic written out whole, each checked against the raw listing):
+- **`32b6e0c0` PlayAnimationSwordWaitStart:** the fatal threshold is 0.15 instead of 0.25 while `m_uiChivalryLevel` (`+0x95d0`, the level of `RNSI_P_SSK_CHIVALRY` 28400, written by `InitPassiveSkillState` `32b88300` @`32b889dd`) is above 0. The class map called this row `new`; March already has the function, so it is `inside` (CLAUDE.md "March has the function").
+- **`32b6e660` DashJumpEventProcess:** a branch before the single-key ones for **both direction keys held**: `( oneRight && facing left ) || ( oneLeft && facing right )` clamps `nowSpeed.y` to `GetJumpSpeed()` and goes to JUMP_UP (speed > 0) or JUMP_DOWN; otherwise nothing, and the riding arm is skipped. March has no such branch (both keys fall into its `pureRight` arm).
+- **`32b5f7c0` QUICK_STANDUP_ATTACK_FRONT_ADVANCED:** the five cancel macros (skill / walk / bwalk / dash / ZX_EX) already carry June's expansion (`SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK`, earlier phases), so the body is March's text.
+- **Form only:** `GetMaxAnimationTime()` already is `max - transition` (June's `+0x220 - +0x2b0`); `GetWalkSpeed()` etc. are the XOR triples x `m_fRunJumpSpeedRate`; the `#ifdef RIDING_SYSTEM` / `ELSWORD_WAY_OF_SWORD` / `SERV_ELESIS_SECOND_CLASS_CHANGE` wrappers are dropped in June's copy (all three are defined); Blazing Heart is `GetUnitClass() == UC_ELESIS_BLAZING_HEART` (June reads `GetUnit()->+0x38 == 0x79`).
+- **Not in the CH1a range:** `ESI_WAIT_STATE_CHANGE`, `ESI_COMMON_BUFF`, `ESI_THROW_ITEM` and the hyper / hyper-job states use base callbacks (nothing to write; registration is CH1m). **`COMMON_BUFF_FrameMove` `32b6def0` is class-map phase CH1h**, not CH1a (the kickoff text lists it; the map and the 33-row count do not).
+
+**Gates.**
+- `flagcheck SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE --worktree --files X2Lib/X2GUEL.cpp KTDXLIB/Always.h`: `files: 1 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: FAIL` only because `_LIVE` is commented out (by design). `git diff --patience --numstat`: 950 / 0 in `X2GUEL.cpp`, 14 / 0 in `Always.h`; `bytes>=0x80` 13,134 before and after.
+- One-file `/Zs` probe of `X2GUEL.cpp` (`census.cl_cmd`, no PCH): 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` (`/P`: `0.15f : 0.25f` 1 hit and the both-keys branch 1 hit with the flag, 0 and 0 without).
+- `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h KTDXLIB/Always.h`: `allow-listed: 0`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: 0 A/B rows.
+- Full build skipped: no play-test (`_LIVE` is off; nothing registers a June body), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: none of its own, the CH1b review covers CH1a-CH1b (no `_DEBUG` define here). Next: `/x2-phase char-elesis CH1b` (Sonnet 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
