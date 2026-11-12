@@ -5280,6 +5280,9 @@ void CX2Main::RegisterLuabind()
 #ifdef SERV_EVENT_CHECK_POWER
 	lua_tinker::class_def<CX2GameEdit>( L, "SetMultiplyer",	&CX2GameEdit::SetMultiplyer );
 #endif SERV_EVENT_CHECK_POWER
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	lua_tinker::class_def<CX2GameEdit>( L, "DamageLog_MI_CRITICAL",	&CX2GameEdit::SetDamageLogMICritical );	// june-stat-calc D2b: June 31d95080 @31e217c8 -> 32746a10
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 	lua_tinker::class_add<CX2TextManager::CX2Text>( L, "CX2Text" );
 	lua_tinker::class_def<CX2TextManager::CX2Text>( L, "Move",				&CX2TextManager::CX2Text::Move_LUA );

@@ -155,7 +155,11 @@ private:
 		bool		IsPossibleAddItem( SORT_TYPE sortType ) const;
 
 		wstring		GetInvenSortTypeName( SORT_TYPE sortType ) const;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		CX2Item*	GetEquippingItemByEquipPos( CX2Unit_PreHeader::EQIP_POSITION equipPos, bool bFashion, bool bMinorUnitSlot = false ) const;	// june-stat-calc D2b: June 32869e10; every June caller outside Lu / Ciel passes 0
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		CX2Item*	GetEquippingItemByEquipPos( CX2Unit_PreHeader::EQIP_POSITION equipPos, bool bFashion ) const;
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 #ifdef MODIFY_INFORMER_INVEN
 		void		GetItemIDAndNum( OUT set<int>& setItemPackage ) const;	//가지고 있는 itemID, 수량

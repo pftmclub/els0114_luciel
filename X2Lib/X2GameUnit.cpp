@@ -2195,6 +2195,62 @@ using namespace _CONST_GAMEUNIT_D2A_;
 		pDamageData_->m_bIgnoreStateDefence = true;
 }
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+// june-stat-calc D2b: GetFinalDamage's local helpers from the defence term to the return
+namespace _CONST_GAMEUNIT_D2B_
+{
+	const float LEVEL_DAMAGE_FIXED_LEVEL = 18.f;	// June 33458e68: the level of a level-damage hit in a damage-free game or a fixed-level PvP channel
+	const float LEVEL_DAMAGE_DEFAULT_FIXED_PART = 2000.f;	// June 33474b4c: the fixed part of a level-damage hit that is neither physic nor magic
+
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	struct FinalDamageTailTrace	// june-stat-calc D2b: the damage after each group of June @32286090-322869b7 for the GFD2 line
+	{
+		float fDamageAfterBase, fDamageAfterGameRate, fStateDefenceRate, fDamageAfterStateDefence, fDamageBeforePiercing;
+		float fDamageBeforeShield, fDamageAfterShield, fDamageBeforeHpRate;
+		FinalDamageTailTrace()
+			: fDamageAfterBase( 0.f ), fDamageAfterGameRate( 0.f ), fStateDefenceRate( 1.f ), fDamageAfterStateDefence( 0.f ), fDamageBeforePiercing( 0.f )
+			, fDamageBeforeShield( 0.f ), fDamageAfterShield( 0.f ), fDamageBeforeHpRate( 0.f )
+		{}
+	};
+
+	inline __int64 GetFinalDamageLogID( CX2GameUnit* pUnit_ )	// june-stat-calc D2b: NPC id or user UID, as the HIT line
+	{
+		return ( CX2GameUnit::GUT_NPC == pUnit_->GetGameUnitType() ) ? static_cast<__int64>( static_cast<CX2GUNPC*>( pUnit_ )->GetNPCTemplet().m_nNPCUnitID ) : pUnit_->GetUnitUID();
+	}
+
+	bool IsLevelDamageLogDue( const CX2GameUnit* pAttacker_, const CX2GameUnit* pDefender_ )	// june-stat-calc D2b: one LVD line per pair, about once a second
+	{
+		static std::map< std::pair< const CX2GameUnit*, const CX2GameUnit* >, DWORD > s_mapLevelDamageLogged;
+		if ( s_mapLevelDamageLogged.size() > 256 )
+			s_mapLevelDamageLogged.clear();
+		const DWORD dwNow = ::GetTickCount();
+		DWORD& dwLast = s_mapLevelDamageLogged[ std::make_pair( pAttacker_, pDefender_ ) ];
+		if ( dwNow - dwLast < 1000 )
+			return false;
+		dwLast = dwNow;
+		return true;
+	}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+}
+using namespace _CONST_GAMEUNIT_D2B_;
+
+// june-stat-calc D2b: June 322726f0: Supersonic's HP-rate damage skips boss-like NPCs
+bool CX2GameUnit::CanApplyHpRateDamage( const CX2DamageManager::DamageData* pDamageData_, CX2GameUnit* pDefender_ ) const
+{
+	if ( CX2SkillTree::RNSI_SA_ALP_SUPERSONIC != pDamageData_->m_iAppliedSkillID || CX2GameUnit::GUT_NPC != pDefender_->GetGameUnitType() )
+		return true;
+
+	const CX2GUNPC* pDefenderNPC = static_cast<const CX2GUNPC*>( pDefender_ );
+	if ( true == pDefenderNPC->GetHasBossGage() || true == pDefenderNPC->GetShowBossName() )
+		return false;
+	if ( true == pDefenderNPC->GetIsBosRaidNPC() || true == pDefenderNPC->GetIsMiddleBosRaidNPC() )
+		return false;
+	// stand-in: IMMUNE_TO_HP_ATTACK ( NPC +0x8f0c, vslot 0x430, default the boss gauge ) is D3's
+	if ( true == pDefenderNPC->GetIsMainBoss() )
+		return false;
+	return ( false == pDefenderNPC->GetIsBosRaidNPC() && false == pDefenderNPC->GetIsMiddleBosRaidNPC() );	// June @3227275b: monster grade not 1 or 2
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 float CX2GameUnit::CalcExtraAttackPower( CX2DamageManager::DamageData* pAttDamageData, CX2GameUnit* pAttacker, CX2Stat* pAttackerStat )
 {
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
@@ -2469,7 +2525,11 @@ float CX2GameUnit::GetIgnoreDefenceRate() const
 		if ( NULL != *vItr )
 			fSum += (*vItr)->GetValue();
 	}
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	return ( fSum > 1.0f ? 1.0f : fSum );	// june-stat-calc D2b: June 32274970 keeps a NaN sum ( fcom; test ah, 0x41 )
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	return ( fSum <= 1.0f ? fSum : 1.0f );
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 }
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_STAT
 
@@ -2945,6 +3005,7 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	kFinalDamageTrace.fMagicAttackIn = fMagicAttack;
 	kFinalDamageTrace.fPhysicDefenceIn = fPhysicDefence;
 	kFinalDamageTrace.fMagicDefenceIn = fMagicDefence;
+	FinalDamageTailTrace kFinalDamageTailTrace;	// june-stat-calc D2b
 #endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
 	// june-stat-calc D2a: June @32284d76-32284db2: this ( the hit unit ) scales both attacks by the attacker's skill
 	{
@@ -3805,6 +3866,79 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	}
 #endif SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	// june-stat-calc D2b: June @32285dc4-32286063: the level-damage path
+	if( true == pAttDamageData->m_bLvDamage )
+	{
+		float fLvDamageFactor = LEVEL_DAMAGE_FIXED_LEVEL;
+		if( false == g_pX2Game->IsDamageFreeGame() )
+			fLvDamageFactor = static_cast<float>( pAttacker->GetUnitLevel() );
+		const int iLvAttacker = static_cast<int>( fLvDamageFactor );
+		const int iLvDefender = pDefender->GetUnitLevel();
+
+		float fLvCorrection = 1.f;
+		float fGameRate = 1.f;
+		if( true == g_pX2Game->GetIsNowPVPCorrectionGame() )
+		{
+			// June @32285e3c-32285e65: the official, guild, event and 1:1 channels and any PCC_PLAY channel fix the level
+			const int iChannelID = static_cast<int>( g_pMain->GetConnectedChannelID() );
+			if( KPVPChannelInfo::PCC_OFFICIAL == iChannelID || KPVPChannelInfo::PCC_GUILD == iChannelID || KPVPChannelInfo::PCC_EVENT_MODE == iChannelID
+				|| KPVPChannelInfo::PCC_PLAY == g_pMain->GetPVPChannelClass( static_cast<UINT>( iChannelID ) ) || KPVPChannelInfo::PCC_1VS1_PVP_CHALLENGE == iChannelID )
+				fLvDamageFactor = LEVEL_DAMAGE_FIXED_LEVEL;
+			fGameRate = pAttDamageData->m_fPvpRate;
+			fLvCorrection = 1.f;
+		}
+		else
+		{
+			fGameRate = pAttDamageData->m_fDungeonRate;
+			if( iLvDefender - iLvAttacker > 5 )
+			{
+				fLvCorrection = ( iLvDefender - iLvAttacker - 5 ) * 0.1f;
+				fLvCorrection = 1.f - fLvCorrection;
+				if( fLvCorrection < 0.f )
+					fLvCorrection = 0.f;
+			}
+		}
+
+		float fPowerRate = 1.f;
+		if( CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() )
+			fPowerRate = static_cast<CX2GUUser*>( pAttacker )->GetPowerRate();
+		fPowerRate = pAttDamageData->m_fMemoLvDamagePowerRate * fPowerRate;
+
+		float fFixDamage = LEVEL_DAMAGE_DEFAULT_FIXED_PART;
+		switch( pAttDamageData->damageType )
+		{
+		case CX2DamageManager::DT_PHYSIC:
+			fFixDamage = fAttackerPhysicDamage * fAttackPower;	// June @32285f15: the motion rate times the attack ( March: the physic stat x 6.16 )
+			break;
+		case CX2DamageManager::DT_MAGIC:
+			fFixDamage = fAttackerMagicDamage;
+			break;
+		}
+
+		const float fLvDamageSquare = powf( fLvDamageFactor, 2.f );
+		float fFinalDamage = ( fLvDamageSquare * 35.f * fLvCorrection * fPowerRate + fFixDamage ) * fGameRate;	// June @32285f38-32285f55: the game rate scales the fixed part too
+
+		const float fIncreaseDamage = ( pAttDamageData->m_bMeleeAttack ?
+			fFinalDamage * ( pAttacker->GetAdditionalFinalDamageMultiplierMeleeAttack() - 1.0f ) :
+			fFinalDamage * ( pAttacker->GetAdditionalFinalDamageMultiplierRangeAttack() - 1.0f ) );
+		const float fUnitTypeRate = ( CX2GameUnit::GUT_USER == pDefender->GetGameUnitType() ?
+			pAttacker->GetAdditionalFinalDamageMultiplierUser() : pAttacker->GetAdditionalFinalDamageMultiplierNpc() ) - 1.0f;	// June @32285ff3-32285ffa rounds it to float
+		const float fIncreaseDamageByUnitType = fUnitTypeRate * fFinalDamage;
+		fFinalDamage = ( fIncreaseDamageByUnitType + fIncreaseDamage ) + fFinalDamage;	// June @32286011-3228601e
+
+		if( fFinalDamage <= 1.f )
+			fFinalDamage = 1.f;
+
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		if ( true == IsLevelDamageLogDue( pAttacker, pDefender ) )
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] LVD att=%I64d lv=%d def=%I64d dlv=%d dt=%d skill=%d level=%.0f corr=%.4f power=%.4f fix=%.0f game=%.4f melee=%.0f unit=%.0f dmg=%.0f",
+				GetFinalDamageLogID( pAttacker ), pAttacker->GetUnitLevel(), GetFinalDamageLogID( pDefender ), iLvDefender, static_cast<int>( pAttDamageData->damageType ),
+				pAttDamageData->m_iAppliedSkillID, fLvDamageFactor, fLvCorrection, fPowerRate, fFixDamage, fGameRate, fIncreaseDamage, fIncreaseDamageByUnitType, fFinalDamage );
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		return fFinalDamage;
+	}
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SERV_ADD_ARME_BATTLE_MAGICIAN
 	if( pAttDamageData->m_bLvDamage == true )
 	{		
@@ -3918,6 +4052,7 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 		return fFinalDamage;
 	}
 #endif
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE
 	// june-stat-calc D1: June @32286068-32286090: frozen and skill rates only, NaN passes the 0 floor
@@ -3980,6 +4115,11 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	}
 #endif //UPGRADE_SKILL_SYSTEM_2013
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	kFinalDamageTailTrace.fDamageAfterBase = fFinalDamage;	// june-stat-calc D2b: the motion damage x the defence damage rate ( and Lord Knight's hook )
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	// 2. 던전게임이면 dungeon rate를 곱해준다
 	if( g_pX2Game->GetGameType() == CX2Game::GT_DUNGEON || g_pX2Game->GetGameType() == CX2Game::GT_BATTLE_FIELD )
 	{
@@ -3988,7 +4128,11 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 
 #ifdef SKILL_BALANCE_20110728
 	// 2.1 대전게임이면 PVP rate를 곱해준다
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	if( true == g_pX2Game->GetIsNowPVPCorrectionGame() )	// june-stat-calc D2b: June @32286167-32286186: PvP or PvE ( 322cc1a0 )
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	if( g_pX2Game->GetGameType() == CX2Game::GT_PVP )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	{
 		fFinalDamage *= pAttDamageData->m_fPvpRate;
 	}
@@ -3999,6 +4143,11 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	ASSERT( GetFinalDamage_WayOfSword(pAttDamageData->m_WayofSwordType) > 0.f );
 	fFinalDamage *= pAttacker->GetFinalDamage_WayOfSword( pAttDamageData->m_WayofSwordType );
 #endif ELSWORD_WAY_OF_SWORD
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	kFinalDamageTailTrace.fDamageAfterGameRate = fFinalDamage;	// june-stat-calc D2b: after the game rates and the way of the sword
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 	// 3. 각성했다면 1.2배
 	//if( pAttacker->GetRemainHyperModeTime() > 0.f )
@@ -4011,13 +4160,28 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 #ifdef SERV_IRUHADEV_JUNE_BUFF_NEW_STAT
 		/// June buff port Phase 5, GetFinalDamage 3228620a-32286252: BBT 108/109, a third increase on the same base as the
 		/// final-damage/defence terms; the multiplier is the attacker's, picked by the defender's unit type.
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		const float fUnitTypeRate = ( CX2GameUnit::GUT_USER == pDefender->GetGameUnitType() ?
+			pAttacker->GetAdditionalFinalDamageMultiplierUser() : pAttacker->GetAdditionalFinalDamageMultiplierNpc() ) - 1.0f;	// june-stat-calc D2b: June @32286233-3228623a rounds it to float
+		const float fIncreaseDamageByUnitType = fUnitTypeRate * fFinalDamage;
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		const float fIncreaseDamageByUnitType = fFinalDamage * ( ( CX2GameUnit::GUT_USER == pDefender->GetGameUnitType() ?
 			pAttacker->GetAdditionalFinalDamageMultiplierUser() : pAttacker->GetAdditionalFinalDamageMultiplierNpc() ) - 1.0f );
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_STAT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		fFinalDamage += fDecreaseDamage;
+		fFinalDamage += fIncreaseDamageByUnitType + fIncreaseDamage;	// june-stat-calc D2b: June @3228624e-3228626a sums the user / NPC and melee / range terms first
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		fFinalDamage += fDecreaseDamage;	/// 음수값
 		fFinalDamage += fIncreaseDamage;	/// 양수값
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SERV_IRUHADEV_JUNE_BUFF_NEW_STAT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		// june-stat-calc D2b: added above with the melee / range term
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		fFinalDamage += fIncreaseDamageByUnitType;
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SERV_IRUHADEV_JUNE_BUFF_DEBUG
 		if ( 0.0f != fIncreaseDamageByUnitType )
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
@@ -4082,7 +4246,17 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 		fDamageReduceRate = 100.f;
 #endif CHUNG_SECOND_CLASS_CHANGE
 	fDamageReduceRate = ( 100.f - fDamageReduceRate ) / 100.f;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	// june-stat-calc D2b: June @32286379-322863ae: this unit's received-damage rate ( vslot 0x2ac ) scales the reduced damage
 	fFinalDamage *= fDamageReduceRate;
+	fFinalDamage = GetReceivedDamageRate() * fFinalDamage;
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	kFinalDamageTailTrace.fStateDefenceRate = fDamageReduceRate;
+	kFinalDamageTailTrace.fDamageAfterStateDefence = fFinalDamage;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	fFinalDamage *= fDamageReduceRate;
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 #ifdef DAMAGE_DOUBLE_AT_DOWN_STATE
 	// 3.2 다운 상태의 적 공격시 데미지 증가
@@ -4120,13 +4294,31 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 //			{
 				float fIncreasePercent = pAttacker->GetDamageUpPercentBySMA( pGUNPC->GetNPCTemplet().m_nNPCUnitID );
 				fFinalDamage += fFinalDamage * fIncreasePercent;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+				// june-stat-calc D2b: June @32286455-3228647e: the hit part's rate ( NPC +0x8fd4, DAMAGE_RATE_OF_PART ) when above 1
+				if ( 1.f < pGUNPC->GetDamageRateOfPart() )
+					fFinalDamage = pGUNPC->GetDamageRateOfPart() * fFinalDamage;
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #if defined( SERV_IRUHADEV_JUNE_SOCKET_PARITY ) && defined( SERV_IRUHADEV_EXTRA_NPC_STAT )
 				/// June buff port 16-step3b2 item 1: June @32286505..32286541, after this block's GetDamageUpPercentBySMA (June's
 				/// NPC +0x8fd4 multiplier between the two is not socket data and is not ported): when the NPC hit is a boss,
 				/// damage *= the attacker's m_fIncreaseDmgRateToBoss result (basic 1.0; an NPC attacker's is 2.0, JUNE_BUGS #46).
 				/// June's other boss route (@32286482..32286505: an NPC listed in the custom event manager's +0x604 map, only in
 				/// DI_SPACE_OF_THOUGHT_1/2/3/DUMMY = 41480-41510, June DungeonEnum.lua) has neither half in March: not ported.
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+				// june-stat-calc D2b: June @32286482-32286519: in the Space of Thought dungeons the custom event manager's NPCs are bosses too
+				bool bCustomEventBoss = false;
+				if ( NULL != g_pData->GetDungeonRoom() )
+				{
+					const int iBossDungeonID = g_pData->GetDungeonRoom()->GetDungeonID();
+					if ( SEnum::DI_SPACE_OF_THOUGHT_1 == iBossDungeonID || SEnum::DI_SPACE_OF_THOUGHT_2 == iBossDungeonID
+						|| SEnum::DI_SPACE_OF_THOUGHT_3 == iBossDungeonID || SEnum::DI_SPACE_OF_THOUGHT_DUMMY == iBossDungeonID )
+						bCustomEventBoss = false;	// stand-in: CX2CustomEventManager not ported ( June 32696fa0 / 32680cb0, its NPC map +0x604 ): Stage 39
+				}
+				if ( true == pGUNPC->IsSocketBossGrade() || true == bCustomEventBoss )
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 				if ( pGUNPC->IsSocketBossGrade() )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 				{
 #ifdef SERV_IRUHADEV_JUNE_BUFF_DEBUG
 					static bool s_bSeenToBoss = false;
@@ -4169,6 +4361,11 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	}
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	kFinalDamageTailTrace.fDamageBeforePiercing = fFinalDamage;	// june-stat-calc D2b: after the state defence and the NPC terms
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	// 5. 피어싱 공격일 경우에 추가 데미지, 무기 공격력의 0.3배
 #ifdef SERV_IRUHADEV_JUNE_ENCHANT_PARITY
 	/// June GetFinalDamage 32284aa0 @32286559..@32286722: the base is the weapon's attack x ENCHANT_STAT_SCALE[enchant level]
@@ -4263,9 +4460,29 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 #endif RENA_SECOND_CLASS_CHANGE
 
 	//{{ JHKang / 강정훈 / 2010/11/29 / 아토믹 쉴드 데미지 감소
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	kFinalDamageTailTrace.fDamageBeforeShield = fFinalDamage;	// june-stat-calc D2b: after piercing, super armour and the stigma debuff
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef NEW_SKILL_2010_11
 	if ( m_fAtomicShieldDamageRate < 1.f )
 	{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		// june-stat-calc D2b: June @322867ef-32286826: 1 - r in June's game states ( its 23 XS_PVE_GAME is not a March state ), r elsewhere
+		switch( g_pMain->GetNowStateID() )
+		{
+		case CX2Main::XS_PVP_GAME:
+		case CX2Main::XS_DUNGEON_GAME:
+		case CX2Main::XS_TRAINING_GAME:
+		case CX2Main::XS_BATTLE_FIELD:
+			fFinalDamage = ( 1.f - m_fAtomicShieldDamageRate ) * fFinalDamage;
+			break;
+		default:
+			fFinalDamage = m_fAtomicShieldDamageRate * fFinalDamage;
+			break;
+		}
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef SKILL_BALANCE_20110728
 		switch( g_pMain->GetNowStateID() )
 		{
@@ -4288,9 +4505,15 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 #else
 		fFinalDamage *= m_fAtomicShieldDamageRate;
 #endif
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	}
 #endif NEW_SKILL_2010_11
 #ifdef SERV_IRUHADEV_JUNE_DAMAGEDATA
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	kFinalDamageTailTrace.fDamageAfterShield = fFinalDamage;	// june-stat-calc D2b
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	// June2017 CX2GameUnit::GetFinalDamage 32284aa0 @3228682a-32286879 (effect completion C3): after the Atomic Shield block, PAUSE_NPC_AI_TIME
 	// (+0x624) > 0 (fldz; fcomp; test ah,5; jp = x87test.py mask 0x05: runs for mem > 0, NaN skips) pauses the NPC in the DamageData's
 	// defender optr (+0x470; 31e55680 validity, 31e55340 deref, unit type +0x264 == 1): 3275b330( time ) is CX2GUNPC::SetTimePauseNPCAI
@@ -4361,7 +4584,14 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	/// (checklist 7c, D8), so in March the call is unconditional.
 	{
 		CX2GameUnit* pHpRateDefender = pAttDamageData->optrDefenderGameUnit.GetObservable();
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kFinalDamageTailTrace.fDamageBeforeHpRate = fFinalDamage;	// june-stat-calc D2b: after the skill change, the attacker rate and my-HP-few
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		if ( NULL != pHpRateDefender && true == CanApplyHpRateDamage( pAttDamageData, pHpRateDefender ) )	// june-stat-calc D2b: June @3228697b-32286986
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		if ( NULL != pHpRateDefender )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 			pHpRateDefender->GetHpRateDamage( &fFinalDamage, pAttDamageData );
 	}
 #endif // SERV_IRUHADEV_JUNE_HP_RATE_DAMAGE && SERV_IRUHADEV_JUNE_DAMAGEDATA
@@ -4378,6 +4608,17 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 	ApplyMultipleDamageByDebuff( fFinalDamage, *pAttDamageData );
 #endif SERV_IRUHADEV_JUNE_BUFF_BINDING
 #endif SERV_IRUHADEV_JUNE_DAMAGEDATA
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	// june-stat-calc D2b: June @322869b7-32286c14: with the dev toggle DamageLog_MI_CRITICAL on, the defence-ignore numbers go to the chat log
+	if ( NULL != g_pMain->GetGameEdit() && true == g_pMain->GetGameEdit()->GetDamageLogMICritical() )
+	{
+		std::wstringstream wstrmDefenceIgnoreLog;
+		wstrmDefenceIgnoreLog << L"\xCE58\xBA85\xC801\xC778 \xD2B9\xC131 \xBC29\xC5B4\xB825 \xBB34\xC2DC\xC728 : ( " << static_cast<__int64>( static_cast<int>( 100.f - fPiercingDefenceFactor * 100.f ) )
+			<< L"% )\n \xC720\xB2DB\xC758 \xBC29\xC5B4\xB825 \xC218\xCE58 : ( " << static_cast<__int64>( fDefencePower )
+			<< L" )\n \xBB34\xC2DC\xB41C \xBC29\xC5B4\xB825 \xC218\xCE58 : ( " << static_cast<__int64>( static_cast<int>( ( 1.f - fPiercingDefenceFactor ) * fDefencePower ) ) << L" )";
+		g_pChatBox->AddChatLog( wstrmDefenceIgnoreLog.str().c_str(), KEGS_CHAT_REQ::CPT_SYSTEM, D3DXCOLOR( 1, 1, 1, 1 ), L"", true, false, 0.f );
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
 	// june-stat-calc D1: one HIT line per attacker-defender pair, about once a second
 	{
@@ -4404,6 +4645,15 @@ float CX2GameUnit::GetFinalDamage( CX2DamageManager::DamageData* pAttDamageData 
 				kFinalDamageTrace.fManaflowRate, kFinalDamageTrace.fSharpenRate, kFinalDamageTrace.fWorldAttackRate, kFinalDamageTrace.fWorldDefenceRate,
 				kFinalDamageTrace.fSocketPhysicAttackRate, kFinalDamageTrace.fSocketMagicAttackRate, kFinalDamageTrace.fSocketPhysicDefenceRate,
 				kFinalDamageTrace.fSocketMagicDefenceRate, fExtraAttackPower );
+			// june-stat-calc D2b: June @32286090-322869b7: the damage after each group of blocks and the rates between them
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] GFD2 att=%I64d def=%I64d motion=%.0f drate=%.4f base=%.0f game=%.0f wos=%.4f reduce=%.0f state=%.4f recv=%.4f stated=%.0f part=%.4f boss=%d npc=%.0f armor=%.0f shield=%.4f>%.0f hp=%.0f dmg=%.0f",
+				iHitAttackerID, iHitDefenderID, fAttackerPowerRateByMotion, fDamageRateByDefencePowerRate, kFinalDamageTailTrace.fDamageAfterBase,
+				kFinalDamageTailTrace.fDamageAfterGameRate, pAttacker->GetFinalDamage_WayOfSword( pAttDamageData->m_WayofSwordType ), fFinalDamageBeforeReduce,
+				kFinalDamageTailTrace.fStateDefenceRate, GetReceivedDamageRate(), kFinalDamageTailTrace.fDamageAfterStateDefence,
+				( GUT_NPC == GetGameUnitType() ? static_cast<CX2GUNPC*>( this )->GetDamageRateOfPart() : 1.f ),
+				( GUT_NPC == GetGameUnitType() && true == static_cast<CX2GUNPC*>( this )->IsSocketBossGrade() ) ? 1 : 0,
+				kFinalDamageTailTrace.fDamageBeforePiercing, kFinalDamageTailTrace.fDamageBeforeShield, m_fAtomicShieldDamageRate, kFinalDamageTailTrace.fDamageAfterShield,
+				kFinalDamageTailTrace.fDamageBeforeHpRate, fFinalDamage );
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		}
 	}

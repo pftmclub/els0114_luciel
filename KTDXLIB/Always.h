@@ -12647,6 +12647,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              the attacker-skill hook (June 3229a530: Raven, Rena, Ace in the Hole, Ara), the user passives on June's skill ids
 //              (Confidence / Pride Victory, Manaflow Overdrive, Sharpen Arrow), the world-mission epsilon, the socket stat rates by
 //              June's game states, CalcExtraAttackPower as June 3226e530, no March 4-argument unit hook. Revert: comment out the #define.
+//              D2b (from @32285ccf): the level-damage path, the PvP-or-PvE rate, the received-damage rate (vslot 0x2ac), the NPC part
+//              rate (+0x8fd4), the Space of Thought boss route (stand-in), the atomic shield, the HP-rate gate, the dev defence-ignore
+//              chat log (DamageLog_MI_CRITICAL), GetEquippingItemByEquipPos's third argument and GetIgnoreDefenceRate's NaN sum.
 #define SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #if defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) && !( defined( SERV_IRUHADEV_JUNE_FINAL_DAMAGE_UNIT_HOOK ) && defined( SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE ) && defined( SERV_IRUHADEV_JUNE_CHAR_ARA_PASSIVE ) )
 #error SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE needs the June unit hook and Eve's / Ara's June overrides ( it drops March's 4-argument call )
@@ -12656,5 +12659,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #if defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) && !( defined( SERV_IRUHADEV_JUNE_SKILL_TEMPLET ) && defined( SERV_IRUHADEV_JUNE_SOCKET_EDT ) && defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
 #error SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE needs June's skill templet calls, the second extra-damage list and June's enum names
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) && !( defined( SERV_IRUHADEV_JUNE_BUFF_NEW_STAT ) && defined( SERV_IRUHADEV_JUNE_SKILL_MEMO_DAMAGE ) && defined( SERV_IRUHADEV_JUNE_DIVERGE_PVP_OFFICIAL_SKILL ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE needs the BBT 108 / 109 terms, the memo level-damage rate and June's PvP channel names ( D2b )
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 //////////////////////////////////////////////////////////////////////////

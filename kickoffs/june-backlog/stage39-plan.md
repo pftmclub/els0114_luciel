@@ -26,6 +26,9 @@ The census found June's date-window event systems with no owner:
   `CustomEventScript.lua`, `CustomEventScript_AddChangeNpcInfo.lua`) and `CX2CustomEventItemSlotManager` (gap
   `X2TalkBoxManagerUI..X2PetAI@0x32eec4d0`, 82);
 - `CX2LVUpEventMgr` (11, `0x32710980`-`0x32714af0`; `EVENT_ID`, `LEVEL`) and `CX2RandomMission` (3, `0x32676590`-`0x32676870`).
+- A reader already in the tree (june-stat-calc D2b, 2026-11-12): `GetFinalDamage`'s Space of Thought boss route (`32286482`, dungeons
+  41480-41510) asks the custom event manager (`32696fa0`) whether the hit NPC is in its `+0x604` map (`32680cb0`); `X2GameUnit.cpp` has a
+  stand-in `false` there (comment "Stage 39"). The port of the manager replaces it.
 Their scripts may be server Lua (CLAUDE.md "server-side Lua the client needs is the user's to pack"); the standing rule "game events on
 from the save DB" (memory, 2026-10-21) says how a date window switches on offline.
 1. Identify each system: classes, Lua binders, data files (client kom or server-only), packets, UI, what the emulator must answer.

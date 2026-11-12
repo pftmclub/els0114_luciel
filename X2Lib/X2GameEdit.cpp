@@ -14,6 +14,9 @@ CX2GameEdit::CX2GameEdit(void)
 {
 	m_bShow		= false;
 	m_bEnable	= false;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	m_bDamageLogMICritical = false;	// june-stat-calc D2b: June ctor 32749f30 @3274a21f
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 	m_pDLGGameEdit	= new CKTDGUIDialog( g_pMain, L"DLG_GameEdit.lua", 0.07f, XDL_GAME_EDIT );
 	g_pKTDXApp->GetDGManager()->GetDialogManager()->AddDlg( m_pDLGGameEdit );
@@ -1764,3 +1767,12 @@ void CX2GameEdit::SetMultiplyer( float f )
 	g_pData->GetServerProtocol()->SendPacket( EGS_SET_MULTIPLYER, kPac);
 }
 #endif SERV_EVENT_CHECK_POWER
+
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+// june-stat-calc D2b: June 32746a10: only a developer ( auth level 3 ) turns the defence-ignore chat log on or off
+void CX2GameEdit::SetDamageLogMICritical( bool bDamageLogMICritical_ )
+{
+	if ( CX2User::XUAL_DEV <= g_pData->GetMyUser()->GetAuthLevel() )
+		m_bDamageLogMICritical = bDamageLogMICritical_;
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE

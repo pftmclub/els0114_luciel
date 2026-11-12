@@ -523,6 +523,14 @@ namespace SEnum
 		DI_EVENT_2017_FOOLSDAY					= 41460,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 	//}}
+	//{{ Iruha : 2026-11-12 // june-stat-calc D2b -- June DungeonEnum's Space of Thought dungeons ( GetFinalDamage's custom-event boss route )
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		DI_SPACE_OF_THOUGHT_1					= 41480,
+		DI_SPACE_OF_THOUGHT_2					= 41490,
+		DI_SPACE_OF_THOUGHT_3					= 41500,
+		DI_SPACE_OF_THOUGHT_DUMMY				= 41510,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+	//}}
 #ifdef SERV_IRUHADEV_ELYSION_PORT
 	//{{ Iruha : 2026-10-17 // Atlas/Elysion port Phase A3 -- DUNGEON_ID, Hero rows are june-dungeons
 		DI_ATLASDEVELOPMENT_NORMAL = 33330,

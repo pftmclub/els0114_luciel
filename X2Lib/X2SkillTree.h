@@ -2915,6 +2915,11 @@ public:
 		RNSI_HA_ROM_MECAVOLT_MX_UPGRADE                       = 31608,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-12 // june-stat-calc D2b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		RNSI_SA_ALP_SUPERSONIC                                = 29058,	// June's Enum.lua: GetFinalDamage's HP-rate gate 322726f0
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 #pragma endregion ½ºÅ³
 	}; 
 

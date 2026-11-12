@@ -246,6 +246,10 @@ class CX2GameEdit
 #ifdef SERV_EVENT_CHECK_POWER
 		void SetMultiplyer( float f );
 #endif SERV_EVENT_CHECK_POWER
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		void SetDamageLogMICritical( bool bDamageLogMICritical_ );	// june-stat-calc D2b: June 32746a10, Lua DamageLog_MI_CRITICAL
+		bool GetDamageLogMICritical() const { return m_bDamageLogMICritical; }
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 	protected:
 
 		bool Reset();
@@ -290,4 +294,7 @@ class CX2GameEdit
 		CKTDGUIDialogType				m_pDLGClassChangeCheat;
 		bool							m_bShowClassChangeCheat;
 #endif //CHEAT_CLASS_CHANGE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		bool							m_bDamageLogMICritical;	// june-stat-calc D2b: June +0xde, GetFinalDamage's defence-ignore chat log
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 };

@@ -1,0 +1,35 @@
+call_site	function	function_name_funcmap	pos	bFashion	bMinorUnitSlot	note
+31f90cc0	31f90ca0	-	2	0	0	0: = the port's default
+31f9292e	31f92910	CX2UnitViewerUI::InitUpgradeWeaponParticle	2	0	0	0: = the port's default
+31f9c086	31f9bf90	-	0x26	1	eax	register: read the site (Lu / Ciel per-form or a constant held in the register)
+31f9f7b7	31f9f560	-	ebp	0	0	0: = the port's default
+31fa903b	31fa89b0	CX2UnitViewerUI::ApplyCustomize( int kind ) (name ours)	ebx	0	eax	register: read the site (Lu / Ciel per-form or a constant held in the register)
+31fca3f5	31fca3e0	-	2	0	0	0: = the port's default
+31fd30b4	31fd2f00	CX2GUUser::GetAddItemAndRemoveItemToViewList (X2GUUser.cpp:41897)	edi	0	0	0: = the port's default
+31febf9d	31febf50	June-only CX2GUUser: Dark Dragon hyper-mode item effect	0x14	0	0	0: = the port's default
+31fedba2	31fed830	-	2	0	0	0: = the port's default
+31fedca1	31fedc00	CX2GUUser vslot 487 (+0x79c)	ebp	ebx	ebx	register: read the site (Lu / Ciel per-form or a constant held in the register)
+31fef597	31fef4d0	-	2	0	0	0: = the port's default
+3201bc1d	3201b930	CX2GUUser::UpdateEquipViewListInfo( pItemToAdd, pItemToRemove, short slotId ) (X2GUUser.cp	ebx	0	0	0: = the port's default
+320660b3	32063650	CX2GUUser::CommonFrameMove	eax	0	0	0: = the port's default
+32169453	321693b0	-	0x17	0	esi	register: read the site (Lu / Ciel per-form or a constant held in the register)
+32169474	321693b0	-	0x1c	0	esi	register: read the site (Lu / Ciel per-form or a constant held in the register)
+3226e618	3226e530	none named: extra-damage sum called from GetFinalDamage @322855b6	2	0	0	0: = the port's default
+32272842	322727f0	CX2GameUnit::GetItemAttackPower (vslot 0x68)	2	ebx	ebx	register: read the site (Lu / Ciel per-form or a constant held in the register)
+32278343	32278280	-	2	ebx	ebx	register: read the site (Lu / Ciel per-form or a constant held in the register)
+32278bca	32278a90	CX2GameUnit::ProcessEnchantSnatch (slot 219)	2	eax	eax	register: read the site (Lu / Ciel per-form or a constant held in the register)
+3228661c	32284540	-	2	0	0	0: = the port's default
+3228ea9b	3228d660	-	2	0	0	0: = the port's default
+3229975f	32299730	CX2GameUnit::Weapon::InitUpgradeWeaponParticle	2	0	0	0: = the port's default
+3229b577	3229b250	CX2GameUnit::ProcessEnchantBlaze (slot 214)	2	0	0	0: = the port's default
+3229c272	3229bf90	CX2GameUnit::ProcessEnchantPoison (slot 216)	2	0	0	0: = the port's default
+323f317c	323f3090	-	0x26	1	ebx	register: read the site (Lu / Ciel per-form or a constant held in the register)
+324e7cb8	324e6130	-	eax	0	0	0: = the port's default
+324e7d02	324e6130	-	eax	0	0	0: = the port's default
+3253f2c4	3253d7d0	-	eax	0	0	0: = the port's default
+3253f313	3253d7d0	-	eax	0	0	0: = the port's default
+328a0773	328a0740	-	0x26	1	eax	register: read the site (Lu / Ciel per-form or a constant held in the register)
+32ba6b37	32ba6990	CX2GUAra::GetAddItemAndRemoveItemToViewListBerserk	ebp	0	0	0: = the port's default
+32c83632	32c835c0	CX2GULire_ElvenRanger::InitEnchantWeaponEffectUnitSpecific	2	ebx	ebx	register: read the site (Lu / Ciel per-form or a constant held in the register)
+32dabb85	32dab5f0	-	edi	1	eax	register: read the site (Lu / Ciel per-form or a constant held in the register)
+32e094cb	32e093c0	-	eax	ecx	esi	register: read the site (Lu / Ciel per-form or a constant held in the register)

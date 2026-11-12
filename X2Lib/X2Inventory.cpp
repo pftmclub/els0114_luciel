@@ -962,6 +962,35 @@ wstring	CX2Inventory::GetInvenSortTypeName( SORT_TYPE sortType ) const
 	return invenSortTypeName;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+// june-stat-calc D2b: June 32869e10: the third argument picks the main unit's or the minor unit's ( Ciel's ) equip slots
+CX2Item* CX2Inventory::GetEquippingItemByEquipPos( CX2Unit::EQIP_POSITION equipPos, bool bFashion, bool bMinorUnitSlot ) const
+{
+	if ( CX2Unit::EP_WEAPON_HAND <= equipPos && CX2Unit::EP_DEFENCE_TEMP3 >= equipPos && false == bFashion )
+		bMinorUnitSlot = false;
+
+	map< int, InvenSlotData* >::const_iterator it;
+	for( it = m_ItemMap[ST_E_EQUIP].begin(); it != m_ItemMap[ST_E_EQUIP].end(); it++ )
+	{
+		const InvenSlotData* pInvenSlotData = it->second;
+		if ( NULL == pInvenSlotData || NULL == pInvenSlotData->m_pItem || NULL == pInvenSlotData->m_pItem->GetItemTemplet() )
+			continue;
+
+		// stand-in: March has no second ring slot ( June 3234fe90 reads a ring there as position 0x1c )
+		if ( pInvenSlotData->m_pItem->GetItemTemplet()->GetEqipPosition() != equipPos )
+			continue;
+		if ( CX2Item::IT_ACCESSORY != pInvenSlotData->m_pItem->GetItemTemplet()->GetItemType()
+			&& pInvenSlotData->m_pItem->GetItemTemplet()->GetFashion() != bFashion )
+			continue;
+
+		// stand-in: March's equip slots have no minor-unit range ( June NESI 20-34, 36, 38, 40, 42 ), so every slot is the main unit's
+		if ( false == bMinorUnitSlot )
+			return pInvenSlotData->m_pItem;
+	}
+
+	return NULL;
+}
+#else SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 CX2Item* CX2Inventory::GetEquippingItemByEquipPos( CX2Unit::EQIP_POSITION equipPos, bool bFashion ) const
 {
 	map< int, InvenSlotData* >::const_iterator it;
@@ -987,6 +1016,7 @@ CX2Item* CX2Inventory::GetEquippingItemByEquipPos( CX2Unit::EQIP_POSITION equipP
 
 	return NULL;
 }
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef MODIFY_INFORMER_INVEN
 void CX2Inventory::GetItemIDAndNum( OUT set<int>& setItemPackage ) const
 #else

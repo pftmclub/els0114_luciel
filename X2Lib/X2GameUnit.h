@@ -4398,6 +4398,8 @@ public:
 #endif SERV_IRUHADEV_JUNE_FINAL_DAMAGE_UNIT_HOOK
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 		virtual void ModifyAttackRateByAttackerSkill( CX2DamageManager::DamageData* pDamageData_, float* pfPhysicRate_, float* pfMagicRate_ );	// june-stat-calc D2a: June 3229a530 ( vslot 0x6c, GetFinalDamage @32284d98 )
+		virtual float GetReceivedDamageRate() const { return 1.f; }	// june-stat-calc D2b: June vslot 0x2ac ( 3208e1b0 ); only Add ( 329d4870 ) and Ain ( 32a3d540 ) override it
+		bool CanApplyHpRateDamage( const CX2DamageManager::DamageData* pDamageData_, CX2GameUnit* pDefender_ ) const;	// june-stat-calc D2b: June 322726f0
 #endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 		bool	ApplyDrainHpBuff()

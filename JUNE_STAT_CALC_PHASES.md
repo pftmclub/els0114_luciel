@@ -469,6 +469,68 @@ matk= pdef= mdef= hook=<p>/<m> conf= pride= mana= sharpen= world=<atk>/<def> soc
 `GFD hook=1.2000/1.2000`; a Rena's Rage Fungus or Ace in the Hole shows `hook=` above 1; a Dimension Witch's combo hit shows `mana=` above
 1 and her skill hit `mana=1.0000`; a Night Watcher with Sharpen Arrow shows its `sharpen=` value (applied to `HIT`'s defence on command hits).
 
+### Phase D2b - Done (2026-11-12)
+
+**Opus 5.5 / xhigh. Flag `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` (D2a's; a fourth `#error` guard for `_BUFF_NEW_STAT`, `_SKILL_MEMO_DAMAGE`,
+`_DIVERGE_PVP_OFFICIAL_SKILL`).** Commit: this commit. Insert-only: `X2GameUnit.cpp` +250, `X2Inventory.cpp` +30, `X2GameEdit.cpp` +12,
+`X2GameEdit.h` +7, `X2GUNPC.cpp` +6, `X2GUNPC.h` +6, `X2Inventory.h` +4, `X2Main.cpp` +3, `X2GameUnit.h` +2, `Always.h` +6; June names under
+`SERV_IRUHADEV_JUNE_ENUM_NAMES`: `DungeonEnum.h` +8 (`DI_SPACE_OF_THOUGHT_1 / _2 / _3 / _DUMMY`), `X2SkillTree.h` +5 (`RNSI_SA_ALP_SUPERSONIC`).
+`gfd_blocks.tsv`: 54 ranges `June`, Rose's `class: char-rose` (the D0 check prints `True 32284aa0 32286c48 55`). Funcmap: 13 rows `StatCalc S33`.
+
+**Ported (June `32284aa0` from @32285ccf):**
+- @32285dc4 level-damage path (Aisha's Energy Spurt `ABM_ENERGYSPURT` / `_MEMO` is the only `LEVEL_DAMAGE` data): PvP-or-PvE test with June's
+  fixed-level channels (`PCC_OFFICIAL` / `_GUILD` / `_EVENT_MODE` / `_1VS1_PVP_CHALLENGE`, class `PCC_PLAY`); DT_PHYSIC fixed part =
+  `fAttackerPhysicDamage x fAttackPower` (March: physic stat x 6.16); `( level^2 x 35 x corr x power + fix ) x game` (March: the game rate on the
+  level part, the power on the sum); user / NPC rate rounded to float; sum `( U + M ) + F`.
+- @32286126 PvP rate behind `GetIsNowPVPCorrectionGame()`. @3228619f re-read (D0 said `June`): June adds `F + D`, then `( U + M )`, with
+  `U = f32( u - 1 ) x F`: ported (last bit).
+- @322862f6 vslot `0x2ac` = new `virtual float CX2GameUnit::GetReceivedDamageRate() const` (base `3208e1b0` = 1.0); only Add `329d4870` and Ain
+  `32a3d540` override it: checklist rows (char-add, Stage 8).
+- @32286416 NPC `+0x8fd4` = `CX2GUNPC::m_fDamageRateOfPart` (ctor 1.0), applied above 1.0. Writer `CX2DamageManager` `32621f40` (four collision
+  sites) and the `StateData +0x41c` `DAMAGE_RATE_OF_PART` loader: D3 (kickoff amended; data only `RAID_ELTRION_MK2_PHASE1/2/3`, "Head" x 2).
+- @32286482 Space of Thought route (41480-41510): the custom event manager lookup (`32696fa0` / `32680cb0`) is a stand-in `false`, backlog
+  Stage 39 (brief amended). The boss test stays `IsSocketBossGrade()`.
+- @322867e0 atomic shield: `( 1 - r ) x F` in `XS_PVP_GAME` / `_DUNGEON_GAME` / `_TRAINING_GAME` / `_BATTLE_FIELD` (by name; June's 23
+  `XS_PVE_GAME` is no March state), `r x F` elsewhere (March: `r - ( 1 - r ) x 0.5` in dungeon / field). Rule 3: the writer is Eve's, already June
+  (CH3a key `int( SA_DAMAGED_REL x 100 )`, June `Atomic_Shield_Eve.lua` `SetShieldDamageReduce( key / 100 )`); at June's 0.6 both give 0.4.
+- @3228696a `CX2GameUnit::CanApplyHpRateDamage` = June `322726f0` except `IMMUNE_TO_HP_ATTACK` (NPC `+0x8f0c`, vslot `0x430`: stand-in, D3).
+  Supersonic is Rena's fourth-line skill (classes 156-158, out of scope): offline the gate is always true.
+- @322869b7 dev log: `g_pGameEdit:DamageLog_MI_CRITICAL( true )` (June `32746a10`, auth level 3, `CX2GameEdit +0xde`) prints June's three lines
+  (defence-ignore %, defence, ignored defence) to the chat box (`CPT_SYSTEM`, white). The Korean text is `\x` escapes (the build machine is not CP949).
+- `GetEquippingItemByEquipPos` `32869e10`: June's 3-argument body (`bMinorUnitSlot = false`; positions 2-14 outside fashion force 0). Two
+  stand-ins: March has no minor-unit slots and no second ring slot (its `NESI_ONEPIECE_FASHION` is 20, June's 35, so June's numeric slot table
+  cannot read March slots). Callers unchanged: June passes 0 at every constant site (`june2017_re/statcalc/equip_by_pos_callers.tsv`, 34 sites).
+- `GetIgnoreDefenceRate` `32274970` re-read: June keeps a NaN sum (the port returned 1.0): fixed; map row `June`.
+
+**D1's `dmg=0` lead:** no D2a / D2b range turns a normal hit into 0 by itself; the candidates are the state defence (100 % reduce or guard),
+`GetFinalDamageToBeChangedBySkill` and the HP-rate overwrite. `GFD2` prints the damage after each group, so the play-test names the block.
+
+**Emulation** `june2017_re/statcalc/emu_final_damage_b.py`: `EMU_FINAL_DAMAGE_B OK: 3687 input sets, 0 mismatch(es), 0 static mismatch(es);
+12 XS_PVE_GAME set(s) not compared (no March state), 2 IMMUNE_TO_HP_ATTACK set(s) left to D3` (level path, both game-rate branches, sum order,
+state defence, part rate, shield on every June state, ignore cap, HP gate on 384 sets; static: channel ids, Space of Thought ids, minor-unit
+slots = June's `NESI_MINORUNIT_*`, dev log strings).
+
+**Debug lines** (`_DEBUG`, beside `HIT` / `GFD`, same throttle): `[JUNE_STATCALC] GFD2 att= def= motion= drate= base= game= wos= reduce= state=
+recv= stated= part= boss= npc= armor= shield=<r>><after> hp= dmg=` (damage after step 1, the game rates and way of the sword, the final
+multipliers and command rate, the state defence, the NPC terms, piercing / super armour / stigma, the shield, the skill change / attacker rate /
+my-HP-few, then `dmg`). Level-damage hits: `[JUNE_STATCALC] LVD att= lv= def= dlv= dt= skill= level= corr= power= fix= game= melee= unit= dmg=`.
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE --worktree --files <12 files>`: 8 PASS, 1 PASS~ (`X2GameEdit.cpp`: one blank
+line before the block), 1 DEFINE, 2 OTHER (the two enum headers, `SERV_IRUHADEV_JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL ->
+`RESULT: PASS`. `junediverge --check <11 files>`: `RESULT: PASS`. `enumscan`: 0 rows in this phase's hunks. Probes (`/Zs`, US_SERVICE):
+`X2GameUnit`, `X2Inventory`, `X2GameEdit`, `X2GUNPC`, `X2Main` 0 errors, no new warnings.
+**Build.** `DEPLOY OK: X2_offline.exe is 26,350,080 B, dated 2026-11-12 18:23:35, md5 463c23d2abc20e8b984db098b32acfa9`; `EXESTR OK: 2 of 2`
+(`[JUNE_STATCALC] GFD2 att=`, `[JUNE_STATCALC] LVD att=`, wide), `EXESTR OK: 1 of 1` (`DamageLog_MI_CRITICAL`).
+
+**Bookkeeping.** Map rows (whole function, `GetEquippingItemByEquipPos`, `GetIgnoreDefenceRate` -> `June`; 4 new rows); divergence row
+`GetEquippingItemByEquipPos` -> `replace`, ported; checklist rows; Stage 39 brief; D3 kickoff; `MODS.md`; save: Raven99 set transcended
+(`elsdb settranscend Raven99 1`, backup `db_backup/els_db_20261112_182124_pre_settranscend.sql`). No `JUNE_BUGS` row (no June bug kept).
+
+**Play-test owed** (D2a and D2b together): jtLordKnight (physical), ArmeDW (magical, Energy Spurt = the level-damage hit) and Raven99
+(transcended) in Wally's Castle (Normal) and Elder Secret Dungeon Hell 33031 (stage 0 `NUI_ELDER_SECRET_BUNKER` 1466, k 1.0; stage 2
+`NUI_ELDER_SECRET_PUNCH_BOSS` 1470, k 1.2). Gate: each `GFD2` chain multiplies out to its `dmg`, the `LVD` line for Energy Spurt, `dmg` = the number
+on screen for a non-critical hit.
+
 ## Phase D3 - The hit pipeline before the formula
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE`: `SetDamageExceptionProcess` base `322990e0` (damage terms only; its MP

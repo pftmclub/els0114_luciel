@@ -1791,6 +1791,9 @@ CX2GUNPC::CX2GUNPC( int unitIndex, int teamNum, int uid, const CX2UnitManager::N
 , m_bIsMainBoss( false )		/// June's ctor 32762670 never writes +0x8e80 ( JUNE_BUGS 513 )
 #endif SERV_BATTLEFIELD_MIDDLE_BOSS
 #endif SERV_IRUHADEV_JUNE_FIX_NPC_MAIN_BOSS_INIT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+, m_fDamageRateOfPart( 1.f )	// june-stat-calc D2b: June CommonConstructor 32762670 @327633dd / @32763427
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 {
 
 	//if( NULL == pNPCTemplet )
@@ -1944,6 +1947,9 @@ CX2GUNPC::CX2GUNPC( const CNpcCreatedInfoPtr NpcCreatedInfoPtr_
 , m_bIsMainBoss( false )		/// June's ctor 32762670 never writes +0x8e80 ( JUNE_BUGS 513 )
 #endif SERV_BATTLEFIELD_MIDDLE_BOSS
 #endif SERV_IRUHADEV_JUNE_FIX_NPC_MAIN_BOSS_INIT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+, m_fDamageRateOfPart( 1.f )	// june-stat-calc D2b: June CommonConstructor 32762670 @327633dd / @32763427
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 {
     if ( pNPCUnitInfo == NULL || pNPCUnitInfo->m_pInitData == NULL )
 		return;

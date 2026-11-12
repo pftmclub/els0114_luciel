@@ -6752,3 +6752,11 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_elesis/ch0b_stage_li
 - **Why:** the class passives and skill bonuses read June's skill data; March's ids never matched, so those bonuses never applied.
 - **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` (D2b continues under it); debug `[JUNE_STATCALC] GFD` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` in `KTDXLIB/Always.h`, rebuild (the two DTT names stay, unused).
+
+## GetFinalDamage from the defence term to the return as June's (june-stat-calc D2b, 2026-11-12)
+
+- **What:** the rest of June `32284aa0` in `CX2GameUnit::GetFinalDamage`: the level-damage path (Energy Spurt: the PvP-or-PvE test with June's channel list, the fixed part = the motion rate x the attack, the game rate on the fixed part too, June's sum order), the PvP-or-PvE rate, June's sum order of the final-defence / melee-range / user-NPC terms, the state defence times the new virtual `GetReceivedDamageRate` (1.0; only Add and Ain override it in June), the NPC part rate `m_fDamageRateOfPart` (1.0 until june-stat-calc D3 ports its writer), the Space of Thought boss route (custom event manager stand-in), the atomic shield's `1 - r` in game states, the HP-rate gate `CanApplyHpRateDamage`, the dev chat log `g_pGameEdit:DamageLog_MI_CRITICAL( true )`, `CX2Inventory::GetEquippingItemByEquipPos`'s third argument (default false) and `GetIgnoreDefenceRate` keeping a NaN sum.
+- **Why:** March's formula differed from June's in each place: Energy Spurt and the atomic shield gave other numbers, and the dev log did not exist.
+- **Files:** `X2GameUnit.cpp/.h`, `X2GUNPC.cpp/.h`, `X2Inventory.cpp/.h`, `X2GameEdit.cpp/.h`, `X2Main.cpp` (Lua bind), `DungeonEnum.h` and `X2SkillTree.h` (June names under `SERV_IRUHADEV_JUNE_ENUM_NAMES`), `KTDXLIB/Always.h`.
+- **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` (D2a's); debug `[JUNE_STATCALC] GFD2` and `LVD` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE` in `KTDXLIB/Always.h` (D2a and D2b together), rebuild; the four dungeon names and the skill name stay, unused. Save: Raven99 was set transcended for the play-test (`python tools/elsdb.py settranscend Raven99 0` undoes it).

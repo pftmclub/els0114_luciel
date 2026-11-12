@@ -3347,6 +3347,9 @@ class CX2GUNPC : public CX2GameUnit
 	bool GetIsMainBoss() const { return m_bIsMainBoss; }
 	void SetIsMainBoss(bool val) { m_bIsMainBoss = val; }
 #endif // SERV_BATTLEFIELD_MIDDLE_BOSS
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+	float GetDamageRateOfPart() const { return m_fDamageRateOfPart; }	// june-stat-calc D2b: June +0x8fd4, read by GetFinalDamage @32286455
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 
 //#ifdef FIX_NPC_SHOW_OBJECT
 //	bool GetShowObjectCurrentState() const { return m_bShowObjectCurrentState; }
@@ -4664,6 +4667,9 @@ class CX2GUNPC : public CX2GameUnit
 #endif // SERV_BATTLEFIELD_MIDDLE_BOSS
 
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
+		float				m_fDamageRateOfPart;	// june-stat-calc D2b: June +0x8fd4, the hit part's DAMAGE_RATE_OF_PART ( its writer 32621f40 is D3's )
+#endif SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE
 #ifdef IMMUNITY_TIME_STOP		
 		bool						m_bImmunityTimeStop;		//타임 스톱 면역 기능 추가
 #endif //IMMUNITY_TIME_STOP
