@@ -1162,6 +1162,8 @@ Found by june-effect C3e (funcmap row `31fe0f60 / 31fe9ff0 / 31fcfb10 (C3e)`). W
   `0x230` = `+0x94b8` / `+0x94bc` ); its consumer `32296fe0` ( also NPC `3277dfd0`, user `3206eaf0` ) draws with the skin's PicChar ( g_pData
   `+0x184` / `+0x194` ) and plays the critical / double-hit particles and sound. NPC Init `SHOW_DAMAGE_AT_IMPACT_POINT` ( `+0x8f88`, 23 June scripts )
   moves the number to the impact point. March draws inline with the same values ( D4a kept it ). funcmap rows `StatCalc S33 D4a`.
+- **june-stat-calc D4b (2026-11-13):** the user `DamageReact` does the same ( `320462a0 @32049752-3204998e`: skin by game vslot `0x230` for a critical or double hit,
+  `0x22c` otherwise, keyed by the attacker's UID or an ally NPC's owner UID; `32299d60` pushes ). March draws inline there too ( D4b kept it ).
 
 **Depends on:** Stage 13 (the item ids, done). It touches no other stage's files.
 
@@ -1591,6 +1593,10 @@ be placed by address.
 - About half of any unowned count is real work (`june2017_re/census/v2_sample.tsv`); the biggest gap (`X2GUUser..X2Data`) is mostly serializers.
 - Boss raid and world mission stay (user, 2026-11-09): identify them and route to Stage 22 or 39; wedding and mentor code found in a gap
   is excluded (needs a second real player).
+- **Found by june-stat-calc D4b (2026-11-13), owner not identified:** two user-`DamageReact` writes whose readers are in no stage yet.
+  `320832a0` stores each hit on the attacker ( or an NPC attacker's owner, `32759f00` ) as protected float `+0x90fc` ( callers `@32049a47`, NPC `@327b4d22` /
+  `@327b4f05`; sole reader `32955210`, called from `324babf1`, `326b3330` and `326b4863` ). `31fdcb70` counts a hit taken per attacking NPC id in map `+0x8854`,
+  but only for ids in the `g_pData +0x28c` set ( `326f8210` ); it is read by `323179c0` from `322f0020` beside `m_nDamageCount`, possibly a play report. Funcmap rows `StatCalc S33 D4b`.
 - **Depends on:** june-census Z. Start: `/x2-phase new-plan june-triage` (Opus 5.5 high), brief `kickoffs/june-backlog/stage40-plan.md`.
 
 ## Open decisions that gate stages

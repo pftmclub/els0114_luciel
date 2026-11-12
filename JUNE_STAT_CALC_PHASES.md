@@ -857,6 +857,60 @@ After commit `3812c4cd`: `flagcheck --range 3812c4cd^..3812c4cd`: 8 PASS, 1 DEFI
 
 **Bookkeeping.** `dr_blocks.tsv`, map, funcmap, divergence row, JUNE_BUGS 640, checklist 7aw, backlog Stages 19 / 20, D4b and D5 kickoffs, `MODS.md`.
 
+### Phase D4b - Done (2026-11-13)
+
+**Opus 5.5 / high. Flag `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4a's; two description lines added).** Commit: this commit. Insert-only:
+`X2GUUser.cpp` +133, `X2GUUser.h` +3, `Always.h` +2. `dr_blocks.tsv`: user 29 rows, 22 `June`, 6 `absent` (each a one-line stand-in or a routed
+write), 1 `n/a` (number display). Map rows 18 / 19 / 20 / 28 `June`, 31 re-checked; funcmap 10 rows `StatCalc S33 D4b`; divergence rows
+`GetBasicReducedDamagePercent` and `GetSocketReducedDamagePercentInCase` closed (`replace`, ported under the flag).
+
+**Ported (June `320462a0`, in June's order):**
+- @32048446 an AT_SPECIAL hit whose skill (`GetSkillTemplet( m_eUsedSkillID )`) is missing or not `ST_HYPER_ACTIVE_SKILL` (`32070510` != 5) is
+  x the new `m_fDamagedRateBySpecialActive` (June `+0x8e94`, ctor 1.0 @32040e56). Its only writer is Lu/Ciel's Nobility (`RNSI_P_LCN_NOBILITY`
+  30410, `SA_DAMAGED_REL`, @32b45ec0): x 1.0 for every March class (checklist 7j).
+- @32049359 Elesis Grand Master's provoke: `31f8ae70` is "attack type == AT_SPECIAL", so June takes every attack type but AT_SPECIAL
+  (March: AT_NORMAL only). The rest of the gate (unit / class, `+0x967c`, DD tests, hold / grab / riding / attacker front) = March.
+- `GetBasicReducedDamagePercent` (vslot `0x348` = `3201aff0`, user vtable `334781f4`) and `GetSocketReducedDamagePercent` (`32000320`) both start
+  with GT_PVE (`322cc1c0`) -> 0. The 16-step3b5 port left that out when March had no GT_PVE. The rest of both = June (re-read: set sum, interval
+  store, title return, random `+0x60`, DUNGEON_ONLY 2 / 3 + type, PVP_ONLY `322cc180`). No offline reach (no GT_PVE game).
+  March's `GetSocketReducedDamagePercentInCase` and its callers stay as they are: they are compiled out on US (`ADJUST_SECRET_ITEM_OPTION`
+  undefined) and have no live caller, and deleting them would break insert-only. The live function is the one with June's body.
+
+**Re-read, = June (no code):** GetFinalDamage call; Raven and Eve parries (0.7, 0.25, 70, 100, effect sets, Raven's sound); the basic reduction
+(monster term, boss, `52fc`, cap 1.0); penetrate; bone shield / SIEE 5; hitted count; slot `0x378` = `ApplyEnchantResist` (= March, in place);
+critical (head shot, rate + `+0x5d4`, WayOfSword, anti-critical clamp, threshold + `GetRandomFloat( 1 )`, stigma, jump table `3204a834` =
+`GetCriticalDamageRate`, >= 1.0); double attack; `GetDrainHpBuffValue` in place (after x2, before the drain); HP and MP drain; Ara quicken guard
+x 0; additional defence; additional attack k; provoke zero; Add stasis; hooks `0x4f8` / `0x4fc`; `322cfca0`, then `GetHpRateDamage`, then slot
+`0x304` (June's order, JUNE_BUGS 93); Add `0x6d8` / Lunatic Psyker `0x6f8`; damage count; random mission; Add DP; `UpNowHp( -damage )`; the
+tutorial clamp. June runs the random mission before the Add DP, March after it. The two are independent, so the order was left.
+
+**Stand-ins and routes (one-line comments in place):** @32048cdb Lu/Ciel back-hit scale (checklist 7aw); @320492ba Elesis `+0x9175` guard,
+whose owner is now identified: set @320476af on unit type 8 by her roll `32b524f0` on `+0x978c`, damage x `+0x9784` (checklist 7j / L477);
+@320492d9 Rose `32a7ff70`; @3204963d Lu/Ciel shadow shield (7j); @3204968f the 2017 treasure event (Stage 19); @320499dc Elesis `0x730` /
+`0x734` (char-elesis CH4c); @32049aeb Ain `32622e80` (Stage 8). Not class code, readers unknown, so the writer and its readers go together
+(rule 3): `320832a0` (the hit stored on the attacker / NPC owner, `+0x90fc`) and `31fdcb70` (hits per attacking NPC id, `+0x8854`), backlog Stage 40.
+The number display (`@32049752-3204998e`, skin vslots `0x230` / `0x22c`, queue `32299d60`) extends D4a's Stage 20 bullet.
+**Kept March, not in June here:** the `NEXON_QA_CHEAT_REQ` zero (in-house dev cheat) and `ProcessSkillAtDie`. June's death prevention
+(`320072d0` in `UpNowHp`) is not whole yet (checklist L261; Rena's Soft Body still lives in `ProcessSkillAtDie`).
+
+**Numbers.** The only new arithmetic is x `m_fDamagedRateBySpecialActive` (1.0) and a gate, so there is no emulation script (D4a likewise).
+**Debug line** (`_DEBUG`, same throttle): `[JUNE_STATCALC] REACT att= def= gfd= special= pre= crit=<0/1>><after> double= guard= add= hprate= dmg=
+hp=<before>><after>`: after GetFinalDamage, the special-active rate, before the critical, after it, after x2, after the guards + provoke +
+additional defence, after the additional attack + provoke zero, after the PvP halving + HP rate + slot `0x304`; then the HP change (my unit only).
+
+**Hygiene.** `flagcheck SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT --worktree --files X2GUUser.cpp X2GUUser.h Always.h`: 2 PASS, 1 DEFINE, 0 OTHER,
+0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL -> `RESULT: PASS`. `junediverge --check X2GUUser.cpp X2GUUser.h`: `RESULT: PASS`. `enumscan --reuse --check`:
+the 2 rows left are older lines (`X2GUUser.h:2561-2562`, NPC ids), not this phase's.
+After commit: see the follow-up commit for the `flagcheck --range` line.
+**Build.** `DEPLOY OK: X2_offline.exe is 26,366,976 B, dated 2026-11-13 00:59:45, md5 798e1d603edc6201a12db70400e4528d, equal to X2/US_SERVICE/x2.exe (2026-11-13 00:59:38); built at main 79ef54ec + 3 uncommitted code file(s).`
+`EXESTR OK: 2 of 2 found in X2_offline.exe, 26366976 B, dated 2026-11-13 00:59:45, md5 798e1d603edc6201a12db70400e4528d` (the user `REACT ... special=` and D4a's NPC `REACT ... share=` lines).
+
+**Play-test** (both sides, D4a and D4b): owed. Save set up (backups in `db_backup/`): Raven99 (unit 49) wears four Grendized Mechanized MK-2 (Raven) pieces 111816-111819 = set 1365
+4-piece option 41149 (`m_fDamageReduce` 0.5 at 30 %, dungeon only; no option in June's data always fires); ArmeDW (unit 53) has no reduction set or title.
+jtCodeEmpress (unit 27): Electronic Field 25020 in slot 5, Dimension Link Sentry 25000 (level 1) in slot 6. Henir element NPCs 1805 / 1806 spawn in no
+dungeon: the element check uses Altera Plain Normal 30270 (232 / 233 + barriers 234 / 235, last stage). `DAMAGED_FUNC` NPCs (3112 / 3113 / 3134) appear
+only in the unregistered 2017 event dungeons 41460 / 41470: not reachable offline.
+
 ## Phase D5 - Extra damage, enchant resist and level correction
 
 **Scope.** Under `SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE`: `LevelCorrectionExtraDamage` NPC `32760210` and the user's twin (June's

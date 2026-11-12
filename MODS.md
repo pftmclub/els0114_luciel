@@ -6776,3 +6776,11 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_elesis/ch0b_stage_li
 - **Files:** `X2GUNPC.cpp/.h`, `X2Game.cpp/.h`, `X2DamageManager.cpp/.h`, `X2GameUnit.h`, `X2Main.cpp`, `X2UnitManager.h`, `KTDXLIB/Always.h`.
 - **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4b continues under it); debug `[JUNE_STATCALC] REACT` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` in `KTDXLIB/Always.h`, rebuild; the four NPC names stay, unused.
+
+## User DamageReact from the final damage to the HP change as June's (june-stat-calc D4b, 2026-11-13)
+
+- **What:** in `CX2GUUser::DamageReact` (June `320462a0` @32048435-32049b70): an AT_SPECIAL hit whose skill is not hyper active is multiplied by the new member `m_fDamagedRateBySpecialActive` (June `+0x8e94`, 1.0; only Lu/Ciel's Nobility writes it); Elesis Grand Master's provoke takes every attack type but AT_SPECIAL (March: AT_NORMAL only); `GetBasicReducedDamagePercent` and `GetSocketReducedDamagePercent` return 0 in a GT_PVE game, as June's `3201aff0` / `32000320`. Lu/Ciel, Elesis (`+0x9175`, vslots `0x730` / `0x734`), Rose, Ain and the 2017 treasure-event steps are one-line stand-in comments (checklist 7j / 7aw, Stage 19).
+- **Why:** June's damage arithmetic on the user hit path; the rest of the section already matched June (re-read).
+- **Files:** `X2GUUser.cpp/.h`, `KTDXLIB/Always.h` (description lines only).
+- **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4a's); debug `[JUNE_STATCALC] REACT ... special=` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` in `KTDXLIB/Always.h`, rebuild (reverts D4a too).

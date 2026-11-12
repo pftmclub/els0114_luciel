@@ -5081,6 +5081,9 @@ public:
 	float m_fCommandHitTime;	/// June +0x9478, 16-step3c2 (ctor 0 @32041e26; a float copy of g_pKTDXApp->GetTime())
 #endif SERV_IRUHADEV_JUNE_SOCKET_EDT
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+	float m_fDamagedRateBySpecialActive;	// june-stat-calc D4b: June +0x8e94 ( ctor 1.0 @32040e56; only Lu/Ciel's Nobility 30410 writes it, 32b45ec0 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
 	float m_fDashJumpDownAccelRate;	/// June +0x8fb8 ( 1.2; Aisha's constructor sets 1.1 )
 	float m_fDashJumpSpeedRate;		/// June +0x8fbc ( 1.6; Aisha's constructor sets 1.2 )

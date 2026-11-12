@@ -12725,6 +12725,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              damage (SetDamageValueByForce) before the enchant resist, NOT_APPLY_DAMAGE_IN_DUNGEON, the sub-stage ally NPC tally,
 //              the state's DAMAGED_FUNC before the HP change, and GetDrainHpBuffValue adds the buff rate to the script's DRAIN_HP_RATE
 //              (June 32071c80). With _DEBUG: the per-hit "[JUNE_STATCALC] REACT" line.
+//              D4b: the user side, June 320462a0 @32048435-32049b70 (the special-active damaged rate, the Elesis provoke attack-type
+//              gate, class stand-ins), and the GT_PVE head of GetBasicReducedDamagePercent / GetSocketReducedDamagePercent.
 //              Revert: comment out the #define.
 #define SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #if defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ) && !( defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) && defined( SERV_IRUHADEV_ELYSION_SCRIPT_B ) && defined( BALANCE_BLADE_MASTER_20130117 ) )

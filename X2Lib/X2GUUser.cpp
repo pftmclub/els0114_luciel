@@ -890,6 +890,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 #ifdef  X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
 , m_bDoubleAttack( false )
 #endif  X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+, m_fDamagedRateBySpecialActive( 1.f )	// june-stat-calc D4b: June ctor @32040e56
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 #ifdef CRAYONPOP_EMOTION_WITH_MUSIC		// 크래용 팝 한벌 아바타 이모션, 사운드가 출력됨
 , m_bIsPlayAvatarEmotionSoundWithoutEmotion ( false )
@@ -9211,6 +9214,43 @@ bool CX2GUUser::HaveInstanceKillDebuff() const
 	return false;
 }
 #endif SERV_IRUHADEV_JUNE_BUFF_INSTANCE_KILL
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+namespace _CONST_GUUSER_D4B_
+{
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	struct DamageReactTrace	// june-stat-calc D4b: the damage after each group of June @3204843b-32049b30 for the REACT line
+	{
+		float fFinalDamage, fAfterSpecialActive, fBeforeCritical, fAfterCritical, fAfterDouble, fAfterGuard, fAfterAdditional, fAfterHpRate;
+		bool bCritical;
+		DamageReactTrace()
+			: fFinalDamage( 0.f ), fAfterSpecialActive( 0.f ), fBeforeCritical( 0.f ), fAfterCritical( 0.f ), fAfterDouble( 0.f )
+			, fAfterGuard( 0.f ), fAfterAdditional( 0.f ), fAfterHpRate( 0.f ), bCritical( false )
+		{}
+	};
+
+	inline __int64 GetDamageReactLogID( CX2GameUnit* pUnit_ )	// june-stat-calc D4b: NPC id or user UID, as the HIT line
+	{
+		if ( NULL == pUnit_ )
+			return 0;
+		return ( CX2GameUnit::GUT_NPC == pUnit_->GetGameUnitType() ) ? static_cast<__int64>( static_cast<CX2GUNPC*>( pUnit_ )->GetNPCTemplet().m_nNPCUnitID ) : pUnit_->GetUnitUID();
+	}
+
+	bool IsDamageReactLogDue( const CX2GameUnit* pAttacker_, const CX2GameUnit* pDefender_ )	// june-stat-calc D4b: one REACT line per pair, about once a second
+	{
+		static std::map< std::pair< const CX2GameUnit*, const CX2GameUnit* >, DWORD > s_mapDamageReactLogged;
+		if ( s_mapDamageReactLogged.size() > 256 )
+			s_mapDamageReactLogged.clear();
+		const DWORD dwNow = ::GetTickCount();
+		DWORD& dwLast = s_mapDamageReactLogged[ std::make_pair( pAttacker_, pDefender_ ) ];
+		if ( dwNow - dwLast < 1000 )
+			return false;
+		dwLast = dwNow;
+		return true;
+	}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+}
+using namespace _CONST_GUUSER_D4B_;
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 {
 #if defined( _SERVICE_ ) 
@@ -10775,6 +10815,22 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 // 			pDamageData->optrAttackerGameUnit->ModifyFinalDamageByGameUnitType( pDamageData );
 
 		float fFinalDamage = GetFinalDamage( pDamageData );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		DamageReactTrace kDamageReactTrace;	// june-stat-calc D4b: the REACT line
+		kDamageReactTrace.fFinalDamage = fFinalDamage;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		// june-stat-calc D4b: June @32048446-3204847a: a special active that is not a hyper active takes this user's damaged rate
+		if ( CX2DamageManager::AT_SPECIAL == pDamageData->attackType )
+		{
+			const CX2SkillTree::SkillTemplet* pUsedSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( pDamageData->m_eUsedSkillID );
+			if ( NULL == pUsedSkillTemplet || CX2SkillTree::ST_HYPER_ACTIVE_SKILL != pUsedSkillTemplet->m_eType )
+				fFinalDamage *= m_fDamagedRateBySpecialActive;
+		}
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterSpecialActive = fFinalDamage;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 #ifdef UPGRADE_RAVEN
 		// 레이븐 패링
@@ -10924,6 +10980,11 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		}
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fBeforeCritical = fFinalDamage;	// june-stat-calc D4b
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		D3DXVECTOR3 numPos;
 		GetFramePos( &numPos, m_pFrame_Bip01_Head );
 		numPos.y += 70.0f;
@@ -11084,6 +11145,13 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			}
 		}
 				
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterCritical = fFinalDamage;	// june-stat-calc D4b
+		kDamageReactTrace.bCritical = bShowRedPicture;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		// stand-in: Lu/Ciel not ported; June @32048cdb-32048d82: +0x80cd clear sets DD +0x5c0, then a UT_LUCIEL attacker scales the damage ( char-luciel, checklist 7aw )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef ADD_BACKATTACK
 		if( bBackAttack == true && bCriticalHit == false )
 		{
@@ -11145,6 +11213,11 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			bShowRedPicture = true; // 더블어택의 경우 빨간색으로 표시!!
 		}
 		
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterDouble = fFinalDamage;	// june-stat-calc D4b
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		bool bCanDrainHp = false;
 
 #ifdef BALANCE_BLADE_MASTER_20130117		/// 이펙트에도 피 흡수를 적용 시킬 수 있도록 수정
@@ -11219,6 +11292,10 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			}
 		}
 #endif
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		// stand-in: Elesis's +0x9175 guard not ported; June @320492ba-320492d5: set by her roll 32b524f0 ( +0x978c ), it scales the damage by her +0x9784 ( char-elesis )
+		// stand-in: Rose not ported; June @320492d9-320492f9: a UT_ROSE defender multiplies the damage by 32a7ff70( DD ) ( Stage 8 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 		bool bIsPossibleProvoke = false;			// 반격이 가능한 상태 인가?
@@ -11235,7 +11312,11 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 					// 피나 마나를 채워주는 형태가 아니고 더미 데미지 타입이 아니고, 센서 타입도 아니고
 					// 그라운드 히트 형태도 아니고 홀드 상태나 그랩 상태도 아니고 라이딩 펫 탄 상태도 아니고
 					// 때린 애가 자기 앞에 있고 Provoke Loop 상태 일 때만.........
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+					if (  CX2DamageManager::AT_SPECIAL != pDamageData->attackType && pDamageData->m_bNoDamage == false	// june-stat-calc D4b: June @32049359 ( 31f8ae70 = attack type is AT_SPECIAL )
+#else SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 					if (  CX2DamageManager::AT_NORMAL == pDamageData->attackType && pDamageData->m_bNoDamage == false 
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 						&& true == g_pData->GetDamageManager()->GetIsPossibleProvokeExtraDamage(pDamageData)
 						&& pDamageData->m_fHpPercentUp <= 0.f && pDamageData->m_fIncreaseMP <= 0.f 
 						&& pDamageData->reActResult != CX2DamageManager::RT_DUMMY_DAMAGE
@@ -11275,6 +11356,11 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		}
 
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterGuard = fFinalDamage;	// june-stat-calc D4b: after the guards, the provoke and the additional defence
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef SERV_ADD_ARME_BATTLE_MAGICIAN
 		if( pDamageData->m_bLvDamage == false )
 #endif
@@ -11347,6 +11433,11 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			}
 		}
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterAdditional = fFinalDamage;	// june-stat-calc D4b
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS
 		/// June CX2GUUser::DamageReact 320462a0 @320495d8-3204963b: a valid user attacker with a unit ( the stasis block's gate
 		/// without the Add type test ) gets vslots 0x4f8, then 0x4fc, with ( DD, damage ). Function scope.
@@ -11359,10 +11450,16 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 				pAttackerUser->OnAttackerDamageReact_Slot4FC( pDamageData, fFinalDamage );
 			}
 		}
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		// stand-in: Lu/Ciel not ported; June @3204963d-32049674: a UT_LUCIEL defender whose shadow shield 32aebaf0 takes 0.2 of the hit keeps x 0.8 ( checklist 7j )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		/// June @32049678-3204968a: 322cfca0 on the game, after the attacker hooks ( and the Lu/Ciel shield and the 2017 event
 		/// block, neither ported ), before the HP-rate call
 		if ( NULL != g_pX2Game )
 			g_pX2Game->PvpAmusementHalveDamage( pDamageData, &fFinalDamage );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		// stand-in: event manager not ported; June @3204968f-32049719: a DI_EVENT_2017_TREASURE NPC's hit costs 0.1 of max HP and 2 s of invincibility ( Stage 19 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #endif SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS
 
 		// UI상 타격된 데미지를 보여주기 위한 용도
@@ -11378,6 +11475,11 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		if ( null != pDamageData->optrAttackerGameUnit )
 			pDamageData->optrAttackerGameUnit->OnDamageDoneToDefender_Slot304( fFinalDamage, pDamageData );
 #endif SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		kDamageReactTrace.fAfterHpRate = fFinalDamage;	// june-stat-calc D4b: after the PvP halving, the HP-rate overwrite and slot 0x304
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		float fFinalDamageToShow = fFinalDamage;
 #ifdef ALWAYS_SCREEN_SHOT_TEST
 		if( g_pInstanceData->GetScreenShotTest() == false)
@@ -11485,9 +11587,16 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		}
 	#endif //SERV_9TH_NEW_CHARACTER
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+		// stand-in: Elesis not ported; June @320499dc-32049a19: a UT_ELESIS defender calls vslots 0x730( damage ) and 0x734( DD, damage ) ( char-elesis CH4c )
+		// june-stat-calc D4b: June @32049a1b-32049a47 stores the hit on the attacker or an NPC attacker's owner ( 320832a0, +0x90fc; reader 32955210 ): Stage 40
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		if( IsMyUnit() == true )
 		{
 			m_nDamageCount++;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+			// june-stat-calc D4b: June @32049a73 then counts the hit per attacking NPC id ( 31fdcb70, map +0x8854, read by 322f0020 ): Stage 40
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 	#ifdef SERV_9TH_NEW_CHARACTER // 김태환
 			/// 애드일 땐, 피격시 DP 수치 올려 주자
@@ -11512,6 +11621,12 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			}
 #endif SERV_IRUHADEV_JUNE_RANDOM_MISSION
 			float fOldHP = GetNowHp();
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+			// stand-in: Ain not ported; June @32049aeb-32049b0e: a UT_AIN defender calls the damage manager's 32622e80( this, attacker, DD ) ( Stage 8 )
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+			const float fHpBeforeReact = GetNowHp();	// june-stat-calc D4b
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
 //#ifdef PVP_BOSS_COMBAT_TEST
 //
@@ -11579,6 +11694,16 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			//{{AFX
 			UpNowHp( -fFinalDamage );
 			//}}AFX
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+			// june-stat-calc D4b: June @3204843b-32049b30: the damage after each group, then the HP change ( same throttle as GFD2 )
+			if ( IsDamageReactLogDue( pAttackerUnit, this ) )
+				CX2OfflineLog::Server( L"[JUNE_STATCALC] REACT att=%I64d def=%I64d gfd=%.0f special=%.0f pre=%.0f crit=%d>%.0f double=%.0f guard=%.0f add=%.0f hprate=%.0f dmg=%.0f hp=%.0f>%.0f",
+					GetDamageReactLogID( pAttackerUnit ), GetDamageReactLogID( this ), kDamageReactTrace.fFinalDamage, kDamageReactTrace.fAfterSpecialActive,
+					kDamageReactTrace.fBeforeCritical, ( kDamageReactTrace.bCritical ? 1 : 0 ), kDamageReactTrace.fAfterCritical, kDamageReactTrace.fAfterDouble,
+					kDamageReactTrace.fAfterGuard, kDamageReactTrace.fAfterAdditional, kDamageReactTrace.fAfterHpRate, fFinalDamage, fHpBeforeReact, GetNowHp() );
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 //#endif PVP_BOSS_COMBAT_TEST
 
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_MODE
@@ -27878,6 +28003,10 @@ float CX2GUUser::GetSkillAdditionalPowerRate( const int iSkillID_ ) const
 */
 float CX2GUUser::GetSocketReducedDamagePercent( const CX2SocketItem::SocketData& kSocketData_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+	if ( NULL != g_pX2Game && CX2Game::GT_PVE == g_pX2Game->GetGameType() )	// june-stat-calc D4b: June 32000320 @3200034b ( 322cc1c0 )
+		return 0.f;
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 	if ( kSocketData_.m_fDamageReduce > 0.0f && kSocketData_.m_fPercentDamageReduce > GetRandomFloat() )
 	{
 		if ( true == kSocketData_.m_bDungeonOnly )
@@ -30960,6 +31089,10 @@ float CX2GUUser::GetBasicReducedDamagePercent()
 	///   32000320's is PvP only (322cc180), JUNE_BUGS #56 (the same thing on March, which has no PvE).
 	/// The US build has no ADJUST_SECRET_ITEM_OPTION (Always_US.h:4 undefines it), so March here is the #else below: the first
 	/// set option that fires returns, with no interval and no cool time; June's per-socket interval gate is new on US.
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+	if ( NULL != g_pX2Game && CX2Game::GT_PVE == g_pX2Game->GetGameType() )	// june-stat-calc D4b: June 3201aff0 @3201b026 ( 322cc1c0 )
+		return 0.f;
+#endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 	float fSetSum = 0.f;
 	for ( int optionIndex = 0; optionIndex < (int)m_vecSetItemOptions.size(); optionIndex++ )
 	{
