@@ -256,6 +256,15 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   wired only Ara's `ProcessLockOn`. Its other June readers skip such an NPC too: `CX2Game` target picks `322d0f70`, `322d1240`, `322d4a10`, `322d7670`,
   `322daa10`, `322dadd0` (March `GetLockOnNearstTarget*`, stand-in comment `X2Game.cpp:16010`; `MODS.md` "not identified"), NPC `32771b80`, `32773cd0`,
   `32774750`; Elesis `32b7ad80` comes with char-elesis. Port each reader's test (funcmap row `327a0fa0 @327abb70`).
+- **Stun -> groggy test polarity in `CommonFrameMove`** (char-luciel DU2, 2026-11-14). June `32063650 @32067598-3206779f`: a stunned unit (not
+  groggy, no detonation / force-down flag, `m_bChangeGroggyState` false) that is IN one of the hit-reaction states (getters `0x46c`-`0x4a0`, `0x114`,
+  `0x118`, `0x48c`, riding `0x55` / `0x56`) is sent to groggy (riding: `0x55`); in any other state nothing happens. March (`X2GUUser.cpp`,
+  `NOT_CANCEL_BBT_STUN_BY_HIT` switch) does the opposite: those states keep their hit reaction, every other state goes groggy. DU2 routed the state
+  set through the getters and kept March's polarity. Every class, combat feel under stun: port June's test whole (funcmap row `32063650 @32067598`).
+- **`LT_JUMP_DOWN` foot lines** (char-luciel DU2, 2026-11-14). June line type 11 (`Enum.lua` `LT_JUMP_DOWN`; March's `LINE_TYPE` stops at
+  `LT_CLIFF` 10, `KTDGLineMap.h:61` notes the gap) has a handler `31fd7350` called from `PhysicProcess` `32015b30 @3201a246`: on such a line, unless
+  the unit is in a down / air-fall / air-down-landing state (getters `0x114` / `0x118` / `0x494` / `0x490`), `CanDown` drops it through the line.
+  First find which June line maps carry type 11, then register the member and port the handler (funcmap row `31fd7350`).
 
 ### Stage 3: skill system core (skill tree engine + skill slots)
 

@@ -13182,3 +13182,13 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA needs SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET ( m_MajorUnitName / m_MinorUnitName )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel DU2 - June's damage-state getters are CX2GUUser virtuals (base vtable 334781f4): groggy 0x468, small /
+//              big 0x46c-0x478, down 0x114 / 0x118, stand-up / air 0x47c-0x4a4, and GetJumpDownStateID 0x458; the bases return March's
+//              USI_ constants. PhysicProcess_Jumping, ForceDownAndDetonationProcess, the stun test in CommonFrameMove, IsDamageState,
+//              IsSocketDownTargetState and Aisha's skill lookup ask them as June does. No class overrides them until Lu/Ciel (CH1).
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+//////////////////////////////////////////////////////////////////////////

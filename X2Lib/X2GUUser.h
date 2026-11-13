@@ -1476,8 +1476,13 @@ public:
 		int							GetDashStateID(){ return USI_DASH; }
 		int							GetDashEndStateID(){ return USI_DASH_END; }
 		int							GetChargeMpStateID() { return m_ChargeMpState; }
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+		virtual int					GetDamageGroggyStateID() const { return USI_DAMAGE_GROGGY; }		/// char-luciel DU2: June user vslot 0x468 ( base 3208de40 )
+		virtual int					GetDamageAirDownStateID() const { return USI_DAMAGE_AIR_DOWN; }	/// June user vslot 0x488 ( base 330de230 )
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		int 						GetDamageGroggyStateID() const { return USI_DAMAGE_GROGGY; }
 		int 						GetDamageAirDownStateID() const { return USI_DAMAGE_AIR_DOWN; }
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 
 		virtual int					GetComboZStateID() const { return USI_WAIT; }
 		virtual int					GetComboXStateID() const { return USI_WAIT; }
@@ -1485,12 +1490,20 @@ public:
 #ifdef RIDING_SYSTEM
 		// 오현빈 // 코드 정리를 위해 스테이트 얻는 함수 추가
 		int			 GetWaitStateID() { if (true == GetRidingOn()) return USI_RIDING_WAIT; return m_CommonState.m_Wait; }
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+		virtual int	  GetJumpDownStateID() { if( true == GetRidingOn()) return USI_RIDING_JUMP_DOWN; return USI_JUMP_DOWN; }	/// char-luciel DU2: June user vslot 0x458 ( base 3208de10 )
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		USER_STATE_ID GetJumpDownStateID() { if( true == GetRidingOn()) return USI_RIDING_JUMP_DOWN; return USI_JUMP_DOWN; }
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		USER_STATE_ID GetWinStateID() { if (true == GetRidingOn()) return USI_RIDING_WAIT_HABIT; return USI_WIN; }
 		USER_STATE_ID GetLoseStateID() { if (true == GetRidingOn()) return USI_RIDING_WAIT; return USI_LOSE; }
 #else
 		int			  GetWaitStateID(){ return m_CommonState.m_Wait; }
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+		virtual int	  GetJumpDownStateID() { return USI_JUMP_DOWN; }	/// char-luciel DU2: June user vslot 0x458
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		USER_STATE_ID GetJumpDownStateID() { return USI_JUMP_DOWN; }
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		USER_STATE_ID GetWinStateID() { return USI_WIN; }
 		USER_STATE_ID GetLoseStateID() { return USI_LOSE; }
 #endif //RIDING_SYSTEM
@@ -2104,9 +2117,29 @@ public:
 		const CKTDXDeviceXSkinMesh* GetMotion() const { return m_pMotion; }
 
 
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+		/// char-luciel DU2: June's damage-state getters are user virtuals ( base vtable 334781f4 ); Lu/Ciel ( 334f06fc ) overrides them
+		virtual int GetDamageSmallFrontStateID() const { return USI_DAMAGE_SMALL_FRONT; }			/// vslot 0x46c
+		virtual int GetDamageSmallBackStateID() const { return USI_DAMAGE_SMALL_BACK; }				/// vslot 0x470
+		virtual int GetDamageBigFrontStateID() const { return USI_DAMAGE_BIG_FRONT; }				/// vslot 0x474
+		virtual int GetDamageBigBackStateID() const { return USI_DAMAGE_BIG_BACK; }					/// vslot 0x478
+		virtual int GetDamageDownLandFront() const { return USI_DAMAGE_DOWN_FRONT; }				/// vslot 0x114
+		virtual int GetDamageDownLandBack() const { return USI_DAMAGE_DOWN_BACK; }					/// vslot 0x118
+		virtual int GetDamageStandUpFrontStateID() const { return USI_DAMAGE_STANDUP_FRONT; }		/// vslot 0x47c
+		virtual int GetDamageStandUpBackStateID() const { return USI_DAMAGE_STANDUP_BACK; }			/// vslot 0x480
+		virtual int GetDamageAirSmallStateID() const { return USI_DAMAGE_AIR_SMALL; }				/// vslot 0x484
+		virtual int GetDamageAirDownInvincibleStateID() const { return USI_DAMAGE_AIR_DOWN_INVINCIBLE; }	/// vslot 0x48c
+		virtual int GetDamageAirDownLanding() const { return USI_DAMAGE_AIR_DOWN_LANDING; }			/// vslot 0x490
+		virtual int GetDamageAirFallStateID() const { return USI_DAMAGE_AIR_FALL; }					/// vslot 0x494
+		virtual int GetDamageAirUpStateID() const { return USI_DAMAGE_AIR_UP; }						/// vslot 0x498
+		virtual int GetDamageAirFlyFrontStateID() const { return USI_DAMAGE_AIR_FLY_FRONT; }		/// vslot 0x49c
+		virtual int GetDamageAirFlyBackStateID() const { return USI_DAMAGE_AIR_FLY_BACK; }			/// vslot 0x4a0
+		virtual int GetDamageRevengeStateID() const { return USI_DAMAGE_REVENGE; }					/// vslot 0x4a4
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		int GetDamageDownLandFront() const { return USI_DAMAGE_DOWN_FRONT; }
 		int GetDamageDownLandBack() const { return USI_DAMAGE_DOWN_BACK; }
 		int GetDamageAirDownLanding() const { return USI_DAMAGE_AIR_DOWN_LANDING; }
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 
 
 

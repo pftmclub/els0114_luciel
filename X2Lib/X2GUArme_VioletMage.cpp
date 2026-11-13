@@ -33902,7 +33902,11 @@ bool CX2GUArme_VioletMage::SpecialAttackLookup( CX2SkillTree::ACTIVE_SKILL_USE_C
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 		{
 			const int iFutureStateID = GetFutureStateID();
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+			if( GetDamageDownLandFront() == iFutureStateID || GetDamageDownLandBack() == iFutureStateID || GetDamageAirDownLanding() == iFutureStateID )	// char-luciel DU2: June @32cec2bf asks vslots 0x114 / 0x118 / 0x490
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 			if( USI_DAMAGE_DOWN_FRONT == iFutureStateID || USI_DAMAGE_DOWN_BACK == iFutureStateID || USI_DAMAGE_AIR_DOWN_LANDING == iFutureStateID )
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 				eSkillUseCondition = CX2SkillTree::ASUT_ANYTIME_EXCEPT_AIR;
 		}
 	}

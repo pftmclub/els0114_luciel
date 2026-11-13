@@ -43,3 +43,13 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   Still `?` (name it by the class pattern from the hint in col 7): `32ae9de0` `32ae9f20` `32b0fa20` `32b143e0` `32b1c960`.
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7 L251 skill-use function 32b1eef0 (vtable +0x800, also slot 512 the reserved-skill hoo; §7 L276 Spec A / B readers 32b14860 (A and B) and 32b37910 (B); §7 L282 vslot 485 (+0x794) override 32b0e670 (CX2GULuciel vtable 334f06fc): skill-group ; §7l L474 virtual 32b34680 (slot 0x568): target check via JuneIsBoundingLandCrash 0x2f4 / ; §7q L557-562 Luciel getter bodies 32b4d810 (0x114), 32b4d850 (0x118), 32b4d990 (0x48c), 32b4d; §7t L602 user vslot 0x51c override 32b4dbe0: state 0x17 or a Luciel state (@32b4dc12) -> ; §7t L611 sound sets: JuneIsHyperModeState also picks the HYPER / BERSERK sound set in Com; §7al L880-888 new CX2GUUser hooks: 0x654, 0x850 (after-image frame move), 0x860, 512, 0x638; §7an L927 GetCharacterSpecializationB readers Lu/Ciel 32b14950 / 32b3794d.
 - The DU2 getters (0x114, 0x118, 0x458, 0x48c, 0x490, 0x494) and the rest of the band from 0x49c: names from June's registration ids (`ch0_reg.tsv`), not March's enum.
+
+## Amended by DU2 (2026-11-14)
+
+- `CX2GUUser` now declares the damage-state getters as virtuals under `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (`X2GUUser.h`). Lu/Ciel's
+  overrides use these exact names and signatures, never a CH0 name: `virtual int <name>() const` for 0x468 `GetDamageGroggyStateID`, 0x46c
+  `GetDamageSmallFrontStateID`, 0x470 `GetDamageSmallBackStateID`, 0x474 `GetDamageBigFrontStateID`, 0x478 `GetDamageBigBackStateID`, 0x114
+  `GetDamageDownLandFront`, 0x118 `GetDamageDownLandBack`, 0x47c `GetDamageStandUpFrontStateID`, 0x480 `GetDamageStandUpBackStateID`, 0x484
+  `GetDamageAirSmallStateID`, 0x488 `GetDamageAirDownStateID`, 0x48c `GetDamageAirDownInvincibleStateID`, 0x490 `GetDamageAirDownLanding`, 0x494
+  `GetDamageAirFallStateID`, 0x498 `GetDamageAirUpStateID`, 0x49c `GetDamageAirFlyFrontStateID`, 0x4a0 `GetDamageAirFlyBackStateID`, 0x4a4
+  `GetDamageRevengeStateID`; and `virtual int GetJumpDownStateID()` (0x458, not const). The engine readers already ask them (DU2 Done note).

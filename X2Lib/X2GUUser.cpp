@@ -20169,6 +20169,25 @@ void CX2GUUser::CommonFrameMove()
 			}
 			else
 #endif NOT_CANCEL_BBT_STUN_BY_HIT
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+			{
+				// char-luciel DU2: June CommonFrameMove @32067598-3206776c asks vslots 0x46c-0x4a0 / 0x114 / 0x118 / 0x48c ( June groggies IN these states: routed )
+				const int iNowStateID = GetNowStateID();
+				const bool bStunKeepsHitReaction =
+#ifdef NOT_CANCEL_BBT_STUN_BY_HIT
+					GetDamageSmallFrontStateID() == iNowStateID || GetDamageSmallBackStateID() == iNowStateID || GetDamageBigFrontStateID() == iNowStateID
+					|| GetDamageBigBackStateID() == iNowStateID || GetDamageStandUpFrontStateID() == iNowStateID || GetDamageStandUpBackStateID() == iNowStateID
+					|| GetDamageAirSmallStateID() == iNowStateID || GetDamageAirDownStateID() == iNowStateID || GetDamageAirDownLanding() == iNowStateID
+					|| GetDamageAirFallStateID() == iNowStateID || GetDamageAirUpStateID() == iNowStateID || GetDamageAirFlyFrontStateID() == iNowStateID
+					|| GetDamageAirFlyBackStateID() == iNowStateID ||
+#endif NOT_CANCEL_BBT_STUN_BY_HIT
+					GetDamageDownLandFront() == iNowStateID || GetDamageDownLandBack() == iNowStateID || GetDamageAirDownInvincibleStateID() == iNowStateID
+#ifdef RIDING_SYSTEM
+					|| USI_RIDING_DAMAGE_FRONT == iNowStateID || USI_RIDING_DAMAGE_BACK == iNowStateID
+#endif RIDING_SYSTEM
+					;
+				if ( false == bStunKeepsHitReaction )
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 			{
 				switch ( GetNowStateID() )
 				{
@@ -20197,6 +20216,7 @@ void CX2GUUser::CommonFrameMove()
 					break;
 
 				default:
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 					{
 #ifdef RIDING_SYSTEM
 						/// 탈것에 탑승시에는 탈것의 스테이트로 전환
@@ -20204,10 +20224,15 @@ void CX2GUUser::CommonFrameMove()
 							StateChange( USI_RIDING_DAMAGE_FRONT );
 						else
 #endif // RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+							StateChange( GetDamageGroggyStateID() );
+					}
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 							StateChange( GetDamageGroggyStateID() );
 					}
 					break;
 				}		
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 			}
 		}
 	}
@@ -26541,11 +26566,19 @@ void CX2GUUser::PhysicProcess_Jumping( CKTDGLineMap* pLineMap )
 				{
 					m_bOnJumpUpLine = true;		// June 31fd6d92 / 31fd702a: set before the state tests
 
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+					if( GetDamageDownLandFront() == GetNowStateID() ||		// char-luciel DU2: June 31fd6da9 / 31fd7070 ask vslots 0x114 / 0x118 / 0x494 / 0x490
+						GetDamageDownLandBack() == GetNowStateID() ||
+						GetDamageAirFallStateID() == GetNowStateID() ||
+						GetDamageAirDownLanding() == GetNowStateID() )
+						break;
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 					if( USI_DAMAGE_DOWN_FRONT == GetNowStateID() ||
 						USI_DAMAGE_DOWN_BACK == GetNowStateID() ||
 						USI_DAMAGE_AIR_FALL == GetNowStateID() ||
 						USI_DAMAGE_AIR_DOWN_LANDING == GetNowStateID() )
 						break;
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 
 					if( GetJumpDownStateID() == GetNowStateID() &&
 						true == m_InputData.pureDown &&
@@ -40714,6 +40747,13 @@ void CX2GUUser::ProcessSocketEffectByAttackSuccess( CX2DamageManager::DamageData
 bool CX2GUUser::IsSocketDownTargetState( const bool bFuture_ ) const
 {
 	const int iStateID = ( true == bFuture_ ) ? static_cast<int>( m_FrameDataFuture.syncData.nowState ) : static_cast<int>( m_FrameDataNow.syncData.nowState );
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+	// char-luciel DU2: June 3208eb60 asks vslots 0x46c-0x478, 0x484, 0x494-0x4a4
+	return GetDamageSmallFrontStateID() == iStateID || GetDamageSmallBackStateID() == iStateID || GetDamageBigFrontStateID() == iStateID
+		|| GetDamageBigBackStateID() == iStateID || GetDamageAirSmallStateID() == iStateID || GetDamageAirFallStateID() == iStateID
+		|| GetDamageAirUpStateID() == iStateID || GetDamageAirFlyFrontStateID() == iStateID || GetDamageAirFlyBackStateID() == iStateID
+		|| GetDamageRevengeStateID() == iStateID;
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 	switch ( iStateID )
 	{
 	case USI_DAMAGE_SMALL_FRONT:
@@ -40730,6 +40770,7 @@ bool CX2GUUser::IsSocketDownTargetState( const bool bFuture_ ) const
 	default:
 		return false;
 	}
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 }
 
 /// June 3202b9a0: the own unit's SIEE 19; when it fires, CommonEventProcess knocks the unit down once (+0x8e78)
@@ -44948,10 +44989,19 @@ void CX2GUUser::CountReservedSkillUse()
 bool CX2GUUser::IsDamageState( const bool bFuture_ )
 {
 	const int iStateID = ( true == bFuture_ ) ? GetFutureStateID() : GetNowStateID();
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+	// char-luciel DU2: the getters June asks, so Lu/Ciel's own damage states count
+	return GetDamageSmallFrontStateID() == iStateID || GetDamageSmallBackStateID() == iStateID || GetDamageBigFrontStateID() == iStateID
+		|| GetDamageBigBackStateID() == iStateID || GetDamageDownLandFront() == iStateID || GetDamageDownLandBack() == iStateID
+		|| GetDamageAirSmallStateID() == iStateID || GetDamageAirDownStateID() == iStateID || GetDamageAirDownInvincibleStateID() == iStateID
+		|| GetDamageAirDownLanding() == iStateID || GetDamageAirFallStateID() == iStateID || GetDamageAirUpStateID() == iStateID
+		|| GetDamageAirFlyFrontStateID() == iStateID || GetDamageAirFlyBackStateID() == iStateID || GetDamageRevengeStateID() == iStateID;
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 	return USI_DAMAGE_SMALL_FRONT == iStateID || USI_DAMAGE_SMALL_BACK == iStateID || USI_DAMAGE_BIG_FRONT == iStateID || USI_DAMAGE_BIG_BACK == iStateID
 		|| USI_DAMAGE_DOWN_FRONT == iStateID || USI_DAMAGE_DOWN_BACK == iStateID || USI_DAMAGE_AIR_SMALL == iStateID || USI_DAMAGE_AIR_DOWN == iStateID
 		|| USI_DAMAGE_AIR_DOWN_INVINCIBLE == iStateID || USI_DAMAGE_AIR_DOWN_LANDING == iStateID || USI_DAMAGE_AIR_FALL == iStateID
 		|| USI_DAMAGE_AIR_UP == iStateID || USI_DAMAGE_AIR_FLY_FRONT == iStateID || USI_DAMAGE_AIR_FLY_BACK == iStateID || USI_DAMAGE_REVENGE == iStateID;
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
@@ -48801,6 +48851,15 @@ void CX2GUUser::Send_SKILL_USE_REQ( CX2SkillTree::SKILL_ID eSkillID )
 #ifdef FIX_FORCE_DOWN_AND_DETONATION_BUG
 void CX2GUUser::ForceDownAndDetonationProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+	// char-luciel DU2: June 3202a9c0 asks vslots 0x114 / 0x118 / 0x48c, then the two riding damage states
+	const int iNowStateID = GetNowStateID();
+	if ( GetDamageDownLandFront() == iNowStateID || GetDamageDownLandBack() == iNowStateID || GetDamageAirDownInvincibleStateID() == iNowStateID
+#ifdef RIDING_SYSTEM
+		|| USI_RIDING_DAMAGE_FRONT == iNowStateID || USI_RIDING_DAMAGE_BACK == iNowStateID
+#endif RIDING_SYSTEM
+		)
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 #ifdef SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 	switch ( m_itNowStateData->first )
 #else SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
@@ -48814,6 +48873,7 @@ void CX2GUUser::ForceDownAndDetonationProcess()
 	case USI_RIDING_DAMAGE_FRONT:
 	case USI_RIDING_DAMAGE_BACK:
 #endif //RIDING_SYSTEM
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		{
 #ifdef SERV_IRUHADEV_JUNE_FORCE_DOWN_FLUSH
 			/// June 3202a9c0 ( C3f ): bDet = UpdateDamageFlushMP ( 32a33d50 ); then the force-down flag is only TESTED ( +0xf8 ): set -> nowSpeed.y ( +0x308 ) = 0
@@ -48863,10 +48923,14 @@ void CX2GUUser::ForceDownAndDetonationProcess()
 			}
 #endif SERV_IRUHADEV_JUNE_FORCE_DOWN_FLUSH
 			
+#ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
+		}
+#else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		} break;
 	default:
 		break;
 	}
+#endif SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 }
 #endif //FIX_FORCE_DOWN_AND_DETONATION_BUG
 
