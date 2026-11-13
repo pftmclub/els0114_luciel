@@ -548,6 +548,32 @@ parser flag), Always.h. Log `[JUNE_CHAR] LUCIEL DATA` (ErrorLog, the NU1 fix-1 i
   second-body rows 7, major body Lu, minor body Ciel`, then NU1's three NEWUNIT lines (635-637); 0 EXCEPTION, 0 XEM_ERROR144 / 148,
   0 KEM_ERROR72, 0 unbound Lua names. The 5 UNHANDLED `E_DISABLE_HB_CHECK_REQ` are the dev heartbeat toggle, not NU3.
 
+### NU3 - Review (2026-11-14)
+
+Opus 5.5 high. **Verdict: pass, no code change.** Covers `f0b8249e` against `nu0_templet_keys.tsv` and June `AddUnitTemplet_LUA` `3237aa40`.
+- **Members** (`X2Unit.h`): 17, June's key names and types (2 name wstrings, 5 int minor promotion items, 7 motion wstrings, 2 floats); the three
+  minor cut-ins stay with `JUNE_HYPER_CUT_IN_TIME`, no second copy.
+- **Defaults, Ghidra (read-only):** `majorUnitName` `@3237afc0` / `minorUnitName` `@3237b1eb` miss -> `mov [esp+0x18],ebp`, EBP = -1 from
+  `3237ad0d` (`or ebp,0xffffffff`) = `STR_ID_EMPTY` (-1, `StringID_def1.h:7`), then the string-table call `31c31060`; weapon item `@3237cde7`
+  miss -> `mov [edi],0`; `m_fLobbyRotationY` `@3237f0da` miss -> `fldz; fstp`. Each miss falls through to the next key: no key fails the row.
+- **Order:** minor items / motions after the game motions and the rotations after `introMovieFIleName` = June. The two names sit after the
+  `description` read, June reads them before it; key reads are independent table lookups and `description` fails the row either way, so the
+  difference has no effect (noted, not moved).
+- **Rows** (re-run by a helper): pre-NU3 `UnitTemplet.lua` from `kom_backup_tools\data036.kom.20261114_013807` (51,112 B, sha1 = the ledger row at
+  `f0b8249e^`); current file's first 51,112 bytes equal it; the 10,956-byte tail = June `UnitTemplet.src.lua:1723-2024` joined with CRLF. Luajit
+  stub dump: 59 -> 66 rows, diff `1492a1493,1780` (row counts `59a60,66`), nothing else. All 7 rows carry the 16 `LUA_GET_VALUE_RETURN` keys.
+- **`DATA` line:** ErrorLog 634 `rows 7 of 66, second-body rows 7, major body Lu, minor body Ciel` (exe e9dee3d6).
+- **Enum.lua:** data036 line 288 `UT_END = 13` (June `Enum.src.lua:313`), no stale C++ comment; no other `.lua` in `kom_contents` names `UT_END`.
+- **Stale comment, not edited:** the `JUNE_HYPER_CUT_IN_TIME` block's comment in `AddUnitTemplet_LUA` still says March has neither rotation key
+  (C3t's line; old comments are not rewritten).
+- **Hygiene:** flagcheck `MINOR_UNIT_TEMPLET --with JUNE_CHAR_LUCIEL_DATA --range f0b8249e^..f0b8249e`: `files: 2 PASS, 0 PASS~ (blank/marker
+  only), 1 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`; `in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 0
+  EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. No later commit touches either
+  flag. junediverge `--check-all`: `RESULT: PASS` (232 allow-listed). `LEDGER CHECK PASS: 0 FAIL, 0 WARN`; `CORE CHECK PASS: 0 FAIL, 0 WARN`.
+- **Logs:** 0 EXCEPTION, 0 XEM_ERROR144 / 148, 0 unbound Lua names.
+- Build: none (no code change). DU1 ready (char-chung Z closed; kickoff carries "Amended by NU3"); NU4 waits on the NU2 review (its kickoff
+  carries "Amended by NU3").
+
 ## Phase DU - The two-body engine (DU1-DU5)
 
 | Sub-phase | Scope | Flag |
