@@ -644,6 +644,7 @@ UNIT_TYPE_RANGE, UNIT_CLASS_WORD, MINOR_UNIT_TEMPLET and JUNE_CLASS_CHANGE_GUIDE
 - `DEPLOY OK: X2_offline.exe is 26,521,088 B, dated 2026-11-14 05:25:52, md5 90b3df890f0d39ea3a24dcb6807fdc08` (built at 0102ee15 + the 14
   NU4 files). `EXESTR OK: 6 of 6` (both `LUCIEL CREATE` formats, `DLG_Unit_Background_Luciel.tga`, `LucielVoice_Introduce.ogg`,
   `SelectVoiceTable.lua`, `LucielCreateUnitSlot`, wide) and `1 of 1` (`AddVoice`).
+- Commit `5f01aed9`; flagcheck `--range 5f01aed9^..5f01aed9` (all three flags): same tallies, 0 deleted lines, `RESULT: PASS`.
 - **Not ported (left):** June's jumping-character mode (`+0x71c`, `_JUMPING` msgs), the new-character badge, the minor body / rotation (DU5),
   the tutorial route (TU: a Lu/Ciel's first Game Start would enter Elsword's tutorial and the class does not exist before CH1).
 - **How to see it:** creation screen slot 10 (right of Elesis); create a Lu/Ciel; select screen lists him; `[JUNE_CHAR] LUCIEL CREATE` lines.
