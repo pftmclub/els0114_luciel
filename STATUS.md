@@ -108,7 +108,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH2a | **ready** (CH1 review passed): Knight (8) skills; no review of its own; both touch `X2GUEL.cpp` with CH5, so one at a time | Sonnet 5.5 / high, user play-test | CH1 review | `X2GUEL.*` | `CH2a.md` |
+| CH2a | **play-test owed** (2026-11-13): Knight (8) skills in under `_SKILL`; max re-use count / back step wait for CH4a; no review of its own (CH2d covers it) | Sonnet 5.5 / high, user play-test | CH1 review | `X2GUEL.*` | `CH2a.md` |
 | CH2b | blocked (CH2a): Saber Knight (29) special actives (CH0 split) | Sonnet 5.5 / high, user play-test | CH2a | `X2GUEL.*` | `CH2b.md` |
 | CH2b2 | blocked (CH2b): Saber Knight actives 28202 / 28203 / 28204 (CH0 split) | Sonnet 5.5 / high, user play-test | CH2b | `X2GUEL.*` | `CH2b2.md` |
 | CH2c | blocked (CH2b2): Pyro Knight (30) skills | Sonnet 5.5 / high, user play-test | CH2b2 | `X2GUEL.*` | `CH2c.md` |

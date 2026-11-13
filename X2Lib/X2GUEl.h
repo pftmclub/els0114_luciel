@@ -646,6 +646,20 @@ protected:
 	void ESI_SI_A_EL_DODGE_AND_SLASH_EventProcess();
 	void ESI_SI_A_EL_DODGE_AND_SLASH_SECOND_StartFuture();
 	void ESI_SI_A_EL_DODGE_AND_SLASH_ATTACK_Z_EventProcess();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	void ESI_SI_A_EL_DODGE_AND_SLASH_StateStart();	/// char-elesis CH2a: June 32b572e0
+	void ESI_SI_A_EL_DODGE_AND_SLASH_StateEndFuture();	/// char-elesis CH2a: June 32b72600
+	void ESI_SI_A_EL_DODGE_AND_SLASH_ATTACK_Z_StateStart();	/// char-elesis CH2a: June 32b704c0
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_READY_StateStart();	/// char-elesis CH2a: June 32b4f7e0
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_READY_StateStartFuture();	/// char-elesis CH2a: June 32b4f800
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_READY_EventProcess();	/// char-elesis CH2a: June 32b58e70
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_CHARGE_StateStart();	/// char-elesis CH2a: June 32b4f830
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_CHARGE_FrameMove();	/// char-elesis CH2a: June 32b75580
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_CHARGE_EventProcess();	/// char-elesis CH2a: June 32b4f840
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE_StateStart();	/// char-elesis CH2a: June 32b4f8a0
+	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE_FrameMove();	/// char-elesis CH2a: June 32b70db0
+	void ESI_SI_SA_EL_WILD_SHOCK_FrameMove();	/// char-elesis CH2a: June 32b75760
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à
 	void ESI_SI_A_EL_LEAP_CRASH_EventProcess();
@@ -1160,6 +1174,12 @@ protected:
 	USHORT m_usDignityOfGrandMasterLevel;	/// char-elesis CH1k: June +0x9796 ( level of RNSI_P_SGM_DIGNITY_OF_GRAND_MASTER; CH4a writes it )
 	float m_fPunishEffectPowerRate;			/// char-elesis CH1k: June +0x9754 ( ability 6 of RNSI_P_SCA_PUNISH, the power rate of Endurance Power's Punish effect set; CH4a / CH4c write it )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	float m_fSonicAssaultStingChargeTime;	/// char-elesis CH2a: June +0x96f0 ( time held in the Sonic Assault: Sting memo charge state; ctor 0 )
+	UINT m_uiDodgeAndSlashAttackCount;		/// char-elesis CH2a: June +0x95b4 ( KProtectedType, ported plain ): Z / X attacks used in this Dodge and Slash, one allowed
+	int m_iWaltzOfSwordDodgeAbility;		/// char-elesis CH2a: June +0x9654 ( KProtectedType, ported plain ): ability 0x1b of RNSI_P_SGM_WALTZ_OF_SWORD; CH4a writes it
+	float m_fDodgeAndSlashConsumedMp;		/// char-elesis CH2a: June +0x9778 ( MP the Dodge and Slash start spent while that ability is set; CH4a resets it )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )
 	bool m_bIsMadnessActive;			/// char-elesis CH1h: June +0x97ac ( set while the HP share is under the Madness threshold; CH4c writes it )

@@ -2640,6 +2640,21 @@ public:
 	RNSI_P_SSK_FIRST_STRIKE                               = 28401,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names Elesis's Knight skill cases and Dodge and Slash's Waltz of Sword term spell ( values from June's Enum.lua )
+	RNSI_SA_EL_SPIRAL_BLAST                               = 28000,
+	RNSI_SA_EL_WILD_SHOCK                                 = 28001,
+	RNSI_SA_EL_MEGA_BURSTER                               = 28002,
+	RNSI_SA_EL_UNLIMITED_BLADE                            = 28004,
+	RNSI_SA_EL_SPIRAL_BLAST_UPGRADE                       = 28026,
+	RNSI_SA_EL_WILD_SHOCK_UPGRADE                         = 28027,
+	RNSI_SA_EL_MEGA_BURSTER_UPGRADE                       = 28028,
+	RNSI_SA_EL_UNLIMITED_BLADE_UPGRADE                    = 28030,
+	RNSI_A_EL_DODGE_AND_SLASH_UPGRADE                     = 28217,
+	RNSI_P_SGM_WALTZ_OF_SWORD                             = 28403,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )
