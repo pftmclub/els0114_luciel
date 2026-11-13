@@ -376,3 +376,44 @@ phase that ports it); funcmap rows tagged `C3z-4t`. User 2026-11-13 (after the s
   death -> `OnBeginGuideNo(101)`), C3z-4t2 (GFx adapter, play-test, review of t1 + t2), C3z-4t3 (game-side gates, incl. the four owed items
   from C3p-2 and Q5b), C3z-4t4 (walkthrough steps 2xx-9xx, fresh-character walk, review of t3 + t4). Kickoffs in `kickoffs/june-dungeons/`.
 - **Routed elsewhere:** none. The per-class input-mask notes in the checklist (section 7: Eve `32978e80`) are served by T3's base `31fcea10` port.
+
+## C3z-4t1 - Done (2026-11-13, Opus 5.5 high): the tutorial guide manager, its table, Lua and key-hint dialogs
+
+Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE` (+ `_DEBUG`: begin / step / end / refuse lines, the C3z-4t2 review retires it). Log tag `JUNE_FX C3z-4t`
+(offline_server.log). Map: `june2017_re/c3z4t_scope.tsv`; every function carries its June address.
+
+- **Class.** New `X2Lib/X2TutorialGuideManager.h/.cpp` (in `X2Lib_2010.vcxproj`): June's whole manager except the GFx movie and the outside
+  callers. Embedded in `CX2Main` (`m_TutorialGuideManager`, June +0x8c4; `GetTutorialGuideManager()` = `31d70b00`), ticked after
+  `CheckClearMovieEnd` (`31d90300 @31d9143c`), loaded in `CX2StateStartUp::LoadData` after the game option (`3259bb20 @3259bbe2`), exit
+  hook in `CX2DungeonGame::Release` beside the key restore (`327d2160 @327d21ae` -> `OnExitTutorial` = `31fc3cc0`).
+- **Table.** `LoadTutorialGuideInfo` (`31fbe4a0`): 52 keys transcribed from the disassembly (key -> scene offset -> type -> default, read off
+  the XOR'd strings and each reader's store); the 0x9c B scene is `GuideScene` with June's offsets in comments. `SERVER_EVENT_TYPE 1` stores
+  June's event id 0x101 (t3 maps it). Repeated `GUIDE_NO` keeps the first row (std::map insert, as June).
+- **State machine.** begin `31fc5d70`, start mode `31fbdc40`, `CanBeginGuide` `31fc4530` (level > 7 / any account unit 10+ outside a dungeon,
+  verbatim), step `31fc4060`, end `31fc4c40`, event NPC / camera wait `31fc4d80` / `31fc4e30`, key wait `31fc6130`, timers `31fc6490` /
+  `31fc6050`, finish / next / replay `31fc5ec0` / `31fc5f80` / `31fc6360` / `31fc6450`. The step's allowed-key list (ESC + F2) is March's
+  `KTDIDevice` list (DIVERGE_GET_KEY_STATE) with two new setters (`31d25490` / `31d254e0`).
+- **Lua.** `CX2TutorialGuideManager` class + 9 methods (binder `31d95080 @31e3a0ab`), `CX2Game::GetTutorialGuideManager` (`322cc010`).
+  `luabind.py check Benders_Actor Dungeon_Tutorial_Elsword`: Benders 0 unbound; Dungeon_Tutorial_Elsword's 3 left are C3y-2's
+  (`PopTalkBox`, `IsOnSomethingNow`, `ShowJumpGuide`), its 9 ENUM rows (`NUI_TUTORIAL_*`, `WI_TUTORIAL_ELSWORD_STAGE0`) too.
+- **Key-hint dialogs.** `ShowInputGuideUI` `31fc4fa0`, side guide `31fc46d0`, hide / fade `31fbdcf0` / `31fc52f0`, blink and key pictures
+  `31fbdd30` / `31fc4960` / `31fc5570`, `CheckEventTriggerNPCPos(X)` `31fc3f80` / `31fc3e80`, `CheckAndResetInputAlarm` `31fbdcc0`.
+- **Data (PACK OK / COPY OK data034, data036, data057, data081).** New June bytecode: data036 `TutorialGuideInfo.lua`, data034
+  `DLG_UI_Tutorial_Input_Guide.lua` / `_Side_Guide.lua` (records `june_adopt_20261113_091510/091515.tsv`); new assets data057
+  `DLG_UI_Common_Texture_Tutorial_01.tga/.TET`, data081 `Tuto_Ui_Notice01.ogg`; none replaced. Core data036 `Enum.lua`: June's
+  `INPUT_GUIDE_STEP` after `MEMO_ID`; ledger / core check PASS.
+- **Stand-ins (one-line comments in the code).** GFx adapter `+0xb8` and show / hide (`32965a60` / `329659b0`) are t2. Scene 101 needs no
+  stand-in: June's frame stop writes only `CX2Game +0x2d8` (no June reader) and `g_pTFieldGame +0x12c` (= `SetEnableKeyProcess`), so
+  nothing freezes; the scene ends on the skill key (`GA_SKILL1` / `GA_SKILL4`) or ESC. June-only members with no March counterpart,
+  skipped and routed to t3: dialog manager `+0x111` (quest reward gate, already t3), `g_pMain+0x3f5` zoom lock (+ reader `3245a8f0`),
+  `CX2StateMenu +0x43d` (msg 122 in a guild), `CX2State` vslot `0xb0`, the now-state's `+0x378`, party manager `+0x8a`, the `+0xc4`
+  start blocker (no June writer found). Likely, not proven: unit vslot `0x170` = `GetIsRight` (`3208dff0` reads `+0x80f6` beside
+  GetPos's `+0x80dc`); `g_pMain+0x1cd` = `m_bPlayGuide`.
+- **Hygiene.** flagcheck `--worktree` (9 files): 6 PASS, 2 FAIL = the new files' `#include "StdAfx.h"` / `#pragma once` (house
+  precedent), 1 ERROR = the `_DEBUG` `#error` guard; 0 deleted lines, 0 non-ASCII, 0 encoding changes. junediverge `RESULT: PASS`;
+  enumscan 0 A/B. Deps checked by `cl` probe: DIVERGE_GET_KEY_STATE, TUTORIAL_MODE, INIT_FOCUS_UNIT, GFX_MANAGER defined.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,407,936 B, dated 2026-11-13 10:02:09, md5 2763c264. EXESTR OK 3 of 3 (wide: the load and begin
+  lines, `DLG_UI_Tutorial_Input_Guide.lua`) and 2 of 2 (`GetTutorialGuideManager`, `CheckEventTriggerNPCPosX`).
+- **The account quirk and the play-test.** Every unit type in the save has a level 10+ character, so `CheckToNeedTutorialGuide` (Benders,
+  `31fbde90`) returns false for any new character and `CanBeginGuide` would refuse outside a dungeon anyway. The play-test drives scene 101
+  from the console inside a dungeon (level checks skipped there, as June). t4 owns the fresh-account walk.

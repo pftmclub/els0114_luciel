@@ -151,6 +151,10 @@ class CKTDIDevice
 		bool                  m_bUseAllowedKeyList;	// June +0x1178 ( setter 31d25490, tutorial guide: not ported )
 		std::vector<unsigned char> m_vecAllowedKeyList;	// June +0x117c
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GET_KEY_STATE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+		void SetUseAllowedKeyList( bool bUse_ ) { m_bUseAllowedKeyList = bUse_; if( false == bUse_ ) m_vecAllowedKeyList.clear(); }	// june-dungeons C3z-4t1: June 31d25490
+		void AddAllowedKey( unsigned char ucKey_ ) { m_vecAllowedKeyList.push_back( ucKey_ ); }	// june-dungeons C3z-4t1: June 31d254e0
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 
 #ifdef KEY_MAPPING
 		unsigned char		  m_ActionMap[GAMEACTION_END];

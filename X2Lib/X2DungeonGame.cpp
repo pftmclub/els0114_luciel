@@ -327,6 +327,10 @@ CX2DungeonGame::~CX2DungeonGame(void)
 	if( NULL != g_pMain && true == g_pMain->GetIsExitingTutorial() )
 		g_pMain->OnExitTutorialRestoreKeys();
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_MODE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+	if( NULL != g_pMain && true == g_pMain->GetIsExitingTutorial() )
+		g_pMain->GetTutorialGuideManager().OnExitTutorial();	// june-dungeons C3z-4t1: June 327d2160 @327d21ae
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 
 	CX2Game::Release();	/// 상위 클래스의 소멸자가 나중에 호출
 }

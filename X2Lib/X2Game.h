@@ -1617,6 +1617,9 @@ void ShowTimerAlarm( int iIndex, float fValue_ );
 		void			SendRandomMissionRewardEXPCheat( int iValue_ );
 		void			SendRandomMissionRewardBuffCheat( int iValue_ );
 #endif SERV_IRUHADEV_JUNE_RANDOM_MISSION
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+		class CX2TutorialGuideManager*	GetTutorialGuideManager();	// june-dungeons C3z-4t1: June 322cc010 ( X2TutorialGuideManager.cpp )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 		virtual	bool			Handler_EGS_RESURRECT_TO_CONTINUE_DUNGEON_NOT( KEGS_RESURRECT_TO_CONTINUE_DUNGEON_NOT& kEGS_RESURRECT_TO_CONTINUE_DUNGEON_NOT );
 
 		void					SetShowSmallGageAndNameForAllGameUnit( const bool bShow_ );

@@ -12840,3 +12840,25 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ( the cut-in reader and the InitState set index )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t1: June's CX2TutorialGuideManager ( CX2Main +0x8c4 ): TutorialGuideInfo.lua loader, guide state machine,
+//              9 Lua methods + CX2Game::GetTutorialGuideManager, the two key-hint dialogs. GFx movie is t2, game-side gates t3 / t4.
+//              Revert: comment out the #define ( JUNE_TUTORIAL_GUIDE ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) && ( !defined( SERV_IRUHADEV_JUNE_DIVERGE_GET_KEY_STATE ) || !defined( SERV_IRUHADEV_JUNE_TUTORIAL_MODE ) || !defined( INIT_FOCUS_UNIT ) )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE needs SERV_IRUHADEV_JUNE_DIVERGE_GET_KEY_STATE ( allowed-key list ), SERV_IRUHADEV_JUNE_TUTORIAL_MODE ( tutorial exit ) and INIT_FOCUS_UNIT
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t1 debug: logs JUNE_FX C3z-4t begin / step / end / refuse ( offline_server.log ). The C3z-4t2 review retires it.
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+//////////////////////////////////////////////////////////////////////////

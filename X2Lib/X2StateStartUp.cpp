@@ -263,6 +263,9 @@ void CX2StateStartUp::LoadData()
 	g_pData->ResetPartyManager();
 
 	g_pMain->GetGameOption().OpenScriptFile();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+	g_pMain->GetTutorialGuideManager().Load();	// june-dungeons C3z-4t1: June 3259bb20 @3259bbe2, after the game option load
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 
 #ifdef OPTIMIZATION_DEV_MODE
 	g_pMain->GetGameOption().SetTexDetail( CX2GameOption::OL_LOW );

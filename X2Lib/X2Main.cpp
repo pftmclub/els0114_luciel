@@ -3002,6 +3002,9 @@ HRESULT CX2Main::OnFrameMove( double fTime, float fElapsedTime )
 #ifdef SERV_IRUHADEV_JUNE_QUEST_MOVIE
 	CheckClearMovieEnd();	// June 31d90300 @31d91398-31d91419, after the info-box lifetime block
 #endif SERV_IRUHADEV_JUNE_QUEST_MOVIE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+	m_TutorialGuideManager.OnFrameMove( fTime, fElapsedTime );	// june-dungeons C3z-4t1: June 31d90300 @31d9143c
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 #ifdef BANDICAM_CAPTURE
 	m_fCaptureDelay -= fElapsedTime;
 	if( m_fCaptureDelay < 0.0f )
@@ -3592,6 +3595,18 @@ void CX2Main::RegisterLuabind()
 #ifdef SERV_IRUHADEV_JUNE_QUEST_MOVIE
 	lua_tinker::class_def<CX2Main>( L, "AddDungeonClearMovieTemplet_LUA",	&CX2Main::AddDungeonClearMovieTemplet_LUA );	/// June 31d95080 @31dab9e5 ( 31d8cb90 )
 #endif SERV_IRUHADEV_JUNE_QUEST_MOVIE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+	lua_tinker::class_add<CX2TutorialGuideManager>( L, "CX2TutorialGuideManager" );	// june-dungeons C3z-4t1: June 31d95080 @31e3a0ab
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "CheckEventTriggerNPCPosX",	&CX2TutorialGuideManager::CheckEventTriggerNPCPosX );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "CheckEventTriggerNPCPos",	&CX2TutorialGuideManager::CheckEventTriggerNPCPos );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "ShowInputGuideUI",			&CX2TutorialGuideManager::ShowInputGuideUI );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "HideInputGuideUI",			&CX2TutorialGuideManager::HideInputGuideUI );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "GetNowGuideNo",				&CX2TutorialGuideManager::GetNowGuideNo );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "CheckAndResetInputAlarm",	&CX2TutorialGuideManager::CheckAndResetInputAlarm );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "CheckToNeedTutorialGuide",	&CX2TutorialGuideManager::CheckToNeedTutorialGuide );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "OnBeginGuide",				&CX2TutorialGuideManager::OnBeginGuide );
+	lua_tinker::class_def<CX2TutorialGuideManager>( L, "OnBeginGuideNo",			&CX2TutorialGuideManager::OnBeginGuideNo );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 
 
 	lua_tinker::class_add<CX2QuestManager>( L, "CX2QuestManager" );
@@ -4140,6 +4155,9 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2Game>( L, "PushCreateNPCReq_LUA3",					&CX2Game::PushCreateNPCReq_LUA3 );
 #endif CREATE_NPC_REQ_FULL_ARGUMENTS
 	lua_tinker::class_def<CX2Game>( L, "GetMyUnit",								&CX2Game::GetMyUnit );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+	lua_tinker::class_def<CX2Game>( L, "GetTutorialGuideManager",				&CX2Game::GetTutorialGuideManager );	// june-dungeons C3z-4t1: June 31dd631f ( 322cc010 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 	lua_tinker::class_def<CX2Game>( L, "IsKeyPressed",							&CX2Game::IsKeyPressed );
 	lua_tinker::class_def<CX2Game>( L, "IsSkipKeyPressed",						&CX2Game::IsSkipKeyPressed );
 	lua_tinker::class_def<CX2Game>( L, "GetGameTime",							&CX2Game::GetGameTime );

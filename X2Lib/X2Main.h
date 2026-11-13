@@ -630,6 +630,9 @@ using boost::mt19937;
 #ifdef SERV_IRUHADEV_JUNE_SKILL_NOTE
 #include "./X2SkillNoteManager.h"
 #endif SERV_IRUHADEV_JUNE_SKILL_NOTE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#include "./X2TutorialGuideManager.h"	// june-dungeons C3z-4t1
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 #ifdef ENUM_CHILD_WINDOW
 BOOL CALLBACK EnumChildProc_Thread(HWND , LPARAM);
 #endif
@@ -1257,6 +1260,9 @@ class CX2Main : public CKTDXStage
 		//CX2GameOption*	GetGameOption(){ return	&m_GameOption; }
         CX2GameOption&	GetGameOption(){ return	m_GameOption; }
 //}} robobeg : 2013-09-17
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+		CX2TutorialGuideManager&	GetTutorialGuideManager() { return m_TutorialGuideManager; }	// june-dungeons C3z-4t1: June 31d70b00
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 		//CX2UnitLoader*	GetUnitLoader(){ return	&m_UnitLoader; }
 		CX2Data*		GetX2Data(){ return m_pData; }
 		CKTDXStage*		GetNowState(){ return m_pNowState; }
@@ -2827,6 +2833,10 @@ public:
 	void							ClearSeenClearMovie();							/// June 324625b0 @32462657
 	void							PlayClearMovieByID( int iMovieID_ );			/// June 31d884f0
 #endif SERV_IRUHADEV_JUNE_QUEST_MOVIE_TAB
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+private:
+	CX2TutorialGuideManager			m_TutorialGuideManager;		// june-dungeons C3z-4t1: June +0x8c4
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 }; // CX2Main
 
 extern CX2Data*			g_pData;
