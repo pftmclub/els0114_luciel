@@ -1988,7 +1988,7 @@ All 11 class-map rows read from `charport_adis.py elesis --phase CH3b2` and the 
   `EXESTR OK: 1 of 1 found` ( md5 871680f0 ): narrow `ESI_A_SBH_FLAME_PROTECTION`.
 - **Save:** unit 30 ( `ElesisBH`, class 121, lv 80, not transcended; backup `db_backup/els_db_20261114_044735_pre_sql.sql` ): A 0 Flame Sword 28210, A 1 Scalet Rose 28211, A 2 Flame Protection 28223 ( all learned at level 1 already );
   the CH3b skills are unslotted ( learned ), slots 3-9 empty.
-- **Play-test: owed.** Log tag `[JUNE_CHAR]` ( `ELESIS SKILL` equip lines, `ELESIS SKILL SBUF` for Flame Sword 28210 BFI 299 and Flame Protection BFI 928 ).
+- **Play-test: passed (2026-11-14, exe `871680f0`).** Logs: 3 equip lines ( states 49 / 51 / 53 ); `SBUF` state 49 BFI 299 ( 3 casts ) and state 53 BFI 928; `ES_CREATE EffectSet_A_SBH_FLAME_SWORD_Finish` ( state 223 ), `EffectSet_A_SBH_Scalet_Rose_Pulling` ( success state 226, twice ), `EffectSet_BUFF_A_SBH_FLAME_PROTECTION` + `EffectSet_A_SBH_FLAME_PROTECTION` ( state 53 ); ErrorLog 0 Elesis lines, 0 Motion Error, 0 unbound Lua names ( 2 old UNHANDLED `E_DISABLE_HB_CHECK_REQ` ). Log tag `[JUNE_CHAR]`.
 
 ## Phase CH4 - Passives and class mechanics
 
