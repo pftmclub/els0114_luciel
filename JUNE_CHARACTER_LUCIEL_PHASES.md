@@ -530,7 +530,10 @@ parser flag), Always.h. Log `[JUNE_CHAR] LUCIEL DATA` (ErrorLog, the NU1 fix-1 i
   junediverge `--check` (2 files): `RESULT: PASS`. enumscan: no row in NU3's lines (the 17 are the existing `UNIT_CLASS` definitions).
 - **Compile:** `/Zs` probe of `X2UnitManager.cpp` (no PCH): exit 0, 0 errors; `/P` has the DATA line, both new parse blocks and the members.
   Build: first `build.py --deploy --pch force` failed in X2Lib on char-elesis CH3b0's uncommitted `ELESIS_SUMMON` guard (`Always.h:12769`
-  `#error`), not NU3's; nothing deployed. Re-run once that guard compiles.
+  `#error`), not NU3's; nothing deployed.
+  Deployed by a peer's build after char-elesis's fix `029ca9e1`: exe 26,488,832 B, dated 2026-11-14 02:08:40, md5 e9dee3d698e1420fe434100dcb726b2a;
+  `EXESTR OK: 1 of 1` (the DATA format string, wide) and `EXESTR OK: 3 of 3` (`m_fMinorUnitLobbyRotationY`, `minorUnitName`, `m_MinorUnitGameMotion0`).
+  Range flagcheck `f0b8249e^..f0b8249e`: `files: 2 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; 0 deleted; `RESULT: PASS`.
 - **How to see it:** start the game to the server / character select; ErrorLog has one `[JUNE_CHAR] LUCIEL DATA` line next to the three NU1
   `LUCIEL NEWUNIT` lines. An existing character's select / village / dungeon is unchanged.
 
