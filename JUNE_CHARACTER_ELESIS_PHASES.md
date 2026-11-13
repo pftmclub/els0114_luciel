@@ -1890,6 +1890,33 @@ One-file `/Zs` probes (`census.cl_cmd`, no PCH): `X2GUEL.cpp` and `X2Game.cpp` 0
 Wall, Blood Cutter and Scalet Rose have no skill case until CH3b / CH3b2 / CH3c, and the Fire Blossoms buff needs CH4a's passive on a June-id save; their hand-offs carry
 `[JUNE_CHAR] ELESIS SUMMON req npc ...` and `[JUNE_CHAR] SUMMON npc ...`).
 
+### CH3b0 - Review (2026-11-14)
+
+Opus 5.5. **Pass, no code change.** Commit `7473d4bf` read against June in Ghidra (read-only), `charport_adis.py elesis 32b8b0c0`, and the jump table read from `unpacked_x2.exe`.
+- **0x24c `32b89260`:** switch = 238 `+0x95d4`, 298 `+0x96d4`, 239 / 326 / 565 Victorious Sword, 940 Soul Ignition; Victorious Sword sets 1.0, then level `31fce5c0( 28008 )`
+  (= `GetSkillLevel( id, false, 0, true )`), `> 0` (JLE), then `31fca8e0( 28008, 1 )`, ability 0x6a at that level with bPvp 0 (`SA_DECREASE_REL` = 106, `SA_EFFECTIVE_RATE` = 5,
+  counted in `X2SkillTree.h`, no `#if` in the range); Soul Ignition takes the templet first and skips the `@32b8930d` write on null. Both saved-debuff tails = `+0x64 == 1`,
+  `+0x66 == 0`, `32369cc0` false (the Fire Blossoms one keeps March's `IsDeBuff` / `IsWorldBuff` / `IsNonControlDebuff`); Blood Runaway's = `word +0x9724 != 0` and `32b6fb10 == 1`.
+- **`32b6fb10`:** riding -> false; 9999.0, tier 1 / 2 / 3 -> `+0x9728 / +0x972c / +0x9730`; `FCOMPP` (elapsed vs interval), `TEST AH,5`, `JNP` -> false only when elapsed < interval.
+  That is MSVC's x87 code for `elapsed >= interval` (NaN counts as true there), so the port's `>=` compiles to June's test.
+- **0x250 `32b74500`:** 298 / 238 cleared, 239 / 326 / 565 -> `+0x9610` 0 and `+0x9614` 1.0, 940 -> `+0x8e50` 0; 294: March's effect set, then `31f8b010( IsMyUnit, 0x61f, 0, 1,
+  GetLandPosition (vslot 0x554), GetIsRight, 0.0, 1, -1, team, NAT_ALLY, uid, 0, -1, 0 )`; the three trailing args are March's `CreateNPCReq` defaults (`bElite`, `TN_NONE`, `NCT_NONE`).
+- **`32b79db0`:** the bound `min( byte +0x9788, 3 )` is re-read each pass; `GetRandomFloat( i )` (vslot 0x1cc) x 450.0 + 50.0 in double, then stored as float; `31c60890( &GetPos( 0 ), dist,
+  GetIsRight, &vPos )`; `PlayEffectSet( name, this, 0, 0, -1, -1, (1,1,1), true, &vPos, 0-vector, 0-vector, 1.0 )` (the custom position is the blossom's spot, by stack offsets);
+  the 16-arg `322e67c0` call is behind `IsMyUnit`; then `+0x9788 = 0` before vslot 0x7dc.
+- **Spawns:** Wall `@32b7a37d` `CMP word +0x97a4, 0 / JBE` -> 0x663 else 0x7b3; level = the dword the frame move saved from now-state `+0x10` (SETNZ); delay 0, noDrop 1, key -1.
+  The helper reads `IsHyperState()` when called, which is the same state and frame as June's read before the seek. Blood Cutter: `GetPos( 0 )`, 0.3 (`3345993c`), level 0, owner gate.
+- **`3230c1a0`:** 0x7b3 `JZ 3230cb83` @3230c3b9; 0x663 `JZ 3230cb83` @3230ca4b; 0x669 falls through to the default `3230ca5c`; 0x61f -> index 0x93, byte 5, `3230d060[5]` = `3230ca5c`.
+  `3230cb83` = flags 1, the default flags 0, rate 1.0 each. The skills 28211 / 28018 / 28018 / 28023 = `summon_npc_skill_map.tsv` (`31fcf520`).
+- `#else` paths: no deleted line in any code file (the 5 in the range are `Always.h`'s CH1k define block becoming the defined one). Widths: `unsigned char` `+0x9788`, `USHORT` `+0x9724`.
+- `CH3b.md` "Amended by CH3b0" checked: it is accurate, no change.
+
+**Hygiene.** `flagcheck JUNE_CHAR_ELESIS_SUMMON --range 7473d4bf^..7473d4bf --with _SUMMON_DEBUG`: `files: 3 PASS, 0 PASS~ (blank/marker only), 1 DEFINE, 3 OTHER (other flags), 0 FAIL,
+0 ERROR`; `in this flag's files: 5 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`;
+`RESULT: PASS`. OTHER = `X2BuffFactor.h` / `X2SkillTree.h` / `X2UnitManager.h` (`JUNE_ENUM_NAMES` names); DEFINE = `Always.h` (+19 -5). `git log -S` the flag after `7473d4bf`: none.
+`junediverge.py --check-all`: `allow-listed: 232`, `RESULT: PASS`. `enumscan.py --check X2GUEL.cpp X2Game.cpp`: `0 A/B row(s) remain in 2 file(s) (C 0, D 1, X 3 ignored)`.
+**Full build skipped: no play-test** (no code change; the spawns are reached in CH3b / CH3b2 / CH3c / CH4a). `_SUMMON_DEBUG` stays (CH3d retires it).
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, one Opus review at CH4c (covers CH4a-CH4c), user play-test (three engine pieces, planned as three from the start).
