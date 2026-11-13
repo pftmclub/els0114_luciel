@@ -627,6 +627,48 @@ instant-complete button in 411. offline_server.log: `begin` / `step` / `end` for
 411 ( by complete quest ), 516 -> 507 -> 508; then `refuse: unit level above 7 outside a dungeon` for 11050 at level 8 (June's own test). ErrorLog.txt:
 0 `C3z-4t` lines. Not seen: 201 (11005 was done before Ruben was left); user: left to the C3z-4t4 review's hand-off.
 
+## C3z-4t4 - Review (2026-11-13, Opus 5.5 high): pass, t3 + t4 + t4b match June; the three `_DEBUG` defines retired
+
+Covers C3z-4t3 (`52951ffe`), C3z-4t4 (`d393113b`) and C3z-4t4b (`b29b62bc`). No transcription error found; no code changed but `Always.h`.
+
+- **t3, against the disassembly: match.** ESC `31f1e1a0` @`31f1e1e8`-`31f1e212` (31fbda90 running, 31fbdb20 = `[+0x66] != 1` = scene `+0x4e`
+  ANY_KEY_ALLOW, eaten -> return false). Dialog manager `+0x111`: writer `31fc42ba` (scene `+0x74` DIALOG_CREATE_ALLOW == 1 -> 0, else 1), clear at
+  EndGuide's tail (`31fc4c40`, beside `+0xd8 = -20`), readers `323d2cb1` (after the -1 test, before the sound) and `31d7d9cc` (June returns an empty
+  handle {-1, 0}, the port NULL; the t3 audit stands). StateChange `@31d88e27` StopGuide; village `@31d8943f` (`g_pTFieldGame +0x12c = 0` after
+  AddUnit) and `@31d8946f`-`31d89493` (31fbdfa0, then a jump past the deferred scene); battle field `@31d896aa`. `31fc63f0`: `+0xd8` first, state 0 ->
+  false, not 4 -> true, `+0x70/74/78` -> 31fc6360 EndGuideStep, `+0x80/84/88`, `+0x7c`, 0x7156 / 0x7157 (= the port's scene fields `+0x58`-`+0x70`);
+  its call site `31efa9c0` @`31efaac9` after `+0xb5`, eaten -> true. `31fc63d0` (state 4 and `+0x6c` = scene `+0x54`) first in `31f2ab80` @`31f2abe1`.
+  SetShowUI `32154820`: the `0x16a` tutorial and `+0xe4 < 3` terms zero `+0x89` / `+0x8b` in both riding branches = the port's two setters. Input mask:
+  `31fcea10` (tutorial only; unit type from `CX2Unit +0xaf0`) and `320708f0`, mapped to March's InputData byte offsets (`+0x10` Z ... `+0x48` LCtrl,
+  `+0x4c` Sit = June `+0x8726` - `+0x86da`, `+0x50` / `+0x54` the slot-10 keys): every case, the fall-throughs, the Lu / Ciel (type 10) skill step and the
+  tail match. Zoom `3245a8f0` (`+0x3f5` -> key taken, no zoom). Party `+0x8a`: `3243d4e0` @`3243d751` / `@3243d771`; `3243c260` reasons 0x411 / 0x412 /
+  0x73f reach `@3243c646` (`+0x8a = 0`, 31fc6020) with no branch out. ShortCutKeyProcess `@31f0d998`: June's third term 31fbde80 is IsPlayingTutorial
+  again, so the port's two terms are exact. Cash shop `@3223d698`, busy `@3230238f`, local map `@322b5a3a` (guide or 0 -> 0x2710 = March's fallback).
+- **t4, against the disassembly: match.** `31fc5920` / `31fc59f0` / `31fc5ae0` match scene `+0x14` / `+0x10` + `+0x22` / `+0x18`, call `31fc4530( 1,
+  prio == 2, +0x08 )` / `( 1, 0, +0x08 )` / `( 1, 0, +0x08 )`; PRIORITY_HIGH over a running guide reserves `+0xcc = +0x18` and calls `31fc4c40` (=
+  EndGuide). `31fc5c20` / `31fbe080`: per id the first scene with field 0 or equal, PRIORITY_HIGH push_front, front returned, the next reserved even if
+  the first cannot begin, `31fc4530( 0, 0, +0x08 )`. `31fc4c30` (state 6 -> step). `31f31990` (8-byte sub-quests, `+6` = success). Field ctor
+  `@3250a047`-`3250a289` (complete quest -> 31fc5ae0 then jump to 31fc5c20 with the vector so far; village id `g_pData +0x268 +0x64`).
+  **Battle-field id now confirmed:** `g_pData +0x124` is the battle-field manager (`32481fa0( g_pData +0x124 )` is March's
+  `GetIsBossRaidCurrentField`: state 0x15, then `GetIsBossRaidFieldByFieldID( [this +0x10] )`), so `+0x134` = `m_uiBattleFieldIdWhereIam` = the port's
+  `GetBattleFieldIdWhereIam`; funcmap row updated. `324b90b0` @`324b9119`-`324b9134` (31fc5e70 once, `+0x5ca`). `32f17780` @`32f17917` after `+0x28` /
+  `+0x2c`. `31f09b50` @`31f09c83`-`31f09ce5` (after `32331a30` UpdateUnitQuest, sub-quest id). `323e4cb0` @`323e5294` (the packet's quest id
+  `local_48[0]`). `323e3cab` (31fc5e30 after `323d2c60`). `322e5b40` (quest map copy, `begin()`, `+0xaf8` written by Reset `@323627da`; JUNE_BUGS 647
+  stands). `322c2930` @`322c2cbe` (dungeon side after `+0x146 = 1`).
+- **t4b:** `323d18c5`-`323d190c` read again: `810.0f`, `22.0`, `173.0`, `SetPos` `31cd2060`. Match.
+- **Routed bullets exist:** Stage 4 "The quest informer's June rework" (`32f17780`, `323e05f0`); Stage 28 (`322c3fa0`, `3243bed0` / `3243c260`).
+- **Hygiene.** flagcheck `_GATES --range 52951ffe^..52951ffe --with _GATES_DEBUG`: 13 PASS, 3 PASS~, 1 DEFINE, 14 OTHER (C3y-2's files), 0 FAIL,
+  0 ERROR, 0 deleted lines, 0 encoding changes, `RESULT: PASS`. `_WALK --range d393113b^..d393113b --files` (13): 11 PASS, 1 PASS~, 1 OTHER (Always.h:
+  t1's `_DEBUG` re-enabled, the 2 "deleted" lines are its old commented define + comment), 0 FAIL, `RESULT: PASS`. `JUNE_QUICK_QUEST_POS --range
+  b29b62bc^..b29b62bc`: 1 PASS (the plain `#else`), 1 DEFINE, `RESULT: PASS`. junediverge `--check-all`: `RESULT: FAIL`, 4 hits, all `GT_PVP` in
+  `X2GUEL.cpp` (5736 / 5766 / 6465 / 6957, char-elesis `b907661f` / `6f9608ea`): not this review's files, reported to that plan, not edited here.
+  enumscan (12 files): 3 A/B rows, all old lines (X2QuestManager.cpp:6356 / 6357, X2State.cpp:9326), 0 on added lines.
+- **Debug retired** (`KTDXLIB/Always.h`): `_GUIDE_DEBUG`, `_GATES_DEBUG`, `_WALK_DEBUG` commented out. With `_WALK_DEBUG` off the walkthrough again
+  shows only on an account with no character at level 10+, as in June. Build skipped: debug retire only. The deployed exe (md5 b68f1fcc) still has all
+  three on, which the scene-201 walk below uses.
+- **Owed (user):** the scene-201 walk on the deployed exe: a new level-1 character, accept 11005, leave Ruben and come back before finishing it ->
+  `begin 201 ( by going quest )`.
+
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
 A new March character's first select now enters June's class tutorial dungeon (`DI_DUNGEON_TUTORIAL_<class>`, 41150-41290) in place of

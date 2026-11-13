@@ -12858,7 +12858,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-13
 // Description: june-dungeons C3z-4t1 debug: logs JUNE_FX C3z-4t begin / step / end / refuse ( offline_server.log ). Retired by the C3z-4t2 review, on again
 //              for the C3z-4t4 walk play-test; the C3z-4t4 review retires it.
-#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+//#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
@@ -12917,7 +12917,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-13
 // Description: june-dungeons C3z-4t3 debug: JUNE_FX C3z-4t gate <name> lines ( offline_server.log, once a second per gate ). The C3z-4t4 review retires it.
-#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+//#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
@@ -12941,7 +12941,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: june-dungeons C3z-4t4 play-test switch: the guide skips June's "a character on the account is level 10+" refusal ( 31fbdf40 ) and logs that it did,
 //              so the walk can be tested in a save with high-level characters. Not June's behaviour; the C3z-4t4 review retires it.
 //              Revert: comment out the #define ( JUNE_TUTORIAL_GUIDE_WALK_DEBUG ).
-#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG
+//#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG
