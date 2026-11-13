@@ -1511,6 +1511,23 @@ Sonnet 5.5. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI` (`Always.h` end; `#error` w
 
 **Play-test (user, 2026-11-13 09:51-09:53, exe `c7d1abf8`; logs read).** Select screen: all nine characters loaded (user's word; the log has only the `MESH_PC_ELESIS_STAND` XET probe). Creation screen: six Elesis class clicks logged `MOVIE_CREATE_ELESIS_BASE` / `_BH` / `_GM` / `_BH` / `_GM` / `_BH` (the name probe, `ErrorEnum(136)` + `(72)` as Raven's `RAVEN_OUT.LUA`); no missing control. June's `EffectSet_SBH_LobbyWait` row played 3 times (3 particles each). `KEM_ERROR` 0, `Motion Error` 0, `ErrorEnum(135)` / `(36)` 0, `EXCEPTION` 0, `UNHANDLED` only `E_DISABLE_HB_CHECK_REQ`. Not reached: a village entry (no `ELESIS DATA`), skill cut-ins (owed to CH2a / CH3a / CH6).
 
+### CH5 - Review (2026-11-13, Opus 5.5): PASS, no code change
+
+- **Cut-in table `333a8450` (Ghidra, disassembly):** 12 `SkillCutIn` written at `337ad5c0 + i * 0x30` (`337ad5c0` .. `337ad7d0`), strings pushed in order `334fe8dc` `HQ_CutIn_Elesis_01` x3 (`333a848c` / `8528` / `85c7`), `334fe8b0` `_GM_01` x3, `334fe884` `_BH_01` x3, `334fe858` `_CA_01` x3 (`333a89f9` / `8a96` / `8b35`)
+  = the port's 4 x 3 `s_SkillCutInSet` exactly. Size / position floats `334367ac` / `33435598` on every entry = March's one-argument `SkillCutIn( name )` defaults (as Ara's `333a8bf0`). Set index (`X2GUEL.cpp:450-464`, CH1m): 120 -> 1, 121 -> 2, 125 -> 3, else 0; table has 4 rows, no overrun.
+  The log line sits after the 0x8b3 override, so it names the drawn cut-in. `CASH_21` / `_22` (`334fe828` / `7f8`) are the 0x8b3 event table, not this one.
+- **UnitTemplet (pre = `data036.kom.20261113_093754`, current = kom_contents = the deployed data036's copy):** 57 -> 59 blocks, no duplicate keys; the 7 `UC_ELESIS_*` blocks byte-equal June's `UnitTemplet.src.lua` (7 of 7, order 8 / 29 / 30 / 35 then 120 / 121 / 125);
+  the other 52 byte-equal pre-phase, order kept. Semantic key delta = `ch0_unittemplet_elesis.tsv` (173 rows: 116 same, 57 june-only, 0 mismatch). BOM, 1610 CRLF, 0 bare LF. `ledger --check` PASS, `core --check` PASS, `luabind.py check UnitTemplet` PASS (ENUM 0 / 0).
+- **Creation screen:** data034 `DLG_Unit_Create_ClassChange_Button_Elesis.lua` = `1B 4B 4C 81`, 5284 B, sha1 `b1f78258..a219` = the adopt record; `luabind.py check` 22 methods, 0 unbound, PASS. `GetUnitStatInfomationChart` `3254ee40`: 8 / 0x1d / 0x78 = 2,1,2; 0x1e / 0x79 = 2,2,2
+  = March's `X2StateCreateUnit.cpp:3901-3914` (MIDDLE, LOW, MIDDLE / MIDDLE x3); 0x23 / 0x7d = 2,1,1 (CHNa's). Stand mesh `32551e30`: `Dummy_Village_Board8` + `EffectSet_Elsword_Stand_Aura`. `SelectElesis` `32554de0`: `LobbyDownLanding`, `325514e0( 8 )`, `ElesisVoice_Introduce.ogg` = March.
+- **Lobby (`cl /P` on the real `X2UnitViewerUI.cpp`):** `JUNE_UNIT_VIEWER_EFFECT_PLAYER`, `JUNE_ANIMATION_NAME_TABLE`, `_ELESIS_UI`, `_ELESIS_LIVE`, `SERV_ELESIS_SECOND_CLASS_CHANGE` all ON. `m_hSeqHandFireSBH1-3` (read at 664-768) are created only at 2560 / 2579 / 2598, in the dead `#else`
+  of `JUNE_UNIT_VIEWER_EFFECT_PLAYER`; the `.i` has no `CreateSequenceHandle` for them, so the BH hand block stays inert. `SPK_LobbyReadyaction` occurs 0 times in the `.i` (2162 / 5280 are dead `#else`); live `AnimationNameTable.lua` (June bytecode) has `SPK_LobbyReadyAction` once.
+- **Hygiene:** `flagcheck JUNE_CHAR_ELESIS_UI --range a693fb15^..a693fb15`: 2 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR; 0 deleted, 0 non-ASCII, 1 EOL (the noted LF-region `#endif`), 0 token-less, 0 encoding, RESULT: PASS; no later commit touches the flag.
+  `junediverge --check-all`: allow-listed 225, RESULT: PASS. `enumscan --check X2Lib/X2GUEL.cpp`: 0 A/B rows. Deployed exe (`2763c264`, a peer's later build that includes CH5): `EXESTR OK: 4 of 4` (the four GFx names, wide), `EXESTR OK: 4 of 4 absent` (March's four `.dds`). No `_UI_DEBUG` define to retire.
+- **Logs (CH5 play-test, 09:51-09:53, exe `c7d1abf8`):** `KEM_ERROR`, `Motion Error`, `EXCEPTION`, `CUTIN` 0; `[JUNE_GFX]` 0 (no skill castable). `ErrorEnum(136)` `MOVIE_CREATE_ELESIS_*.LUA` x6 = the subtitle-name probe (movie plays on), `ErrorEnum(431)` `MESH_PC_ELESIS_STAND.XET` = the engine's optional-XET probe: not CH5's.
+- **Kickoffs:** `CH6.md` l.48 already walks sets 0-3 by class and the hyper cut-ins on 120 / 121 / 125; l.25 the creation screen. `CHNa.md` already carries CH5's routed items. CHNa is ready (char-ara CHNa review done 2026-11-11).
+- Full build skipped: no play-test (no code change).
+
 ## Phase CH-N - Elesis's June-only class path: Dark Knight (35) and Crimson Avenger (125)
 
 The template block is `JUNE_CHARACTER_AISHA_PHASES.md` "Phase CH-N" as Ara's Z rewrites it; Ara ran it first. **What Elesis reuses** (Ara's CHNa,
