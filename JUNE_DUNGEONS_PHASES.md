@@ -494,3 +494,92 @@ Verdict: **pass, no transcription error.** The only code change is `//#define SE
 - **Build.** Skipped: debug retire only (the queued build was cancelled; rule amended 2026-11-13: no build for a debug retire). The always-on lines stay: `load failed`,
   `gfx adapter unbound`, `gfx show %d not seen`, and the first-begin count.
 - **Next.** C3z-4t3 is ready (`kickoffs/june-dungeons/C3z-4t3.md` checked). C3y-2 is unblocked (t1 + t2 done) and runs alongside t3.
+
+## C3z-4t3 - Done (2026-11-13, Opus 5.5 high): the tutorial guide's game-side gates
+
+Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES` (`#error` without `JUNE_TUTORIAL_GUIDE` / `JUNE_GFX_MANAGER`) + `_DEBUG` (gate lines, once a
+second per gate; the C3z-4t4 review retires it). Log tag `JUNE_FX C3z-4t gate <name>` (offline_server.log). Funcmap rows tagged `(C3z-4t3)`.
+
+- **ESC** (C3p-2's owed item): `HandleMsgByESC` eats ESC while a guide runs and the scene has no `ANY_KEY_ALLOW` (`@31f1e1e8-31f1e212`), first
+  inside the key test, before the result-UI mode (C3p-2's insertion point). C3p's `SKIP_START` comment now names GFx `closeToTopZorder`, not the chat box.
+- **Dialog manager `+0x111`** (Q5b's owed item; t1 stand-in retired): `CKTDGUIDialogManager::m_bDialogCreateBlocked`, set to `!DIALOG_CREATE_ALLOW`
+  by the step (`31fc42ba`), cleared by the end (`31fc4d70`). June has two readers and both are ported: `OpenQuestRewardWindow` returns before its
+  sound (`323d2cb1`), and `KTDGUIOKMsgBox` returns an empty dialog (`31d7d9cc`; the C3z-4t3 audit: March's handle type never dereferences NULL,
+  the 7 unguarded `->` sites stay safe). Scene 101 has no `DIALOG_CREATE_ALLOW`, so both are blocked during it.
+- **StateChange** (Q5b's owed item): `StopGuide` (`31fc6010`) on every state change, after the relationship reset (`@31d88e27`). Village block (case 14):
+  a new field game during a guide gets `SetEnableKeyProcess( false )` (`+0x12c`), and a running guide calls `SetShowQuickSlotByGuide` (`31fbdfa0`, now
+  public) instead of the deferred quest scene. Battle field: no deferred scene while a guide runs. Like June, the test sits at the two call sites,
+  not inside `PlayDeferredQuestScene` (the kickoff said the player; June's player has no test).
+- **UI events:** `CX2TutorialGuideManager::UICustomEventProc` (`31fc63f0`) runs in `CX2State::MsgProc`'s custom-event case after `m_bIgnoreAllUIEvent`
+  (June `+0xb5`); `UIServerEventProc` (`31fc63d0`) first in `CX2State::UIServerEventProc`. `SERVER_EVENT_TYPE 1` is now `EGS_CHANGE_INVENTORY_SLOT_ITEM_ACK`
+  (June 0x101: `32916d90` sends 0x100 / waits 0x101). 0x7156 / 0x7157 = `STUCM_SKILLTREESLOT_MOUSEIN` / `_MOUSEOUT`.
+- **UI hiding:** `SetShowUI` hides the skill and riding slots in the tutorial while the input step is below `IGS_SKILL` (June's `INPUT_GUIDE_STEP`,
+  now a manager enum), and in the dungeon state the key-hint dialogs follow the UI (`31fbddf0`). `OnFrameMove`: no shortcut keys while a stop-frame
+  guide runs (`31fbdab0`).
+- **Busy / shop / local map:** no busy warning during a guide (`@3230238f`); closing the cash shop during a guide shows GFx UI 6 again, every other
+  open / close hides it (`@3223d698`); the party UI's local map opens Ruben during a guide (`@322b5a3a`).
+- **Input mask:** `CX2GUUser::InitInpuDataProcess` (vslot `0x6fc`, `31fcea10`) masks held keys in the tutorial by input step through
+  `InputData::Init_ByInputGuideStep` (`320708f0`; June's groups are March's key order; Lu / Ciel keeps S at the skill step). Eve's override
+  (`32978e80`) and other class overrides stay their char ports' (checklist section 7).
+- **t1's June-only members:** zoom lock `g_pMain+0x3f5` = `CX2Main::m_bLockCameraZoom` with its reader `CameraZoomInAndOutKeyProcess` (`3245a8f0`);
+  party manager `+0x8a` = `m_bAutoPartyMatchFound`, set by the auto-party match popup (`3243d4e0`, beside `StopGuide`), cleared by the close for
+  reasons 02 / 03 (and June-only 0x73f) with `BeginReplayGuide` (`3243c260`), read by `CanBeginGuide`. Event ids from June's dispatcher `3243ec20`
+  (893 / 895 = March's `AUTO_PARTY_MAKING_SUCCESS_NOT` / `AUTO_PARTY_CLOSE_NOT`, two apart in both); close reasons by NetError value (0x40f-0x412).
+- **Routed, not ported (scope rule):** (1) `CX2StateMenu +0x43d` (read by June's bottom-bar helpers `3245a9d0` / `3245c098`), the now-state `+0x378`
+  (read by the menu dialog `324617c0` and `32388448-323895a2`), and `CX2State` vslot `0xb0` (field `3245c560`: a June UI at `+0x38c`, gauge `+0xd1`):
+  June-only menu / HUD bytes, stand-ins kept, bullet in Stage 9. (2) The rest of June's two auto-party handlers (`32461a70` / `324639a0`, the
+  0x40f / 0x410 rework): Stage 28 (updated). (3) `31d72cc0` in `KTDGUIOKMsgBox` (a June-only `g_pData+0x290` system, also SetShowUI's early
+  return): Stage 9. Offline the auto-party handlers never fire (no matching server).
+- **Hygiene.** flagcheck `--worktree --files` (17 files): 11 PASS, 1 PASS~, 5 OTHER (X2Game.cpp / X2Main.cpp: the peer's
+  `JUNE_TUTORIAL_LUA_BIND` hunks; X2State.cpp: the ordered comment fix, 1 replaced line; the manager's .cpp / .h: nested in t1's flags), 0 FAIL,
+  0 deleted lines, 0 non-ASCII, 0 encoding changes, `RESULT: PASS`. junediverge `--check` (17 files) `RESULT: PASS`. enumscan: 0 A/B on added lines.
+- **Build.** First run failed in this phase's own edit (`X2CashShop.cpp` lacked `KTDGGFXManager.h`; include added under the flag). DEPLOY OK:
+  X2_offline.exe is 26,430,464 B, dated 2026-11-13 11:51:19, md5 62a1a621 (built with the peer C3y-2 / CH2a uncommitted files in). EXESTR OK 6 of 6
+  (wide: the gate format line, `esc eaten`, `quest reward window blocked`, `ok box blocked`, `skill slots hidden`, `input mask`).
+- **Play-test owed** (hand-off below the note in the conversation): ESC, skill slots and the reward / OK-box block during scene 101 in the tutorial
+  dungeon, the gate log lines (scene 101 has no `USE_LIMIT_ZOOM`, so the zoom lock is not in the test). No review of its own: `C3z-4t4-review.md` covers t3 + t4.
+
+## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
+
+A new March character's first select now enters June's class tutorial dungeon (`DI_DUNGEON_TUTORIAL_<class>`, 41150-41290) in place of
+the battle-field tutorial. Flags (`KTDXLIB/Always.h`): `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON` (+ `_DEBUG`, `#error`s without
+`JUNE_ENUM_NAMES`, `JUNE_TUTORIAL_GUIDE`, `JUNE_TUTORIAL_LUA_BIND`), `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND` (needs `_PLAY_GUIDE`),
+`SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE`. funcmap rows tagged C3y-2; MODS.md "the March classes' June tutorial dungeons".
+
+- **Room request** (`325622e0`, re-checked): June's switch replaces March's in `CX2StateServerSelect::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ`
+  (types 2-9 -> Aisha 41160, Lena 41170, Raven 41190, Eve 41180, Chung 41290, Ara 41210, Elesis 41220 with no early return, Add 41230;
+  default Elsword 41150); Lu/Ciel / Rose / Ain are a one-line stand-in. The `CX2StateBeginning` copy gets the same switch, but it is
+  compiled out (`ELSWORD_NEW_BEGINNING` is commented at `InHouse3.h:486`), so only server select logs. Divergence row 408 -> replaced.
+  `DungeonEnum.h`: the 9 ids under `JUNE_ENUM_NAMES`. Add's first-select skip (CH0c) is untouched: char-add TU retires it.
+- **The 5 unbound names, whole from June:** `PopTalkBox` `32305f00` -> new `CX2Game::PopTalkBox( uid, string id, bUser )` (talk box on
+  `m_pTalkBoxMgr`; the scripts pass 2 args, so the box goes to an NPC owner and is dropped: JUNE_BUGS 644, kept); `IsOnSomethingNow`
+  `31e4d0a0` = `m_FrameDataNow.unitCondition.bFootOnLine` (+0x80bc, the twin of Future's +0x7e1c); `ShowJumpGuide` `327ca2c0` ->
+  `CX2DungeonGame::ShowJumpGuide( f )` -> the play guide; `CreateCurtain` / `DeleteCurtain` `327ed0a0` / `327ed240` = March's bodies, bound.
+- **Play guide (`X2PlayGuide.*`), what ShowJumpGuide needs:** June's jump guide (create `3289e030`: UI-major `JumpGuide`, layer 12,
+  hidden; show `3289e270`: `Tuto_Ui_Jump01.ogg` when it was hidden; follow the head 80 px up `3289cfe0`; frame-move `3289e370` hides it
+  with a 2.0 s time once elapsed; delete `3289d1d0` beside the input guide in `CX2DungeonGame::Release` @`327d25f3` and
+  `X2StateDungeonGame.cpp:6902` (`324ce714` @`324cea74`); hide on tutorial exit `327d2160` @`327d21c7`). June's `OnFrameMove_Tutorial`
+  `3289e180` / `SetPostionInputGuide` `3289df90` replace March's (place only, never create, 80 px, no quest-guide particle): divergence
+  rows added. June's whole `CX2PlayGuide::OnFrameMove` `3289e490` differs beyond the tutorial (state 7-8 skip, picture layout):
+  only the `3289e370` call is in; the rest is a divergence row + allow row routed to Stage 9.
+- **Emulator:** `IsQuestTutorialDungeon` learns the 9 ids; `IsEventDropDungeon` / `IsSkillUseCountedDungeon` learn Elsword's (they named
+  only his). Stages load from the client's DungeonData (`Handlers_Room.cpp:2286`), so the rows below are what "stage 0 out of range" needs.
+- **Data (subagent, verified by the gates):** core source data036 `DungeonEnum.lua` (+9), `Enum.lua` (+9 `WI_TUTORIAL_*_STAGE0`, +41
+  `NUI_TUTORIAL_*`, no value collisions), data035 `DungeonData.lua` (June's 9 rows), data037 `NPCTemplet.lua` (41 rows; NewNPCStat rows
+  already there now resolve), data040 `WorldData.lua` (9 rows keyed by `worldID`; June reuses the name `WI_TUTORIAL_EL_STAGE0` on a school
+  row). 18 world scripts by `adopt-june` (`june_adopt_20261113_112144.tsv`); 416 assets by `stage-june`, 0 replaced, 47 identical; 8
+  `tutorial_new_*.ogg` copied to the game dir's loose `data\music\` (June keeps them loose, C3y-1b precedent). ledger / core check PASS.
+  `dungeon_registry_census.py`: SAME 250, STR_ID missing none. `luabind.py check` over the 9 scripts: RESULT PASS (0 unbound, ENUM 0).
+  Still missing in June too: 2 stage BGMs, 3 textures, `HQ_BOSS_NAME_TUTORIAL_BOSS_SKA.dds`, 10 NPC sounds, 3 NPCTemplet MOTION names
+  (unit scripts load their own meshes) - JUNE_BUGS 645 with the 4 nil NPC names.
+- **Pack / copy:** PACK OK + COPY OK data035 3f0fc5c0, data036 991bcd6f, data037 2ce7045b, data040 24f03ec0, data078 861dc440, data080
+  8e24690e, data081 8491c0a0, data082 6d58afc3, data083 bf76d90d, data084 87080081, data108 15704f65, data126 31db9eb7, data133 f1219677,
+  data144 e885e6a7, data149 e9552cec, data164 3f1e542f, data165 b1500b88, data166 175e2d81.
+- **Hygiene.** flagcheck `--worktree` (16 files): every site PASS (CLASS_TUTORIAL_DUNGEON 4, LUA_BIND 4, PLAY_GUIDE 3, the X2Main /
+  ServerSelect / DungeonEnum / DungeonGame hunks counted under their own flags), 0 FAIL, 0 deleted lines, 0 non-ASCII, 0 EOL mismatch;
+  1 ERROR per flag = the `#error` dependency guards in Always.h (precedent). junediverge `RESULT: PASS`; enumscan: 2 old rows outside
+  these hunks (`X2GUUser.h:2564-2565`), 0 new.
+- **Build.** First run failed only in C3z-4t3's then-unfinished files (X2GUUser / X2CashShop / camera zoom; 0 errors in C3y-2's); after their fix: DEPLOY OK: X2_offline.exe is 26,430,464 B, dated 2026-11-13 11:51:19, md5 62a1a6211612ef8d77162e5087f6fc12 (built at main 5b50392e + 34 uncommitted code files, shared with C3z-4t3). EXESTR OK: 3 of 3 (wide: the room line, Tuto_Ui_Jump01.ogg, JumpGuide) and 5 of 5 (the Lua names), md5 62a1a621.
+- **How to see it:** create a new Elsword (and an Elesis); the first select loads `Ruben Forest` (Elsword) / `Ruben Training Ground`
+  (Elesis), the guide hints run, the stage clears to the village. offline_server.log `JUNE_FX C3y-2 room 41150` / `41220`.
+- **Debug define stays on** until the review. Next: user play-test, then `C3y-2-review.md`.

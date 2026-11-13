@@ -2906,6 +2906,15 @@ wstring CX2UIQuestNew::GetSlotItemDesc()
 void CX2UIQuestNew::OpenQuestRewardWindow( int iQuestID, bool bEnableSelection )
 {
 	if(iQuestID == -1) return;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	if( true == g_pKTDXApp->GetDGManager()->GetDialogManager()->GetDialogCreateBlocked() )	// june-dungeons C3z-4t3: June 323d2c60 @323d2cb1-323d2ccb, before the sound
+	{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		g_pMain->GetTutorialGuideManager().LogGate( L"quest reward window blocked", iQuestID );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		return;
+	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 	g_pKTDXApp->GetDeviceManager()->PlaySound( L"QuestReward.ogg", false, false );		
 

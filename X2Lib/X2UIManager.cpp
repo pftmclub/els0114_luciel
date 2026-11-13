@@ -4319,6 +4319,18 @@ void CX2UIManager::SetShowUI(bool bVal, bool bForce/* = false*/)
 
 	m_bShowUI = bVal;
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	// june-dungeons C3z-4t3: June 32154820 @32154915 / @32154943: no skill or riding slot in the tutorial before the input guide's skill step
+	if( true == g_pMain->GetIsPlayingTutorial() && g_pMain->GetTutorialGuideManager().GetInputGuideStep() < CX2TutorialGuideManager::IGS_SKILL )
+	{
+		SetShowSkillSlot( false );
+		SetShowRidingPetSkillSlot( false );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		g_pMain->GetTutorialGuideManager().LogGate( L"skill slots hidden", g_pMain->GetTutorialGuideManager().GetInputGuideStep() );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+	}
+	else
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #ifdef RIDING_SYSTEM
 	if( NULL != CX2RidingPetManager::GetInstance() && NULL != CX2RidingPetManager::GetInstance()->GetMyRidingPet() )
 	{
@@ -4379,6 +4391,10 @@ void CX2UIManager::SetShowUI(bool bVal, bool bForce/* = false*/)
 			SetShowMenu(bVal);
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_MODE
 			SetShowResurrectionStone(bVal);
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+			if( true == g_pMain->GetIsPlayingTutorial() )	// june-dungeons C3z-4t3: June @32154bd8 ( 31fbddf0 ), the key-hint dialogs follow the UI
+				g_pMain->GetTutorialGuideManager().SetShowInputGuideUI( bVal );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 			SetShowCinematicUI(bVal);
 			SetShowFeverUI(bVal);
 			//던전에서는 던전,대전 도구창 무조건 꺼지도록 설정

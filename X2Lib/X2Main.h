@@ -1263,6 +1263,10 @@ class CX2Main : public CKTDXStage
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 		CX2TutorialGuideManager&	GetTutorialGuideManager() { return m_TutorialGuideManager; }	// june-dungeons C3z-4t1: June 31d70b00
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		void			SetLockCameraZoom( bool bLock ) { m_bLockCameraZoom = bLock; }	// june-dungeons C3z-4t3: June g_pMain+0x3f5, the guide's step 31fc4060 / end 31fc4c40
+		bool			GetLockCameraZoom() const { return m_bLockCameraZoom; }			// june-dungeons C3z-4t3: read by the zoom key handler 3245a8f0
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 		//CX2UnitLoader*	GetUnitLoader(){ return	&m_UnitLoader; }
 		CX2Data*		GetX2Data(){ return m_pData; }
 		CKTDXStage*		GetNowState(){ return m_pNowState; }
@@ -2837,6 +2841,9 @@ public:
 private:
 	CX2TutorialGuideManager			m_TutorialGuideManager;		// june-dungeons C3z-4t1: June +0x8c4
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	bool							m_bLockCameraZoom;			// june-dungeons C3z-4t3: June +0x3f5
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 }; // CX2Main
 
 extern CX2Data*			g_pData;

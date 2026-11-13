@@ -137,6 +137,10 @@ public:
 	void SetShowFirstEpicQuestGuide(bool bShow_);
 #endif //GUIDE_FIRST_EPIC_QUEST
 	void SetShowPlayGuide(bool bVal_);
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+	void ShowJumpGuide( bool bShow, float fShowTime );	// june-dungeons C3y-2: June 3289e270
+	void DeleteJumpGuideParticle();						// june-dungeons C3y-2: June 3289d1d0
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 
 	CX2PlayGuide(void);
 	~CX2PlayGuide(void);
@@ -161,6 +165,11 @@ private:
 	void SetShowGuideParticle(bool bVal);
 	void CreateInputGuide();
 	void SetPostionInputGuide(const D3DXVECTOR3& vPos);
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+	void CreateJumpGuide();									// june-dungeons C3y-2: June 3289e030
+	void SetPositionJumpGuide( const D3DXVECTOR3& vPos );	// june-dungeons C3y-2: June 3289cfe0
+	void OnFrameMove_JumpGuide( float fElapsedTime );		// june-dungeons C3y-2: June 3289e370
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 	//}}튜토리얼 던전에서 사용되는 퀘스트 가이드 
 
 
@@ -189,6 +198,11 @@ private:
 
 
 	CKTDGParticleSystem::CParticleEventSequenceHandle	m_hInputGuide;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+	CKTDGParticleSystem::CParticleEventSequenceHandle	m_hJumpGuide;				// june-dungeons C3y-2: June +0x38c
+	float												m_fJumpGuideElapsedTime;	// june-dungeons C3y-2: June +0x390
+	float												m_fJumpGuideShowTime;		// june-dungeons C3y-2: June +0x394 ( June's ctor leaves it unset )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 	//}}튜토리얼 던전에서 사용되는 퀘스트 가이드 
 
 

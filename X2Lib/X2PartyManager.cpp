@@ -15,6 +15,9 @@ m_pDLGPartyQuickJoin(NULL)
 , m_bChangeMap(false)
 , m_bStartGame(false)
 , m_bProcessDungeonMatch(false)
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+, m_bAutoPartyMatchFound(false)
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 , m_iCurrentDungeonIDWithDifficulty(0)
 {	
 }
@@ -2910,11 +2913,20 @@ bool CX2PartyManager::Handler_EGS_AUTO_PARTY_MAKING_SUCCESS_NOT( HWND hWnd, UINT
 		GET_REPLACED_STRING( ( STR_ID_21304, "Li", wstrDungeonName, kEvent.m_iMemberCount ) ), 
 		(CKTDXStage*) g_pMain->GetNowState(), 
 		CX2StateMenu::SMUCM_DUNGEON_MATCH_GAME_ACCEPT, CX2StateMenu::SMUCM_DUNGEON_MATCH_GAME_DENY, CX2StateMenu::SMUCM_DUNGEON_MATCH_GAME_DENY );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	g_pMain->GetTutorialGuideManager().StopGuide();		// june-dungeons C3z-4t3: June 3243d4e0 @3243d751 ( 31fc6010 )
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+	g_pMain->GetTutorialGuideManager().LogGate( L"auto party match stops the guide" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #ifdef SERV_IRUHADEV_JUNE_QUEST_STORY_PLAYER
 	// June 3243d4e0 @3243d75c..3243d76c: after the match popup a running story slide show ends ( the rest of June's tail is not this phase's )
 	if( true == g_pData->IsStorySlideShotRunning() )
 		g_pData->EndStorySlideShot();
 #endif SERV_IRUHADEV_JUNE_QUEST_STORY_PLAYER
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	SetAutoPartyMatchFound( true );		// june-dungeons C3z-4t3: June 3243d4e0 @3243d771 +0x8a = 1
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	return true;
 }
 
@@ -2966,6 +2978,16 @@ bool CX2PartyManager::Handler_EGS_AUTO_PARTY_CLOSE_NOT( HWND hWnd, UINT uMsg, WP
 				g_pMain->RemoveTimedMessagePopup( CX2Main::TimedMessagePopUp::MT_DUNGEON_MATCH_START_REQUEST, userData );
 				g_pMain->GetPartyUI()->CancelToWaitForDungeonPartyMatching();
 				SetProcessDungeonMatch(false);
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+				if( NetError::NOT_LEAVE_AUTO_PARTY_REASON_00 != kEvent.m_iReason )	// june-dungeons C3z-4t3: June 3243c260 @3243c5a3, reasons 02 / 03 ( and June-only 0x73f ) resume the held guide
+				{
+					SetAutoPartyMatchFound( false );
+					g_pMain->GetTutorialGuideManager().BeginReplayGuide();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+					g_pMain->GetTutorialGuideManager().LogGate( L"auto party close resumes the guide", kEvent.m_iReason );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+				}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 			} break;
 		case NetError::NOT_LEAVE_AUTO_PARTY_REASON_01://자동 파티 대상자 중 누군가가 게임 시작에 동의하지 않았습니다.
 			{

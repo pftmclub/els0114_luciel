@@ -6900,6 +6900,9 @@ void CX2StateDungeonGame::MoveToRubenVillage()
 				}
 				g_pData->GetPlayGuide()->DeleteQuestGuideParticle();
 				g_pData->GetPlayGuide()->DeleteInputGuideParticle();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+				g_pData->GetPlayGuide()->DeleteJumpGuideParticle();	// june-dungeons C3y-2: June 324ce714 @324cea74
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 			}
 		}
 	}

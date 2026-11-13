@@ -200,6 +200,9 @@ class CX2DungeonGame : public CX2Game
 		int						GetDungeonType();
 		int						GetGameLevel() { return (int)m_pDungeonRoom->GetDifficulty(); }
 		void					ClearSubStage( int clearType, int nextStageNum, int nextSubStageNum );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+		void					ShowJumpGuide( float fShowTime );	// june-dungeons C3y-2: June 327ca2c0
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 		
 		
 		// 훈련소 관련 함수

@@ -152,6 +152,10 @@ class CKTDGUIDialogManager : public CKTDXStage
 #endif SERV_IRUHADEV_JUNE_GFX_GATES
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		void	SetDialogCreateBlocked( bool bBlocked ) { m_bDialogCreateBlocked = bBlocked; }	// june-dungeons C3z-4t3: June +0x111, the tutorial guide's step 31fc4060 / end 31fc4c40
+		bool	GetDialogCreateBlocked() const { return m_bDialogCreateBlocked; }				// june-dungeons C3z-4t3: read by KTDGUIOKMsgBox 31d7d8c0 and OpenQuestRewardWindow 323d2c60
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 private:
 
         void    _InsertIntoDialogListTop( CKTDGUIDialogType pkInDialog_ );
@@ -213,4 +217,7 @@ private:
 		HRESULT _OnFrameRender( bool bFront, bool bLayerBand_, int iMinLayer_, int iMaxLayer_ );
 #endif SERV_IRUHADEV_JUNE_RENDER_PASS1
 #endif SERV_IRUHADEV_JUNE_UI_DIALOG_BANDS
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		bool m_bDialogCreateBlocked;		// june-dungeons C3z-4t3: June +0x111 ( ctor 31d067e0: 0 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 };

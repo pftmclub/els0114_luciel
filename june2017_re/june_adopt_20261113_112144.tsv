@@ -1,0 +1,21 @@
+# adopt-june --bytecode run 2026-11-13 (LUA_SOURCE_PHASES.md L3)
+# mode bytecode = ljconv(June bytecode), shipped_sha1 is its sha1; mode source = BOM + decompile proven at `tier`, shipped_sha1 is the staged file's
+name	kom	state	june_koms	size	shipped_sha1	mode	tier	note
+Tutorial_Add_Stage0.lua	data040	new	data040	19252	ee0737d81ce8e3decdd9ad603545675cc657116b	bytecode		ljconv
+Tutorial_Add_Stage0_LineMap.lua	data040	new	data040	3590	d9df85a74a51f0205a51665453ada60f771517be	bytecode		ljconv
+Tutorial_Aisha_Stage0.lua	data040	new	data040	12044	9853f2dc584fb21c2bd800138a56914384b25fb5	bytecode		ljconv
+Tutorial_Aisha_Stage0_LineMap.lua	data040	new	data040	5092	7758bb719354cd64dfbacc167de715bafa401a46	bytecode		ljconv
+Tutorial_Ara_Stage0.lua	data040	new	data040	19384	af5c38b668db0d22a41c9bc0dbb9102419034ae8	bytecode		ljconv
+Tutorial_Ara_Stage0_LineMap.lua	data040	new	data040	5794	664b82089f92871c6ceee51f5ae61ffa49871c94	bytecode		ljconv
+Tutorial_Chung_Stage0.lua	data040	new	data040	20900	a4987f97ef4166e9af75527dbeb4e84db0c42ad0	bytecode		ljconv
+Tutorial_Chung_Stage0_LineMap.lua	data040	new	data040	4629	8e4060cc207986a4681aec6d091fe4757900b1d1	bytecode		ljconv
+Tutorial_Elesis_Stage0.lua	data040	new	data040	16246	b6eae5545daeb842a650d6219259d4a61ba800f9	bytecode		ljconv
+Tutorial_Elesis_Stage0_LineMap.lua	data040	new	data040	4408	a545843b7eca118b2022799a29e90c00808b9549	bytecode		ljconv
+Tutorial_Elsword_Stage0.lua	data040	new	data040	12046	691b9c6500c863e3802a858022600b3290d21d44	bytecode		ljconv
+Tutorial_Elsword_Stage0_LineMap.lua	data040	new	data040	5084	a50e8d4041639f7b0ccb3674f28dbd62966c7894	bytecode		ljconv
+Tutorial_Eve_Stage0.lua	data040	new	data040	13334	c940742f291cb4dea23c1ededdd22ed9d1fa5d0a	bytecode		ljconv
+Tutorial_Eve_Stage0_LineMap.lua	data040	new	data040	4994	44e2f3c42547411053300a62169e63321212ec2c	bytecode		ljconv
+Tutorial_Raven_Stage0.lua	data040	new	data040	8929	4dd2723dde4aa3055131cdb74c05e285f8d0dd84	bytecode		ljconv
+Tutorial_Raven_Stage0_LineMap.lua	data040	new	data040	5224	2d72208a4ce9e4153fc1919f3cc4bf42366d6d89	bytecode		ljconv
+Tutorial_Rena_Stage0.lua	data040	new	data040	12043	a0bde23a41d84c6c03f65f3b20337f1068fc47ff	bytecode		ljconv
+Tutorial_Rena_Stage0_LineMap.lua	data040	new	data040	5092	7758bb719354cd64dfbacc167de715bafa401a46	bytecode		ljconv

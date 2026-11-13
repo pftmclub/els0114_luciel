@@ -9,6 +9,9 @@
 #include "Offline/X2OfflineLog.h"	// char-add CH0c: the ADD CREATE tutorial line
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
 #endif SERV_IRUHADEV_OFFLINE
+#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+#include "Offline/X2OfflineLog.h"	// june-dungeons C3y-2: the JUNE_FX C3y-2 room line
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
 //}}
 
 bool CX2StateServerSelect::m_sbSelectedServerSet = false;
@@ -7526,6 +7529,44 @@ void CX2StateServerSelect::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ()
 	kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_DifficultyLevel	= CX2Dungeon::DL_NORMAL;
 	kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_fPlayTime			= 19999.0f;
 	kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_cGetItemType		= CX2DungeonRoom::DGIT_RANDOM;
+#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
+	// june-dungeons C3y-2: June 325622e0, one tutorial dungeon per class; Elesis has no early return
+	switch( g_pData->GetMyUser()->GetSelectUnit()->GetType() )
+	{
+	default:
+	case CX2Unit::UT_ELSWORD:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_ELSWORD;
+		break;
+	case CX2Unit::UT_ARME:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_AISHA;
+		break;
+	case CX2Unit::UT_LIRE:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_LENA;
+		break;
+	case CX2Unit::UT_RAVEN:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_RAVEN;
+		break;
+	case CX2Unit::UT_EVE:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_EVE;
+		break;
+	case CX2Unit::UT_CHUNG:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_CHUNG;
+		break;
+	case CX2Unit::UT_ARA:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_ARA;
+		break;
+	case CX2Unit::UT_ELESIS:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_EL;
+		break;
+	case CX2Unit::UT_ADD:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_ADD;
+		break;
+	// stand-in: Lu/Ciel, Rose, Ain not ported ( June unit types 10 / 11 / 12 -> 41240 / 41250 / 41420 )
+	}
+#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+	CX2OfflineLog::Server( L"JUNE_FX C3y-2 room %d ( server select, unit type %d )", kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID, (int)g_pData->GetMyUser()->GetSelectUnit()->GetType() );
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+#else SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
 
 	switch( g_pData->GetMyUser()->GetSelectUnit()->GetType() )
 	{
@@ -7587,6 +7628,7 @@ void CX2StateServerSelect::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ()
 #endif //SERV_9TH_NEW_CHARACTER
 	}
 
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
 	g_pData->GetServerProtocol()->SendPacket( EGS_CREATE_TUTORIAL_ROOM_REQ, kEGS_CREATE_ROOM_REQ );
 	g_pMain->AddServerPacket( EGS_CREATE_TUTORIAL_ROOM_ACK, 40.f );	
 }

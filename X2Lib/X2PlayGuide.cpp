@@ -19,6 +19,11 @@ m_bShowGuideParticle(false),
 m_hInputGuide(INVALID_PARTICLE_SEQUENCE_HANDLE),
 m_eOldPlayGuide(PGT_NONE),
 m_hParticleGo( INVALID_PARTICLE_SEQUENCE_HANDLE )
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+, m_hJumpGuide( INVALID_PARTICLE_SEQUENCE_HANDLE )
+, m_fJumpGuideElapsedTime( 0.f )
+, m_fJumpGuideShowTime( 0.f )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 #ifdef GUIDE_FIRST_EPIC_QUEST
 , m_pDLGUIFirstEpicQuestGuide(NULL)
 , m_bShowFirstEpicQuestGuide(false)
@@ -70,6 +75,9 @@ CX2PlayGuide::~CX2PlayGuide(void)
 void CX2PlayGuide::OnFrameMove( double fTime, float fElapsedTime )
 {
 	OnFrameMove_Tutorial();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+	OnFrameMove_JumpGuide( fElapsedTime );	// june-dungeons C3y-2: June 3289e490 calls 3289e370 right after the tutorial frame-move
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 
 #ifdef GUIDE_FIRST_EPIC_QUEST
 	OnFrameMove_FirstEpicGuide(fElapsedTime);
@@ -721,6 +729,11 @@ void CX2PlayGuide::OnFrameMove_FirstEpicGuide(float fElapsedTime)
 
 void CX2PlayGuide::OnFrameMove_Tutorial()
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+	// june-dungeons C3y-2: June 3289e180 only places the input guide; no quest-guide particle, no create
+	if( true == g_pMain->GetIsPlayingTutorial() && NULL != g_pX2Game && NULL != g_pX2Game->GetMyUnit() )
+		SetPostionInputGuide( g_pX2Game->GetMyUnit()->GetHeadBonePos() );
+#else SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 	if( false == g_pMain->GetIsPlayingTutorial() )
 		return;
 
@@ -745,6 +758,7 @@ void CX2PlayGuide::OnFrameMove_Tutorial()
 		}
 		SetPostionInputGuide(g_pX2Game->GetMyUnit()->GetHeadBonePos());
 	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 
 
 }
@@ -888,6 +902,16 @@ void CX2PlayGuide::CreateInputGuide()
 
 void CX2PlayGuide::SetPostionInputGuide(const D3DXVECTOR3& vPos)
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+	// june-dungeons C3y-2: June 3289df90 never creates the guide and places it 80 px above the head ( March 350 )
+	if( INVALID_PARTICLE_SEQUENCE_HANDLE != m_hInputGuide )
+	{
+		D3DXVECTOR2 finalPos = g_pKTDXApp->GetProj3DPos( vPos );
+		float fOffsetY = 80.f * g_pKTDXApp->GetResolutionScaleY();
+		CKTDGParticleSystem::CParticleEventSequence* pInputGuide = g_pData->GetUIMajorParticle()->GetInstanceSequence( m_hInputGuide );
+		pInputGuide->SetPosition( D3DXVECTOR3( finalPos.x, finalPos.y - fOffsetY, 0.f ) );
+	}
+#else SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 	if( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hInputGuide )
 	{
 		CreateInputGuide();
@@ -899,8 +923,97 @@ void CX2PlayGuide::SetPostionInputGuide(const D3DXVECTOR3& vPos)
 
 	CKTDGParticleSystem::CParticleEventSequence* pInputGuide = g_pData->GetUIMajorParticle()->GetInstanceSequence( m_hInputGuide );
 	pInputGuide->SetPosition(D3DXVECTOR3(finalPos.x, finalPos.y - fOffsetY, 0.f));
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 }
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+// june-dungeons C3y-2: June 3289e030
+void CX2PlayGuide::CreateJumpGuide()
+{
+	if( NULL == g_pX2Game || NULL == g_pX2Game->GetMyUnit() )
+		return;
+
+	if( INVALID_PARTICLE_SEQUENCE_HANDLE != m_hJumpGuide )
+		return;
+
+	if( NULL != g_pData && NULL != g_pData->GetUIMinorParticle() )
+	{
+		m_hJumpGuide = g_pData->GetUIMajorParticle()->CreateSequenceHandle( NULL, L"JumpGuide", 0, 0, 0 );
+
+		if( INVALID_PARTICLE_SEQUENCE_HANDLE != m_hJumpGuide )
+		{
+			CKTDGParticleSystem::CParticleEventSequence* pSeq = g_pData->GetUIMajorParticle()->GetInstanceSequence( m_hJumpGuide );
+			if( NULL != pSeq )
+			{
+				pSeq->CreateNewParticle( D3DXVECTOR3( 0.f, 0.f, 0.f ) );
+				pSeq->SetOverUI( false );
+				pSeq->SetLayer( 12 );
+				pSeq->SetShowObject( false );
+			}
+		}
+	}
+}
+
+// june-dungeons C3y-2: June 3289e270
+void CX2PlayGuide::ShowJumpGuide( bool bShow, float fShowTime )
+{
+	if( NULL == g_pData || NULL == g_pData->GetUIMajorParticle() )
+		return;
+
+	if( true == bShow && INVALID_PARTICLE_SEQUENCE_HANDLE == m_hJumpGuide )
+		CreateJumpGuide();
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeq = g_pData->GetUIMajorParticle()->GetInstanceSequence( m_hJumpGuide );
+	if( NULL == pSeq )
+		return;
+
+	if( true == bShow )
+	{
+		m_fJumpGuideElapsedTime = 0.f;
+		if( false == pSeq->GetShowObject() )
+			g_pKTDXApp->GetDeviceManager()->PlaySound( L"Tuto_Ui_Jump01.ogg", false, false );
+	}
+	pSeq->SetShowObject( bShow );
+	m_fJumpGuideShowTime = fShowTime;
+}
+
+// june-dungeons C3y-2: June 3289cfe0
+void CX2PlayGuide::SetPositionJumpGuide( const D3DXVECTOR3& vPos )
+{
+	if( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hJumpGuide )
+		return;
+
+	D3DXVECTOR2 finalPos = g_pKTDXApp->GetProj3DPos( vPos );
+	float fOffsetY = 80.f * g_pKTDXApp->GetResolutionScaleY();
+	CKTDGParticleSystem::CParticleEventSequence* pJumpGuide = g_pData->GetUIMajorParticle()->GetInstanceSequence( m_hJumpGuide );
+	pJumpGuide->SetPosition( D3DXVECTOR3( finalPos.x, finalPos.y - fOffsetY, 0.f ) );
+}
+
+// june-dungeons C3y-2: June 3289e370; the expired guide is hidden with a 2 s time, as June
+void CX2PlayGuide::OnFrameMove_JumpGuide( float fElapsedTime )
+{
+	if( NULL == g_pX2Game )
+		return;
+
+	m_fJumpGuideElapsedTime += fElapsedTime;
+	if( m_fJumpGuideShowTime < m_fJumpGuideElapsedTime )
+	{
+		m_fJumpGuideElapsedTime = 0.f;
+		ShowJumpGuide( false, 2.f );
+	}
+
+	if( NULL != g_pX2Game->GetMyUnit() )
+		SetPositionJumpGuide( g_pX2Game->GetMyUnit()->GetHeadBonePos() );
+}
+
+// june-dungeons C3y-2: June 3289d1d0
+void CX2PlayGuide::DeleteJumpGuideParticle()
+{
+	if( INVALID_PARTICLE_SEQUENCE_HANDLE != m_hJumpGuide && NULL != g_pData && NULL != g_pData->GetUIMajorParticle() )
+		g_pData->GetUIMajorParticle()->DestroyInstanceHandle( m_hJumpGuide );
+}
+
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 void CX2PlayGuide::ClearPlayGuide()
 {
 	m_GuideOrderManager.ClearGuideList();

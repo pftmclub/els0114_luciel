@@ -5343,6 +5343,10 @@ bool CX2StateMenu::CameraZoomInAndOutKeyProcess()
 #endif REMOVE_DEFAULT_ZOOM
 		)
 	{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		if( true == g_pMain->GetLockCameraZoom() )		// june-dungeons C3z-4t3: June 3245a8f0 @3245a90c, the key is taken without a zoom
+			return true;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 		g_pMain->GetGameOption().CameraZoomIn( 1 );
 		return true;
 	}
@@ -5352,6 +5356,10 @@ bool CX2StateMenu::CameraZoomInAndOutKeyProcess()
 #endif REMOVE_DEFAULT_ZOOM
 			 )
 	{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		if( true == g_pMain->GetLockCameraZoom() )		// june-dungeons C3z-4t3: June 3245a8f0 @3245a961
+			return true;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 		g_pMain->GetGameOption().CameraZoomIn( -1 );
 		return true;
 	}

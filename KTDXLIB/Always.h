@@ -12897,6 +12897,30 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE, SERV_IRUHADEV_JUNE_GFX_MANAGER, SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( data bindings ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t3 - the tutorial guide's game-side gates: ESC eaten, quest reward window / OK box blocked while a scene
+//              disallows dialogs, deferred quest scene skipped, guide stopped on every state change and by an auto-party match, custom /
+//              server UI events routed to the guide, skill slots hidden before the skill step, no shortcut keys, busy warning, cash shop
+//              and local map follow the guide, held keys masked by input step, camera zoom locked.
+//              Revert: comment out the #define ( JUNE_TUTORIAL_GUIDE_GATES ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_JUNE_GFX_MANAGER ) )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE and SERV_IRUHADEV_JUNE_GFX_MANAGER ( cash shop ShowUI / HideUI )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t3 debug: JUNE_FX C3z-4t gate <name> lines ( offline_server.log, once a second per gate ). The C3z-4t4 review retires it.
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+//////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-13
 // Description: June character port ( Elesis ) Phase CH2a - Knight ( 8 ) skills: June's state functions inside March's ( Spiral Blast, Wild Shock, Mega Burster, Unlimited Blade,

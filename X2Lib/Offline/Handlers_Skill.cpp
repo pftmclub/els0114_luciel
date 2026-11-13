@@ -153,6 +153,9 @@ static bool IsSkillUseCountedDungeon( int iDungeonID )
 	// caller as well and is the more reliable of the two.
 	case SEnum::DI_TUTORIAL_ELSWORD:
 	case SEnum::DI_BATTLE_FIELD_TUTORIAL_ELSWORD:
+#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
+	case SEnum::DI_DUNGEON_TUTORIAL_ELSWORD:	// june-dungeons C3y-2: the June dungeon Elsword's tutorial now uses
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
 
 	// CXSLDungeon::IsHenirDungeon. The other five Henir spaces are commented
 	// out here exactly as they are in the client's own IsHenirDungeon.

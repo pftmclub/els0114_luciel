@@ -3574,6 +3574,9 @@ static bool IsEventDropDungeon( int iDungeonID )
 	case SEnum::DI_EL_FOREST_GATE_NORMAL:
 	case SEnum::DI_TUTORIAL_ELSWORD:
 	case SEnum::DI_BATTLE_FIELD_TUTORIAL_ELSWORD:
+#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
+	case SEnum::DI_DUNGEON_TUTORIAL_ELSWORD:	// june-dungeons C3y-2: the June dungeon Elsword's tutorial now uses
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
 		return false;
 
 	default:

@@ -408,6 +408,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+			void Init_ByInputGuideStep( int iInputGuideStep, int iUnitType );	// june-dungeons C3z-4t3: June 320708f0 ( body in X2GUUser.cpp )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 			void Init_ZXArrowOnly()
 			{
 				pureLeft			= false;

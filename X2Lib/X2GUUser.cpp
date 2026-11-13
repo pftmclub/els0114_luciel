@@ -50891,8 +50891,71 @@ bool CX2GUUser::IsEnoughMPForAttack( IN const float fConsumeMP, IN const D3DXVEC
 #endif //SERV_9TH_NEW_CHARACTER
 
 #ifdef FIX_SHOOTING_MEGABALL_AT_JUMP_LINE_MAP
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+// june-dungeons C3z-4t3: June 320708f0, the tutorial guide's held-key mask by input step ( June's InputData groups follow March's key order )
+void CX2GameUnit::InputData::Init_ByInputGuideStep( int iInputGuideStep, int iUnitType )
+{
+	switch( iInputGuideStep )
+	{
+	case -1:
+		return;
+
+	case CX2TutorialGuideManager::IGS_MOVE:
+	case CX2TutorialGuideManager::IGS_DASH:
+		pureZ = oneZ = pureDoubleZ = oneDoubleZ = false;
+		pureX = oneX = pureDoubleX = oneDoubleX = false;
+		// fall through, as June
+	case CX2TutorialGuideManager::IGS_ATTACK:
+		pureC = oneC = pureDoubleC = oneDoubleC = false;
+		pureA = oneA = pureDoubleA = oneDoubleA = false;
+#ifdef SERV_IRUHADEV_JUNE_INPUT_SIT_KEY
+		pureSit = oneSit = pureDoubleSit = oneDoubleSit = false;
+#endif SERV_IRUHADEV_JUNE_INPUT_SIT_KEY
+		pureD = oneD = pureDoubleD = oneDoubleD = false;
+#ifdef SERV_IRUHADEV_JUNE_SKILL_SLOT_10
+		pureSkill5 = oneSkill5 = pureDoubleSkill5 = oneDoubleSkill5 = false;
+		pureSkillEx5 = oneSkillEx5 = pureDoubleSkillEx5 = oneDoubleSkillEx5 = false;
+#endif SERV_IRUHADEV_JUNE_SKILL_SLOT_10
+		pureS = oneS = pureDoubleS = oneDoubleS = false;
+		break;
+
+	case CX2TutorialGuideManager::IGS_SKILL:
+		if( CX2Unit::UT_LUCIEL != iUnitType )		// June @32070969: Lu / Ciel keeps the S key at the skill step
+			pureS = oneS = pureDoubleS = oneDoubleS = false;
+		break;
+
+	default:
+		break;
+	}
+
+	if( CX2TutorialGuideManager::IGS_MOVE <= iInputGuideStep && CX2TutorialGuideManager::IGS_SKILL >= iInputGuideStep )	// June @32070985: steps 0-3 also drop LCtrl
+		pureLCtr = oneLCtr = pureDoubleLCtr = oneDoubleLCtr = false;
+
+	pureD = oneD = pureDoubleD = oneDoubleD = false;
+	pureQ = oneQ = pureDoubleQ = oneDoubleQ = false;
+	pureW = oneW = pureDoubleW = oneDoubleW = false;
+	pureE = oneE = pureDoubleE = oneDoubleE = false;
+	pureR = oneR = pureDoubleR = oneDoubleR = false;
+	pureF = oneF = pureDoubleF = oneDoubleF = false;
+	pureSpace = oneSpace = pureDoubleSpace = oneDoubleSpace = false;
+#ifdef SERV_IRUHADEV_JUNE_SKILL_SLOT_10
+	pureSkill5 = oneSkill5 = pureDoubleSkill5 = oneDoubleSkill5 = false;
+	pureSkillEx5 = oneSkillEx5 = pureDoubleSkillEx5 = oneDoubleSkillEx5 = false;
+#endif SERV_IRUHADEV_JUNE_SKILL_SLOT_10
+}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+
 /*virtual*/void CX2GUUser::InitInpuDataProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	if( true == g_pMain->GetIsPlayingTutorial() )		// june-dungeons C3z-4t3: June vslot 0x6fc 31fcea10 @31fcea1c-31fcea53
+	{
+		m_InputData.Init_ByInputGuideStep( g_pMain->GetTutorialGuideManager().GetInputGuideStep(), GetUnitType() );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		g_pMain->GetTutorialGuideManager().LogGate( L"input mask", g_pMain->GetTutorialGuideManager().GetInputGuideStep() );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	if( m_fCanNotInputTimeZXArrow > 0.f )
 	{
 		m_InputData.Init_ZXArrowOnly();

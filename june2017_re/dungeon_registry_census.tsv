@@ -178,6 +178,27 @@ dungeon_id	name	march_name	june_name	differ	march_only	june_only	june_unread_jun
 33320	DI_RANOX_FINALHALL_NORMAL	Grand Cavern: Chasm of the Divided Land	Grand Cavern: Chasm of the Divided Land						ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
 33321	DI_RANOX_FINALHALL_HARD	Grand Cavern: Chasm of the Divided Land	Grand Cavern: Chasm of the Divided Land								SAME
 33322	DI_RANOX_FINALHALL_EXPERT	Grand Cavern: Chasm of the Divided Land	Grand Cavern: Chasm of the Divided Land				FixMaximumDifficulty,MaxAdequateMemberCount,MinAdequateMemberCount				SAME
+33330	DI_ATLASDEVELOPMENT_NORMAL	Diceon Mines	Diceon Mines				m_iRequireCompleteQuestID		BOSS_DROP_ITEM.LUCIEL,ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33331	DI_ATLASDEVELOPMENT_HARD	Diceon Mines	Diceon Mines						BOSS_DROP_ITEM.LUCIEL		SAME
+33332	DI_ATLASDEVELOPMENT_EXPERT	Diceon Mines	Diceon Mines				FixMaximumDifficulty,MaxAdequateMemberCount,MinAdequateMemberCount		BOSS_DROP_ITEM.LUCIEL		SAME
+33340	DI_ATLASCITY_NORMAL	Atlas City	Atlas City						BOSS_DROP_ITEM.AIN,BOSS_DROP_ITEM.LUCIEL,BOSS_DROP_ITEM.ROSE,ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33341	DI_ATLASCITY_HARD	Atlas City	Atlas City						BOSS_DROP_ITEM.AIN,BOSS_DROP_ITEM.LUCIEL,BOSS_DROP_ITEM.ROSE		SAME
+33342	DI_ATLASCITY_EXPERT	Atlas City	Atlas City				FixMaximumDifficulty,MaxAdequateMemberCount,MinAdequateMemberCount		BOSS_DROP_ITEM.AIN,BOSS_DROP_ITEM.LUCIEL,BOSS_DROP_ITEM.ROSE		SAME
+33350	DI_TOWER_NORMAL	Elysion Tower	Elysion Tower						ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33351	DI_TOWER_HARD	Elysion Tower	Elysion Tower								SAME
+33352	DI_TOWER_EXPERT	Elysion Tower	Elysion Tower				FixMaximumDifficulty,MaxAdequateMemberCount,MinAdequateMemberCount				SAME
+33870	DI_SKYCROSSROADS_NORMAL	Celestial Crossroad	Celestial Crossroad						BOSS_DROP_ITEM.AIN,ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33871	DI_SKYCROSSROADS_HARD	Celestial Crossroad	Celestial Crossroad						BOSS_DROP_ITEM.AIN		SAME
+33872	DI_SKYCROSSROADS_EXPERT	Celestial Crossroad	Celestial Crossroad						BOSS_DROP_ITEM.AIN		SAME
+33880	DI_ADRIAN_NORMAL	Adrian's Palace	Adrian's Palace						ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33881	DI_ADRIAN_HARD	Elysion Tower	Elysion Tower								SAME
+33882	DI_ADRIAN_EXPERT	Elysion Tower	Elysion Tower								SAME
+33890	DI_SOLESS_NORMAL	Solace's Fortress	Solace's Fortress						BOSS_DROP_ITEM.LUCIEL,BOSS_DROP_ITEM.ROSE,ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33891	DI_SOLESS_HARD	Solace's Fortress	Solace's Fortress						BOSS_DROP_ITEM.LUCIEL,BOSS_DROP_ITEM.ROSE		SAME
+33892	DI_SOLESS_EXPERT	Solace's Fortress	Solace's Fortress						BOSS_DROP_ITEM.LUCIEL,BOSS_DROP_ITEM.ROSE		SAME
+33900	DI_MEMORY_NORMAL	Halted Sun's Memory	Halted Sun's Memory						ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33901	DI_MEMORY_HARD	Halted Sun's Memory	Halted Sun's Memory						ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+33902	DI_MEMORY_EXPERT	Halted Sun's Memory	Halted Sun's Memory						ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
 38020	DI_ARCADE_SEASON1	Imir's time and space : full screen mode	Imir's time and space : full screen mode					m_bArcadeMode			SAME
 38100	DI_ELDER_HENIR_SPACE	Henir's	Henir's				DUNGEON_CHECK_CONDITION,m_HardMaxLevel,m_HardMinLevel,m_HardRequireItemLevel,m_fExtraValue	m_LocalStarPosX,m_LocalStarPosY	ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE,ENDING_SPEECH1.AIN,ENDING_SPEECH1.LUCIEL,ENDING_SPEECH1.ROSE		SAME
 38300	DI_DEFENCE_DUNGEON_ELDER_NORMAL	Gates of Darkness	Gates of Darkness				DUNGEON_CHECK_CONDITION		ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE,ENDING_SPEECH1.AIN,ENDING_SPEECH1.LUCIEL,ENDING_SPEECH1.ROSE		SAME
@@ -217,5 +238,14 @@ dungeon_id	name	march_name	june_name	differ	march_only	june_only	june_unread_jun
 39530	DI_EVENT_TREE_DAY_PEITA	Tears of Ruben Forest	Tears of Ruben Forest				DUNGEON_CHECK_CONDITION	m_bSwitchingWithEventInfo			SAME
 39540	DI_EVENT_TREE_DAY_VELDER	Tears of Ruben Forest	Tears of Ruben Forest				DUNGEON_CHECK_CONDITION	m_bSwitchingWithEventInfo			SAME
 39550	DI_EVENT_TREE_DAY_HAMEL	Tears of Ruben Forest	Tears of Ruben Forest				DUNGEON_CHECK_CONDITION	m_bSwitchingWithEventInfo			SAME
+41150	DI_DUNGEON_TUTORIAL_ELSWORD	Ruben Forest	Ruben Forest				DUNGEON_CHECK_CONDITION				SAME
+41160	DI_DUNGEON_TUTORIAL_AISHA	Ruben Forest	Ruben Forest				DUNGEON_CHECK_CONDITION				SAME
+41170	DI_DUNGEON_TUTORIAL_LENA	Ruben Forest	Ruben Forest				DUNGEON_CHECK_CONDITION				SAME
+41180	DI_DUNGEON_TUTORIAL_EVE	Altera Core Center	Altera Core Center				DUNGEON_CHECK_CONDITION				SAME
+41190	DI_DUNGEON_TUTORIAL_RAVEN	Altera Laboratory	Altera Laboratory				DUNGEON_CHECK_CONDITION				SAME
+41210	DI_DUNGEON_TUTORIAL_ARA	Burning Village	Burning Village				DUNGEON_CHECK_CONDITION				SAME
+41220	DI_DUNGEON_TUTORIAL_EL	Ruben Training Ground	Ruben Training Ground				DUNGEON_CHECK_CONDITION				SAME
+41230	DI_DUNGEON_TUTORIAL_ADD	Elder's Underground Laboratory	Elder's Underground Laboratory				DUNGEON_CHECK_CONDITION				SAME
 41270	?	Grand Cavern: The Source of Demonic Energy	Grand Cavern: The Source of Demonic Energy				m_SuitableLevelFixValue	m_LocalStarPosX,m_LocalStarPosY,m_bForbidEnterDungeon	ENDING_SPEECH0.LUCIEL		SAME
 41271	DI_RANOX_SECRET_HELL	Grand Cavern: The Source of Demonic Energy	Grand Cavern: The Source of Demonic Energy				m_SuitableLevelFixValue	m_LocalStarPosX,m_LocalStarPosY	ENDING_SPEECH0.AIN,ENDING_SPEECH0.LUCIEL,ENDING_SPEECH0.ROSE		SAME
+41290	DI_DUNGEON_TUTORIAL_CHUNG	Hamel of Dawn	Hamel of Dawn				DUNGEON_CHECK_CONDITION				SAME

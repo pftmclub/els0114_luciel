@@ -292,6 +292,9 @@ CX2DungeonGame::~CX2DungeonGame(void)
 	{
 		g_pData->GetPlayGuide()->DeleteQuestGuideParticle();
 		g_pData->GetPlayGuide()->DeleteInputGuideParticle();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+		g_pData->GetPlayGuide()->DeleteJumpGuideParticle();	// june-dungeons C3y-2: June 327d2240 @327d25f3
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 	}
 
 #ifdef SERV_IRUHADEV_JUNE_SHOW_BOSS_NAME_AT_START
@@ -331,6 +334,10 @@ CX2DungeonGame::~CX2DungeonGame(void)
 	if( NULL != g_pMain && true == g_pMain->GetIsExitingTutorial() )
 		g_pMain->GetTutorialGuideManager().OnExitTutorial();	// june-dungeons C3z-4t1: June 327d2160 @327d21ae
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+	if( NULL != g_pMain && true == g_pMain->GetIsExitingTutorial() && NULL != g_pData && NULL != g_pData->GetPlayGuide() )
+		g_pData->GetPlayGuide()->ShowJumpGuide( false, 0.f );	// june-dungeons C3y-2: June 327d2160 @327d21c7
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
 
 	CX2Game::Release();	/// 상위 클래스의 소멸자가 나중에 호출
 }
@@ -3185,6 +3192,15 @@ void CX2DungeonGame::ShowSubStageOpenGuide()
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+// june-dungeons C3y-2: June 327ca2c0 ( Lua ShowJumpGuide ): the play guide's jump hint for fShowTime seconds
+void CX2DungeonGame::ShowJumpGuide( float fShowTime )
+{
+	if( NULL != g_pData && NULL != g_pData->GetPlayGuide() )
+		g_pData->GetPlayGuide()->ShowJumpGuide( true, fShowTime );
+}
+
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 void CX2DungeonGame::ClearSubStage( int clearType, int nextStageNum, int nextSubStageNum )
 {
 	GetDungeon()->GetNowStage()->GetNowSubStage()->ClearSubStage( clearType, nextStageNum, nextSubStageNum );

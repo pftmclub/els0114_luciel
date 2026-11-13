@@ -1749,6 +1749,15 @@ void CX2PartyUI::OpenLocalMapDlg()
 				}
 			}
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+			if( true == g_pMain->GetTutorialGuideManager().IsGuideRunning() )		// june-dungeons C3z-4t3: June 322b5970 @322b5a3a-322b5a47, a guide opens Ruben's map
+			{
+				eLocalMapID = CX2LocationManager::LMI_RUBEN;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+				g_pMain->GetTutorialGuideManager().LogGate( L"local map forced to Ruben" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+			}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 			if( CX2LocationManager::LMI_INVALID == eLocalMapID )
 			{
 				eLocalMapID = CX2LocationManager::LMI_RUBEN;

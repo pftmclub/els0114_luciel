@@ -50,6 +50,9 @@ CKTDGUIDialogManager::CKTDGUIDialogManager(void)
 #ifdef SERV_IRUHADEV_JUNE_UI_DIALOG_BANDS
 	m_bFlaggedDialogsOnly = false;	// June +0x110 ( ctor 31d067e0 @31d06a5b )
 #endif SERV_IRUHADEV_JUNE_UI_DIALOG_BANDS
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	m_bDialogCreateBlocked = false;	// june-dungeons C3z-4t3: June +0x111 ( ctor 31d067e0 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 }
 
 CKTDGUIDialogManager::~CKTDGUIDialogManager(void)

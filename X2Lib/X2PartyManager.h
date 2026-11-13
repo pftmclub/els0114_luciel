@@ -455,6 +455,10 @@ public:
 	bool GetProcessPvpMatch() const { return m_bProcessPvpMatch; }
 	void SetProcessDungeonMatch(bool bVal) { m_bProcessDungeonMatch = bVal; }
 	bool GetProcessDungeonMatch() const { return m_bProcessDungeonMatch; }
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	void SetAutoPartyMatchFound( bool bVal ) { m_bAutoPartyMatchFound = bVal; }	// june-dungeons C3z-4t3: June +0x8a, set by the match popup 3243d4e0, cleared by the close 3243c260
+	bool GetAutoPartyMatchFound() const { return m_bAutoPartyMatchFound; }			// june-dungeons C3z-4t3: read by the tutorial guide's CanBeginGuide 31fc4530
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 	void RemovePvpPartyMsg() 
 	{ 
@@ -534,6 +538,9 @@ private:
 	CKTDGUIDialogType	m_pDlgPvpPartyMsg;
 #endif
 	bool				m_bProcessDungeonMatch;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	bool				m_bAutoPartyMatchFound;		// june-dungeons C3z-4t3: June +0x8a
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 	std::map<int,KAutoPartyDungeonBonusInfo>	m_mapAutoPartyDungeonBonusInfo;
 	int											m_iCurrentDungeonIDWithDifficulty;

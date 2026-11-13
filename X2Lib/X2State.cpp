@@ -759,8 +759,13 @@ HRESULT CX2State::OnFrameMove( double fTime, float fElapsedTime )
 	/// June buff port Phase 14c, CX2State::OnFrameMove 31f0d390 @31f0d996-31f0d9cb: no shortcut keys in the tutorial.
 	/// June also skips them while its June-only CX2TutorialGuideManager (g_pMain+0x8c4, 31fbdab0) is active; March has none.
 	/// This drops March's COMBOTREE_IN_TUTORIAL K-key exception, as June does.
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	if( false == g_pMain->GetTutorialGuideManager().IsGuideRunningWithStopFrame() && false == g_pMain->GetIsPlayingTutorial() )	// june-dungeons C3z-4t3: June @31f0d998 ( 31fbdab0 )
+		ShortCutKeyProcess();
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	if( false == g_pMain->GetIsPlayingTutorial() )
 		ShortCutKeyProcess();
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #else SERV_IRUHADEV_JUNE_TUTORIAL_MODE
 	ShortCutKeyProcess();
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_MODE
@@ -1395,6 +1400,10 @@ bool CX2State::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 				if ( m_bIgnoreAllUIEvent == true )
 					return false;
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+				if( true == g_pMain->GetTutorialGuideManager().UICustomEventProc( static_cast<int>( wParam ) ) )	// june-dungeons C3z-4t3: June 31efa9c0 case 0x467 ( 31fc63f0 )
+					return true;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 				if ( UICustomEventProc( hWnd, uMsg, wParam, lParam ) == true )
 					return true;
 			}
@@ -2205,6 +2214,9 @@ bool CX2State::UICustomFuncProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 bool CX2State::UIServerEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	g_pMain->GetTutorialGuideManager().UIServerEventProc( static_cast<int>( wParam ) );	// june-dungeons C3z-4t3: June 31f2ab80 @31f2abe1 ( 31fc63d0 ), result unused
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	if( g_pData->GetUIManager() != NULL)
 	{
 		if ( true == g_pData->GetUIManager()->UIServerEventProc( hWnd, uMsg, wParam, lParam))
@@ -4381,6 +4393,15 @@ bool CX2State::HandleMsgByESC()
 	if ( ( g_pMain->GetNowStateID() != CX2Main::XS_LOADING ) && g_pKTDXApp->GetDIManager()->Getkeyboard()->GetKeyState( DIK_ESCAPE ) == TRUE )
 #endif // SERV_KEY_MAPPING_INT
 	{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		if( true == g_pMain->GetTutorialGuideManager().IsGuideRunning() && true == g_pMain->GetTutorialGuideManager().IsAnyKeyNotAllowed() )	// june-dungeons C3z-4t3: June @31f1e1e8-31f1e212
+		{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+			g_pMain->GetTutorialGuideManager().LogGate( L"esc eaten" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+			return false;
+		}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #ifdef SERV_IRUHADEV_JUNE_RESULT_FLOW
 		// June @31f1e214-31f1e261: the result UI takes ESC
 		if ( 0 != m_iResultMode )
@@ -4445,7 +4466,7 @@ bool CX2State::HandleMsgByESC()
 #ifdef SERV_IRUHADEV_JUNE_SKIP_START
 		/// June CX2State::HandleMsgByESC ( vslot 0x1e8, 31f1e1a0 @31f1e359-31f1e3ba ): with a live g_pX2Game, an armed skip-the-start list takes
 		/// the ESC ( 322f4c60 ) and HandleMsgByESCImp ( vslot 0x1ec, a tail jump in June ) is not called. The June-only gates earlier in
-		/// 31f1e1a0 ( state +0x210, the tutorial guide manager, the chat box ) belong to June's ESC handler, not to this chain.
+		/// 31f1e1a0 ( state +0x210, the tutorial guide manager, GFx closeToTopZorder 31c43bb0 ) belong to June's ESC handler, not to this chain.
 		if ( NULL != g_pX2Game && true == g_pX2Game->SkipStartRequest() )
 			return false;
 #endif SERV_IRUHADEV_JUNE_SKIP_START

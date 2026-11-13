@@ -83,6 +83,18 @@ public:
 		GS_WAIT_CLICK			= 6,
 	};
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	// june-dungeons C3z-4t3: June Enum.lua INPUT_GUIDE_STEP ( the +0xe4 step )
+	enum INPUT_GUIDE_STEP
+	{
+		IGS_MOVE				= 0,
+		IGS_DASH				= 1,
+		IGS_ATTACK				= 2,
+		IGS_SKILL				= 3,
+		IGS_AWAKE				= 4,
+	};
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+
 	// the object June reads at +0xc4 (vslot 4 -> bool); no June writer found, so it stays NULL
 	class GuideStartBlocker
 	{
@@ -105,6 +117,15 @@ public:
 	bool	IsGuideRunning() const { return GS_NONE != m_iGuideState; }								// June 31fbda90
 	bool	IsGuideRunningWithStopFrame() const { return GS_NONE != m_iGuideState && false == m_NowGuideScene.m_bNoStopFrame; }	// June 31fbdab0 / 31fbdad0
 	bool	IsAnyKeyNotAllowed() const { return true != m_NowGuideScene.m_bAnyKeyAllow; }			// June 31fbdb20
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	int		GetInputGuideStep() const { return m_iInputGuideStep; }		// june-dungeons C3z-4t3: June +0xe4, read by SetShowUI 32154820 and 31fcea10
+	bool	UICustomEventProc( int iCustomMsg );		// june-dungeons C3z-4t3: June 31fc63f0, true = the message is eaten
+	bool	UIServerEventProc( int iEventID );			// june-dungeons C3z-4t3: June 31fc63d0, always false
+	void	SetShowQuickSlotByGuide();					// June 31fbdfa0 ( june-dungeons C3z-4t3: public, StateChange calls it )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+	void	LogGate( const WCHAR* wszGate, int iValue = 0 );	// june-dungeons C3z-4t3: once a second per gate name
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
 
 	// Lua (binder 31d95080 @31e3a0ab-31e3b29b)
 	float	CheckEventTriggerNPCPosX( int iNPCID );		// June 31fc3e80
@@ -145,7 +166,9 @@ private:
 	void	ResetFocusEventNPC();						// June 31fc4430
 	void	StopGameFrame();							// June 31fc3e10
 	void	ResumeGameFrame();							// June 31fc3da0
+#ifndef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	void	SetShowQuickSlotByGuide();					// June 31fbdfa0
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	void	ResetInputGuideState();						// June 31fc3990
 	void	ShowInputSideGuideUI( int iInputGuideStep );	// June 31fc46d0
 	void	BlinkInputGuideKey( CKTDGUIStatic* pStatic, int iPictureIndex, float* pfBlinkTime, float fElapsedTime );	// June 31fbdd30
@@ -185,6 +208,9 @@ private:
 	std::map< int, bool >		m_mapMoveGuideKeyPressed;	// +0x104 picture index -> pressed
 	CKTDGUIDialogType			m_pDLGInputSideGuide;		// +0x114 DLG_UI_Tutorial_Input_Side_Guide.lua
 	bool						m_bInputGuideHidden;		// +0x11c
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+	std::map< std::wstring, DWORD >	m_mapGateLogTime;		// june-dungeons C3z-4t3: gate name -> last log tick
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
 };
 
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE

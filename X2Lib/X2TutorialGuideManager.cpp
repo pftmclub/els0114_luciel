@@ -218,7 +218,11 @@ bool CX2TutorialGuideManager::LoadTutorialGuideInfo()
 			int iServerEventType = 0;
 			LUA_GET_VALUE( luaManager, "SERVER_EVENT_TYPE",					iServerEventType,							0 );
 			if( 1 == iServerEventType )		// TutorialGuideInfo.lua SEVER_EVENT_INVENTORY_SLOT_ITEM
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+				kScene.m_iServerEventID = EGS_CHANGE_INVENTORY_SLOT_ITEM_ACK;	// june-dungeons C3z-4t3: June 0x101 ( June sends 0x100 / waits 0x101 in 32916d90 )
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 				kScene.m_iServerEventID = SERVER_EVENT_ID_INVENTORY_SLOT_ITEM;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 			LUA_GET_VALUE( luaManager, "CUSTOM_EVENT_MSG",					kScene.m_iCustomEventMsg,					-10 );
 			LUA_GET_VALUE( luaManager, "CUSTOM_EVENT_SUB_MSG1",				kScene.m_iCustomEventSubMsg1,				-10 );
@@ -512,9 +516,15 @@ bool CX2TutorialGuideManager::CanBeginGuide( bool bNotInDungeon, bool bHighPrior
 	if( true == pPartyManager->DoIHaveParty() && false == pPartyManager->AmIPartyLeader() )
 		return false;
 
+#ifndef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	// stand-in: June also blocks on party manager +0x8a, a June-only flag with no March member
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	if( true == pPartyManager->GetProcessDungeonMatch() )
 		return false;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	if( true == pPartyManager->GetAutoPartyMatchFound() )		// june-dungeons C3z-4t3: June 31fc468f party manager +0x8a
+		return false;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 	if( 1 == iConditionState )		// TutorialGuideInfo.lua SC_SHOW_QUEST_UI
 	{
@@ -562,7 +572,11 @@ void CX2TutorialGuideManager::PlayGuideStep()
 	if( true == m_NowGuideScene.m_bUseLimitZoom )
 	{
 		g_pMain->GetGameOption().GetOptionList().m_iZoomLevel = -1;	// June g_pMain+0x1d0
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		g_pMain->SetLockCameraZoom( true );		// june-dungeons C3z-4t3: June 31fc410b g_pMain+0x3f5
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 		// stand-in: June also sets g_pMain+0x3f5 ( zoom lock, June-only, read by the zoom key handler 3245a8f0, not ported )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	}
 
 	if( true == m_NowGuideScene.m_bFixSkillTypeA && NULL != g_pData && NULL != g_pData->GetUIManager() &&
@@ -606,7 +620,11 @@ void CX2TutorialGuideManager::PlayGuideStep()
 	if( NULL != g_pTFieldGame && true == g_pTFieldGame->GetJoinNpc() )
 		g_pTFieldGame->SetShowNpcMessage( false );
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	g_pKTDXApp->GetDGManager()->GetDialogManager()->SetDialogCreateBlocked( true != m_NowGuideScene.m_bDialogCreateAllow );	// june-dungeons C3z-4t3: June 31fc42ba +0x111
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	// stand-in: June writes the dialog manager's +0x111 here ( DIALOG_CREATE_ALLOW; June-only, its quest-reward reader is t3 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 	if( false == m_NowGuideScene.m_bNoStopFrame )
 		StopGameFrame();
@@ -657,7 +675,11 @@ void CX2TutorialGuideManager::EndGuide()
 		pState->SetShowMouseClickUI( true, (CX2State::MouseClickUI::HIDE_REASON)3 );	// June-only hide reason 3, no Enum entry
 
 	g_pKTDXApp->GetDIManager()->Getkeyboard()->SetUseAllowedKeyList( false );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	g_pMain->SetLockCameraZoom( false );		// june-dungeons C3z-4t3: June 31fc4c9c g_pMain+0x3f5
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	// stand-in: June clears g_pMain+0x3f5 here ( the June-only zoom lock )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 	ResetFocusEventNPC();
 
@@ -678,7 +700,11 @@ void CX2TutorialGuideManager::EndGuide()
 		HideGuideMovie();
 
 	m_iLastCustomEventMsg = LAST_CUSTOM_EVENT_NONE;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	g_pKTDXApp->GetDGManager()->GetDialogManager()->SetDialogCreateBlocked( false );		// june-dungeons C3z-4t3: June 31fc4d70 +0x111
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 	// stand-in: June clears the dialog manager's +0x111 here ( June-only, t3 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 }
 
 void CX2TutorialGuideManager::WaitEventNPC()
@@ -843,6 +869,59 @@ void CX2TutorialGuideManager::EndGuideStepWithCustomEvent()
 
 	EndGuideStep();
 }
+
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+// june-dungeons C3z-4t3: June 31fc63f0, called by CX2State's custom-event base 31efa9c0 before UICustomEventProc
+bool CX2TutorialGuideManager::UICustomEventProc( int iCustomMsg )
+{
+	m_iLastCustomEventMsg = iCustomMsg;
+	if( GS_NONE == m_iGuideState )
+		return false;
+
+	bool bEaten = false;
+	if( GS_WAIT_INPUT != m_iGuideState )
+		bEaten = true;
+	else if( m_NowGuideScene.m_iCustomEventMsg == iCustomMsg || m_NowGuideScene.m_iCustomEventSubMsg1 == iCustomMsg ||
+		m_NowGuideScene.m_iCustomEventSubMsg2 == iCustomMsg )
+		EndGuideStep();
+	else if( m_NowGuideScene.m_iButtonEventAllowMsg1 != iCustomMsg && m_NowGuideScene.m_iButtonEventAllowMsg2 != iCustomMsg &&
+		m_NowGuideScene.m_iButtonEventAllowMsg3 != iCustomMsg && true != m_NowGuideScene.m_bMouseEventAllow &&
+		CX2UISkillTreeNew::STUCM_SKILLTREESLOT_MOUSEIN != iCustomMsg && CX2UISkillTreeNew::STUCM_SKILLTREESLOT_MOUSEOUT != iCustomMsg )
+		bEaten = true;
+
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+	if( true == bEaten )
+		LogGate( L"custom event eaten", iCustomMsg );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+	return bEaten;
+}
+
+// june-dungeons C3z-4t3: June 31fc63d0, called first by CX2State::UIServerEventProc 31f2ab80; June ignores the result
+bool CX2TutorialGuideManager::UIServerEventProc( int iEventID )
+{
+	if( GS_WAIT_INPUT == m_iGuideState && m_NowGuideScene.m_iServerEventID == iEventID )
+	{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		LogGate( L"server event ends step", iEventID );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		EndGuideStep();
+	}
+	return false;
+}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+void CX2TutorialGuideManager::LogGate( const WCHAR* wszGate, int iValue )
+{
+	const DWORD dwNow = GetTickCount();
+	std::map< std::wstring, DWORD >::iterator it = m_mapGateLogTime.find( wszGate );
+	if( it != m_mapGateLogTime.end() && dwNow - it->second < 1000 )
+		return;
+
+	m_mapGateLogTime[ wszGate ] = dwNow;
+	CX2OfflineLog::Server( L"JUNE_FX C3z-4t gate %s: guide %d, value %d", wszGate, m_NowGuideScene.m_iGuideNo, iValue );
+}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
 
 bool CX2TutorialGuideManager::CheckAllowedKeyPressed()
 {

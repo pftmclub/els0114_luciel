@@ -4067,6 +4067,41 @@ void CX2StateBeginning::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ()
 	kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_DifficultyLevel	= CX2Dungeon::DL_NORMAL;
 	kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_fPlayTime			= 19999.0f;
 	kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_cGetItemType		= CX2DungeonRoom::DGIT_RANDOM;
+#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
+	// june-dungeons C3y-2: June has one builder ( 325622e0 ); this compiled-out copy ( ELSWORD_NEW_BEGINNING ) follows it
+	switch( g_pData->GetMyUser()->GetSelectUnit()->GetType() )
+	{
+	default:
+	case CX2Unit::UT_ELSWORD:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_ELSWORD;
+		break;
+	case CX2Unit::UT_ARME:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_AISHA;
+		break;
+	case CX2Unit::UT_LIRE:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_LENA;
+		break;
+	case CX2Unit::UT_RAVEN:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_RAVEN;
+		break;
+	case CX2Unit::UT_EVE:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_EVE;
+		break;
+	case CX2Unit::UT_CHUNG:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_CHUNG;
+		break;
+	case CX2Unit::UT_ARA:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_ARA;
+		break;
+	case CX2Unit::UT_ELESIS:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_EL;
+		break;
+	case CX2Unit::UT_ADD:
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_ADD;
+		break;
+	// stand-in: Lu/Ciel, Rose, Ain not ported ( June unit types 10 / 11 / 12 -> 41240 / 41250 / 41420 )
+	}
+#else SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
 
 
 	switch( g_pData->GetMyUser()->GetSelectUnit()->GetType() )
@@ -4105,6 +4140,7 @@ void CX2StateBeginning::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ()
 
 	}
 
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
 	g_pData->GetServerProtocol()->SendPacket( EGS_CREATE_TUTORIAL_ROOM_REQ, kEGS_CREATE_ROOM_REQ );
 	g_pMain->AddServerPacket( EGS_CREATE_TUTORIAL_ROOM_ACK, 40.f );	
 }

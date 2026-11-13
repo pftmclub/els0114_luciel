@@ -21409,6 +21409,15 @@ bool CX2Game::CheckAndWarningBusyStateNow( const bool bCheckDead_ /*= true*/ )
 		}
 		else
 		{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+			if( true == g_pMain->GetTutorialGuideManager().IsGuideRunning() )	// june-dungeons C3z-4t3: June 323022b0 @3230238f-323023bd, no busy warning during a guide
+			{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+				g_pMain->GetTutorialGuideManager().LogGate( L"busy warning skipped" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+				return false;
+			}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 			const float fTimeGap = GetMyUnit()->GetRemainElapsedTimeNotBusyState();
 
 #ifdef HARDCODING_STRING_TO_INDEX

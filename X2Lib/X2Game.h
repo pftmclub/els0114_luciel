@@ -1620,6 +1620,9 @@ void ShowTimerAlarm( int iIndex, float fValue_ );
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 		class CX2TutorialGuideManager*	GetTutorialGuideManager();	// june-dungeons C3z-4t1: June 322cc010 ( X2TutorialGuideManager.cpp )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+		void						PopTalkBox( UidType iUnitUID, int iStringID, bool bUser );	// june-dungeons C3y-2: June 32305f00
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 		virtual	bool			Handler_EGS_RESURRECT_TO_CONTINUE_DUNGEON_NOT( KEGS_RESURRECT_TO_CONTINUE_DUNGEON_NOT& kEGS_RESURRECT_TO_CONTINUE_DUNGEON_NOT );
 
 		void					SetShowSmallGageAndNameForAllGameUnit( const bool bShow_ );

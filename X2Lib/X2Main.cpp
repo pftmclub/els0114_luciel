@@ -1507,6 +1507,9 @@ m_pMemoryHolder( NULL )
 	m_bIsExitFieldDungeon   = false;
 	m_bIsPlayingTutorial 	= false;
 	m_bIsExitingTutorial 	= false;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	m_bLockCameraZoom		= false;	// june-dungeons C3z-4t3: June +0x3f5
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_MODE
 	m_bTutorialKeyLatch	= false;
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_MODE
@@ -5738,6 +5741,9 @@ bool CX2Main::StateChange( int stateID, int iDetailStateID )
 		}
 #endif // ADDED_RELATIONSHIP_SYSTEM
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+		m_TutorialGuideManager.StopGuide();		// june-dungeons C3z-4t3: June StateChange 31d88bf0 @31d88e27 ( 31fc6010 ), every state change
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #ifdef NEW_EMBLEM_MANAGER
 		CX2EmblemManager::GetInstance()->InitEmbelmPlayInfo();
 #endif //NEW_EMBLEM_MANAGER
@@ -5921,6 +5927,10 @@ bool CX2Main::StateChange( int stateID, int iDetailStateID )
 						{
 							g_pTFieldGame->AddUnit( g_pData->GetMyUser()->GetSelectUnit(), true, true );
 							g_pTFieldGame->SetAddedMyUnit(true);					
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+							if( true == m_TutorialGuideManager.IsGuideRunning() )	// june-dungeons C3z-4t3: June @31d8943f-31d8944d ( g_pTFieldGame +0x12c = 0 )
+								g_pTFieldGame->SetEnableKeyProcess( false );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 						}					
 					}	
 
@@ -5929,7 +5939,19 @@ bool CX2Main::StateChange( int stateID, int iDetailStateID )
 #ifdef SERV_IRUHADEV_JUNE_QUEST_SCENE
 					// June StateChange 31d88bf0 @31d896bd..31d896fb ( the village block ): the quest scene NEW_QUEST_NOT deferred in state 5. June skips it while a
 					// tutorial guide runs ( 31fbda90 on g_pMain +0x8c4 ): March has no tutorial-guide manager ( Stage 9 ).
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+					if( true == m_TutorialGuideManager.IsGuideRunning() )	// june-dungeons C3z-4t3: June @31d8946f-31d89493, the guide's quick-slot refresh 31fbdfa0 instead
+					{
+						m_TutorialGuideManager.SetShowQuickSlotByGuide();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+						m_TutorialGuideManager.LogGate( L"village deferred quest scene skipped" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+					}
+					else
+						CX2UIQuestNew::PlayDeferredQuestScene();
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 					CX2UIQuestNew::PlayDeferredQuestScene();
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #endif SERV_IRUHADEV_JUNE_QUEST_SCENE
 
 				}
@@ -6009,7 +6031,16 @@ bool CX2Main::StateChange( int stateID, int iDetailStateID )
 					m_pNowState = new CX2StateBattleField();
 #ifdef SERV_IRUHADEV_JUNE_QUEST_SCENE
 					// June StateChange 31d88bf0 @31d896bd..31d896fb ( the battle field block ): the same deferred quest scene
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+					if( false == m_TutorialGuideManager.IsGuideRunning() )	// june-dungeons C3z-4t3: June @31d896aa-31d896b7
+						CX2UIQuestNew::PlayDeferredQuestScene();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+					else
+						m_TutorialGuideManager.LogGate( L"battle field deferred quest scene skipped" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 					CX2UIQuestNew::PlayDeferredQuestScene();
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #endif SERV_IRUHADEV_JUNE_QUEST_SCENE
 				} break;
 
@@ -6300,6 +6331,15 @@ CKTDGUIDialogType CX2Main::KTDGUIOKMsgBox( D3DXVECTOR2 pos, const WCHAR* pText, 
 {
 	if( pNowState == NULL )
 		pNowState = m_pNowState;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	if( true == g_pKTDXApp->GetDGManager()->GetDialogManager()->GetDialogCreateBlocked() )	// june-dungeons C3z-4t3: June 31d7d8c0 @31d7d9cc, no box while the guide's scene blocks dialogs
+	{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		m_TutorialGuideManager.LogGate( L"ok box blocked" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+		return NULL;
+	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 
 #ifdef DIALOG_SHOW_TOGGLE
 	if( g_pKTDXApp->GetDGManager()->GetDialogManager()->GetHideDialog() == true )

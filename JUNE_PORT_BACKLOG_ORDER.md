@@ -749,6 +749,11 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
   `32924ac0` walks 5 set statics, the item list in sets of 5, and has no per-set slot constant), so the fix is June's exchange UI whole, not a
   raised constant. (2) The personal-shop search combo's Add entry (lifted by CH0c) is March's hard-coded CP949 label `L"#C0000FF<Add>#CX"`
   (`X2UIPersonalShopBoard.cpp`, seven blocks, studio TODO); if it shows garbled, June's combo text goes with June's search board (ctor `32d8e980`).
+- **Tutorial-guide menu / HUD bytes (june-dungeons C3z-4t3, 2026-11-13).** The guide writes three June-only bytes whose readers are June UI: the
+  state menu's `+0x43d` (CUSTOM_EVENT_MSG 122 in a guild; read by the bottom-bar helpers `3245a9d0` / `3245c098`), the now-state's `+0x378` (written
+  by `31fbdfa0` and `SetShowMenu` `32150b0e`; read by the menu dialog `324617c0` and `32388448-323895a2`), and `CX2State` vslot `0xb0` (field override
+  `3245c560`: a June UI at `+0x38c`, gauge-manager `+0xd1` for buff 0x86b). Stand-ins stay in `X2TutorialGuideManager.cpp` until these UIs are
+  ported. Also `31d72cc0` (`KTDGUIOKMsgBox`'s first test, a June-only `g_pData+0x290 +0xd8` system that also returns early from `SetShowUI`).
 
 **Why UI is last and not first:** UI is not one system. Each stage above brings its own June dialogs: the region maps (1), slots and skill tree (3), quests (4), and the transcendence guides (6). A UI-first pass would port buttons with no system behind them, and then collide with every feature stage that touches the same dialog. The only UI work that must come early is the framework itself, and that is measured in Stage 2.
 
@@ -1334,6 +1339,9 @@ ported only their story-slide-show forced Ends. Offline the AI party sends neith
 plan's subject (scope rule). Brief: `kickoffs/june-backlog/stage28-plan.md`. Planning: `/x2-phase new-plan june-party`. Not started.
 *June-result R0 (2026-10-22):* the party manager also calls the dungeon state's retry refresh (vslot 0xe8, `@32434dd6`). The result's
 `RESULT_SUCCESS_ACK` handler (`324d4cd0`) has a `+0x22d` branch into `324334d0( 0x72 )`, which offline is never taken (always 0).
+*June-dungeons C3z-4t3 (2026-11-13):* the tutorial-guide lines of both auto-party handlers are ported: `31fc6010` and `+0x8a`
+(`CX2PartyManager::m_bAutoPartyMatchFound`) in the match popup `3243d4e0`, and in the close `3243c260` (event 895) the reasons 02 / 03 clear `+0x8a`
+and call `31fc6020`. Still owed here: `32461a70` / `324639a0` after the popup, and the close's June rework (0x40f / 0x410 branches, popups, sound).
 
 ### Stage 29: June dungeon result screen (user, 2026-10-21; split out of Stage 9)
 

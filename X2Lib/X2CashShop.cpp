@@ -1,5 +1,8 @@
 #include "StdAfx.h"
 #include ".\x2cashshop.h"
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+#include "KTDGGFXManager.h"		// june-dungeons C3z-4t3: SetOpen's ShowUI / HideUI
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #ifdef SERV_IRUHADEV_JUNE_SKILL_CASH_OPEN_ITEM
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_JUNE_SKILL_CASH_OPEN_ITEM
@@ -2774,6 +2777,16 @@ void CX2CashShop::OpenClassChangeGuideItem( int iGuideLine_ )
 #endif SERV_IRUHADEV_JUNE_CLASS_CHANGE_GUIDE
 void CX2CashShop::SetOpen( bool bOpen )
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
+	// june-dungeons C3z-4t3: June 3223d680 @3223d698-3223d6e1: closing during a guide shows GFx UI 6 ( the guide widget ) again, anything else hides it
+	if( NULL != g_pKTDXApp->GetGFXManager() )
+	{
+		if( false == bOpen && true == g_pMain->GetTutorialGuideManager().IsGuideRunning() )
+			g_pKTDXApp->GetGFXManager()->ShowUI( 6 );		// June GFx UI id, no Enum entry
+		else
+			g_pKTDXApp->GetGFXManager()->HideUI( 6 );
+	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 #ifdef FIX_MISSING_MAIL
 	if( bOpen == false )
 	{
