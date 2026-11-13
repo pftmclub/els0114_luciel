@@ -633,5 +633,7 @@ funcmap rows tagged C3y-2b; MODS.md "tutorial dungeon fixes".
   deleted lines are a peer's uncommitted `Always.h` block reorder, not committed here (see the range line). junediverge `RESULT: PASS`
   (allow-listed 7, selftest PASS); enumscan 0 A/B rows.
 - **Build.** DEPLOY OK: X2_offline.exe is 26,430,464 B, dated 2026-11-13 13:10:58, md5 c49b3858237554964c663bf8bfd63500 (built at main a6fa91e8 + 9 uncommitted code files, all C3y-2b's). EXESTR OK 1 of 1 (wide: the scene-end line) and 3 of 3 (PlayEventScene, IsRecentlyPlayedEventScene, ScenEnd), md5 c49b3858.
+- **Range flagcheck** (`39e785ea^..39e785ea`): SCENE_END_HOOK 4 PASS, TUTORIAL_ROOM_LOADING 1 PASS, TUTORIAL_LUA_BIND 2 PASS; 0 FAIL, 0 deleted
+  lines; 1 ERROR = the Always.h `#error` guard (precedent). The peer's `Always.h` / funcmap reorder was left out of the commit.
 - **How to see it:** the C3y-2 play-test again (hand-off in the session). offline_server.log `JUNE_FX C3y-2 room 4115x` and
   `JUNE_FX C3y-2b scene end: guide resume, dungeon 41150`; ErrorLog no `can't find 'IsRecentlyPlayedEventScene'` / `'PlayEventScene'`.
