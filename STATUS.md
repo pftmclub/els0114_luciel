@@ -110,8 +110,8 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH2b2 | **done 2026-11-13** (play-test passed, exe `13b50b83`; enhanced ids 28219 / 28225 / 28226 not played: CH2d review or CH6) | Sonnet 5.5 / high, user play-test | CH2b | `X2GUEL.*` | `CH2b2.md` | Sonnet 5.5 / high, user play-test | CH2b | `X2GUEL.*` | `CH2b2.md` |
-| CH2d | blocked (CHNb review; CH2c done 2026-11-13): Dark Knight (35) skills; CH2 stage review (CH2a-CH2d) | Sonnet 5.5 / high, Opus review, user play-test | CH2c, CHNb review | `X2GUEL.*` | `CH2d.md` |
+| CH2b2 | **done 2026-11-13** (play-test passed, exe `13b50b83`; enhanced ids 28219 / 28225 / 28226 not played: CH2d review or CH6) | Sonnet 5.5 / high, user play-test | CH2b | `X2GUEL.*` | `CH2b2.md` |
+| CH2d | **ready** (CH2c done, CHNb review passed `5b50392e`): Dark Knight (35) skills; CH2 stage review (CH2a-CH2d) | Sonnet 5.5 / high, Opus review, user play-test | CH2c, CHNb review | `X2GUEL.*` | `CH2d.md` |
 | CH3a | blocked (CH2d review): Grand Master (120) special actives (CH0 split) | Sonnet 5.5 / high, user play-test | CH2d review | `X2GUEL.*` | `CH3a.md` |
 | CH3a2 | blocked (CH3a): Grand Master actives 28205 / 28206 / 28222 (CH0 split) | Sonnet 5.5 / high, user play-test | CH3a | `X2GUEL.*` | `CH3a2.md` |
 | CH3b0 | blocked (CH3a2): four summons + vslots 0x24c / 0x250 (effect-set rate writers), flag `_SUMMON` | Opus 5.5 / high, Opus review | CH3a2 | `X2GUEL.*`, `X2UnitManager.h`, NPC scripts | `CH3b0.md` |
