@@ -272,7 +272,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| NU1 | **startup-line check owed** (play-test passed 2026-11-14: existing chars unchanged; fix 1 `ErrorLog` line, DEPLOY OK 917b9e3c): one launch to select, then NU1 review | Opus 5.5 / high, Opus review | NU0, char-chung Z | `X2UnitManager.*`, `X2Unit.h`, `X2Item*`, `X2StateServerSelect.cpp`, Always.h | `NU1.md`, `NU1-review.md` |
+| NU1 | **done** 2026-11-14 (`18460a26`, fix 1 `6ffe57ee`, DEPLOY OK 917b9e3c; play-tests 1 + 2 passed): Opus review next | Opus 5.5 / high, Opus review | NU0, char-chung Z | `X2UnitManager.*`, `X2Unit.h`, `X2Item*`, `X2StateServerSelect.cpp`, Always.h | `NU1.md`, `NU1-review.md` |
 | NU2 | blocked (NU1 review): unit class as June's word on the wire + emulator, flag `UNIT_CLASS_WORD` (CommonPacket.h exception) | Opus 5.5 / xhigh, Opus review | NU1 review | `CommonPacket.h`, `ClientPacket.h`, `ServerDefine.h`, `Handlers_Unit.cpp`, `X2Unit.cpp`, vcxproj | `NU2.md` |
 | NU3 | blocked (NU1 review): Lu/Ciel's 7 `UnitTemplet` rows + parser for the 18 June-only keys | Opus 5.5 / high, Opus review | NU1 review | `UnitTemplet.lua`, `X2UnitManager.*`, data036 | `NU3.md` |
 | NU4 | blocked (NU2, NU3 reviews): creation-screen entry (slot, portrait, preview, job buttons) + `SelectLuciel`, emulator create-unit, 15 starter rows, stat fallback fix, `createchar.py` | Opus 5.5 / high, Opus review, user play-test | NU2 review, NU3 review | `X2StateCreateUnit.*`, `X2Offline*`, `tools/createchar.py`, data koms | `NU4.md` |

@@ -416,8 +416,10 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE` (Always.h). Log `[
   `CX2OfflineLog` opens at 00:58:04, the unit scripts load at 00:57:55, so the lines were dropped.
 - **Fix 1:** the line goes to ErrorLog (`ErrorLogMsg( XEM_ERROR142, ... )`, the JUNE_FX idiom; ErrorLog is open from 00:57:55) and the misplaced
   `X2OfflineLog.h` include (nested in `EXTRA_NPC_STAT_PARITY`) is dropped. flagcheck `--base 18460a26^`: PASS, 0 deleted; `/Zs` 0 errors.
-  `DEPLOY OK: X2_offline.exe is 26,485,248 B, dated 2026-11-14 01:15:49, md5 917b9e3c95b58f02d35c49878d17141e`; `EXESTR OK: 1 of 1`. Owed: one
-  launch to the select screen to see the three lines.
+  `DEPLOY OK: X2_offline.exe is 26,485,248 B, dated 2026-11-14 01:15:49, md5 917b9e3c95b58f02d35c49878d17141e`; `EXESTR OK: 1 of 1`. Commit `6ffe57ee`.
+- **Play-test 2 (user, 2026-11-14): passed** - ErrorLog lines 634-636 at startup: types 10 (`LUCIEL_DUO.LUA`), 11, 12 skipped; none for 1-9;
+  0 XEM_ERROR144 / 148, 0 EXCEPTION. The run's nine empty-name KEM_ERROR72 follow missing movie subtitle scripts (`RAVEN_OUT.LUA`,
+  `MOVIE_CREATE_RENA_BASE.LUA`, `[JUNE_ENGINE] UI MOVIE subtitle script NOT loaded`): not NU1.
 
 ## Phase DU - The two-body engine (DU1-DU5)
 
