@@ -1749,7 +1749,7 @@ All 27 class-map rows read from `charport_adis.py elesis --phase CH2d` listings 
 ### CH2d - Review (2026-11-13)
 
 Opus 5.5 high. The CH2 stage review: CH2a `454c376c` (+ fix `4a74cb3b`), CH2b `9d42957b`, CH2b2 `699daff1` (+ fix `9adceac8`), CH2c `5326702e`, CH2d `1c4a9754` (+ fix `c3afbbe8`).
-**Verdict: pass on the code, no change; the enhanced-id play-test is owed** (save set, below). Only edit: `_SKILL_DEBUG` retired.
+**Verdict: pass, no code change; the enhanced-id play-test passed** (below). Only edit: `_SKILL_DEBUG` retired.
 - **Spot-checks against the June listings** (`charport_adis.py elesis <va>`), 8 functions, all = June:
   - `32b89470` bleeding helper: effect set first; HP share < 0.2 (double `(double)0.2f`) returns true; copy defender = this; WoS destruction x `+0x9720` for WST 4-6;
     min( GetFinalDamage x count, HP - 0.1 max HP ); BTI 666 x0.2; UpNowHp( -cost, 0 ) only when > 0; true on every path (JUNE_BUGS 651). June calls vslot 0x70 twice
@@ -1782,6 +1782,12 @@ Opus 5.5 high. The CH2 stage review: CH2a `454c376c` (+ fix `4a74cb3b`), CH2b `9
   28026-28030); unit 144 `DKnight80` (35): 0 28221, 1 28233, 2 28234, 3 28038, 5 28035, 6 28055, 7 28028, 8 28030; unit 21 `eresisu` (30): 0 28034, 1 28037, 2 28050,
   3 28230, 5 28220, 6 28229, 7 28026, 8 28027; unit 40 `SaberT` (29): 0 28219, 1 28225, 2 28033, 3 28217, 5 28226, 6 28036, 7 28045, 8 base 28003.
   Not slotted: 28218 (Endurance Power enhanced, a buff return) and 28029 (played in CH2a): CH6.
+- **Enhanced-id play-test (user, 2026-11-13 23:32-23:45): all passed.** Logs: 8 equip lines per unit with the ids above (144 at 23:33 / 23:35, 21 at 23:35:57, 40 at
+  23:36:56 / 23:41:19; states 49-55 / 59-65), Infernal Blade+ `SBUF frame: state 53 BFI 658`, Saber's `SBUF` 28402 / BFI 656 on states 49 / 149 / 55; ErrorLog 0 `Motion Error`,
+  0 `KEM_ERROR`; packets 0 `EXCEPTION` (5 `E_DISABLE_HB_CHECK_REQ` UNHANDLED); 0 unbound Lua names. Known, not CH2's: optional `.XET` misses (`SDK_*` / `SSK_*` / `SPK_*`
+  blades, as March's own), the CH0b `Anim Frame 79, Mesh Frame 80` lines on the `MESH_EL_SDK_*` part meshes, a peer's `X2SlideShot` lines.
+- **Stale PCH note:** that run's exe (md5 `79b337ec`, a peer's 17:52 build at `1ccad820`) still printed the equip lines, so its PCH kept the old `Always.h`. Harmless here
+  (CH3a turns the define back on); the CH3d review's retire must prove the tag gone with `exestr.py --absent` after a `--pch force` build if it builds.
 
 ## Phase CH3 - Skills: second jobs (120, 121, 125), summons, hyper actives, transcendence
 

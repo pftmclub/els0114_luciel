@@ -65,7 +65,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - **`_SKILL_DEBUG` is off** (the CH2 stage review commented out its `#define`). CH3a turns it back on in `KTDXLIB/Always.h` (`bytepatch.py`: `//#define` -> `#define`)
   for the CH3 play-tests' `ELESIS SKILL equip` lines; it then stays on until the CH3d review retires it.
-- Depends also on the CH2d review's enhanced-id play-test (STATUS row CH2d).
+- The save's 29 / 30 / 35 units (40 / 21 / 144) now have the enhanced ids slotted (base ids at level 0); reslot them for CH3 tests as needed.
 
 ## Amended by CH5 (2026-11-13)
 
