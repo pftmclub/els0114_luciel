@@ -28,7 +28,9 @@ Map: `june2017_re/c3z4t_scope.tsv`. Code: the `_GATES` and `_WALK` blocks (grep 
    @`3250a047`-`3250a289` (the break, then 31fc5c20 still runs), battle-field ctor `324bbe50` (is `g_pData +0x134` the battle-field id where I am?
    the port uses `GetBattleFieldIdWhereIam`, marked likely), `324b90b0`, `32f17780` @`32f17917`, `31f09b50` @`31f09ce5`, `323e4cb0` @`323e5294`,
    `323e3cab`, `322e5b40` (the `+0xaf8` pre-update level; JUNE_BUGS 647), `322c2930` @`322c2cbe`.
-3. **C3z-4t4b:** the quick-quest base y against June `323d0ca0` @`323d18c5`-`323d190c` (its flag in the hygiene step too).
+3. **C3z-4t4b:** the quick-quest base y against June `323d0ca0` @`323d18c5`-`323d190c` (its flag in the hygiene step too). Scene 201 was walked in
+   neither play-test (user 2026-11-13: left to this review): hand off the walk (new level-1 character, accept 11005, leave Ruben and come back
+   before finishing it; look for `begin 201 ( by going quest )`). The deployed exe keeps `_WALK_DEBUG` until the next build after item 6.
 4. **Routed, check the bullets exist:** Stage 4 (the informer rework `32f17780`, `323e05f0`), Stage 28 (`OpenPartyDLG` rework, `322c3fa0`).
 5. **Hygiene:** `python tools/flagcheck.py SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES --range 52951ffe^..52951ffe --with SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG`
    and `python tools/flagcheck.py SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK --range d393113b^..d393113b --files <the C3z-4t4 code files> --with SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG`;

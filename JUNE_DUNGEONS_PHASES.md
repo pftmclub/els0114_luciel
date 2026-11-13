@@ -617,8 +617,15 @@ Flag `SERV_IRUHADEV_JUNE_QUICK_QUEST_POS` (no dependencies). One site: the `CX2U
   peer's uncommitted Elesis block move; this phase's 8 lines appended at the end), 0 deleted lines, 0 non-ASCII, 0 encoding changes, `RESULT: PASS`.
   junediverge `--check` (2 files) `RESULT: PASS`. enumscan: 0 A/B rows.
 - **Build.** DEPLOY OK: X2_offline.exe is 26,437,632 B, dated 2026-11-13 14:18:11, md5 8cc8dc3d (built at main 76a33020 + 12 uncommitted code files, peers' included). No new strings, so no exestr check.
-- **Play-test owed** (hand-off in the STATUS row's session): a new level-1 character, scene 211's highlight on the quick-quest entry, 411's on the
-  instant-complete button; Ruben out and back with 11005 going for `begin 201 ( by going quest )`.
+- **Commit.** `b29b62bc` (temp-index commit: Always.h carried a peer's uncommitted block move). Range flagcheck `b29b62bc^..b29b62bc --files` (2):
+  1 PASS, 1 DEFINE, 0 FAIL, 0 deleted lines, `RESULT: PASS`.
+
+## C3z-4t4b - Play-test (2026-11-13, user): pass
+
+Exe md5 13b50b83 (main 84aca201, includes `b29b62bc`), a new level-1 character. User: the highlight sits on the quick-quest entry in 211 and on the
+instant-complete button in 411. offline_server.log: `begin` / `step` / `end` for 101, 102, 211 ( by new quest ) -> 202 -> 204, 503 -> 504 -> 505,
+411 ( by complete quest ), 516 -> 507 -> 508; then `refuse: unit level above 7 outside a dungeon` for 11050 at level 8 (June's own test). ErrorLog.txt:
+0 `C3z-4t` lines. Not seen: 201 (11005 was done before Ruben was left); user: left to the C3z-4t4 review's hand-off.
 
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
