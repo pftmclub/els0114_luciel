@@ -1635,6 +1635,7 @@ CX2GUEL::~CX2GUEL(void)
 				m_LuaManager.MakeTableReference( "ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE", stateData.stateID );
 				stateData.StateStart		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE_StateStart );
 				stateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE_FrameMove );
+				stateData.OnEventProcess	= normalStateData.OnEventProcess;	// char-elesis CH2a: June 32b8ca71 copies the skill state's EventProcess ( anim end -> WAIT ); without it the fire state never ends
 				m_StateList[stateData.stateID] = stateData;
 			}
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL

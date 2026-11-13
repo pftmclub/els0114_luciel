@@ -141,6 +141,13 @@ step needs the answer, otherwise let it run). The user has authorised this for O
    June-named, address-named or phase-tag identifier, a PvP-only game-type test inside June code, and a call to a `replace`-row
    function that is not replaced. A hit is fixed, or allow-listed in `tools/data/june_diverge_allow.tsv` with the June address that
    justifies it (never to silence it). A review runs `--check-all`.
+   **Stuck-state gate (user, 2026-11-13; char-elesis CH2a):** every phase that registers skill states (a class's
+   `SetEquippedSkillFuncBySkillSlotIndex` cases, any `MakeTableReference` + `m_StateList` block) runs `python tools/stateends.py check
+   <class file> <June script>` and it must print `RESULT: PASS`. A state with no `OnEventProcess` whose script is `XAP_ONE_WAIT` never ends:
+   the player is stuck and, with `INVINCIBLE`, cannot be hit (Elesis Sonic Assault: Sting memo fire state). The CH0 callback tables miss a
+   callback June *copies* from the skill state (`mov ecx, [esi + 0x44]` / `[esi + 0x48]` into the new state's EventProcess slot), so when you
+   transcribe a registration read the `UpdateUserUnitStateData` call's struct slots in the listing, never only the table row. The play-test
+   hand-off also says "after each skill you must be able to move; if you are stuck, name the skill".
 2. `build.py --deploy`: paste its `DEPLOY OK` line into the Done note. Check the phase's
    strings are in the deployed exe if the phase's gate asks for it.
    Exception (user, 2026-11-09): only a phase or review that hands off a play-test runs the full build. Any other
