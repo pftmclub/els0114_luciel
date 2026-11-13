@@ -4009,6 +4009,10 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2DungeonSubStage>( L, "GetStarted",					&CX2DungeonSubStage::GetStarted );
 	lua_tinker::class_def<CX2DungeonSubStage>( L, "GetCheckedClearSubStage",	&CX2DungeonSubStage::GetCheckedClearSubStage );
 	lua_tinker::class_def<CX2DungeonSubStage>( L, "GetDoneClearSubStage",		&CX2DungeonSubStage::GetDoneClearSubStage );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+	lua_tinker::class_def<CX2DungeonSubStage>( L, "CreateCurtain",				&CX2DungeonSubStage::CreateCurtain );	// june-dungeons C3y-2: June @31dc2abb ( 327ed0a0 = March's body )
+	lua_tinker::class_def<CX2DungeonSubStage>( L, "DeleteCurtain",				&CX2DungeonSubStage::DeleteCurtain );	// june-dungeons C3y-2: June @31dc2c1d ( 327ed240 = March's body )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 
 
 
@@ -4161,6 +4165,9 @@ void CX2Main::RegisterLuabind()
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 	lua_tinker::class_def<CX2Game>( L, "GetTutorialGuideManager",				&CX2Game::GetTutorialGuideManager );	// june-dungeons C3z-4t1: June 31dd631f ( 322cc010 )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+	lua_tinker::class_def<CX2Game>( L, "PopTalkBox",							&CX2Game::PopTalkBox );	// june-dungeons C3y-2: June @31ddba3a ( 32305f00 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 	lua_tinker::class_def<CX2Game>( L, "IsKeyPressed",							&CX2Game::IsKeyPressed );
 	lua_tinker::class_def<CX2Game>( L, "IsSkipKeyPressed",						&CX2Game::IsSkipKeyPressed );
 	lua_tinker::class_def<CX2Game>( L, "GetGameTime",							&CX2Game::GetGameTime );
@@ -4342,6 +4349,9 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2DungeonGame>( L, "GetGameLevel",						&CX2DungeonGame::GetGameLevel );
 	lua_tinker::class_def<CX2DungeonGame>( L, "GetDungeonType",						&CX2DungeonGame::GetDungeonType );	
 	lua_tinker::class_def<CX2DungeonGame>( L, "ClearSubStage",						&CX2DungeonGame::ClearSubStage );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+	lua_tinker::class_def<CX2DungeonGame>( L, "ShowJumpGuide",						&CX2DungeonGame::ShowJumpGuide );	// june-dungeons C3y-2: June @31de3577 ( 327ca2c0 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 	lua_tinker::class_def<CX2DungeonGame>( L, "GetStartRealTraining",				&CX2DungeonGame::GetStartRealTraining );
 	lua_tinker::class_def<CX2DungeonGame>( L, "SetStartRealTraining",				&CX2DungeonGame::SetStartRealTraining );
 	lua_tinker::class_def<CX2DungeonGame>( L, "GetRemainPlayTime",					&CX2DungeonGame::GetRemainPlayTime );
@@ -5000,6 +5010,9 @@ void CX2Main::RegisterLuabind()
 #ifdef SERV_IRUHADEV_JUNE_USER_LAST_TOUCH_LINE
 	lua_tinker::class_def<CX2GUUser>( L, "GetLastTouchLineIndex",		&CX2GUUser::GetLastTouchLineIndex );	/// June @31e03bcd ( thunk 31e4e960, vslot 0x12c = 3208e100 )
 #endif SERV_IRUHADEV_JUNE_USER_LAST_TOUCH_LINE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+	lua_tinker::class_def<CX2GUUser>( L, "IsOnSomethingNow",			&CX2GUUser::IsOnSomethingNow );	// june-dungeons C3y-2: June @31e14789 ( 31e4d0a0 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 #ifdef SERV_IRUHADEV_JUNE_UNIT_BASE_BINDS
 	lua_tinker::class_def<CX2GUUser>( L, "SetIsRight",					&CX2GUUser::SetIsRight );				/// June 31fc8ca0 (bound @31e156d9)
 #endif SERV_IRUHADEV_JUNE_UNIT_BASE_BINDS

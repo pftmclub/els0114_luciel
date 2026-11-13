@@ -4865,6 +4865,23 @@ D3DXVECTOR3 CX2Game::GetFocusUnitPos_LUA()
 }
 
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+// june-dungeons C3y-2: June 32305f00; the scripts pass two arguments, so bUser reads false and the box goes to an NPC owner ( JUNE_BUGS 644 )
+void CX2Game::PopTalkBox( UidType iUnitUID, int iStringID, bool bUser )
+{
+	if( NULL == m_pTalkBoxMgr )
+		return;
+
+	CX2TalkBoxManagerImp::TalkBox talkBox;
+	talkBox.m_OwnerUnitUID		= iUnitUID;
+	talkBox.m_GameUnitType		= ( true == bUser ) ? CX2GameUnit::GUT_USER : CX2GameUnit::GUT_NPC;
+	talkBox.m_bTraceUnit		= true;
+	talkBox.m_TalkBoxType		= CX2TalkBoxManagerImp::TBT_FROM_DOWN_LEFT;
+	talkBox.m_wstrTalkContent	= GET_STRING( iStringID );
+	m_pTalkBoxMgr->Push( talkBox );
+}
+
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 CX2GUUser* CX2Game::GetUserUnitByUID( UidType unitUID )
 {
 	KTDXPROFILE();

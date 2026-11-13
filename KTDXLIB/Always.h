@@ -12940,3 +12940,47 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2 - June's tutorial pieces of CX2PlayGuide: the tutorial frame-move only places the input guide
+//              ( 3289e180 / 3289df90, 80 px above the head, no quest-guide particle ), and the jump guide ( JumpGuide particle +
+//              Tuto_Ui_Jump01.ogg: 3289e030 / 3289e270 / 3289cfe0 / 3289e370 / 3289d1d0 ) shown from Lua and hidden after its time.
+//              Revert: comment out the #define ( JUNE_TUTORIAL_PLAY_GUIDE ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2 - the five Lua bindings June's Dungeon_Tutorial_* scripts call that March lacked: CX2Game::PopTalkBox
+//              ( 32305f00 ), CX2GUUser::IsOnSomethingNow ( 31e4d0a0 ), CX2DungeonGame::ShowJumpGuide ( 327ca2c0 ) and March's own
+//              CX2DungeonSubStage::CreateCurtain / DeleteCurtain ( 327ed0a0 / 327ed240 ). Revert: comment out the #define ( JUNE_TUTORIAL_LUA_BIND ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND ) && !defined( SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND needs SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE ( CX2PlayGuide::ShowJumpGuide )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2 - June's class tutorial dungeons: Handler_EGS_CREATE_TUTORIAL_ROOM_REQ ( 325622e0 ) sends each March
+//              class to DI_DUNGEON_TUTORIAL_<class> ( 41150-41290 ) in place of the battle-field tutorials ( Elesis included, no early
+//              return ), and the emulator's tutorial-dungeon lists learn the new ids. Revert: comment out the #define ( JUNE_CLASS_TUTORIAL_DUNGEON ).
+#define SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
+#if defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON ) && ( !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND ) )
+#error SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( DI_DUNGEON_TUTORIAL_* ), SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE and SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND ( the scripts' guide calls, else sub-stage 0 never clears )
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2 debug: logs JUNE_FX C3y-2 room <dungeon id> when the tutorial room is requested ( offline_server.log ). The C3y-2 review retires it.
+#define SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG needs SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+//////////////////////////////////////////////////////////////////////////
