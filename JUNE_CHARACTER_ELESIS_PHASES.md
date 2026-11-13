@@ -1746,6 +1746,43 @@ All 27 class-map rows read from `charport_adis.py elesis --phase CH2d` listings 
 - **Play-test ( user, 2026-11-13 16:50-16:52, exe `4263c1f7` ): Ejection Buster, Dark Wave, Injection Stigma, Shade Scratch, Burning Phantom passed; Brutal Cutter's weapon effect stayed after the buff ended.** Logs: 6 equip lines ( 28212 / 28213 / 28214 / 28020 bank A slots 0-3, 28019 / 28021 bank B slots 0-1; states 49 / 51 / 53 / 55 / 59 / 61 ), ErrorLog 0 lines, packets EXCEPTION 0 ( 2 `E_DISABLE_HB_CHECK_REQ` UNHANDLED and `AddGroupChainQuest` x1: not CH2d's ).
 - **Fix ( same day ):** Brutal Cutter's FrameMove pushes the handle of each of its two effect sets on `m_vecEffectSetToDeleteOnStateEnd` ( June `32b89c10` @32b8a110 / @32b8a24a, which I had read as a handle destructor ); the other five Dark Knight listings have no such call. `flagcheck --worktree` PASS ( 2 deleted lines: the two plain `PlayEffectSet` lines inside the flag ), `/Zs` probe 0 errors. `DEPLOY OK: X2_offline.exe is 26,462,720 B, dated 2026-11-13 16:55:34, md5 9043fc8bad96f57677ca5b17b6a04fc4, equal to X2/US_SERVICE/x2.exe (2026-11-13 16:55:27); built at main 1c4a9754 + 1 uncommitted code file(s).` `EXESTR OK: 2 of 2 found in X2_offline.exe, md5 9043fc8b` ( wide `EffectSet_SI_SA_SDK_BRUTAL_CUTTER_FX2`, `EffectSet_B_EL_SDC_Bleeding` ). Re-test ( user, 2026-11-13 17:36-17:38, exe `9043fc8b` ): Brutal Cutter's weapon effect now ends with the buff; logs: 6 equip lines, ErrorLog 0 lines, packets EXCEPTION 0 ( 2 `E_DISABLE_HB_CHECK_REQ` UNHANDLED ), 0 unbound Lua names.
 
+### CH2d - Review (2026-11-13)
+
+Opus 5.5 high. The CH2 stage review: CH2a `454c376c` (+ fix `4a74cb3b`), CH2b `9d42957b`, CH2b2 `699daff1` (+ fix `9adceac8`), CH2c `5326702e`, CH2d `1c4a9754` (+ fix `c3afbbe8`).
+**Verdict: pass on the code, no change; the enhanced-id play-test is owed** (save set, below). Only edit: `_SKILL_DEBUG` retired.
+- **Spot-checks against the June listings** (`charport_adis.py elesis <va>`), 8 functions, all = June:
+  - `32b89470` bleeding helper: effect set first; HP share < 0.2 (double `(double)0.2f`) returns true; copy defender = this; WoS destruction x `+0x9720` for WST 4-6;
+    min( GetFinalDamage x count, HP - 0.1 max HP ); BTI 666 x0.2; UpNowHp( -cost, 0 ) only when > 0; true on every path (JUNE_BUGS 651). June calls vslot 0x70 twice
+    (compare, then value) and zeroes copy +0x50c-0x50f (EXCEPT_ME_HP_UP / ATTACK_ONLY_ME, unread by GetFinalDamage); one call is equal here: March's GetFinalDamage has
+    no random draw (June's variance roll `322788c0` is not ported, funcmap rows 698 / 927).
+  - `32b89c10` Brutal Cutter: Oneshot 0.2, helper( m_DamageData, 0.1, 8 ), x1.3 PvP / PvE else x1.4 on both damages, BTI 509 / 429 test, erase 429, BFI 466 / 593,
+    memo type 0xf (`MI_CHECK_AND_KILL_1`) rescale of the first time value, `31fcf3e0` ( upgraded ) time x ability 1 ( `SA_EFFECTIVE_TIME` ), `SetGameUnitBuffFactor( this, -1, true )`,
+    vslot 0x224; `32a2dec0` at @32b8a110 / @32b8a24a is `vector<UINT>::push_back` on `+0x3ec0` = the CH2d fix is right.
+  - `32b8b410` Injection Stigma: 0.01 s ATK_REL (7) x `+0x4424` physic attack (x0.2 with BTI 666), 0.2 s dummy damage effect + helper count 1, power rate x1.3 / x1.4,
+    erase BTI 433, BFI 470 = ( 470, no creator, level 1, adjust 0, skip false ).
+  - `32b73ae0` / `32b51d10` Burning Phantom loop: shock time cleared; count > 9 returns with no CommonFrameMove (JUNE_BUGS 652); tick = trunc( state time / 0.15 ), 10 MP above
+    tick 4; from tick 4: MP < 10, tick >= 9 or no skill key -> END (298).
+  - `32b8c470` cases @596 / @630 / @638 / @1190 / @1198 / @1206: every second state (293, 296-298, 308) has `UserUnitStateData::Init` before its stores, constants only.
+  - `32b75580` (CH2a) Sonic memo charge: hold += dt, MP 100 / s if affordable and charge < 0.5, charge = min( +dt, 0.5 ), effect set at >= 0.5.
+  - `32b60650` (CH2b) Critical Dive: hit after 0.425 s, refund = `+0x9440` x 0.5 through `UpNowMpWithText`, on-line cancels.
+- **Held key (CH1p review note): confirmed.** Ejection Buster sets `m_kSkillSlotKey` in the charge StartFuture (`32b51b90`); the charge EventProcess `32b51be0` changes state on
+  its first frame and the attack state's two functions (`32b7d110`, `32b67ff0`) read no key. Nothing to port.
+- **`GT_PVP` hits (CH2c note): none now.** `junediverge --check-all`: `allow-listed: 232`, `RESULT: PASS`, no hit printed; `X2GUEL.cpp` / `.h`: `allow-listed: 10`, `RESULT: PASS`.
+  The allow list has not changed since CH2c, so the four were not in committed `X2GUEL.cpp` code; its June-code PvP tests are CH1's three allow rows (June tests type 1 only).
+- **Hygiene** (one `flagcheck JUNE_CHAR_ELESIS_SKILL --with _SKILL_DEBUG --range <c>^..<c>` per commit): all 8 `RESULT: PASS`, 0 FAIL, 0 non-ASCII, 0 untokened, 0 encoding change;
+  deleted lines only in `9adceac8` (26: the CH2b2 hunk move) and `c3afbbe8` (2: the plain `PlayEffectSet` lines); `eol!` 5 (`9d42957b`) and 6 (`5326702e`), each the anchor's EOL.
+  Retirement: `flagcheck JUNE_CHAR_ELESIS_SKILL --with _SKILL_DEBUG --worktree --files KTDXLIB/Always.h`: `1 OTHER` (a peer's uncommitted `JUNE_PARTICLE_LUA_LAYER` block), `RESULT: PASS`.
+  `enumscan --check X2GUEL.cpp`: 0 A/B rows. `stateends.py check X2GUEL.cpp ELESIS_KNIGHT`: 289 tables, 0 STUCK, `RESULT: PASS`. `skillicons check 28000-28999`: 129 skills,
+  misses 0, 2 known June gaps (28208 / 28229), `RESULT: PASS`.
+- **CH2d play-test logs** (run 17:36:51-17:38:15, exe `a0d1654e` = `9043fc8b` + Q12): 6 equip lines (states 49 / 51 / 53 / 55 / 59 / 61), every state above has a callback
+  (stateends), 0 `EXCEPTION`, 0 `KEM_ERROR`, 0 `Motion Error`, 0 unbound Lua names; no `NUM use` line (as every CH2 phase).
+- **Debug retire:** `//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG` (`Always.h`; guarded code stays). Build skipped: debug retire only. The deployed exe still has
+  the equip lines, which the enhanced-id test below reads. `kickoffs/char-elesis/CH3a.md` amended: CH3a turns the define back on for the CH3 play-tests.
+- **Save for the enhanced-id test** (`elsdb.py x`, backup taken): base ids set to level 0, the enhanced id learned at level 1 (the save's own upgrade pattern, as 28000-28004 /
+  28026-28030); unit 144 `DKnight80` (35): 0 28221, 1 28233, 2 28234, 3 28038, 5 28035, 6 28055, 7 28028, 8 28030; unit 21 `eresisu` (30): 0 28034, 1 28037, 2 28050,
+  3 28230, 5 28220, 6 28229, 7 28026, 8 28027; unit 40 `SaberT` (29): 0 28219, 1 28225, 2 28033, 3 28217, 5 28226, 6 28036, 7 28045, 8 base 28003.
+  Not slotted: 28218 (Endurance Power enhanced, a buff return) and 28029 (played in CH2a): CH6.
+
 ## Phase CH3 - Skills: second jobs (120, 121, 125), summons, hyper actives, transcendence
 
 **Run with:** as CH2 (CH3b0 and CH3d on Opus); one Opus review at CH3d (covers CH3a-CH3d; CH3b0 keeps its own). Sub-tag `SKILL`.

@@ -61,6 +61,12 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   Write that case under `_LIVE` as `case RNSI_SA_SGM_JUGGERNAUT_BUSTER: case RNSI_SA_SGM_JUGGERNAUT_BUSTER_UPGRADE:` (June `32b8cf8c`): the memo route then needs
   nothing more. A case body that reads `eSkillID_` gets the raw id (the base skill), as June's `param_2`.
 
+## Amended by the CH2d review (2026-11-13)
+
+- **`_SKILL_DEBUG` is off** (the CH2 stage review commented out its `#define`). CH3a turns it back on in `KTDXLIB/Always.h` (`bytepatch.py`: `//#define` -> `#define`)
+  for the CH3 play-tests' `ELESIS SKILL equip` lines; it then stays on until the CH3d review retires it.
+- Depends also on the CH2d review's enhanced-id play-test (STATUS row CH2d).
+
 ## Amended by CH5 (2026-11-13)
 
 - Grand Master's skill cut-in is `[JUNE_CHAR] ELESIS UI cut-in set 1 name HQ_CutIn_Elesis_GM_01`: the hand-off checks it once per special active cast, with a `[JUNE_GFX] CUTIN play` the same second.
