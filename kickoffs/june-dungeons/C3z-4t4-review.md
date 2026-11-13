@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase june-dungeons C3z-4t4 review` |
 | Plan doc | `JUNE_DUNGEONS_PHASES.md` (branch `main`) |
-| Depends on | C3z-4t4 done and its play-test passed (C3z-4t3 play-test passed 2026-11-13) |
+| Depends on | C3z-4t4 (play-test passed 2026-11-13) and C3z-4t4b done with its play-test |
 | Flags | `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES` (+ `_DEBUG`), `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK` (+ `_WALK_DEBUG`), t1's `_GUIDE_DEBUG` (on again for t4) |
 | Log tag | `JUNE_FX C3z-4t` (offline_server.log) |
 
@@ -28,12 +28,13 @@ Map: `june2017_re/c3z4t_scope.tsv`. Code: the `_GATES` and `_WALK` blocks (grep 
    @`3250a047`-`3250a289` (the break, then 31fc5c20 still runs), battle-field ctor `324bbe50` (is `g_pData +0x134` the battle-field id where I am?
    the port uses `GetBattleFieldIdWhereIam`, marked likely), `324b90b0`, `32f17780` @`32f17917`, `31f09b50` @`31f09ce5`, `323e4cb0` @`323e5294`,
    `323e3cab`, `322e5b40` (the `+0xaf8` pre-update level; JUNE_BUGS 647), `322c2930` @`322c2cbe`.
-3. **Routed, check the bullets exist:** Stage 4 (the informer rework `32f17780`, `323e05f0`), Stage 28 (`OpenPartyDLG` rework, `322c3fa0`).
-4. **Hygiene:** `python tools/flagcheck.py SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES --range 52951ffe^..52951ffe --with SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG`
-   and `python tools/flagcheck.py SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK --range <C3z-4t4 commit>^..<C3z-4t4 commit> --with SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG`;
+3. **C3z-4t4b:** the quick-quest base y against June `323d0ca0` @`323d18c5`-`323d190c` (its flag in the hygiene step too).
+4. **Routed, check the bullets exist:** Stage 4 (the informer rework `32f17780`, `323e05f0`), Stage 28 (`OpenPartyDLG` rework, `322c3fa0`).
+5. **Hygiene:** `python tools/flagcheck.py SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES --range 52951ffe^..52951ffe --with SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG`
+   and `python tools/flagcheck.py SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK --range d393113b^..d393113b --files <the C3z-4t4 code files> --with SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG`;
    paste the summary lines (`_DEBUG` `#error` guard ERRORs are house precedent). `python tools/junediverge.py --check-all` = `RESULT: PASS`;
    `enumscan.py --check` on the changed files = 0 A/B on added lines.
-5. **Retire the debug lines:** comment out `#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG`, `#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG`
+6. **Retire the debug lines:** comment out `#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG`, `#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG`
    and `#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG` (the last one is the play-test switch that skips June's account level-10 refusal:
    with it off the walkthrough again shows only on an account with no character at level 10+, as in June).
 

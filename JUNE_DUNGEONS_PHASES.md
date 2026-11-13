@@ -586,6 +586,14 @@ again (begin / step / end / refuse lines). The C3z-4t4 review retires all three 
 - **Play-test owed** (hand-off below the STATUS row): a new level-1 character through Ruben, scenes 211 / 202 / 204, 201 on re-entry, 503-505 at
   quest 11010, 411 when 11010 completes; one `begin` / `step` / `end` line per scene.
 
+## C3z-4t4 - Play-test (2026-11-13, user): pass, quest highlight 30 px off -> C3z-4t4b
+
+Exe md5 f2899679, a new level-1 character. offline_server.log: `begin` / `step` / `end` for 211 -> 202 -> 204, 503 -> 504 -> 505, 411 and
+516 -> 507 -> 508 (the `by new quest` / `by complete quest` begins, every one after the `dev: account level 10+ test skipped` line); 101 / 102 in the
+tutorial dungeon; ErrorLog.txt clean. Not seen: 201 (village re-entry with 11005 going; not walked). The user saw the quest scenes' highlight sit
+off the quick-quest list. Cause (this session, June `323d0ca0` @`323d18c5`-`323d190c`): June's ctor places the quick-quest dialogs at y
+`173 + 22 * i`, March's at `143 + 22 * i` (`X2UIQuestNew.cpp:359`); the GFx timelines are drawn for June's. Fix phase C3z-4t4b (kickoff written).
+
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
 A new March character's first select now enters June's class tutorial dungeon (`DI_DUNGEON_TUTORIAL_<class>`, 41150-41290) in place of
