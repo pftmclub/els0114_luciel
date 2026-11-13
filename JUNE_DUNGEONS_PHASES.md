@@ -580,6 +580,9 @@ again (begin / step / end / refuse lines). The C3z-4t4 review retires all three 
 - **Build.** DEPLOY OK: X2_offline.exe is 26,437,632 B, dated 2026-11-13 13:48:24, md5 f2899679 (built at main 1fc6edcc + 20 uncommitted code files,
   the Elesis CH2b session's included; the first run at 13:19 failed only in that session's half-saved X2GUEL.cpp / X2GUUser.cpp). EXESTR OK 4 of 4
   (wide: `begin %d ( by %s )`, `dev: account level %d+ test skipped`, `complete quest`, `going quest`).
+- **Commit.** `d393113b`. It was written from a tree read before C3y-2b's `2652e5de` landed 8 s earlier, so it dropped that commit's hunks;
+  C3y-2b re-landed them in `fd841055` (identical to the restore this session had built). Range flagcheck `d393113b^..d393113b --files` (the 13 C3z-4t4
+  files): 11 PASS, 1 PASS~, 1 OTHER (Always.h: t1's `_DEBUG` define switched on), 0 FAIL, 0 ERROR, 0 deleted lines, `RESULT: PASS`.
 - **Play-test owed** (hand-off below the STATUS row): a new level-1 character through Ruben, scenes 211 / 202 / 204, 201 on re-entry, 503-505 at
   quest 11010, 411 when 11010 completes; one `begin` / `step` / `end` line per scene.
 
