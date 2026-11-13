@@ -2428,6 +2428,10 @@ CX2GUEL::~CX2GUEL(void)
 	
 	// ÀüÀåÀÇ ¼û°á
 	case CX2SkillTree::SI_SA_SGM_WAR_PRELUDE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SGM_WAR_PRELUDE:	// char-elesis CH3a fix: June 32b8c470 @429
+	case CX2SkillTree::RNSI_SA_SGM_WAR_PRELUDE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{
 			m_LuaManager.MakeTableReference( "ESI_SA_SGM_WAR_PRELUDE", normalStateData.stateID );			
 			// ÀüÀåÀÇ ¼û°á
