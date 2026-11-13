@@ -4,9 +4,6 @@
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_EXTRA_NPC_STAT
 #ifdef SERV_IRUHADEV_EXTRA_NPC_STAT_PARITY
-#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
-#include "Offline/X2OfflineLog.h"
-#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 #include <float.h>	// Iruha : 2026-09-27 // _finite(), Phase 4 NaN guard
 #endif SERV_IRUHADEV_EXTRA_NPC_STAT_PARITY
 
@@ -443,7 +440,12 @@ void    CX2UnitManager::CreateUnitLuaSpace()
             // char-luciel NU1: no script (Rose / Ain) or one not mounted yet (Lu before CH1) takes the NULL path, logged
             const bool bUnitScriptMissing = ( apszScript[ iUnitType ] == NULL || false == g_pKTDXApp->GetDeviceManager()->GetMassFileManager()->IsValidFile( apszScript[ iUnitType ] ) );
             if ( true == bUnitScriptMissing && iUnitType > CX2Unit::UT_NONE )
-                CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL NEWUNIT unit type %d has no mounted script ( %s ): type skipped", iUnitType, ( apszScript[ iUnitType ] != NULL ) ? apszScript[ iUnitType ] : L"none" );
+            {
+                // char-luciel NU1 fix 1: ErrorLog, since offline_server.log opens after the unit manager loads
+                WCHAR wszUnitScriptLog[256] = { 0, };
+                StringCchPrintfW( wszUnitScriptLog, ARRAY_SIZE( wszUnitScriptLog ), L"[JUNE_CHAR] LUCIEL NEWUNIT unit type %d has no mounted script ( %s ): type skipped", iUnitType, ( apszScript[ iUnitType ] != NULL ) ? apszScript[ iUnitType ] : L"none" );
+                ErrorLogMsg( XEM_ERROR142, wszUnitScriptLog );
+            }
             if ( true == bUnitScriptMissing )
 #else SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
             if ( apszScript[ iUnitType ] == NULL )

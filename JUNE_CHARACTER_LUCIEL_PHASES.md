@@ -410,7 +410,14 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE` (Always.h). Log `[
   `EXESTR OK: 2 of 2 found` (the NEWUNIT format string, `LUCIEL_DUO.LUA`, wide).
 - **Routed:** data036 `Enum.lua` still says `UT_END = 10` (no Lua reads it) -> NU3 kickoff. March's 9-picture `DLG_PVP_Result_Card_Back*` /
   `DLG_PVP_Room_Character_Slot` (June's hold 12) -> CH5 kickoff. `PlaySoundCreateUnit` / `PlaySoundRevive` bodies stay NU4 / DU1.
-- **How to see it:** startup writes three `LUCIEL NEWUNIT` lines (types 10, 11, 12); an existing character's select / village / dungeon is unchanged.
+- **How to see it:** startup writes (ErrorLog.txt since fix 1) three `LUCIEL NEWUNIT` lines (types 10, 11, 12); an existing character's select / village / dungeon is unchanged.
+- **Play-test 1 (user, 2026-11-14): passed** - select (every slot, no 707), village / dungeon on `ElesisGM` and `reyaa` unchanged; logs on exe
+  a62d6986: 0 XEM_ERROR144 / 148, 0 KEM_ERROR72 for `LUCIEL_DUO.LUA` (the skip ran), 0 EXCEPTION. The three NEWUNIT lines were missing:
+  `CX2OfflineLog` opens at 00:58:04, the unit scripts load at 00:57:55, so the lines were dropped.
+- **Fix 1:** the line goes to ErrorLog (`ErrorLogMsg( XEM_ERROR142, ... )`, the JUNE_FX idiom; ErrorLog is open from 00:57:55) and the misplaced
+  `X2OfflineLog.h` include (nested in `EXTRA_NPC_STAT_PARITY`) is dropped. flagcheck `--base 18460a26^`: PASS, 0 deleted; `/Zs` 0 errors.
+  `DEPLOY OK: X2_offline.exe is 26,485,248 B, dated 2026-11-14 01:15:49, md5 917b9e3c95b58f02d35c49878d17141e`; `EXESTR OK: 1 of 1`. Owed: one
+  launch to the select screen to see the three lines.
 
 ## Phase DU - The two-body engine (DU1-DU5)
 
