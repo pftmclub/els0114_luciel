@@ -13229,4 +13229,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              offline_server.log line [JUNE_CHAR] LUCIEL CREATE gives the class, the starter-row count and the stat source.
 //              Revert: comment out the #define (a Lu/Ciel then starts with no items, logged).
 #define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS ) && !defined( SERV_IRUHADEV_JUNE_CHAR_CREATE )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS needs SERV_IRUHADEV_JUNE_CHAR_CREATE ( CX2OfflineStatTable::GetStatSource in the CREATE line )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 //////////////////////////////////////////////////////////////////////////

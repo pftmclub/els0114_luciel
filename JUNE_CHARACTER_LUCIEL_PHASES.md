@@ -655,6 +655,48 @@ UNIT_TYPE_RANGE, UNIT_CLASS_WORD, MINOR_UNIT_TEMPLET and JUNE_CLASS_CHANGE_GUIDE
   and the client crashed at `XS_DUNGEON_GAME`: no `CX2GULuciel` before CH1, as expected. `testlu1` (uid 166) stays in the save; Game Start
   with him crashes until CH1.
 
+### NU4 - Review (2026-11-14)
+
+Opus 5.5 high. **Verdict: pass after one hygiene fix** (a missing flag-dependency guard, no behaviour change). Covers `5f01aed9` against
+`nu0_create.tsv` and June, Ghidra read-only.
+- **SelectLuciel** = June `325559f0`: guard `+0x2c0 == 200`, side flag (0.08, 0.13, 0.88, 1) by `charport_consts.py` (fld order r, g, b), background
+  `DLG_Unit_Background_Luciel.tga`, viewer Move 0 / -50 / 200, Scale 1.2, light -250 / 100 / -600, `LobbyDownLanding`, class 200 / type 10, class-change
+  dialog, stand board `32551e30(10)`, intro movie from the dummy's templet (`+0x30c` -> `+0xaf0` -> `+0x2b8`, show + loop `0x101`), info dialog
+  `325514e0(10, 1)`, `LucielVoice_Introduce.ogg`. March's SelectAdd repeats the front-control block twice; NU4 keeps it once (no effect). The
+  promotion stand-in wears `promotionWeapon / Body / Leg / Hand / FootItemID` 41890-41894 from Lu's templet = June's preload set 5933.
+- **Stand board** (create `32551e30`, select `32561130`): `fadd 25.0` on `[esp+0x2c]` (x) and `fadd 50.0` on `[esp+0x34]` (z) at `@325522ad` /
+  `@325522bf` and `@325615ad` / `@325615bf`. The cached `vStandMeshPos` equals March's per-iteration `GetPos()` for every other class.
+- **Rotation** = June `31edf260`: templet `+0x2d4` / minor `+0x2d8` when |v| > 1.1920929e-07, then the case table; all 17 value groups re-mapped through
+  June's `Enum.src.lua` UNIT_CLASS ids, every class in the right group, Noblesse 20 (minor) / -15. Templet values vs June's `UnitTemplet.src.lua`:
+  63 of 66 rows equal (Elsword Swordman 35, Raven Fighter 10, Eve Nasod 15, Ara Asura 40, all 7 Lu/Ciel incl. minor); the 3 Add rows have no key in
+  the tree (March rows) and fall back to the switch (20 / 10 / 3, June's templet says 30 / 50 / 5): char-add CH5 brings Add's rows, not NU4's to fix.
+- **Voices** = June `32376270`: (class, type) lexicographic find = `std::pair`; suffix switch 0-13 = June's 14 cases (`QuestComplete_` prefix,
+  `Voice_Revive0` / `Voice_Create0` + `rand(0,100) % 2 + 1`); name table `32375d00` read from exe bytes incl. the four Ghidra leaves as bare returns
+  (`Eve` / `Ara` / `Add` / `Ain` at `33458d74` / `60` / `48` / `24`). Class -> type stand-in: June `31eca1d0` puts 0x25-0x27, 0x7f-0x81, 200 in type
+  10; the templet rows of all 7 say `UT_LUCIEL`; Swordman -> 1 and Ara Asura -> 7 agree too. `CX2StateServerSelect::SOUND_PLAY_TYPE` 0 / 1 =
+  the manager's `SPT_UNIT_SELECT` / `SPT_SERVER_SELECT`.
+- **Create request / stat fallback:** `s_aiClassTable[t][BASIC][FIRST]` is class t for types 1-9 (Swordman ... Nasod Ruler) and 200 for type 10, so
+  March characters send the same class as before; `BaseClassOf` uses the same table.
+- **Image rows 59-65** = `char_image_rows.py` for all 9 tables (first two columns; June's transcendence columns have no slot in March's two-field
+  row, CH6's); quirks = `JUNE_BUGS.md` 655 / 656.
+- **Data:** data057 texture 89 / 91 `.tga` + `.TET` md5 = June's extract (4 of 4). `luabind.py check` on the **shipped** data034 button file (by path):
+  19 methods, 0 unbound, `ENUM 0 member(s) missing`, `RESULT: PASS`; by name the tool reads June's own layout file, whose 13 missing members are Rose /
+  Ain / the unported `_JUMPING` buttons (not shipped). `SelectVoiceTable`, `ClassChange_Button_Luciel`: 0 unbound, 0 enum missing.
+  `LEDGER CHECK PASS: 0 FAIL, 0 WARN`; `CORE CHECK PASS: 0 FAIL, 0 WARN`.
+- **Fix:** `_STARTER_ITEMS`'s CREATE line calls `CX2OfflineStatTable::GetStatSource`, declared only under `JUNE_CHAR_CREATE`, with no guard: turning
+  `JUNE_CHAR_CREATE` off alone broke the build. `Always.h` now has `#error ... _STARTER_ITEMS needs ... JUNE_CHAR_CREATE` after its define; `/Zs`
+  probe of `X2OfflineInventory.cpp` with the guard: 0 errors (so `JUNE_CHAR_CREATE` is defined at that line). flagcheck `JUNE_CHAR_LUCIEL_STARTER_ITEMS
+  --worktree --files KTDXLIB/Always.h`: `files: 1 PASS`, `0 deleted line(s)`, `RESULT: PASS`; junediverge `--check KTDXLIB/Always.h`: `RESULT: PASS`.
+- **Hygiene (NU4 commit):** flagcheck `JUNE_CHAR_CREATE --with JUNE_SELECT_VOICE_TABLE JUNE_CHAR_LUCIEL_STARTER_ITEMS --range 5f01aed9^..5f01aed9`:
+  `files: 6 PASS, 2 PASS~ (blank/marker only), 1 DEFINE, 5 OTHER (other flags), 0 FAIL, 0 ERROR`; `in this flag's files: 0 deleted line(s), 0
+  non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`.
+  OTHER: `X2Main.cpp`, `X2StateServerSelect.h`, `X2UnitManager.cpp` / `.h` hold only `JUNE_SELECT_VOICE_TABLE` blocks; `X2OfflineInventory.cpp` only
+  `_STARTER_ITEMS` (its other listed flags are existing context). PASS~: the two `X2OfflineStatTable` files, one marker line each.
+  junediverge `--check-all`: `RESULT: PASS` (235 allow-listed).
+- **Logs (exe 90b3df89):** ErrorLog 639 voice table `rows=400 inserted=400`; server 192 `15 of 15 starter row(s)`, stat source the class's rows;
+  0 EXCEPTION; 2 UNHANDLED `E_DISABLE_HB_CHECK_REQ` (not NU4's).
+- Full build skipped: no play-test (the fix is a compile-time guard only). CH1 no longer waits on this review.
+
 ## Phase DU - The two-body engine (DU1-DU5)
 
 | Sub-phase | Scope | Flag |
