@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, medium** effort, then type `/x2-phase char-elesis CH6` |
 | Plan doc | `JUNE_CHARACTER_ELESIS_PHASES.md` (branch `main`) |
-| Depends on | CH4c review, CH5 review, CHNb review |
+| Depends on | CH4c review, CH5 review (done 2026-11-13), CHNb review (done 2026-11-13) |
 | Flag | none (a defect goes back to its phase's flag) |
 | Log tag | `[JUNE_CHAR]` (`ELESIS *`) |
 | Review | none (the user's walk is the check) |

@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, high** effort, then type `/x2-phase char-elesis CH2d` |
 | Plan doc | `JUNE_CHARACTER_ELESIS_PHASES.md` (branch `main`) |
-| Depends on | CH2c, CHNb review (tested on a 35 unit). One at a time with CH1-CH4: they all edit `X2GUEL.*` |
+| Depends on | CH2c, CHNb review (both done 2026-11-13; tested on a 35 unit). One at a time with CH1-CH4: they all edit `X2GUEL.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `..._SKILL_DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ELESIS SKILL`), `[JUNE_SKILL]` (`--grep NUM`) |
 | Review | `kickoffs/char-elesis/CH2d-review.md` (Opus 5.5 high; the phase writes it when done); the CH2 stage review: covers CH2a-CH2d, retires `_SKILL_DEBUG` |

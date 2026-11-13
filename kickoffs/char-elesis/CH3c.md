@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, high** effort, then type `/x2-phase char-elesis CH3c` |
 | Plan doc | `JUNE_CHARACTER_ELESIS_PHASES.md` (branch `main`) |
-| Depends on | CH3b2, CHNb review (tested on a 125 unit). One at a time with CH1-CH4: they all edit `X2GUEL.*` |
+| Depends on | CH3b2 (done 2026-11-14), CHNb review (done 2026-11-13; tested on a 125 unit). One at a time with CH1-CH4: they all edit `X2GUEL.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `..._SKILL_DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ELESIS SKILL`), `[JUNE_SKILL]` (`--grep NUM`) |
 | Review | none of its own: the CH3d review covers it (its `_DEBUG` define stays on) |
