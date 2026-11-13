@@ -775,5 +775,5 @@ clear, `Quest_11000_End`), 0 unbound names, no loading-image error line; but the
 `SeedDefaultSkills`, which this build never reaches at creation: under `SERV_IRUHADEV_JUNE_SKILL_REFORM_AUTOLEARN` the create, class-change
 and skill-tree-init paths call `SeedAutoLearn` (its free-slot search). Fix 4 puts the A, C, S, D order into `SeedAutoLearn` (same flag
 `SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS`); the `SeedDefaultSkills` hunk stays (flag-off AUTOLEARN path). flagcheck `--worktree` 1 PASS (+13),
-junediverge PASS. BUILD OK x2.exe 26,439,680 B 14:47:36; DEPLOY REFUSED (game running): deploy-only owed. `Tutorial_Elsworld_03` played
+junediverge PASS. BUILD OK x2.exe 26,439,680 B 14:47:36; DEPLOY OK (deploy-only): X2_offline.exe 26,439,680 B, 2026-11-13 14:48:54, md5 b68f1fcc18893888d6b2fc08ea8854c5. `Tutorial_Elsworld_03` played
 14:42:00 and ended forced 14:42:10 (the user's ESC after the click loop): C3y-2c's re-run still needs its trace.
