@@ -1574,6 +1574,11 @@ Reused unchanged from Ara's CHNa: `SERV_IRUHADEV_JUNE_CLASS_PATH` (socket-group 
   uncommitted `KTDGGFXManager.*`). `EXESTR OK: 6 of 6` (wide: the `ELESIS CLASS gauge class` tag, `EL_SDK_FACE`, `EL_SCA_PARTY`, `list_ELESIS_C_AVENGER`,
   `HQ_Dungeon_Clear_Elesis_Crimson_Avenger.tga`, `CLASS_D`).
 - **Play-test hand-off:** see the session reply. Log tag `[JUNE_CHAR]` (`ELESIS CLASS`).
+- **Play-test (user, 2026-11-13 10:51-10:57, exe `b4108783` = a peer's redeploy of `4750f9b9`, CHNa code in): all checks passed** (creation screen six entries, DKnight20 /
+  Crimson Avenger village + dungeon, gauge, gear, portraits, other classes). Logs: `ELESIS CLASS gauge class 35` x2, `125` x1; `ELESIS DATA class 35 ... states 164`, `class 125 ...
+  states 169` (CH1m's SDK / SCA registrations reached; `ESI_SDK_WIN` / `ESI_SCA_START` random-state rolls); packets EXCEPTION 0. Not CHNa's: 20 KEM 433 on
+  `MESH_EL_SDK_*` / `MESH_EL_BASIC_FACE` (the CH0b part-mesh frame mismatch, routed to CH1 final), `MESH_EL_SCA_BASIC_FACE.TGA.TGA` (misspelt name in June's data), the usual
+  `OpenXET` optional probes, 4 `E_DISABLE_HB_CHECK_REQ`, `AddGroupChainQuest`, `Add_Skill_Page_ED`.
 
 ## Phase CH2 - Skills: Knight and the first jobs (classes 8, 29, 30, 35)
 
