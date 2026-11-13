@@ -497,9 +497,17 @@ Log `[JUNE_CHAR] LUCIEL NEWUNIT unit <uid> class <n> read as a word ( a char wou
 - **Routed:** a unit whose class has no templet crashes the server select (`ChangeUnitButtonInfo`'s unconditional
   `XSkinMeshReady( pUnit->GetUnitTemplet()->m_MotionFile )` after the 707 test; `GetType()` at the top unit) -> NU4 kickoff. NU3's rows give
   class 200 a templet, so NU4's Lu/Ciel is not hit.
-- **Play-test (owed, after the build):** an existing character's login / village / dungeon / relog unchanged, and a scratch class-200 unit
-  (old last-login date, so it sorts onto the last page and is never drawn) logs the NEWUNIT line with class 200 and "a char would read -56";
-  the scratch unit is deleted afterwards.
+- **After the commit:** flagcheck `--range 0c915cba^..0c915cba`: `files: 19 PASS, 0 PASS~ (blank/marker only), 2 DEFINE, 0 OTHER (other
+  flags), 0 FAIL, 0 ERROR`; 0 deleted, the same 6 EOL rows; `RESULT: PASS`. Build: after char-elesis's fix `029ca9e1`, a peer's
+  `build.py --deploy` of main built NU2 in: `X2_offline.exe` 26,488,832 B, 2026-11-14 02:08:40, md5 `e9dee3d698e1420fe434100dcb726b2a`
+  (all four projects linked, 0 C4005 for the flag). `EXESTR OK: 1 of 1 found` (the NEWUNIT format string, wide).
+- **Play-test (user, 2026-11-14): passed.** Scratch unit `NU2Word` (uid 165, class 200, all three dates 1700000000 so it sorted onto page 5;
+  backup `db_backup/els_db_20261114_021117_pre_sql.sql`). Run 02:12:37: offline_server.log:193 `[JUNE_CHAR] LUCIEL NEWUNIT unit 165 class
+  200 read as a word ( a char would read -56 )`, once over four character-list loads; no NEWUNIT for any other unit; every other class read
+  as saved (`[JUNE_TRANSCEND] UNIT ... ( select )`, 1-125). Selects `jtLordKnight` (100), `jtVoidPrincess` (105, a dungeon), `ElesisGM` (120),
+  `ElGuideCA` (125), four relogs; 0 EXCEPTION. The 5 UNHANDLED `E_DISABLE_HB_CHECK_REQ` are March's state-change heartbeat toggle
+  (`X2State.cpp:8772` / `:8915`, no class field), not NU2. The scratch unit was deleted afterwards (no other table held uid 165; backup
+  `els_db_20261114_021901_pre_sql.sql`).
 
 ### NU3 - Done (2026-11-14)
 
