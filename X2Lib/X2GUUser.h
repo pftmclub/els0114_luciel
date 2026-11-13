@@ -5127,6 +5127,9 @@ public:
 	bool	m_abHyperSkillSlotUsed[3];	/// June +0x90d0 ( false )
 #endif SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS
 #ifdef SERV_IRUHADEV_JUNE_BUFF_INSTANCE_KILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	float	m_fSkillStartMpConsumed;	/// char-elesis CH2b: June +0x9440 ( 0; the MP a skill state's start spent, net of refunds; Critical Dive refunds half )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	/// June buff port Phase 14b: June +0x6ba4 (a protected bool; ctor 322a2700, setter 32082710), written by DamageReact
 	/// from HaveInstanceKillDebuff and consumed (cleared, HP to 0) after UpNowHp in the same function
 	KProtectedType<bool> m_bInstanceKill;

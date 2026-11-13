@@ -220,6 +220,22 @@ namespace _CONST_EL_CH2A_
 	const float WILD_SHOCK_DAMAGE_EVENT_TIME				= 0.55f;
 }
 using namespace _CONST_EL_CH2A_;
+// char-elesis CH2b: constants of the Saber Knight special actives ( June 32b75f90 / 32b5cb40 / 32b76710 / 32b5cbd0 / 32b60650 )
+namespace _CONST_EL_CH2B_
+{
+	const float EXTINCTION_ATTACK_SCALE_VICTORIOUS_SWORD			= 1.2f;	// the attack effect's scale while the Victorious Sword buff is applied
+	const float EXTINCTION_ATTACK_SCALE_VICTORIOUS_SWORD_UPGRADE	= 1.4f;	// the same with the enhanced Victorious Sword buff
+	const float JUDGEMENT_DRIVE_CHARGE_LIMIT						= 2.f;
+	const float JUDGEMENT_DRIVE_CHARGE_LIMIT_UPGRADE				= 1.f;
+	const float JUDGEMENT_DRIVE_HOLD_TIME_AFTER_EVENT				= 2.1f;	// the hold state ends this long after its event time
+	const float JUDGEMENT_DRIVE_DAMAGE_EVENT_TIME					= 0.01f;
+	const float JUDGEMENT_DRIVE_MIN_CHARGE							= 0.15f;	// a shorter charge counts as none
+	const float JUDGEMENT_DRIVE_POWER_PER_CHARGE					= 0.25f;
+	const float JUDGEMENT_DRIVE_POWER_PER_CHARGE_UPGRADE			= 0.5f;
+	const float CRITICAL_DIVE_HIT_TIME								= 0.425f;
+	const float CRITICAL_DIVE_MP_REFUND_RATE						= 0.5f;
+}
+using namespace _CONST_EL_CH2B_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
@@ -1187,6 +1203,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_SA_SSK_EXTINCTION:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SSK_EXTINCTION:	// char-elesis CH2b: June 32b8c470 @311
+	case CX2SkillTree::RNSI_SA_SSK_EXTINCTION_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{ // 세이버 - 익스팅션
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SSK_EXTINCTION_START", normalStateData.stateID );
 
@@ -1250,6 +1270,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_SA_SSK_JUDGEMENT_DRIVE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SSK_JUDGEMENT_DRIVE:	// char-elesis CH2b: June 32b8c470 @387
+	case CX2SkillTree::RNSI_SA_SSK_JUDGEMENT_DRIVE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{ // 저지먼트 드라이브
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SSK_JUDGEMENT_DRIVE", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SSK_JUDGEMENT_DRIVE_Init );
@@ -1258,6 +1282,9 @@ CX2GUEL::~CX2GUEL(void)
 			normalStateData.StateStart		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SSK_JUDGEMENT_DRIVE_StateStart );
 #endif //ADD_MEMO_1ST_CLASS
 			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SSK_JUDGEMENT_DRIVE_EventProcess );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FrameMove );	// char-elesis CH2b: June 32b8c470 @32b8cd94
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SSK_JUDGEMENT_DRIVE", hyperStateData.stateID );
 			hyperStateData.m_bHyperState		= true;
@@ -1267,6 +1294,17 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.StateStart			= normalStateData.StateStart;
 #endif //ADD_MEMO_1ST_CLASS
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			{	// char-elesis CH2b: June 32b8c470 @32b8ce09 ( state 223 )
+				UserUnitStateData stateData;
+				stateData.Init();
+				stateData.stateID			= ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL;
+				m_LuaManager.MakeTableReference( "ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL", stateData.stateID );
+				stateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL_FrameMove );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		} break;
 	case CX2SkillTree::SI_SA_SPK_BURST_RISING:
 		{	/// 버스트 라이징
@@ -1954,6 +1992,10 @@ CX2GUEL::~CX2GUEL(void)
 	
 	// 크리티컬 다이브
 	case CX2SkillTree::SI_SA_SGM_CRITICAL_DIVE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SSK_CRITICAL_DIVE:	// char-elesis CH2b: June 32b8c470 @367
+	case CX2SkillTree::RNSI_SA_SSK_CRITICAL_DIVE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{
 			m_LuaManager.MakeTableReference( "ESI_SA_SGM_CRITICAL_DIVE", normalStateData.stateID );			
 			// 크리티컬 다이브, 시작 ~ 적이 안맞았다면 끝
@@ -11559,6 +11601,12 @@ void CX2GUEL::Extinction_FrameMoveFuture()
 #else   X2OPTIMIZE_PARTICLE_AND_ETC_HANDLE
     pParticle = m_pExtinctionArrow;
 #endif  X2OPTIMIZE_PARTICLE_AND_ETC_HANDLE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+#ifdef  X2OPTIMIZE_PARTICLE_AND_ETC_HANDLE
+	if( NULL == pParticle )
+		m_hExtinctionArrowParticle = INVALID_PARTICLE_HANDLE;	// char-elesis CH2b: June 32b75e80 @32b75ec5
+#endif  X2OPTIMIZE_PARTICLE_AND_ETC_HANDLE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( NULL != pParticle )
 	{
 		D3DXVECTOR3 vRot(0, (m_FrameDataFuture.syncData.bIsRight == true ) ? 0.f : 180.f ,m_fExtinctionDegreeZ );
@@ -11592,10 +11640,27 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_START_Init()
 	XSkinMeshReadyInBackground(L"Mega_Slash_Trace_Dummy.x");
 	XSkinMeshReadyInBackground(L"EXTINCTION_ATTACK_DUMMY.X");
 	XSkinMeshReadyInBackground(L"SA_SSK_EXTINCTION_END_FX_Blade.X");
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	TextureReadyInBackground(L"ADD_CENTER_LIGHT01.dds");	// char-elesis CH2b: June 32b4ff80
+	TextureReadyInBackground(L"ALS_SLICER_01.dds");
+	TextureReadyInBackground(L"Arme_Critical.dds");
+	TextureReadyInBackground(L"Arme_Damage_Center.dds");
+	TextureReadyInBackground(L"Arme_Damage_Ring.dds");
+	TextureReadyInBackground(L"star2.dds");
+	XMeshReadyInBackground(L"SA_SSK_EXTINCTION_AIM_ARROW.Y");
+	XMeshReadyInBackground(L"SSK_Extinction_Projectile01.Y");
+	XMeshReadyInBackground(L"SSK_Extinction_Projectile02.Y");
+	XSkinMeshReadyInBackground(L"DummyAttackBox_50x50x50.X");
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_START_Start()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	m_fExtinctionRemainTime = 0.f;	// char-elesis CH2b: June 32b500a0 ( the aim starts level; March's base angle is -30 )
+	m_fExtinctionDegreeZ = 0.f;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	InitExtinction();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonStateStart();
 }
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_START_StartFuture()
@@ -11620,10 +11685,17 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_START_EventProcess()
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_CHARGE );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b: June 32b5b8e0
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonEventProcess();
 }
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_CHARGE_FrameMove()
@@ -11660,19 +11732,62 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_CHARGE_EventProcess()
 	{
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_ATTACK );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,	// char-elesis CH2b: June 32b5bbe0 @32b5bc40
+		true == m_InputData.pureUp, ESI_SI_SA_SSK_EXTINCTION_DEGREE_UP )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		true == m_InputData.pureDown, ESI_SI_SA_SSK_EXTINCTION_DEGREE_DOWN )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	ELSE_IF_STATE_CHANGE_ON_EX_STRUCT( 0, 0, true == m_InputData.pureUp, ESI_SI_SA_SSK_EXTINCTION_DEGREE_UP )
 	ELSE_IF_STATE_CHANGE_ON_EX_STRUCT( 1, 0, true == m_InputData.pureDown, ESI_SI_SA_SSK_EXTINCTION_DEGREE_DOWN )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b: June 32b5bbe0
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
 /// 세이버 - 익스팅션 - Attack
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_ATTACK_FrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH2b: June 32b75f90
+	if ( true == m_pXSkinAnim->EventTimerOneshot( 0.001f ) )
+	{
+		D3DXVECTOR3 vDamageScale( 1.f, 1.f, 1.f );
+		if ( true == m_bIsApplyVictoriousSword )
+		{
+			const float fVictoriousSwordScale = ( true == HaveThisBuff( BTI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE ) )
+				? EXTINCTION_ATTACK_SCALE_VICTORIOUS_SWORD_UPGRADE : EXTINCTION_ATTACK_SCALE_VICTORIOUS_SWORD;
+			vDamageScale = D3DXVECTOR3( fVictoriousSwordScale, fVictoriousSwordScale, fVictoriousSwordScale );
+		}
+		float fEffectLifeTime = -1.f;
+		if ( true == IsNowStateSkillUpgraded() )
+		{
+			vDamageScale *= GetLearnedSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_SIZE, GetNowStateSkillID() );
+			fEffectLifeTime = GetLearnedSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, GetNowStateSkillID() );
+		}
+		const CX2EffectSet::Handle hEffect = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_SSK_EXTINCTION_DAMAGE", this, NULL,
+			IsHyperState(), GetPowerRate(), fEffectLifeTime );
+		if ( INVALID_EFFECTSET_HANDLE != hEffect )
+		{
+			if ( CX2EffectSet::EffectSetInstance* pEffectSet = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffect ) )
+			{
+				pEffectSet->SetEffectScale( vDamageScale, true );
+				pEffectSet->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, m_fExtinctionDegreeZ ) );
+			}
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
     if( m_pXSkinAnim->EventTimerOneshot( 0.001f ) )
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -11706,6 +11821,7 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_ATTACK_FrameMove()
 		}
 	}
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonFrameMove();
 }
 void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_ATTACK_EventProcess()
@@ -11725,10 +11841,17 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_ATTACK_EventProcess()
 		}
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b: June 32b6ee00
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -11787,10 +11910,17 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_DEGREE_UP_EventProcess()
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_DEGREE_DOWN );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b: June 32b5c0c0
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -11858,10 +11988,17 @@ void CX2GUEL::ESI_SI_SA_SSK_EXTINCTION_DEGREE_DOWN_EventProcess()
 		StateChange( ESI_SI_SA_SSK_EXTINCTION_DEGREE_UP );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b: June 32b5c400
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -11949,10 +12086,25 @@ void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_Init()
 	XSkinMeshReadyInBackground(L"Mega_Slash_Trace_Dummy.x");
 	TextureReadyInBackground(L"Particle_Blur.dds");
 	XSkinMeshReadyInBackground(L"aisha_active_energySpurt_circle.X");
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	TextureReadyInBackground(L"Arme_Critical.dds");	// char-elesis CH2b: June 32b50320
+	TextureReadyInBackground(L"Arme_Damage_Center.dds");
+	TextureReadyInBackground(L"Arme_Damage_Ring.dds");
+	TextureReadyInBackground(L"Mesh_Raven_Event_AC_Upbody21_Effect.tga");
+	TextureReadyInBackground(L"star2.dds");
+	TextureReadyInBackground(L"Stat_Stun_B.tga");
+	TextureReadyInBackground(L"WhitePoint.dds");
+	XSkinMeshReadyInBackground(L"DummyAttackBox_50x50x50.X");
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 #ifdef ADD_MEMO_1ST_CLASS //김창한
 void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_StateStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	CommonStateStartFuture();	// char-elesis CH2b: June 32b50430
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+	m_fDashJumpZXChargeTime = 0.f;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonStateStartFuture();
 
 	if( GetEqippedSkillMemo( CX2SkillTree::SMI_ELESIS_MEMO7 ) == true )
@@ -11960,9 +12112,14 @@ void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_StateStartFuture()
 		float fAniSpeed = m_pXSkinAnimFuture->GetPlaySpeed();
 		m_pXSkinAnimFuture->SetPlaySpeed( fAniSpeed * 1.3f );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_StateStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	CommonStateStart();	// char-elesis CH2b: June 32b50460
+	m_fDashJumpZXChargeTime = 0.f;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonStateStart();
 
 	if( GetEqippedSkillMemo( CX2SkillTree::SMI_ELESIS_MEMO7 ) == true )
@@ -11970,11 +12127,21 @@ void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_StateStart()
 		float fAniSpeed = m_pXSkinAnim->GetPlaySpeed();
 		m_pXSkinAnim->SetPlaySpeed( fAniSpeed * 1.3f );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 }
 #endif //ADD_MEMO_1ST_CLASS
 void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH2b: June 32b50480
+	if ( m_fEventTime[0].stateChange + JUDGEMENT_DRIVE_HOLD_TIME_AFTER_EVENT < m_FrameDataFuture.unitCondition.fStateTime
+		|| ( true == m_kSkillSlotKey.IsKeyReleased( m_InputData ) && m_fEventTime[0].stateChange < m_FrameDataFuture.unitCondition.fStateTime ) )
+	{
+		StateChange( ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL );
+	}
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -11986,7 +12153,45 @@ void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_EventProcess()
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FrameMove()	// char-elesis CH2b: June 32b5cb40
+{
+	if ( m_fEventTime[0].stateChange < m_FrameDataNow.unitCondition.fStateTime )
+	{
+		const float fChargeLimit = ( true == IsNowStateSkillUpgraded() ) ? JUDGEMENT_DRIVE_CHARGE_LIMIT_UPGRADE : JUDGEMENT_DRIVE_CHARGE_LIMIT;
+		m_fDashJumpZXChargeTime = min( m_fElapsedTime + m_fDashJumpZXChargeTime, fChargeLimit );	// the member the Dark Knight charge states use
+	}
+	CommonFrameMove();
+}
+void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL_FrameMove()	// char-elesis CH2b: June 32b76710
+{
+	CommonFrameMove();
+	if ( true == m_pXSkinAnim->EventTimerOneshot( JUDGEMENT_DRIVE_DAMAGE_EVENT_TIME ) )
+	{
+		if ( JUDGEMENT_DRIVE_MIN_CHARGE > m_fDashJumpZXChargeTime )
+			m_fDashJumpZXChargeTime = 0.f;
+		const float fPowerPerCharge = ( true == IsNowStateSkillUpgraded() ) ? JUDGEMENT_DRIVE_POWER_PER_CHARGE_UPGRADE : JUDGEMENT_DRIVE_POWER_PER_CHARGE;
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_SSK_JUDGEMENT_DAMAGE", this, NULL, false,
+			GetPowerRate() * ( 1.f + m_fDashJumpZXChargeTime * fPowerPerCharge ), -1.f );
+	}
+}
+void CX2GUEL::ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL_EventProcess()	// char-elesis CH2b: June 32b5cbd0
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 스킬 스테이트 함수 - 2-1차 파이로 나이트
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13109,6 +13314,30 @@ void CX2GUEL::ESI_SA_SGM_CRITICAL_DIVE_Init()
 
 void CX2GUEL::ESI_SA_SGM_CRITICAL_DIVE_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	if ( m_pXSkinAnim->GetNowAnimationTime() > CRITICAL_DIVE_HIT_TIME && true == GetAttackSuccess( true ) )	// char-elesis CH2b: June 32b60650
+	{
+		StateChange( ESI_SA_SGM_CRITICAL_DIVE_HIT );
+	}
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		const CX2UserSkillTree::SkillSlotData* pSkillSlotData = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillSlot( GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_SA_SSK_CRITICAL_DIVE ) );
+		if ( NULL != pSkillSlotData )
+		{
+			const float fMpRefund = m_fSkillStartMpConsumed * CRITICAL_DIVE_MP_REFUND_RATE;
+			m_fSkillStartMpConsumed = 0.f;
+			UpNowMpWithText( fMpRefund );
+		}
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	if( m_pXSkinAnim->GetNowAnimationTime() > 0.425f && GetAttackSuccess(true) == true )
 	{
@@ -13143,6 +13372,7 @@ void CX2GUEL::ESI_SA_SGM_CRITICAL_DIVE_EventProcess()
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 
 
@@ -13154,10 +13384,17 @@ void CX2GUEL::ESI_SA_SGM_CRITICAL_DIVE_HIT_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b: June 32b609e0
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }

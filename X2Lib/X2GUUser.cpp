@@ -845,6 +845,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 , m_fReservedSkillMp( 0.f )
 , m_fChosenSkillMp( 0.f )
 #endif SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+, m_fSkillStartMpConsumed( 0.f )	// char-elesis CH2b
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE //±Ë√¢«—
 , m_bSetCustomRenderParam( false )
 #endif //SERV_ELESIS_SECOND_CLASS_CHANGE
@@ -44836,6 +44839,9 @@ void CX2GUUser::CountReservedSkillUse()
 	ReservedSkillStart( pSkillTemplet );	// June @32057c4c-cb2
 #endif SERV_IRUHADEV_JUNE_CHAR_CHUNG_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	const float fNowMpBeforeSkillStart = GetNowMp();	// char-elesis CH2b: June @32057c4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
@@ -44916,6 +44922,9 @@ void CX2GUUser::CountReservedSkillUse()
 // char-elesis CH1o: June 3208e8c0 ( user vslot 0x534 ): June asks the damage-state getters 0x46c-0x4a4 / 0x114 / 0x118, which only Lu/Ciel overrides
 bool CX2GUUser::IsDamageState( const bool bFuture_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	m_fSkillStartMpConsumed = fNowMpBeforeSkillStart - GetNowMp();	// char-elesis CH2b: June @32057cc0-ce2
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	const int iStateID = ( true == bFuture_ ) ? GetFutureStateID() : GetNowStateID();
 	return USI_DAMAGE_SMALL_FRONT == iStateID || USI_DAMAGE_SMALL_BACK == iStateID || USI_DAMAGE_BIG_FRONT == iStateID || USI_DAMAGE_BIG_BACK == iStateID
 		|| USI_DAMAGE_DOWN_FRONT == iStateID || USI_DAMAGE_DOWN_BACK == iStateID || USI_DAMAGE_AIR_SMALL == iStateID || USI_DAMAGE_AIR_DOWN == iStateID

@@ -6820,6 +6820,17 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (`Always.h`; `#error` without `..._E
 - **Damage.** The skills' damage is the numerical tables of June's `ELESIS_KNIGHT.lua` states ( the effect sets and damage effects carry no C++ number ); March's script is bytecode, so the per-skill March / June comparison is the `[JUNE_SKILL] NUM use` lines of the play-test.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( the skills fall back to March's id switch, which never matches June's ids ), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 7 Elesis, CH2b: Saber Knight (29) special actives (char-elesis CH2b, 2026-11-13)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, still on until the CH2d review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** Extinction ( 28005 / 28033 ), Judgement Drive ( 28007 / 28045 ) and Critical Dive ( 28006 / 28036 ) bind March's states on March's cases; their cancels need the foot on a line.
+  Extinction: the aim starts level ( June 0, March -30 ); the attack's effect scale is 1.2 ( 1.4 with the enhanced Victorious Sword buff 565 ) while Victorious Sword is applied, times the upgrade's projectile size, with the upgrade's effective time as life time; the up / down keys also take effect when the animation ends.
+  Judgement Drive is two states now: a hold state ( charge grows after its event time, 2 s cap, 1 s when upgraded; ends at event time + 2.1 s or on key release ) and the final state ( damage effect set at 0.01 s, power x ( 1 + charge x 0.25 ), 0.5 when upgraded; a charge under 0.15 s counts as none ); March's memo 1.3x animation speed is gone ( June has no memos ).
+  Critical Dive: at animation end without a hit half of the MP the skill start actually spent comes back ( MP+ text ); March refunded half the slot's nominal cost.
+- **Shared.** `CX2GUUser::CountReservedSkillUse` stores the MP a skill start spent ( `m_fSkillStartMpConsumed`, June +0x9440 ) around `ReservedSkillStart`; new enum names `RNSI_SA_SSK_EXTINCTION_UPGRADE` / `_CRITICAL_DIVE_UPGRADE` / `_JUDGEMENT_DRIVE_UPGRADE`, `BTI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE` ( 565 ).
+- **Damage.** The skills' damage is the numerical tables of June's `ELESIS_KNIGHT.lua` states ( effect sets carry the numbers; March's script is bytecode ), so the March / June comparison is the `NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ### June dungeons: the tutorial guide manager (june-dungeons C3z-4t1, 2026-11-13)
 
 Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE` in `KTDXLIB/Always.h` (`#error`s without `JUNE_DIVERGE_GET_KEY_STATE`, `JUNE_TUTORIAL_MODE`, `INIT_FOCUS_UNIT`), debug lines under `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG`. Plan `JUNE_DUNGEONS_PHASES.md` "C3z-4t1 - Done"; log tag `JUNE_FX C3z-4t`.

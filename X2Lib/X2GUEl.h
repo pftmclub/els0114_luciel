@@ -761,6 +761,11 @@ protected:
 	void ESI_SI_SA_SSK_JUDGEMENT_DRIVE_StateStart();
 #endif //ADD_MEMO_1ST_CLASS
 	void ESI_SI_SA_SSK_JUDGEMENT_DRIVE_EventProcess();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	void ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FrameMove();	/// char-elesis CH2b: June 32b5cb40
+	void ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL_FrameMove();	/// char-elesis CH2b: June 32b76710
+	void ESI_SI_SA_SSK_JUDGEMENT_DRIVE_FINAL_EventProcess();	/// char-elesis CH2b: June 32b5cbd0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 파이로 나이트 스테이트 함수

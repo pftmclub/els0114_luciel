@@ -2655,6 +2655,14 @@ public:
 	RNSI_P_SGM_WALTZ_OF_SWORD                             = 28403,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of the Saber Knight special actives' upgrades ( values from June's Enum.lua )
+	RNSI_SA_SSK_EXTINCTION_UPGRADE                        = 28033,
+	RNSI_SA_SSK_CRITICAL_DIVE_UPGRADE                     = 28036,
+	RNSI_SA_SSK_JUDGEMENT_DRIVE_UPGRADE                   = 28045,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

@@ -540,6 +540,11 @@ enum BUFF_TEMPLET_ID
 	BTI_DEBUFF_SELF_SOFTBODY              = 395,	// June's Enum.lua
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE = 565,	// June's Enum.lua; the enhanced Victorious Sword buff Extinction's attack reads
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-11 // char-ara CH1h
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	BTI_BUFF_NECROMANCY                   = 423,	// June's Enum.lua; Ara's Necromancy rate buff
