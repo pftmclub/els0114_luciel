@@ -3021,6 +3021,19 @@ HRESULT CX2Main::OnFrameMove( double fTime, float fElapsedTime )
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+// june-dungeons C3y-2b: June 31d87420, run when a slide shot or a GFx scene ends
+void CX2Main::OnSceneEnded()
+{
+	m_TutorialGuideManager.OnBeginGuideByGame();		// June 31fc5e30 on +0x8c4
+	// stand-in: CX2UIQuestNew 323ca2a0 ( the deferred quest REQ 0x36a from its +0x784 / +0x788 ) not ported
+	if( NULL != g_pX2Game && SEnum::DI_EVENT_2017_TREASURE == g_pX2Game->GetDungeonID() && NULL != g_pX2Game->GetMyUnit() )
+		g_pX2Game->GetMyUnit()->SetStartMotionDelayTime( 0.f );		// June vslot 0x1c4 / 0x98, +0x92cc = 0
+#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+	CX2OfflineLog::Server( L"JUNE_FX C3y-2b scene end: guide resume, dungeon %d", NULL != g_pX2Game ? g_pX2Game->GetDungeonID() : -1 );
+#endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+}
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 bool CX2Main::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	switch( uMsg )
@@ -3184,6 +3197,14 @@ bool CX2Main::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 		return true;
 	}
 #endif EVENT_SCENE
+#ifdef SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+	// june-dungeons C3y-2b: June 31d8e280 @31d8e5ce, the slide shot's MsgProc after the two scenes'
+	if( NULL != g_pData && NULL != g_pData->GetSlideShot() &&
+		true == g_pData->GetSlideShot()->MsgProc( hWnd, uMsg, wParam, lParam ) )
+	{
+		return true;
+	}
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 	
 #ifdef	CHECK_KOM_FILE_ON_LOAD
 #ifdef SERV_KOM_FILE_CHECK_ADVANCED
@@ -3230,7 +3251,11 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_add<CX2SlideShot>( L, "CX2SlideShot" );
 	lua_tinker::class_def<CX2SlideShot>( L, "ScenStart_LUA",					&CX2SlideShot::ScenStart_LUA);
 	lua_tinker::class_def<CX2SlideShot>( L, "ScenWait",							&CX2SlideShot::ScenWait);
+#ifdef SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+	lua_tinker::class_def<CX2SlideShot>( L, "ScenEnd",							&CX2SlideShot::ScenEnd_LUA );	// june-dungeons C3y-2b: June 325c74a0
+#else SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 	lua_tinker::class_def<CX2SlideShot>( L, "ScenEnd",							&CX2SlideShot::ScenEnd);
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 #ifdef SERV_IRUHADEV_ELYSION_SCRIPT_B
 	lua_tinker::class_def<CX2SlideShot>( L, "IsSceneEnded",						&CX2SlideShot::IsSceneEnded );	// Atlas E7: June @31d98bb8 ( 325c4a50 )
 #endif SERV_IRUHADEV_ELYSION_SCRIPT_B
@@ -4351,6 +4376,8 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2DungeonGame>( L, "ClearSubStage",						&CX2DungeonGame::ClearSubStage );
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 	lua_tinker::class_def<CX2DungeonGame>( L, "ShowJumpGuide",						&CX2DungeonGame::ShowJumpGuide );	// june-dungeons C3y-2: June @31de3577 ( 327ca2c0 )
+	lua_tinker::class_def<CX2DungeonGame>( L, "PlayEventScene",						&CX2DungeonGame::PlayEventScene );	// june-dungeons C3y-2b: June @31de31c0 ( 327ccad0 )
+	lua_tinker::class_def<CX2DungeonGame>( L, "IsRecentlyPlayedEventScene",			&CX2DungeonGame::IsRecentlyPlayedEventScene );	// june-dungeons C3y-2b: June @31de342a ( 327ccb20 )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 	lua_tinker::class_def<CX2DungeonGame>( L, "GetStartRealTraining",				&CX2DungeonGame::GetStartRealTraining );
 	lua_tinker::class_def<CX2DungeonGame>( L, "SetStartRealTraining",				&CX2DungeonGame::SetStartRealTraining );
@@ -5679,9 +5706,13 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2SkillNoteManager>( L, "AddRemovableMemoItemID",	&CX2SkillNoteManager::AddRemovableMemoItemID_LUA );
 #endif SERV_IRUHADEV_JUNE_SKILL_NOTE
 #ifdef SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+	// june-dungeons C3y-2b: June binds these two only as CX2DungeonGame methods ( @31de31c0 / @31de342a ), so no globals
+#else SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 	// June2017 31d95080 @31de31c0 / @31de342a: the global Lua functions PlayEventScene( name ) and IsRecentlyPlayedEventScene( name ) ( 327ccad0 / 327ccb20 )
 	lua_tinker::def( L, "PlayEventScene",				&GfxPlayEventScene_LUA );
 	lua_tinker::def( L, "IsRecentlyPlayedEventScene",	&GfxIsRecentlyPlayedEventScene_LUA );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 #endif SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
 #ifdef SERV_IRUHADEV_JUNE_GFX_TALK_CUTIN_DEBUG
 	lua_tinker::def( L, "GfxCutIn",					&GfxCutIn_LUA );	/// G4 debug: GfxCutIn( "HQ_CutIn_Elsword_01" )

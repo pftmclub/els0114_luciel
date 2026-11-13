@@ -12,6 +12,10 @@ class CX2SlideShot
 		void		ScenStart_LUA( char* pScenName, int scenNum );
 		void		ScenWait();
 		void		ScenEnd();
+#ifdef SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+		void		ScenEnd_LUA();		// june-dungeons C3y-2b: June 325c74a0
+		bool		MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );		// june-dungeons C3y-2b: June 325c74b0
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 #ifdef SERV_IRUHADEV_ELYSION_SCRIPT_B
 		/// Atlas E7: June 325c4a50: true once after a scene end ( +0x88, set by 325c7140 @325c7162 ), clearing it; else false
 		bool		IsSceneEnded() { if ( true == m_bSceneEnded ) { m_bSceneEnded = false; return true; } return false; }

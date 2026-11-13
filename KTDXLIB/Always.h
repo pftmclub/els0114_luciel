@@ -12961,6 +12961,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND ) && !defined( SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE )
 #error SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND needs SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE ( CX2PlayGuide::ShowJumpGuide )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND ) && !defined( SERV_IRUHADEV_JUNE_GFX_EVENTSCENE )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND needs SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( C3y-2b: CX2DungeonGame::PlayEventScene / IsRecentlyPlayedEventScene call the Gfx*EventScene_LUA bodies )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -12983,4 +12986,24 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG needs SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2b - June's scene-end hook CX2Main 31d87420 ( resumes a waiting tutorial guide step; dungeon 41470 start delay ) and its callers:
+//              the slide shot's ESC / right-click skip CX2SlideShot::MsgProc ( 325c74b0, from CX2Main::MsgProc @31d8e5ce ), Lua ScenEnd ( 325c74a0 ) and the
+//              GFx scene end ( @3226be30 ). Revert: comment out the #define ( JUNE_SCENE_END_HOOK ).
+#define SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+#if defined( SERV_IRUHADEV_JUNE_SCENE_END_HOOK ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ) || !defined( SERV_IRUHADEV_JUNE_BUFF_START_DELAY ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_SCENE_END_HOOK needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ( the guide manager ), SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( its End ), SERV_IRUHADEV_JUNE_BUFF_START_DELAY and SERV_IRUHADEV_JUNE_ENUM_NAMES ( DI_EVENT_2017_TREASURE )
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2b - CX2StateDungeonRoom::UISetting on a tutorial / field-dungeon entry keeps the loading dialog's own pictures ( June 324e6130
+//              @324e79a3-324e7a71 ): the old Ruben-prologue pictures are set only on the exiting-tutorial branch. Revert: comment out the #define ( JUNE_TUTORIAL_ROOM_LOADING ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING
 //////////////////////////////////////////////////////////////////////////

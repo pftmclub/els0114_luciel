@@ -24,3 +24,4 @@ X2GUEL.cpp	CX2GUEL::ReInit	GT_PVP	June 32b81900 @32b819a8: vslot 0x10c, dec eax 
 X2GUEL.cpp	CX2GUEL::Start_SwordmanDestruction	GT_PVP	June 32b7f0b0 @32b7f28f / @32b7f312: vslot 0x10c, cmp eax, 1 (type 1 only); char-elesis CH1
 X2GUEL.cpp	CX2GUEL::GetFinalDamage_WayOfSword	GT_PVP	June 32b74ed0 @32b74f14: vslot 0x10c, cmp eax, 1 (type 1 only); char-elesis CH1
 X2PlayGuide.cpp	*	OnFrameMove	tsv CX2PlayGuide::OnFrameMove (3289e490) -> Stage 9; june-dungeons C3y-2 inserted only June's jump-guide call (3289e370) at June's place
+X2SlideShot.cpp	*	ScenEnd	tsv CX2SlideShot::ScenEnd (325c7140) -> Stage 9; june-dungeons C3y-2b's ScenEnd_LUA (325c74a0) / MsgProc (325c74b0) call March's scene end until then

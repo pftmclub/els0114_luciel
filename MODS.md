@@ -6842,3 +6842,18 @@ Flags in `KTDXLIB/Always.h`: `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON` (`#erro
 - **What changes in game.** A new March character's first select enters June's class tutorial dungeon (Ruben Forest etc.) in place of the battle-field tutorial.
 - **Data.** Core source: data036 `DungeonEnum.lua` (9 ids), `Enum.lua` (9 `WI_TUTORIAL_*_STAGE0`, 41 `NUI_TUTORIAL_*`), data035 `DungeonData.lua` (9 rows), data037 `NPCTemplet.lua` (41 rows), data040 `WorldData.lua` (9 rows). June bytecode: 18 world scripts in data040 (`june2017_re/june_adopt_20261113_112144.tsv`). 416 June assets staged, nothing replaced (backup dir `kom_backup_stage_june\20261113_112415` empty): data078 / 080-084 / 108 / 126 / 133 / 144 / 149 / 164 / 165 / 166. Loose: 8 `tutorial_new_*.ogg` in the game dir's `data\music\` (June's loose music, as C3y-1b).
 - **Revert:** comment out the three defines (main one first), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The data can stay (unreached without the flag); live-kom backups in `kom_backup_tools\` (2026-11-13 C3y-2 stamps). No save change.
+
+### June dungeons: tutorial dungeon fixes - scene calls, story skip, room loading (june-dungeons C3y-2b, 2026-11-13)
+
+Flags in `KTDXLIB/Always.h`: inside C3y-2's `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND` (now also `#error`s without `JUNE_GFX_EVENTSCENE`), plus
+`SERV_IRUHADEV_JUNE_SCENE_END_HOOK` and `SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING`.
+- **Client.** `X2DungeonGame.*` / `X2Main.cpp`: Lua `PlayEventScene` / `IsRecentlyPlayedEventScene` are `CX2DungeonGame` methods (June's binding);
+  March's two globals sit in the `#else`. `X2Main.*`: `CX2Main::OnSceneEnded` (June `31d87420`: the tutorial guide resumes, dungeon 41470 start
+  delay); `X2SlideShot.*`: `MsgProc` (ESC / right click ends a showing slide shot) and Lua `ScenEnd` -> `ScenEnd_LUA` (scene end + hook);
+  `X2GFXEventScene.cpp`: the hook at the GFx scene's end. `X2StateDungeonRoom.cpp`: no Ruben-prologue pictures on the tutorial room's loading.
+- **Data.** data034 `DLG_PVP_Game_Loading_State.lua` replaced by June's (`adopt-june`, bytecode; backup `kom_backup_stage_june\20261113_130423`,
+  live kom `kom_backup_tools\data034.kom.20261113_130430`). `tools/luabind.py check` gained `METHOD BOUND ONLY AS GLOBAL` and `--receiver`.
+- **What changes in game.** The tutorial character can move after the opening scene; ESC / right click skips the opening story; no old loading
+  picture before June's.
+- **Revert:** comment out `JUNE_SCENE_END_HOOK` / `JUNE_TUTORIAL_ROOM_LOADING`; the scene methods go with `JUNE_TUTORIAL_LUA_BIND`; then
+  `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The dialog backup restores March's data034 entry. No save change.

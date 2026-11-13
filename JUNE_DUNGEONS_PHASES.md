@@ -599,3 +599,39 @@ opening slide shot (`PF_STAGE0_SUB0_SHOT0`) not skippable with ESC / right click
 call `PlayEventScene` / `IsRecentlyPlayedEventScene` as CX2DungeonGame methods (June binds them there, `327ccad0` / `327ccb20`); March
 binds them only as globals, so `CannotInput( 9999 )` is never released (ErrorLog x1 / x1114). `luabind.py` missed it (name-only match).
 Also logged: OpenXET failures for the tutorial worlds and missing Ruben textures. All routed to `kickoffs/june-dungeons/C3y-2b.md`.
+
+## C3y-2b - Done (2026-11-13, Opus 5.5 high): the tutorial dungeons' first play-test fixed
+
+Flags (`KTDXLIB/Always.h`): C3y-2's `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND` (missed piece; new `#error` without `JUNE_GFX_EVENTSCENE`), new
+`SERV_IRUHADEV_JUNE_SCENE_END_HOOK` and `SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING`. Debug lines under C3y-2's `_DEBUG` (the review retires it).
+funcmap rows tagged C3y-2b; MODS.md "tutorial dungeon fixes".
+
+- **Input lock (fixed).** June binds `PlayEventScene` / `IsRecentlyPlayedEventScene` only as `CX2DungeonGame` methods: `class_def` helpers
+  `31e7b2d0` @`31de31c0` / `31e7b420` @`31de344f` on class table `33777990` (= `ShowJumpGuide`'s); the bodies `327ccad0` / `327ccb20` ignore
+  `this` and call `3226b130` / `3226a130` (xrefs @`327ccb0c` / @`327ccb58`). New members call March's `Gfx*EventScene_LUA`; March's two globals
+  (GFx G3 misread them as globals) are in the `#else`. No live Lua calls them as globals. C3z-4t3's `input mask: guide 0, value -1` line is
+  ruled out: step -1 is `case -1: return;` in `Init_ByInputGuideStep` (`X2GUUser.cpp`), no mask.
+- **Gate gap (closed).** `tools/luabind.py check` reports `METHOD BOUND ONLY AS GLOBAL` (a `x:Name(` whose name is only `def`'d) and takes
+  `--receiver CLASS --receiver-var slot1` (class_def on CLASS or a `class_inh` base). Before the fix all 9 scripts FAIL on the two names;
+  after: 9 x `0 unbound, 0 only-global, 0 off-receiver`, RESULT PASS (also with `--receiver CX2DungeonGame --receiver-var slot1`).
+- **Story skip (fixed).** June's `CX2SlideShot::OnFrameMove` `325c6b50` = March's (Enter / left click skip one shot; ESC / right click in the
+  tutorial only drop the frame). The whole-story skip is June's `CX2SlideShot::MsgProc` `325c74b0` (showing && ESC key-down or right
+  button-up -> scene end + `31d87420`), called by `CX2Main::MsgProc` @`31d8e5ce` after the two scenes' MsgProc: March had none.
+- **Scene-end hook.** `CX2Main::OnSceneEnded` = June `31d87420`: the guide manager's `OnBeginGuideByGame` (C3z-4t's, no caller until now), a
+  stand-in for `CX2UIQuestNew` `323ca2a0` (deferred REQ 0x36a, Stage 9 bullet), and dungeon 41470 (`DI_EVENT_2017_TREASURE`) start delay 0.
+  Callers ported: the MsgProc skip, Lua `ScenEnd` -> `ScenEnd_LUA` (`325c74a0`: scene end + hook; every tutorial's last shot calls it) and
+  the GFx scene end @`3226be30`. June's `CX2SlideShot::ScenEnd` `325c7140` adds two UI steps: divergence row + allow row -> Stage 9.
+- **Loading flash (fixed).** `CX2StateDungeonRoom::UISetting`'s tutorial / field-dungeon branch set `HQ_Loading_RUBEN_PROLOG_01/02.tga`;
+  June's `324e6130` @`324e79a3`-`324e7a71` sets no picture there (only the exiting branch and `324e93b0` do). The dialog's own pictures stay:
+  June's `DLG_PVP_Game_Loading_State.lua` adopted (data034, bytecode; same 5 controls as March's, black bars; luabind PASS).
+- **Assets (nothing to stage).** Full closure of the 18 world scripts + 41 NPC rows (meshes, textures inside `.X` / `.Y`, mesh-derived XETs):
+  976 names June has, all already in March (935 assets byte-identical, `stage-june --dry-run` 0 new / 0 replaced); the logged textures,
+  world layers and 301 XETs are missing in June too: JUNE_BUGS 646.
+- **Pack / copy:** PACK OK + COPY OK data034 md5 d2b06cfb.
+- **Hygiene.** flagcheck `--worktree --files` (9 files): SCENE_END_HOOK 4 PASS, TUTORIAL_ROOM_LOADING 1 PASS, TUTORIAL_LUA_BIND 2 PASS (+ the
+  X2Main hunks counted under SCENE_END_HOOK); 0 FAIL, 0 non-ASCII, 0 EOL mismatch; 1 ERROR = the `#error` guard (precedent); LUA_BIND's 19
+  deleted lines are a peer's uncommitted `Always.h` block reorder, not committed here (see the range line). junediverge `RESULT: PASS`
+  (allow-listed 7, selftest PASS); enumscan 0 A/B rows.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,430,464 B, dated 2026-11-13 13:10:58, md5 c49b3858237554964c663bf8bfd63500 (built at main a6fa91e8 + 9 uncommitted code files, all C3y-2b's). EXESTR OK 1 of 1 (wide: the scene-end line) and 3 of 3 (PlayEventScene, IsRecentlyPlayedEventScene, ScenEnd), md5 c49b3858.
+- **How to see it:** the C3y-2 play-test again (hand-off in the session). offline_server.log `JUNE_FX C3y-2 room 4115x` and
+  `JUNE_FX C3y-2b scene end: guide resume, dungeon 41150`; ErrorLog no `can't find 'IsRecentlyPlayedEventScene'` / `'PlayEventScene'`.

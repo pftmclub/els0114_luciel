@@ -1901,11 +1901,15 @@ void CX2StateDungeonRoom::UISetting()
 			if( pStatic->GetPicture(0) != NULL )
 				pStatic->GetPicture(0)->SetShow(false);
 			
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING
+			// june-dungeons C3y-2b: June 324e6130 @324e7a3a-324e7a6b sets no picture here, the dialog's own stay
+#else SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING
 			if ( pStatic->GetPicture(1) != NULL )
 				pStatic->GetPicture(1)->SetTex( L"HQ_Loading_RUBEN_PROLOG_01.tga" );
 
 			if (pStatic->GetPicture(2) != NULL )
 				pStatic->GetPicture(2)->SetTex( L"HQ_Loading_RUBEN_PROLOG_02.tga" );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING
 		}		
 
 		Handler_EGS_STATE_CHANGE_GAME_START_REQ();		

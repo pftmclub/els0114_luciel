@@ -754,6 +754,12 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
   by `31fbdfa0` and `SetShowMenu` `32150b0e`; read by the menu dialog `324617c0` and `32388448-323895a2`), and `CX2State` vslot `0xb0` (field override
   `3245c560`: a June UI at `+0x38c`, gauge-manager `+0xd1` for buff 0x86b). Stand-ins stay in `X2TutorialGuideManager.cpp` until these UIs are
   ported. Also `31d72cc0` (`KTDGUIOKMsgBox`'s first test, a June-only `g_pData+0x290 +0xd8` system that also returns early from `SetShowUI`).
+- **Slide-shot scene end and the scene-end hook's quest piece (june-dungeons C3y-2b, 2026-11-13).** June's `CX2SlideShot::ScenEnd` `325c7140` =
+  March's plus two UI steps: the `CX2Game +0xbb8` dialog is re-shown (`31d41d10` / `31d41c90` / `31cd32e0`; June's `OnFrameMove` `325c6b50` hides it
+  while a shot shows), and with `g_pData+0x70 +0xdc` in 33900-33902 and the dialog manager hidden, `SetShow( 1, 0 )` (`31d05af0`). Divergence row +
+  allow row until then. The scene-end hook `CX2Main::OnSceneEnded` (`31d87420`) keeps a stand-in for `CX2UIQuestNew` `323ca2a0` (a deferred
+  quest REQ `0x36a` from `+0x784` / `+0x788`, `31f06270`; sets `g_pMain+0x90 +0x22f`): find the two fields' writers, then port it. The GFx scene
+  end's `31d70b30` (after the hook @`3226be35`) is still out (`X2GFXEventScene.cpp` comment).
 
 **Why UI is last and not first:** UI is not one system. Each stage above brings its own June dialogs: the region maps (1), slots and skill tree (3), quests (4), and the transcendence guides (6). A UI-first pass would port buttons with no system behind them, and then collide with every feature stage that touches the same dialog. The only UI work that must come early is the framework itself, and that is measured in Stage 2.
 

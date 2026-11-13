@@ -12,8 +12,15 @@ play-test.
 
 Exit 1 when a script calls a method that is neither registered in March nor listed in tools/data/lua_unbound_known.tsv
 (columns: name, phase, reason; a name goes there only when a phase decided to leave it absent, and says why).
-Names are matched by method name only (the class is not checked), so a method bound on the wrong class is not found;
-a registration inside a dead #if is counted as bound. Both are false negatives, never false alarms.
+A registration inside a dead #if is counted as bound (a false negative, never a false alarm).
+Two more FAIL categories (june-dungeons C3y-2b, 2026-11-13: `slot1:PlayEventScene()` passed because March binds
+PlayEventScene as a GLOBAL while June binds it as a CX2DungeonGame method):
+  METHOD BOUND ONLY AS GLOBAL  `x:Name(` where March registers Name only through lua_tinker::def / set / decl, never
+                               class_def / class_mem: the method call dies at run time ("can't find 'Name'").
+  METHOD NOT ON RECEIVER       with `--receiver CLASS`: `x:Name(` whose Name is class_def'd on no class in CLASS plus its
+                               class_inh bases (CX2DungeonGame accepts CX2Game methods). The Lua variable's class is not
+                               known, so every `:Name(` is held to CLASS unless `--receiver-var slot1,...` limits it to
+                               calls on those variables. A name the script defines itself (`function T:Name`) is skipped.
 
 `check` also runs two enum gates (added by char-ara CH1, 2026-11-11, after Ara's June script died at load and her
 CHAIN_SYSTEM read nil ids):
@@ -52,19 +59,51 @@ STATE_TABLES = {
 ENUM_REF = re.compile(r'\b([A-Z][A-Z0-9_]*)\.([A-Za-z_]\w*)')
 
 # lua_tinker::class_def<T>( L, "Name", ...), decl( L, "Name", ...), def(...), class_mem(...): the name is the 2nd argument
-REG = re.compile(r'(?:class_def|class_mem|class_add|decl|def|set)\s*(?:<[^()]*?>)?\s*\(\s*[\w>.\-*&()]+?\s*,\s*"(\w+)"')
-CALL = re.compile(r':(\w+)\s*\(')
+REG = re.compile(r'(class_def|class_mem|class_add|decl|def|set)\s*(?:<([^()]*?)>)?\s*\(\s*[\w>.\-*&()]+?\s*,\s*"(\w+)"')
+INH = re.compile(r'class_inh\s*<\s*(\w+)\s*,\s*(\w+)\s*>')
+CALL = re.compile(r'(\w+)?:(\w+)\s*\(')
+LUA_DEF = re.compile(r'\bfunction\s+[\w.]*[.:](\w+)\s*\(|\b(\w+)\s*=\s*function\b')
 
 
-def march_names():
-    names = set()
+class Bindings(object):
+    """What March registers: all names, global-only names, {method: {classes}} (class_def / class_mem), class_inh bases."""
+    def __init__(self):
+        self.names, self.glob = set(), set()
+        self.methods, self.bases = collections.defaultdict(set), collections.defaultdict(set)
+
+    def ancestry(self, cls):
+        out, todo = set(), [cls]
+        while todo:
+            c = todo.pop()
+            if c not in out:
+                out.add(c)
+                todo += self.bases.get(c, ())
+        return out
+
+    def only_global(self, n):
+        return n in self.glob and n not in self.methods
+
+
+def march_bindings():
+    b = Bindings()
     for d in SRC_DIRS:
         for f in glob.glob(os.path.join(ROOT, d, "*.cpp")) + glob.glob(os.path.join(ROOT, d, "*.h")):
             t = open(f, "rb").read().decode("cp949", "replace")
             if "lua_tinker" not in t and "LuaBinder" not in t:
                 continue
-            names.update(REG.findall(t))
-    return names
+            for kind, cls, name in REG.findall(t):
+                b.names.add(name)
+                if kind in ("class_def", "class_mem"):
+                    b.methods[name].add(cls.split(",")[0].strip() if cls else "?")
+                elif kind != "class_add":
+                    b.glob.add(name)
+            for cls, base in INH.findall(t):
+                b.bases[cls].add(base)
+    return b
+
+
+def march_names():
+    return march_bindings().names
 
 
 def known():
@@ -92,14 +131,22 @@ def find_script(name):
     return hits[0] if hits else None
 
 
-def calls_in(path):
+def call_sites(path):
+    """([(line, receiver variable or None, method name)], method names the script defines itself in Lua)."""
     t = open(path, encoding="utf-8-sig", errors="replace").read()
     t = re.sub(r"--\[\[.*?\]\]", "", t, flags=re.S)
     t = re.sub(r"--[^\n]*", "", t)
-    uses = collections.defaultdict(list)
+    sites = []
     for no, line in enumerate(t.split("\n"), 1):
         for m in CALL.finditer(line):
-            uses[m.group(1)].append(no)
+            sites.append((no, m.group(1), m.group(2)))
+    return sites, {a or b for a, b in LUA_DEF.findall(t)}
+
+
+def calls_in(path):
+    uses = collections.defaultdict(list)
+    for no, _, n in call_sites(path)[0]:
+        uses[n].append(no)
     return uses
 
 
@@ -230,8 +277,11 @@ def main():
     ap.add_argument("targets", nargs="*", help="script name or path")
     ap.add_argument("--dir", help="check every *.lua in this folder")
     ap.add_argument("--no-cpp", action="store_true", help="skip the STATE gate's compiler probe")
+    ap.add_argument("--receiver", help="C++ class the scripts' `x:Name(` receivers are (e.g. CX2DungeonGame): every name must be class_def'd on it or a class_inh base")
+    ap.add_argument("--receiver-var", help="with --receiver: comma list of Lua variable names to check (default: every receiver)")
     a = ap.parse_args()
-    reg = march_names()
+    bnd = march_bindings()
+    reg = bnd.names
     if a.cmd == "names":
         print("\n".join(sorted(reg)))
         print("# %d names" % len(reg), file=sys.stderr)
@@ -251,16 +301,35 @@ def main():
 
     kn, notes = known(), gap_notes()
     new = collections.defaultdict(list)
+    glob_only, off_recv = collections.defaultdict(list), collections.defaultdict(list)
+    allowed = bnd.ancestry(a.receiver) if a.receiver else set()
+    rvars = set(a.receiver_var.split(",")) if a.receiver_var else None
     bad_files = 0
     for p in files:
-        uses = calls_in(p)
+        sites, own = call_sites(p)
+        uses = collections.defaultdict(list)
+        for no, _, n in sites:
+            uses[n].append(no)
         unb = {n: l for n, l in uses.items() if n not in reg and n not in kn}
-        if len(files) <= 12 or unb:
-            print("%s: %d method(s) called, %d unbound" % (os.path.relpath(p, ROOT), len(uses), len(unb)))
+        # a name bound only as a global (def/set/decl) is not callable as a method; a name class_def'd off the receiver's classes neither
+        gl = {n: l for n, l in uses.items() if n in reg and n not in kn and n not in own and bnd.only_global(n)}
+        rc = {}
+        if a.receiver:
+            for no, rv, n in sites:
+                if n in reg and n not in kn and n not in own and n not in gl and (rvars is None or rv in rvars) and not (bnd.methods.get(n, set()) & allowed):
+                    rc.setdefault(n, []).append(no)
+        if len(files) <= 12 or unb or gl or rc:
+            print("%s: %d method(s) called, %d unbound, %d only-global, %d off-receiver" % (os.path.relpath(p, ROOT), len(uses), len(unb), len(gl), len(rc)))
         for n, lines in sorted(unb.items()):
             print("   UNBOUND %-40s line %s   %s" % (n, ",".join(map(str, lines[:4])), " ".join(notes.get(n, ["(not in c3z4_class_gap.tsv)"]))))
             new[n].append(os.path.basename(p))
-        bad_files += bool(unb)
+        for n, lines in sorted(gl.items()):
+            print("   METHOD BOUND ONLY AS GLOBAL %-34s line %s   (March: lua_tinker::def global; June: class_def method, bind it on the class)" % (n, ",".join(map(str, lines[:4]))))
+            glob_only[n].append(os.path.basename(p))
+        for n, lines in sorted(rc.items()):
+            print("   METHOD NOT ON RECEIVER %-39s line %s   (%s bases: %s; class_def'd on: %s)" % (n, ",".join(map(str, lines[:4])), a.receiver, ",".join(sorted(allowed - {a.receiver})) or "none", ",".join(sorted(bnd.methods[n])[:4])))
+            off_recv[n].append(os.path.basename(p))
+        bad_files += bool(unb or gl or rc)
     if len(files) > 12:
         print("\n== census: %d unbound name(s) across %d of %d script(s)" % (len(new), bad_files, len(files)))
         for n, fs in sorted(new.items(), key=lambda kv: -len(kv[1]))[:40]:
@@ -269,6 +338,10 @@ def main():
     why = []
     if new:
         why.append("%d unbound name(s): bind each whole from June's function, or add it to tools/data/lua_unbound_known.tsv with the reason" % len(new))
+    if glob_only:
+        why.append("%d name(s) bound only as a global (called as methods): bind the name with class_def on the receiver's class (June's binding), see METHOD BOUND ONLY AS GLOBAL" % len(glob_only))
+    if off_recv:
+        why.append("%d method name(s) not bound on %s or its bases: see METHOD NOT ON RECEIVER" % (len(off_recv), a.receiver))
     if efails:
         why.append("%d ENUM / STATE failure(s): fix Enum.lua (data036, core-list source) or the C++ enum, see the lines above" % efails)
     print("RESULT: %s" % ("FAIL, " + "; ".join(why) if why else "PASS"))

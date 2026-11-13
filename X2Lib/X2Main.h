@@ -1263,6 +1263,9 @@ class CX2Main : public CKTDXStage
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 		CX2TutorialGuideManager&	GetTutorialGuideManager() { return m_TutorialGuideManager; }	// june-dungeons C3z-4t1: June 31d70b00
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
+#ifdef SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+		void			OnSceneEnded();		// june-dungeons C3y-2b: June 31d87420
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES
 		void			SetLockCameraZoom( bool bLock ) { m_bLockCameraZoom = bLock; }	// june-dungeons C3z-4t3: June g_pMain+0x3f5, the guide's step 31fc4060 / end 31fc4c40
 		bool			GetLockCameraZoom() const { return m_bLockCameraZoom; }			// june-dungeons C3z-4t3: read by the zoom key handler 3245a8f0

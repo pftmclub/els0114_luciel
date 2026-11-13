@@ -473,6 +473,10 @@ void CX2GFXEventScene::End( bool bForce )
 
 	// tail @3226be2a. Not ported: 31d87420 ( June's dungeon 41470 start hook ), 31d70b30 ( the tutorial guide manager, Stage 9 ), the Aisha-only
 	// game value at @3226bf38 ( CX2Game +0xb38 = 2.8f when my unit type is 2 ) and 32396dc0 / 3239d810 ( CX2UIProfessionManager, Stage 9 )
+#ifdef SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+	if ( g_pMain != NULL )
+		g_pMain->OnSceneEnded();		// june-dungeons C3y-2b: June @3226be30
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 	if ( m_bNotifyNewEpicQuest == true )
 	{
 		m_bNotifyNewEpicQuest = false;

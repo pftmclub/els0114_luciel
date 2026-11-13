@@ -214,6 +214,32 @@ void CX2SlideShot::ScenEnd()
 }
 
 
+#ifdef SERV_IRUHADEV_JUNE_SCENE_END_HOOK
+// june-dungeons C3y-2b: June 325c74a0 ( Lua ScenEnd ): the scene end, then the scene-end hook
+void CX2SlideShot::ScenEnd_LUA()
+{
+	ScenEnd();
+	if( NULL != g_pMain )
+		g_pMain->OnSceneEnded();
+}
+
+// june-dungeons C3y-2b: June 325c74b0, from CX2Main::MsgProc: ESC down or right button up ends a showing slide shot
+bool CX2SlideShot::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	if( false == m_bNowPresent )
+		return false;
+
+	if( ( WM_KEYDOWN == uMsg && VK_ESCAPE == wParam ) || WM_RBUTTONUP == uMsg )
+	{
+		ScenEnd();
+		if( NULL != g_pMain )
+			g_pMain->OnSceneEnded();
+		return true;
+	}
+	return false;
+}
+
+#endif SERV_IRUHADEV_JUNE_SCENE_END_HOOK
 void CX2SlideShot::GoNextScen()
 {
 #ifdef CHECK_VOICE_IN_SLIDESHOT

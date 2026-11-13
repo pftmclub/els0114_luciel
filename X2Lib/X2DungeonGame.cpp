@@ -3200,6 +3200,17 @@ void CX2DungeonGame::ShowJumpGuide( float fShowTime )
 		g_pData->GetPlayGuide()->ShowJumpGuide( true, fShowTime );
 }
 
+// june-dungeons C3y-2b: June 327ccad0 ( Lua PlayEventScene, a CX2DungeonGame method @31de31c0 ): ignores this, plays the GFx scene
+void CX2DungeonGame::PlayEventScene( const char* szName )
+{
+	GfxPlayEventScene_LUA( szName );
+}
+
+// june-dungeons C3y-2b: June 327ccb20 ( Lua IsRecentlyPlayedEventScene, a method @31de342a ): ignores this
+bool CX2DungeonGame::IsRecentlyPlayedEventScene( const char* szName )
+{
+	return GfxIsRecentlyPlayedEventScene_LUA( szName );
+}
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 void CX2DungeonGame::ClearSubStage( int clearType, int nextStageNum, int nextSubStageNum )
 {

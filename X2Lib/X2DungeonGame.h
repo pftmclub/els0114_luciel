@@ -202,6 +202,8 @@ class CX2DungeonGame : public CX2Game
 		void					ClearSubStage( int clearType, int nextStageNum, int nextSubStageNum );
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 		void					ShowJumpGuide( float fShowTime );	// june-dungeons C3y-2: June 327ca2c0
+		void					PlayEventScene( const char* szName );				// june-dungeons C3y-2b: June 327ccad0
+		bool					IsRecentlyPlayedEventScene( const char* szName );	// june-dungeons C3y-2b: June 327ccb20
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 		
 		
