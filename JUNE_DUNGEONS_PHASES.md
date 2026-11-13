@@ -584,3 +584,12 @@ the battle-field tutorial. Flags (`KTDXLIB/Always.h`): `SERV_IRUHADEV_JUNE_CLASS
   (Elesis), the guide hints run, the stage clears to the village. offline_server.log `JUNE_FX C3y-2 room 41150` / `41220`.
 - **Range flagcheck** (`52951ffe^..e57133b6`, C3y-2 files): CLASS_TUTORIAL_DUNGEON 4 PASS, LUA_BIND 5 PASS, PLAY_GUIDE 3 PASS, 0 FAIL, 0 deleted; 1 ERROR each = the Always.h `#error` guards. 52951ffe also carries C3z-4t3's staged files (index race; e57133b6 restored C3y-2's lost hunks).
 - **Debug define stays on** until the review. Next: user play-test, then `C3y-2-review.md`.
+
+## C3y-2 - Play-test (2026-11-13): failed -> C3y-2b
+
+New Elsword (`JUNE_FX C3y-2 room 41150 ( server select, unit type 1 )`) and new Elesis (`room 41220 ... unit type 8`) both reach June's
+tutorial worlds (no `stage 0 out of range`, 0 EXCEPTION). The user saw: the old tutorial loading screen for a second before June's; the
+opening slide shot (`PF_STAGE0_SUB0_SHOT0`) not skippable with ESC / right click; the character cannot move. Cause of the lock: the scripts
+call `PlayEventScene` / `IsRecentlyPlayedEventScene` as CX2DungeonGame methods (June binds them there, `327ccad0` / `327ccb20`); March
+binds them only as globals, so `CannotInput( 9999 )` is never released (ErrorLog x1 / x1114). `luabind.py` missed it (name-only match).
+Also logged: OpenXET failures for the tutorial worlds and missing Ruben textures. All routed to `kickoffs/june-dungeons/C3y-2b.md`.
