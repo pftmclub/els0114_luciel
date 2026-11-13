@@ -600,6 +600,28 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no
 - **Play-test (2026-11-14, exe `e9dee3d6`): passed.** `jtLordKnight` (02:12) and `jtVoidPrincess` (02:13) in a dungeon; logs run after the
   deploy, clean exit, 0 `EXCEPTION`, 0 unbound Lua names, only the usual `E_DISABLE_HB_CHECK_REQ` unhandled; no crash bundle from the run.
 
+### DU2 - Review (2026-11-14)
+
+Opus 5.5 high. **Verdict: pass, no code change** (commit `14fe2f4d`, flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS`).
+- **Bases, re-read from `unpacked_x2.exe` bytes** (vtable `334781f4`, capstone on the raw image): 0x468 -> `3208de40` `mov eax, 0x19` (25 -> March
+  `USI_DAMAGE_GROGGY` 24); 0x114 -> `3208de60` `mov eax, 0x1e` (30 -> `USI_DAMAGE_DOWN_FRONT` 29); 0x490 -> `330de330` `mov eax, 0x25` (37 ->
+  `USI_DAMAGE_AIR_DOWN_LANDING` 36); 0x4a4 -> `3208def0` `mov eax, 0x2a` (42 -> `USI_DAMAGE_REVENGE` 41); 0x458 -> `3208de10` = riding (vslot 0x200)
+  ? 0x4f : 0x11 (17 = `USI_JUMP_DOWN`; ids below 25 are equal in both). March = June - 1 from 25 holds.
+- **No accidental override.** None of the 19 names is declared in any `X2Lib` / `KTDXLIB` header but `X2GUUser.h` (grep). `GetJumpDownStateID`'s
+  `int` return: its 3 callers (`X2GUEL.cpp:11958` StateChange, `X2GUUser.cpp` PhysicProcess_Jumping, IsNotCommonMoveState) all take an `int`.
+- **Two routed sites opened against June's listing:** PhysicProcess_Jumping `31fd6da9`: 0x114 -> 0x118 -> 0x494 -> 0x490, then 0x458 = DU2's order;
+  ForceDownAndDetonationProcess `3202a9c0`: 0x114 -> 0x118 -> 0x48c -> riding 0x55 / 0x56 = DU2's `if`; `GetNowStateID()` is March's
+  `m_itNowStateData->first`, so the switch -> `if` reads the same state. The stun test (@32067598-3206776c) asks 0x46c-0x484, 0x488, 0x490-0x4a0,
+  0x114, 0x118, 0x48c, riding: DU2's order. A match jumps to the groggy change (`3206776e`), confirming the polarity the Done note routes to Stage 2.
+- **Every NU0 `DU2` reader row has a verdict** (48 rows, 12 functions): routed (31fd6ce0, 3202a9c0, 32063650, 3208e8c0, 3208eb60, 32cea0c0
+  @32cec2bf), automatic (31f6eea0, 320348c0, IsNotCommonMoveState: NU0 files @31fd77b1 under Ghidra's carve `31fd7350`, the real start is
+  `31fd7640`, funcmap row `3208de10`), no March body (31fe7610 +0x8e74 block, 31fd7350 `LT_JUMP_DOWN`, 32296570, 3208e7d0 Ain).
+- **Hygiene.** flagcheck `--range 14fe2f4d^..14fe2f4d`: 3 PASS (`X2GUUser.cpp` +64, `X2GUUser.h` +33, `X2GUArme_VioletMage.cpp` +4), 1 DEFINE, 0 OTHER,
+  0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `git log -S<flag> 14fe2f4d..HEAD`: only `274dc26c` (Done note text). `junediverge --check-all`:
+  allow-listed 232, RESULT: PASS. Flag-off = March: flagcheck's unifdef strip of the three files equals `14fe2f4d^` byte for byte (no `cl /P` run: a
+  flag-off preprocess needs an `Always.h` edit, which the shared tree forbids).
+- **Build:** none (no fix, no play-test). CH1p's DU2 dependency is met.
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under
