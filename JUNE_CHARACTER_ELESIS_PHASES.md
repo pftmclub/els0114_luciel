@@ -1916,6 +1916,10 @@ Opus 5.5. **Pass, no code change.** Commit `7473d4bf` read against June in Ghidr
 `RESULT: PASS`. OTHER = `X2BuffFactor.h` / `X2SkillTree.h` / `X2UnitManager.h` (`JUNE_ENUM_NAMES` names); DEFINE = `Always.h` (+19 -5). `git log -S` the flag after `7473d4bf`: none.
 `junediverge.py --check-all`: `allow-listed: 232`, `RESULT: PASS`. `enumscan.py --check X2GUEL.cpp X2Game.cpp`: `0 A/B row(s) remain in 2 file(s) (C 0, D 1, X 3 ignored)`.
 **Full build skipped: no play-test** (no code change; the spawns are reached in CH3b / CH3b2 / CH3c / CH4a). `_SUMMON_DEBUG` stays (CH3d retires it).
+**Fix after the review (user asked for a build, 2026-11-14):** the full build failed in KTDXLIB on CH3b0's own `Always.h` `#error`. `SERV_ELESIS_SECOND_CLASS_CHANGE` is
+defined only in `ServerDefine.h`, which KTDXLIB never sees, and CH3b0's one-file probe compiled only X2Lib files. That check moved to the top of `X2GUEL.cpp` (as Raven's
+`SERV_RAVEN_VETERAN_COMMANDER`); the rest of the guard stays in `Always.h`. flagcheck `--worktree --files Always.h X2GUEL.cpp`: `1 PASS, 1 OTHER, 0 FAIL`, `RESULT: PASS`.
+`DEPLOY OK: X2_offline.exe is 26,488,832 B, dated 2026-11-14 02:08:40, md5 e9dee3d698e1420fe434100dcb726b2a`.
 
 ## Phase CH4 - Passives and class mechanics
 
