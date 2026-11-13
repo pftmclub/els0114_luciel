@@ -1982,6 +1982,15 @@ class CKTDGParticleSystem
 				return INVALID_PARTICLE_SEQUENCE_HANDLE;
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
+		// june-dungeons C3y-2c: June 31c25e00 - the 5th Lua argument is the layer; an absent one reads 0 ( lua_tonumber ) and is set too, as in June
+		CParticleEventSequence* CreateSequence_LUA( const char* pSequenceName, D3DXVECTOR3 pos, D3DXVECTOR2 emitRate, D3DXVECTOR2 trigger, int iLayer )
+		{
+			wstring wSequenceName;
+			ConvertUtf8ToWCHAR( wSequenceName, pSequenceName );
+			return CreateSequence( NULL, wSequenceName.c_str(), pos.x, pos.y, pos.z, emitRate.x, emitRate.y, -1, (int)trigger.x, trigger.y, true, 0.0f, false, iLayer );
+		}
+#else SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 		CParticleEventSequence* CreateSequence_LUA( const char* pSequenceName, D3DXVECTOR3 pos, D3DXVECTOR2 emitRate, D3DXVECTOR2 trigger )
 		{
 			wstring wSequenceName;
@@ -1992,6 +2001,7 @@ class CKTDGParticleSystem
 				pos.x, pos.y, pos.z, emitRate.x, emitRate.y, 
 				-1, (int)trigger.x, trigger.y );
 		}
+#endif SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 
 		CParticleEventSequence* GameUnitCreateSequence_LUA( CKTDGObject* pKTDGObject_, const char* pSequenceName, D3DXVECTOR3 pos, D3DXVECTOR2 emitRate, D3DXVECTOR2 trigger )
 		{
@@ -2014,11 +2024,19 @@ class CKTDGParticleSystem
 				drawCount, triggerCount, triggerTime, bCullCheck, latency, bNextFrame );
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
+		CParticleEventSequence* CreateSequence( CKTDGObject* pKTDGObject, const WCHAR* pSequenceName, 
+			float x, float y, float z, 
+			float minEmitrate = -1, float maxEmitrate = -1, int drawCount = -1, 
+			int triggerCount = -1, float triggerTime = -1.0f,
+			bool bCullCheck = true, float latency = 0.0f, bool bNextFrame = false, int iLayer = -1 );		// june-dungeons C3y-2c: June 31cf90f0, iLayer -1 keeps the templet's
+#else SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 		CParticleEventSequence* CreateSequence( CKTDGObject* pKTDGObject, const WCHAR* pSequenceName, 
 			float x, float y, float z, 
 			float minEmitrate = -1, float maxEmitrate = -1, int drawCount = -1, 
 			int triggerCount = -1, float triggerTime = -1.0f,
 			bool bCullCheck = true, float latency = 0.0f, bool bNextFrame = false );
+#endif SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 
 #ifdef EVENT_SCENE
 		//{{ oasis907 : ±ËªÛ¿± [2010.6.10] // 

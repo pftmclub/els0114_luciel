@@ -1508,6 +1508,35 @@ public:
 	}
 
 	// ---- per frame / device -------------------------------------------------------------------------------------------------------
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	void TraceSceneAdvance()		// june-dungeons C3y-2c trace: once a second while a scene plays, Advance calls and movie seconds vs real seconds
+	{
+		static DWORD s_dwWindowStart = 0;
+		static int s_iAdvanceCount = 0;
+		static float s_fMovieSeconds = 0.f;
+		const DWORD dwNow = timeGetTime();
+		if ( m_bEventScenePlaying == false )
+		{
+			s_dwWindowStart = 0;
+			return;
+		}
+		if ( s_dwWindowStart == 0 )
+		{
+			s_dwWindowStart = dwNow;
+			s_iAdvanceCount = 0;
+			s_fMovieSeconds = 0.f;
+		}
+		++s_iAdvanceCount;
+		s_fMovieSeconds += m_fElapsed;
+		if ( dwNow - s_dwWindowStart >= 1000 )
+		{
+			GfxSceneTrace( "advance: %d call(s), %.3f s of movie time in %.3f s real", s_iAdvanceCount, s_fMovieSeconds, ( dwNow - s_dwWindowStart ) / 1000.f );
+			s_dwWindowStart = dwNow;
+			s_iAdvanceCount = 0;
+			s_fMovieSeconds = 0.f;
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 	void OnFrameMove()		// 31c430e0
 	{
 		DWORD dwNow = timeGetTime();
@@ -1519,6 +1548,9 @@ public:
 	{
 		if ( m_pUI != NULL )
 			m_pUI->Advance( m_fElapsed, 2 );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		TraceSceneAdvance();		// june-dungeons C3y-2c trace: movie time fed vs real time while a scene plays
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 		if ( m_pStateBlock == NULL )
 			return;
 		m_pStateBlock->Capture();

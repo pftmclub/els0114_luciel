@@ -13099,3 +13099,13 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN needs SERV_IRUHADEV_JUNE_QUEST_LOAD ( AddChainQuestDays, LoadChainQuestInfo )
 #endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2c - June's Lua CreateSequence_LUA ( 31c25e00 ) takes a 5th argument, the sequence layer, passed to CreateSequence
+//              ( 31cf90f0 ) which stores it in m_Layer unless -1. The tutorials' slide shots pass 19 for the black back and 20 for the picture,
+//              so the post-boss pictures draw over the black. Verbatim (user, 2026-11-13): a call without it reads 0 ( lua_tonumber ) and sets
+//              layer 0 as June does ( JUNE_BUGS ). Revert: comment out the #define ( JUNE_PARTICLE_LUA_LAYER ).
+#define SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
+//////////////////////////////////////////////////////////////////////////

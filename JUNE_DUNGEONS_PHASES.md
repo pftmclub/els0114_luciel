@@ -899,3 +899,30 @@ several lines; after the boss dies a scene shows only black until ESC / right cl
 - **Build.** DEPLOY OK: X2_offline.exe is 26,462,720 B, dated 2026-11-13 16:27:38, md5 4263c1f75e4cbf50eb87d6ed7576dec4 (built at main 46ba840f + 7
   uncommitted code files, 4 of them a peer's char-elesis work). EXESTR OK 2 of 2 (`[JUNE_GFX] SCENE TRACE `, `TRACE input msg 0x%x`), md5 4263c1f7.
 - **Next:** the user's trace run (new Elsword, the whole tutorial), "check logs", then the fix under its own flag in this phase.
+
+### C3y-2c - trace run 1 (2026-11-13) and fix 1
+
+Run (new Elsword, exe 9043fc8b = a peer build on top of 05723e9c, so the trace was in): scenes `_01`, `_02`, `_04`, then the boss, the slide
+shot `PF_STAGE0_SUB2_SHOT`, `_03`, clear 17:00:14. User: lines "type fast and jump on before the white box is fully shown"; after the boss a black
+screen until ESC / right click, then the portrait dialog.
+- **The click path is clean.** Every click = one `input 0x202` -> one `FireNextScene` -> one observer (`#5`, `#7`, `#9`, `#11`; one per scene,
+  each removed by `deleteBinding` at the end). `_04` closed by the scene (2nd click -> AS call 0 -> `End by the scene`). `_01` / `_02` / `_03`
+  were force-ended by right click. No queue, no replay, no double fire. Unloaded scenes still answer Enter / ESC in the village (stage
+  KEY_DOWN listener): dropped by the BUG_REPORT 4 / 5 guard. Every `playEventSceneSound` passes `Tuto_Elsword_New_01_Els.ogg` (the SWF's
+  sound player keeps its first label).
+- **The black screen is the slide shot, not a GFx scene** (no Play between 16:59:29 and 16:59:50). `PF_STAGE0_SUB2_SHOT0` creates
+  `PresentProlBlackBack_T` at layer 19 and `PresentElswordProl9` at layer 20 through the Lua `CreateSequence_LUA` 5th argument. March's
+  binding has 4 arguments, so both keep the templet's layer 15 and the black covers the picture (textures present, byte-equal to June's).
+  Shot 0 ran 7 s and never reached its 5 s `GoNextScen` (open: the C3y-2c play-test 2 shows whether the layer fix also changes this).
+- **June's binding** `31c25e00` (registered @`31c0feda`, functor `31c251e0` reads Lua arg 6 with `32fe7b00` = `lua_tonumber` + `_ftol2`) passes
+  it as the 14th argument of `CreateSequence` `31cf90f0`, stored to `m_Layer` +0x164 (funcmap row 79) after `InChain` (`31cef5a0`) unless -1.
+  `GameUnitCreateSequence_LUA` `31c25fa0` passes -1 (no change). June's scripts pass 18-24 in 222 calls (the tutorials, 2 event dungeons,
+  `BES_KOMODO`); 3,172 calls pass 4 arguments and so set layer 0 in June. User (2026-11-13): port verbatim; JUNE_BUGS 653.
+- **Fix 1.** `SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER`: `CreateSequence_LUA( ..., int iLayer )`, `CreateSequence( ..., bool bNextFrame, int iLayer = -1 )`,
+  `SetLayer` after `InChain`. March's lua_tinker reads an absent int as `(int)lua_tonumber` = 0, as June does. Divergence row
+  `CreateSequence_LUA` (replace, ported). The trace gains `advance: N call(s), X s of movie time in Y s real` once a second while a scene plays,
+  to settle the typing-speed report.
+- **Hygiene.** flagcheck `--worktree`: PARTICLE_LUA_LAYER 2 PASS + DEFINE (+31), SCENE_TRACE_DEBUG 1 PASS; 0 FAIL, 0 deleted. junediverge `RESULT: PASS`.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,467,328 B, dated 2026-11-13 17:52:39, md5 79b337ec61a16d5030f6e48ca280ce03 (built at main 1ccad820 + 4
+  uncommitted code files, all this phase's). EXESTR OK 2 of 2 (`advance: %d call(s)`, `CreateSequence_LUA`), md5 79b337ec.
+- **User, after the run:** the fast typing also shows in other quests' scenes, so it is on the GFx side; the `advance` line decides it.

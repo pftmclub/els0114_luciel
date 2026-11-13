@@ -663,12 +663,21 @@ CKTDGParticleSystem::CParticleEventSequenceHandle CKTDGParticleSystem::CreateIns
 //}}
 #endif EVENT_SCENE
 
+#ifdef SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
+CKTDGParticleSystem::CParticleEventSequence* CKTDGParticleSystem::CreateSequence( CKTDGObject* pKTDGObject, 
+																				const WCHAR* pSequenceName, 
+																				 float x, float y, float z, 
+																				 float minEmitrate, float maxEmitrate, int drawCount, 
+																				 int triggerCount, float triggerTime,
+																				 bool bCullCheck, float latency, bool bNextFrame, int iLayer )		// june-dungeons C3y-2c: June 31cf90f0 ( iLayer, the 14th argument )
+#else SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 CKTDGParticleSystem::CParticleEventSequence* CKTDGParticleSystem::CreateSequence( CKTDGObject* pKTDGObject, 
 																				const WCHAR* pSequenceName, 
 																				 float x, float y, float z, 
 																				 float minEmitrate, float maxEmitrate, int drawCount, 
 																				 int triggerCount, float triggerTime,
 																				 bool bCullCheck, float latency, bool bNextFrame )
+#endif SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 {
 	KTDXPROFILE();	
 
@@ -842,6 +851,10 @@ CKTDGParticleSystem::CParticleEventSequence* CKTDGParticleSystem::CreateSequence
 	}
 
 	retval->InChain();
+#ifdef SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
+	if( iLayer != -1 )		// june-dungeons C3y-2c: June 31cf90f0 after 31cef5a0, a plain store to m_Layer ( +0x164 )
+		retval->SetLayer( iLayer );
+#endif SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 
 	return retval;
 }
