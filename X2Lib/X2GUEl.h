@@ -722,6 +722,35 @@ protected:
 	void ESI_SA_SBH_IGNIS_CRASHER_EventProcess();	/// char-elesis CH3b: June 32b6c5d0
 	void ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_StateStart();	/// char-elesis CH3b2: June 32b51550
 	void ESI_A_SBH_FLAME_PROTECTION_EventProcess();	/// char-elesis CH3b2: June 32b6d1e0
+	void SI_SA_SDK_BRANDISH_BREAKER_START_Init();	/// char-elesis CH3c: June 32b51c00
+	void SI_SA_SDK_BRANDISH_BREAKER_START_StateStart();	/// char-elesis CH3c: June 32b737a0
+	void SI_SA_SDK_BRANDISH_BREAKER_START_EventProcess();	/// char-elesis CH3c: June 32b682f0
+	void SI_SA_SDK_BRANDISH_BREAKER_LOOP_StateStart();	/// char-elesis CH3c: June 32b73940
+	void SI_SA_SDK_BRANDISH_BREAKER_LOOP_FrameMove();	/// char-elesis CH3c: June 32b8a320
+	void SI_SA_SDK_BRANDISH_BREAKER_LOOP_EventProcess();	/// char-elesis CH3c: June 32b51c50
+	void SI_SA_SDK_BRANDISH_BREAKER_FINISH_EventProcess();	/// char-elesis CH3c: June 32b68330
+	void ScaleBrandishBreakerPowerRateByLostHp();	/// char-elesis CH3c: June 32b737a0 / 32b73940 ( inlined there )
+	void SI_SA_SCA_DREAD_WEAPON_START_Init();	/// char-elesis CH3c: June 32b51dd0
+	void SI_SA_SCA_DREAD_WEAPON_START_StateStartFuture();	/// char-elesis CH3c: June 32b51e60
+	void SI_SA_SCA_DREAD_WEAPON_START_FrameMove();	/// char-elesis CH3c: June 32b8a9d0
+	void SI_SA_SCA_DREAD_WEAPON_START_EventProcess();	/// char-elesis CH3c: June 32b68cd0
+	void SI_SA_SCA_DREAD_WEAPON_LOOP_StateStartFuture();	/// char-elesis CH3c: June 32b51e80
+	void SI_SA_SCA_DREAD_WEAPON_LOOP_EventProcess();	/// char-elesis CH3c: June 32b68d00
+	void SI_SA_SCA_DREAD_WEAPON_END_StateStart();	/// char-elesis CH3c: June 32b51ea0
+	void SI_SA_SCA_DREAD_WEAPON_END_EventProcess();	/// char-elesis CH3c: June 32b68d40
+	void SI_SA_SCA_SHADE_THE_ILLUSION_Init();	/// char-elesis CH3c: June 32b51eb0
+	void SI_SA_SCA_SHADE_THE_ILLUSION_FrameMove();	/// char-elesis CH3c: June 32b8ad50
+	void SI_SA_SCA_SHADE_THE_ILLUSION_EventProcess();	/// char-elesis CH3c: June 32b69040
+	void SI_SA_SCA_BLOOD_CUTTER_Init();	/// char-elesis CH3c: June 32b51f40
+	void SI_SA_SCA_BLOOD_CUTTER_FrameMove();	/// char-elesis CH3c: June 32b8b0c0
+	void SI_SA_SCA_BLOOD_CUTTER_EventProcess();	/// char-elesis CH3c: June 32b69360
+	void SI_A_SCA_ASSAULT_STRIKE_Init();	/// char-elesis CH3c: June 32b52120
+	void SI_A_SCA_ASSAULT_STRIKE_FrameMove();	/// char-elesis CH3c: June 32b8bd70
+	void SI_A_SCA_ASSAULT_STRIKE_EventProcess();	/// char-elesis CH3c: June 32b6a660
+	void ESI_SA_SCA_BLOOD_FALLS_FrameMove();	/// char-elesis CH3c: June 32b8c0f0
+	void ESI_SA_SCA_CHASING_SWORD_EventProcess();	/// char-elesis CH3c: June 32b6c8d0
+	void ESI_SA_SCA_SHADE_EventProcess();	/// char-elesis CH3c: June 32b6cbd0
+	void ESI_A_SCA_BLOOD_STING_EventProcess();	/// char-elesis CH3c: June 32b6d4e0
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à
@@ -1256,6 +1285,9 @@ protected:
 	UidType m_uidBlazingDanceNowTarget;			/// char-elesis CH3b: June +0x96b0 ( UID of the unit the dance jumped to last, -1 at the start )
 	float m_fBlazingDanceLineRange;				/// char-elesis CH3b: June +0x975c ( SA_SCOPE_ABS_Z of Blazing Dance, 99999 without it: how far off her facing line a PvP / PvE target may stand )
 	float m_fBlazingDanceSearchRange;			/// char-elesis CH3b: June +0x97b4 ( SA_SCOPE_ABS / SA_SCOPE_ABS_PVP: how far the dance reaches for its next target )
+	USHORT m_usBrandishBreakerLoopCount;			/// char-elesis CH3c: June +0x96f8 ( loop ticks of Brandish Breaker: 0 at the start state, grows by 1 per 0.15 s of the loop state )
+	USHORT m_usDreadWeaponLoopCount;				/// char-elesis CH3c: June +0x96fc ( passes of the Dread Weapon loop state: 0 at the start state, +1 per loop entered )
+	CX2EffectSet::Handle m_hCrimsonAvengerSkillEffectSet;	/// char-elesis CH3c: June +0x9710 ( the effect set of Dread Weapon / Assault Strike / Blood Falls; the next replaces it )
 	char m_cBlazingDanceAttackCount;			/// char-elesis CH3b: June +0x9789 ( strikes made, 0 to 100; a strike from the seventh on costs 20 MP )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD

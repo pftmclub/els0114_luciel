@@ -106,8 +106,9 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH3c | **ready** (CH3b2 done, CHNb review done 2026-11-13): Crimson Avenger (125) skills | Sonnet 5.5 / high, user play-test | CH3b2 (done), CHNb review (done) | `X2GUEL.*` | `CH3c.md` |
-| CH3d | blocked (CH3c): hyper actives + transcendence rows 120 / 121 / 125; CH3 stage review (CH3a-CH3d) | Opus 5.5 / high, Opus review, user play-test | CH3c | `X2GUEL.*`, `Handlers_Quest.cpp`, data036 | `CH3d.md` |
+| CH3c | **play-test owed** (2026-11-14): 9 Crimson Avenger (125) skills written, Shadow Edge split to CH3c2; test units 146 / 145 | Sonnet 5.5 / high, user play-test | CH3b2 (done), CHNb review (done) | `X2GUEL.*` | `CH3c.md` |
+| CH3c2 | blocked (CH3c play-test): Shadow Edge 28215 / 28235 (target search, mark record, Link effect, buff clone) | Opus 5.5 / high, user play-test | CH3c | `X2GUEL.*`, `X2Game.*`, `X2SkillTree.h` | `CH3c2.md` |
+| CH3d | blocked (CH3c2): hyper actives + transcendence rows 120 / 121 / 125; CH3 stage review (CH3a-CH3d) | Opus 5.5 / high, Opus review, user play-test | CH3c2 | `X2GUEL.*`, `Handlers_Quest.cpp`, data036 | `CH3d.md` |
 | CH4a | blocked (CH3d review): passives `32b88300`, 0x83c hook, delegates; no review of its own | Opus 5.5 / high, user play-test | CH3d review | `X2GUEL.*`, `X2GUUser.*` | `CH4a.md` |
 | CH4b | blocked (CH4a): overrides (damage exception, MP / cool time, 0x428) + `MemoConditionElesis` | Opus 5.5 / high, user play-test | CH4a | `X2GUEL.*`, `X2GUUser.*` | `CH4b.md` |
 | CH4c | blocked (CH4b): blood hooks (0x4f8 / 0x4fc / 0x734, Blood Runaway, Madness), flag `_BLOOD`; CH4 stage review (CH4a-CH4c) | Opus 5.5 / high, Opus review, user play-test | CH4b | `X2GUEL.*`, `X2GUUser.*`, `X2BuffFactor.h` | `CH4c.md` |

@@ -7043,3 +7043,15 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md`, "NU4 - Done".
   `tools/createchar.py` knows the seven classes.
 - **Revert:** comment out the three defines, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`; `luasrc.py restore data034
   DLG_Unit_Create_Unit_Button_New.lua` and drop the two `Enum.lua` blocks, then `kom.py pack` / `copy` data034 and data036.
+
+## Stage 7 Elesis, CH3c: Crimson Avenger (125) skills (char-elesis CH3c, 2026-11-14)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for the CH3d review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** New cases for Brandish Breaker 28022 / 28056, Blood Cutter 28023 / 28057, Shade the Illusion 28024 / 28058, Dread Weapon 28025 / 28059, Chasing Sword 28043, Shade 28044, Blood Falls 28064,
+  Assault Strike 28216 / 28236, Blood Sting 28224 ( June's states and effects; the skills had no state before ). **Shadow Edge 28215 / 28235 is not ported** ( this needs Opus: see the Done note ).
+  Brandish Breaker: start state, loop ( a dummy damage effect every 0.15 s takes the bleeding HP cost, up to 6 ticks, ends when no skill key is held ) and finish; the damage rate grows by 0.3 x the share of max HP lost.
+  Dread Weapon: start, loop ( 4 passes ) and end; the effect set `EffectSet_SI_SA_SCA_DREAD_WEAPON_Loop` at 0.3 s with the bleeding cost. Assault Strike, Blood Falls, Shade the Illusion: one effect set at 0.4 s with the bleeding cost
+  ( power rate x1.3 in PvP / PvE, else x1.4 ). Blood Cutter: at 0.01 s the bleeding cost raises the state's rate, then CH3b0's Blood Cutter NPC ( 1641 ) is summoned. Chasing Sword, Shade, Blood Sting: motion only, damage from the script.
+- **Shared.** `X2SkillTree.h`: 10 `RNSI_*` names; `X2BuffFactor.h`: `BFI_BUFF_BRANDISH_BREAKER_MEMO` 594 ( `JUNE_ENUM_NAMES` ). No `Always.h` change.
+- **Damage.** All of these are June's script tables ( numerical-only for Blood Sting and Chasing Sword ); no March row exists, so no number is compared. The bleeding cost uses the shared `ApplyBleedingHpCost` ( CH2d ).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.

@@ -2633,6 +2633,21 @@ public:
 	RNSI_SA_SBH_BLAZE_WING_UPGRADE                        = 28053,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3c
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names the Crimson Avenger actives register on ( values from June's Enum.lua )
+	RNSI_SA_SCA_SHADE_THE_ILLUSION                        = 28024,
+	RNSI_SA_SCA_CHASING_SWORD                             = 28043,
+	RNSI_SA_SCA_SHADE                                     = 28044,
+	RNSI_SA_SCA_BRANDISH_BREAKER_UPGRADE                  = 28056,
+	RNSI_SA_SCA_SHADE_THE_ILLUSION_UPGRADE                = 28058,
+	RNSI_SA_SCA_DREAD_WEAPON_UPGRADE                      = 28059,
+	RNSI_SA_SCA_BLOOD_FALLS                               = 28064,
+	RNSI_A_SCA_ASSAULT_STRIKE                             = 28216,
+	RNSI_A_SCA_BLOOD_STING                                = 28224,
+	RNSI_A_SCA_ASSAULT_STRIKE_UPGRADE                     = 28236,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-14 // char-elesis CH3b2
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June SKILL_ID names the Blazing Heart actives register on ( values from June's Enum.lua )

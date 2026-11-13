@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-elesis CH3d` |
 | Plan doc | `JUNE_CHARACTER_ELESIS_PHASES.md` (branch `main`) |
-| Depends on | CH3c. One at a time with CH1-CH4: they all edit `X2GUEL.*` |
+| Depends on | CH3c, CH3c2. One at a time with CH1-CH4: they all edit `X2GUEL.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` and `SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND` (+ `..._SKILL_DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ELESIS SKILL`) |
 | Review | `kickoffs/char-elesis/CH3d-review.md` (Opus 5.5 high; the phase writes it when done); the CH3 stage review: covers CH3a-CH3d, retires `_SKILL_DEBUG` |

@@ -11269,3 +11269,33 @@ UQNCM_* / PUCM_* / LMUCM_* (C3z-4t4)	the 8 UI messages TutorialGuideInfo.lua wai
 32b6d1e0	CX2GUEL::ESI_A_SBH_FLAME_PROTECTION_EventProcess	PORTED	Char Elesis CH3b2: new; animation end -> WAIT, then the foot-on-a-line cancels ( the Burst Rising template )
 32b51550	CX2GUEL::ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_StateStart	PORTED	Char Elesis CH3b2: new; CommonStateStart ( vslot 0x7c4 ) then the Fire Blossom hit count +0x9788 = 0; the increment is CH4a's delegate 32b524b0
 32b513e0 32b514c0 32b79b10 32b79d70	Flame Sword Init / Scalet Rose Init / Scalet Rose FrameMove / Scalet Rose End	= March	Char Elesis CH3b2: read from the listing = March's ( preload lists; X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE branch: damage effect handle at 0.25 s, destroyed at 0.465 s and in End ); no code
+32b8c470 (CH3c)	CX2GUEL::SetEquippedSkillFuncBySkillSlotIndex cases 28022 / 28056, 28023 / 28057, 28024 / 28058, 28025 / 28059, 28043, 28044, 28064, 28216 / 28236, 28224	PORTED	Char Elesis CH3c: new cases from the registration listing's struct slots ( Init +0x18, StartFuture +0x20, Start +0x28, FrameMove +0x38, EventProcess +0x48 ); Blood Falls Init 32b52550 is a bare ret ( not registered ), its EventProcess is 329cbfc0 > 31fcc740; Shadow Edge 28215 / 28235 not registered ( needs Opus )
+32b51c00	CX2GUEL::SI_SA_SDK_BRANDISH_BREAKER_START_Init	PORTED	Char Elesis CH3c: preloads
+32b51dd0	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_START_Init	PORTED	Char Elesis CH3c: preloads
+32b51eb0	CX2GUEL::SI_SA_SCA_SHADE_THE_ILLUSION_Init	PORTED	Char Elesis CH3c: preloads
+32b51f40	CX2GUEL::SI_SA_SCA_BLOOD_CUTTER_Init	PORTED	Char Elesis CH3c: preloads
+32b52120	CX2GUEL::SI_A_SCA_ASSAULT_STRIKE_Init	PORTED	Char Elesis CH3c: preloads
+32b737a0	CX2GUEL::SI_SA_SDK_BRANDISH_BREAKER_START_StateStart	PORTED	Char Elesis CH3c: CommonStateStart, loop count ( +0x96f8 ) = 0, state power rate ( +0x7cc8 ) x ( 1 + 0.3 x ( max HP - HP ) / max( max HP, 1 ) ) ( ScaleBrandishBreakerPowerRateByLostHp )
+32b73940	CX2GUEL::SI_SA_SDK_BRANDISH_BREAKER_LOOP_StateStart	PORTED	Char Elesis CH3c: the same without the count reset
+32b682f0	CX2GUEL::SI_SA_SDK_BRANDISH_BREAKER_START_EventProcess	PORTED	Char Elesis CH3c: animation end -> loop ( 0x126 ) while a skill key is held ( 31fc7ac0 IsAnySkillKeyPressed ), else finish ( 0x127 )
+32b51c50	CX2GUEL::SI_SA_SDK_BRANDISH_BREAKER_LOOP_EventProcess	PORTED	Char Elesis CH3c: count >= 6 or no skill key held -> finish ( 0x127 ); CommonEventProcess
+32b8a320	CX2GUEL::SI_SA_SDK_BRANDISH_BREAKER_LOOP_FrameMove	PORTED	Char Elesis CH3c: shock debuff time ( +0x2480 ) cleared; count <= 6: tick = state time / 0.15, a new tick makes the LOOP_DUMMY ( memo 608111: MEMO_LOOP_DUMMY, BFI 594 at count 1 ) damage effect for ApplyBleedingHpCost( 1/60, 1 ) and destroys it; CommonFrameMove; JUNE_BUGS 657
+32b68330	CX2GUEL::SI_SA_SDK_BRANDISH_BREAKER_FINISH_EventProcess	PORTED	Char Elesis CH3c: the Shade Scratch attack template ( animation end: air -> JUMP_DOWN, ground -> WAIT; line cancels )
+32b51e60	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_START_StateStartFuture	PORTED	Char Elesis CH3c: CommonStateStartFuture, pass count ( +0x96fc ) = 0
+32b51e80	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_LOOP_StateStartFuture	PORTED	Char Elesis CH3c: CommonStateStartFuture, pass count + 1
+32b51ea0	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_END_StateStart	PORTED	Char Elesis CH3c: CommonStateStart
+32b68cd0	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_START_EventProcess	PORTED	Char Elesis CH3c: animation end -> loop ( 0x135 )
+32b68d00	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_LOOP_EventProcess	PORTED	Char Elesis CH3c: animation end -> loop again below 4 passes, else end ( 0x136 )
+32b68d40	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_END_EventProcess	PORTED	Char Elesis CH3c: the Cross Slash template with animation end AND foot on a line -> USI_JUMP_LANDING ( 0x12 ); line cancels
+32b8a9d0	CX2GUEL::SI_SA_SCA_DREAD_WEAPON_START_FrameMove	PORTED	Char Elesis CH3c: 0.3 s one-shot: Loop_DUMMY damage effect, ApplyBleedingHpCost( 0.1, 1 ) -> power rate x1.3 ( PvP / PvE ) / x1.4, StopEffectSet( +0x9710 ), +0x9710 = PlayEffectSet( EffectSet_SI_SA_SCA_DREAD_WEAPON_Loop ), destroy the dummy; CommonFrameMove
+32b69040	CX2GUEL::SI_SA_SCA_SHADE_THE_ILLUSION_EventProcess	PORTED	Char Elesis CH3c: the Shade Scratch attack template
+32b8ad50	CX2GUEL::SI_SA_SCA_SHADE_THE_ILLUSION_FrameMove	PORTED	Char Elesis CH3c: 0.4 s one-shot: DUMMY damage effect, bleeding cost -> rate, EffectSet_SI_SA_SCA_SHADE_THE_ILLUSION_Attack ( no handle kept ), destroy; then SetBuffFactorToGameUnit( templet of 28024, 0 ) while the unit exists; CommonFrameMove
+32b69360	CX2GUEL::SI_SA_SCA_BLOOD_CUTTER_EventProcess	PORTED	Char Elesis CH3c: the Shade Scratch attack template
+32b8b0c0	CX2GUEL::SI_SA_SCA_BLOOD_CUTTER_FrameMove	PORTED	Char Elesis CH3c: 0.01 s one-shot: DUMMY damage effect, bleeding cost -> state power rate ( +0x7cc8 ) x1.3 / x1.4, CreateBloodCutterNPC ( CH3b0 ), destroy; CommonFrameMove
+32b6a660	CX2GUEL::SI_A_SCA_ASSAULT_STRIKE_EventProcess	PORTED	Char Elesis CH3c: the Shade Scratch attack template
+32b8bd70	CX2GUEL::SI_A_SCA_ASSAULT_STRIKE_FrameMove	PORTED	Char Elesis CH3c: 0.4 s one-shot, the Dread Weapon frame move ( diffed: 2 constants differ ) with EffectSet_SI_A_SCA_ASSAULT_STRIKE_Attack
+32b8c0f0	CX2GUEL::ESI_SA_SCA_BLOOD_FALLS_FrameMove	PORTED	Char Elesis CH3c: 0.4 s one-shot, the Dread Weapon frame move with EffectSet_SA_SCA_Blood_Falls
+32b6c8d0	CX2GUEL::ESI_SA_SCA_CHASING_SWORD_EventProcess	PORTED	Char Elesis CH3c: the Cross Slash template ( diffed 0 lines against 32b6bcd0 )
+32b6cbd0	CX2GUEL::ESI_SA_SCA_SHADE_EventProcess	PORTED	Char Elesis CH3c: the Cross Slash template ( 0 lines )
+32b6d4e0	CX2GUEL::ESI_A_SCA_BLOOD_STING_EventProcess	PORTED	Char Elesis CH3c: the Cross Slash template ( 0 lines )
+32b84390	CX2GUEL::SI_A_SCA_SHADOW_EDGE_FrameMove	NEEDS OPUS	Char Elesis CH3c: not ported: 0.31 s, three times a nearest enemy outside a (UID) exclusion set ( CX2Game 322d7b30, range 700 PvP / PvE or 1200 ), Projectile / Link damage effects aimed with 31f75980, a 0x20-byte record pushed on +0x9700 ( the CH4c record type, upkeep 32b813d0 ) and the skill's buff factor cloned onto the target; Init 32b520f0 and EventProcess 32b6a340 wait with it
