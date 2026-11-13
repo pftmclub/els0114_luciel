@@ -767,3 +767,13 @@ step points at A and C while the skills sit on A / S; the sub-stage 2 Banthus di
   0 deleted. junediverge `RESULT: PASS`; enumscan 0 A/B (dungeon ids written by name).
 - **Build.** DEPLOY OK: X2_offline.exe is 26,438,144 B, dated 2026-11-13 14:28:46, md5 894df4f9ff44d8bbc704e061d7d8a902 (built at main b29b62bc +
   11 uncommitted code files). EXESTR OK 1 of 1 (wide `HQ_LoadingDungeon_Hero_Hell.tga`), md5 894df4f9.
+
+### C3y-2b - play-test 3 (2026-11-13) and fix 4
+
+Play-test 3 (new Elsword `elstut4`, unit 156; exe md5 13b50b83, a peer build carrying fix 3): the tutorial runs end to end (guide 101, 102,
+clear, `Quest_11000_End`), 0 unbound names, no loading-image error line; but the starter skills still sat on slots 0 / 1. Fix 3 had patched
+`SeedDefaultSkills`, which this build never reaches at creation: under `SERV_IRUHADEV_JUNE_SKILL_REFORM_AUTOLEARN` the create, class-change
+and skill-tree-init paths call `SeedAutoLearn` (its free-slot search). Fix 4 puts the A, C, S, D order into `SeedAutoLearn` (same flag
+`SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS`); the `SeedDefaultSkills` hunk stays (flag-off AUTOLEARN path). flagcheck `--worktree` 1 PASS (+13),
+junediverge PASS. BUILD OK x2.exe 26,439,680 B 14:47:36; DEPLOY REFUSED (game running): deploy-only owed. `Tutorial_Elsworld_03` played
+14:42:00 and ended forced 14:42:10 (the user's ESC after the click loop): C3y-2c's re-run still needs its trace.

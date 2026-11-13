@@ -851,6 +851,18 @@ bool CX2OfflineSkill::SeedAutoLearn( UidType nUnitUID, int iUnitClass, int iUnit
 		switch( kRow.m_iSkillType )
 		{
 		case 5: case 6: case 7: case 14: case 15: case 16:
+#ifdef SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
+			for( int o = 0; o < 4; ++o )	// june-dungeons C3y-2b stand-in: free A-bar slots in the order A, C, S, D ( the four castable slots )
+			{
+				const int s = STARTER_SKILL_SLOT_ORDER[o];
+				if( 0 == m_aiSkillSlot[s] )
+				{
+					m_aiSkillSlot[s] = kRow.m_iSkillID;
+					++iSlotted;
+					break;
+				}
+			}
+#else SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
 #ifdef SERV_IRUHADEV_JUNE_SKILL_SLOT_10
 			for( int s = 0; s < SLOT_COUNT_PER_SET - 1; ++s )	// not the locked transcendence slot
 #else SERV_IRUHADEV_JUNE_SKILL_SLOT_10
@@ -864,6 +876,7 @@ bool CX2OfflineSkill::SeedAutoLearn( UidType nUnitUID, int iUnitClass, int iUnit
 					break;
 				}
 			}
+#endif SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
 			break;
 		default:
 			break;
