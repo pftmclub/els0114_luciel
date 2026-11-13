@@ -1002,3 +1002,10 @@ Run (exe d7fa0c0e; Elesis character in the village, then a new Elsword). User: e
   scene logs `released: N class(es) of scene <previous> ( soundPlayer, EventScene, SoundPlayer ... )`; a scene played again later adds `restored:`;
   the same scene twice in a row logs `kept:`. Tutorial voices are `Tuto_*.ogg`; `Tutorial_Elsworld_03` ends by the scene after its 15th line.
 - **MODS.md.** The C3y-2d line under "tutorial scene fixes" went in with char-luciel NU1's commit `6aa77bde` (that session committed the whole file).
+- **Play-test passed (user, 2026-11-14 01:11-01:15, exe 2c19b61f; logs read).** Scenes in one session: `Quest_22160_Start` (village), new Elsword's
+  `Tutorial_Elsworld_01` / `_02` / `_04` / `_03`, then `Quest_11000_End`. First load `SCENE CLASSES none registered ( first scene; 3 abc file(s)
+  loaded )`; each of the 5 later loads `released: 3 class(es) of scene <previous> ( EventScene, SoundPlayer, soundPlayer )`. Every tutorial voice is
+  its own (`Tuto_Elsword_New_02_Els` ... `_14_Els`, `Tuto_Aisha_12` / `_6`, `Tuto_Elsword_10`), `Quest_11000_End` calls `GFX_ID_297`;
+  `Tutorial_Elsworld_03` ran its 13 voices and logged `End Tutorial_Elsworld_03 ... by the scene`. 0 EXCEPTION, 0 unbound Lua names. Leftover
+  instances still answer ESC in the village (`SCENE STALE ... dropped`, as before). **Not exercised in this run:** a scene played a second time
+  (`restored` / `kept` lines) and a new Elesis; the C3y-2 review's play-test notes carry it if it shows.
