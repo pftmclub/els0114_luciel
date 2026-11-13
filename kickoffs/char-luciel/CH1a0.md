@@ -39,3 +39,8 @@ No hardcoded enum literals and no `June` prefix (CLAUDE.md rules): use the membe
   - `32030160` CX2GUUser: linked-slot key press check; prints the "not ready" info text ( strings 0x9f5 / 0xe2 ) through InfoTextManager::PushText 322db770 (candidate; callers' phases CH2d CH2d2 CH3c CH3c2)
   - `32039dc0` CX2GUUser: StateChange( 320348c0 ) into the state of the linked skill ( skill id 31fdc680( +0x8f70 +0x14 ), state by vslot 0x57c ) (candidate; callers' phases CH2d CH2d2 CH3c CH3c2)
   - `31fd0440` CX2GUUser: key-pressed flag of the current skill-slot row ( +0x8713 when the skill-slot swap is on, else +0x86f3 ) (candidate; callers' phases CH2d2 CH3c2)
+
+## Amended by char-luciel DU1b (2026-11-14)
+
+- The pair `+0x8f6e` / `+0x8f6f` is declared: `m_bFirstUnitTransformed` / `m_bMinorUnitTransformed` (ctor false, June `@320431f6`). `UpdateDuo`
+  skips the equipment pass while either is set. `31fc9d50` / `31fc9d90` use these members; rename them here if the setter shows a better name.

@@ -46,3 +46,10 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Amended by DU1b (2026-11-14)
+
+- Order is now DU1b -> DU1b2 -> DU1b3 -> DU1c (DU1b split again). DU1b2 adds the second position to `SyncData`; this phase adds its wire bits.
+- **`InitStat` per form:** June's `CX2GUUser::InitStat` (user vslot 0x330, `31fe5480`, uncarved) takes the game stat from the unit by the
+  active body (`3234af90( +0x8e90 == 1 )` on unit `+0x28`), March's from `m_GameStat`. `UpdateDuo` already calls `InitStat()` with a stand-in
+  comment: replace March's body with June's here (a `june_march_divergent.tsv` row in the same commit) together with the other unit form readers.

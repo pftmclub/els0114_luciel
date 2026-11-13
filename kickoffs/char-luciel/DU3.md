@@ -45,3 +45,9 @@ strings), `328825c0`, `32882540`. `31fd48a0`, `31fd63c0`, `32882540` have no Mar
 ## Amended by CH0 (2026-11-02)
 
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7g L407 item record +48 m_ItemIDForMinorUnit (429 Lu items -> Ciel dummy, 30344 -> 20003; §7g L408 item flags2 bit 2 m_bIsForMinorUnit (2,582 Ciel dummies); §7g L409 Extra accessors 32867660..32867960: unit type 10 -> key 10 (Lu) or 11 (Ciel) by ; §7z L683-688 CX2Eqip::_UpdateSkin 3295ae20 attaches every model for owner unit type 10 when t; §7aa L690-697 minor-unit attach-anim models: 3295dfa0 @3295e2cf-3295e4f6 builds the second ani; §7aa L698-701 UpdateEquipCollisionData pair (329657d0 reads basic items) is every-class, not L; §7as L994-1003 upgrade-weapon glow type 10 cases: InitUpgradeWeaponParticle 32299730, ProcessUp.
+
+## Amended by char-luciel DU1b (2026-11-14)
+
+- **The equip's minor-unit byte** (`CX2Eqip +0x15d4`, set when the equip is Ciel's): `CX2GUUser::UpdateShowViewListByActiveBody` (`31fd6260`,
+  DU1b) reads it as a stand-in `false` (every equip Lu's). Replace the stand-in with the member when it lands here; DU1b2's equip loop in
+  `CommonFrameMove` (`@3206585b`) has the same stand-in.

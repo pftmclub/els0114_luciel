@@ -6126,4 +6126,21 @@ float CX2Unit::GetSkillMpDecreaseRate(CX2SkillTree::SKILL_ID eSkillID, CX2SkillT
 	return fDecreaseRate;
 #endif SERV_IRUHADEV_JUNE_SKILL_MP_DECREASE_RATE
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1b: June 3234d930, my unit's form picks the skill window's command group
+void CX2Unit::UpdateSkillTreeCommandGroup( const int iCommandGroup_ )
+{
+	if( NULL == g_pData || NULL == g_pData->GetUIManager() || NULL == g_pData->GetMyUser() || NULL == g_pData->GetMyUser()->GetSelectUnit() )
+		return;
+	if( GetUID() != g_pData->GetMyUser()->GetSelectUnit()->GetUID() )
+		return;
+
+	CX2UISkillTreeNew* pUISkillTree = g_pData->GetUIManager()->GetUISkillTree();
+	if( NULL == pUISkillTree )
+		return;
+	pUISkillTree->SetCommandGroup( iCommandGroup_ );
+	// stand-in: June then refreshes Lu/Ciel's portrait ( 328dcba0 ), character material ( checklist )
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif //SERV_BALANCE_FINALITY_SKILL_EVENT

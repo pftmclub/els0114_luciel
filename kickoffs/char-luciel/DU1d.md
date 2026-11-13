@@ -48,3 +48,10 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Amended by DU1b (2026-11-14)
+
+- **The second after-image** (unit `+0x6758`, created at `31feed3d` in `31fee682`, on skin anim `+0x8e80`) and the after-image mode June's
+  `EnableAfterImage( mode )` / `DisableAfterImage( bForce, mode )` take (`32275a30` / `322720f0`: 0 first, 1 second, 3 = unit vslot 152 =
+  the active body). `SetActiveBody` (DU1b) tests and toggles only `m_pAfterImage` with a stand-in comment: widen it here. `MINOR_UNIT_AFTER_IMAGE`
+  (`@3205b69b`, table `+0x852c`) comes with it.

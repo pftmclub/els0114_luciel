@@ -2137,6 +2137,12 @@ public:
 		}
 		bool IsMinorUnitActive() const { return m_bMinorUnitActive; }	/// char-luciel DU1: June 31e4d0b0
 		bool IsDuoEnabled() const { return m_bDuoEnabled; }
+		void SetActiveBody( const bool bMinorUnit_ );		/// char-luciel DU1b: June 3204e030
+		void SetDuoEnabled( const bool bDuoEnabled_ );		/// char-luciel DU1b: June 32092a00
+		void UpdateDuo( const bool bSkipStatRefresh_ );		/// char-luciel DU1b: June 3204df80
+		void UpdateShowViewListByActiveBody();				/// char-luciel DU1b: June 31fd6260
+		bool IsActiveBodyChangeReached() const;				/// char-luciel DU1b: June 31fc9510
+		void ApplyDuoTypeAtStateStart( const int iDuoType_, const bool bHasAnimName_, const bool bHasMinorUnitAnimName_, bool* pbEventFlagList_ );	/// char-luciel DU1b: June 320506f0 @32050e10 / 32057b80 @32059a1e
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		CKTDGXSkinAnimPtr GetXSkinAnimPtr() const { return m_pXSkinAnim; }
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
@@ -4737,6 +4743,12 @@ public:
 		bool											m_bMinorUnitActive;				/// June +0x8e90: the minor unit ( Ciel ) is the active body
 		bool											m_bDuoEnabled;					/// June +0x8e91: both bodies are shown
 		bool											m_bEndDuoAtAnimEnd;				/// June +0x8e92: the duo ends when the state's anim ends
+		bool											m_bDuoTypeBodyApplied;			/// char-luciel DU1b: June +0x8e93, a plain DUO_TYPE 0 / 1 start set the body ( only the ctor clears it )
+		bool											m_bActiveBodyChanged;			/// char-luciel DU1b: June +0x84dc, set by SetActiveBody; Lu/Ciel's vslot 0x648 clears it
+		bool											m_bActiveBodyChangeWaitNow;		/// char-luciel DU1b: June +0x84dd, the Now frame has not reached the switch yet
+		char											m_cActiveBodyChangeStateNum;	/// char-luciel DU1b: June +0x84de, the Future stateChangeNum at the switch
+		bool											m_bFirstUnitTransformed;		/// char-luciel DU1b: June +0x8f6e, CH1a0's pair ( 31fc9d50 / 31fc9d90 ); UpdateDuo skips the equipment while either is set
+		bool											m_bMinorUnitTransformed;		/// char-luciel DU1b: June +0x8f6f
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		
 

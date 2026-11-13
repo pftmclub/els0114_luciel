@@ -1062,6 +1062,12 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_bMinorUnitActive					= ( NULL != m_pUnit ) ? m_pUnit->IsMinorUnitForm() : false;
 	m_bDuoEnabled						= false;
 	m_bEndDuoAtAnimEnd					= false;
+	m_bDuoTypeBodyApplied				= false;	// char-luciel DU1b: June ctor @32042480, @3203f385-3203f38c, @320431f6
+	m_bActiveBodyChanged				= false;
+	m_bActiveBodyChangeWaitNow			= false;
+	m_cActiveBodyChangeStateNum			= 0;
+	m_bFirstUnitTransformed				= false;
+	m_bMinorUnitTransformed				= false;
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
@@ -16568,6 +16574,19 @@ static bool ParseSpeedTimeList( KLuaManager& luaManager_, const char* pszName_, 
 	return 0 < iIndex;
 }
 #endif SERV_IRUHADEV_JUNE_SPEED_TIME
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+namespace _CONST_GUUSER_DU1B_	// char-luciel DU1b
+{
+	const int DUO_TYPE_FIRST_UNIT				= 0;	// DUO_TYPE 0: Lu acts ( no Enum entry in June )
+	const int DUO_TYPE_MINOR_UNIT				= 1;	// DUO_TYPE 1: Ciel acts
+	const int DUO_TYPE_BOTH						= 2;	// DUO_TYPE 2: both bodies shown
+	const int DUO_TYPE_NONE						= 3;	// DUO_TYPE missing ( June's default 3 ): the duo ends
+	const int EVENT_FLAG_DUO_TO_MINOR_UNIT		= 8;	// June +0x7d8d / +0x802d: DUO_TYPE 1 began while Lu was active
+	const int EVENT_FLAG_DUO_TO_FIRST_UNIT		= 9;	// June +0x7d8e / +0x802e: DUO_TYPE 0 began while Ciel was active
+	const float BIG_HAND_POTION_HAND_SCALE		= 1.5f;	// June 33471a1c
+}
+using namespace _CONST_GUUSER_DU1B_;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 void CX2GUUser::CommonStateStartFuture()
 {
 	KTDXPROFILE();
@@ -16620,6 +16639,14 @@ void CX2GUUser::CommonStateStartFuture()
 
 	wstring animName;
 	LUA_GET_VALUE( m_LuaManager, "ANIM_NAME", animName, L"" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b: June 320506f0 @32050bb5-32050f60, Ciel's anim name and the duo type
+	wstring wstrMinorUnitAnimName;
+	LUA_GET_VALUE( m_LuaManager, "MINOR_UNIT_ANIM_NAME", wstrMinorUnitAnimName, L"" );
+	int iDuoType = DUO_TYPE_NONE;
+	LUA_GET_VALUE( m_LuaManager, "DUO_TYPE", iDuoType, DUO_TYPE_NONE );
+	ApplyDuoTypeAtStateStart( iDuoType, false == animName.empty(), false == wstrMinorUnitAnimName.empty(), m_FrameDataFuture.stateParam.bEventFlagList );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef SERV_9TH_NEW_CHARACTER // ±èÅÂÈ¯
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_RIDING_ANIM_NAME
@@ -16670,13 +16697,34 @@ void CX2GUUser::CommonStateStartFuture()
 		bAnimationChanged = m_pXSkinAnimFuture->ChangeAnim( animName.c_str(), true, fStartTime );
 
 	if ( true == bAnimationChanged )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		m_pXSkinAnimFuture->Play( DUO_TYPE_MINOR_UNIT == iDuoType ? CKTDGXSkinAnim::XAP_ONE_WAIT : playType );	// char-luciel DU1b: June @320516e9
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		m_pXSkinAnimFuture->Play( playType );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 // 	else
 // 	{
 // 		ASSERT(!"NOT GOOD");
 // 	}
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b: June 320506f0 @32051704-3205181e, Ciel's body plays MINOR_UNIT_ANIM_NAME
+	if( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
+	{
+#ifdef SERV_9TH_NEW_CHARACTER
+		SetCustomAnimName( m_itFutureStateData->second, wstrMinorUnitAnimName );
+#endif SERV_9TH_NEW_CHARACTER
+		// stand-in: June's state 0x2f anim-name override ( 31fdbb70 ) is not ported ( char-chung CH1n2, routed )
+		bool bMinorUnitAnimChanged = false;
+		if( m_FrameDataFuture.unitCondition.bTransitionChange == false || bTransition == false || m_FrameDataFuture.syncData.bDirectChange == true )
+			bMinorUnitAnimChanged = m_pMinorUnitXSkinAnimFuture->ChangeAnim( wstrMinorUnitAnimName.c_str(), false, fStartTime );
+		else
+			bMinorUnitAnimChanged = m_pMinorUnitXSkinAnimFuture->ChangeAnim( wstrMinorUnitAnimName.c_str(), true, fStartTime );
+		if( true == bMinorUnitAnimChanged )
+			m_pMinorUnitXSkinAnimFuture->Play( DUO_TYPE_FIRST_UNIT == iDuoType ? CKTDGXSkinAnim::XAP_ONE_WAIT : playType );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef	ADD_ANIM_SPEED_FUTURE
 	LUA_GET_VALUE( m_LuaManager, "ANIM_SPEED", m_fAnimSpeedFuture, 1.f );
 #else	ADD_ANIM_SPEED_FUTURE
@@ -17405,6 +17453,17 @@ void CX2GUUser::CommonStateStart()
 
 	wstring animName;
 	LUA_GET_VALUE( m_LuaManager, "ANIM_NAME", animName, L"" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b: June 32057b80 @320597a1-32059b92, the duo type on others' units and the switch reaching the Now frame
+	wstring wstrMinorUnitAnimName;
+	LUA_GET_VALUE( m_LuaManager, "MINOR_UNIT_ANIM_NAME", wstrMinorUnitAnimName, L"" );
+	int iDuoType = DUO_TYPE_NONE;
+	LUA_GET_VALUE( m_LuaManager, "DUO_TYPE", iDuoType, DUO_TYPE_NONE );
+	if( false == IsMyUnit() )
+		ApplyDuoTypeAtStateStart( iDuoType, false == animName.empty(), false == wstrMinorUnitAnimName.empty(), m_FrameDataNow.stateParam.bEventFlagList );
+	if( true == IsActiveBodyChangeReached() )
+		m_bActiveBodyChangeWaitNow = false;	// stand-in: June first calls user vslot 0x848 ( empty base, Lu/Ciel's 32b18170 ); CH1o declares it
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef SERV_9TH_NEW_CHARACTER // ±èÅÂÈ¯
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_RIDING_ANIM_NAME
@@ -17452,7 +17511,24 @@ void CX2GUUser::CommonStateStart()
 		m_pXSkinAnim->ChangeAnim( animName.c_str(), false, fStartTime );
 	else
 		m_pXSkinAnim->ChangeAnim( animName.c_str(), true, fStartTime );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	m_pXSkinAnim->Play( DUO_TYPE_MINOR_UNIT == iDuoType ? CKTDGXSkinAnim::XAP_ONE_WAIT : playType );	// char-luciel DU1b: June @3205a1f4
+	// char-luciel DU1b: June 32057b80 @3205a20f-3205a2f0, Ciel's body plays MINOR_UNIT_ANIM_NAME
+	if( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
+	{
+#ifdef SERV_9TH_NEW_CHARACTER
+		SetCustomAnimName( m_itNowStateData->second, wstrMinorUnitAnimName );
+#endif SERV_9TH_NEW_CHARACTER
+		// stand-in: June's state 0x2f anim-name override ( 31fdbb70 ) is not ported ( char-chung CH1n2, routed )
+		if( m_FrameDataNow.unitCondition.bTransitionChange == false || bTransition == false || m_FrameDataNow.syncData.bDirectChange == true )
+			m_pMinorUnitXSkinAnim->ChangeAnim( wstrMinorUnitAnimName.c_str(), false, fStartTime );
+		else
+			m_pMinorUnitXSkinAnim->ChangeAnim( wstrMinorUnitAnimName.c_str(), true, fStartTime );
+		m_pMinorUnitXSkinAnim->Play( DUO_TYPE_FIRST_UNIT == iDuoType ? CKTDGXSkinAnim::XAP_ONE_WAIT : playType );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	m_pXSkinAnim->Play( playType );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	LUA_GET_VALUE( m_LuaManager, "ANIM_SPEED", m_fAnimSpeed, 1.f );
 
@@ -18545,6 +18621,19 @@ void CX2GUUser::CommonFrameMoveFuture()
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	m_ElapsedTimeNotBusyState.OnFrameMove();
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	{
+		// char-luciel DU1b: June 32061bf0 @32061cc2-32061d41, the duo ends with the not-selected body's anim
+		CKTDGXSkinAnim* pNotSelectXSkinAnimFuture = GetNotSelectXSkinAnimFuture();
+		if( NULL != pNotSelectXSkinAnimFuture && 0.f < pNotSelectXSkinAnimFuture->GetNowAnimationTime() &&
+			true == pNotSelectXSkinAnimFuture->IsAnimationEnd() && true == m_bEndDuoAtAnimEnd )
+		{
+			m_bDuoEnabled		= false;
+			m_bEndDuoAtAnimEnd	= false;
+			UpdateDuo( true );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef TEST_GROUP_GRAP
 
@@ -19255,6 +19344,19 @@ void CX2GUUser::CommonFrameMove()
 	}
 
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	{
+		// char-luciel DU1b: June 32063650 @3206393c-32063a67, the duo ends with the not-selected body's anim
+		CKTDGXSkinAnimPtr pNotSelectXSkinAnim = GetNotSelectXSkinAnimPtr();
+		if( NULL != pNotSelectXSkinAnim && 0.f < pNotSelectXSkinAnim->GetNowAnimationTime() &&
+			true == pNotSelectXSkinAnim->IsAnimationEnd() && true == m_bEndDuoAtAnimEnd )
+		{
+			m_bDuoEnabled		= false;
+			m_bEndDuoAtAnimEnd	= false;
+			UpdateDuo( true );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_USER_CREATE_EFFECT_SET
 	{
 		/// June 32063650 @32063a6c-32063d06: Fight God doubles the rate under Endurance once transcended
@@ -24309,6 +24411,128 @@ void CX2GUUser::ParseNotSelectUnitOffset( IN int iStateId_, IN bool bFuture_ )
 #endif SERV_IRUHADEV_JUNE_C9H4G_DEBUG
 }
 #endif SERV_IRUHADEV_JUNE_NOT_SELECT_UNIT_OFFSET
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1b: June 3204e030
+void CX2GUUser::SetActiveBody( const bool bMinorUnit_ )
+{
+	if( bMinorUnit_ == m_bMinorUnitActive )
+		return;
+
+	CKTDGXSkinAfterImage* pAfterImage = GetAfterImage();	// stand-in: June tests the active body's after-image ( +0x6754 / +0x6758 ); the second one is DU1d's ( 31fee682 )
+	const bool bAfterImageEnabled = ( NULL != pAfterImage && true == pAfterImage->GetEnable() );
+	if( true == bAfterImageEnabled )
+		DisableAfterImage( true );
+
+	m_bMinorUnitActive = bMinorUnit_;
+	UpdateDuo( false );
+	m_pUnit->SetMinorUnitForm( m_bMinorUnitActive );
+
+	if( true == bAfterImageEnabled )
+		EnableAfterImage();
+
+#ifdef SERV_NEW_DEFENCE_DUNGEON
+	if( true == HaveThisBuff( BTI_BUFF_ELIXIR_BIG_HAND_POTION ) )
+		ScaleHand( D3DXVECTOR3( BIG_HAND_POTION_HAND_SCALE, BIG_HAND_POTION_HAND_SCALE, BIG_HAND_POTION_HAND_SCALE ) );
+#endif SERV_NEW_DEFENCE_DUNGEON
+
+	m_bActiveBodyChanged			= true;
+	m_bActiveBodyChangeWaitNow		= true;
+	m_cActiveBodyChangeStateNum		= m_FrameDataFuture.syncData.stateChangeNum;
+}
+
+// char-luciel DU1b: June 32092a00
+void CX2GUUser::SetDuoEnabled( const bool bDuoEnabled_ )
+{
+	m_bDuoEnabled = bDuoEnabled_;
+	UpdateDuo( true );
+}
+
+// char-luciel DU1b: June 3204df80
+void CX2GUUser::UpdateDuo( const bool bSkipStatRefresh_ )
+{
+	if( NULL == m_pUnit || NULL == m_pUnit->GetUnitTemplet() || CX2Unit::UT_LUCIEL != m_pUnit->GetUnitTemplet()->m_UnitType )
+		return;
+
+	if( false == m_bFirstUnitTransformed && false == m_bMinorUnitTransformed )
+	{
+		UpdateShowViewListByActiveBody();	// stand-in: June skips it while riding with the riding byte +0x93da set ( not ported, Stage 17: reads 0 )
+		UpdateEquipCollisionData( m_ViewEqipList );
+	}
+
+	if( false == bSkipStatRefresh_ )
+	{
+		UpdateSocketDataAndEnchantData();
+		UpdatePassiveAndActiveSkillState();
+		InitStat();	// stand-in: June's InitStat 31fe5480 reads the active body's game stat ( 3234af90 ), DU1c's
+		m_pUnit->UpdateSkillTreeCommandGroup( true == m_bMinorUnitActive ? 1 : 0 );	// command group 1 = Ciel's ( no Enum entry )
+	}
+}
+
+// char-luciel DU1b: June 31fd6260
+void CX2GUUser::UpdateShowViewListByActiveBody()
+{
+	for( UINT i = 0; i < m_ViewEqipList.size(); ++i )
+	{
+		const bool bEquipForMinorUnit = false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's; every equip is Lu's until then
+		m_ViewEqipList[i]->SetShowObject( true == m_bDuoEnabled || bEquipForMinorUnit == m_bMinorUnitActive );
+	}
+#ifdef NOT_RENDERING_OTHER_EQUIP_POS
+	UpdateNotRenderingOtherEquipList();
+#endif NOT_RENDERING_OTHER_EQUIP_POS
+}
+
+// char-luciel DU1b: June 31fc9510, a Future switch applies once the Now state counter reaches it
+bool CX2GUUser::IsActiveBodyChangeReached() const
+{
+	if( true != IsMyUnit() )
+		return m_bActiveBodyChangeWaitNow;
+	if( m_cActiveBodyChangeStateNum < 0 && 0 < m_FrameDataNow.syncData.stateChangeNum )
+		return false;
+	return m_cActiveBodyChangeStateNum <= m_FrameDataNow.syncData.stateChangeNum && true == m_bActiveBodyChangeWaitNow;
+}
+
+// char-luciel DU1b: June 320506f0 @32050e10-32050f56 ( Now 32057b80 @32059a1e-32059b6e )
+void CX2GUUser::ApplyDuoTypeAtStateStart( const int iDuoType_, const bool bHasAnimName_, const bool bHasMinorUnitAnimName_, bool* pbEventFlagList_ )
+{
+	if( DUO_TYPE_NONE == iDuoType_ )
+	{
+		m_bDuoEnabled		= false;
+		m_bEndDuoAtAnimEnd	= false;
+		UpdateDuo( true );
+	}
+	else if( DUO_TYPE_FIRST_UNIT == iDuoType_ || DUO_TYPE_MINOR_UNIT == iDuoType_ )
+	{
+		const bool bMinorUnit = ( DUO_TYPE_MINOR_UNIT == iDuoType_ );
+		const bool bHasOtherBodyAnimName = ( true == bMinorUnit ? bHasAnimName_ : bHasMinorUnitAnimName_ );
+		if( true == bHasOtherBodyAnimName && bMinorUnit != IsMinorUnitActive() )
+		{
+			pbEventFlagList_[ true == bMinorUnit ? EVENT_FLAG_DUO_TO_MINOR_UNIT : EVENT_FLAG_DUO_TO_FIRST_UNIT ] = true;
+			m_bEndDuoAtAnimEnd = true;
+			SetDuoEnabled( true );
+			SetActiveBody( bMinorUnit );
+		}
+		else if( false == m_bDuoTypeBodyApplied )
+		{
+			m_bEndDuoAtAnimEnd		= false;
+			m_bDuoTypeBodyApplied	= true;
+			SetDuoEnabled( false );
+			SetActiveBody( bMinorUnit );
+		}
+		else
+		{
+			m_bEndDuoAtAnimEnd = false;
+			SetDuoEnabled( false );
+		}
+		m_iSkillCutInSetSubIndex = iDuoType_;
+	}
+	else if( DUO_TYPE_BOTH == iDuoType_ )
+	{
+		SetDuoEnabled( true );
+		m_iSkillCutInSetSubIndex = iDuoType_;
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE
 /// June class InitState ( e.g. Eve 329ba9c0 @329bae2a-329bae48 ): UpdateUserUnitStateData( 0x82 = USI_WAIT_STATE_CHANGE, "<prefix>WAIT_STATE_CHANGE", data ) with only
 /// OnEventProcess = thunk 329cb720 -> 31fc8620; StateStart is empty, so CommonStateStart runs ( as in March ). Not June: a missing table registers nothing and logs once
@@ -25251,6 +25475,12 @@ void CX2GUUser::CommonStateEnd()
 #ifdef SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF
 	ApplyAllStateInsertBuffFactor();	/// June 32015250 @32015284, the first thing CommonStateEnd does
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b: June 32015250 @32015306-320153c5, both bodies' matrices to the Now position ( every class: the active body is the first )
+	GetXSkinAnimPtr()->GetMatrix().Move( m_FrameDataNow.syncData.position );
+	if( NULL != GetNotSelectXSkinAnimPtr() )
+		GetNotSelectXSkinAnimPtr()->GetMatrix().Move( m_FrameDataNow.syncData.position );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_UNIT_SOUND
 	/// June CommonStateEnd 32015250 @320153c7 ( before the avatar-emotion sound stop, which is March's first block here ): 32009ae0
 	ClearStateSounds();

@@ -43,3 +43,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-elesis CH1o (2026-11-13)
 
 - Lu/Ciel (vtable `334f06fc`) is the only class that overrides the damage-state getters 0x46c-0x4a4 / 0x114 / 0x118. June's `CX2GUUser::IsDamageState` (vslot 0x534 `3208e8c0`) asks those getters; char-elesis CH1o wrote it with March's `USI_DAMAGE_*` names. When his getters are ported, make the base ask them (or override `IsDamageState`) so his own damage states count.
+
+## Amended by char-luciel DU1b (2026-11-14)
+
+- **User vslot 0x848** (base `31f3f070` empty; Lu/Ciel `32b18170`): June's Now `CommonStateStart` calls it when `IsActiveBodyChangeReached()`
+  (`31fc9510`), just before clearing `m_bActiveBodyChangeWaitNow`. DU1b left a stand-in comment there: declare the virtual (name it by what
+  `32b18170` does) and add the call. **Vslot 0x648**'s Lu/Ciel override (`32b0fa20`) clears `m_bActiveBodyChanged` (+0x84dc, DU1b's member).

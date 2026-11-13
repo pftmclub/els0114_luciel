@@ -745,6 +745,49 @@ before CH1). Files: `X2GUUser.h`, `X2GUUser.cpp`, `X2Unit.h`, `X2Unit.cpp`. func
   a `/P` probe shows both flags on. Full build skipped: no play-test (DU1d builds and hands off the regression pass).
 - **In game:** nothing to see. Every other class has form 0 and reads March's anims.
 
+### DU1b - Done (2026-11-14)
+
+Opus 5.5 high. Part 2 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (Always.h: a second `#error` guard, SKILL_STATE_PTR and SKILL_TREE_PANELS).
+Files: `X2GUUser.h`, `X2GUUser.cpp`, `X2Unit.h`, `X2Unit.cpp`, `Always.h`. No `_DEBUG`, no log line (nothing runs before CH1). funcmap rows:
+`grep "Char Luciel DU1b" june2017_re/funcmap.tsv` (15).
+- **Split again (scope rule, one logical change).** June also runs Ciel's body every frame (matrix, rotation, clock, bones, equip anims in
+  `CommonFrameMove(Future)`) and through a second physics set (`PhysicProcess`'s second position, PhysicParam `+0x36c`, the
+  `MINOR_UNIT_SPEED_*` keys, the `+0x8604` speed-time twin). That is 2-3 sessions of RE on its own: **DU1b2** = the per-frame body and the
+  SyncData second position; **DU1b3** = the physics, the not-select keys and the other `CommonStateStart` keys CH1o gives DU1. Kickoffs
+  written; DU1c now follows DU1b3; `DU1-review.md` covers all six parts.
+- **Switching:** `SetActiveBody` (`3204e030`), `SetDuoEnabled` (`32092a00`), `UpdateDuo( bSkipStatRefresh )` (`3204df80`; vslots resolved
+  with `vtslot.py`: 0x638 `UpdateEquipCollisionData`, 0x2c0 `UpdatePassiveAndActiveSkillState`, 0x330 `InitStat`, 0x630
+  `UpdateNotRenderingOtherEquipList`), the equipment show pass `UpdateShowViewListByActiveBody` (`31fd6260`, inlined `SetShowObject`),
+  `CX2Unit::SetMinorUnitForm` (the store of `3234b8c0`) and `CX2Unit::UpdateSkillTreeCommandGroup` (`3234d930` -> `SetCommandGroup`).
+- **New members** (ctor zeroes all, `@32042480` / `@3203f385` / `@320431f6`): `m_bDuoTypeBodyApplied` (+0x8e93, the latch: only the ctor
+  clears it, so after the first plain `DUO_TYPE` 0 / 1 start only a hand-over switches the body), `m_bActiveBodyChanged` /
+  `m_bActiveBodyChangeWaitNow` / `m_cActiveBodyChangeStateNum` (+0x84dc / +0x84dd / +0x84de: the switch recorded in the Future frame, applied
+  by the Now state start once `IsActiveBodyChangeReached` `31fc9510` sees the Now `stateChangeNum` reach it), `m_bFirstUnitTransformed` /
+  `m_bMinorUnitTransformed` (+0x8f6e / +0x8f6f, declared here for CH1a0's `31fc9d50` / `31fc9d90`).
+- **State start:** `MINOR_UNIT_ANIM_NAME` and `DUO_TYPE` (miss 3) in both starts, through `ApplyDuoTypeAtStateStart` (Future always, Now only
+  for others' units, June's `IsMyUnit` gate `@32059a14`): 3 ends the duo; 0 / 1 hand over (event flag 9 / 8 = June +0x7d8e / +0x7d8d, Now
+  +0x802e / +0x802d: `bEventFlagList[8..9]`, read by Lu/Ciel `32b397a0`) when the other body's anim name is set and the other body is active,
+  else set the body once (latch); 2 shows both; types 0-2 also set `m_iSkillCutInSetSubIndex` (+0x8acc). Ciel's body plays
+  `MINOR_UNIT_ANIM_NAME` (unit type 10), Lu's waits (`XAP_ONE_WAIT`) while Ciel acts and the reverse. `DUO_TYPE` has no June Enum entry:
+  named constants in `_CONST_GUUSER_DU1B_`.
+- **Settled (kickoff ask):** `+0x8f50` is `APPLY_ANIM_MOVE_MULTIPLY` (float, miss 1.0), not a not-select key; `USE_PHYSICPROCESS_NOT_SELECT_UNIT`
+  = +0x8f6c (both starts), `USE_NOT_SELECT_UNIT_ANIM_TIME_IN_SPEED` = +0x8f6d (Future only). All go to DU1b3 with their readers.
+- **State end / frame move:** `CommonStateEnd` moves both bodies' matrices to the Now position (June's block runs for every class: the
+  active body is the first, already moved each frame); both frame moves end the duo when the other body's anim ends and `m_bEndDuoAtAnimEnd`.
+- **Stand-ins (one-line comments):** the second after-image (+0x6758, created at `31fee682`, DU1d) and the after-image mode in
+  Enable/Disable; the equip's minor-unit byte +0x15d4 (DU3: every equip is Lu's until then); the riding byte +0x93da (Stage 17, reads 0);
+  user vslot 0x848 in the Now start (empty base, Lu/Ciel `32b18170`: CH1o); `31fdbb70` (state 0x2f anim override, routed by char-chung
+  CH1n2); the portrait refresh `328dcba0` (checklist); `InitStat`'s per-form game stat `3234af90` (DU1c). Not added: `32d51e80`'s
+  `SetActiveBody( form )` at user creation is a no-op after the ctor's copy.
+- **Kickoffs amended:** DU1c (`InitStat` per-form stat), DU1d (second after-image + mode), DU3 (equip +0x15d4 in
+  `UpdateShowViewListByActiveBody`), CH1o (vslot 0x848, vslot 0x648 clears `m_bActiveBodyChanged`), CH1a0 (the pair is declared).
+- **Hygiene.** flagcheck `--worktree` (my five files): 2 PASS, 2 PASS~ (one blank line each), 1 OTHER (Always.h: a peer's uncommitted
+  char-elesis CH3c2 block, not staged), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS. enumscan: no row in
+  DU1b's lines.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2Unit.cpp`, `X2GUChung.cpp`: 0 errors each; a flag probe shows
+  every dependency on. Full build skipped: no play-test (DU1d builds and hands off the regression pass).
+- **In game:** nothing to see. Every other class has no `DUO_TYPE` (miss 3 -> `UpdateDuo` returns at the unit-type test) and form 0.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,
