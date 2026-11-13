@@ -45,7 +45,11 @@ so they run as their own plan. Engine fixes the dungeons need (NPC/game queries,
 | C3y-4 | Space of Thought 1-3 + `_DUMMY`, the Special-map line | "C3y-4 - port: Space of Thought 1-3" |
 | C3y-5 | identify June's route into the Hero tier (read-only), then write the port phases | "C3y-5 - identify: ..." |
 | C3z-1b | June's data101 map assets (Velder / Henir); waits for june-asset-port P0 | kickoff `C3z-1b.md`; "C3z-1 - Done" |
-| C3z-4t | June's `CX2TutorialGuideManager` (the 9 Battle Field tutorial dungeons via `benders_actor.lua`); scope first: report the system's size before porting | kickoff `C3z-4t.md`; "C3z-4 - Done (batch 1)" |
+| C3z-4t | June's `CX2TutorialGuideManager` (the 9 Battle Field tutorial dungeons via `benders_actor.lua`); scope first: report the system's size before porting. Done 2026-11-13: 4 port phases | kickoff `C3z-4t.md`; "C3z-4t - Done (scope)" below |
+| C3z-4t1 | the guide manager core, its loader, its Lua bindings and the key-hint dialogs (unblocks C3y-2's scripts) | kickoff `C3z-4t1.md`; `june2017_re/c3z4t_scope.tsv` |
+| C3z-4t2 | the GFx guide movie (`CX2TutorialGuideAdapter`, `tutorial_guide.gfx`); review covers t1 + t2 | kickoff `C3z-4t2.md` |
+| C3z-4t3 | the game-side gates (ESC, UI hiding, shortcut keys, custom / server UI events, quest reward byte, deferred quest scene, input mask) | kickoff `C3z-4t3.md` |
+| C3z-4t4 | the village / field / quest walkthrough steps 2xx-9xx (field entry, quest handlers, party and local-map UI); review covers t3 + t4 | kickoff `C3z-4t4.md` |
 | C3z-5b | the DungeonData readers C3z-5 routed (DCC bits, GetLastClearDungeonID, m_fExtraValue, June-only-row keys) | kickoff `C3z-5b.md`; "C3z-5 - Done" |
 | C3z-8 | June's boss-raid systems (`CX2BossRaidLongTimeEvent` enter / state UI, `CX2NewBossRaidManager` + raid phases, June's `CX2BossRaidManager`); scope first, report size and offline reach, then write port phases. Routed from skill-system-core S7o (user 2026-10-19) | kickoff `C3z-8.md`; `JUNE_SKILL_SYSTEM_PHASES.md` "Phase S7o - Done" |
 | W3 | June's village world Lua: census every village world script + line map in data040, stage the closure, adopt June's (ljconv), pack, ask, copy. Moved from june-engine by its scope audit (2026-10-20), same ID; Sonnet 5.5 high | `JUNE_ENGINE_REMAINDER_PHASES.md` "Phase W3 - June village world Lua"; kickoff `W3.md` |
@@ -333,3 +337,42 @@ No code, no flag, no build, no pack. The kickoff's stop rule applied ("if the ex
   - C3z-4t's kickoff now carries the 7 manager names, `INPUT_GUIDE_STEP`, and these 9 scripts as its play-test material.
   - C3y-2's kickoff now depends on C3z-4t and carries the 5 non-manager bindings, which stay its own. Its task is otherwise unchanged.
   - char-add TU and char-luciel TU already wait on C3y-2, so they now wait on C3z-4t too. No edit needed.
+
+## C3z-4t - Done (scope) (2026-11-13, Opus 5.5 high): 4 port phases, T1 first
+
+Read-only: no code, no flag, no build, no pack. Function map: `june2017_re/c3z4t_scope.tsv` (every manager function, its external callers, the
+phase that ports it); funcmap rows tagged `C3z-4t`. User 2026-11-13 (after the size report): 4 phases, T1 first; C3y-2 waits for T1 + T2.
+
+- **What the system is.** June's new-player walkthrough, not a tutorial-dungeon helper. `CX2TutorialGuideManager` (RTTI `.?AVCX2TutorialGuideManager@@`,
+  vtable `33471a4c`) is a member of `CX2Main` at `+0x8c4` (`31d70b00`, never nil; ctor `31fc3a40` from `CX2Main` ctor `31e46300`, dtor `31fbe320`,
+  frame move `31fc6510` from `31d90300`). About 55 functions in `31fbda90`-`31fc6650` (~36 KB of code, 21.7 KB of it the table loader `31fbe4a0`).
+- **Four parts.**
+  1. *Manager:* a guide state machine (`+0x14`: 0 idle, 1 running, 2 waiting on an event NPC, 4 waiting on a UI event, 6 waiting on a step).
+     It reads June's `TutorialGuideInfo.lua` (data036, June-only, not in March): `TUTORIAL_GUIDE_INFO.GUIDE_SCENE`, 24 scenes. Scenes 101-103 are
+     the tutorial dungeon; 2xx is the Ruben village; 4xx-5xx are quests and the party / local-map UI; 7xx is a failed dungeon entry; 9xx is
+     the holy-animal quest. A scene has about 35 keys: conditions (going / new / complete quest, field, dungeon, UI state), key limits,
+     start / end timers, next / replay, a GFx movie number and the UI custom event it waits for. `31fc4530` blocks guides above level 7, or
+     when any character on the account is level 10+.
+  2. *GFx adapter:* `CX2TutorialGuideAdapter` + `CallbackHandler` (`329656d0`-`32965d90`, about 12 functions). It registers
+     `tutorialGuide.showGuide` / `hideGuide` on the GFx manager's movie (`g_pKTDXApp+0x1c8 +0x98`) and takes the `tutorialGudie` callback.
+     `tutorial_guide.gfx` is already staged (GFx GA, data194). March's template is the R1 result adapter (`X2UIDungeonResultAdapter.*`,
+     `CKTDGGFXResultBridge`).
+  3. *Key-hint dialogs:* `ShowInputGuideUI` `31fc4fa0` (`DLG_UI_Tutorial_Input_Guide.lua`) and the side guide `31fc46d0`
+     (`DLG_UI_Tutorial_Input_Side_Guide.lua`). Both are June-only data034 files. Blink and per-step key checks: `31fc5570` / `31fc52f0`.
+  4. *Game hooks:* about 30 June functions call in (`c3z4t_scope.tsv`, "game hook" rows and the callers column). These are ESC, SetShowUI,
+     the state frame move, StateChange, the CX2State custom / server UI events, the quest handlers, PartyUI, CashShop, the Field /
+     BattleField ctors, `CX2Game::CheckAndWarningBusyStateNow`, DungeonGame release and the CX2GUUser input mask.
+- **Lua surface.** 9 methods on the manager (binder `31d95080`, order from the `PUSH`es @31e3a452-31e3b29b): `CheckEventTriggerNPCPosX`
+  `31fc3e80`, `CheckEventTriggerNPCPos` `31fc3f80`, `ShowInputGuideUI` `31fc4fa0`, `HideInputGuideUI` `31fbdcf0`, `GetNowGuideNo` `31fbdcb0`,
+  `CheckAndResetInputAlarm` `31fbdcc0`, `CheckToNeedTutorialGuide` `31fbde90`, `OnBeginGuide` `31fc6320`, `OnBeginGuideNo` `31fc5e20` (body `31fc5d70`).
+  Plus `CX2Game::GetTutorialGuideManager` `322cc010`. Six of these entry points are not split as functions in Ghidra: disassemble them by
+  address. Users: the 12 June `Dungeon_Tutorial_*.lua`, 12 tutorial boss / NPC scripts (data037; `OnBeginGuideNo(102)` x10, `(103)` x1)
+  and `Benders_Actor.lua` (March's battle-field tutorials: `CheckToNeedTutorialGuide`, `OnBeginGuideNo(101)`). Enum: `INPUT_GUIDE_STEP`
+  (`Enum.src.lua:17590`).
+- **Why C3y-2 waits** (agrees with "C3y-2 - Stopped" above). The class tutorial scripts clear sub-stage 0 only through `CheckEventTriggerNPCPosX`,
+  and sub-stage 2 only on `GetNowGuideNo() == 102`. So T1 (bindings, state, dialogs) is the hard need. T2 makes scene 101's key limit visible
+  and lets it finish the way June's does.
+- **Phases written:** C3z-4t1 (manager core + loader + bindings + dialogs + data, small play-test on March's battle-field tutorial: Benders
+  death -> `OnBeginGuideNo(101)`), C3z-4t2 (GFx adapter, play-test, review of t1 + t2), C3z-4t3 (game-side gates, incl. the four owed items
+  from C3p-2 and Q5b), C3z-4t4 (walkthrough steps 2xx-9xx, fresh-character walk, review of t3 + t4). Kickoffs in `kickoffs/june-dungeons/`.
+- **Routed elsewhere:** none. The per-class input-mask notes in the checklist (section 7: Eve `32978e80`) are served by T3's base `31fcea10` port.

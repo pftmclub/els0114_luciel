@@ -1,0 +1,45 @@
+june_va	part	what (June)	external callers (June)	phase
+31fc3a40	manager	CX2TutorialGuideManager ctor (member of CX2Main at +0x8c4)	CX2Main ctor 31e46300	C3z-4t1
+31fbe320	manager	dtor (vtable 33471a4c; frees the two input-guide dialogs at [0x37]/[0x38] and [0x45]/[0x46])	CX2Main dtor 31d93900, 31fc72c0	C3z-4t1
+31fbdb30 / 31fbdb60	manager	vtable 33471a50 / 33471a58: delete / recreate the GFx adapter (+0xb8)	vtable only	C3z-4t2
+31fc3c20	manager	load: 31fbe4a0 then create the adapter on the GFx manager's movie (g_pKTDXApp+0x1c8 +0x98, or 0)	bulk data loader 3259bb20	C3z-4t1 (adapter half t2)
+31fbe4a0	manager	LoadTutorialGuideInfo: TutorialGuideInfo.lua TUTORIAL_GUIDE_INFO.GUIDE_SCENE -> guide list (+0x8), 0x9c B per scene (21.7 KB of code: one table read per key)	31fc3c20	C3z-4t1
+31fc6510	manager	OnFrameMove: F2 key (0x3b) toggle +200 from g_pMain+0x1cd; state 4 wait -> 31fc6130/31fc6360; 31fc4e30, 31fc6490, 31fc6050, start/end timers (+0xbc/+0xa0), 31fc5570 (input-guide blink), 31fc52f0 (input-guide step check)	31d90300 (CX2Main frame move)	C3z-4t1
+31fbda90	manager	IsGuideRunning: [+0x14] != 0	HandleMsgByESC @31f1e1f5, StateChange 31d88bf0 x4, 31d70b30, CashShop::SetOpen 3223d680, PartyUI::OpenLocalMapDlg 322b5970, CX2Game::CheckAndWarningBusyStateNow 323022b0	C3z-4t1 (callers t3)
+31fbdab0 / 31fbdad0	manager	guide running and +0x65 clear	CX2State::OnFrameMove 31f0d390 / 31d70b40	C3z-4t1 (caller t3)
+31fbdb20	manager	+0x66 != 1 (ESC gate's second test)	HandleMsgByESC @31f1e20b	C3z-4t1 (caller t3)
+31fbde80	manager	IsPlayingTutorial: g_pMain+0x16a == 1 (already read by March's ported Buff 14c gates through m_bIsPlayingTutorial)	5 sites, c14c_tutorial_reads.tsv	-
+31fbdfa0	manager	refresh UI: UIManager+0x8a / state+0x378 from the tutorial flag	StateChange @31d8948e, 32509101, 324bb780	C3z-4t3
+31fbdc40	manager	guide start mode: +0x1c / +0x3b / callback +0xc4 -> state 1; +0x5c -> 2; +0x1d -> 6	internal	C3z-4t1
+31fc4530	manager	CanBeginGuide: level > 7 or an account unit at level >= 10 (31fbdf40 -> +0xc9) blocks; game type, F2 toggle, state 0	internal	C3z-4t1
+31fc4060	manager	guide step: plays the scene; writes the dialog manager's +0x111 (0 when +0x8c == 1, else 1) @31fc42a8	13 internal callers	C3z-4t1 (quest-reward reader t3)
+31fc4c40	manager	end guide (reset state, hide GFx)	internal, 31fc6010	C3z-4t1
+31fc4d80	manager	state 2: wait on the event NPC (+0x60) -> NPC +0x8d34 = 1	internal	C3z-4t1
+31fc5d70	manager	OnBeginGuideNo body (find scene, 31fc4530, copy to +0x18, 31fbdc40 -> 31fc4d80 / 31fc4060)	31fc5e20 (Lua), 31fc5f80, 31fc6020	C3z-4t1
+31fc6320	manager	OnBeginGuide (Lua): state 1 -> next step	binder	C3z-4t1
+31fc5e30 / 31fc5e70	manager	same as OnBeginGuide; 5e70 also needs +100	31d87420, 323e3cab / field state 324b90b0	C3z-4t1 (callers t4)
+31fc5920	manager	sub-quest step (quest id)	UPDATE_QUEST_NOT 31f09b50 / 323e08c0, 323e05f0, NEW_QUEST_NOT 323e4cb0	C3z-4t4
+31fc59f0	manager	quest-accept step	322e5b40	C3z-4t4
+31fc5ae0	manager	begin the scene whose CONDITION_FIELD_ID / dungeon matches	BattleField ctor 324bbe50, Field ctor 32509d30, 32f17780	C3z-4t4
+31fc5c20	manager	begin by condition list 31fbe080 (field / village id)	BattleField ctor 324bbe50, Field ctor 32509d30	C3z-4t4
+31fc5f80	manager	replay the guide at +0xcc	322c3fa0	C3z-4t4
+31fc6010 / 31fc6020	manager	clear +0xcc and end / resume the held scene (+0xd1/+0xd4)	StateChange 31d88bf0, 3243d4e0 / 3243c260	C3z-4t3
+31fc63f0	manager	UI custom event: guide waiting (state 4) eats every msg but its own (+0x70..+0x88, 0x7156, 0x7157)	CX2State UICustomEventProc base 31efa9c0	C3z-4t3
+31fc63d0	manager	UI server event: state 4 and msg == +0x6c -> next	CX2State::UIServerEventProc 31f2ab80	C3z-4t3
+31fc3cc0	manager	tutorial exit: close both input-guide dialogs, +0xe4 = -1	CX2DungeonGame::Release tail 327d2160	C3z-4t1
+31fc4fa0	input guide	ShowInputGuideUI (Lua): DLG_UI_Tutorial_Input_Guide.lua, statics Move / Dash / Attack / Skill / Awake	binder	C3z-4t1
+31fc46d0	input guide	side guide: DLG_UI_Tutorial_Input_Side_Guide.lua (+ ESC static)	internal	C3z-4t1
+31fbdcf0	input guide	HideInputGuideUI (Lua)	binder	C3z-4t1
+31fbddf0	input guide	show / hide both dialogs with the UI	CX2UIManager::SetShowUI 32154820	C3z-4t1 (caller t3)
+31fbdd30 / 31fc4960 / 31fc5570 / 31fc52f0	input guide	key-hint blink and per-step key checks (0x23-0x26 action keys)	internal	C3z-4t1
+31fbdcb0 / 31fbdcc0	input guide	GetNowGuideNo / CheckAndResetInputAlarm (Lua; not split as functions in Ghidra)	binder	C3z-4t1
+31fc3e80 / 31fc3f80	input guide	CheckEventTriggerNPCPosX / CheckEventTriggerNPCPos (Lua; not split as functions)	binder	C3z-4t1
+31fbde90	manager	CheckToNeedTutorialGuide (Lua): quest 11000 done -> false, else per-unit check (not split as a function)	binder	C3z-4t1
+322cc010	binding	CX2Game::GetTutorialGuideManager (Lua) -> &g_pMain->m_TutorialGuideManager	binder	C3z-4t1
+31fcea10 / 320708f0	game hook	CX2GUUser vslot 0x6fc: in the tutorial, mask held keys by guide step +0xe4	12 user vtables; Eve 32978e80	C3z-4t3
+32154820	game hook	CX2UIManager::SetShowUI: skill / riding slots hidden while step +0xe4 < 3; 31fbddf0	-	C3z-4t3
+31f0d390	game hook	CX2State::OnFrameMove: ShortCutKeyProcess also needs !31fbdab0	-	C3z-4t3
+31f1e1a0	game hook	CX2State::HandleMsgByESC @31f1e1e8-31f1e212: 31fbda90 && 31fbdb20 -> ESC eaten	-	C3z-4t3
+323d2c60	game hook	CX2UIQuestNew::OpenQuestRewardWindow returns while dialog manager +0x111 == 1	-	C3z-4t3
+31d88bf0	game hook	StateChange: deferred quest scene skipped while a guide runs; village block calls 31fbdfa0	-	C3z-4t3
+329656d0..32965d90	adapter	CX2TutorialGuideAdapter (+CallbackHandler): ctor 32965bd0 registers tutorialGuide.showGuide / hideGuide; show 32965a60 (guide no), hide 329659b0, dtor 329659e0, callback 32965a90 ("tutorialGudie"); tutorial_guide.gfx (data194, staged by GFx GA)	31fc3c20, 31fbdb60	C3z-4t2
