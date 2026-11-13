@@ -874,3 +874,28 @@ junediverge PASS. BUILD OK x2.exe 26,439,680 B 14:47:36; DEPLOY OK (deploy-only)
 New Elsword `elstut5` (unit 157, exe md5 b68f1fcc): starter skills on slots 0 / 3 (A / C), the skill step advances, loading screens show
 their pictures, the boss attacks and takes damage after the awakening guide, the tutorial clears to the village; ErrorLog has no unbound
 name from this phase (`AddGroupChainQuest` predates it). Open: the sub-stage 2 Banthus dialog (C3y-2c), then the C3y-2 review (covers 2b / 2c).
+
+### C3y-2c - trace run (2026-11-13, Opus 5.5 high): the tutorial's GFx scenes, before the fix
+
+Reports (user, C3y-2b play-tests 2 / 3 plus this session): in sub-stage 2 a click on the last line of `Tutorial_Elsworld_03` / `_04` replays the
+line instead of closing (C3y-2b play-test 3: `_03` played 14:42:00, ended forced 14:42:10 after the click loop); one left click on a line skips
+several lines; after the boss dies a scene shows only black until ESC / right click, then the quest dialog shows; no Banthus portrait.
+- **SWF read (AS3 disassembled, `abcdis.py` in the session scratchpad).** Every scene's `EventScene` class: `config` (first ENTER_FRAME) starts the
+  typing and `createBinding( "EventScene.nextScene", nextEventScene )`; `nextEventScene`: 1st call shows the whole line, 2nd calls
+  `playScene( _sceneNum )`: frame label `lastScene` -> `GameDataFunction.endEventScene()`, else `gotoAndPlay( n + 1 )` and retype
+  (`_sceneNum` starts at 1). `clearBindings` on REMOVED_FROM_STAGE deletes both bindings; a stage KEY_DOWN listener (Enter / ESC) is never
+  removed. `_03`: 15 frames, `lastScene` on 15; `_04`: 1 frame labelled `lastScene`. `Tutorial_Back.swf` has no script (text GFX_ID_6557 "Close").
+- **Ruled out.** The Lua triggers are `ONE_TIME` and March honours it (`CX2DungeonSubStage::ProcessTrigger`); Enter is edge-locked
+  (`CKTDIDevice::GetKeyState`); June's frame move `3226c120` = March's; Scaleform compares method closures by object + vtable index, so
+  `deleteBinding` matches; `currentFrameLabel` stores and reads 0-based frames.
+- **Banthus portrait: June shows none, not a bug.** Neither SWF has a Banthus symbol: `_03` speakers are Berthe (GFX_ID_1034, `T_NPC_Peita_PNG`),
+  Elsword, Aisha, Rena (the bandit is named in Rena's 5113); `_04` is Elsword's one line 5176. No fix and no JUNE_BUGS row (its rules exclude a
+  design that is merely different).
+- **Trace.** `SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG` (temporary, the C3y-2 review retires it), tag `[JUNE_GFX] SCENE TRACE`: clicks / Enter,
+  FireNextScene and the observer serials one fire reaches, createBinding / deleteBinding (match or miss), every AS bridge call (id, instance,
+  arg), `gameDataEventScene` member types, Play / queue / End with the state, `loadUserWidget` 0x2711 / 0x2712 with whether main.gfx's root
+  value is registered (`CKTDGGFXUI::Invoke` does nothing until it is), the scene object's ctor / dtor ("DELETED WHILE PLAYING").
+- **Hygiene.** flagcheck `--worktree` (3 files): 1 PASS, 1 PASS~ (a blank line), 1 DEFINE, 0 FAIL, 0 deleted; junediverge `RESULT: PASS`.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,462,720 B, dated 2026-11-13 16:27:38, md5 4263c1f75e4cbf50eb87d6ed7576dec4 (built at main 46ba840f + 7
+  uncommitted code files, 4 of them a peer's char-elesis work). EXESTR OK 2 of 2 (`[JUNE_GFX] SCENE TRACE `, `TRACE input msg 0x%x`), md5 4263c1f7.
+- **Next:** the user's trace run (new Elsword, the whole tutorial), "check logs", then the fix under its own flag in this phase.

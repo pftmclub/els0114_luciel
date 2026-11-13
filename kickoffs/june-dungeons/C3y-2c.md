@@ -14,6 +14,9 @@
 1. The dialog mentioning Banthus **replays when you left click** instead of closing at its last line.
 2. The dialog names Banthus but **no Banthus portrait** shows.
 
+3. (user, 2026-11-13, this phase) One left click on a line skips several lines.
+4. (user, 2026-11-13, this phase) After the boss dies a scene shows only black until ESC / right click; then the quest dialog shows.
+
 ## What C3y-2b found (logs of that run are overwritten; re-run first)
 
 - Sub-stage 2 plays the GFx event scenes `Tutorial_Elsworld_03` (after the boss: slide shot `PF_STAGE0_SUB2_SHOT`, then `PlayEventScene`)

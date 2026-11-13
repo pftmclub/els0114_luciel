@@ -79,10 +79,17 @@ CX2GFXEventScene::CX2GFXEventScene()
 {
 	if ( g_pKTDXApp != NULL )
 		m_pBridge = new CKTDGGFXEventSceneBridge( g_pKTDXApp->GetGFXManager(), this );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	GfxSceneLog( "TRACE ctor %p, state %d", this, ( g_pMain != NULL ) ? (int)g_pMain->GetNowStateID() : -1 );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 }
 
 CX2GFXEventScene::~CX2GFXEventScene()
 {
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	GfxSceneLog( "TRACE dtor %p: %s %s, %d queued", this, m_bPlaying ? "DELETED WHILE PLAYING" : "idle", GfxSceneToUTF8( m_wstrName ).c_str(),
+		(int)m_dequeQueue.size() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 	SAFE_DELETE( m_pBridge );
 	if ( m_pSound != NULL && g_pKTDXApp != NULL && g_pKTDXApp->GetDeviceManager() != NULL )
 	{
@@ -351,6 +358,10 @@ void CX2GFXEventScene::Play( const std::wstring& wstrName, int iFrame /*= -1*/, 
 		kEntry.m_wstrName	= wstrName;
 		kEntry.m_iFrame		= iFrame;
 		m_dequeQueue.push_back( kEntry );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		GfxSceneLog( "TRACE Play %s queued behind %s ( %d in the queue )", GfxSceneToUTF8( wstrName ).c_str(), GfxSceneToUTF8( m_wstrName ).c_str(),
+			(int)m_dequeQueue.size() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 		return;
 	}
 
@@ -412,11 +423,19 @@ void CX2GFXEventScene::Play( const std::wstring& wstrName, int iFrame /*= -1*/, 
 	pManager->unloadWidget( 3 );
 
 	GfxSceneLog( "Play %s ( %s ): frame %d", GfxSceneToUTF8( wstrName ).c_str(), GfxSceneToUTF8( std::wstring( wszPath ) ).c_str(), iFrame );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	GfxSceneLog( "TRACE Play %s by %p: state %d, black layout %s, t=%u", GfxSceneToUTF8( wstrName ).c_str(), this,
+		( g_pMain != NULL ) ? (int)g_pMain->GetNowStateID() : -1, ( m_hBlackLayOut != INVALID_PARTICLE_SEQUENCE_HANDLE ) ? "on" : "off", (unsigned)GetTickCount() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 }
 
 // 3226b6c0
 void CX2GFXEventScene::End( bool bForce )
 {
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	GfxSceneLog( "TRACE End %s by %p: %s, %s, %d queued, state %d, t=%u", GfxSceneToUTF8( m_wstrName ).c_str(), this, bForce ? "forced" : "by the scene",
+		m_bPlaying ? "playing" : "NOT PLAYING", (int)m_dequeQueue.size(), ( g_pMain != NULL ) ? (int)g_pMain->GetNowStateID() : -1, (unsigned)GetTickCount() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 	// the cursor back to normal ( 32868790( 0 ) )
 	if ( g_pMain != NULL && g_pMain->GetNowState() != NULL )
 	{
@@ -516,6 +535,9 @@ void CX2GFXEventScene::OnFrameMove( double /*fTime*/, float fElapsedTime )
 
 	if ( g_pKTDXApp->GetDIManager()->Getkeyboard()->GetKeyState( DIK_RETURN ) == TRUE )
 	{
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		GfxSceneLog( "TRACE input Enter ( %s )", GfxSceneToUTF8( m_wstrName ).c_str() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 		if ( m_pBridge != NULL )
 			m_pBridge->FireNextScene();		// 32e59800
 	}
@@ -539,6 +561,10 @@ bool CX2GFXEventScene::MsgProc( HWND /*hWnd*/, UINT uMsg, WPARAM /*wParam*/, LPA
 {
 	if ( m_bPlaying == false )
 		return false;
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	if ( uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONUP || uMsg == WM_LBUTTONDBLCLK )
+		GfxSceneLog( "TRACE input msg 0x%x ( %s ) t=%u", uMsg, GfxSceneToUTF8( m_wstrName ).c_str(), (unsigned)GetTickCount() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 	switch ( uMsg )
 	{
 	case WM_LBUTTONUP:

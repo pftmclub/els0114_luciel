@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase june-dungeons C3y-2 review` |
 | Plan doc | `JUNE_DUNGEONS_PHASES.md` (branch `main`) |
-| Depends on | C3y-2 and C3y-2b done, and the C3y-2b play-test passed (amended 2026-11-13: this review covers C3y-2b) |
+| Depends on | C3y-2, C3y-2b and C3y-2c done, and their play-tests passed (amended 2026-11-13: this review covers C3y-2b and C3y-2c; C3y-2c's fix flag joins the Flags row when it lands) |
 | Flags | `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON` (+ `_DEBUG`), `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND`, `SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE`; C3y-2b: `SERV_IRUHADEV_JUNE_SCENE_END_HOOK`, `SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING` |
 | Log tag | `JUNE_FX C3y-2` (offline_server.log; `python tools/logs.py --grep "JUNE_FX C3y-2"`) |
 
@@ -34,6 +34,6 @@ Code: the three flags' blocks in `X2StateServerSelect.cpp`, `X2StateBeginning.cp
    trailing-space name kept) against `june_src_fixed`; `python tools/luabind.py check` over the 9 scripts = PASS; `luasrc.py ledger --check`.
 3. **Hygiene:** `python tools/flagcheck.py <FLAG> --range <first C3y-2 commit>^..HEAD` for each flag (paste the RESULT lines; explain OTHER
    rows), `python tools/junediverge.py --check-all`, `python tools/enumscan.py --check` on the changed files.
-4. Retire `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG` (comment out the define; no build: debug retire only).
+4. Retire `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG` and C3y-2c's `SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG` (comment out the defines; no build: debug retire only).
 5. Write "C3y-2 - Review" into the plan doc, update STATUS.md (C3y-2 to Done; char-add TU / char-luciel TU now only wait on their own
    phases), check the next kickoffs, commit.

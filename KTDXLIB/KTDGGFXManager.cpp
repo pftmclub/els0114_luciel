@@ -129,6 +129,22 @@ namespace
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+namespace _CONST_GFXSCENE_TRACE_C3Y2C_		// june-dungeons C3y-2c: the scene bridge trace, tag [JUNE_GFX] SCENE TRACE
+{
+	void GfxSceneTrace( const char* szFormat, ... )
+	{
+		char szBuf[2048] = { 0, };
+		va_list args;
+		va_start( args, szFormat );
+		_vsnprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, szFormat, args );
+		va_end( args );
+		GfxLogLine( std::string( "[JUNE_GFX] SCENE TRACE " ) + szBuf );
+	}
+}
+using namespace _CONST_GFXSCENE_TRACE_C3Y2C_;
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+
 // ---------------------------------------------------------------------------------------------------------------------------------------
 // GFxPlayerLog ( RTTI .?AVGFxPlayerLog@@, 0x824 B, ctor 31c46880, vtable 33446d0c ): June's is the FxPlayer sample's console log
 // ( GetStdHandle( STD_OUTPUT_HANDLE ) + colour attributes 7 / 0xd ). A GUI exe has no console, so the text goes to the debugger, and under
@@ -662,6 +678,10 @@ struct KGfxBindingObserver
 {
 	SFG::Value	m_kClosure;		// record +0x00: the Value the notify invokes
 	SFG::Value	m_kExtra;		// record +0x18: compared on delete only
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	int			m_iSerial;		// june-dungeons C3y-2c trace: the observer's creation number
+	KGfxBindingObserver() : m_iSerial( 0 ) {}
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 };
 
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
@@ -858,6 +878,19 @@ public:
 		else
 			kValue.SetNull();
 		std::vector< KGfxBindingObserver > vecObserver = it->second.m_vecObserver;
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		if ( strName.compare( "EventScene.nextScene" ) == 0 )		// june-dungeons C3y-2c trace: which observers one fire reaches
+		{
+			std::string strSerials;
+			for ( size_t i = 0; i < vecObserver.size(); ++i )
+			{
+				char szOne[ 32 ] = { 0, };
+				sprintf_s( szOne, sizeof( szOne ), " #%d%s", vecObserver[i].m_iSerial, vecObserver[i].m_kClosure.IsClosure() ? "" : "(not a closure)" );
+				strSerials += szOne;
+			}
+			GfxSceneTrace( "notify %s: %d observer(s):%s", strName.c_str(), (int)vecObserver.size(), strSerials.c_str() );
+		}
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 		for ( size_t i = 0; i < vecObserver.size(); ++i )
 		{
 			if ( vecObserver[i].m_kClosure.IsClosure() )
@@ -993,7 +1026,15 @@ private:
 		KGfxBindingObserver kObserver;
 		kObserver.m_kClosure	= kParams.pArgs[1];
 		kObserver.m_kExtra		= kParams.pArgs[2];
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		static int s_iObserverSerial = 0;		// june-dungeons C3y-2c trace
+		kObserver.m_iSerial = ++s_iObserverSerial;
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 		it->second.m_vecObserver.push_back( kObserver );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		GfxSceneTrace( "createBinding %s: observer #%d ( closure type %d, extra type %d ), %d observer(s) now", kParams.pArgs[0].GetString(),
+			kObserver.m_iSerial, (int)kObserver.m_kClosure.GetType(), (int)kObserver.m_kExtra.GetType(), (int)it->second.m_vecObserver.size() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 		// 31d1ed90: the listeners are told the name; the scene's ( 32e597d0 ) and the manager's answer false, so nothing follows from it
 #ifdef SERV_IRUHADEV_JUNE_RESULT_WIDGET
 		const std::string strBindingName = kParams.pArgs[0].GetString();
@@ -1018,10 +1059,21 @@ private:
 		{
 			if ( vecObserver[i].m_kExtra == kParams.pArgs[2] && vecObserver[i].m_kClosure == kParams.pArgs[1] )
 			{
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+				GfxSceneTrace( "deleteBinding %s: observer #%d removed, %d left", kParams.pArgs[0].GetString(), vecObserver[i].m_iSerial,
+					(int)vecObserver.size() - 1 );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 				vecObserver.erase( vecObserver.begin() + i );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+				return;		// june-dungeons C3y-2c trace: the miss line below is for no match only
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 				break;
 			}
 		}
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		GfxSceneTrace( "deleteBinding %s: NO observer matched ( closure type %d, extra type %d ), %d kept", kParams.pArgs[0].GetString(),
+			(int)kParams.pArgs[1].GetType(), (int)kParams.pArgs[2].GetType(), (int)vecObserver.size() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 	}
 #endif SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
 };
@@ -1131,6 +1183,9 @@ public:
 	}
 
 	void SetRootValue( const SFG::Value& kValue ) { m_RootValue = kValue; }		// 31c3f650 ( AS RegisterMainUI )
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	bool IsRootValueSet() const { return m_RootValue.IsObject() || m_RootValue.IsArray() || m_RootValue.IsDisplayObject(); }		// june-dungeons C3y-2c trace
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 #ifdef SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
 	CLIKDataBindingAdapter* GetAdapter() const { return m_pAdapter.GetPtr(); }			// vslot 1 of the wrapper ( 3226aed0: mgr +0x98 vslot 1 )
 #endif SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
@@ -1910,6 +1965,10 @@ public:
 		{
 			SFG::Value kCurrent;
 			kObject.GetMember( s_aszFunction[ i ], &kCurrent );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+			GfxSceneTrace( "gameDataEventScene %s: member type %d before ( %s )", s_aszFunction[ i ], (int)kCurrent.GetType(),
+				( kCurrent.IsObject() == false && kCurrent.IsArray() == false && kCurrent.IsDisplayObject() == false ) ? "set now" : "kept" );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 			if ( kCurrent.IsObject() == false && kCurrent.IsArray() == false && kCurrent.IsDisplayObject() == false )		// @32e59a20: types 8 / 9 / 10 are left alone
 			{
 #ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_STALE_INSTANCE
@@ -1941,6 +2000,9 @@ public:
 
 	void FireNextScene()		// 32e59800
 	{
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+		GfxSceneTrace( "FireNextScene t=%u", (unsigned)GetTickCount() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 		if ( m_pAdapter )
 			m_pAdapter->NotifyBinding( JGES_BINDING_NEXT_SCENE );
 	}
@@ -1955,6 +2017,15 @@ private:
 
 	void DoFunction( int iID, const SFG::FunctionHandler::Params& kParams )
 	{
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_STALE_INSTANCE
+		GfxSceneTrace( "AS call %d from instance %d ( current %d ), %u arg(s)%s%s t=%u", iID & 3, iID >> 2, m_iSceneInstance, kParams.ArgCount,
+			( kParams.ArgCount >= 1 && kParams.pArgs != NULL && kParams.pArgs[0].IsString() ) ? " arg0 " : "",
+			( kParams.ArgCount >= 1 && kParams.pArgs != NULL && kParams.pArgs[0].IsString() ) ? kParams.pArgs[0].GetString() : "", (unsigned)GetTickCount() );		// june-dungeons C3y-2c
+#else SERV_IRUHADEV_JUNE_GFX_SCENE_STALE_INSTANCE
+		GfxSceneTrace( "AS call %d, %u arg(s) t=%u", iID, kParams.ArgCount, (unsigned)GetTickCount() );		// june-dungeons C3y-2c
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_STALE_INSTANCE
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 #ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_STALE_INSTANCE
 		// BUG_REPORT 4 / 5, not June: an unloaded scene swf keeps its key listener here and still calls in; only the newest instance is heard
 		if ( ( iID >> 2 ) != m_iSceneInstance )
@@ -2554,6 +2625,11 @@ void CKTDGGFXManager::loadUserWidget( int iUIID, const WCHAR* wszPath, int iArg1
 		return;
 	SFG::Value akArgs[4] = { SFG::Value( (SF::Double)iUIID ), SFG::Value( wszPath ), SFG::Value( (SF::Double)iArg1 ), SFG::Value( (SF::Double)iArg2 ) };
 	m_pImpl->m_pUI->Invoke( "loadUserWidget", NULL, akArgs, 4 );
+#ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+	if ( iUIID == 0x2711 || iUIID == 0x2712 )		// june-dungeons C3y-2c trace: the scene and its back widget
+		GfxSceneTrace( "loadUserWidget 0x%x %s: root %s t=%u", iUIID, GfxToUTF8( wszPath ).c_str(),
+			m_pImpl->m_pUI->IsRootValueSet() ? "registered" : "NOT registered ( the call did nothing )", (unsigned)GetTickCount() );
+#endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 }
 
 void CKTDGGFXManager::loadEventSceneEndFrame( int iUIID, const WCHAR* wszPath, int iFrame )
