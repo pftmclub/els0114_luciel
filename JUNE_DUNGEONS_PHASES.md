@@ -451,5 +451,7 @@ Funcmap rows `32965bd0`, `32965a60 / 329659b0`, `32965a90`, `31fbdb30 / 31fbdb60
   enumscan 0 A/B.
 - **Build.** DEPLOY OK: X2_offline.exe is 26,419,200 B, dated 2026-11-13 10:43:12, md5 b4108783. EXESTR OK 3 of 3 (wide: `gfx show %d`,
   `gfx hide`, `(logged at the first begin)`) and 2 of 2 (`tutorialGuide.showGuide`, `tutorialGudie`).
-- **Play-test (owed).** Console scene 101 in a dungeon (the account quirk of t1 still blocks Benders' own call outside one): the guide
-  movie on screen, then gone when the skill key ends the scene. No review of its own: `C3z-4t2-review.md` covers t1 + t2.
+- **Play-test (2026-11-13, user): pass.** Console scene 101 in a dungeon (md5 b4108783), offline_server.log 10:53:10-10:53:12: `load 24
+  scene(s) ... (logged at the first begin)`, `begin 101`, `gfx show 2: 1 observer(s) on tutorialGuide.showGuide` (the widget bound),
+  `step 101: gfx 2, key limit 1, stop frame 1`, `end 101`, `gfx hide`; no callback line (none expected). 0 EXCEPTION. No review of its
+  own: `C3z-4t2-review.md` covers t1 + t2.
