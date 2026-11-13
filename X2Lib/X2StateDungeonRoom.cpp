@@ -3108,6 +3108,11 @@ bool CX2StateDungeonRoom::EnterTutorial()
 
 			if (pStatic->GetPicture(2) != NULL )
 				pStatic->GetPicture(2)->SetTex( L"HQ_Loading_RUBEN_PROLOG_02.tga" );
+#ifdef SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
+
+			if( pStatic->GetPicture(3) != NULL )
+				pStatic->GetPicture(3)->SetShow( false );	// june-dungeons C3y-2b: June EnterTutorial 324e93b0 @324e9514
+#endif SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
 		}
 
 	}

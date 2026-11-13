@@ -741,6 +741,14 @@ int CX2OfflineSkill::ChangeSkillSlot( int iSlotID, int iSkillID,
 
 //////////////////////////////////////////////////////////////////////////
 
+#ifdef SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
+namespace _CONST_OFFLINESKILL_C3Y2B_
+{
+	const int STARTER_SKILL_SLOT_ORDER[] = { 0, 3, 1, 2, 4 };	// june-dungeons C3y-2b stand-in: A, C, S, D ( June's tutorial skill step checks A and C )
+}
+using namespace _CONST_OFFLINESKILL_C3Y2B_;
+
+#endif SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
 bool CX2OfflineSkill::SeedDefaultSkills( UidType nUnitUID, int iUnitClass )
 {
 	if( NULL == g_pData || NULL == g_pData->GetSkillTree() )
@@ -783,7 +791,11 @@ bool CX2OfflineSkill::SeedDefaultSkills( UidType nUnitUID, int iUnitClass )
 			case CX2SkillTree::ST_ACTIVE:
 			case CX2SkillTree::ST_SPECIAL_ACTIVE:
 			case CX2SkillTree::ST_BUFF:
+#ifdef SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
+				kRow.m_iSlot = STARTER_SKILL_SLOT_ORDER[ iSlot++ ];	// june-dungeons C3y-2b stand-in
+#else SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
 				kRow.m_iSlot = iSlot++;
+#endif SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
 				break;
 
 			default:

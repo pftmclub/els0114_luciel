@@ -102,6 +102,13 @@ void CX2DungeonManager::Add_HeroDungeon_ExtraStatForException_LUA()
 		( 110001 <= iDungeonID && iDungeonID < 110311 ) ||
 		120000 == iDungeonID || 120010 == iDungeonID;
 }
+#ifdef SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
+// june-dungeons C3y-2b: June 32931c20: the Hero hell dungeons ( 110001..110310 ) and the hell dummy
+/*static*/ bool CX2DungeonManager::IsHeroHellDungeon( int iDungeonID )
+{
+	return SEnum::DI_HERO_DUMMY_HELL == iDungeonID || ( SEnum::DI_HERO_HELL_DUNGEON_START < iDungeonID && iDungeonID <= SEnum::DI_HERO_HELL_DUNGEON_END );
+}
+#endif SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
 //}}
 #endif SERV_IRUHADEV_JUNE_HERO_NPC_ANIM_SPEED
 

@@ -5185,6 +5185,10 @@ void CX2TFieldGame::LoadUI()
 				bCheck2 = pStatic->GetPicture(2)->SetTex( wstrImgR.c_str() );
 			}
 			bCheck = bCheck1 && bCheck2;
+#ifdef SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
+			if( pStatic->GetPicture(3) != NULL )
+				pStatic->GetPicture(3)->SetShow( false );	// june-dungeons C3y-2b: June 32d544e0 @32d54730
+#endif SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
 
 
 			if(bCheck == true)

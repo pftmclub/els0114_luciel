@@ -6866,6 +6866,9 @@ Flags in `KTDXLIB/Always.h`: inside C3y-2's `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIN
   live kom `kom_backup_tools\data034.kom.20261113_130430`). `tools/luabind.py check` gained `METHOD BOUND ONLY AS GLOBAL` and `--receiver`.
 - **What changes in game.** The tutorial character can move after the opening scene; ESC / right click skips the opening story; no old loading
   picture before June's.
+- **Fix 2 / 3.** `GetNowStateSkillID` / `SetLineForce` on CX2GUUser (tutorial boss softlock); 83 June tutorial / guide textures; June's loading
+  picture 3 handled (`SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE`, `IsHeroHellDungeon`, 3 Hero ids in `DungeonEnum.h`); starter skills seeded A, C, S, D
+  (`SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS`).
 - **Revert:** comment out `JUNE_SCENE_END_HOOK` / `JUNE_TUTORIAL_ROOM_LOADING`; the scene methods go with `JUNE_TUTORIAL_LUA_BIND`; then
   `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The dialog backup restores March's data034 entry. No save change.
 

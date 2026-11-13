@@ -2187,6 +2187,10 @@ void CX2BattleFieldGame::CreateLoadingUI()
 				bCheck2 = pStatic->GetPicture(2)->SetTex( wstrImgR.c_str() );
 			}
 			bCheck = bCheck1 && bCheck2;
+#ifdef SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
+			if( pStatic->GetPicture(3) != NULL )
+				pStatic->GetPicture(3)->SetShow( false );	// june-dungeons C3y-2b: June 323b0f20 @323b122d
+#endif SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
 
 
 			if(bCheck == true)

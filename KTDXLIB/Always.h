@@ -13036,6 +13036,31 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-13
+// Description: june-dungeons C3y-2b - June's DLG_PVP_Game_Loading_State.lua adds a full-screen picture 3 to Static_Loading_Dungeon_BG. June's readers handle it:
+//              the dungeon loading shows it with the Hero art on Hero dungeons and hides it otherwise ( 324cb020 @324cc025-324cc09d, IsHeroHellDungeon 32931c20 ),
+//              the battle-field ( 323b0f20 @323b122d ), field ( 32d544e0 @32d54730 ) and EnterTutorial ( 324e93b0 @324e9514 ) loadings hide it.
+//              Revert: comment out the #define ( JUNE_LOADING_HERO_PICTURE ) and restore March's data034 DLG_PVP_Game_Loading_State.lua.
+#define SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
+#if defined( SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE ) && ( !defined( SERV_IRUHADEV_JUNE_HERO_NPC_ANIM_SPEED ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE needs SERV_IRUHADEV_JUNE_HERO_NPC_ANIM_SPEED ( CX2DungeonManager::IsHeroDungeon ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( the Hero hell ids )
+#endif SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3y-2b - emulator stand-in: a new character's starter skills fill the bar in the order A, C, S, D ( slots 0, 3, 1, 2 ). June's tutorial
+//              skill step expects them on A and C: the input guide watches GA_SKILL1 / GA_SKILL4 ( 31fc5570 ) and its picture shows the A and C keys; June's
+//              server-side placement is not available. Revert: comment out the #define ( JUNE_STARTER_SKILL_SLOTS ).
+#define SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
+#if defined( SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS ) && !defined( SERV_IRUHADEV_OFFLINE )
+#error SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS needs SERV_IRUHADEV_OFFLINE ( CX2OfflineSkill::SeedDefaultSkills )
+#endif SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
 // Description: june-dungeons C3z-4t4b - the quick-quest dialogs sit at June's y 173 + 22 i ( CX2UIQuestNew ctor 323d0ca0 ), not March's 143, so the
 //              tutorial guide's quest highlight ( scenes 211 / 202 / 411 ) lands on them. Revert: comment out the #define ( JUNE_QUICK_QUEST_POS ).
 #define SERV_IRUHADEV_JUNE_QUICK_QUEST_POS

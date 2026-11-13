@@ -528,6 +528,9 @@ namespace SEnum
 		DI_SANDER_SECRET_HELL					= 41141,
 		DI_RANOX_SECRET_COMMON					= 41270,
 		DI_EVENT_2017_TREASURE					= 41470,
+		DI_HERO_HELL_DUNGEON_START				= 110000,	// june-dungeons C3y-2b: June DungeonEnum
+		DI_HERO_HELL_DUNGEON_END				= 110310,	// june-dungeons C3y-2b: June DungeonEnum
+		DI_HERO_DUMMY_HELL						= 120010,	// june-dungeons C3y-2b: June DungeonEnum
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 	//}}
 	//{{ Iruha : 2026-11-02 // char-chung CH1n2 -- June DungeonEnum's 2017 event dungeons StartEnd names

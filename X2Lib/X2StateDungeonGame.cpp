@@ -694,6 +694,22 @@ void CX2StateDungeonGame::LoadUI()
 			}
 
 
+#ifdef SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
+			// june-dungeons C3y-2b: June 324cb020 @324cc025-324cc09d: picture 3 shows the Hero art on a Hero dungeon, else it is hidden
+			if( pStatic != NULL && pStatic->GetPicture(3) != NULL )
+			{
+				const int iDungeonID = g_pData->GetDungeonRoom()->GetDungeonID();
+				if( true == CX2DungeonManager::IsHeroDungeon( iDungeonID ) )
+				{
+					pStatic->GetPicture(3)->SetTex( true == CX2DungeonManager::IsHeroHellDungeon( iDungeonID ) ? L"HQ_LoadingDungeon_Hero_Hell.tga" : L"HQ_LoadingDungeon_Hero.tga" );
+					pStatic->GetPicture(3)->SetShow( true );
+				}
+				else
+				{
+					pStatic->GetPicture(3)->SetShow( false );
+				}
+			}
+#endif SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE
 			if(bCheck == true)
 			{
 				// 정상적으로 그림이 나오는 상황 : LoadingTip Object를 한줄팁 표시로 바꾸자.

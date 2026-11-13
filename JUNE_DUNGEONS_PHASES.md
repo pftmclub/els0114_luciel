@@ -738,3 +738,25 @@ so no awakening orb, no guide 102, boss stays undamageable).
   `JUNE_CHAR_ELESIS_SKILL` hunks (not committed here; see the range line). junediverge `RESULT: PASS`; enumscan 0 A/B.
 - **Build.** DEPLOY OK: X2_offline.exe is 26,437,632 B, dated 2026-11-13 13:48:24, md5 f2899679c89d8a4e066018905a035295 (built at main
   1fc6edcc + 20 uncommitted code files, shared with char-elesis CH2b). EXESTR OK 2 of 2 (GetNowStateSkillID, SetLineForce), md5 f2899679.
+
+### C3y-2b - play-test 2 (2026-11-13) and fix 3
+
+Play-test 2 (new Elsword): the boss attacks, guide 102 runs, the tutorial clears to the village (`Quest_11000_End`). Reports: the skill
+step points at A and C while the skills sit on A / S; the sub-stage 2 Banthus dialog replays on left click and shows no Banthus portrait; and
+(caused by fix 1's adoption of June's `DLG_PVP_Game_Loading_State.lua`) every loading screen went black with only the tip.
+- **Loading screens (fixed in code, June's dialog kept).** June's dialog adds a full-screen black picture 3; June's readers handle it and March's
+  did not: dungeon loading `324cb020` @`324cc025` (Hero art on Hero dungeons, else hidden; new `CX2DungeonManager::IsHeroHellDungeon` `32931c20`,
+  ids `DI_HERO_HELL_DUNGEON_START` / `_END`, `DI_HERO_DUMMY_HELL` registered in `DungeonEnum.h` under `JUNE_ENUM_NAMES`), battle field
+  `323b0f20` @`323b122d`, field `32d544e0` @`32d54730`, `EnterTutorial` `324e93b0` @`324e9514` (hide). The tutorial-exit room branch keeps
+  June's black (JUNE_BUGS 648). Flag `SERV_IRUHADEV_JUNE_LOADING_HERO_PICTURE`. March's dialog was briefly restored, then June's re-adopted
+  (backup `kom_backup_stage_june\20261113_140854`); PACK OK + COPY OK data034 d2b06cfb.
+- **A / C skill step (stand-in).** June's `OnFrameMoveInputGuideKey` `31fc5570` watches `GA_SKILL1` / `GA_SKILL4` and the input-guide picture
+  shows A and C, so June's starter skills sit on slots 0 and 3; June's server placement is unavailable. `SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS`:
+  `CX2OfflineSkill::SeedDefaultSkills` fills A, C, S, D. Existing characters keep their slots (create new ones to test).
+- **Sub-stage 2 dialog (routed: C3y-2c).** The scenes are SWF-only (`Tutorial_Elsworld_03` / `_04`, no XML rows in March or June, same
+  `eventscene` files as June); `tutorial_elsworld_03.swf` holds no Banthus symbol. The play-test logs were overwritten by another session's
+  run, so `kickoffs/june-dungeons/C3y-2c.md` re-runs it with a bridge trace.
+- **Hygiene.** flagcheck `--worktree`: LOADING_HERO_PICTURE 6 PASS, STARTER_SKILL_SLOTS 1 PASS, JUNE_ENUM_NAMES (DungeonEnum.h) PASS; 0 FAIL,
+  0 deleted. junediverge `RESULT: PASS`; enumscan 0 A/B (dungeon ids written by name).
+- **Build.** DEPLOY OK: X2_offline.exe is 26,438,144 B, dated 2026-11-13 14:28:46, md5 894df4f9ff44d8bbc704e061d7d8a902 (built at main b29b62bc +
+  11 uncommitted code files). EXESTR OK 1 of 1 (wide `HQ_LoadingDungeon_Hero_Hell.tga`), md5 894df4f9.
