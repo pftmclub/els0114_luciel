@@ -777,3 +777,9 @@ and skill-tree-init paths call `SeedAutoLearn` (its free-slot search). Fix 4 put
 `SERV_IRUHADEV_JUNE_STARTER_SKILL_SLOTS`); the `SeedDefaultSkills` hunk stays (flag-off AUTOLEARN path). flagcheck `--worktree` 1 PASS (+13),
 junediverge PASS. BUILD OK x2.exe 26,439,680 B 14:47:36; DEPLOY OK (deploy-only): X2_offline.exe 26,439,680 B, 2026-11-13 14:48:54, md5 b68f1fcc18893888d6b2fc08ea8854c5. `Tutorial_Elsworld_03` played
 14:42:00 and ended forced 14:42:10 (the user's ESC after the click loop): C3y-2c's re-run still needs its trace.
+
+### C3y-2b - play-test 4 (2026-11-13): passed
+
+New Elsword `elstut5` (unit 157, exe md5 b68f1fcc): starter skills on slots 0 / 3 (A / C), the skill step advances, loading screens show
+their pictures, the boss attacks and takes damage after the awakening guide, the tutorial clears to the village; ErrorLog has no unbound
+name from this phase (`AddGroupChainQuest` predates it). Open: the sub-stage 2 Banthus dialog (C3y-2c), then the C3y-2 review (covers 2b / 2c).
