@@ -2694,7 +2694,17 @@ bool CX2StateCreateUnit::Handler_EGS_CREATE_UNIT_ACK( HWND hWnd, UINT uMsg, WPAR
 			if( pUnit->GetType() != CX2Unit::UT_ADD )
 				g_pMain->SetIsPlayingTutorial( true );
 #else //SERV_ELISIS_PREVIOUS_SIS_EVENT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+			// char-add CH0c stand-in: Add skips the tutorial ( 39608 has no data, June's 41230 not ported ), as SERV_ELISIS_PREVIOUS_SIS_EVENT does
+			if( pUnit->GetType() != CX2Unit::UT_ADD )
 				g_pMain->SetIsPlayingTutorial( true );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+			else
+				CX2OfflineLog::Server( L"[JUNE_CHAR] ADD CREATE tutorial skipped after create ( stand-in until June's 41230 )" );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				g_pMain->SetIsPlayingTutorial( true );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_ELISIS_PREVIOUS_SIS_EVENT
 
 				if( m_pDLGMSGOkBoxEnterTutorial != NULL )

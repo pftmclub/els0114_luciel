@@ -52,3 +52,8 @@ NU0 (2026-11-02), `nu0_jobchange_tutorial.tsv`:
   (June `WorldData.src.lua:3153`): add Lu/Ciel's.
 - Files: `Dungeon_Tutorial_Luciel.lua` live (June bytecode); `Tutorial_Luciel_Stage0.lua` (15,580 B) and `_LineMap.lua` (5,332 B) June data040, new
   (CH0b); `HQ_Loading_TUTORIAL_LUCIEL_01/02.tga` not found in kom_contents (CH0b checks June's koms).
+
+## Amended by char-add CH0c (2026-11-13)
+
+- Add's case of June's tutorial switch `325622e0` (type 9 -> `DI_DUNGEON_TUTORIAL_ADD` 41230) is owned by `kickoffs/char-add/TU.md`. If that phase
+  has landed, keep its case; if this one lands first, add Lu/Ciel's case only and leave Add's to char-add TU.

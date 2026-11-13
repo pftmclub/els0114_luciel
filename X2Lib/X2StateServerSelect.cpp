@@ -5,6 +5,9 @@
 //{{ Iruha : 2026-08-31 // offline mode
 #ifdef SERV_IRUHADEV_OFFLINE
 #include "OfflineHook.h"
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+#include "Offline/X2OfflineLog.h"	// char-add CH0c: the ADD CREATE tutorial line
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
 #endif SERV_IRUHADEV_OFFLINE
 //}}
 
@@ -4312,9 +4315,21 @@ bool CX2StateServerSelect::Handler_EGS_SELECT_UNIT_5_NOT( HWND hWnd, UINT uMsg, 
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_MODE
 		/// June buff port Phase 14c, Handler_EGS_SELECT_UNIT_5_NOT 32563560 @3256369e-325636d2: the tutorial also needs the
 		/// server's first-select bool (kEvent +0x12a in June = m_bFirstSelect, read right after the bingo block as here)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+		// char-add CH0c stand-in: Add skips the first-select tutorial ( 39608 has no data, June's 41230 not ported )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+		if ( CX2Unit::UT_ADD == g_pData->GetMyUser()->GetSelectUnit()->GetType() && true == kEvent.m_bFirstSelect )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ADD CREATE first select: tutorial skipped ( stand-in until June's 41230 )" );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+		if ( 1 == g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_Level &&
+			0 == g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_EXP &&
+			true == kEvent.m_bFirstSelect &&
+			CX2Unit::UT_ADD != g_pData->GetMyUser()->GetSelectUnit()->GetType() )
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 		if ( 1 == g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_Level &&
 			0 == g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_EXP &&
 			true == kEvent.m_bFirstSelect )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #else SERV_IRUHADEV_JUNE_TUTORIAL_MODE
 		if ( 1 == g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_Level &&
 			0 == g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_EXP )

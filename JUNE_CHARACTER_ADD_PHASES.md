@@ -427,8 +427,24 @@ DEPLOY OK: X2_offline.exe is 26,367,488 B, dated 2026-11-13 07:35:21, md5 a225d8
 EXESTR OK: 2 of 2 found (`[JUNE_CHAR] ADD CREATE slot shown`, `... select class`, wide).
 Commit `0aa567e7`; flagcheck `--range 0aa567e7^..0aa567e7 --with _DEBUG`: 3 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 
+**Play-test 1 (2026-11-13): froze after create.** Slot / select / create worked (`CREATE 'AddCh0c' class=9 -> unitUID=142`); the first-login
+tutorial sent him to `DI_BATTLE_FIELD_TUTORIAL_ADD` 39608, which has no `DungeonData` row (March never had one; June dropped all battle-field
+tutorials and sends class 9 to `DI_DUNGEON_TUTORIAL_ADD` 41230 from `325622e0`); emulator `stage 0 out of range (dungeon 39608 has 0)`, the
+client quit and hung. **User decision: skip it for now.** Stand-in under `_CREATE`: no tutorial for Add on the create reply
+(`X2StateCreateUnit.cpp`, the studio's own `SERV_ELISIS_PREVIOUS_SIS_EVENT` skip, off on US) and on the first select (`X2StateServerSelect.cpp`,
+`JUNE_TUTORIAL_MODE` gate); debug `ADD CREATE tutorial skipped ...`. Tutorials give no quest credit offline (`IsQuestTutorialDungeon`), so nothing is
+lost. June's Add tutorial = new phase **TU** (`kickoffs/char-add/TU.md`); Lu/Ciel's TU kickoff amended (Add's case is char-add TU's).
+flagcheck `--worktree` (2 files): 1 PASS, 1 OTHER (debug block), 0 FAIL, RESULT: PASS; junediverge PASS; enumscan 0. DEPLOY OK: X2_offline.exe 26,368,000 B, 2026-11-13 08:24:17, md5 fa47ddb445faeba7c18f234517b2cb8d; EXESTR OK 2/2 (both skip lines).
+
 **How to see it:** the creation screen shows Add's slot, his June class buttons and info texture; create one, and he gets his beginner gear.
 Personal-shop search: Add is the last entry of the character combo (the label may show garbled, see Stage 9 bullet).
+
+## Phase TU - Add's June tutorial (added by CH0c, 2026-11-13)
+
+**Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_TUTORIAL`. After CH1's and CH0c's reviews.
+**Scope:** June's `325622e0` case 9 (`DI_DUNGEON_TUTORIAL_ADD` 41230) in March's tutorial-room request, the enum member and June's `DungeonData` row
+(core list), `Dungeon_Tutorial_Add.lua` and its assets, the emulator's tutorial lists; retires CH0c's tutorial skip. Kickoff `kickoffs/char-add/TU.md`.
+**Done gate:** a new Add plays June's tutorial to its end and lands in the village.
 
 ## Phase CH0b - Every June Add asset, whole, first
 

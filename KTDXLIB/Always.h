@@ -12802,6 +12802,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: June character port ( Add ) Phase CH0c - Add on the creation screen: the US SERV_LIMIT_UNIT limit ( 8 ) no longer hides
 //              AddCreateUnitSlot ( June's ctor 3255bd10 has no limit test ) nor his entry in the seven personal-shop character combos;
 //              the default-select switch keeps March's limit ( June opens on Ain, Stage 8 ). The emulator's class-9 beginner gear is now reached.
+//              Stand-in: a new Add skips the first-login tutorial ( March's DI_BATTLE_FIELD_TUTORIAL_ADD 39608 has no DungeonData row; June's
+//              DI_DUNGEON_TUTORIAL_ADD 41230 from 325622e0 is not ported ), on the create reply and the first select.
 //              Revert: comment out the #define ( JUNE_CHAR_ADD_CREATE ).
 #define SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 //////////////////////////////////////////////////////////////////////////
@@ -12809,6 +12811,6 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-13
-// Description: char-add CH0c debug: logs [JUNE_CHAR] ADD CREATE slot shown / select class <c> type <t> on the creation screen. The CH0c review retires it.
+// Description: char-add CH0c debug: logs [JUNE_CHAR] ADD CREATE slot shown / select class <c> type <t> / tutorial skipped. The CH0c review retires it.
 #define SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
 //////////////////////////////////////////////////////////////////////////

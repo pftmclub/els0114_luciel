@@ -28,6 +28,8 @@ Review CH0c's commit(s) against `ch0_create.tsv` and June's creation-screen func
   `EquipPromotionItem`), the exchange-shop routing. Spot-check 2 of them; if one fails, re-check them all.
 - The play-test log: `[JUNE_CHAR] ADD CREATE slot shown ( US limit 8, slot found )`, `ADD CREATE select class 9 type 9`, the emulator's
   `CREATE '<name>' class=9 -> unitUID=...`, and no new error against `data\ErrorLog_pre_CH0c_add.txt` (`python tools/logs.py --tag JUNE_CHAR`).
+- The tutorial stand-in (play-test 1 froze on 39608): Add excluded from `SetIsPlayingTutorial( true )` on the create reply and from the first-select gate;
+  every other class still enters its tutorial; log `ADD CREATE tutorial skipped ...` / `first select: tutorial skipped`.
 - Retire the debug lines: comment out `#define SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG` (start the build, don't wait: CLAUDE.md 2026-11-03).
 
 Hygiene is one command, not a fresh script:
