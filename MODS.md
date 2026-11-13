@@ -6917,6 +6917,17 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, retired by t
 - **Damage.** March has none of these skills; the damage is the numerical tables and effect-set rows of June's `ELESIS_KNIGHT.lua` ( Brutal Cutter's numerical-only table: `NUMERICAL_DATA_INDEX` 1 ), so the comparison is the `NUM use` lines of the play-test ( this build emits none, as CH2b / CH2c ).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 7 Elesis, CH3a: Grand Master (120) special actives (char-elesis CH3a, 2026-11-14)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, defined again for the CH3 play-tests; the CH3d review retires it). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** June's ids join March's cases ( base / enhanced ): Victorious Sword 28008 / 28046, War Prelude 28009 / 28047, Juggernaut Buster 28010 / 28048, Sonic Blade 28011 / 28049; new cases Cross Slash 28039, Divine Blade 28040, Giga Blast 28062 ( charge state 336, end state 337 ).
+  Victorious Sword: its 0.533 s buff takes the level of 28008 and applies BFI 345 unless BTI 326 / 565 is held, else erases BTI 326 and applies BFI 655 ( JUNE_BUGS 654 ); 12 more preloads. War Prelude: the state goes at once to a ground state ( 335 ), or an air state ( 334, lands on a line ) when not on a line and the Dignity of Grand Master level is above 0 ( written by CH4a, so ground only until then ).
+  Juggernaut Buster: start speed x0.75 of the dash speed ( March 0.5 ), loop x1.05 ( March 0.7 ); at 0.8 s of the start state C++ plays the BLACKHOLE effect set ( Trans variant under the transcendence memo, WithVictoriousSword variant while the Victorious Sword flag is set ) and at 0.29 s of the end state the Finish one.
+  Every EventProcess' walk / back-walk / dash / Z-X cancels need the foot on a line. Giga Blast's end state is `CX2GUUser::GenericSpecialActiveSkillEventProcess`.
+- **Shared.** `X2SkillTree.h`: `RNSI_SA_SGM_VICTORIOUS_SWORD(_UPGRADE)`, `RNSI_SA_SGM_SONIC_BLADE(_UPGRADE)`, `RNSI_SA_SGM_JUGGERNAUT_BUSTER_UPGRADE`, `RNSI_SA_SGM_CROSS_SLASH`, `RNSI_SA_SGM_DIVINE_BLADE`; `X2BuffFactor.h`: `BFI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE` ( 655 ); constants in `_CONST_EL_CH3A_`.
+- **Damage.** March's Grand Master versions of these skills used March's tables; June's come from `ELESIS_KNIGHT.lua` ( Victorious Sword's DAMAGE_DATA_NEXT is numerical-only, `NUMERICAL_DATA_INDEX` 1 ), so the comparison is the `NUM use` lines of the play-test ( this build emits none, as CH2b - CH2d ).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ### June quest system: AddGroupChainQuest bound (quest-system Q12, 2026-11-13)
 
 Flag `SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN` in `KTDXLIB/Always.h` (needs `JUNE_QUEST_LOAD`). Plan `JUNE_QUEST_SYSTEM_PHASES.md` "Phase Q12"; log tag `[JUNE_QUEST] LOAD`.
@@ -6924,3 +6935,10 @@ Flag `SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN` in `KTDXLIB/Always.h` (needs `JUNE_Q
   (2026-11-13) `X2Main.cpp` binds it to the new `CX2QuestManager::AddGroupChainQuest_LUA` (keys and defaults as `AddChainQuestDays`), which stores the row in `m_mapChainGroup`
   (group 4 -> 43077, group 5 -> 43079). Nothing reads the map: June has no reader and no June quest is in those chains. The two `[JUNE_QUEST] LOAD` lines print `groups %d`.
 - **Revert:** comment out the define, `python tools/build.py --deploy`. No data or save change.
+
+### June dungeons: tutorial scene fixes - slide-shot layer, scene classes (june-dungeons C3y-2c, 2026-11-14)
+
+Flags `SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER` and `SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE` in `KTDXLIB/Always.h`; temporary `SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG` (the C3y-2 review retires it). Plan `JUNE_DUNGEONS_PHASES.md` "C3y-2c"; log tag `[JUNE_GFX] SCENE`.
+- **Slide-shot layer (June).** `CreateSequence_LUA` takes June's 5th argument (`31c25e00` -> `CreateSequence` `31cf90f0` `m_Layer`), so the tutorial's post-boss pictures draw over the black back. Kept verbatim: a 4-argument call sets layer 0 as in June (JUNE_BUGS 653).
+- **Scene classes (not June).** Every GFx scene swf defines class `EventScene`; this Scaleform build shares one class domain (first registered wins) and never frees an unloaded scene, so later scenes ran the first scene's code (wrong voices, no `stop()` past its frames: fast typing, loops). Before each scene widget (0x2711) loads, `KTDGGFXManager.cpp` unregisters the classes of the file that owns `EventScene`.
+- **Revert:** comment out either define, `python tools/build.py --deploy`. No data or save change.

@@ -910,6 +910,12 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_BRUTAL_CUTTER_MEMO           = 593,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June BFI name of Elesis's enhanced Victorious Sword buff ( value from June's Enum.lua )
+	BFI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE = 655,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 

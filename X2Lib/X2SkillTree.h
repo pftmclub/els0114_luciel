@@ -2700,6 +2700,18 @@ public:
 	RNSI_A_SDK_SHADE_SCRATCH_UPGRADE                      = 28234,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of the Grand Master special actives Victorious Sword, Sonic Blade, Juggernaut Buster, Cross Slash and Divine Blade ( the bases are above ) ( values from June's Enum.lua )
+	RNSI_SA_SGM_VICTORIOUS_SWORD                          = 28008,
+	RNSI_SA_SGM_SONIC_BLADE                               = 28011,
+	RNSI_SA_SGM_CROSS_SLASH                               = 28039,
+	RNSI_SA_SGM_DIVINE_BLADE                              = 28040,
+	RNSI_SA_SGM_VICTORIOUS_SWORD_UPGRADE                  = 28046,
+	RNSI_SA_SGM_JUGGERNAUT_BUSTER_UPGRADE                 = 28048,
+	RNSI_SA_SGM_SONIC_BLADE_UPGRADE                       = 28049,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

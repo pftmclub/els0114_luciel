@@ -698,6 +698,14 @@ protected:
 	void SI_A_SCA_SHADE_SCRATCH_ATTACK_EventProcess();	/// char-elesis CH2d: June 32b6a020
 	bool ApplyBleedingHpCost( CX2DamageManager::DamageData* pDamageData_, float fDamageRate_, const USHORT usHitCount_ );	/// char-elesis CH2d: June 32b89470 ( the HP cost of the Dark Knight skills; true always )
 	bool IsAnySkillKeyPressed() const;	/// char-elesis CH2d: June 31fc7ac0 ( A S D C Skill5 Q W E R SkillEx5 )
+	void ESI_SA_SGM_JUGGERNAUT_BUSTER_START_FrameMove();	/// char-elesis CH3a: June 32b77de0
+	void ESI_SA_SGM_JUGGERNAUT_BUSTER_END_FrameMove();	/// char-elesis CH3a: June 32b78170
+	void ESI_SA_SGM_WAR_PRELUDE_FLY_EventProcess();	/// char-elesis CH3a: June 32b6d7e0
+	void ESI_SA_SGM_WAR_PRELUDE_GROUND_EventProcess();	/// char-elesis CH3a: June 32b6dae0
+	void ESI_SA_SGM_CROSS_SLASH_EventProcess();	/// char-elesis CH3a: June 32b6bcd0
+	void ESI_SA_SGM_DIVINE_BLADE_EventProcess();	/// char-elesis CH3a: June 32b6bfd0
+	void ESI_SA_SGM_GIGA_BLAST_EventProcess();	/// char-elesis CH3a: June 32b6dde0
+	void ESI_SA_SGM_GIGA_BLAST_CHARGE_EventProcess();	/// char-elesis CH3a: June 32b6de10
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à
