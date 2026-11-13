@@ -772,7 +772,7 @@ What a class port does:
 - Re-run the census for the class after staging; a name still missing is a script fix, not a motion hold.
 - **Elesis frame count:** June's `Motion_EL.x` (live since R12b) has 79 frames, March's `MESH_EL_*_SORTED.X` parts 80 (one unnamed
   frame; every named bone matches), so each Elesis unit logs KEM 433 `Anim Frame : 79, Mesh Frame : 80` per part (66 in the R12b
-  play-test). Warning only; June's Elesis part meshes, staged with this port, end it.
+  play-test). Warning only; June's Elesis part meshes, staged with this port, end it. (Elesis: CH1, they do not: the six basic parts are June's bytes and the 20 lines stay with June's script and motions, `JUNE_BUGS.md` 642)
 
 ### 7ac. CanDown's June call shape in class code (from June engine W1f)
 

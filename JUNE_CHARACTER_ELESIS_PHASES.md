@@ -1383,7 +1383,7 @@ virtuals, skill head, pressed-slot space and her Way of the Sword class side and
   (`cmp eax, 1`) call vslot 0x10c and test type 1 only: three allow-list rows with those addresses.
 - **Reference log:** `data\ErrorLog_pre_CH1_elesis.txt` (254,291 B, the run of 2026-11-13 08:29).
 - **Scans:** `charport_keys.py ELESIS_KNIGHT`: `june-only=9 neither=1 march-only-site=4 both=234` = CH0's `plan_charport_keys.txt` (only the reader label of
-  `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` now reads `CX2GUEL::ReservedSkillStart`).`charport_scan.py`: running at commit time; its diff against `plan_charport_scan_20261111.txt` follows below.
+  `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` now reads `CX2GUEL::ReservedSkillStart`).`charport_scan.py`: still decompiling its June copies at the logs check; the CH1 review diffs it against `plan_charport_scan_20261111.txt`.
 - **Play-test save** (`elsdb x`, backup taken): slots A 0-3 / B 5-8, 4 / 9 empty. wewe (20): Spiral Blast, Dodge and Slash, Wild Shock, Endurance Power (28201
   learned at 1 now); SaberT (40): + Rushing Sword, B Sonic Assault, Unlimited Blade, Mega Burster, Extinction; eresisu (21): four upgrades, B Sword Fire, Infernal
   Blade, Big Burst, Avatar of the Fire; ElesisGM (29): four upgrades, B Extinction, Drastic Charge, Upper Slash, Victorious Sword; ElesisBH (30): four upgrades,
@@ -1409,6 +1409,20 @@ Build (`--pch force`): `DEPLOY OK: X2_offline.exe is 26,382,848 B, dated 2026-11
 the Way of the Sword both ways across a stage change and a dungeon end, ErrorLog against the reference. No skills (not castable yet); no riding (no Elesis unit owns a
 mount: CH6's walk).
 The review is `kickoffs/char-elesis/CH1-review.md`.
+
+**Play-test (2026-11-13, run 08:48-08:54 on md5 6379174f), first part.** The user played all five units in battle fields (5 `EGS_JOIN_BATTLE_FIELD_REQ`,
+no dungeon), so the stage-change and dungeon-end steps were not reached; a follow-up dungeon run is asked for in the hand-off.
+- `offline_server.log`: `ELESIS DATA` for all five classes, each `script ELESIS_KNIGHT.lua motion MOTION_EL.X wait_state_change 1`; states 8: 137, 29: 167,
+  30: 157, 120: 173, 121: 163 (the review checks them against the registrations).
+- `WOS`: `attack gain` both ways (type 1 negative, type 4 positive, `rate x1.00`: no Dark Force), `vigor start` x2 (30 at 4800, 120 at 4800), `destruction start`
+  x1 (121 at -4800), each `dark knight line 0`; in vigor the point drains with `mp rate x1.50`. No `vigor end` / `destruction end`: each mode was still on
+  when the user switched character. Point carried across loads (wewe opened at -2924, GM at 4566): June's kept gauge (CH1q).
+- `ErrorLog.txt` against `ErrorLog_pre_CH1_elesis.txt` (that run loaded no Elesis): `KEM_ERROR` 0 / 0, `Motion Error` 0 / 0, `lua error` 3 / 3 (TutorSystem,
+  `ChainQuestInfo` `AddGroupChainQuest`, both pre-existing), `[LUA_SRC]` 7 / 7, `ELESIS_KNIGHT` / `StateID` / `Parsing Error` 0. New Elesis shapes are first loads:
+  one-time `OpenXET` probes (`MESH_EL_SSK / SGM / SPK / SBH` hair and cash parts, `MESH_EL_ED_*`), event-scene `.swf` / `.gfx` probes (`PC_ELESIS_PNG`,
+  `QUEST_N_ELESIS_END`). **CH0b's routed `ErrorEnum(433)`** `Anim Frame : 79, Mesh Frame : 80` x20 on the six `Mesh_EL_Basic_*_Sorted.X` parts: those parts
+  are June's bytes (`stage-june --dry-run`: 6 identical), so June's own data: `JUNE_BUGS.md` 642 (Ara's 603 twin), checklist l.775 marked.
+  `offline_packets.log`: `EXCEPTION` 0, `UNHANDLED` only `E_DISABLE_HB_CHECK_REQ`. No missing animation, no popup.
 
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
