@@ -710,6 +710,14 @@ Character: a new level-1 character of any March class (tutorial dungeon, then Ru
    (the `begin 201 ( by going quest )` line needs `_GUIDE_DEBUG`, retired, so judge by the guide appearing on screen).
 If not: `python tools/logs.py --grep "ROOM     leaving|VISIT_FIELD done|VISIT_VILLAGE done|C3z-4t begin"`; say "check logs" after.
 
+## C3z-4t4c - Play-test (2026-11-13, user): pass (logs)
+
+Two characters (unit 159, 160), both runs after the deploy. Village entry: `ROOM     leaving room 1001 (reason=115)` / `1003 (reason=115)` =
+`NOT_LEAVE_ROOM_REASON_01`. Return from field 40000: `leaving room 1002 / 1004 (reason=941)` = `_27`. 11000 handed in -> 11005 accepted with no
+`VISIT_FIELD done` in the village (16:14:07, 16:18:15); `11005 sub 11005 VISIT_FIELD done (field 40000)` only on field entry (16:14:48, 16:18:23).
+0 EXCEPTION. Scene-201 walk: not judged from logs (its debug line is retired); the C3z-4t4 row still owes it. Unrelated, not this phase:
+`AddGroupChainQuest` unbound in a June script; `QUEST_11000_END` / `_11005_END` `.GFX` / `.SWF` missing from the kom.
+
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
 A new March character's first select now enters June's class tutorial dungeon (`DI_DUNGEON_TUTORIAL_<class>`, 41150-41290) in place of
