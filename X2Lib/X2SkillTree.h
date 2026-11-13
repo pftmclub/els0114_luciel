@@ -2687,6 +2687,19 @@ public:
 	RNSI_A_SPK_FIREWORKS_UPGRADE                          = 28230,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2d
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of the Dark Knight skills Brutal Cutter, Ejection Buster, Burning Phantom, Dark Wave, Injection Stigma and Shade Scratch ( their bases are above ) ( values from June's Enum.lua )
+	RNSI_SA_SDK_BRUTAL_CUTTER                             = 28020,
+	RNSI_SA_SDK_EJECTION_BUSTER_UPGRADE                   = 28035,
+	RNSI_SA_SDK_BRUTAL_CUTTER_UPGRADE                     = 28038,
+	RNSI_SA_SDK_BURNING_PHANTOM_UPGRADE                   = 28055,
+	RNSI_A_SDK_DARK_WAVE                                  = 28212,
+	RNSI_A_SDK_DARK_WAVE_UPGRADE                          = 28221,
+	RNSI_A_SDK_INJECTION_STIGMA_UPGRADE                   = 28233,
+	RNSI_A_SDK_SHADE_SCRATCH_UPGRADE                      = 28234,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

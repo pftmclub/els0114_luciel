@@ -258,6 +258,57 @@ namespace _CONST_EL_CH2C_
 	const float AVATAR_OF_THE_FIRE_MP_PER_ABSORBED_EFFECT	= 10.f;
 }
 using namespace _CONST_EL_CH2C_;
+// char-elesis CH2d: constants and helpers of the Dark Knight skills ( June 32b89c10 / 32b8b410 / 32b8b850 / 32b73ae0 / 32b51d10 / 32b89470 )
+namespace _CONST_EL_CH2D_
+{
+	const float		BRUTAL_CUTTER_EVENT_TIME					= 0.2f;
+	const USHORT	BRUTAL_CUTTER_BLEEDING_HIT_COUNT			= 8;
+	const float		EJECTION_BUSTER_ATTACK_EVENT_TIME			= 0.01f;
+	const float		BURNING_PHANTOM_TICK_TIME					= 0.15f;
+	const USHORT	BURNING_PHANTOM_FIRST_TICK					= 4;		// the loop may end from this tick on, MP is paid above it
+	const USHORT	BURNING_PHANTOM_LAST_TICK					= 9;
+	const float		BURNING_PHANTOM_MP_PER_TICK					= 10.f;
+	const float		BURNING_PHANTOM_MIN_MP						= 10.f;
+	const float		INJECTION_STIGMA_HP_COST_EVENT_TIME			= 0.01f;
+	const float		INJECTION_STIGMA_DAMAGE_EVENT_TIME			= 0.2f;
+	const float		DARK_WAVE_DAMAGE_EVENT_TIME					= 0.3f;
+	const float		DARK_WAVE_IMPACT_EVENT_TIME					= 0.8f;
+	const USHORT	BLEEDING_SINGLE_HIT_COUNT					= 1;
+	const float		BLEEDING_HP_COST_DAMAGE_RATE				= 0.1f;		// the share of the skill's damage a bleeding cost takes per hit
+	const float		BLEEDING_MIN_HP_RATE						= 0.2f;		// no HP is paid below this HP share
+	const float		BLEEDING_KEEP_HP_RATE						= 0.1f;		// the cost leaves this share of max HP
+	const float		BLEEDING_BLOOD_RUNAWAY_COST_RATE			= 0.2f;		// June multiplies the cost by the double 0.2f
+	const float		BLEEDING_DAMAGE_RATE						= 1.4f;
+	const float		BLEEDING_DAMAGE_RATE_PVP_OR_PVE				= 1.3f;
+
+	// June 32007c40: the acquired skill's ability value ( char-ara CH1h's copy )
+	bool TryGetAcquiredSkillAbilityValue( CX2Unit* pUnit_, const CX2SkillTree::SKILL_ABILITY_TYPE eType_, const CX2SkillTree::SKILL_ID eSkillID_, const bool bMemoSwap_, float& fOut_ )
+	{
+		if( NULL == pUnit_ )
+			return false;
+
+		const int iSkillLevel = pUnit_->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID_, false, 0, true );
+		if( iSkillLevel <= 0 )
+			return false;
+
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = pUnit_->GetUnitData().m_UserSkillTree.GetUserSkillTemplet( eSkillID_, bMemoSwap_ );
+		if( NULL == pSkillTemplet )
+			return false;
+
+		const bool bPvpOrPve = ( NULL != g_pX2Game && true == g_pX2Game->GetIsNowPVPCorrectionGame() );	// June 322cc1a0: PVP or PVE
+		return pSkillTemplet->TryGetSkillAbilityValue( eType_, iSkillLevel, bPvpOrPve, fOut_ );
+	}
+
+	// June 32028250 type 0xf, inlined in 32b89c10 @32b89ea4: the factor's first time finalizer x the skill memo's first value
+	void RescaleBuffFactorTime( CX2BuffFactor& refFactor_, const float fRate_ )
+	{
+		const KBuffFinalizerFactor* pFirstTime = refFactor_.GetFirstFinalizer( BFT_TIME );
+		if ( NULL == pFirstTime || pFirstTime->m_vecValues.size() <= 1 )
+			return;
+		refFactor_.ApplyExternalFactorToFinalizer( BFT_TIME, pFirstTime->m_vecValues[1] * fRate_, false );
+	}
+}
+using namespace _CONST_EL_CH2D_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
@@ -336,6 +387,7 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 , m_uiDodgeAndSlashAttackCount(0)
 , m_iWaltzOfSwordDodgeAbility(0)
 , m_fDodgeAndSlashConsumedMp(0.f)
+, m_usBurningPhantomLoopCount(0)	// char-elesis CH2d
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_usDashComboZZZLoopCount(0)	// char-elesis CH1g2
@@ -1611,6 +1663,130 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.m_bHyperState		= true;
 			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SDK_EJECTION_BUSTER:	// char-elesis CH2d: June 32b8c470 @596
+	case CX2SkillTree::RNSI_SA_SDK_EJECTION_BUSTER_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_SA_SDK_EJECTION_BUSTER_CHARGE", normalStateData.stateID );
+			normalStateData.StateInit			= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_EJECTION_BUSTER_CHARGE_Init );
+			normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_EJECTION_BUSTER_CHARGE_StateStartFuture );
+			normalStateData.StateStart			= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_EJECTION_BUSTER_CHARGE_StateStart );
+			normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_EJECTION_BUSTER_CHARGE_FrameMove );
+			normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_EJECTION_BUSTER_CHARGE_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_SA_SDK_EJECTION_BUSTER_CHARGE", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+			hyperStateData.StateStart			= normalStateData.StateStart;
+			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			{
+				UserUnitStateData stateData;
+				stateData.Init();
+				stateData.stateID			= SI_SA_SDK_EJECTION_BUSTER_ATTACK;
+				m_LuaManager.MakeTableReference( "SI_SA_SDK_EJECTION_BUSTER_ATTACK", stateData.stateID );
+				stateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_EJECTION_BUSTER_ATTACK_FrameMove );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_EJECTION_BUSTER_ATTACK_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
+		} break;
+	case CX2SkillTree::RNSI_SA_SDK_BRUTAL_CUTTER:	// char-elesis CH2d: June 32b8c470 @630
+	case CX2SkillTree::RNSI_SA_SDK_BRUTAL_CUTTER_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_SA_SDK_BRUTAL_CUTTER", normalStateData.stateID );
+			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BRUTAL_CUTTER_Init );
+			normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BRUTAL_CUTTER_FrameMove );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BRUTAL_CUTTER_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_SA_SDK_BRUTAL_CUTTER", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+		} break;
+	case CX2SkillTree::RNSI_SA_SDK_BURNING_PHANTOM:	// char-elesis CH2d: June 32b8c470 @638
+	case CX2SkillTree::RNSI_SA_SDK_BURNING_PHANTOM_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_SA_SDK_BURNING_PHANTOM_READY", normalStateData.stateID );
+			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BURNING_PHANTOM_READY_Init );
+			normalStateData.StateStart		= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BURNING_PHANTOM_READY_StateStart );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BURNING_PHANTOM_READY_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_SA_SDK_BURNING_PHANTOM_READY", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.StateStart			= normalStateData.StateStart;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			{
+				UserUnitStateData stateData;
+				stateData.Init();
+				stateData.stateID			= SI_SA_SDK_BURNING_PHANTOM_START;
+				m_LuaManager.MakeTableReference( "SI_SA_SDK_BURNING_PHANTOM_START", stateData.stateID );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BURNING_PHANTOM_START_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
+			{
+				UserUnitStateData stateData;
+				stateData.Init();
+				stateData.stateID			= SI_SA_SDK_BURNING_PHANTOM_LOOP;
+				m_LuaManager.MakeTableReference( "SI_SA_SDK_BURNING_PHANTOM_LOOP", stateData.stateID );
+				stateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BURNING_PHANTOM_LOOP_FrameMove );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BURNING_PHANTOM_LOOP_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
+			{
+				UserUnitStateData stateData;
+				stateData.Init();
+				stateData.stateID			= SI_SA_SDK_BURNING_PHANTOM_END;
+				m_LuaManager.MakeTableReference( "SI_SA_SDK_BURNING_PHANTOM_END", stateData.stateID );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_SA_SDK_BURNING_PHANTOM_END_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
+		} break;
+	case CX2SkillTree::RNSI_A_SDK_DARK_WAVE:	// char-elesis CH2d: June 32b8c470 @1190
+	case CX2SkillTree::RNSI_A_SDK_DARK_WAVE_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_A_SDK_DARK_WAVE", normalStateData.stateID );
+			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, SI_A_SDK_DARK_WAVE_Init );
+			normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, SI_A_SDK_DARK_WAVE_FrameMove );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_A_SDK_DARK_WAVE_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_A_SDK_DARK_WAVE", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+		} break;
+	case CX2SkillTree::RNSI_A_SDK_INJECTION_STIGMA:	// char-elesis CH2d: June 32b8c470 @1198
+	case CX2SkillTree::RNSI_A_SDK_INJECTION_STIGMA_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_A_SDK_INJECTION_STIGMA", normalStateData.stateID );
+			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, SI_A_SDK_INJECTION_STIGMA_Init );
+			normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, SI_A_SDK_INJECTION_STIGMA_FrameMove );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_A_SDK_INJECTION_STIGMA_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_A_SDK_INJECTION_STIGMA", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+		} break;
+	case CX2SkillTree::RNSI_A_SDK_SHADE_SCRATCH:	// char-elesis CH2d: June 32b8c470 @1206
+	case CX2SkillTree::RNSI_A_SDK_SHADE_SCRATCH_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_A_SCA_SHADE_SCRATCH", normalStateData.stateID );
+			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, SI_A_SCA_SHADE_SCRATCH_Init );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_A_SCA_SHADE_SCRATCH_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_A_SCA_SHADE_SCRATCH", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			{
+				UserUnitStateData stateData;
+				stateData.Init();
+				stateData.stateID			= SI_A_SCA_SHADE_SCRATCH_ATTACK;
+				m_LuaManager.MakeTableReference( "SI_A_SCA_SHADE_SCRATCH_ATTACK", stateData.stateID );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_A_SCA_SHADE_SCRATCH_ATTACK_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
 		} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	case CX2SkillTree::SI_A_SSK_CROSS_SLASH:
@@ -16860,6 +17036,494 @@ void CX2GUEL::ESI_SI_SA_EL_WILD_SHOCK_FrameMove()
 			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_EL_WILD_SHOCK_DAMAGE_Sub", this, NULL, IsHyperState() );
 		}
 	}
+}
+
+// char-elesis CH2d: June 31fc7ac0 ( a pure skill key: A S D C Skill5 Q W E R SkillEx5 )
+bool CX2GUEL::IsAnySkillKeyPressed() const
+{
+	return m_InputData.pureA == true || m_InputData.pureS == true || m_InputData.pureD == true || m_InputData.pureC == true
+		|| m_InputData.pureSkill5 == true
+		|| m_InputData.pureQ == true || m_InputData.pureW == true || m_InputData.pureE == true || m_InputData.pureR == true
+		|| m_InputData.pureSkillEx5 == true;
+}
+
+// char-elesis CH2d: June 32b89470 ( the bleeding HP cost of the Dark Knight skills: the effect set, then the damage of the given hit data ( x rate, x hit count ) taken from HP, leaving 10% of max HP; true always )
+bool CX2GUEL::ApplyBleedingHpCost( CX2DamageManager::DamageData* pDamageData_, float fDamageRate_, const USHORT usHitCount_ )
+{
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_B_EL_SDC_Bleeding", this );
+
+	const float fHpRate = GetNowHp() / GetMaxHp();
+	if ( fHpRate < BLEEDING_MIN_HP_RATE )
+		return true;
+
+	CX2DamageManager::DamageData kDamageData( *pDamageData_ );
+	kDamageData.optrDefenderGameUnit = this;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	if ( WSS_DESTRUCTION == GetWayOfSwordState() && CX2DamageManager::WST_DESTRUCTION_NORMAL <= pDamageData_->m_WayofSwordType && pDamageData_->m_WayofSwordType <= CX2DamageManager::WST_DESTRUCTION_SPECIAL )
+		fDamageRate_ *= m_fDestructionBleedingDamageRate;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+
+	kDamageData.damage.fMagic *= fDamageRate_;
+	kDamageData.damage.fPhysic *= fDamageRate_;
+
+	const double dHitDamage = static_cast<double>( GetFinalDamage( &kDamageData ) ) * static_cast<double>( usHitCount_ );
+	const double dLeftHp = static_cast<double>( GetNowHp() ) - static_cast<double>( GetMaxHp() ) * static_cast<double>( BLEEDING_KEEP_HP_RATE );
+	float fHpCost = static_cast<float>( dHitDamage <= dLeftHp ? dHitDamage : dLeftHp );
+	if ( true == HaveThisBuff( BTI_BUFF_BLOOD_RUNAWAY_PASSIVE ) )
+		fHpCost = static_cast<float>( static_cast<double>( fHpCost ) * static_cast<double>( BLEEDING_BLOOD_RUNAWAY_COST_RATE ) );
+	if ( 0.f < fHpCost )
+		UpNowHp( -fHpCost, 0.f );
+	return true;
+}
+
+// char-elesis CH2d: June 32b51aa0
+void CX2GUEL::SI_SA_SDK_BRUTAL_CUTTER_Init()
+{
+	XSkinMeshReadyInBackground( L"Brutal_Cutter_Weapon_T.X" );
+	XSkinMeshReadyInBackground( L"Brutal_Cutter_Weapon_W.X" );
+	TextureReadyInBackground( L"EL_Base_Blood_M01.dds" );
+	TextureReadyInBackground( L"ASL_HIT_P001.dds" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XMeshReadyInBackground( L"ELK_WIND_SLICER_M02.Y" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+}
+
+// char-elesis CH2d: June 32b51b00
+void CX2GUEL::SI_SA_SDK_EJECTION_BUSTER_CHARGE_Init()
+{
+	TextureReadyInBackground( L"ASL_HIT_P001.dds" );
+	XMeshReadyInBackground( L"Ejection_Buster_Oura.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"Ejection_Buster_Weapon.X" );
+	XMeshReadyInBackground( L"SDK_Ejection_Buster_Blade01.Y" );
+	XMeshReadyInBackground( L"Ejection_Buster_Oura4.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_PE02.Y" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+	XMeshReadyInBackground( L"Ejection_Buster_Oura5.Y" );
+	XSkinMeshReadyInBackground( L"SDK_EJECTION_BUSTER_Attack01.X" );
+	XMeshReadyInBackground( L"Ejection_Buster_Oura6.Y" );
+}
+
+// char-elesis CH2d: June 32b51c90
+void CX2GUEL::SI_SA_SDK_BURNING_PHANTOM_READY_Init()
+{
+	XMeshReadyInBackground( L"SDK_BURNING_PHANTOM_P001.Y" );
+	TextureReadyInBackground( L"WhiteImage.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+	XSkinMeshReadyInBackground( L"SDK_BURNING_PHANTOM_StartDummy.X" );
+}
+
+// char-elesis CH2d: June 32b51fa0
+void CX2GUEL::SI_A_SDK_INJECTION_STIGMA_Init()
+{
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+	XSkinMeshReadyInBackground( L"SDK_INJECTION_STIGMA_Blade01.X" );
+	TextureReadyInBackground( L"ASL_HIT_P001.dds" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"SDK_BURNING_PHANTOM_PT01.X" );
+	XMeshReadyInBackground( L"SDK_BURNING_PHANTOM_Storm001.Y" );
+}
+
+// char-elesis CH2d: June 32b52000
+void CX2GUEL::SI_A_SDK_DARK_WAVE_Init()
+{
+	TextureReadyInBackground( L"WhiteImage.dds" );
+	TextureReadyInBackground( L"EL_Base_Blood_M01.dds" );
+	TextureReadyInBackground( L"WhiteImage.dds" );
+	XMeshReadyInBackground( L"ELK_WIND_SLICER_M02.Y" );
+	XMeshReadyInBackground( L"Ejection_Buster_Oura5.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+}
+
+// char-elesis CH2d: June 32b52060
+void CX2GUEL::SI_A_SCA_SHADE_SCRATCH_Init()
+{
+	TextureReadyInBackground( L"EL_Base_Blood_M01.dds" );
+	XMeshReadyInBackground( L"SDK_BURNING_PHANTOM_P001.Y" );
+	XMeshReadyInBackground( L"SDK_BURNING_PHANTOM_Storm001.Y" );
+	XMeshReadyInBackground( L"ALS_SHAKE_CHAOS_02.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XMeshReadyInBackground( L"ELK_WIND_SLICER_M02.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+	TextureReadyInBackground( L"star2.dds" );
+	XMeshReadyInBackground( L"Raven_Seven_Burst_MEMO_F01.Y" );
+}
+
+// char-elesis CH2d: June 32b89c10 ( 0.2 s: the HP cost raises the damage ( x1.3 in PvP / PvE, else x1.4 ), then the Brutal Cutter buff factor and its two effect sets )
+void CX2GUEL::SI_SA_SDK_BRUTAL_CUTTER_FrameMove()
+{
+	if ( true == m_pXSkinAnim->EventTimerOneshot( BRUTAL_CUTTER_EVENT_TIME ) )
+	{
+		if ( true == ApplyBleedingHpCost( &m_DamageData, BLEEDING_HP_COST_DAMAGE_RATE, BRUTAL_CUTTER_BLEEDING_HIT_COUNT ) )
+		{
+			const float fDamageRate = ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ) ? BLEEDING_DAMAGE_RATE_PVP_OR_PVE : BLEEDING_DAMAGE_RATE;
+			m_DamageData.damage.fMagic *= fDamageRate;
+			m_DamageData.damage.fPhysic *= fDamageRate;
+		}
+
+		const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_SDK_BRUTAL_CUTTER, false, 0, true );
+
+		wstring wstrEffectSetFirst;
+		wstring wstrEffectSetSecond;
+		UINT uiBuffFactorId = BFI_BUFF_BRUTAL_CUTTER;
+		if ( false == HaveThisBuff( BTI_BUFF_BRUTAL_CUTTER_MEMO ) && false == HaveThisBuff( BTI_BUFF_BRUTAL_CUTTER ) )
+		{
+			wstrEffectSetFirst = L"EffectSet_SI_SA_SDK_BRUTAL_CUTTER_FX1";
+			wstrEffectSetSecond = L"EffectSet_SI_SA_SDK_BRUTAL_CUTTER_FX2";
+		}
+		else
+		{
+			EraseBuffTempletFromGameUnit( BTI_BUFF_BRUTAL_CUTTER );
+			wstrEffectSetFirst = L"EffectSet_SA_SDK_BrutalCutterFX1_MEMO";
+			wstrEffectSetSecond = L"EffectSet_SA_SDK_BrutalCutterFX2_MEMO";
+			uiBuffFactorId = BFI_BUFF_BRUTAL_CUTTER_MEMO;
+		}
+
+		CX2BuffFactorPtr ptrBuffFactor = CX2BuffTempletManager::GetInstance()->GetBuffFactorPtr( uiBuffFactorId );
+		if ( NULL != ptrBuffFactor )
+		{
+			CX2BuffFactorPtr ptrBuffFactorClone = ptrBuffFactor->GetClonePtr( iSkillLevel );
+			if ( NULL != ptrBuffFactorClone )
+			{
+				const SkillMemoEntry* pMemoEntry = GetSkillMemoEntry( CX2SkillTree::RNSI_SA_SDK_BRUTAL_CUTTER );
+				if ( NULL != pMemoEntry && CX2SkillTree::MI_CHECK_AND_KILL_1 == pMemoEntry->m_iType )
+					RescaleBuffFactorTime( *ptrBuffFactorClone, true == pMemoEntry->m_vecValue.empty() ? 0.f : pMemoEntry->m_vecValue[0] );
+
+				if ( true == IsUpgradedSkillLearned( GetNowStateSkillID() ) )
+				{
+					float fBuffTime = 1.f;
+					const KBuffFinalizerFactor* pFirstTime = ptrBuffFactorClone->GetFirstFinalizer( BFT_TIME );
+					if ( NULL != pFirstTime && 1 < pFirstTime->m_vecValues.size() )
+						fBuffTime = pFirstTime->m_vecValues[1];
+
+					float fEffectiveTime = 1.f;
+					if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_EFFECTIVE_TIME, GetNowStateSkillID(), false, fEffectiveTime ) )
+						ptrBuffFactorClone->ApplyExternalFactorToFinalizer( BFT_TIME, fEffectiveTime * fBuffTime, false );
+				}
+
+				ptrBuffFactorClone->SetGameUnitBuffFactor( this, -1, true );
+				SetBuffFactorToGameUnit( *ptrBuffFactorClone );
+			}
+		}
+
+		g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetFirst, this );
+		g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetSecond, this );
+	}
+
+	CommonFrameMove();
+}
+
+// char-elesis CH2d: June 32b67cd0
+void CX2GUEL::SI_SA_SDK_BRUTAL_CUTTER_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b51b90 ( the held key is June's slot 0-9; the charge time members are the Sonic Assault charge's )
+void CX2GUEL::SI_SA_SDK_EJECTION_BUSTER_CHARGE_StateStartFuture()
+{
+	CommonStateStartFuture();
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+	m_fSonicAssaultStingChargeTime = 0.f;
+	m_fDashJumpZXChargeTime = 0.f;
+}
+
+// char-elesis CH2d: June 32b51bc0
+void CX2GUEL::SI_SA_SDK_EJECTION_BUSTER_CHARGE_StateStart()
+{
+	CommonStateStart();
+	m_fSonicAssaultStingChargeTime = 0.f;
+	m_fDashJumpZXChargeTime = 0.f;
+}
+
+// char-elesis CH2d: June 32b7cfa0
+void CX2GUEL::SI_SA_SDK_EJECTION_BUSTER_CHARGE_FrameMove()
+{
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_SA_SDK_EJECTION_BUSTER_Charge_3", this );
+	CommonFrameMove();
+}
+
+// char-elesis CH2d: June 32b51be0 ( the charge state lasts one frame )
+void CX2GUEL::SI_SA_SDK_EJECTION_BUSTER_CHARGE_EventProcess()
+{
+	StateChange( SI_SA_SDK_EJECTION_BUSTER_ATTACK );
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b7d110
+void CX2GUEL::SI_SA_SDK_EJECTION_BUSTER_ATTACK_FrameMove()
+{
+	if ( true == m_pXSkinAnim->EventTimerOneshot( EJECTION_BUSTER_ATTACK_EVENT_TIME ) )
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_SA_SDK_EJECTION_BUSTER_Attack_1500", this );
+
+	CommonFrameMove();
+}
+
+// char-elesis CH2d: June 32b67ff0 ( the end of the animation lands only on a line; in the air the state goes on )
+void CX2GUEL::SI_SA_SDK_EJECTION_BUSTER_ATTACK_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() && true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( USI_JUMP_LANDING );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b51cf0
+void CX2GUEL::SI_SA_SDK_BURNING_PHANTOM_READY_StateStart()
+{
+	CommonStateStart();
+	m_usBurningPhantomLoopCount = 0;
+}
+
+// char-elesis CH2d: June 32b68650
+void CX2GUEL::SI_SA_SDK_BURNING_PHANTOM_READY_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+		StateChange( SI_SA_SDK_BURNING_PHANTOM_START );
+
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b68680
+void CX2GUEL::SI_SA_SDK_BURNING_PHANTOM_START_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+		StateChange( SI_SA_SDK_BURNING_PHANTOM_LOOP );
+
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b73ae0 ( the shock debuff is cleared; a tick every 0.15 s, each tick above the 4th costs 10 MP; no CommonFrameMove once the count is past 9 )
+void CX2GUEL::SI_SA_SDK_BURNING_PHANTOM_LOOP_FrameMove()
+{
+	if ( 0.f != m_ExtraDamagePack.m_EnchantShock.m_fTime )
+		m_ExtraDamagePack.m_EnchantShock.m_fTime = 0.f;
+
+	if ( m_usBurningPhantomLoopCount <= BURNING_PHANTOM_LAST_TICK )
+	{
+		const USHORT usTick = static_cast<USHORT>( static_cast<int>( static_cast<double>( m_FrameDataNow.unitCondition.fStateTime ) / static_cast<double>( BURNING_PHANTOM_TICK_TIME ) ) );
+		if ( m_usBurningPhantomLoopCount < usTick )
+		{
+			m_usBurningPhantomLoopCount = usTick;
+			if ( BURNING_PHANTOM_FIRST_TICK < usTick )
+				UpNowMp( -BURNING_PHANTOM_MP_PER_TICK );
+		}
+		CommonFrameMove();
+	}
+}
+
+// char-elesis CH2d: June 32b51d10 ( from the 4th tick the loop ends below 10 MP, from the 9th, or when no skill key is held )
+void CX2GUEL::SI_SA_SDK_BURNING_PHANTOM_LOOP_EventProcess()
+{
+	if ( BURNING_PHANTOM_FIRST_TICK <= m_usBurningPhantomLoopCount )
+	{
+		if ( GetNowMp() < BURNING_PHANTOM_MIN_MP || BURNING_PHANTOM_LAST_TICK <= m_usBurningPhantomLoopCount || false == IsAnySkillKeyPressed() )
+			StateChange( SI_SA_SDK_BURNING_PHANTOM_END );
+	}
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b686b0
+void CX2GUEL::SI_SA_SDK_BURNING_PHANTOM_END_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b8b410 ( 0.01 s: half the physical attack x the skill's ability is taken from HP; 0.2 s: the dummy damage effect carries the bleeding cost, the effect set plays, the buff is replaced )
+void CX2GUEL::SI_A_SDK_INJECTION_STIGMA_FrameMove()
+{
+	if ( true == m_pXSkinAnim->EventTimerOneshot( INJECTION_STIGMA_HP_COST_EVENT_TIME )
+		&& NULL != GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SDK_INJECTION_STIGMA, true ) )
+	{
+		float fHpCost = GetLearnedSkillAbilityValue( CX2SkillTree::SA_ATK_PHYSIC_REL, GetNowStateSkillID() ) * GetPhysicAttackValue();
+		if ( true == HaveThisBuff( BTI_BUFF_BLOOD_RUNAWAY_PASSIVE ) )
+			fHpCost = static_cast<float>( static_cast<double>( fHpCost ) * static_cast<double>( BLEEDING_BLOOD_RUNAWAY_COST_RATE ) );
+		UpNowHp( -fHpCost, 0.f );
+	}
+
+	if ( true == m_pXSkinAnim->EventTimerOneshot( INJECTION_STIGMA_DAMAGE_EVENT_TIME )
+		&& NULL != GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SDK_INJECTION_STIGMA, true ) && NULL != GetUnit() )
+	{
+		CX2DamageEffect::CEffect* pDamageEffect = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SI_A_SDK_INJECTION_STIGMA_DUMMY",
+			GetPowerRate(), GetPos(), GetRotateDegree(), GetRotateDegree() );
+		if ( NULL != pDamageEffect )
+		{
+			float fPowerRate = GetPowerRate();
+			if ( true == ApplyBleedingHpCost( pDamageEffect->GetDamageDataPtr(), BLEEDING_HP_COST_DAMAGE_RATE, BLEEDING_SINGLE_HIT_COUNT ) )
+				fPowerRate *= ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ) ? BLEEDING_DAMAGE_RATE_PVP_OR_PVE : BLEEDING_DAMAGE_RATE;
+
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_A_SDK_INJECTION_STIGMA", this, NULL, false, fPowerRate );
+			g_pX2Game->GetDamageEffect()->DestroyInstance( pDamageEffect );
+		}
+
+		EraseBuffTempletFromGameUnit( BTI_BUFF_INJECTION_STIGMA );
+		SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_INJECTION_STIGMA, 1, NULL, 0, false );
+	}
+
+	CommonFrameMove();
+}
+
+// char-elesis CH2d: June 32b69680
+void CX2GUEL::SI_A_SDK_INJECTION_STIGMA_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b8b850 ( 0.3 s: the dummy damage effect carries the bleeding cost, the pushing effect set plays; 0.8 s: the impact effect set, with the same damage rise )
+void CX2GUEL::SI_A_SDK_DARK_WAVE_FrameMove()
+{
+	if ( true == m_pXSkinAnim->EventTimerOneshot( DARK_WAVE_DAMAGE_EVENT_TIME ) )
+	{
+		CX2DamageEffect::CEffect* pDamageEffect = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_A_SDK_DARK_WAVE_DUMMY",
+			GetPowerRate(), GetPos(), GetRotateDegree(), GetRotateDegree() );
+		if ( NULL != pDamageEffect )
+		{
+			float fPowerRate = GetPowerRate();
+			if ( true == ApplyBleedingHpCost( pDamageEffect->GetDamageDataPtr(), BLEEDING_HP_COST_DAMAGE_RATE, BLEEDING_SINGLE_HIT_COUNT ) )
+			{
+				const float fDamageRate = ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ) ? BLEEDING_DAMAGE_RATE_PVP_OR_PVE : BLEEDING_DAMAGE_RATE;
+				m_FrameDataNow.stateParam.bEventFlagList[0] = true;
+				fPowerRate *= fDamageRate;
+			}
+
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_SDK_DARK_WAVE_HIT_Pushing", this, NULL, false, fPowerRate );
+			g_pX2Game->GetDamageEffect()->DestroyInstance( pDamageEffect );
+		}
+	}
+
+	if ( true == m_pXSkinAnim->EventTimerOneshot( DARK_WAVE_IMPACT_EVENT_TIME ) )
+	{
+		float fPowerRate = GetPowerRate();
+		if ( true == m_FrameDataNow.stateParam.bEventFlagList[0] )
+			fPowerRate = ( ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ) ? BLEEDING_DAMAGE_RATE_PVP_OR_PVE : BLEEDING_DAMAGE_RATE ) * fPowerRate;
+
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_SDK_DARK_WAVE_HIT_Impact", this, NULL, false, fPowerRate );
+	}
+
+	CommonFrameMove();
+}
+
+// char-elesis CH2d: June 32b699a0
+void CX2GUEL::SI_A_SDK_DARK_WAVE_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b69cc0 ( a hit after the key-input time goes on to the attack state )
+void CX2GUEL::SI_A_SCA_SHADE_SCRATCH_EventProcess()
+{
+	if ( true == GetFrameData( true ).unitCondition.bHit && m_fEventTime[0].keyInputStart < m_pXSkinAnimFuture->GetNowAnimationTime() )
+	{
+		StateChange( SI_A_SCA_SHADE_SCRATCH_ATTACK );
+	}
+	else if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+	CommonEventProcess();
+}
+
+// char-elesis CH2d: June 32b6a020
+void CX2GUEL::SI_A_SCA_SHADE_SCRATCH_ATTACK_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+	CommonEventProcess();
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #endif // NEW_CHARACTER_EL

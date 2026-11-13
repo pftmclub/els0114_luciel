@@ -670,6 +670,34 @@ protected:
 	void ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_EventProcess();	/// char-elesis CH2c: June 32b6b9c0
 	void ESI_SI_SA_SPK_SWORDFIRE_FLY_EventProcess();	/// char-elesis CH2c: June 32b6f160
 	void ESI_SI_SA_SPK_SWORDFIRE_GROUND_EventProcess();	/// char-elesis CH2c: June 32b5e860
+	void SI_SA_SDK_BRUTAL_CUTTER_Init();	/// char-elesis CH2d: June 32b51aa0
+	void SI_SA_SDK_BRUTAL_CUTTER_FrameMove();	/// char-elesis CH2d: June 32b89c10
+	void SI_SA_SDK_BRUTAL_CUTTER_EventProcess();	/// char-elesis CH2d: June 32b67cd0
+	void SI_SA_SDK_EJECTION_BUSTER_CHARGE_Init();	/// char-elesis CH2d: June 32b51b00
+	void SI_SA_SDK_EJECTION_BUSTER_CHARGE_StateStartFuture();	/// char-elesis CH2d: June 32b51b90
+	void SI_SA_SDK_EJECTION_BUSTER_CHARGE_StateStart();	/// char-elesis CH2d: June 32b51bc0
+	void SI_SA_SDK_EJECTION_BUSTER_CHARGE_FrameMove();	/// char-elesis CH2d: June 32b7cfa0
+	void SI_SA_SDK_EJECTION_BUSTER_CHARGE_EventProcess();	/// char-elesis CH2d: June 32b51be0
+	void SI_SA_SDK_EJECTION_BUSTER_ATTACK_FrameMove();	/// char-elesis CH2d: June 32b7d110
+	void SI_SA_SDK_EJECTION_BUSTER_ATTACK_EventProcess();	/// char-elesis CH2d: June 32b67ff0
+	void SI_SA_SDK_BURNING_PHANTOM_READY_Init();	/// char-elesis CH2d: June 32b51c90
+	void SI_SA_SDK_BURNING_PHANTOM_READY_StateStart();	/// char-elesis CH2d: June 32b51cf0
+	void SI_SA_SDK_BURNING_PHANTOM_READY_EventProcess();	/// char-elesis CH2d: June 32b68650
+	void SI_SA_SDK_BURNING_PHANTOM_START_EventProcess();	/// char-elesis CH2d: June 32b68680
+	void SI_SA_SDK_BURNING_PHANTOM_LOOP_FrameMove();	/// char-elesis CH2d: June 32b73ae0
+	void SI_SA_SDK_BURNING_PHANTOM_LOOP_EventProcess();	/// char-elesis CH2d: June 32b51d10
+	void SI_SA_SDK_BURNING_PHANTOM_END_EventProcess();	/// char-elesis CH2d: June 32b686b0
+	void SI_A_SDK_INJECTION_STIGMA_Init();	/// char-elesis CH2d: June 32b51fa0
+	void SI_A_SDK_INJECTION_STIGMA_FrameMove();	/// char-elesis CH2d: June 32b8b410
+	void SI_A_SDK_INJECTION_STIGMA_EventProcess();	/// char-elesis CH2d: June 32b69680
+	void SI_A_SDK_DARK_WAVE_Init();	/// char-elesis CH2d: June 32b52000
+	void SI_A_SDK_DARK_WAVE_FrameMove();	/// char-elesis CH2d: June 32b8b850
+	void SI_A_SDK_DARK_WAVE_EventProcess();	/// char-elesis CH2d: June 32b699a0
+	void SI_A_SCA_SHADE_SCRATCH_Init();	/// char-elesis CH2d: June 32b52060
+	void SI_A_SCA_SHADE_SCRATCH_EventProcess();	/// char-elesis CH2d: June 32b69cc0
+	void SI_A_SCA_SHADE_SCRATCH_ATTACK_EventProcess();	/// char-elesis CH2d: June 32b6a020
+	bool ApplyBleedingHpCost( CX2DamageManager::DamageData* pDamageData_, float fDamageRate_, const USHORT usHitCount_ );	/// char-elesis CH2d: June 32b89470 ( the HP cost of the Dark Knight skills; true always )
+	bool IsAnySkillKeyPressed() const;	/// char-elesis CH2d: June 31fc7ac0 ( A S D C Skill5 Q W E R SkillEx5 )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à
@@ -1195,6 +1223,7 @@ protected:
 	UINT m_uiDodgeAndSlashAttackCount;		/// char-elesis CH2a: June +0x95b4 ( KProtectedType, ported plain ): Z / X attacks used in this Dodge and Slash, one allowed
 	int m_iWaltzOfSwordDodgeAbility;		/// char-elesis CH2a: June +0x9654 ( KProtectedType, ported plain ): ability 0x1b of RNSI_P_SGM_WALTZ_OF_SWORD; CH4a writes it
 	float m_fDodgeAndSlashConsumedMp;		/// char-elesis CH2a: June +0x9778 ( MP the Dodge and Slash start spent while that ability is set; CH4a resets it )
+	USHORT m_usBurningPhantomLoopCount;		/// char-elesis CH2d: June +0x96fa ( loop ticks of Burning Phantom: 0 at the ready state, grows by 1 per 0.15 s of the loop state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )

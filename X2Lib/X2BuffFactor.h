@@ -569,6 +569,14 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_BLOOD_RUNAWAY_PASSIVE        = 666,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2d
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June BTI names of Elesis's Dark Knight skills Brutal Cutter and Injection Stigma
+	BTI_BUFF_BRUTAL_CUTTER                = 429,
+	BTI_BUFF_INJECTION_STIGMA             = 433,
+	BTI_BUFF_BRUTAL_CUTTER_MEMO           = 509,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-10-26 // June character port Phase CH1l3 (JUNE_CHARACTER_EVE_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June BTI names the Eve skill use spells
@@ -892,6 +900,14 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_ANNIHILATION_WAY_OF_SWORD_DARK_KNIGHT     = 471,
 	BFI_BUFF_ANNIHILATION_WAY_OF_SWORD_PVP_DARK_KNIGHT = 472,
 	BFI_BUFF_GALE_WAY_OF_SWORD_DARK_KNIGHT             = 473,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2d
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June BFI names of Elesis's Dark Knight skills Brutal Cutter and Injection Stigma
+	BFI_BUFF_BRUTAL_CUTTER                = 466,
+	BFI_BUFF_INJECTION_STIGMA             = 470,
+	BFI_BUFF_BRUTAL_CUTTER_MEMO           = 593,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };
