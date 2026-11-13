@@ -1621,7 +1621,11 @@ class CX2Main : public CKTDXStage
 
 		//}}
 		//{{ 2008. 2. 18  ÃÖÀ°»ç  À¯´Ö Å¬·¡½º Ä¡Æ®
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		void			ChangeUnitClass( short cUnitClass );	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		void			ChangeUnitClass( char cUnitClass );
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		void			ModifyChangeUnitClass( const char* UnitClassName );
 #ifdef SERV_IRUHADEV_ADMIN_CHEATS
 		void			AdminQuestCompleteCheat( int iQuestID_ );			/// /qdone

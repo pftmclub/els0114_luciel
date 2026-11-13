@@ -2255,7 +2255,11 @@ bool CX2UIPersonalShopBoard::Handler_EGS_SEARCH_TRADE_BOARD_REQ()
 	}
 	else
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		kPacket.m_cUnitClass	= static_cast< short >( nowUnitClass );	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		kPacket.m_cUnitClass	= static_cast< char >( nowUnitClass );
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	}
 
 

@@ -453,7 +453,11 @@ bool CX2OfflineServer::ReplyID( KOfflineSession& kSes, unsigned short usEventID 
 /*static*/ void CX2OfflineServer::MakeDefaultUnitInfo( KUnitInfo& kOut,
 													   UidType nOwnerUserUID,
 													   UidType nUnitUID,
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+													   short cUnitClass,	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 													   char cUnitClass,
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 													   const std::wstring& wstrNickName,
 													   int iLevel )
 {
@@ -958,7 +962,11 @@ bool CX2OfflineServer::EnsureAccount( KOfflineSession& kSes, const std::wstring&
 /*static*/ void CX2OfflineServer::MakeUnitInfoFromRow( KUnitInfo& kOut, const KOfflineUnitRow& kRow )
 {
 	MakeDefaultUnitInfo( kOut, kRow.m_nUserUID, kRow.m_nUnitUID,
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		(short)kRow.m_iUnitClass, kRow.m_wstrNickName, kRow.m_iLevel );	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		(char)kRow.m_iUnitClass, kRow.m_wstrNickName, kRow.m_iLevel );
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 	kOut.m_iUnitClassTran		= kRow.m_iTranscendence;
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT

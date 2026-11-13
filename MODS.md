@@ -6978,3 +6978,14 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE`. Plan `JUNE_CHARACTER_LUCIEL_PHAS
   tests June's type range (a Lu/Ciel no longer pops STR 707). The emulator's class -> type identity stays at the nine base classes.
   Side effect: Lu / Rose / Ain costume rows in the offline cash shop now get the mounted-file check.
 - **Revert:** comment out the `#define`, `python tools/build.py --deploy --pch force` (X2Unit.h is in the PCH).
+
+## Stage 8 Lu/Ciel, NU2: the unit class is a 2-byte word (char-luciel NU2, 2026-11-14)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD`, defined in three places: `KTDXLIB/Always.h`, the end of `KncWX2Server/Common/ServerDefine.h`,
+and `X2ServerProtocol_2010.vcxproj`'s X2TOOL defines (`SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD=`). Plan `JUNE_CHARACTER_LUCIEL_PHASES.md`, "NU2 - Done".
+- **What changes.** Every live unit-class member of the shared packets (35, `m_cUnitClass` and kin; June's offsets, e.g. `KUnitInfo` +0x15
+  with the transcendence int moving to +0x17) and the client / emulator structs that hold one become `short`, so classes 128 / 129 / 200 no
+  longer wrap negative. The emulator's `(char)` casts, `MakeDefaultUnitInfo`, `AllocateRelationDummyUnit`, `SetCharIcon` and
+  `CX2Main::ChangeUnitClass` follow. `[JUNE_CHAR] LUCIEL NEWUNIT` logs once per unit whose class a char would have wrapped. Packet sizes
+  grow by one byte per member; the save is unchanged (the class was already an int there).
+- **Revert:** comment out all three defines together, `python tools/build.py --deploy --pch force` (CommonPacket.h is in the PCH).

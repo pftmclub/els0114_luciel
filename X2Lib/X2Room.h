@@ -312,7 +312,11 @@ class CX2Room
 			/// KEGS_PARTY_GAME_START_NOT has no m_mapPvpNpcInfo, only
 			/// EGS_GAME_START_PVP_MATCH_NOT does, so m_iNpcId is 0 there.
 			/// A client-side struct, not a packet, so this costs nothing.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+			short		m_cUnitClass;	// char-luciel NU2: holds KRoomUserInfo's class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 			char		m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #endif SERV_IRUHADEV_OFFLINE
 
 			RoomNpcSlot()

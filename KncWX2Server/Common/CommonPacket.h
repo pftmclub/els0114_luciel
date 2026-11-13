@@ -1454,7 +1454,11 @@ DECL_DATA( KUnitInfo )
     char                            	m_cAuthLevel;
 	UidType                         	m_nUnitUID;
 	u_int								m_uiKNMSerialNum;	//넥슨코리아 메신져에 사용될 씨리얼 넘버
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short                            	m_cUnitClass;	// char-luciel NU2: June 3235eb7b reads a word at +0x15
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char                            	m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 	int                             	m_iUnitClassTran;	// June CX2Unit +0x3c, right after the class
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
@@ -2276,7 +2280,11 @@ DECL_DATA( KRoomUserInfo )
     UCHAR                   m_ucAge; // 나이 정보 필요없다면 제거 하자..
     UidType                 m_nUnitUID;
     u_int					m_uiKNMSerialNum;	//넥슨코리아 메신져에 사용될 씨리얼 넘버
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+    short                    m_cUnitClass;	// char-luciel NU2: June 323600f8 reads a word at +0x21
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
     char                    m_cUnitClass;    
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
     int                     m_iUnitClassTran;	// June CX2Unit +0x3c, right after the class
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
@@ -3003,7 +3011,11 @@ DECL_DATA( KHenirRankingInfo )
 	
 	UidType						m_iUnitUID;
 	std::wstring				m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short						m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char						m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR						m_ucLevel;
 #ifdef SERV_HENIR_RENEWAL_2013// 작업날짜: 2013-09-16	// 박세훈
 	byte						m_bytePlayStartedUserNum;	// 등록할 때만 체크하면 된다.
@@ -3106,7 +3118,11 @@ DECL_DATA( KDungeonRankingInfo )
 	int									m_iRank;
 	UidType								m_iUnitUID;
 	std::wstring						m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR								m_ucLevel;
 	int									m_iEXP;
 
@@ -3124,7 +3140,11 @@ DECL_DATA( KPvpRankingInfo )
 	int									m_iRank;
 	UidType								m_iUnitUID;
 	std::wstring						m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR								m_ucLevel;	
 	//{{ 2011. 07. 11	최육사	대전 개편
 #ifdef SERV_PVP_NEW_SYSTEM
@@ -4030,7 +4050,11 @@ DECL_PACKET( DBE_QUEST_COMPLETE_REQ )
 	bool								m_bIsRepeat;
 
 	bool								m_bIsChangeJob;	//08.02.20.hoons : 전직퀘스트로 인한 변수추가.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cChangeUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cChangeUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 
 	bool								m_bIsNew;
 	std::map< int, KItemInfo >          m_mapInsertedItem;
@@ -4088,7 +4112,11 @@ DECL_PACKET( DBE_QUEST_COMPLETE_ACK )
 #endif SERV_DAILY_QUEST
 	//}}
 	bool								m_bIsChangeJob;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cChangeUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cChangeUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	bool								m_bIsNew;
 
 	std::map< int, KItemInfo >          m_mapInsertedItem;
@@ -4213,7 +4241,11 @@ DECL_DATA( KConnectionUnitInfo )
 {
 	UidType			m_iUnitUID;
 	int				m_nKNMSN;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short            m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char            m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	u_char			m_ucLevel;
 	std::wstring	m_wstrCharName;
 	//{{ 2011. 07. 11	최육사	대전 개편
@@ -4326,7 +4358,11 @@ DECL_DATA( KSquareUserInfo )
     std::wstring                        	m_wstrIP;
     unsigned short                      	m_usPort;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+    short                                	m_cUnitClass;	// char-luciel NU2: June 32361e4f reads a word at +0x4a
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
     char                                	m_cUnitClass; 
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
     int                                 	m_iUnitClassTran;	// June CX2Unit +0x3c, right after the class
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
@@ -4581,7 +4617,11 @@ DECL_DATA( KPartyUserInfo )
 	int						m_iChannelID;
 	UidType					m_iFieldUID;	
 	UidType					m_iUnitUID;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short					m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char					m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	std::wstring			m_wstrNickName;
 	UCHAR					m_ucLevel;
 	bool					m_bIsGuestUser;
@@ -4738,7 +4778,11 @@ DECL_DATA( KPartyListUserInfo )
 	int						m_iChannelID;
 	UidType					m_iUnitUID;
 	std::wstring            m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short                    m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char                    m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR                   m_ucLevel;
 	UCHAR					m_cState;
 	int						m_iStateCode; // m_cState값이 CX2Unit::CUS_FIELD_MAP 이면 mapID이다.
@@ -6134,7 +6178,11 @@ DECL_DATA( KFieldUserInfo )
 {
 	UidType                             	m_iUnitUID;
 	std::wstring                        	m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short                                	m_cUnitClass;	// char-luciel NU2: June 3236150f reads a word at +0x24
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char                                	m_cUnitClass; 
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 	int                                 	m_iUnitClassTran;	// June CX2Unit +0x3c, right after the class
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
@@ -6295,7 +6343,11 @@ DECL_DATA( KCommunityUserInfo )
 
 	UidType                             	m_iUnitUID;
 	std::wstring                        	m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short                                	m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char                                	m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR                               	m_ucLevel;
 	char									m_cState;	
 	UidType									m_iStateCode;
@@ -6944,7 +6996,11 @@ DECL_DATA( KGuildMemberInfo )
 	UidType								m_iGSUID;
 	UidType								m_iUnitUID;
 	std::wstring						m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short                            	m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char                            	m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR                           	m_ucLevel;
 	u_char								m_ucMemberShipGrade;
 	int									m_iChannelID;
@@ -6976,7 +7032,11 @@ DECL_DATA( KGuildMemberMessageInfo )
 	UidType								m_iUnitUID;
 	std::wstring						m_wstrNickName;
 	u_char								m_ucMemberShipGrade;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short                            	m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char                            	m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR                           	m_ucLevel;
 	std::wstring						m_wstrMessage;
 
@@ -7417,7 +7477,11 @@ DECL_DATA( KApplyJoinGuildInfo )
 	int									m_iApplyJoinGuildUID;
     UidType								m_iUnitUID;
 	std::wstring						m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short                            	m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char                            	m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	u_char                           	m_ucLevel;
 	std::wstring						m_wstrMessage;
 	std::wstring						m_wstrRegDate;
@@ -7460,7 +7524,11 @@ DECL_DATA( KRecommendUserInfo )
 	std::wstring						m_wstrRecommendDate;
 	bool								m_bIsOnline;
 #ifdef SERV_RECRUIT_EVENT_BASE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #endif SERV_RECRUIT_EVENT_BASE
 
 	KRecommendUserInfo()
@@ -8013,7 +8081,11 @@ DECL_DATA( KMatchUserInfo )
 	UidType					m_iUnitUID;
 	UidType					m_iPartyUID;
 	std::wstring			m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short					m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char					m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR					m_ucLevel;
 
 	//{{ 2012. 06. 20	박세훈	2012 대전 시즌2
@@ -8073,7 +8145,11 @@ DECL_DATA( KPvpMatchUserResultLog )
 	UidType					m_iUnitUID;
 	std::wstring			m_wstrNickName;
 	u_char					m_ucLevel;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short					m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char					m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	int						m_iRating;
 	char					m_cPvpRank;
     int						m_iRPoint;
@@ -8782,7 +8858,11 @@ DECL_DATA( EVENT_DATA )
 	int		m_iDungeonMode;
 	int		m_iUnitLevel;		
 	char	m_cUnitType;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short    m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char    m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	int		m_iPartyNum;
 
 	// 아이템 이벤트
@@ -9004,7 +9084,11 @@ DECL_DATA( KAutoPartyUserInfo )
 	UidType					m_iUnitUID;
 	KOldPartyInfo			m_kOldPartyInfo;
 	std::wstring			m_wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short					m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char					m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR					m_ucLevel;
 	int						m_iAutoPartyWaitTime;
 	bool					m_bAutoPartyBonus;
@@ -9438,7 +9522,11 @@ DECL_DATA( KLocalRankingUnitInfo )
 	UidType			m_iUnitUID;
 	std::wstring	m_wstrNickName;
 	u_char			m_ucLevel;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short			m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char			m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	int				m_iPoint[2];
 
 	KLocalRankingUnitInfo()

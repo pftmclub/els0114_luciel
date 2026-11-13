@@ -661,7 +661,11 @@ class CX2Community
 		bool			IsRelatioshipSkillID ( int iSkillID );
 		bool			Handler_EGS_RELATIONSHIP_INFO_ACK  ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 		void			ResetRelationDummyUnit ();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		void			AllocateRelationDummyUnit ( wstring wstrTargetNickName, short cClassType );	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		void			AllocateRelationDummyUnit ( wstring wstrTargetNickName, char cClassType );
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		void			UpdateRelationshipList ();
 		void			SetRelationshipMemberIcon( int i, bool bShow, int iUnitClass, int iUnitLv  );
 		void			SetRelationTab( const bool bOpen_ );

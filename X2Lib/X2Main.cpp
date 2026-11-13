@@ -12283,7 +12283,11 @@ void CX2Main::ChangeVSPoint( int iChangeVSPoint, int iChangeVSPointMax )
 //}}
 
 //{{ 2008. 2. 18  ÃÖÀ°»ç  À¯´Ö Å¬·¡½º Ä¡Æ®
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+void CX2Main::ChangeUnitClass( short cUnitClass )	// char-luciel NU2: the class word ( Lua reads a short )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 void CX2Main::ChangeUnitClass( char cUnitClass )
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 {
 	if( g_pData->GetMyUser() != NULL && g_pData->GetMyUser()->GetAuthLevel() >= CX2User::XUAL_OPERATOR &&
 		g_pData->GetMyUser()->GetSelectUnit() != NULL )

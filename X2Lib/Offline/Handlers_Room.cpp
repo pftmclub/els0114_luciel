@@ -106,7 +106,11 @@ namespace
 	/// See AI_PARTY_PLAN.md phase 0.
 	struct KBotCastEntry
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		short				m_cUnitClass;	// char-luciel NU2: goes into KRoomUserInfo's class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		char				m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		const wchar_t*		m_szNickName;
 	};
 
@@ -183,7 +187,11 @@ void CX2OfflineServer::MakeRoomUserInfo( const KOfflineUnitRow& kRow, OUT KRoomU
 	kOut.m_cAuthLevel		= (char)CX2User::XUAL_NORMAL_USER;
 #endif SERV_IRUHADEV_OFFLINE_AUTH_LEVEL
 	kOut.m_nUnitUID			= kRow.m_nUnitUID;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	kOut.m_cUnitClass		= (short)kRow.m_iUnitClass;	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	kOut.m_cUnitClass		= (char)kRow.m_iUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 	kOut.m_iUnitClassTran	= kRow.m_iTranscendence;
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT

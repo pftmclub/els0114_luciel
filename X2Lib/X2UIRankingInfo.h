@@ -254,7 +254,11 @@ private:
 	std::wstring		ConvertSecToPlayTimeStr( UINT uiSec ) const;
 	std::wstring		ConvertTimeToRegisterDateStr( __int64 tRegisterDate );
 	void				DestoryUIRankingInfo();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	void				SetCharIcon( CKTDGUIStatic* const pStaticClass, short cUnitClass, int iLevel );	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	void				SetCharIcon( CKTDGUIStatic* const pStaticClass, char cUnitClass, int iLevel );
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	void				SetLevelIcon( CKTDGUIControl::CPictureData* const pPictureData, int num );
 	void				SetRankNumImage( CKTDGUIStatic* const pStaticRankNumImg, int iRankNum );
 	void				SetNumToPictureForRank( CKTDGUIControl::CPictureData* const pPictureData, int num );

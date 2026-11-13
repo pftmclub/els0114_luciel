@@ -12029,7 +12029,11 @@ void CX2Community::ResetRelationDummyUnit ()
 	m_pDlgRelationOnlyPartnerShowing->SetShowEnable(false, false);
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+void CX2Community::AllocateRelationDummyUnit ( wstring wstrTargetNickName, short cClassType )	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 void CX2Community::AllocateRelationDummyUnit ( wstring wstrTargetNickName, char cClassType )
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 {
 	KUnitInfo kUnitInfo;
 	kUnitInfo.Init();

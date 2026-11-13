@@ -416,7 +416,11 @@ public:
 		struct KPartyBot
 		{
 			UidType			m_nUnitUID;			///< at most -2; CX2GUNPC::IsPvpBot tests m_UnitUID < -1
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+			short			m_cUnitClass;	// char-luciel NU2: goes into KRoomUserInfo's class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 			char			m_cUnitClass;		///< carries the hero selection to the client - see BOT_CAST
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 			int				m_iLevel;
 			std::wstring	m_wstrNickName;
 
@@ -652,7 +656,11 @@ public:
 	static void MakeDefaultUnitInfo( KUnitInfo& kOut,
 									 UidType nOwnerUserUID,
 									 UidType nUnitUID,
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+									 short cUnitClass,	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 									 char cUnitClass,
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 									 const std::wstring& wstrNickName,
 									 int iLevel );
 

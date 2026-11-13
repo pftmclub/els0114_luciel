@@ -80,3 +80,12 @@ NU0 (2026-11-02), `june2017_re/char_luciel/nu0_create.tsv` (47 rows) and `nu0_ty
   `m_fLobbyRotationY`; nothing read it before this phase. Also `m_MajorUnitName` / `m_MinorUnitName` (string-table text; empty for every non-Lu
   row) and the five `m_MinorUnitPromotion*ItemID` (June `3254e410`'s promotion preload).
 - data036 holds Lu/Ciel's 7 templet rows (classes 200 / 37 / 38 / 39 / 127 / 128 / 129); `GetUnitTemplet( UC_LUCIEL_DUO )` is non-NULL from here.
+
+## Amended by NU2 (2026-11-14)
+
+- The unit class is a `short` on the wire and in the emulator (`SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD`): a created class 200 reaches the
+  client as 200 (`[JUNE_CHAR] LUCIEL NEWUNIT ... class 200 read as a word`). `MakeDefaultUnitInfo` takes a `short`; the create-unit echo in
+  `Handlers_Unit.cpp` already casts to `short`.
+- **Server-select trap:** `CX2StateServerSelect::ChangeUnitButtonInfo` reads `pUnit->GetUnitTemplet()->m_MotionFile` unconditionally after
+  NU1's 707 test, and the ACK handler calls `GetType()` on the top unit: a unit whose class has no templet crashes the select screen. Lu/Ciel's
+  seven classes have templets (NU3); keep that true for every class NU4 can create, and check June `32564d50` before adding a guard.

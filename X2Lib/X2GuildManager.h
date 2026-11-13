@@ -183,7 +183,11 @@ public:
 	struct GuildMemberInfo{
 		UidType	m_UID;		//	길드원 UID
 		UCHAR	ucGrade;		//	길드원 등급
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		short	m_cUnitClass;	// char-luciel NU2: holds KGuildMemberMessageInfo's class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		char	m_cUnitClass;	//	길드원 클래스
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		UCHAR	m_ucLevel;		//	길드원 레벨
 
 		GuildMemberInfo() : m_UID(0), ucGrade(GUG_INVALID), m_cUnitClass(0), m_ucLevel(0) {}

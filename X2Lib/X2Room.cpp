@@ -1102,7 +1102,11 @@ void CX2Room::DeleteNpcSlot()
 			// UID, the nickname and the rating for an m_bNpc slot. This is the
 			// last point it is reachable: the SlotData is deleted three lines
 			// below, and CX2Game::CreateOfflinePartyBots runs afterwards.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+			roomNpcSlot.m_cUnitClass = (short)pSlotData->m_pUnit->GetUnitData().m_UnitClass;	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 			roomNpcSlot.m_cUnitClass = (char)pSlotData->m_pUnit->GetUnitData().m_UnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #endif SERV_IRUHADEV_OFFLINE
 
 			// 대전 NPC Stat은 RoomSlot에 저장된 Stat정보를 사용한다.

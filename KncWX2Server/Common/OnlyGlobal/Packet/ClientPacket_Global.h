@@ -315,7 +315,11 @@ DECL_PACKET( EGS_FINAL_DELETE_UNIT_ACK )
 #ifdef SERV_CHAR_LOG
 	std::wstring			m_wstrNickName;
 	u_char					m_ucLevel;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short					m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char					m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #endif SERV_CHAR_LOG
 	//}}
 	__int64					m_tReDelAbleDate;

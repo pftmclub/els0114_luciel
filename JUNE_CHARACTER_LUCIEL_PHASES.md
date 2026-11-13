@@ -452,6 +452,55 @@ Opus 5.5 high. **Verdict: pass, no code change.** Covers `18460a26` + fix 1 `6ff
   `[JUNE_CHAR] LUCIEL ...`); now `--grep "JUNE_CHAR\] LUCIEL"` (re-run: 3 lines).
 - Build: none (no code change). NU2, NU3, DU2 ready (kickoffs checked: NU3 carries "Amended by NU1"; NU2 / DU2 need none).
 
+### NU2 - Done (2026-11-14)
+
+Opus 5.5 xhigh. Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD`: Always.h, second home at the end of `ServerDefine.h` (`SECOND_HOMES`), and
+`X2ServerProtocol_2010.vcxproj` X2TOOL as `SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD=` (empty, so ServerDefine.h's `#define` raises no C4005).
+Log `[JUNE_CHAR] LUCIEL NEWUNIT unit <uid> class <n> read as a word ( a char would read <n wrapped> )` (offline_server.log, once per unit).
+- **Width and offsets:** the class is a `short`. Probe (template-error sizeof): X2Lib `KUnitInfo` 654 B (NU0: 653), class +0x15 width 2,
+  transcendence int +0x17 (= June 3235eb7b / 3235eb84); `KRoomUserInfo` +0x21, `KFieldUserInfo` +0x24, `KSquareUserInfo` +0x4a (= June
+  323600f8 / 3236150f / 32361e4f). X2ServerProtocol (X2TOOL defines): the same four offsets and width 2; its totals (612 / 585 / 159 / 173)
+  differ by country / in-house flags its config lacks, as before NU2 (no X2ServerProtocol source touches these structs, NU0).
+  June reads the word with `movzx` (unsigned); `short` is the house precedent (`m_sNewUnitClass`) and keeps the trade-board search's "any
+  class" `-1`; every class id (0..202) reads the same either way.
+- **Names kept:** members and parameters keep `m_cUnitClass` / `cUnitClass` and change type only; a rename would touch 408 uses in 62 files.
+- **Members, live by `cl /P` of a stdafx probe (35):** CommonPacket.h 19 (`KUnitInfo`, `KRoomUserInfo`, the Henir / Dungeon / Pvp ranking
+  infos, `DBE_QUEST_COMPLETE_REQ` / `_ACK` `m_cChangeUnitClass`, `KConnectionUnitInfo`, `KSquareUserInfo`, `KPartyUserInfo` (live
+  `SERV_CHANNEL_PARTY` copy), `KPartyListUserInfo`, `KFieldUserInfo`, `KCommunityUserInfo`, `KGuildMemberInfo`, `KGuildMemberMessageInfo`,
+  `KApplyJoinGuildInfo`, `KMatchUserInfo`, `KPvpMatchUserResultLog`, `KAutoPartyUserInfo`); ClientPacket.h 10 (`DELETE_UNIT_ACK`,
+  `UPDATE_PARTY_USER_INFO_NOT`, `ADMIN_CHANGE_UNIT_CLASS_REQ` / `_ACK`, `CHANGE_USER_INFO_NOT`, `SEARCH_TRADE_BOARD_REQ`,
+  `COUPLE_PROPOSE_AGREE_NOT` `m_cAcceptUnitClass`, `RELATIONSHIP_INFO_ACK` x2, `CHANGE_MY_UNIT_INFO_NOT`); **`ClientPacket_Global.h`
+  `KEGS_FINAL_DELETE_UNIT_ACK`** (missing from the NU0 tsv: the `OnlyGlobal/` headers were not swept; the emulator writes it); client
+  `RoomNpcSlot` (X2Room.h), `RelationshipCommunityInfo`, `GuildMemberInfo`; emulator `KPartyBot`, `KBotCastEntry`. Three tsv members are
+  dead in this build and widened anyway (`KRecommendUserInfo`, CommonPacket.h's `EVENT_DATA`, `KLocalRankingUnitInfo`).
+- **Left, with the verdict:** unit types `m_cUnitType` x2 / `m_cAttUnitType` x2 (<= 12); `KPartyUserInfo` 4683 (`#else` of
+  `SERV_CHANNEL_PARTY`); X2SkillTree's `SealSkillItemInfo::m_cUnitClass`, `AddSealSkillInfo_LUA( ..., char )`, `GetUnsealSkillItemInfo( ...,
+  char& )` and X2UIInventory.cpp:6650 (all in the dead `#else` of `UPGRADE_SKILL_SYSTEM_2013`; the tsv had them live); `ClientPacket_Global.h`
+  `REGISTRATION_GUILD_INVITE_MSG_REQ` / `EVENT_CHUNG_GIVE_ITEM_NOT` (dead); `GetChungUIClass` (Chung UI index); `BOT_CAST`'s `(char)UC_*`
+  initialisers (base classes); `ServerPacket.h`, `GameEvent/`, `PvpMatch/`, `X2Data/XSL*` (no X2Lib include). Serializers need no edit:
+  `PUT` / `GET` pick `KSerializer::Put( short )` / `Get( short& )`, 2 bytes.
+- **Narrowing census:** `/Zs /W4` of the 22 X2Lib TUs that name a member, flag off vs `/D` on. New C4244 short -> char only at
+  X2Community.cpp:11849 (`AllocateRelationDummyUnit`) and X2UIRankingInfo.cpp 865-1048 (`SetCharIcon` x6); explicit casts by grep. Edited:
+  the emulator's `(char)` casts (Handlers_Unit.cpp x4, Handlers_Room.cpp `MakeRoomUserInfo`, X2OfflineServer.cpp `MakeUnitInfoFromRow`),
+  the `char` parameters of `MakeDefaultUnitInfo`, `AllocateRelationDummyUnit`, `SetCharIcon`, `CX2Main::ChangeUnitClass` (Lua-bound;
+  lua_tinker reads a short), and the casts at X2Room.cpp:1105 / X2UIPersonalShopBoard.cpp:2258. After: 22 TUs 0 errors, 0 short -> char.
+- **Readback line** in `CX2Unit::UnitData::SetKUnitInfo`: a class above `CHAR_MAX` logs once per unit uid. Existing characters (<= 125)
+  never log it.
+- **Hygiene:** flagcheck `--worktree --files <19 code files> Always.h ServerDefine.h`: `files: 19 PASS, 0 PASS~ (blank/marker only), 1
+  DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR`; `in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 6 EOL-mismatched
+  inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. OTHER = Always.h's peer blocks; the 6 EOL
+  rows are `KGuildMemberInfo` / `KGuildMemberMessageInfo`, whose member lines are LF inside a CRLF block (the inserted lines take the member
+  line's LF). junediverge `--check` (19 files): `RESULT: PASS`. enumscan: 0 rows on NU2 lines.
+- **Build: blocked, not NU2's.** `build.py --deploy`: X2ServerProtocol ok (0 warning lines); KTDXLIB failed at Always.h:12769, char-elesis
+  CH3b0's `#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON needs ...` (committed `7473d4bf`; its `SERV_ELESIS_SECOND_CLASS_CHANGE` is defined
+  only in ServerDefine.h:4117, which KTDXLIB does not include). Nothing deployed; build + play-test once that is fixed.
+- **Routed:** a unit whose class has no templet crashes the server select (`ChangeUnitButtonInfo`'s unconditional
+  `XSkinMeshReady( pUnit->GetUnitTemplet()->m_MotionFile )` after the 707 test; `GetType()` at the top unit) -> NU4 kickoff. NU3's rows give
+  class 200 a templet, so NU4's Lu/Ciel is not hit.
+- **Play-test (owed, after the build):** an existing character's login / village / dungeon / relog unchanged, and a scratch class-200 unit
+  (old last-login date, so it sorts onto the last page and is never drawn) logs the NEWUNIT line with class 200 and "a char would read -56";
+  the scratch unit is deleted afterwards.
+
 ### NU3 - Done (2026-11-14)
 
 Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET` (parser) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA` (load line; `#error` without the

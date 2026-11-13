@@ -133,7 +133,11 @@ DECL_PACKET( EGS_DELETE_UNIT_ACK )
 #ifdef SERV_CHAR_LOG
 	std::wstring			m_wstrNickName;
 	u_char					m_ucLevel;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short					m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char					m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #endif SERV_CHAR_LOG
 	//}}
 	//{{ 2012.02.20 조효진	캐릭터 삭제 프로세스 변경 (삭제 대기 기간 도입)
@@ -2854,7 +2858,11 @@ DECL_PACKET( EGS_UPDATE_PARTY_USER_INFO_NOT )
 	UidType							m_iUnitUID;
 	UCHAR							m_cState;
 	int								m_iStateCode;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short						    m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char						    m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UCHAR							m_ucLevel;
 };
 
@@ -4287,13 +4295,21 @@ typedef KPacketOK		KEGS_LEAVE_PERSONAL_SHOP_ACK;
 //{{ 2008. 2. 18  최육사  
 DECL_PACKET( EGS_ADMIN_CHANGE_UNIT_CLASS_REQ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 };
 
 DECL_PACKET( EGS_ADMIN_CHANGE_UNIT_CLASS_ACK )
 {
 	int									m_iOK;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short							 	m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char							 	m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 
 #ifdef SERV_UPGRADE_SKILL_SYSTEM_2013 // 적용날짜: 2013-06-27
 	int									m_iSPoint;
@@ -6214,7 +6230,11 @@ DECL_PACKET( EGS_CHANGE_JOB_CASH_ITEM_NOT )
 DECL_PACKET( EGS_CHANGE_USER_INFO_NOT )
 {
     UidType								m_iUnitUID;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	//{{ 2009. 10. 9  최육사	길드
 #ifdef GUILD_TEST
 	std::wstring						m_wstrGuildName;
@@ -6622,7 +6642,11 @@ DECL_PACKET( EGS_SEARCH_TRADE_BOARD_REQ )
 	char	m_cSlotCategory;	// 필수 셋팅 항목
 	char	m_cEqipPosition;	// 장착 위치
 	char	m_cUnitType;		// 유닛 타입
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short	m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char	m_cUnitClass;		// 유닛 클래스
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 
 	char	m_cMinLevel;		// 최소 레벨 범위
 	char	m_cMaxLevel;		// 최대 레벨 범위
@@ -9771,7 +9795,11 @@ DECL_PACKET( EGS_COUPLE_PROPOSE_AGREE_NOT )
 	std::wstring				m_wstrRequestUnitName;
 	UidType						m_iAcceptUserUID;
 	u_char						m_ucAcceptUnitLevel;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short						m_cAcceptUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char						m_cAcceptUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	UidType						m_iAcceptUnitUID;
 	std::wstring				m_wstrAcceptUnitName;
 
@@ -9834,14 +9862,22 @@ DECL_PACKET( EGS_RELATIONSHIP_INFO_ACK )
 	UidType								m_iAcceptUnitUID;
 
 	u_char								m_ucMyLevel;			// 레벨
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cMyUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cMyUnitClass;			// 클래스
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	int									m_iMyMapID;				// 위치
 	std::wstring						m_wstrMyChannelName;	// 채널 이름
 	char								m_cMyPosition;
 
 	std::map< int, KInventoryItemInfo > m_mapOtherUnitEquippedItem;
 	u_char								m_ucLevel;			// 레벨
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short								m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char								m_cUnitClass;		// 클래스
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	int									m_iMapID;			// 위치
 	__int64								m_tLastLogOutTime;	// 마지막 접속 시간
 	bool								m_bIsConnect;		// 현재 접속 여부
@@ -10629,7 +10665,11 @@ DECL_PACKET( EGS_HACKING_USER_PROCESS_NAME_RECORD_NOT )
 #ifdef SERV_UPGRADE_SKILL_SYSTEM_2013 // 적용날짜: 2013-06-27
 DECL_PACKET( EGS_CHANGE_MY_UNIT_INFO_NOT )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	short			m_cUnitClass;	// char-luciel NU2: June's width not read; a word like KUnitInfo's
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	char			m_cUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	int				m_iNewDefaultSkill_1;
 	int				m_iNewDefaultSkill_2;
 

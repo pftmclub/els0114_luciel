@@ -4395,6 +4395,16 @@ void CX2Unit::UnitData::SetKUnitInfo( const KUnitInfo& data )
 	m_UnitUID				= data.m_nUnitUID;
 	m_UserUID				= data.m_iOwnerUserUID;
 	m_UnitClass				= (UNIT_CLASS)data.m_cUnitClass;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+#ifdef SERV_IRUHADEV_OFFLINE
+	if( data.m_cUnitClass > CHAR_MAX )	// char-luciel NU2: a class a char would have wrapped
+	{
+		static std::set< __int64 > s_setWordClassLogged;
+		if( true == s_setWordClassLogged.insert( static_cast<__int64>( data.m_nUnitUID ) ).second )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL NEWUNIT unit %I64d class %d read as a word ( a char would read %d )", static_cast<__int64>( data.m_nUnitUID ), static_cast<int>( data.m_cUnitClass ), static_cast<int>( static_cast<char>( data.m_cUnitClass ) ) );
+	}
+#endif SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 	m_iUnitClassTran		= data.m_iUnitClassTran;
 #ifdef SERV_IRUHADEV_OFFLINE

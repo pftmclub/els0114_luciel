@@ -72,7 +72,11 @@ class CX2RelationshipManager
 		{
 			char						m_cPosition;		// 현재 상태
 			u_char						m_ucLevel;			// 레벨
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+			short						m_cUnitClass;	// char-luciel NU2: holds KEGS_RELATIONSHIP_INFO_ACK's class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 			char						m_cUnitClass;		// 클래스
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 			int							m_iMapID;			// 위치
 			__int64						m_tLastLogOutTime;	// 마지막 접속 시간
 			bool						m_bIsConnect;		// 현재 접속 여부

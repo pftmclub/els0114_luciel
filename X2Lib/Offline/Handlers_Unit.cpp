@@ -248,7 +248,11 @@ void CX2OfflineServer::BuildCreateUnitAck( KOfflineSession& kSes, const std::wst
 		// class back out of the failed ACK to re-populate its own form, so echo
 		// them even on the error path - dbo.gup_create_unit does the same.
 		kAck.m_kUnitInfo.m_wstrNickName	= wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		kAck.m_kUnitInfo.m_cUnitClass	= (short)iClass;	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		kAck.m_kUnitInfo.m_cUnitClass	= (char)iClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 
 		CX2OfflineLog::Server( L"CREATE   rejected '%s' class=%d (m_iOK=%d)",
 			wstrNickName.c_str(), iClass, kAck.m_iOK );
@@ -260,7 +264,11 @@ void CX2OfflineServer::BuildCreateUnitAck( KOfflineSession& kSes, const std::wst
 	{
 		kAck.m_iOK						= NetError::ERR_CREATE_UNIT_02;		///< transaction error
 		kAck.m_kUnitInfo.m_wstrNickName	= wstrNickName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+		kAck.m_kUnitInfo.m_cUnitClass	= (short)iClass;	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		kAck.m_kUnitInfo.m_cUnitClass	= (char)iClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 		return;
 	}
 
@@ -408,7 +416,11 @@ void CX2OfflineServer::BuildDeleteUnitAck( KOfflineSession& kSes, UidType iUnitU
 
 	kAck.m_wstrNickName	= kRow.m_wstrNickName;
 	kAck.m_ucLevel		= (u_char)kRow.m_iLevel;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	kAck.m_cUnitClass	= (short)kRow.m_iUnitClass;	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	kAck.m_cUnitClass	= (char)kRow.m_iUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 
 	if( true == kRow.IsDeleted() )
 	{
@@ -496,7 +508,11 @@ bool CX2OfflineServer::Handler_EGS_FINAL_DELETE_UNIT_REQ( KOfflineSession& kSes,
 
 	kAck.m_wstrNickName	= kRow.m_wstrNickName;
 	kAck.m_ucLevel		= (u_char)kRow.m_iLevel;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+	kAck.m_cUnitClass	= (short)kRow.m_iUnitClass;	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 	kAck.m_cUnitClass	= (char)kRow.m_iUnitClass;
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 
 	if( false == kRow.IsDeleted() )
 	{

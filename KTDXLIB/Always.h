@@ -13152,6 +13152,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-14
+// Description: char-luciel NU2 - the unit class is June's word on the wire (June reads a word at KUnitInfo +0x15, KRoomUserInfo
+//              +0x21, KFieldUserInfo +0x24, KSquareUserInfo +0x4a): every live unit-class member of the shared packets, and the client
+//              structs that hold one, is a short, so Lu/Ciel's classes 128 / 129 / 200 no longer wrap negative; the emulator's writers
+//              and four char parameters follow. Logs [JUNE_CHAR] LUCIEL NEWUNIT once per unit whose class a char would have wrapped.
+//              Also defined at the end of KncWX2Server/Common/ServerDefine.h and in X2ServerProtocol_2010.vcxproj (X2TOOL): CommonPacket.h
+//              is compiled before Always.h is reachable. Revert: comment out all three together.
+#define SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
 // Description: char-luciel NU3 - the unit templet reads June's minor-unit keys (June AddUnitTemplet_LUA 3237aa40): majorUnitName /
 //              minorUnitName (string ids), the second body's five promotion items, its four motions and three game motions, and
 //              the lobby rotations m_fLobbyRotationY / m_fMinorUnitLobbyRotationY. A missing key stores June's default (empty, 0).

@@ -1245,7 +1245,11 @@ void		CX2UIRankingInfo::DestoryUIRankingInfo()
 #endif //SERV_LOCAL_RANKING_SYSTEM
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
+void		CX2UIRankingInfo::SetCharIcon( CKTDGUIStatic* const pStaticClass, short cUnitClass, int iLevel )	// char-luciel NU2: the class word
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 void		CX2UIRankingInfo::SetCharIcon( CKTDGUIStatic* const pStaticClass, char cUnitClass, int iLevel )
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 {
 	
 	wstring fileName;
