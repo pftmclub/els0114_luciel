@@ -637,3 +637,29 @@ funcmap rows tagged C3y-2b; MODS.md "tutorial dungeon fixes".
   lines; 1 ERROR = the Always.h `#error` guard (precedent). The peer's `Always.h` / funcmap reorder was left out of the commit.
 - **How to see it:** the C3y-2 play-test again (hand-off in the session). offline_server.log `JUNE_FX C3y-2 room 4115x` and
   `JUNE_FX C3y-2b scene end: guide resume, dungeon 41150`; ErrorLog no `can't find 'IsRecentlyPlayedEventScene'` / `'PlayEventScene'`.
+
+### C3y-2b - play-test 1 (2026-11-13) and fix 2
+
+Play-test (new Elsword 41150, new Elesis 41220): no input lock, story skip and scene-end hook work (`JUNE_FX C3y-2b scene end: guide resume,
+dungeon 41220` x3). Three reports: images missing; the guide shows A / C while the skills sit in A / S; the boss softlocks (it never attacks,
+so no awakening orb, no guide 102, boss stays undamageable).
+- **Softlock (fixed).** All 11 tutorial boss scripts' `State_Change_to_Attack` reads `slot2:GetNowStateSkillID()` on the user: unbound in
+  March (ErrorLog x1114), the condition dies, the boss never attacks. June binds it on CX2GUUser @`31e14b58` (vslot 0x524 thunk `31e4e760`);
+  bound to March's `CX2GUUser::GetNowStateSkillID`. Also unbound: `SetLineForce` (the `Tutotial_*_Dp1` direct NPCs), June `31fff2d0` @`31e14ca3`:
+  new `CX2GUUser::SetLineForce` (line centre `31c6ad50`, Future dirDegree / land position / position, Now position, both line indices). Both
+  under `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND`. C3y-2's gate only covered the 9 dungeon scripts: `luabind.py check` over the 63 data037
+  `Tuto*` scripts now has 0 unbound (3 ENUM misses are Rose / Lu-Ciel rows, out of scope).
+- **Images (staged).** The tutorial's GFx scenes load (the 135 lines are the kom probe before the loose `data\eventscene\*.swf`). Missing were
+  particle / UI textures the census never followed: a particle census of the tutorial scripts, effect sets, `X2PlayGuide.cpp` sequences and
+  guide dialogs staged 83 June files (41 new, 42 replaced; backup `kom_backup_stage_june\20261113_133408`): `HQ_WhiteBack.tga`,
+  `inform_dungeonGate_signal*.dds` (3), `HQ_KOGLogoWinter2015.tga`, `PerturbationMap.png`, 4 Ain portal files, 72 `DLG_UI_Guide_*` images (41
+  replacing March's same-name files), `DLG_UI_Common_Texture03.tga`. Missing in June too: JUNE_BUGS 646 (extended). PACK OK + COPY OK data045
+  8c87300b, data048 29161d23, data056 af4783a1, data057 46eaff38, data064 404f081a, data212 6fad0702 (data045 / data064 also carried earlier
+  staged entries: ~31 / ~164 changed vs live).
+- **A / C prompt (open).** The new characters' two skills sit in slots 0 / 1 (A / S), as the client places learned skills; guide 101 is
+  June's GFx movie `timeLineNoTutorial_1` (`FIX_SKILL_TYPE_A`, skill keys allowed). Whether June's movie names the skill-key range (A..C) or
+  expects a skill on C is not settled: asked the user.
+- **Hygiene.** flagcheck `--worktree` TUTORIAL_LUA_BIND: X2Main.cpp PASS; X2GUUser.cpp FAIL / .h OTHER are a peer's uncommitted
+  `JUNE_CHAR_ELESIS_SKILL` hunks (not committed here; see the range line). junediverge `RESULT: PASS`; enumscan 0 A/B.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,437,632 B, dated 2026-11-13 13:48:24, md5 f2899679c89d8a4e066018905a035295 (built at main
+  1fc6edcc + 20 uncommitted code files, shared with char-elesis CH2b). EXESTR OK 2 of 2 (GetNowStateSkillID, SetLineForce), md5 f2899679.

@@ -5039,6 +5039,8 @@ void CX2Main::RegisterLuabind()
 #endif SERV_IRUHADEV_JUNE_USER_LAST_TOUCH_LINE
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 	lua_tinker::class_def<CX2GUUser>( L, "IsOnSomethingNow",			&CX2GUUser::IsOnSomethingNow );	// june-dungeons C3y-2: June @31e14789 ( 31e4d0a0 )
+	lua_tinker::class_def<CX2GUUser>( L, "GetNowStateSkillID",			&CX2GUUser::GetNowStateSkillID );	// june-dungeons C3y-2b: June @31e14b58 ( vslot 0x524 thunk 31e4e760 )
+	lua_tinker::class_def<CX2GUUser>( L, "SetLineForce",				&CX2GUUser::SetLineForce );	// june-dungeons C3y-2b: June @31e14ca3 ( 31fff2d0 )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 #ifdef SERV_IRUHADEV_JUNE_UNIT_BASE_BINDS
 	lua_tinker::class_def<CX2GUUser>( L, "SetIsRight",					&CX2GUUser::SetIsRight );				/// June 31fc8ca0 (bound @31e156d9)
