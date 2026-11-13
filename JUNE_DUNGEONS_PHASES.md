@@ -536,8 +536,14 @@ second per gate; the C3z-4t4 review retires it). Log tag `JUNE_FX C3z-4t gate <n
 - **Build.** First run failed in this phase's own edit (`X2CashShop.cpp` lacked `KTDGGFXManager.h`; include added under the flag). DEPLOY OK:
   X2_offline.exe is 26,430,464 B, dated 2026-11-13 11:51:19, md5 62a1a621 (built with the peer C3y-2 / CH2a uncommitted files in). EXESTR OK 6 of 6
   (wide: the gate format line, `esc eaten`, `quest reward window blocked`, `ok box blocked`, `skill slots hidden`, `input mask`).
-- **Play-test owed** (hand-off below the note in the conversation): ESC, skill slots and the reward / OK-box block during scene 101 in the tutorial
-  dungeon, the gate log lines (scene 101 has no `USE_LIMIT_ZOOM`, so the zoom lock is not in the test). No review of its own: `C3z-4t4-review.md` covers t3 + t4.
+- **Commit.** The code, this note and the STATUS row went in under C3y-2's commit `52951ffe` (an index race between the two sessions;
+  `e57133b6`'s message says so). Range flagcheck `52951ffe^..52951ffe`: 13 PASS, 1 PASS~, 16 OTHER (C3y-2's files), 1 ERROR = the `_DEBUG`
+  `#error` guard line (t1 precedent), 0 deleted lines, 0 encoding changes.
+- **Play-test (2026-11-13, user): pass.** Exe md5 62a1a621, console scene 101 in a dungeon. ESC during the movie closed the guide and the
+  system menu did not open. ESC pressed after the key-limit window is taken by the guide's own abort (`31fc6130`, which ticks before the
+  state's `HandleMsgByESC`, as in June), so no `esc eaten` line. Begin + OK box in one line: `gate ok box blocked: guide 101` and no box.
+  The tutorial-dungeon slot check was skipped (C3y-2's dungeons are not playable yet: C3y-2b). No review of its own: `C3z-4t4-review.md`
+  covers t3 + t4 and retires `_GATES_DEBUG`.
 
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
