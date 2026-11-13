@@ -22,7 +22,8 @@ python tools/docsection.py june2017_re/char_elesis/plan_march_side.md --list   #
 Do "Phase CH5": Elesis's 5 `UnitTemplet.lua` rows (8, 29, 30, 120, 121) become June's (`june_src_fixed/data036_kom/UnitTemplet.src.lua` L1239 /
 L1264 / L1290 / L1316 / L1452 / L1480 / L1508 are her seven rows: CH0 says which line is which class) and June's rows for 35 and 125 are added
 (core-list BOM source; `luasrc.py refresh` after; every other row stays; if CH0 found the templet loader refuses a class >= `UC_END`, the 125 row
-waits for CHNa); the cut-in table and the InitState index switch (`X2GUEL.cpp:249-273`) replaced by June's names and layout (7t cut-in `.gfx` names,
+waits for CHNa); the cut-in table (`X2GUEL.cpp:212-232`, read at `:5083-5102`) and the InitState index switch (June's under `_LIVE` `:439-453`, March's
+`#else` `:499-522`; CH1 review: June's already gives 125 index 3, so June's fourth set must land here, before CHNa makes 125 loadable) replaced by June's names and layout (7t cut-in `.gfx` names,
 `HQ_Cutin_EGM / EBH / ECA_Transcendence`; March's `HQ_CutIn_Elesis_Pyro_Knight.dds` / `_Saber_Knight.dds` exist nowhere); 7ah; the lobby particle
 hard-codes (`X2UnitViewerUI.cpp:630` / `:2414` / `:2530`) retired where June's `AnimationNameTable` row plays the same particles (under the unit
 viewer's flag, March's code in `#else`; Ara's decision 2 is the precedent).
@@ -30,8 +31,8 @@ viewer's flag, March's code in `#else`; Ara's decision 2 is the precedent).
 **Creation screen (user, 2026-11-10 and 2026-11-11: part of this port).** Today Elesis shows only Saber Knight and Pyro Knight there. Adopt June's
 `DLG_Unit_Create_ClassChange_Button_Elesis.lua` (data034, six buttons; `adopt-june`, `luabind.py check`); list from Ghidra every June function the
 creation state and unit viewer run for Elesis (class-preview switch, class buttons, `Movie_Create_Elesis_*` previews, the stat chart
-`X2StateCreateUnit.cpp:3870-3885`, the sites of `plan_march_side.md` section 10) and port them under `_UI`. The six `SCUUCM_*_CLASS_CHANGE_BUTTON_UP`
-handlers are generic (`:778-808`, `SelectUpperClass` `:3397`), so Grand Master and Blazing Heart need the dialog and whatever June's functions add.
+`X2StateCreateUnit.cpp:3901-3913` (CH1 review; peers' edits moved it), the sites of `plan_march_side.md` section 10) and port them under `_UI`. The six `SCUUCM_*_CLASS_CHANGE_BUTTON_UP`
+handlers are generic (`:790-819`, `SelectUpperClass` `:3421`), so Grand Master and Blazing Heart need the dialog and whatever June's functions add.
 A click on a third-line button before CHNa must be harmless: check what `SelectUpperClass` does with the assert-only third line; if it is not
 harmless, hide the two third-line buttons under `_UI` until CHNa (one line each, removed by CHNa).
 

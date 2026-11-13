@@ -23,7 +23,7 @@ awk -F'\t' '$7=="CH2a"' june2017_re/char_elesis/ch0_class_map.tsv   # CH0 confir
 Scope: the skill ids class 8 has (a skill's line decides its phase). For each id: its case in `SetEquippedSkillFuncBySkillSlotIndex` (`32b8c470`; CH0's
 switch map names the case) with June's state functions whole (Ghidra and, for `listing-only` rows, `charport_adis.py elesis <va>`), inside March's
 case under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (March's in `#else`) or a new case; its block in `SetEquippedSkillLevel` `32b4e790` if it has one; its attached rows (7u names,
-7ai BFI arguments, 7h UPDOWN cancels, §7 l.256 power-rate operator, the numerical-only tables of `plan_numerical_rows.tsv`); its effect closure
+7ai BFI arguments, 7h UPDOWN cancels, §7 l.259 power-rate operator (the row "Per-class code that writes the state power rate"; l.256 before the CH1 review), the numerical-only tables of `plan_numerical_rows.tsv`); its effect closure
 (a name found only now is staged byte-exact and added to `ch0_assets.tsv`); its `WAY_OF_SWORD_TYPE` on CH1q's code. Upgrade ids reach their base
 through the templet's `m_iDeleteSkillIDByUpgrade` (June `32071720`): check the templet swap for every term that reads the id. A skill whose factor
 names a BFI id June's `Enum.lua` lacks (`JUNE_BUGS` 279) keeps June's nil. A function the map does not settle (new mechanism, unmapped callee, a

@@ -12669,7 +12669,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-13
 // Description: June character port ( Elesis ) Phase CH1q - temporary [JUNE_CHAR] ELESIS WOS lines ( vigor / destruction start and end, the attack gain once a
 //              second ) for CH1's play-test; they sit inside JUNE_CHAR_ELESIS_WOS code only. Revert: undefine the flag ( JUNE_CHAR_ELESIS_WOS_DEBUG ).
-#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+// char-elesis CH1 review: retired
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -12819,7 +12820,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-13
 // Description: char-elesis CH1 debug: logs [JUNE_CHAR] ELESIS SKILL SBUF parse / at once / cleared / frame / state end ( her reserved-buff path, Elesis only,
-//              the parse line once a second per state ). The CH1 review retires it. Revert: undefine the flag ( JUNE_CHAR_ELESIS_DEBUG ).
+//              the parse line once a second per state ). The CH3d review retires it. Revert: undefine the flag ( JUNE_CHAR_ELESIS_DEBUG ).
 #define SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG needs SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ( June's ParsingBuffFactorID ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )

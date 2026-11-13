@@ -1426,6 +1426,48 @@ no dungeon), so the stage-change and dungeon-end steps were not reached; a follo
 - **Closed (user, 2026-11-13):** the dungeon run (mode end, stage change, dungeon end) is waived: "i trust your code for this one, it'll be tested anyways
   in future playtest". CH1 is done; the CH1 review retires `_WOS_DEBUG` without asking for that step.
 
+### CH1 - Review (2026-11-13): pass; `_WOS_DEBUG` retired
+
+Opus 5.5. **Verdict: passes.** The only code change retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG` (`Always.h` `//#define`, one `// char-elesis CH1 review: retired`
+line); `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` stays for CH2a-CH3b (its stale "The CH1 review retires it" comment now names the CH3d review). `ELESIS DATA` stays.
+- **Deploy unit:** data036 `ELESIS_KNIGHT.lua` 245,689 B sha1 `4c3b68b4...` header `1B 4B 4C 81` = the `june_adopt_20261113_083005.tsv` row (`bytecode ljconv`); no
+  `.src.lua` sidecar. `stage-june --dry-run ch1_held_motions.tsv`: `2 staged (0 new, 0 replaced, 2 identical)`. `kom.py status data036 data033`: both `in sync`, `+0 / -0 / ~0`
+  vs live (data036's `[stale .src.lua: compile]` is older non-Elesis sidecars, as in Ara's review). `luabind.py check ELESIS_KNIGHT`: `ENUM 0 table(s) missing, 0 member(s)
+  missing, 3 nil in June too`, `RESULT: PASS`. `core --check` / `ledger --check`: PASS, 0 FAIL, 0 WARN. The 4 `-- char-elesis CH1` `Enum.lua` lines (live :12308 / :12315 /
+  :12368 / :12814) = `Enum.src.lua:14308 / 16063 / 15734 / 15564`, names and values. `EXESTR OK: 2 of 2` (`ELESIS DATA`, `ELESIS WOS vigor start`), md5 `6379174f`.
+- **State counts, exact for all 5 units** (one load each, logged at the end of June's `InitState`, `X2GUEL.cpp:493`): base 134 = 97 `InitStateCommon` (its `_LIVE` body;
+  June's riding / PvP amusement / dance left out as Ara's) + 3 `InitBoundingStates( "ESI_" )` + 3 START / WIN / LOSE + 1 `USI_WAIT_STATE_CHANGE` + 30 user states (9
+  `USI_EVENT_*` + 20 slot + key 0, Ara's term); class path `InitStateByUnitClass` (29 / 120: 19, 30 / 121: 15, 8: 0); learned-skill sub-states (`SetEquippedSkillLevel`'s
+  22 blocks, `m_StateList[ id ]` on each learned base or upgrade; `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE` is already in the common body). 8 (unit 20, Dodge 3 + Endurance 0)
+  134+0+3 = 137; 29 (40: Sonic 3, Dodge 3, Rushing 2, Extinction 4, Judgement 1, Critical Dive 1) 134+19+14 = 167; 30 (21: Sonic 3, Swordfire 2, Dodge 3) 134+15+8 = 157;
+  120 (29: + War Prelude 3, Provoke 1, Drastic Charge 2 on 29's 14) 134+19+20 = 173; 121 (30: Sonic 3, Swordfire 2, Dodge 3, Blazing Dance 4, Flame Sword 1, Scarlet Rose 1)
+  134+15+14 = 163. All = the log.
+- **Way of the Sword:** 43 lines: 40 `attack gain`, 2 `vigor start` (30, 120 at 4800), 1 `destruction start` (121 at -4800). In vigor the opposite type drains the point with
+  `mp rate x1.50` (30, type 1 -133) and the same type gains 0.00 at mp x1.00 (120, type 4): `CalcWayOfSwordPoint` / `CalcVigorMpUpOnAttack_Elesis`, as designed. No mode
+  end, stage change or dungeon end (waived by the user, 2026-11-13); they ride on later play-tests without the debug lines.
+- **Skills:** not cast (unported characters cannot cast skills); the two-cast, held-key and `SBUF` checks stay in `CH2a.md` / `CH2b.md` / `CH2c.md` / `CH3b.md`.
+- **ErrorLog** (current / `_pre_CH1_elesis`; last write 08:53:59, no later run): `KEM_ERROR` 0 / 0, `Motion Error` 0 / 0, `lua error` 3 / 3, `[LUA_SRC]` 8 / 8,
+  `ELESIS_KNIGHT` / `StateID` / `Parsing Error` 0 / 0. `ErrorEnum(433)` 20 / 0, all `Anim Frame : 79, Mesh Frame : 80` on the six `MESH_EL_BASIC_*_SORTED.X` parts at
+  the first load (face 4, hair 4, foot / hand / lowbody / upbody 3 each) = `JUNE_BUGS.md` 642 (CH0b counted 21).
+- **Divergence allow-list:** `charport_adis.py elesis 32b81900`: @32b819a8 `mov eax, [edx + 0x10c]` on the `g_pX2Game` handle, `call eax`, `dec eax` / `jne`: game type 1
+  only, as the row says. The other two rows (`32b7f0b0`, `32b74ed0`, `cmp eax, 1`) are the same idiom per the CH1 Done note.
+- **Scan:** `charport_scan.py` rerun to completion: 57 lines = `plan_charport_scan_20261111.txt`, 0 differences (no Elesis row moved). `charport_keys.py ELESIS_KNIGHT`:
+  `june-only=9 neither=1 march-only-site=4 both=234` = CH1's.
+- **Kickoffs:** `CH5.md` amended (cut-in table now `X2GUEL.cpp:212-232`, read at `:5083-5102`; June's index switch `:439-453` already gives 125 index 3, so June's fourth
+  set must land in CH5 before CHNa makes 125 loadable; March's `#else` `:499-522`; `X2StateCreateUnit.cpp` chart `:3901-3913`, handlers `:790-819`, `SelectUpperClass`
+  `:3421`, moved by peers). `CH2a.md` amended (checklist power-rate row now l.259). `X2UnitViewerUI.cpp:630` / `:2414` / `:2530` still the sites.
+
+Hygiene: `flagcheck --range 9b48ec80^..9b48ec80`: `JUNE_CHAR_ELESIS_LIVE --files X2Lib/X2GUEL.cpp` `1 PASS (+7), 0 FAIL`, all zeros, `RESULT: PASS`; `JUNE_CHAR_ELESIS_DEBUG
+--files X2Lib/X2GUUser.cpp KTDXLIB/Always.h` `1 PASS, 1 OTHER, 0 FAIL, 0 ERROR`, `RESULT: PASS`; `JUNE_CHAR_ELESIS_WOS --files KTDXLIB/Always.h` `1 OTHER, 0 FAIL`,
+`RESULT: PASS`; `JUNE_CHAR_ELESIS_LIVE --files KTDXLIB/Always.h`: `ERROR` only (guard `:12650` `_WOS && !_LIVE` with `_LIVE` stripped, as Ara's CH1), 2 deleted = the two
+`//#define` lines. The retire: `flagcheck JUNE_CHAR_ELESIS_WOS_DEBUG --worktree --files KTDXLIB/Always.h`: `1 DEFINE, 0 FAIL`; RESULT FAIL only on "not #defined anywhere"
+(the define is commented out, as every retire); 2 deleted = the old `#define` and the `_ELESIS_DEBUG` comment line, 0 non-ASCII, 0 EOL. `junediverge.py --check-all`: `allow-listed: 217`,
+`RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h`: `0 A/B row(s)`. Probe (`census.cl_cmd`, `/c /Zs /EHsc`, `_WOS_DEBUG` off): `X2GUEL.cpp`,
+`X2GUUser.cpp` exit 0, 0 errors (their `X2OfflineLog.h` include stays under `_LIVE` / `_ELESIS_DEBUG`).
+Build (started not awaited, finished before the commit): `DEPLOY OK: X2_offline.exe is 26,381,824 B, dated 2026-11-13 09:18:04, md5 f77c835db6e6d99c82053c9c09802c81,
+equal to X2/US_SERVICE/x2.exe (2026-11-13 09:17:55); built at main a805e326 + 3 uncommitted code file(s).` `EXESTR OK: 1 of 1 absent` (`ELESIS WOS vigor start`, wide), md5
+`f77c835d`. CH5 and CH2a are ready.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
