@@ -12862,3 +12862,26 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: June character port ( Elesis ) Phase CHNa - Dark Knight ( 35 ) and Crimson Avenger ( 125 ) load and play: Elesis's gauge for both
+//              ( 3248e290 ), their item-class compatibility ( 31ed6500 ), the creation screen's third Elesis line 8 / 35 / 125 ( 3234b390 ) and its
+//              stat chart ( 3254ee40 ), and their portraits in all nine picture tables ( 31ee0de0 rows 0x3b / 0x3c ).
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_CLASS ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS ) && !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( UC_ELESIS_DARK_KNIGHT / UC_ELESIS_CRIMSON_AVENGER )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: char-elesis CHNa debug: logs [JUNE_CHAR] ELESIS CLASS gauge class <c> when an Elesis class gets her gauge. The CHNa review retires it.
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG
+//////////////////////////////////////////////////////////////////////////

@@ -109,7 +109,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CHNa | **ready** (CH5 review passed): 35 / 125 load and play, gauge arms, stat rows, creation screen third line | Opus 5.5 / high, Opus review, user play-test | CH5 review, char-ara CHNa review | `X2GageManager.cpp`, `X2Unit.h`, `X2GUEL.cpp`, `X2StateCreateUnit.cpp`, emulator, `createchar.py`, `StatTable.lua` (user packs) | `CHNa.md` |
+| CHNa | **done 2026-11-13, play-test owed**: gauge + item arms, third line 8 / 35 / 125 + chart, portraits 57 / 58, Texture85 staged (data057); units 144-146; then CHNa review | Opus 5.5 / high, Opus review, user play-test | CH5 review, char-ara CHNa review | `X2GageManager.cpp`, `X2Unit.h`, `X2Data.cpp`, `X2StateCreateUnit.cpp`, `createchar.py`, data057 | `CHNa.md`, `CHNa-review.md` |
 | CHNb | blocked (CHNa review): job change to 35 / 125 (quests 35569-35577) + level-15 / level-35 class-change dialogs | Opus 5.5 / high, Opus review, user play-test | CHNa review | `LevelUpEvent.lua`, `Handlers_Quest.cpp`, dialogs | `CHNb.md` |
 | CH2a | **ready** (CH1 review passed): Knight (8) skills; no review of its own; both touch `X2GUEL.cpp` with CH5, so one at a time | Sonnet 5.5 / high, user play-test | CH1 review | `X2GUEL.*` | `CH2a.md` |
 | CH2b | blocked (CH2a): Saber Knight (29) special actives (CH0 split) | Sonnet 5.5 / high, user play-test | CH2a | `X2GUEL.*` | `CH2b.md` |

@@ -1543,6 +1543,38 @@ reward path that accepts any class. **What is hers** (flag `SERV_IRUHADEV_JUNE_C
 **Done gate:** a 35 and a 125 reached both by job change and by `createchar.py` load, fight and relog; the gauge, socket and stat paths log no
 refusal; no other class changed (a select-screen pass of all nine March characters).
 
+### CHNa - Done (2026-11-13)
+
+Opus 5.5. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS` (+ `_CLASS_DEBUG`, the review retires it), `Always.h` end, `#error` without `SERV_IRUHADEV_JUNE_ENUM_NAMES`.
+Reused unchanged from Ara's CHNa: `SERV_IRUHADEV_JUNE_CLASS_PATH` (socket-group bound 202, `GetClassLevel` = June: 35 = 1, 125 = 2). Review kickoff `kickoffs/char-elesis/CHNa-review.md`.
+- **Gauge (crash fix, first edit):** `X2GageManager.cpp` Elesis arm gains 35 / 125 (June `3248e290` case list 8 / 0x1d / 0x1e / 0x23 / 0x78 / 0x79 / 0x7d, read in Ghidra this
+  session), so `CX2GUEL::CreateGageData`'s static_cast to `CX2ElesisGageData` no longer reads a plain `CX2GageData`. Debug line `[JUNE_CHAR] ELESIS CLASS gauge class <c> -> CX2ElesisGageData`.
+- **Items:** `GetX2UnitClassCompatibility` 35 -> {8, 35}, 125 -> {8, 35, 125} (June `31ed6500` cases 0x23 / 0x7d, re-read this session; a 125 does not wear 29 / 120 gear).
+- **Creation screen:** `GetThirdLineElesisClassTypeByUnitClassType` = June `3234b390` table `337a1660` (8 / 35 / 125; same values as Ara CHNb's `GetUnitClassByTierAndLine`
+  Elesis row), March's all-`UC_NONE` body in `#else`; new divergence row. Stat chart 35 / 125 = (MIDDLE, LOW, LOW) = June `3254ee40` 2,1,1 (re-read). CH5 added no hide
+  lines; June's six-button dialog, `character_info_08` (`stage-june --dry-run`: identical to June) and `movie_create_elesis_ca.avi` (loose in `data\movie`) were already in.
+- **Portraits:** index 57 / 58 appended to all nine March arrays + the switch, from June `31ee0de0` rows 0x3b / 0x3c (`char_image_rows.py 35:0x3b 125:0x3c`; its no-argument run
+  reproduces March's Little Devil / Yama Raja rows): `EL_SDK_*` / `EL_SCA_*` (FACE, LARGE, GRAY, MEDIUM, ICON, PARTY) in `DLG_UI_Common_Texture85_NEW`, `CLASS_D` / `CLASS_C`
+  (Texture11), `list_ELESIS_D_KNIGHT` / `list_ELESIS_C_AVENGER` (GUI_character_01; `_GRAY` pieces in the `_gray` sheet), `HQ_Dungeon_Clear_Elesis_Dark_Knight / _Crimson_Avenger.tga`.
+  Next free index for Add: 59.
+- **Portrait assets:** `stage-june --dry-run` on 21 portrait / creation names: 18 identical to June, `Movie_Create_Elesis_CA.avi` not in a June kom (loose file), and
+  `DLG_UI_Common_Texture85_NEW` `.tga` + `.TET` new (March had no Texture85). Staged into data057 (`STAGE-JUNE OK`, 2 new); `PACK OK data057`, `COPY OK data057` md5
+  `a86401b58beb9afd05ded2219bf11727` (backup `kom_backup_tools/data057.kom.20261113_101652`). The June TET carries all 12 `EL_SDK_*` / `EL_SCA_*` pieces the rows name.
+- **Tool:** `createchar.py` CLASSES + PARENT gain 35 (-> 8) / 125 (-> 35). Units (backup `db_backup/els_db_20261113_101653_pre_pre_elesis_chna.sql`): 144 `DKnight20` (35, L20),
+  145 `CAvenger40` (125, L40), 146 `CAvenger80` (125, L80); each wears its promotion costume and has class-8 gear at +10 in the equip bag (Void Claymore + Henir set).
+- **Moot / checked, not needed:** stat rows (the flat StatTable already has 35 / 120 / 121 / 125: classn row 21; GM / BH numbers unchanged, no `MODS.md` before / after);
+  `X2ComboTree.cpp:302` (June loads no combo tree); `RotateYSelectCharacterType` (default 10; the templet reader is Lu/Ciel NU4, as Ara); the `X2GUEL.cpp` class switches
+  `:213` / `:249` / `:2747` are CH1m's (35 / 125 arms already in), `:411` is CH4a, `:9581` is CH1o. `Motion_EL_DK.x` / `MOTION_EL_CA.x` are in the March koms and named by
+  the CH5 `UnitTemplet.lua` rows. A skill-level socket on a 35 / 125 weapon is not observable without such an item: the bound is proven by code (Ara CHNa).
+- **Routed:** transcended 35 / 125 portrait pair (five-argument overload) -> CH3d; job change + class-change dialogs -> CHNb; 35 / 125 skills -> CH2d / CH3c.
+- **Hygiene:** `flagcheck JUNE_CHAR_ELESIS_CLASS --with _CLASS_DEBUG --worktree`: `files: 4 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; 0 deleted, 0 non-ASCII,
+  0 EOL-mismatched, 0 untokened, 0 encoding changes; `RESULT: PASS`. `junediverge --check` (5 files): allow-listed 9, `RESULT: PASS`. `enumscan --check`: 0 rows on the changed lines
+  (the 20 file rows are pre-existing, e.g. `X2Data.cpp:3106-3108`).
+- **Deploy:** `DEPLOY OK: X2_offline.exe is 26,412,544 B, dated 2026-11-13 10:27:45, md5 9666b48ab8ebf0ed3c9b5e1997e8c400` (built at main 8800dcdc; it also carries a peer's
+  uncommitted `KTDGGFXManager.*`). `EXESTR OK: 6 of 6` (wide: the `ELESIS CLASS gauge class` tag, `EL_SDK_FACE`, `EL_SCA_PARTY`, `list_ELESIS_C_AVENGER`,
+  `HQ_Dungeon_Clear_Elesis_Crimson_Avenger.tga`, `CLASS_D`).
+- **Play-test hand-off:** see the session reply. Log tag `[JUNE_CHAR]` (`ELESIS CLASS`).
+
 ## Phase CH2 - Skills: Knight and the first jobs (classes 8, 29, 30, 35)
 
 **Run with:** Sonnet 5.5 high (transcription from CH0's map), one Opus review at CH2d (covers CH2a-CH2d), user play-test per phase. Flag

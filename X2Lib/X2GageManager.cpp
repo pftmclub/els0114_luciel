@@ -3,6 +3,9 @@
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS_DEBUG
 #include "Offline/X2OfflineLog.h"	// char-ara CHNa: the ARA CLASS gauge line
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS_DEBUG
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG
+#include "Offline/X2OfflineLog.h"	// char-elesis CHNa: the ELESIS CLASS gauge line
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG
 
 
 CX2GageManager* CX2GageManager::m_pGageManager = NULL;
@@ -213,9 +216,17 @@ void CX2GageManager::CreateMyGageUI( const CX2Unit::UNIT_CLASS eGameUnitClass_, 
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 3248e290 gives 35 / 125 Elesis's gauge
+	case CX2Unit::UC_ELESIS_DARK_KNIGHT:
+	case CX2Unit::UC_ELESIS_CRIMSON_AVENGER:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 		{
 			pGageData = new CX2ElesisGageData();
 			pGageUI = new CX2ElesisMyGageUI( pGageData, eGameUnitClass_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS CLASS gauge class %d -> CX2ElesisGageData", static_cast<int>( eGameUnitClass_ ) );	// char-elesis CHNa
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG
 		} break;
 #endif
 

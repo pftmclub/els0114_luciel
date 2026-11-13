@@ -2145,6 +2145,34 @@ inline bool GetX2UnitClassCompatibility( CX2Unit::UNIT_CLASS unitClass, CX2Unit:
 				break;
 			}
 		} break;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ed6500 case 0x23 / 0x7d
+	case CX2Unit::UC_ELESIS_DARK_KNIGHT:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_ELESIS_KNIGHT:
+			case CX2Unit::UC_ELESIS_DARK_KNIGHT:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+	case CX2Unit::UC_ELESIS_CRIMSON_AVENGER:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_ELESIS_KNIGHT:
+			case CX2Unit::UC_ELESIS_DARK_KNIGHT:
+			case CX2Unit::UC_ELESIS_CRIMSON_AVENGER:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®
 
@@ -2768,6 +2796,25 @@ inline CX2Unit::UNIT_CLASS GetSecondLineElesisClassTypeByUnitClassType ( CX2Unit
 	return CX2Unit::UC_NONE;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+// char-elesis CHNa: June 3234b390 table 337a1660 ( filled by 3234afb0 ): Elesis's third line is 8 / 35 / 125
+inline CX2Unit::UNIT_CLASS GetThirdLineElesisClassTypeByUnitClassType ( CX2Unit::UNIT_CLASS_TYPE eUnitClassType_ )
+{
+	switch ( eUnitClassType_ )
+	{
+	case CX2Unit::UCT_BASIC_CLASS :
+		return CX2Unit::UC_ELESIS_KNIGHT;
+	case CX2Unit::UCT_FIRST_CLASS :
+		return CX2Unit::UC_ELESIS_DARK_KNIGHT;
+	case CX2Unit::UCT_SECOND_CLASS :
+		return CX2Unit::UC_ELESIS_CRIMSON_AVENGER;
+	default:
+		break;
+	}
+	ASSERT ( !L"Wrong Unit Type" );
+	return CX2Unit::UC_NONE;
+}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 inline CX2Unit::UNIT_CLASS GetThirdLineElesisClassTypeByUnitClassType ( CX2Unit::UNIT_CLASS_TYPE eUnitClassType_ )
 {
 	switch ( eUnitClassType_ )
@@ -2782,6 +2829,7 @@ inline CX2Unit::UNIT_CLASS GetThirdLineElesisClassTypeByUnitClassType ( CX2Unit:
 	return CX2Unit::UC_NONE;
 }
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 inline CX2Unit::UNIT_CLASS GetElesisClassByUnitClassTypeAndLineType ( CX2Unit::UNIT_CLASS_TYPE eUnitClassType_, CX2Unit::UNIT_CLASS_LINE eUnitClassLine_ )
 {
 	switch ( eUnitClassLine_ )

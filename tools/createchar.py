@@ -50,6 +50,7 @@ CLASSES = {
     120: 'ELESIS_GRAND_MASTER', 121: 'ELESIS_BLAZING_HEART', 122: 'ADD_LUNATIC_PSYKER',
     # June-only classes (X2Unit.h SERV_IRUHADEV_JUNE_ENUM_NAMES), added by their char port's class-path phase.
     34: 'ARA_LITTLE_SPECTER', 124: 'ARA_ASURA',
+    35: 'ELESIS_DARK_KNIGHT', 125: 'ELESIS_CRIMSON_AVENGER',
 }
 
 
@@ -139,7 +140,7 @@ PARENT = {
     18: 5, 19: 5, 26: 5, 108: 18, 109: 19, 116: 26,
     20: 6, 21: 6, 27: 6, 110: 20, 111: 21, 117: 27,
     28: 7, 31: 7, 34: 7, 118: 28, 119: 31, 124: 34,
-    29: 8, 30: 8, 120: 29, 121: 30,
+    29: 8, 30: 8, 35: 8, 120: 29, 121: 30, 125: 35,
     32: 9, 122: 32,
 }
 

@@ -138,6 +138,11 @@ static const CharacterImageName s_CharacterImageNameMyGage[] =
 	CharacterImageName( L"DLG_UI_Common_Texture77_NEW.tga",		L"L_SPECTER_STATE"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture82_NEW.tga",		L"ASURA_STATE"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 7 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_FACE"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_FACE"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 유저 Gage UI
@@ -237,6 +242,11 @@ static const CharacterImageName s_CharacterImageName160[] =
 	CharacterImageName( L"DLG_UI_Common_Texture77_NEW.tga",		L"L_SPECTER_LARGE"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture82_NEW.tga",		L"ASURA_LARGE"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 2 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_LARGE"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_LARGE"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 	#pragma endregion 큰 초상화 이미지_160x160
@@ -337,6 +347,11 @@ static const CharacterImageName s_CharacterImageName160Gray[] =
 	CharacterImageName( L"DLG_UI_Common_Texture77_NEW.tga",		L"L_SPECTER_LARGE_GRAY"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture82_NEW.tga",		L"ASURA_LARGE_GRAY"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 3 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_GRAY"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_GRAY"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 큰 초상화 회색 이미지_160x160
@@ -435,6 +450,11 @@ static const CharacterImageName s_CharacterImageName50[] =
 	CharacterImageName( L"DLG_UI_Common_Texture77_NEW.tga",		L"L_SPECTER_MEDIUM"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture82_NEW.tga",		L"ASURA_MEDIUM"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 4 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_MEDIUM"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_MEDIUM"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 중간 초상화 회색 이미지_50x50
@@ -533,6 +553,11 @@ static const CharacterImageName s_CharacterImageName20[] =
 	CharacterImageName( L"DLG_UI_Common_Texture77_NEW.tga",		L"L_SPECTER_ICON"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture82_NEW.tga",		L"ASURA_ICON"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 5 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_ICON"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_ICON"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 작인 초상화 이미지_20x20
@@ -633,6 +658,11 @@ CharacterImageName s_CharacterImageNameDungeonClear[] =
 	CharacterImageName( L"HQ_Dungeon_Clear_Ara_Little_Specter_Normal.tga",	L""	),	//55
 	CharacterImageName( L"HQ_Dungeon_Clear_Ara_Asura_Normal.tga",	L""	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 1 rows 0x3b / 0x3c
+	CharacterImageName( L"HQ_Dungeon_Clear_Elesis_Dark_Knight.tga",	L""	),	//57
+	CharacterImageName( L"HQ_Dungeon_Clear_Elesis_Crimson_Avenger.tga",	L""	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 던전 클리어 이미지
@@ -729,6 +759,11 @@ CharacterImageName s_CharacterImageNameInitial[] =
 	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_L"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_A"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 6 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_D"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_C"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 직업 관련 글자
@@ -828,6 +863,11 @@ static const CharacterImageName s_CharacterImageNameParty[] =
 	CharacterImageName( L"DLG_UI_Common_Texture77_NEW.tga",		L"L_SPECTER_PARTY"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture82_NEW.tga",		L"ASURA_PARTY"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 8 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_PARTY"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_PARTY"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 파티원 이미지
@@ -928,6 +968,11 @@ static const CharacterImageName s_CharacterImageUnitSlot[] =
 	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"list_ARA_L_SPECTER"	),	//55
 	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"list_ARA_ASURA"	),	//56
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 type 9 rows 0x3b / 0x3c
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"list_ELESIS_D_KNIGHT"	),	//57
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"list_ELESIS_C_AVENGER"	),	//58
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 };
 #pragma endregion 유닛 슬롯 이미지
@@ -2949,6 +2994,11 @@ void CX2Data::SetServerCurrentTime( wstring wstrTime )
 	case CX2Unit::UC_ARA_LITTLE_SPECTER:				iImageIndex = 55;		break;
 	case CX2Unit::UC_ARA_ASURA:							iImageIndex = 56;		break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+	// char-elesis CHNa: June 31ee0de0 class 0x23 -> row 0x3b, 0x7d -> 0x3c ( here 57 / 58 )
+	case CX2Unit::UC_ELESIS_DARK_KNIGHT:				iImageIndex = 57;		break;
+	case CX2Unit::UC_ELESIS_CRIMSON_AVENGER:			iImageIndex = 58;		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 
 	default:
 		break;
