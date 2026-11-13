@@ -1423,6 +1423,8 @@ no dungeon), so the stage-change and dungeon-end steps were not reached; a follo
   `QUEST_N_ELESIS_END`). **CH0b's routed `ErrorEnum(433)`** `Anim Frame : 79, Mesh Frame : 80` x20 on the six `Mesh_EL_Basic_*_Sorted.X` parts: those parts
   are June's bytes (`stage-june --dry-run`: 6 identical), so June's own data: `JUNE_BUGS.md` 642 (Ara's 603 twin), checklist l.775 marked.
   `offline_packets.log`: `EXCEPTION` 0, `UNHANDLED` only `E_DISABLE_HB_CHECK_REQ`. No missing animation, no popup.
+- **Closed (user, 2026-11-13):** the dungeon run (mode end, stage change, dungeon end) is waived: "i trust your code for this one, it'll be tested anyways
+  in future playtest". CH1 is done; the CH1 review retires `_WOS_DEBUG` without asking for that step.
 
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 

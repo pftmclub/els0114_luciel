@@ -25,7 +25,7 @@ Review CH1's deploy unit and the play-test evidence. Check at least:
 - **State counts:** each class's `ELESIS DATA ... states N` against the registrations (`InitStateCommon` + START / WIN / LOSE + bounding + wait-state-change
   + event + slot states + `InitStateByUnitClass` + learned-skill sub-states), as Ara's review did; every count the same on every load.
 - **Way of the Sword:** `ELESIS WOS vigor start / end`, `destruction start / end`, `attack gain` per the CH1q amendment; a mode across a stage change
-  (one point back, mode ends) and after a dungeon end (kept). A step the play-test did not reach is asked for once before `_WOS_DEBUG` goes.
+  (one point back, mode ends) and after a dungeon end (kept). The mode end, stage change and dungeon end were not reached and the user waived them (2026-11-13): retire `_WOS_DEBUG` without asking.
 - **Skills:** not cast in CH1 (unported characters cannot cast skills, user 2026-11-13); the two-cast, held-key and `SBUF` checks are the skill phases'
   (`CH2a.md` / `CH2b.md` / `CH2c.md` / `CH3b.md` amended). Nothing to check here.
 - **ErrorLog** against `data\ErrorLog_pre_CH1_elesis.txt`: `KEM_ERROR`, `Motion Error`, `lua error`, `ELESIS_KNIGHT`, `StateID`, `Parsing Error`;

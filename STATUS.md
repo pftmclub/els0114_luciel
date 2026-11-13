@@ -110,7 +110,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH1 | **play-test (user), part 2**: battle-field run clean (5 classes load, gauge both ways, 3 modes start); owed: one dungeon run for the mode end, stage change, dungeon end | Opus 5.5 / high, Opus review, user play-test | CH1q review, CH0b | Always.h, data036, motion koms | `CH1.md`, `CH1-review.md` |
+| CH1 | **done 2026-11-13** (battle-field play-test clean; dungeon WoS steps waived by the user); review ready | Opus 5.5 / high, Opus review, user play-test | CH1q review, CH0b | Always.h, data036, motion koms | `CH1.md`, `CH1-review.md` |
 | CH5 | blocked (CH1 review): `UnitTemplet` rows, cut-in table, creation screen (Grand Master, Blazing Heart) | Sonnet 5.5 / high, Opus review, user play-test | CH1 review | `UnitTemplet.lua`, `X2GUEL.cpp` cut-ins, `X2StateCreateUnit.*`, `X2UnitViewerUI.*`, data034 | `CH5.md` |
 | CHNa | blocked (CH5 review): 35 / 125 load and play, gauge arms, stat rows, creation screen third line | Opus 5.5 / high, Opus review, user play-test | CH5 review, char-ara CHNa review | `X2GageManager.cpp`, `X2Unit.h`, `X2GUEL.cpp`, `X2StateCreateUnit.cpp`, emulator, `createchar.py`, `StatTable.lua` (user packs) | `CHNa.md` |
 | CHNb | blocked (CHNa review): job change to 35 / 125 (quests 35569-35577) + level-15 / level-35 class-change dialogs | Opus 5.5 / high, Opus review, user play-test | CHNa review | `LevelUpEvent.lua`, `Handlers_Quest.cpp`, dialogs | `CHNb.md` |
