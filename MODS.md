@@ -6941,4 +6941,15 @@ Flag `SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN` in `KTDXLIB/Always.h` (needs `JUNE_Q
 Flags `SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER` and `SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE` in `KTDXLIB/Always.h`; temporary `SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG` (the C3y-2 review retires it). Plan `JUNE_DUNGEONS_PHASES.md` "C3y-2c"; log tag `[JUNE_GFX] SCENE`.
 - **Slide-shot layer (June).** `CreateSequence_LUA` takes June's 5th argument (`31c25e00` -> `CreateSequence` `31cf90f0` `m_Layer`), so the tutorial's post-boss pictures draw over the black back. Kept verbatim: a 4-argument call sets layer 0 as in June (JUNE_BUGS 653).
 - **Scene classes (not June).** Every GFx scene swf defines class `EventScene`; this Scaleform build shares one class domain (first registered wins) and never frees an unloaded scene, so later scenes ran the first scene's code (wrong voices, no `stop()` past its frames: fast typing, loops). Before each scene widget (0x2711) loads, `KTDGGFXManager.cpp` unregisters the classes of the file that owns `EventScene`.
+  **C3y-2d (2026-11-14) rewrote it in place:** C3y-2c's lookup never matched (the class is `gfxAS3.UI_Contents.EventScene.EventScene`). `CKTDGGFXUI::PrepareSceneClasses` now takes the last scene's shared class names (`EventScene`, `SoundPlayer`, `soundPlayer`, ...) out of the class table before the next scene loads and puts a scene's own names back when it plays again (the engine reuses its file); the per-scene `<document>_fla` classes stay registered. Plan "C3y-2d - fix 3".
 - **Revert:** comment out either define, `python tools/build.py --deploy`. No data or save change.
+
+## Stage 8 Lu/Ciel, NU1: June's unit-type range (char-luciel NU1, 2026-11-14)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE`. Plan `JUNE_CHARACTER_LUCIEL_PHASES.md`, "NU1 - Done".
+- **What changes.** `CX2Unit::UT_END` is June's 13 (after `UT_LUCIEL` 10 / `UT_ROSE` 11 / `UT_AIN` 12), so every unit-type array and loop reaches
+  13. The unit-script table has June's 13 slots (`LUCIEL_DUO.LUA`; Rose / Ain empty); an empty or unmounted slot is skipped and logged
+  (`[JUNE_CHAR] LUCIEL NEWUNIT`, 3 lines per start until CH1). Item-parse class check 0..202, class stat check 100..136, the server-select slot
+  tests June's type range (a Lu/Ciel no longer pops STR 707). The emulator's class -> type identity stays at the nine base classes.
+  Side effect: Lu / Rose / Ain costume rows in the offline cash shop now get the mounted-file check.
+- **Revert:** comment out the `#define`, `python tools/build.py --deploy --pch force` (X2Unit.h is in the PCH).

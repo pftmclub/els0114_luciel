@@ -377,6 +377,41 @@ Sonnet 5.5. No C++, no flag, no build (assets and data only; CH0 found no March 
 Lu/Ciel's slot, portrait, description and preview as June's, and his job-preview buttons play; a Lu/Ciel is created and
 listed with its 15 items in the save (`/x2-db` inventory); NU4's `CREATE` line shows class 200, the starter-row count and the stat source.
 
+### NU1 - Done (2026-11-14)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE` (Always.h). Log `[JUNE_CHAR] LUCIEL NEWUNIT` (offline_server.log).
+- **Enum** (`X2Unit.h`): with the flag `UT_LUCIEL` 10, `UT_ROSE` 11, `UT_AIN` 12, `UT_END` 13 (June `Enum.src.lua:313`); March's enum (incl. the
+  `JUNE_ENUM_NAMES` block) is the `#else`. No member renumbered. Every `UT_END` site follows by itself, so the 15 `widen` rows that are plain
+  `UT_END` bounds needed no edit: the `m_aUnitTypeLuaTemplet` array (13 x 8 B, June `32385a07`), the script loop (`337341ec`), the getter
+  (`3237a6b3`, `<= 12`), `InvalideDataCheck`'s type loop (`328d6ad4`), the item-parse type check (`325bd4d8`), and the three picture loops
+  (`324e41cf`, `324a9b5a`, `32532edf`: 12 pictures, null-safe `GetPicture`).
+- **Script table** (`X2UnitManager.cpp`): June's 13 slots (`337341b8`): index 10 `LUCIEL_DUO.LUA`, 11 / 12 NULL. A `BOOST_STATIC_ASSERT` stands in for
+  the compiled-out `ASSERT` (the NU0 trap). A slot with no script, or one `IsValidFile` cannot find, takes March's NULL path and logs once per type
+  (three lines per start until CH1 adopts `Luciel_Duo.lua`; 9 March types unchanged). Stand-in: June builds the templet anyway and logs 0x48 / 0x49.
+- **Class guards:** item parse class `0 .. UC_AIN_ANGEL` (June `325bd515`, `X2ItemManager_Preprocessing.cpp`); class stat check
+  `UC_ELSWORD_LORD_KNIGHT .. UC_AIN_APOSTASIA` (June `328d6ae1` / `328d6b30`, 100..136; the live `CharacterStatTable.lua` is June's and holds all 37
+  class rows and types 1-12, so no XEM_ERROR148). `X2SocketItem.cpp:2899` was already June's 1..202 (char-ara CHNa, `JUNE_CLASS_PATH`): no edit.
+  `UC_END` stays 124.
+- **`ChangeUnitButtonInfo`** (`X2StateServerSelect.cpp`): June `32564d50 @325651bd-325651d0` tests templet NULL or type outside 1..12 for the STR 707
+  box (same arguments, Ghidra-checked: `0x18` / `0x2d` string lengths), replacing March's case list. A type-10 unit no longer pops 707.
+- **Kept March's on purpose:** `X2OfflineStatTable::UnitTypeOf` identity pinned to `<= UT_ADD` (classes 10-12 are job classes; would have widened
+  silently). `X2GameEdit.cpp` class cheat (kickoff: leave).
+- **Live `UT_END` readers that now reach 13 without an edit (harmless):** `X2OfflineCashShop.cpp:174` (Lu / Rose / Ain costume rows get the
+  mounted-file check instead of "offered unchecked"), `IruhaKimCensus` counts, `PlaySoundCreateUnit` (NU4) and `PlaySoundRevive` (DU1) guards:
+  types 10-12 fall to March's switch default (no voice) until those phases. Dead rows (`X2Item.h`, `X2BeginningGame`, the old `Select*`, block
+  comment, `#else` bodies) widen for free.
+- **Hygiene:** flagcheck `--worktree`: `files: 6 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; `in this flag's files: 0 deleted line(s), 0
+  non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`.
+  `--range 18460a26^..18460a26`: same tallies, `RESULT: PASS`.
+  junediverge `--check` (6 files): `RESULT: PASS`. enumscan: 0 new (17 rows are the existing `JUNE_ENUM_NAMES` definitions).
+- **Compile:** `/Zs` probes of the 5 `.cpp` (no PCH, `census.cl_cmd`): 0 errors with the flag; `/P` shows `LUCIEL_DUO.LUA`, `UT_END = 13` and the
+  NEWUNIT line. Flag off = base by flagcheck. Commit `18460a26`.
+  `DEPLOY OK: X2_offline.exe is 26,475,008 B, dated 2026-11-14 00:55:27, md5 a62d6986ede44b4015f4d47aea583cb6` (`--pch force`).
+  `EXESTR OK: 2 of 2 found` (the NEWUNIT format string, `LUCIEL_DUO.LUA`, wide).
+- **Routed:** data036 `Enum.lua` still says `UT_END = 10` (no Lua reads it) -> NU3 kickoff. March's 9-picture `DLG_PVP_Result_Card_Back*` /
+  `DLG_PVP_Room_Character_Slot` (June's hold 12) -> CH5 kickoff. `PlaySoundCreateUnit` / `PlaySoundRevive` bodies stay NU4 / DU1.
+- **How to see it:** startup writes three `LUCIEL NEWUNIT` lines (types 10, 11, 12); an existing character's select / village / dungeon is unchanged.
+
 ## Phase DU - The two-body engine (DU1-DU5)
 
 | Sub-phase | Scope | Flag |

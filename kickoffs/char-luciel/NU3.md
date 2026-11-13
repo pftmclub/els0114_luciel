@@ -55,3 +55,11 @@ NU0 (2026-11-02), `june2017_re/char_luciel/nu0_templet_keys.tsv`:
 ## Amended by CH0 (2026-11-02)
 
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §3 L155-156 New characters need a unit type, a unit class, a skill tree and server-side data; §7t L591-593 UnitTemplet m_HyperCutIn / m_BerserkCutIn / m_MinorUnitHyperCutIn and the two _T.
+
+## Amended by NU1 (2026-11-14)
+
+- C++ `UT_END` is now June's 13 (`SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE`). data036 `Enum.lua` (core list) still says `UT_END = 10` with a comment
+  "C++ UT_END is 10" (lines 288 / 303-306); no Lua reads `UT_END` (grep of every kom, 2026-11-14). When this phase packs data036, set it to June's
+  13 (`Enum.src.lua:313`), drop the stale comment, `luasrc.py refresh`, and list it in the Done note.
+- `CreateUnitLuaSpace` loads `LUCIEL_DUO.LUA` for unit type 10 only once that file is mounted; until CH1 adopts it the startup log has
+  `[JUNE_CHAR] LUCIEL NEWUNIT unit type 10 has no mounted script ( LUCIEL_DUO.LUA ): type skipped`. That is expected here.

@@ -37,3 +37,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §3 L153 EmotionData, EventScene* (Lu/Ciel rows); §7t L617-622 skill cut-in names -> June .gfx: replace s_SkillCutInSet and the InitState index; §7ah L827 class statics Static_LucielSwitchingGuide / g_pStatic_LucielCooltime in the 10-s; §7aj L862-864 slot data type 6 (328d9b00 / 328da050): Luciel transform slot, ctor caller 3200f; §7aj L865 Luciel's portrait 328dcba0 / 328db7a0: form flag at tree +0x8c from unit +0xe40,.
 - Adopt `DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua` and `DLG_Luciel_CombinationPoint.lua` (data034). The switching guide (`322e6300`) is CH1a0's, the transform HUD CH2d20's.
+
+## Amended by NU1 (2026-11-14)
+
+- The unit-picture loops now walk June's 12 pictures (`X2StateDungeonRoom.cpp`, `X2StatePVPResult.cpp`, `X2StatePVPRoom.cpp`; null-safe), but
+  the live dialogs are March's with 9: `DLG_PVP_Result_Card_Back.lua`, `DLG_PVP_Result_Card_Back_MatchPvp.lua`, `DLG_PVP_Room_Character_Slot.lua`
+  (data034, no `LUCIEL` key). June's copies (`june_src_fixed/data034_kom/*.src.lua`) carry `LUCIEL_DUEL` etc. Adopt them (`adopt-june`, asset
+  rule), then a Lu/Ciel shows his picture in the dungeon-room slot. PvP is not reachable offline, so only the dungeon-room slot is testable.
