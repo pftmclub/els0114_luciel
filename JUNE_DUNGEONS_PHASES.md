@@ -673,6 +673,43 @@ Covers C3z-4t3 (`52951ffe`), C3z-4t4 (`d393113b`) and C3z-4t4b (`b29b62bc`). No 
   never leaves the room (the real server does, `GSUserField.cpp`), so `QuestCheckHereAndNow` ran `OnVisitField( 40000 )` from the stale battle-field
   room (offline_server.log 15:14:58.704). Not a tutorial-guide defect; kickoff `C3z-4t4c.md`.
 
+## C3z-4t4c - Done (2026-11-13, Sonnet 5.5 high): the offline server leaves the room on a field change
+
+Flag `SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE` (`KTDXLIB/Always.h`, no `_DEBUG`: the `ROOM     leaving room` line is the evidence).
+No review of its own (one emulator handler, transcribed from the real server).
+
+- **`Handler_EGS_STATE_CHANGE_FIELD_REQ`** (`Handlers_Field.cpp`): ACK, buff list, then (when `m_kRoom.m_bActive`) the room leave, in the order of
+  `GSUserField.cpp:211-221, 276-334`. Reason: `RT_BATTLE_FIELD` -> `NOT_LEAVE_ROOM_REASON_30` with the warp item, else `_27`; every other room
+  type (square, training centre, dungeon) -> `_01`. The client's room-type enum has no wedding hall, so the server's `RT_WEDDING_HALL` arm has no
+  offline counterpart. No `EGS_LEAVE_ROOM_ACK` (the client never asked).
+- **Shared tail** `CX2OfflineServer::LeaveActiveRoom( kSes, iReason )` (`Handlers_Room.cpp`, declared in `X2OfflineServer.h`): the `ROOM     leaving
+  room` log line, `CX2OfflineBuff::OnLeaveRoom`, `m_kRoom.Clear()`, `S_FIELD_MAP`; returns "buff list changed" so each caller sends
+  `SendUpdateBuffInfo` after its own ACK. `Handler_EGS_LEAVE_ROOM_REQ` now calls it (its old tail sits in the flag's `#else`).
+- **Reader audit** (clearing on a field change is safe because the real server clears at the same point):
+  - `Handlers_Quest.cpp:143-150` `QuestCheckHereAndNow`: unchanged, now falls through to `OnVisitVillage( m_iLastPos )` in a village (the defect).
+    `:738`, `:1142`, `:1244-1247`, `Handlers_Inventory.cpp:3976`, `Handlers_Skill.cpp:213`, `Handlers_Field.cpp:380` all test `m_bActive` first.
+  - Dungeon result / continue-end: the client sends `EGS_STATE_CHANGE_FIELD_REQ` after the result is closed, so every result-time reader has run.
+    A late `EGS_LEAVE_ROOM_REQ` on a cleared room only logs `RoomUID 0`, skips the buff call (`m_bActive` guard) and ACKs, as before.
+  - Training centre `Handlers_Room.cpp:798` ("Not m_kRoom.Clear()"): it keeps the room for the 5 s after `EGS_END_TC_GAME_ACK` because the client keeps
+    sending sync packets; the field change comes after those, and the server leaves `RT_TRAININGCENTER` there too.
+  - `X2OfflineServer.cpp:181` reconnect note: about `m_nSelectedUnitUID`, not the room; `m_kRoom` is a server member, not a session one. Unaffected.
+  - Field -> field portals use `EGS_JOIN_BATTLE_FIELD_REQ` (`X2StateBattleField.cpp:1238`), whose `OpenRoom` clears the room itself; only
+    `PMT_MOVE_TO_VILLAGE` (`:1245`) sends the field change.
+- **Hygiene.** flagcheck `--worktree --files` (4): 1 PASS, 2 PASS~ (1 marker line each), 1 DEFINE, 0 FAIL, `RESULT: PASS`. junediverge `--check`
+  (3 files): `RESULT: PASS`. enumscan: 0 rows (reasons are `NetError::NOT_LEAVE_ROOM_REASON_*`, room type `CX2Room::RT_BATTLE_FIELD`).
+- **Build.** `DEPLOY OK: X2_offline.exe is 26,441,216 B, dated 2026-11-13 15:54:08, md5 bd2b85980ddcf429ebc0cb3604ce1b59`, built at main `07fece2b` + the 4 files above.
+
+### Play-test hand-off (gate): C3z-4t4c
+
+Character: a new level-1 character of any March class (tutorial dungeon, then Ruben).
+1. Tutorial dungeon -> result -> back in Ruben. Look for: `ROOM     leaving room ...` on the village entry (the reason is the number of `NOT_LEAVE_ROOM_REASON_01`).
+2. Ruben -> field 40000 (portal) -> back to Ruben. Look for: `ROOM     leaving room ...` on the return, with a different reason number than step 1 (`NOT_LEAVE_ROOM_REASON_27`).
+3. In Ruben hand in 11000. Expected: 11005 is accepted and **not** completed; no `VISIT_FIELD done` line while in the village.
+4. Go to the field. Expected: `11005 sub 11005 VISIT_FIELD done (field 40000)` on field entry.
+5. Optional, the review's owed scene-201 walk: hand in 11000 before the field, ESC -> Character Select -> same character; 201 should begin
+   (the `begin 201 ( by going quest )` line needs `_GUIDE_DEBUG`, retired, so judge by the guide appearing on screen).
+If not: `python tools/logs.py --grep "ROOM     leaving|VISIT_FIELD done|VISIT_VILLAGE done|C3z-4t begin"`; say "check logs" after.
+
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
 A new March character's first select now enters June's class tutorial dungeon (`DI_DUNGEON_TUTORIAL_<class>`, 41150-41290) in place of

@@ -1466,6 +1466,27 @@ bool CX2OfflineServer::Handler_EGS_ROOM_LIST_REQ( KOfflineSession& kSes, const K
 	return Reply( kSes, EGS_ROOM_LIST_ACK, kAck );
 }
 
+#ifdef SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
+// C3z-4t4c: the tail of Handler_EGS_LEAVE_ROOM_REQ, moved here so a field change leaves the room the same way
+bool CX2OfflineServer::LeaveActiveRoom( KOfflineSession& kSes, int iReason )
+{
+	CX2OfflineLog::Server( L"ROOM     leaving room %I64d (reason=%d)",
+		(__int64)m_kRoom.m_kInfo.m_RoomUID, iReason );
+
+	bool bBuffChanged = false;
+#ifdef SERV_IRUHADEV_OFFLINE_ITEM_BUFF
+	// ERM_LEAVE_ROOM_ACK (GSUserRoomCommon.cpp:935-982): the leave-room end flags,
+	// then the list again - from outside the room now, so as EGS_UPDATE_BUFF_INFO_NOT.
+	bBuffChanged = ( true == m_kRoom.m_bActive &&
+		true == CX2OfflineBuff::Instance()->OnLeaveRoom( kSes.m_nSelectedUnitUID, (int)m_kRoom.m_kInfo.m_RoomType ) );
+#endif SERV_IRUHADEV_OFFLINE_ITEM_BUFF
+
+	m_kRoom.Clear();
+	kSes.m_eState = S_FIELD_MAP;
+	return bBuffChanged;
+}
+#endif SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
+
 bool CX2OfflineServer::Handler_EGS_LEAVE_ROOM_REQ( KOfflineSession& kSes, const KEvent& kEvent )
 {
 	KEGS_LEAVE_ROOM_REQ kReq;
@@ -1557,6 +1578,10 @@ bool CX2OfflineServer::Handler_EGS_LEAVE_ROOM_REQ( KOfflineSession& kSes, const 
 		}
 	}
 
+#ifdef SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
+	// C3z-4t4c: the tail is shared with Handler_EGS_STATE_CHANGE_FIELD_REQ
+	const bool bBuffChanged = LeaveActiveRoom( kSes, kReq.m_iReason );
+#else // SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
 	CX2OfflineLog::Server( L"ROOM     leaving room %I64d (reason=%d)",
 		(__int64)m_kRoom.m_kInfo.m_RoomUID, kReq.m_iReason );
 
@@ -1569,6 +1594,7 @@ bool CX2OfflineServer::Handler_EGS_LEAVE_ROOM_REQ( KOfflineSession& kSes, const 
 
 	m_kRoom.Clear();
 	kSes.m_eState = S_FIELD_MAP;
+#endif SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
 
 #ifdef SERV_IRUHADEV_OFFLINE_ITEM_BUFF
 	const bool bAckSent = Reply( kSes, EGS_LEAVE_ROOM_ACK, kAck );

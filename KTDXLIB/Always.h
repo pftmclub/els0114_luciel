@@ -13065,3 +13065,12 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              tutorial guide's quest highlight ( scenes 211 / 202 / 411 ) lands on them. Revert: comment out the #define ( JUNE_QUICK_QUEST_POS ).
 #define SERV_IRUHADEV_JUNE_QUICK_QUEST_POS
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t4c - the offline EGS_STATE_CHANGE_FIELD_REQ leaves the battle-field / dungeon room as the real server does
+//              ( GSUserField.cpp:276-334 ), so a quest accepted in a village no longer gets visit credit from the last field.
+//              Revert: comment out the #define ( OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE ).
+#define SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
+//////////////////////////////////////////////////////////////////////////

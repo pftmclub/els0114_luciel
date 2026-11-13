@@ -101,6 +101,28 @@ bool CX2OfflineServer::Handler_EGS_STATE_CHANGE_FIELD_REQ( KOfflineSession& kSes
 			L" - allowed through, nothing persisted", kReq.m_iMapID );
 	}
 
+#ifdef SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
+	// C3z-4t4c: the ACK, then the buff list, then the room leave - GSUserField.cpp:211-221, 276-334
+	const bool bAckSent = Reply( kSes, EGS_STATE_CHANGE_FIELD_ACK, kAck );
+#ifdef SERV_IRUHADEV_OFFLINE_ITEM_BUFF
+	SendUpdateBuffInfo( kSes, true );
+#endif SERV_IRUHADEV_OFFLINE_ITEM_BUFF
+
+	if( true == m_kRoom.m_bActive )
+	{
+		// the battle field leaves with the warp-item reason when one was used; every other room type is reason 01
+		const int iLeaveReason = ( (char)CX2Room::RT_BATTLE_FIELD != m_kRoom.m_kInfo.m_RoomType )
+			? (int)NetError::NOT_LEAVE_ROOM_REASON_01
+			: ( true == kReq.m_bUseWarpItem ) ? (int)NetError::NOT_LEAVE_ROOM_REASON_30 : (int)NetError::NOT_LEAVE_ROOM_REASON_27;
+
+		const bool bBuffChanged = LeaveActiveRoom( kSes, iLeaveReason );
+#ifdef SERV_IRUHADEV_OFFLINE_ITEM_BUFF
+		if( true == bBuffChanged )
+			SendUpdateBuffInfo( kSes );
+#endif SERV_IRUHADEV_OFFLINE_ITEM_BUFF
+	}
+	return bAckSent;
+#else // SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
 #ifdef SERV_IRUHADEV_OFFLINE_ITEM_BUFF
 	// GSUserField.cpp:215-221: after the ACK, the whole buff list, only if there is one.
 	const bool bAckSent = Reply( kSes, EGS_STATE_CHANGE_FIELD_ACK, kAck );
@@ -109,6 +131,7 @@ bool CX2OfflineServer::Handler_EGS_STATE_CHANGE_FIELD_REQ( KOfflineSession& kSes
 #else // SERV_IRUHADEV_OFFLINE_ITEM_BUFF
 	return Reply( kSes, EGS_STATE_CHANGE_FIELD_ACK, kAck );
 #endif SERV_IRUHADEV_OFFLINE_ITEM_BUFF
+#endif SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
 }
 
 //////////////////////////////////////////////////////////////////////////

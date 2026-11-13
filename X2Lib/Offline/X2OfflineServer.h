@@ -820,6 +820,13 @@ private:
 	bool Handler_EGS_ROOM_LIST_REQ( KOfflineSession& kSes, const KEvent& kEvent );
 	bool Handler_EGS_LEAVE_ROOM_REQ( KOfflineSession& kSes, const KEvent& kEvent );
 
+#ifdef SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
+	/// C3z-4t4c: the tail every room leave shares - the ROOM log line, the room-type buff end
+	/// flags, m_kRoom.Clear(), S_FIELD_MAP. Returns true when the buff list changed (the caller
+	/// sends SendUpdateBuffInfo after its own ACK, as the server's ERM_LEAVE_ROOM_ACK does).
+	bool LeaveActiveRoom( KOfflineSession& kSes, int iReason );
+#endif SERV_IRUHADEV_OFFLINE_LEAVE_ROOM_ON_FIELD_CHANGE
+
 	/// room options, all cosmetic offline but all waited on.
 	/// (EGS_CHANGE_DUNGEON_GET_ITEM_TYPE_REQ is absent on purpose:
 	/// NOT_USE_DICE_ROLL is defined in this build, so both the packet struct and
