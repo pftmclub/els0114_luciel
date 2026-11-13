@@ -40,7 +40,7 @@ so they run as their own plan. Engine fixes the dungeons need (NPC/game queries,
 |---|---|---|
 | C3y-1b | Henir Space's 5 missing boss worlds + the other Sander secret worlds (13 worlds); play-test + review owed | "C3y-1b - port: ..." and "C3y-1b - Done" |
 | C3y-1c | the Sander secret dungeon (41141, 32 NPCs, map button, BEHEMOTHSOUL effect data) | "C3y-1c - port: the Sander secret dungeon" |
-| C3y-2 | June's class tutorial dungeons (9 classes; identify the entry route first) | "C3y-2 - identify, then port: ..." |
+| C3y-2 | June's class tutorial dungeons replace March's battle-field tutorials (9 classes; route known since 2026-11-13: same entry `325622e0`, new ids; kickoff re-scoped to a port) | "C3y-2 - identify, then port: ..." + `kickoffs/june-dungeons/C3y-2.md` |
 | C3y-3 | Bestera 1-4 + `DI_BESTERA_START` | "C3y-3 - identify, then port: Bestera 1-4" |
 | C3y-4 | Space of Thought 1-3 + `_DUMMY`, the Special-map line | "C3y-4 - port: Space of Thought 1-3" |
 | C3y-5 | identify June's route into the Hero tier (read-only), then write the port phases | "C3y-5 - identify: ..." |

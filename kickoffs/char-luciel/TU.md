@@ -57,3 +57,9 @@ NU0 (2026-11-02), `nu0_jobchange_tutorial.tsv`:
 
 - Add's case of June's tutorial switch `325622e0` (type 9 -> `DI_DUNGEON_TUTORIAL_ADD` 41230) is owned by `kickoffs/char-add/TU.md`. If that phase
   has landed, keep its case; if this one lands first, add Lu/Ciel's case only and leave Add's to char-add TU.
+
+## Amended 2026-11-13 (june-dungeons C3y-2 re-scoped)
+
+- The March classes' cases of `325622e0` (and the `X2StateBeginning.cpp` copy), their `DI_DUNGEON_TUTORIAL_*` enums, DungeonData rows, worlds
+  624-632 and emulator lists belong to june-dungeons C3y-2. NU0's "TU ports June's whole body, every class" now means: add case 10 (Lu/Ciel)
+  to C3y-2's switch, plus Lu/Ciel's own data. If C3y-2 has not landed when this phase runs, stop and run C3y-2 first.

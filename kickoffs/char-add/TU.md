@@ -38,6 +38,10 @@ client quit on the empty dungeon. CH0c's stand-in skips the tutorial for Add (cr
 - Retire CH0c's tutorial skip (both sites) under this flag.
 - Play-test: create a new Add, he enters June's tutorial, plays it to its end and lands in the village; relog.
 
+**Amended 2026-11-13 (june-dungeons C3y-2 re-scoped):** C3y-2 ports June's whole tutorial switch for every March class, Add's case, enum,
+DungeonData row, world, NPCs and emulator lists included. If C3y-2 has landed, skip those bullets: this phase only retires CH0c's skip (both
+sites) and play-tests. If this phase lands first, do the bullets as written; C3y-2 keeps Add's case.
+
 No hardcoded enum literals (user, 2026-10-26; CLAUDE.md): an id that has a name in an Enum (June's
 `Enum.lua`, or a C++ enum) is never written as a number, in any new or touched code: use the member, and
 register it under a `SERV_IRUHADEV_` flag with June's value and name if C++ lacks it. A value with no Enum
