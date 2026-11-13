@@ -536,6 +536,9 @@ parser flag), Always.h. Log `[JUNE_CHAR] LUCIEL DATA` (ErrorLog, the NU1 fix-1 i
   Range flagcheck `f0b8249e^..f0b8249e`: `files: 2 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; 0 deleted; `RESULT: PASS`.
 - **How to see it:** start the game to the server / character select; ErrorLog has one `[JUNE_CHAR] LUCIEL DATA` line next to the three NU1
   `LUCIEL NEWUNIT` lines. An existing character's select / village / dungeon is unchanged.
+- **Play-test (user, 2026-11-14): passed** on exe e9dee3d6, run 02:12:35: ErrorLog 634 `[JUNE_CHAR] LUCIEL DATA unit templet rows 7 of 66,
+  second-body rows 7, major body Lu, minor body Ciel`, then NU1's three NEWUNIT lines (635-637); 0 EXCEPTION, 0 XEM_ERROR144 / 148,
+  0 KEM_ERROR72, 0 unbound Lua names. The 5 UNHANDLED `E_DISABLE_HB_CHECK_REQ` are the dev heartbeat toggle, not NU3.
 
 ## Phase DU - The two-body engine (DU1-DU5)
 
