@@ -143,6 +143,16 @@ static const CharacterImageName s_CharacterImageNameMyGage[] =
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_FACE"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_FACE"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 7 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture88_NEW.tga",		L"LU_FACE"	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_CHILIARCH_FACE_NORMAL"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_ROYAL_GUARD_FACE_NORMAL"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDB_FACE_NORMAL"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_DREADLORD_FACE_NORMAL"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_NOBLESSE_FACE_NORMAL"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDN_FACE_NORMAL"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 유저 Gage UI
@@ -247,6 +257,16 @@ static const CharacterImageName s_CharacterImageName160[] =
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_LARGE"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_LARGE"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 2 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture88_NEW.tga",		L"LUCIEL_LARGE"	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_CHILIARCH_LARGE"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_ROYAL_GUARD_LARGE"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDB_LARGE"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture91_NEW.tga",		L"LUCIEL_DREADLORD_LARGE"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture91_NEW.tga",		L"LUCIEL_NOBLESSE_LARGE"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDN_LARGE"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 	#pragma endregion 큰 초상화 이미지_160x160
@@ -352,6 +372,16 @@ static const CharacterImageName s_CharacterImageName160Gray[] =
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_GRAY"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_GRAY"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 3 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture88_NEW.tga",		L"LUCIEL_GRAY"	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_CHILIARCH_GRAY"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_ROYAL_GUARD_GRAY"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDB_GRAY"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture91_NEW.tga",		L"LUCIEL_DREADLORD_GRAY"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture91_NEW.tga",		L"LUCIEL_NOBLESSE_GRAY"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDN_GRAY"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 큰 초상화 회색 이미지_160x160
@@ -455,6 +485,16 @@ static const CharacterImageName s_CharacterImageName50[] =
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_MEDIUM"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_MEDIUM"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 4 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture88_NEW.tga",		L"LUCIEL_MEDIUM"	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_CHILIARCH_MEDIUM"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_ROYAL_GUARD_MEDIUM"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDB_MEDIUM"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_DREADLORD_MEDIUM"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_NOBLESSE_MEDIUM"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDN_MEDIUM"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 중간 초상화 회색 이미지_50x50
@@ -558,6 +598,16 @@ static const CharacterImageName s_CharacterImageName20[] =
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_ICON"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_ICON"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 5 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture88_NEW.tga",		L"LUCIEL_ICON"	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_CHILIARCH_ICON"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_ROYAL_GUARD_ICON"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDB_ICON"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_DREADLORD_ICON"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_NOBLESSE_ICON"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDN_ICON"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 작인 초상화 이미지_20x20
@@ -663,6 +713,16 @@ CharacterImageName s_CharacterImageNameDungeonClear[] =
 	CharacterImageName( L"HQ_Dungeon_Clear_Elesis_Dark_Knight.tga",	L""	),	//57
 	CharacterImageName( L"HQ_Dungeon_Clear_Elesis_Crimson_Avenger.tga",	L""	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 1 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"HQ_Dungeon_Clear_Lu.tga",	L""	),	//59
+	CharacterImageName( L"HQ_Dungeon_Clear_LUCIEL_CHILIARCH.tga",	L""	),	//60
+	CharacterImageName( L"HQ_Dungeon_Clear_Lu.tga",	L""	),	//61
+	CharacterImageName( L"HQ_Dungeon_Clear_LUCIEL_DIABLURA.tga",	L""	),	//62
+	CharacterImageName( L"HQ_Dungeon_Clear_LUCIEL_CHILIARCH.tga",	L""	),	//63
+	CharacterImageName( L"HQ_Dungeon_Clear_LUCIEL_NOBLESSE.tga",	L""	),	//64
+	CharacterImageName( L"HQ_Dungeon_Clear_LUCIEL_DIABLURA.tga",	L""	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 던전 클리어 이미지
@@ -764,6 +824,16 @@ CharacterImageName s_CharacterImageNameInitial[] =
 	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_D"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_C"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 6 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L""	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_C"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"Class_R"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_B"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_D"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_N"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture11.tga",		L"CLASS_M"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 직업 관련 글자
@@ -868,6 +938,16 @@ static const CharacterImageName s_CharacterImageNameParty[] =
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SDK_PARTY"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture85_NEW.tga",		L"EL_SCA_PARTY"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 8 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture88_NEW.tga",		L"LUCIEL_PARTY"	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_CHILIARCH_PARTY"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_ROYAL_GUARD_PARTY"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDB_PARTY"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_DREADLORD_PARTY"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture89_NEW.tga",		L"LUCIEL_NOBLESSE_PARTY"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture96_NEW.tga",		L"LUCIEL_LDN_PARTY"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 파티원 이미지
@@ -973,6 +1053,16 @@ static const CharacterImageName s_CharacterImageUnitSlot[] =
 	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"list_ELESIS_D_KNIGHT"	),	//57
 	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"list_ELESIS_C_AVENGER"	),	//58
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 type 9 rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"LIST_LUCIEL"	),	//59
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"LIST_LUCIEL_CHILIARCH"	),	//60
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"LIST_LUCIEL_ROYAL_GUARD"	),	//61
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"LIST_LUCIEL_DIABLURA"	),	//62
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"LIST_LUCIEL_DREADLORD"	),	//63
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"LIST_LUCIEL_NOBLESSE"	),	//64
+	CharacterImageName( L"DLG_UI_Common_Texture_GUI_character_01.tga",		L"LIST_LUCIEL_DEMONIO"	),	//65
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 };
 #pragma endregion 유닛 슬롯 이미지
@@ -2007,6 +2097,9 @@ CX2UnitManager* CX2Data::ResetUnitManager( const WCHAR* pFileName, const WCHAR* 
 #endif // REFORM_SKILL_NOTE_UI
 
 #ifdef SERV_IRUHADEV_JUNE_ANIMATION_NAME_TABLE
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+	m_pUnitManager->OpenSelectVoiceTable( L"SelectVoiceTable.lua" );	// char-luciel NU4: June 31ee6100 @31ee620a, before AnimationNameTable.lua
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 	// June 31ee6100 @31ee6217: AnimationNameTable.lua is opened after SelectVoiceTable.lua (not ported) and just before
 	// UnitViewerEffectSetTable.lua (@31ee6224)
 	m_pUnitManager->OpenAnimationNameTable( L"AnimationNameTable.lua" );
@@ -2999,6 +3092,16 @@ void CX2Data::SetServerCurrentTime( wstring wstrTime )
 	case CX2Unit::UC_ELESIS_DARK_KNIGHT:				iImageIndex = 57;		break;
 	case CX2Unit::UC_ELESIS_CRIMSON_AVENGER:			iImageIndex = 58;		break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: June 31ee0de0 class 0xc8 -> row 0x3f, 0x25 -> 0x40, 0x26 -> 0x41, 0x27 -> 0x4d, 0x7f -> 0x42, 0x80 -> 0x43, 0x81 -> 0x4e ( here 59..65 )
+	case CX2Unit::UC_LUCIEL_DUO:					iImageIndex = 59;		break;
+	case CX2Unit::UC_LUCIEL_CHILIARCH:				iImageIndex = 60;		break;
+	case CX2Unit::UC_LUCIEL_ROYAL_GUARD:			iImageIndex = 61;		break;
+	case CX2Unit::UC_LUCIEL_DIABLURA:				iImageIndex = 62;		break;
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:				iImageIndex = 63;		break;
+	case CX2Unit::UC_LUCIEL_NOBLESSE:				iImageIndex = 64;		break;
+	case CX2Unit::UC_LUCIEL_DEMONIO:				iImageIndex = 65;		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 	default:
 		break;
@@ -3643,6 +3746,94 @@ CX2RelationshipEffectManager* CX2Data::ResetRelationshipEffectManager()
 
 #ifdef REFORM_ENTRY_POINT //JHKang
 #pragma region RotateYSelectCharacterType
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+// char-luciel NU4: June 31edf260, the templet's lobby rotation ( second body: bMinorUnit_ ) when not 0, else a per-class constant
+float CX2Data::RotateYSelectCharacterType( CX2Unit::UNIT_CLASS eClass_, bool bMinorUnit_ )
+{
+	const CX2Unit::UnitTemplet* pUnitTemplet = ( NULL != m_pUnitManager ) ? m_pUnitManager->GetUnitTemplet( eClass_ ) : NULL;
+	if ( NULL != pUnitTemplet )
+	{
+		const float fTempletRotY = ( true == bMinorUnit_ ) ? pUnitTemplet->m_fMinorUnitLobbyRotationY : pUnitTemplet->m_fLobbyRotationY;
+		if ( 1.1920929e-07f < fabs( fTempletRotY ) )
+			return fTempletRotY;
+	}
+
+	switch ( eClass_ )
+	{
+	case CX2Unit::UC_ELSWORD_SWORDMAN:
+	case CX2Unit::UC_ELESIS_SABER_KNIGHT:
+	case CX2Unit::UC_CHUNG_DEADLY_CHASER:
+	case CX2Unit::UC_CHUNG_TACTICAL_TROOPER:
+		return 25.f;
+	case CX2Unit::UC_ARME_VIOLET_MAGE:
+	case CX2Unit::UC_ARME_DARK_MAGICIAN:
+		return 40.f;
+	case CX2Unit::UC_LIRE_ELVEN_RANGER:
+	case CX2Unit::UC_ELESIS_KNIGHT:
+	case CX2Unit::UC_ELSWORD_KNIGHT:
+	case CX2Unit::UC_LIRE_COMBAT_RANGER:
+	case CX2Unit::UC_LIRE_SNIPING_RANGER:
+	case CX2Unit::UC_RAVEN_SOUL_TAKER:
+	case CX2Unit::UC_ARME_DIMENSION_WITCH:
+	case CX2Unit::UC_RAVEN_VETERAN_COMMANDER:
+		return 30.f;
+	case CX2Unit::UC_RAVEN_FIGHTER:
+	case CX2Unit::UC_RAVEN_OVER_TAKER:
+	case CX2Unit::UC_EVE_EXOTIC_GEAR:
+	case CX2Unit::UC_ARA_LITTLE_HSIEN:
+	case CX2Unit::UC_ARA_LITTLE_DEVIL:
+	case CX2Unit::UC_RAVEN_RECKLESS_FIST:
+	case CX2Unit::UC_ELSWORD_INFINITY_SWORD:
+	case CX2Unit::UC_ELESIS_GRAND_MASTER:
+		return 15.f;
+	case CX2Unit::UC_EVE_NASOD:
+	case CX2Unit::UC_ADD_NASOD_RULER:
+	case CX2Unit::UC_CHUNG_SHOOTING_GUARDIAN:
+	case CX2Unit::UC_ELSWORD_SHEATH_KNIGHT:
+	case CX2Unit::UC_ARME_BATTLE_MAGICIAN:
+	case CX2Unit::UC_ELSWORD_RUNE_SLAYER:
+	case CX2Unit::UC_LIRE_WIND_SNEAKER:
+	case CX2Unit::UC_LIRE_GRAND_ARCHER:
+	case CX2Unit::UC_ARME_ELEMENTAL_MASTER:
+	case CX2Unit::UC_CHUNG_IRON_PALADIN:
+	case CX2Unit::UC_LUCIEL_DUO:
+		return 20.f;
+	case CX2Unit::UC_ELSWORD_MAGIC_KNIGHT:
+		return 45.f;
+	case CX2Unit::UC_ARME_HIGH_MAGICIAN:
+	case CX2Unit::UC_RAVEN_BLADE_MASTER:
+		return 35.f;
+	case CX2Unit::UC_CHUNG_SHELLING_GUARDIAN:
+	case CX2Unit::UC_EVE_CODE_NEMESIS:
+	case CX2Unit::UC_EVE_BATTLE_SERAPH:
+	case CX2Unit::UC_ARA_SAKRA_DEVANAM:
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+		return 5.f;
+	case CX2Unit::UC_ROSE_BLOODIA:
+	case CX2Unit::UC_ROSE_CRIMSON_ROSE:
+	case CX2Unit::UC_ROSE_GUNNER:
+		return -10.f;
+	case CX2Unit::UC_ROSE_HEAVY_BARREL:
+	case CX2Unit::UC_ROSE_STORM_TROOPER:
+		return -20.f;
+	case CX2Unit::UC_ROSE_VALKYRIE:
+	case CX2Unit::UC_ROSE_OPTIMUS:
+		return -15.f;
+	case CX2Unit::UC_ARA_YAMA_RAJA:
+		return 13.f;
+	case CX2Unit::UC_ELESIS_BLAZING_HEART:
+		return 8.f;
+	case CX2Unit::UC_ADD_LUNATIC_PSYKER:
+		return 3.f;
+	case CX2Unit::UC_ADD_DIABOLIC_ESPER:
+		return 0.f;
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+		return ( true == bMinorUnit_ ) ? 20.f : -15.f;
+	default:
+		return 10.f;
+	}
+}
+#else SERV_IRUHADEV_JUNE_CHAR_CREATE
 float CX2Data::RotateYSelectCharacterType( CX2Unit::UNIT_CLASS eClass_ )
 {
 	float fRotY = 0.f;
@@ -3902,6 +4093,7 @@ float CX2Data::RotateYSelectCharacterType( CX2Unit::UNIT_CLASS eClass_ )
 
 	return fRotY;
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 #pragma endregion 유닛 회전 값 지정
 #endif //REFORM_ENTRY_POINT
 

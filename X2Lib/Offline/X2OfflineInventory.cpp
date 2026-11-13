@@ -12,6 +12,9 @@
 #include "X2OfflineLog.h"
 #include "X2OfflineEnchantTable.h"		///< MAX_ENCHANT_LEVEL, for SetEnchantLevel's range check
 #include "X2OfflineSocketTable.h"		///< GetSocketCount, for the socket slot range check
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+#include "X2OfflineStatTable.h"			///< char-luciel NU4: the stat source in the CREATE line
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 
 #include <algorithm>
 
@@ -1241,7 +1244,15 @@ namespace
 #else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 		{ 9, { 112991, 112992, 112993, 112994, 112995 }, {  41757,  41758,  41759,  41760,  41761 } },	///< unreachable, see above
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+		{ 200, { 113300, 113301, 113302, 113303, 113304 }, {  41890,  41891,  41892,  41893,  41894 } },	///< Lu/Ciel ( char-luciel NU4: stand-in from item.kim, user 2026-11-02; the live table has no row )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 	};
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+	/// char-luciel NU4: Ciel's promotion costume ( set 5934, is_for_minor_unit ), the five rows past the live shape of ten
+	const int LUCIEL_MINOR_UNIT_COSTUME[5] = { 41900, 41901, 41902, 41903, 41904 };
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 
 	/// Where each half's five pieces go, in the same order the arrays list them.
 	/// The odd/even pairing is the fashion layer ([X2Unit.h:223](X2Lib/X2Unit.h#L223)),
@@ -1395,6 +1406,22 @@ bool CX2OfflineInventory::SeedBeginnerGear( UidType nUnitUID, int iUnitClass )
 		L" worn here is a difference between this install's packed item table and the"
 		L" live one", iUnitClass, iWorn, iBagged, iMissing );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+	// char-luciel NU4: runs after SeedPromotionItems, so the count covers all fifteen rows
+	if( CX2Unit::UC_LUCIEL_DUO == iUnitClass )
+	{
+		int iStarterRows = 0;
+		for( int i = 0; i < 5; ++i )
+		{
+			iStarterRows += CountItemByID( pSet->m_aiGear[i], false );
+			iStarterRows += CountItemByID( pSet->m_aiCostume[i], false );
+			iStarterRows += CountItemByID( LUCIEL_MINOR_UNIT_COSTUME[i], false );
+		}
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL CREATE class %d unit %I64d: %d of 15 starter row(s) in the save, stat source %s",
+			iUnitClass, nUnitUID, iStarterRows, CX2OfflineStatTable::Instance()->GetStatSource( iUnitClass ) );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+
 	return ( iWorn > 0 || iBagged > 0 );
 }
 
@@ -1439,6 +1466,31 @@ bool CX2OfflineInventory::SeedPromotionItems( UidType nUnitUID, int iUnitClass )
 		else
 			++iBagged;
 	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+	// char-luciel NU4: Ciel's five go to the costume slots Lu already wears, so they land in the bag until DU4
+	if( CX2Unit::UC_LUCIEL_DUO == iUnitClass )
+	{
+		for( int i = 0; i < 5; ++i )
+		{
+			if( NULL == Templet( LUCIEL_MINOR_UNIT_COSTUME[i] ) )
+			{
+				++iMissing;
+				continue;
+			}
+
+			bool bWorn = false;
+			if( false == PlaceAtEquipSlot( nUnitUID, LUCIEL_MINOR_UNIT_COSTUME[i], COSTUME_SLOT[i],
+										   CX2Item::PT_INFINITY, -1, bWorn ) )
+				continue;
+
+			if( true == bWorn )
+				++iWorn;
+			else
+				++iBagged;
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 
 	// dbo.gup_create_unit_set_promotion gives each of these a GItemPeriod row of
 	// 7 days, so on the live server the costume is a rental that expires. It is

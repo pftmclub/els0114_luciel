@@ -13195,3 +13195,38 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              Revert: comment out the #define.
 #define SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel NU4 - Lu/Ciel on the character-creation screen and the select screen (class-agnostic where June is):
+//              SelectLuciel (June 325559f0), the slot / re-select / default-select cases, the dummy unit, the class-change dialog,
+//              stand board + aura, info texture, stat chart, side-flag colour, the job-preview table, the select-screen background and
+//              stand board; June's lobby rotation (31edf260: templet m_fLobbyRotationY first, per-class switch when 0) for every
+//              class; the create request sends the base class of the selected type (stand-in, June sends +0x2c0). One body until DU5.
+//              Revert: comment out the #define (DLG_Unit_Create_Unit_Button_New.lua then shows a slot that does nothing).
+#define SERV_IRUHADEV_JUNE_CHAR_CREATE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_CREATE ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE ) && defined( SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD ) && defined( SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET ) && defined( SERV_IRUHADEV_JUNE_CLASS_CHANGE_GUIDE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_CREATE needs UNIT_TYPE_RANGE ( UT_LUCIEL ), UNIT_CLASS_WORD ( class 200 ), MINOR_UNIT_TEMPLET ( rotations ) and JUNE_CLASS_CHANGE_GUIDE ( class table )
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel NU4 - June's SelectVoiceTable.lua (data036) is loaded (g_pUnitManager:AddVoice, June 32379ed0, opened by
+//              ResetUnitManager 31ee6100) and June's voice-name builder (32376270: table row first, else unit-type name + suffix) names
+//              the create voice (PlaySoundCreateUnit 32550aa0) and the select voices (PlaySoundSelect 3255f240, by class). Changes
+//              for March classes: Rena's create voice is RenaVoice_Create0n (was LenaVoice_), and the table's per-class select
+//              voices (Elesis DK / CA, Add TT / DE) play. ErrorLog line [JUNE_CHAR] LUCIEL CREATE voice table gives the row count.
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel NU4 - the emulator seeds a created Lu/Ciel (class 200) with 15 starter rows (user 2026-11-02, labelled
+//              stand-in: the live gup_create_unit shape is ten and has no Lu/Ciel rows): Cobo beginner gear 113300-113304, Lu's
+//              promotion costume 41890-41894 (set 5933) and Ciel's 41900-41904 (set 5934, bagged until DU4 gives her slots).
+//              offline_server.log line [JUNE_CHAR] LUCIEL CREATE gives the class, the starter-row count and the stat source.
+//              Revert: comment out the #define (a Lu/Ciel then starts with no items, logged).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
+//////////////////////////////////////////////////////////////////////////

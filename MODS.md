@@ -7022,3 +7022,24 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for
 - **Damage.** The numbers are June's numerical-only tables read by the engine ( no March row exists ); this phase changes no number. June's L1 values ( x100, PvP rate ): Flame Sword finish effect 345 ( 0.28 ),
   Scalet Rose start 290 / attack 275 ( 0.32 ), Flame Protection 1305 ( 0.28 ); the Flame Sword state's own table is `NUMERICAL_DATA_INDEX` 1 of skill 28210.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
+## Stage 8 Lu/Ciel, NU4: Lu/Ciel on the creation and select screens, 15 starter rows, June's voice table (char-luciel NU4, 2026-11-14)
+
+Flags `SERV_IRUHADEV_JUNE_CHAR_CREATE`, `SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE`, `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS` (all `KTDXLIB/Always.h`).
+Plan `JUNE_CHARACTER_LUCIEL_PHASES.md`, "NU4 - Done".
+- **Creation screen** (`X2StateCreateUnit.*`): June's `SelectLuciel` (`325559f0`), the slot / re-select / default-select cases, `DummyLuciel`,
+  class-change dialog, stand board `Dummy_Village_Board11` + aura (x + 25, z + 50), info texture `_info_10`, stat chart, side-flag colour, job
+  previews (`X2Unit.h` class table). One body (Lu) until DU5. The create request sends the base class of the selected type (stand-in: June sends
+  the previewed class); for types 1-9 that is March's value.
+- **Select screen** (`X2StateServerSelect.cpp`): Lu/Ciel's background and stand board. `X2Data.cpp`: Lu/Ciel's 7 class picture rows
+  (`31ee0de0`), and June's lobby rotation `31edf260` for every class (templet `m_fLobbyRotationY` first, per-class constant when 0).
+- **Voices:** June's `SelectVoiceTable.lua` (data036) is loaded and bound (`AddVoice`); create and select voices come from June's builder
+  `32376270`. For March classes: Rena's create voice is `RenaVoice_Create0n` (was `LenaVoice_`), and Elesis DK / CA and Add TT / DE get their
+  table select voices.
+- **Emulator:** class 200 gets 15 starter rows (`X2OfflineInventory.cpp`: Cobo gear 113300-113304, Lu costume 41890-41894 worn, Ciel costume
+  41900-41904 bagged until DU4); the stat fallback uses the base class of the unit type (never class 10 for type 10), logged once per class.
+- **Data:** data034 `DLG_Unit_Create_Unit_Button_New.lua` converted to core-list source (T1) + Lu/Ciel's slot at x 713; data036 `Enum.lua`
+  gains `SCUUCM_LUCIEL_BUTTON_UP` 36 and June's `SOUND_PLAY_TYPE`; data057 stages June's `DLG_UI_Common_Texture89_NEW` / `91_NEW` (.tga / .TET, new).
+  `tools/createchar.py` knows the seven classes.
+- **Revert:** comment out the three defines, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`; `luasrc.py restore data034
+  DLG_Unit_Create_Unit_Button_New.lua` and drop the two `Enum.lua` blocks, then `kom.py pack` / `copy` data034 and data036.

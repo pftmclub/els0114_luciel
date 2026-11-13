@@ -71,6 +71,9 @@ class CX2StateCreateUnit : public CX2State
 			SCUUCM_NICKNAME_CHECK,
 
 			SCUUCM_ADD_BUTTON_UP,
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+			SCUUCM_LUCIEL_BUTTON_UP = 36,	// char-luciel NU4: June Enum.lua STATE_CREATE_UNIT_UI_CUSTOM_MSG
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 // #endif // REFORM_ENTRY_POINT	// 13-11-11, 진입 구조 개편, kimjh
 		};
 #ifdef REFORM_ENTRY_POINT	 	// 13-11-11, 진입 구조 개편, kimjh
@@ -138,6 +141,9 @@ class CX2StateCreateUnit : public CX2State
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 		void SelectAdd();
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		void SelectLuciel();	// char-luciel NU4: June 325559f0
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 
 #ifdef REFORM_ENTRY_POINT	 	// 13-11-11, 진입 구조 개편, kimjh
@@ -232,6 +238,9 @@ class CX2StateCreateUnit : public CX2State
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 		CX2Unit*				m_pDummyAdd;
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		CX2Unit*				m_pDummyLuciel;	// char-luciel NU4: June +0x30c
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 
 		CX2UnitViewerUI*		m_pUnitViewerUI;

@@ -81,6 +81,13 @@ public:
 
 	bool	IsLoaded() const					{ return false == m_mapStat.empty(); }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	/// char-luciel NU4: which rows GetUnitStat reads for a class ( its own, its base class's, or the synthetic curve )
+	const WCHAR*	GetStatSource( int iUnitClass );
+	/// char-luciel NU4: the base class of a class's unit type ( June 32368880 ), never a job class with the type's number
+	static int	BaseClassOf( int iUnitClass );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
+
 	/// KGamePlayStatus::CHAR_ABIL_TYPE for a class, mirroring the real server's
 	/// switch in KGSGameDBThread (GSGameDBThread.cpp:792-809), flags included.
 	static char	CharAbilTypeOf( int iUnitClass );

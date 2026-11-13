@@ -51,6 +51,9 @@ CLASSES = {
     # June-only classes (X2Unit.h SERV_IRUHADEV_JUNE_ENUM_NAMES), added by their char port's class-path phase.
     34: 'ARA_LITTLE_SPECTER', 124: 'ARA_ASURA',
     35: 'ELESIS_DARK_KNIGHT', 125: 'ELESIS_CRIMSON_AVENGER',
+    # char-luciel NU4: Lu/Ciel (UT_LUCIEL 10), June Enum.lua UNIT_CLASS
+    200: 'LUCIEL_DUO', 37: 'LUCIEL_CHILIARCH', 38: 'LUCIEL_ROYAL_GUARD', 39: 'LUCIEL_DIABLURA',
+    127: 'LUCIEL_DREAD_LORD', 128: 'LUCIEL_NOBLESSE', 129: 'LUCIEL_DEMONIO',
 }
 
 
@@ -142,6 +145,7 @@ PARENT = {
     28: 7, 31: 7, 34: 7, 118: 28, 119: 31, 124: 34,
     29: 8, 30: 8, 35: 8, 120: 29, 121: 30, 125: 35,
     32: 9, 122: 32,
+    37: 200, 38: 200, 39: 200, 127: 37, 128: 38, 129: 39,
 }
 
 
@@ -153,6 +157,9 @@ def lineage(cls):
 
 
 # Fallback: the five-piece promotional costume per base class: weapon, body, leg, hand, foot. Transcribed from
+# char-luciel NU4: a base class whose number is not its unit type (June 32368880: type 10 -> class 200).
+UNIT_TYPE_OF_BASE = {200: 10}
+
 # X2OfflineInventory.cpp GBASE_ITEM (the live dbo.GBase_Item rows); class 9 is unreachable in the real create path
 # (gup_create_unit rejects it) but its ids resolve in June's kim, so a test Add gets them too.
 PROMO = {
@@ -161,6 +168,7 @@ PROMO = {
     5: (130134, 130135, 130136, 130137, 130138), 6: (133125, 133126, 133127, 133128, 133129),
     7: (41460, 41470, 41480, 41490, 41500), 8: (41720, 41721, 41722, 41723, 41724),
     9: (41757, 41758, 41759, 41760, 41761),
+    200: (41890, 41891, 41892, 41893, 41894),   # char-luciel NU4 stand-in row (Lu's promotion set 5933)
 }
 # The create screen previews a job in its own promotion costume (CX2StateCreateUnit::EquipPromotionItemByUnitTemplet reads
 # promotion*ItemID off the class's UnitTemplet row), so the worn costume comes from the same live file.
@@ -221,7 +229,7 @@ def top_gear(k, kimmod, cls):
     era = k.L['era']
     lab = lambda f, v: kimmod.enum_label(f, v, era)
     line = lineage(cls)
-    base = line[-1]
+    base = UNIT_TYPE_OF_BASE.get(line[-1], line[-1])   # kim's unit_type is the unit type (Lu/Ciel 10), not the base class
     positions = {kimmod.enum_parse('eqip_position', p, era) for p in GEAR_POSITIONS}
     weapons, sets = [], {}
     for i in k.ids():

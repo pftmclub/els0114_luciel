@@ -359,13 +359,22 @@ void CX2OfflineStatTable::GetUnitStat( int iUnitClass, int iLevel, OUT KStat& kO
 	// against an older StatTable.lua.)
 	if( mitClass == m_mapStat.end() )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		const int iBaseClass = BaseClassOf( iUnitClass );	// char-luciel NU4: UnitTypeOf( 200 ) is 10, Elsword Knight's class
+#else SERV_IRUHADEV_JUNE_CHAR_CREATE
 		const int iBaseClass = UnitTypeOf( iUnitClass );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 		if( iBaseClass != iUnitClass )
 			mitClass = m_mapStat.find( iBaseClass );
 	}
 
 	if( mitClass == m_mapStat.end() )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		// char-luciel NU4: once per class, not once per stat read
+		static std::set< int > s_setSyntheticClassLogged;
+		if( true == s_setSyntheticClassLogged.insert( iUnitClass ).second )
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 		CX2OfflineLog::Server( L"STAT     WARNING no rows for class=%d - using the synthetic curve",
 			iUnitClass );
 
@@ -394,5 +403,27 @@ void CX2OfflineStatTable::GetUnitStat( int iUnitClass, int iLevel, OUT KStat& kO
 
 	kOut = mitLevel->second;
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+// char-luciel NU4: June 32368880 maps a unit type to its base class ( type 10 -> 200 ); GetUnitClassByTierAndLine is the same table
+/*static*/ int CX2OfflineStatTable::BaseClassOf( int iUnitClass )
+{
+	return GetUnitClassByTierAndLine( UnitTypeOf( iUnitClass ), CX2Unit::UCT_BASIC_CLASS, CX2Unit::UCL_FIRST );
+}
+
+// char-luciel NU4: the CREATE line's stat source, the same lookups GetUnitStat makes
+const WCHAR* CX2OfflineStatTable::GetStatSource( int iUnitClass )
+{
+	EnsureLoaded();
+
+	if( true == m_mapStat.empty() )
+		return L"synthetic curve ( StatTable.lua not loaded )";
+	if( m_mapStat.end() != m_mapStat.find( iUnitClass ) )
+		return L"StatTable.lua rows of the class";
+	if( m_mapStat.end() != m_mapStat.find( BaseClassOf( iUnitClass ) ) )
+		return L"StatTable.lua rows of the base class";
+	return L"synthetic curve ( no rows )";
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 #endif SERV_IRUHADEV_OFFLINE

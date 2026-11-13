@@ -66,6 +66,9 @@ m_pDummyEL ( NULL ) ,
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 m_pDummyAdd ( NULL ) ,
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+m_pDummyLuciel ( NULL ) ,	// char-luciel NU4
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 m_pUnitViewerUI( NULL ),
 m_bSelectUnit( false ),		
 m_fMouseSensitivity( 0.01f ),
@@ -221,6 +224,14 @@ m_pDLGMSGOkBoxEnterTutorial( NULL )
 			if ( NULL != m_pDLGCreateUnitFront->GetControl( L"AddCreateUnitSlot") )
 				static_cast<CKTDGUIRadioButton *> ( m_pDLGCreateUnitFront->GetControl( L"AddCreateUnitSlot") )->SetChecked( true );
 		} break;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	case CX2Unit::UT_LUCIEL:	// char-luciel NU4: June 32556f60 opens on the newest class; US limit 8 keeps Elesis here
+		{
+			SelectLuciel();
+			if ( NULL != m_pDLGCreateUnitFront->GetControl( L"LucielCreateUnitSlot") )
+				static_cast<CKTDGUIRadioButton *> ( m_pDLGCreateUnitFront->GetControl( L"LucielCreateUnitSlot") )->SetChecked( true );
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 	default:
 		{
 			// 신캐릭터가 없다면 엘소드를 선택하는게 가장 자연스럽다. by 박진웅
@@ -304,6 +315,9 @@ CX2StateCreateUnit::~CX2StateCreateUnit(void)
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 	SAFE_DELETE( m_pDummyAdd );
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	SAFE_DELETE( m_pDummyLuciel );	// char-luciel NU4
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 #ifdef REFORM_ENTRY_POINT	 	// 13-11-11, 진입 구조 개편, kimjh
 	if ( NULL != g_pData->GetUIMajorXMeshPlayer() )
@@ -786,6 +800,12 @@ bool CX2StateCreateUnit::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 				SelectAdd();
 			} break;
 #endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		case SCUUCM_LUCIEL_BUTTON_UP :	// char-luciel NU4: June 32558860 msg 36 ( the jumping flag +0x71c is not ported )
+			{
+				SelectLuciel();
+			} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 #ifdef REFORM_ENTRY_POINT	 	// 13-11-11, 진입 구조 개편, kimjh
 		case SCUUCM_FIRST_LINE_FIRST_CLASS_CHANGE_BUTTON_UP :
 			{
@@ -866,6 +886,12 @@ bool CX2StateCreateUnit::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 							SelectAdd();
 						} break;
 	#endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+					case CX2Unit::UT_LUCIEL:	// char-luciel NU4: June jump table 3255ab8c type 10 @325593da
+						{
+							SelectLuciel();
+						} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 					default:
 						{
@@ -2500,6 +2526,99 @@ void CX2StateCreateUnit::SelectAdd()
 #endif //ADD_PLAY_SOUND
 }
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+// char-luciel NU4: June 325559f0, SelectAdd's skeleton; Ciel's body and her rotation ( viewer +0xd7c ) wait for DU5
+void CX2StateCreateUnit::SelectLuciel()
+{
+	if( m_SelectUnitClass == CX2Unit::UC_LUCIEL_DUO )
+		return;
+
+	UnSelect();
+
+	if ( m_bSelectUnit == false )
+		m_bSelectUnit = true;
+
+	m_wstrIntroMovieName = L"";
+	if ( NULL != m_pDLGCreateUnitFront )
+	{
+		if ( NULL != m_pDLGCreateUnitFront->GetControl( L"ButtonCreate" ) )
+		{
+			m_pDLGCreateUnitFront->GetControl( L"ButtonCreate" )->SetShow( true );
+		}
+		if ( NULL != m_pDLGCreateUnitFront->GetControl( L"Creative_Character" ) )
+		{
+			m_pDLGCreateUnitFront->GetControl( L"Creative_Character" )->SetShow( true );
+		}
+		if ( NULL != m_pDLGCreateUnitFront->GetControl( L"Creative_Character_Center" ) )
+		{
+			m_pDLGCreateUnitFront->GetControl( L"Creative_Character_Center" )->SetShow( true );
+		}
+	}
+	if ( NULL != m_pDLGCreateUnitBack )
+	{
+		if ( NULL != m_pDLGCreateUnitBack->GetStatic_LUA( "SideFlag" ) )
+		{
+			SetRightSideFlagColor ( GetUnitKeyColorByUnitType( CX2Unit::UT_LUCIEL ) );
+		}
+		if ( NULL != m_pDLGCreateUnitBack->GetStatic_LUA( "Unit_Select_background" ) )
+		{
+			m_pDLGCreateUnitBack->GetStatic_LUA( "Unit_Select_background" )->GetPicture(0)->SetTex ( L"DLG_Unit_Background_Luciel.tga" );
+		}
+	}
+	m_pDummyLuciel->ResetUnitClass ( CX2Unit::UC_LUCIEL_DUO );
+
+	m_pUnitViewerUI = CX2UnitViewerUI::CreateUnitViewerUI();
+	g_pKTDXApp->GetDGManager()->AddObjectChain( m_pUnitViewerUI );
+	m_pUnitViewerUI->SetUnit( m_pDummyLuciel );
+	m_pUnitViewerUI->GetMatrix().Move( D3DXVECTOR3( 0, -50, 200 ) );
+	m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( 1.2f, 1.2f, 1.2f ) );
+	m_pUnitViewerUI->SetLightPos( -250, 100, -600 );
+	m_pUnitViewerUI->PlayAnim( L"LobbyDownLanding", CKTDGXSkinAnim::XAP_ONE_WAIT );
+
+	m_SelectUnitClass = CX2Unit::UC_LUCIEL_DUO;
+	m_SelectUnitType = CX2Unit::UT_LUCIEL;
+	ChangeCreateUnitTypeChangeInfoDlg ( CX2Unit::UT_LUCIEL );
+	ChangeCreateUnitStandMeshInstance ( CX2Unit::UT_LUCIEL );
+
+	// stand-in: June 3254e410 preloads the templet's promotion items; March's EquipPromotionItem has no Lu array
+	EquipPromotionItemByUnitTemplet( m_pDummyLuciel->GetUnitTemplet() );
+
+	m_pUnitViewerUI->OnFrameMove( g_pKTDXApp->GetTime(),g_pKTDXApp->GetElapsedTime() );
+
+	CKTDGUIStatic * pMovieStatic = static_cast<CKTDGUIStatic*> ( m_pDLGCreateUnitFront->GetControl( L"IntroMovie" ) );
+	if ( NULL != pMovieStatic )
+	{
+		CKTDGUIControl::CMovieData* pIntroMovieData = pMovieStatic->GetMovie ( 0 );
+		if ( NULL != pIntroMovieData )
+		{
+			const CX2Unit::UnitTemplet *pTemplet = m_pDummyLuciel->GetUnitTemplet();
+			if ( NULL != pTemplet )
+			{
+				pIntroMovieData->SetMovieFileName ( pTemplet->m_IntroMovieFileName.c_str() );
+				pIntroMovieData->SetShow ( true );
+			#ifdef PLAY_PROMOTION_MOVIE
+				pIntroMovieData->SetLoop( true );
+			#endif //PLAY_PROMOTION_MOVIE
+			}
+		}
+		pMovieStatic->SetShow ( true );
+	}
+	ChangeCreateUnitClassChangeInfoDlg ( CX2Unit::UT_LUCIEL, CX2Unit::UCT_BASIC_CLASS, CX2Unit::UCL_FIRST );
+
+#ifdef ADD_PLAY_SOUND
+	if( m_pCreateUnitSelectSound != NULL )
+	{
+		m_pCreateUnitSelectSound->Stop();
+		SAFE_CLOSE( m_pCreateUnitSelectSound );
+	}
+#ifdef SERV_IRUHADEV_JUNE_SOUND_AUTO_RELEASE
+	m_pCreateUnitSelectSound = g_pKTDXApp->GetDeviceManager()->PlaySound(L"LucielVoice_Introduce.ogg", false, false, false );
+#else SERV_IRUHADEV_JUNE_SOUND_AUTO_RELEASE
+	m_pCreateUnitSelectSound = g_pKTDXApp->GetDeviceManager()->PlaySound(L"LucielVoice_Introduce.ogg", false, false );
+#endif SERV_IRUHADEV_JUNE_SOUND_AUTO_RELEASE
+#endif //ADD_PLAY_SOUND
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 bool CX2StateCreateUnit::Handler_EGS_CREATE_UNIT_REQ()
 {											
@@ -2516,7 +2635,12 @@ bool CX2StateCreateUnit::Handler_EGS_CREATE_UNIT_REQ()
 #ifdef REFORM_ENTRY_POINT		// 13-11-11, kimjh 진입 구조 개편
 	KEGS_CREATE_NEW_UNIT_REQ kPacket;
 	kPacket.m_iServerGroup		= m_eSelectServerGroupID;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	// char-luciel NU4: stand-in, June 325584f0 sends +0x2c0 ( a job class after a job preview ); the base class of the type ( June 32368880 ) equals March's value for types 1-9
+	kPacket.m_iClass			= GetUnitClassByTierAndLine( m_SelectUnitType, CX2Unit::UCT_BASIC_CLASS, CX2Unit::UCL_FIRST );
+#else SERV_IRUHADEV_JUNE_CHAR_CREATE
 	kPacket.m_iClass			= m_SelectUnitType;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 	kPacket.m_wstrNickName		= m_NickName;
 	g_pData->GetServerProtocol()->SendPacket( EGS_CREATE_NEW_UNIT_REQ, kPacket );
 #else  // REFORM_ENTRY_POINT	// 13-11-11, 진입 구조 개편, kimjh
@@ -2908,6 +3032,12 @@ void CX2StateCreateUnit::InitDummyUnits()
 	m_pDummyAdd = new CX2Unit( kUnitInfo );
 //#endif // NEW_CHARACTER_EL
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	kUnitInfo.Init();
+	kUnitInfo.m_wstrNickName = L"DummyLuciel";	// char-luciel NU4: June 3255b800
+	kUnitInfo.m_cUnitClass = CX2Unit::UC_LUCIEL_DUO;
+	m_pDummyLuciel = new CX2Unit( kUnitInfo );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 	ReadyPromotionUnitResources();
 
@@ -3191,6 +3321,11 @@ void CX2StateCreateUnit::ChangeCreateUnitTypeChangeInfoDlg ( CX2Unit::UNIT_TYPE 
 		wstrCharacterClassChangeInfoDlgName = L"DLG_Unit_Create_ClassChange_Button_Add.lua";
 		break;
 #endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June 325525a0 case 10 ( its event badge test 0x90e is not ported )
+		wstrCharacterClassChangeInfoDlgName = L"DLG_Unit_Create_ClassChange_Button_Luciel.lua";
+		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 	default : 
 		ASSERT ( !L"Wrong Unit Type");
 		return ;
@@ -3286,6 +3421,9 @@ void CX2StateCreateUnit::ChangeCreateUnitStandMeshInstance ( CX2Unit::UNIT_TYPE 
 	{
 		wstring wstrName = L"";
 		std::vector<wstring> vecWstrName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		D3DXVECTOR3 vStandMeshPos = ( NULL != m_pUnitViewerUI ) ? m_pUnitViewerUI->GetMatrix().GetPos() : D3DXVECTOR3( 0, 0, 0 );	// char-luciel NU4
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 		if ( NULL != g_pData->GetUIMajorXMeshPlayer() )
 		{
@@ -3347,6 +3485,14 @@ void CX2StateCreateUnit::ChangeCreateUnitStandMeshInstance ( CX2Unit::UNIT_TYPE 
 			wstrName = L"EffectSet_Add_Stand_Aura";
 			break;
 	#endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June 32551e30 case 10 moves the board x + 25, z + 50
+			vecWstrName.push_back(L"Dummy_Village_Board11");
+			wstrName = L"EffectSet_Luciel_Stand_Aura";
+			vStandMeshPos.x += 25.f;
+			vStandMeshPos.z += 50.f;
+			break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 		default : 
 			ASSERT ( !L"Wrong Unit Type");
 			return ;
@@ -3355,9 +3501,15 @@ void CX2StateCreateUnit::ChangeCreateUnitStandMeshInstance ( CX2Unit::UNIT_TYPE 
 
 		BOOST_FOREACH( wstring wstrName, vecWstrName )
 		{	
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+			CKTDGXMeshPlayer::CXMeshInstance* pMeshStandInst = g_pData->GetUIMajorXMeshPlayer()->CreateInstance( m_pUnitViewerUI,
+				wstrName.c_str(), vStandMeshPos,
+				D3DXVECTOR3 ( 0, 0, 0 ), D3DXVECTOR3 ( 0, 0, 0 ) );
+#else SERV_IRUHADEV_JUNE_CHAR_CREATE
 			CKTDGXMeshPlayer::CXMeshInstance* pMeshStandInst = g_pData->GetUIMajorXMeshPlayer()->CreateInstance( m_pUnitViewerUI, 
 				wstrName.c_str(), m_pUnitViewerUI->GetMatrix().GetPos(), 
 				D3DXVECTOR3 ( 0, 0, 0 ), D3DXVECTOR3 ( 0, 0, 0 ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 			if( NULL != pMeshStandInst )
 				m_vecStandMeshInst.push_back(pMeshStandInst->GetHandle());
@@ -3543,6 +3695,11 @@ CX2Unit * CX2StateCreateUnit::GetViewerUnitByUnitType ( CX2Unit::UNIT_TYPE eUnit
 		return m_pDummyAdd;
 		break;
 #endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June 3254e2b0 type 10
+		return m_pDummyLuciel;
+		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 	default :
 		break;
@@ -3606,6 +3763,10 @@ wstring CX2StateCreateUnit::GetUnitClassCreateInfoTextureNameByUnitType ( CX2Uni
 	case CX2Unit::UT_ADD :
 		return L"DLG_UI_Common_Texture_GUI_character_info_09.tga";
 #endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June 325506e0 case 10
+		return L"DLG_UI_Common_Texture_GUI_character_info_10.tga";
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 	}
 
 	return L"";
@@ -3919,6 +4080,19 @@ CX2StateCreateUnit::UNIT_STAT_INFOMATION_CHART CX2StateCreateUnit::GetUnitStatIn
 			return UNIT_STAT_INFOMATION_CHART ( USICL_MIDDLE, USICL_LOW, USICL_LOW );
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS
 #endif // NEW_CHARACTER_EL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		// char-luciel NU4: June 3254ee40 cases 0x25 / 0x7f = 2,1,2; 0x26 / 0x80 / 200 = 2,3,2; 0x27 / 0x81 = 3,2,3
+		case CX2Unit::UC_LUCIEL_CHILIARCH :
+		case CX2Unit::UC_LUCIEL_DREAD_LORD :
+			return UNIT_STAT_INFOMATION_CHART ( USICL_MIDDLE, USICL_LOW, USICL_MIDDLE );
+		case CX2Unit::UC_LUCIEL_DUO :
+		case CX2Unit::UC_LUCIEL_ROYAL_GUARD :
+		case CX2Unit::UC_LUCIEL_NOBLESSE :
+			return UNIT_STAT_INFOMATION_CHART ( USICL_MIDDLE, USICL_HIGH, USICL_MIDDLE );
+		case CX2Unit::UC_LUCIEL_DIABLURA :
+		case CX2Unit::UC_LUCIEL_DEMONIO :
+			return UNIT_STAT_INFOMATION_CHART ( USICL_HIGH, USICL_MIDDLE, USICL_HIGH );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 #ifdef SERV_9TH_NEW_CHARACTER
 		case CX2Unit::UC_ADD_NASOD_RULER :
@@ -4015,6 +4189,21 @@ bool CX2StateCreateUnit::Handler_EGS_GET_CREATE_UNIT_TODAY_COUNT_ACK( HWND hWnd,
 #ifdef ADD_PLAY_SOUND
 void CX2StateCreateUnit::PlaySoundCreateUnit( CX2Unit::UNIT_TYPE eUnitType )
 {
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+	// char-luciel NU4: June 32550aa0, the builder's name for the type's base class ( 32368880 ) and SPT_CREATE
+	if( g_pKTDXApp->GetDeviceManager() == NULL )
+		return;
+
+	if( eUnitType <= CX2Unit::UT_NONE || eUnitType >= CX2Unit::UT_END )
+		return;
+
+	wstring wstrSoundName = L"";
+	if( NULL != g_pData->GetUnitManager() )
+		wstrSoundName = g_pData->GetUnitManager()->GetVoiceFileName( static_cast<CX2Unit::UNIT_CLASS>( GetUnitClassByTierAndLine( eUnitType, CX2Unit::UCT_BASIC_CLASS, CX2Unit::UCL_FIRST ) ), CX2UnitManager::SPT_CREATE );
+
+	if( wstrSoundName.compare(L"") != 0 )
+		g_pKTDXApp->GetDeviceManager()->PlaySound( wstrSoundName.c_str(), false, false );
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 	if( g_pKTDXApp->GetDeviceManager() == NULL )
 		return;
 
@@ -4082,5 +4271,6 @@ void CX2StateCreateUnit::PlaySoundCreateUnit( CX2Unit::UNIT_TYPE eUnitType )
 
 	if( wstrSoundName.compare(L"") != 0 )
 		g_pKTDXApp->GetDeviceManager()->PlaySound(wstrSoundName.c_str(), false, false );
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 }
 #endif //ADD_PLAY_SOUND

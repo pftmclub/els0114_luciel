@@ -2251,7 +2251,11 @@ bool CX2StateServerSelect::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPara
 
 	#ifdef ADD_PLAY_SOUND //±èÃ¢ÇÑ
 						if( m_pSelectUnit != NULL )
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+							PlaySoundSelect( m_pSelectUnit->GetClass(), SPT_SERVER_SELECT );	// char-luciel NU4: June passes the class
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 							PlaySoundSelect( m_pSelectUnit->GetType(), SPT_SERVER_SELECT );
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 	#endif //ADD_PLAY_SOUND
 	//					SAFE_DELETE_DIALOG ( m_pDLGMsgBox );
 	//					m_pDLGMsgBox = g_pMain->KTDGUIOKMsgBox( D3DXVECTOR2(305, 375 ), L"Ã¤³Î ¸ñ·ÏÀ» ¹Þ¾Æ¿À´Â Áß ÀÔ´Ï´Ù.", this, -1, -1.f, L"DLG_UI_Selection_MessageBox_Ok_Button_New.lua",D3DXVECTOR2 (0, 0),  L"UI_PopUp_Negative_01.ogg" );		
@@ -3340,7 +3344,11 @@ void CX2StateServerSelect::UnitButtonUp( CX2Unit* pUnit )
 
 #ifdef ADD_PLAY_SOUND //±èÃ¢ÇÑ
 				if( m_pSelectUnit != NULL )
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+					PlaySoundSelect( m_pSelectUnit->GetClass(), SPT_SERVER_SELECT );	// char-luciel NU4: June passes the class
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 					PlaySoundSelect( m_pSelectUnit->GetType(), SPT_SERVER_SELECT );
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 #endif //ADD_PLAY_SOUND
 			}
 			else
@@ -3365,7 +3373,11 @@ void CX2StateServerSelect::UnitButtonUp( CX2Unit* pUnit )
 
 #ifdef ADD_PLAY_SOUND //±èÃ¢ÇÑ
 			if( m_pSelectUnit != NULL )
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+				PlaySoundSelect( m_pSelectUnit->GetClass(), SPT_SERVER_SELECT );	// char-luciel NU4: June passes the class
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 				PlaySoundSelect( m_pSelectUnit->GetType(), SPT_SERVER_SELECT );
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 #endif //ADD_PLAY_SOUND
 #endif SERV_UNIT_WAIT_DELETE
 		}
@@ -3450,7 +3462,11 @@ void CX2StateServerSelect::UnitButtonUp( CX2Unit* pUnit )
 	ChangeSelectUnitStandMeshInstance ( pUnit->GetType() );
 	SetBackgroundImageBySelectUnitType ( pUnit->GetType() );
 #ifdef ADD_PLAY_SOUND //±èÃ¢ÇÑ
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+	PlaySoundSelect( pUnit->GetClass(), SPT_UNIT_SELECT );	// char-luciel NU4: June 32578938 passes the class
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 	PlaySoundSelect( pUnit->GetType(), SPT_UNIT_SELECT );
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 #endif //ADD_PLAY_SOUND
 
 //{{ Iruha : 2026-09-16 // Vanilla's real restore/final-delete buttons (see
@@ -10866,6 +10882,9 @@ void CX2StateServerSelect::ChangeSelectUnitStandMeshInstance ( CX2Unit::UNIT_TYP
 	{
 		wstring wstrName = L"";
 		std::vector<wstring> vecWstrName;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		D3DXVECTOR3 vStandMeshPos = ( NULL != m_pUnitViewerUI ) ? m_pUnitViewerUI->GetMatrix().GetPos() : D3DXVECTOR3( 0, 0, 0 );	// char-luciel NU4
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 		if ( NULL != g_pData->GetUIMajorXMeshPlayer() )
 		{
@@ -10927,15 +10946,29 @@ void CX2StateServerSelect::ChangeSelectUnitStandMeshInstance ( CX2Unit::UNIT_TYP
 			wstrName = L"EffectSet_Add_Stand_Aura";
 			break;
 #endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June 32561130 case 10 moves the board x + 25, z + 50
+			vecWstrName.push_back(L"Dummy_Village_Board11");
+			wstrName = L"EffectSet_Luciel_Stand_Aura";
+			vStandMeshPos.x += 25.f;
+			vStandMeshPos.z += 50.f;
+			break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 		default : 
 			ASSERT ( !L"Wrong Unit Type");
 			return ;
 		}
 		BOOST_FOREACH( wstring wstrName, vecWstrName )
 		{	
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+			CKTDGXMeshPlayer::CXMeshInstance* pMeshStandInst = g_pData->GetUIMajorXMeshPlayer()->CreateInstance( m_pUnitViewerUI,
+				wstrName.c_str(), vStandMeshPos,
+				D3DXVECTOR3( 0, 0, 0 ), D3DXVECTOR3( 0, 0, 0 ) );
+#else SERV_IRUHADEV_JUNE_CHAR_CREATE
 			CKTDGXMeshPlayer::CXMeshInstance* pMeshStandInst = g_pData->GetUIMajorXMeshPlayer()->CreateInstance( m_pUnitViewerUI, 
 				wstrName.c_str(), m_pUnitViewerUI->GetMatrix().GetPos(), 
 				D3DXVECTOR3( 0, 0, 0 ), D3DXVECTOR3( 0, 0, 0 ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 
 			if( NULL != pMeshStandInst )
 			{
@@ -11280,6 +11313,11 @@ void CX2StateServerSelect::SetBackgroundImageBySelectUnitType ( CX2Unit::UNIT_TY
 			wstrFileName = L"DLG_Unit_Background_add.tga";
 			break;
 #endif // SERV_9TH_NEW_CHARACTER 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June 3255ecf0 case 10
+			wstrFileName = L"DLG_Unit_Background_Luciel.tga";
+			break;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 	}
 	
 	if ( NULL != m_pDLGUnitSelectFront->GetStatic_LUA( "Unit_Select_background" ) && 
@@ -12218,11 +12256,21 @@ void CX2StateServerSelect::ConnectToLowerUserCountGameServer ()
 #endif // REFORM_ENTRY_POINT	// 13-11-11, ÁøÀÔ ±¸Á¶ °³Æí, kimjh
 
 #ifdef ADD_PLAY_SOUND //±èÃ¢ÇÑ
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+void CX2StateServerSelect::PlaySoundSelect( CX2Unit::UNIT_CLASS eUnitClass_, SOUND_PLAY_TYPE eSoundPlayType_ )
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 void CX2StateServerSelect::PlaySoundSelect( CX2Unit::UNIT_TYPE eUnitType_, SOUND_PLAY_TYPE eSoundPlayType_ )
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 {
 	if( g_pKTDXApp->GetDeviceManager() == NULL )
 		return;
 
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+	// char-luciel NU4: June 3255f240, the builder's name for ( class, play type )
+	wstring wstrSoundName = L"";
+	if( NULL != g_pData->GetUnitManager() )
+		wstrSoundName = g_pData->GetUnitManager()->GetVoiceFileName( eUnitClass_, static_cast<int>( eSoundPlayType_ ) );
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 	wstring wstrSoundName = L"";
 
 	switch( eUnitType_ )
@@ -12282,6 +12330,7 @@ void CX2StateServerSelect::PlaySoundSelect( CX2Unit::UNIT_TYPE eUnitType_, SOUND
 	default:
 		break;
 	}
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 
 	if( StrCmp( wstrSoundName.c_str(), L"" ) != 0 )
 	{

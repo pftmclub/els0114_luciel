@@ -426,7 +426,11 @@ protected:
 	bool Handler_EGS_ENTRY_POINT_CHANGE_NICK_NAME_REQ ( UidType uid, const WCHAR* wszNickName, bool bCheckOnly, SEnum::SERVER_GROUP_ID eGroupID );
 
 #ifdef ADD_PLAY_SOUND //±Ë√¢«—
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+	void PlaySoundSelect( CX2Unit::UNIT_CLASS eUnitClass, SOUND_PLAY_TYPE eSoundPlayType );	// char-luciel NU4: June 3255f240 takes the class
+#else SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 	void PlaySoundSelect( CX2Unit::UNIT_TYPE eUnitType, SOUND_PLAY_TYPE eSoundPlayType );
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 #endif //ADD_PLAY_SOUND
 
 	#ifdef FIX_2ND_CHANNEL_TO_FIRST_ALIGN_BUG

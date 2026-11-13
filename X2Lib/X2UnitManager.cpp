@@ -418,6 +418,100 @@ bool CX2UnitManager::OpenAnimationNameTable( const WCHAR* pFileName )
 	return bLoaded;
 }
 #endif SERV_IRUHADEV_JUNE_ANIMATION_NAME_TABLE
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+// char-luciel NU4: June 32379ed0, g_pUnitManager:AddVoice( UNIT_CLASS, SOUND_PLAY_TYPE, name ); the name is ANSI ( CP 0 ), the insert keeps the first row
+void CX2UnitManager::AddVoice_LUA( int iUnitClass, int iSoundPlayType, const char* pszFileName )
+{
+	++m_iVoiceRows;
+
+	std::wstring wstrFileName;
+	if( NULL != pszFileName )
+		ConvertCharToWCHAR( wstrFileName, pszFileName );
+
+	if( true == m_mapVoiceFileName.insert( std::make_pair( std::make_pair( iUnitClass, iSoundPlayType ), wstrFileName ) ).second )
+		++m_iVoiceInserted;
+}
+
+// char-luciel NU4: June 32376270, the table's row, else the unit type's name ( 32375d00 ) with the play type's suffix
+std::wstring CX2UnitManager::GetVoiceFileName( CX2Unit::UNIT_CLASS eUnitClass, int iSoundPlayType )
+{
+	std::map< std::pair<int,int>, std::wstring >::const_iterator it =
+		m_mapVoiceFileName.find( std::make_pair( static_cast<int>( eUnitClass ), iSoundPlayType ) );
+	if( m_mapVoiceFileName.end() != it )
+		return it->second;
+
+	// stand-in: June's class -> type switch 31eca1d0 read through the class templet
+	const CX2Unit::UnitTemplet* pUnitTemplet = GetUnitTemplet( eUnitClass );
+	std::wstring wstrUnitName;
+	switch( ( NULL != pUnitTemplet ) ? pUnitTemplet->m_UnitType : CX2Unit::UT_NONE )
+	{
+	case CX2Unit::UT_ELSWORD:	wstrUnitName = L"Elsword";	break;
+	case CX2Unit::UT_ARME:		wstrUnitName = L"Aisha";	break;
+	case CX2Unit::UT_LIRE:		wstrUnitName = L"Rena";		break;
+	case CX2Unit::UT_RAVEN:		wstrUnitName = L"Raven";	break;
+	case CX2Unit::UT_EVE:		wstrUnitName = L"Eve";		break;
+	case CX2Unit::UT_CHUNG:		wstrUnitName = L"Chung";	break;
+	case CX2Unit::UT_ARA:		wstrUnitName = L"Ara";		break;
+	case CX2Unit::UT_ELESIS:	wstrUnitName = L"Elesis";	break;
+	case CX2Unit::UT_ADD:		wstrUnitName = L"Add";		break;
+	case CX2Unit::UT_LUCIEL:	wstrUnitName = L"Luciel";	break;
+	case CX2Unit::UT_ROSE:		wstrUnitName = L"Rose";		break;
+	case CX2Unit::UT_AIN:		wstrUnitName = L"Ain";		break;
+	default:					break;
+	}
+
+	switch( iSoundPlayType )
+	{
+	case SPT_UNIT_SELECT:
+		return wstrUnitName + L"Voice_Character_Select.ogg";
+	case SPT_SERVER_SELECT:
+		return wstrUnitName + L"Voice_GameStart.ogg";
+	case SPT_PRAISE:
+	case SPT_PRAISE_MINOR_UNIT:
+		return wstrUnitName + L"Voice_Praise.ogg";
+	case SPT_THANK:
+	case SPT_THANK_MINOR_UNIT:
+		return wstrUnitName + L"Voice_Thank.ogg";
+	case SPT_APOLOGIZE:
+	case SPT_APOLOGIZE_MINOR_UNIT:
+		return wstrUnitName + L"Voice_Apologize.ogg";
+	case SPT_BYE:
+	case SPT_BYE_MINOR_UNIT:
+		return wstrUnitName + L"Voice_Bye.ogg";
+	case SPT_QUEST_COMPLETE:
+	case SPT_QUEST_COMPLETE_MINOR_UNIT:
+		return L"QuestComplete_" + wstrUnitName + L".ogg";
+	case SPT_REVIVE:
+	case SPT_CREATE:
+		{
+			// June 31c19ae0( 0, 100 ) % 2 + 1
+			WCHAR wszFileName[256] = {0};
+			StringCchPrintfW( wszFileName, ARRAY_SIZE( wszFileName ), L"%s%s%d.ogg", wstrUnitName.c_str(),
+				( SPT_REVIVE == iSoundPlayType ) ? L"Voice_Revive0" : L"Voice_Create0", ( ( rand() % 100 ) % 2 ) + 1 );
+			return std::wstring( wszFileName );
+		}
+	default:
+		break;
+	}
+	return wstrUnitName;
+}
+
+// char-luciel NU4: June 31ee6100 @31ee620a opens SelectVoiceTable.lua ( 32376f10 ); ErrorLog, since offline_server.log opens later
+bool CX2UnitManager::OpenSelectVoiceTable( const WCHAR* pFileName )
+{
+	m_mapVoiceFileName.clear();
+	m_iVoiceRows = 0;
+	m_iVoiceInserted = 0;
+
+	const bool bLoaded = OpenDataScriptFile( pFileName );
+
+	WCHAR wszVoiceLog[256] = {0};
+	StringCchPrintfW( wszVoiceLog, ARRAY_SIZE( wszVoiceLog ), L"[JUNE_CHAR] LUCIEL CREATE voice table %s loaded=%d rows=%d inserted=%d%s",
+		pFileName, ( true == bLoaded ) ? 1 : 0, m_iVoiceRows, m_iVoiceInserted, ( true == bLoaded ) ? L"" : L" ( missing or failed: the builder's default names play; pack it into data036.kom )" );
+	ErrorLogMsg( XEM_ERROR142, wszVoiceLog );
+	return bLoaded;
+}
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 //{{ robobeg : 2011-01-24
 void    CX2UnitManager::CreateUnitLuaSpace()
 {

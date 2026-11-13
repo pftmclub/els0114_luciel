@@ -2975,6 +2975,27 @@ inline CX2Unit::UNIT_CLASS GetUnitClassByUnitClassTypeAndLineType ( CX2Unit::UNI
 	case CX2Unit::UT_ADD :
 		return GetNewCharacterClassByUnitClassTypeAndLineType ( eUnitClassType_, eUnitClassLine_ );	
 #endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June 3234b390's table row 10 ( the basic class has lines 1-2 only )
+		switch ( eUnitClassType_ )
+		{
+		case CX2Unit::UCT_BASIC_CLASS :
+			return ( CX2Unit::UCL_FIRST == eUnitClassLine_ || CX2Unit::UCL_SECOND == eUnitClassLine_ ) ? CX2Unit::UC_LUCIEL_DUO : CX2Unit::UC_NONE;
+		case CX2Unit::UCT_FIRST_CLASS :
+			if ( CX2Unit::UCL_FIRST == eUnitClassLine_ )	return CX2Unit::UC_LUCIEL_CHILIARCH;
+			if ( CX2Unit::UCL_SECOND == eUnitClassLine_ )	return CX2Unit::UC_LUCIEL_ROYAL_GUARD;
+			if ( CX2Unit::UCL_THIRD == eUnitClassLine_ )	return CX2Unit::UC_LUCIEL_DIABLURA;
+			break;
+		case CX2Unit::UCT_SECOND_CLASS :
+			if ( CX2Unit::UCL_FIRST == eUnitClassLine_ )	return CX2Unit::UC_LUCIEL_DREAD_LORD;
+			if ( CX2Unit::UCL_SECOND == eUnitClassLine_ )	return CX2Unit::UC_LUCIEL_NOBLESSE;
+			if ( CX2Unit::UCL_THIRD == eUnitClassLine_ )	return CX2Unit::UC_LUCIEL_DEMONIO;
+			break;
+		default :
+			break;
+		}
+		return CX2Unit::UC_NONE;
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 	default :
 		break;
 	}
@@ -3078,6 +3099,10 @@ inline D3DXCOLOR GetUnitKeyColorByUnitType ( CX2Unit::UNIT_TYPE eUnitType_ )
 	case CX2Unit::UT_ADD :
 		return D3DXCOLOR ( 0.647f, 0.588f, 1.0f, 1.0f );
 #endif // SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+	case CX2Unit::UT_LUCIEL :	// char-luciel NU4: June SelectLuciel 325559f0 passes ( 0.08, 0.13, 0.88, 1 )
+		return D3DXCOLOR ( 0.08f, 0.13f, 0.88f, 1.0f );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 	default :
 		break;
 	}

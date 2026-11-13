@@ -606,6 +606,48 @@ Opus 5.5 high. **Verdict: pass, no code change.** Covers `f0b8249e` against `nu0
 - Build: none (no code change). DU1 ready (char-chung Z closed; kickoff carries "Amended by NU3"); NU4 waits on the NU2 review (its kickoff
   carries "Amended by NU3").
 
+### NU4 - Done (2026-11-14)
+
+Opus 5.5 high. Flags (Always.h): `SERV_IRUHADEV_JUNE_CHAR_CREATE` (create / select screens, rotation, request, stat fallback; `#error` unless
+UNIT_TYPE_RANGE, UNIT_CLASS_WORD, MINOR_UNIT_TEMPLET and JUNE_CLASS_CHANGE_GUIDE), `SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE`,
+`SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS`. No debug flag: the `LUCIEL CREATE` lines are permanent (one at load, one per Lu/Ciel create).
+- **Creation screen** (`X2StateCreateUnit.*`): new `SelectLuciel` = June `325559f0` (Ghidra-read: SelectAdd's skeleton, colour 0.08 / 0.13 /
+  0.88, `DLG_Unit_Background_Luciel.tga`, Move 0 / -50 / 200, Scale 1.2, `LobbyDownLanding`, class 200 / type 10, voice
+  `LucielVoice_Introduce.ogg`); msg `SCUUCM_LUCIEL_BUTTON_UP` 36 (C++ + Enum.lua), re-select type 10 (`3255ab8c`), default-select case (dead on US:
+  limit 8), `DummyLuciel` (`3255b800`), class-change dialog (`325525a0` case 10), stand board `Dummy_Village_Board11` + `EffectSet_Luciel_Stand_Aura`
+  at x + 25 / z + 50 (`32551e30`, read from the fadd at `@325522ad`), info texture `_info_10` (`325506e0`), stat chart (`3254ee40`: 37 / 127 =
+  2,1,2; 38 / 128 / 200 = 2,3,2; 39 / 129 = 3,2,3), viewer lookup (`3254e2b0`). `X2Unit.h`: key colour + the job-preview class table for UT_LUCIEL.
+  Stand-ins: preview costume by `EquipPromotionItemByUnitTemplet` (June preloads, `3254e410`); the create request sends the base class of the
+  type (June `325584f0` sends `+0x2c0`, the previewed job; `32368880`'s base class equals March's value for types 1-9). One body until DU5.
+- **Rotation** (`X2Data.cpp`): June `31edf260` replaces `RotateYSelectCharacterType` for every class (divergence row marked ported): templet
+  `m_fLobbyRotationY` / minor when |v| > 1.19e-7, else June's case table (floats by `charport_consts.py`). March callers pass no minor flag.
+- **Select screen** (`X2StateServerSelect.cpp`): background (`3255ecf0`), stand board (`32561130`, same offsets); `X2Data.cpp` image rows 59-65
+  (`31ee0de0` rows 0x3f / 0x40 / 0x41 / 0x4d / 0x42 / 0x43 / 0x4e, by `char_image_rows.py`; two quirks -> `JUNE_BUGS.md` 655 / 656).
+- **Voices:** `CX2UnitManager::OpenSelectVoiceTable` / `AddVoice_LUA` (`32379ed0`, bound in `X2Main.cpp`; first row wins) /
+  `GetVoiceFileName` (`32376270`); `ResetUnitManager` opens it before `AnimationNameTable.lua` (`31ee6100 @31ee620a`). `PlaySoundCreateUnit`
+  (`32550aa0`) and `PlaySoundSelect` (`3255f240`, now by class, 4 callers) use it. Stand-in: class -> type through the templet (June `31eca1d0`
+  switch). **Other classes' voices change:** Rena's create voice `RenaVoice_Create0n` (was `LenaVoice_`; both files exist, June has only Rena's);
+  select voices from the table rows (Elesis DK / CA, Add TT / DE, Lu Noblesse, Ain AP); everything else builds March's names.
+- **Emulator:** `GBASE_ITEM` row 200 (gear 113300-113304, costume 41890-41894) + `LUCIEL_MINOR_UNIT_COSTUME` 41900-41904 (bagged: Lu's costume holds
+  the fashion slots until DU4). `X2OfflineStatTable`: fallback by `BaseClassOf` (type -> base class), synthetic line once per class,
+  `GetStatSource`. The flat StatTable already has all 7 classes (`STATFLAT OK: 12177 rows, 123 classes`), so Lu/Ciel reads its own rows.
+- **Data:** data034 `DLG_Unit_Create_Unit_Button_New.lua` -> core-list source (`convert`, T1) + Lu/Ciel's slot (June's keys, x 713: March's row
+  ends at Elesis 668, June's own layout re-orders every slot); data036 `Enum.lua` + `SCUUCM_LUCIEL_BUTTON_UP` and June's `SOUND_PLAY_TYPE`
+  (`refresh`); data057 stage-june `DLG_UI_Common_Texture89_NEW` / `91_NEW` .tga / .TET (new). `ClassChange_Button_Luciel.lua` and
+  `SelectVoiceTable.lua` were already June's bytecode. `lua_unbound_known.tsv`: AddVoice row dropped (bound now). `createchar.py`: 7 classes.
+  PACK OK / COPY OK data034 (md5 08b46ebb...), data036 (58c6c97d...), data057 (144bccfe...).
+- **Hygiene:** flagcheck `JUNE_CHAR_CREATE --with JUNE_SELECT_VOICE_TABLE JUNE_CHAR_LUCIEL_STARTER_ITEMS --worktree` (14 files): `files: 6 PASS,
+  2 PASS~ (blank/marker only), 1 DEFINE, 5 OTHER (other flags), 0 FAIL, 0 ERROR`; `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched
+  inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS` (the 5 OTHER are the voice-only files; the voice
+  and starter flags alone: PASS, 0 deleted). junediverge `--check` (14 files): `RESULT: PASS`. enumscan: no row on NU4 lines. luabind (shipped button
+  file, SelectVoiceTable, ClassChange_Button_Luciel): `RESULT: PASS`. `LEDGER CHECK PASS`, `CORE CHECK PASS`. `/Zs` probe of the 7 .cpp: 0 errors.
+- `DEPLOY OK: X2_offline.exe is 26,521,088 B, dated 2026-11-14 05:25:52, md5 90b3df890f0d39ea3a24dcb6807fdc08` (built at 0102ee15 + the 14
+  NU4 files). `EXESTR OK: 6 of 6` (both `LUCIEL CREATE` formats, `DLG_Unit_Background_Luciel.tga`, `LucielVoice_Introduce.ogg`,
+  `SelectVoiceTable.lua`, `LucielCreateUnitSlot`, wide) and `1 of 1` (`AddVoice`).
+- **Not ported (left):** June's jumping-character mode (`+0x71c`, `_JUMPING` msgs), the new-character badge, the minor body / rotation (DU5),
+  the tutorial route (TU: a Lu/Ciel's first Game Start would enter Elsword's tutorial and the class does not exist before CH1).
+- **How to see it:** creation screen slot 10 (right of Elesis); create a Lu/Ciel; select screen lists him; `[JUNE_CHAR] LUCIEL CREATE` lines.
+
 ## Phase DU - The two-body engine (DU1-DU5)
 
 | Sub-phase | Scope | Flag |

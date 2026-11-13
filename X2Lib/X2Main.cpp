@@ -3804,6 +3804,9 @@ void CX2Main::RegisterLuabind()
 	// June2017 FUN_31d95080: "AddAnimationName" decrypted @31db61d0, pushed @31db62b1 (0x3237a060).
 	lua_tinker::class_def<CX2UnitManager>( L, "AddAnimationName",	&CX2UnitManager::AddAnimationName_LUA );
 #endif SERV_IRUHADEV_JUNE_ANIMATION_NAME_TABLE
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+	lua_tinker::class_def<CX2UnitManager>( L, "AddVoice",	&CX2UnitManager::AddVoice_LUA );	// char-luciel NU4: June 31d95080 pushes 32379ed0 @31db610c
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 #ifdef SERV_IRUHADEV_JUNE_DAMAGE_DATA_TABLE
 	// June2017 FUN_31d95080: "CX2DamageManager" class block @31e16bcb, "InsertDamageData_LUA" decrypted @31e16d8d,
 	// pushed @31e16eae (0x32621080). Elsword_DamageData.lua calls g_pDamageManager:InsertDamageData_LUA.

@@ -3437,6 +3437,34 @@ class CX2UnitManager
 		int												m_iAnimationNameClassNone;
 	public:
 #endif SERV_IRUHADEV_JUNE_ANIMATION_NAME_TABLE
+#ifdef SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
+		// char-luciel NU4: June SelectVoiceTable.lua, one file name per ( UNIT_CLASS, SOUND_PLAY_TYPE ) ( 32379ed0 inserts, 32376270 builds )
+		enum SOUND_PLAY_TYPE
+		{
+			SPT_UNIT_SELECT					= 0,
+			SPT_SERVER_SELECT				= 1,
+			SPT_PRAISE						= 2,
+			SPT_THANK						= 3,
+			SPT_APOLOGIZE					= 4,
+			SPT_BYE							= 5,
+			SPT_PRAISE_MINOR_UNIT			= 6,
+			SPT_THANK_MINOR_UNIT			= 7,
+			SPT_APOLOGIZE_MINOR_UNIT		= 8,
+			SPT_BYE_MINOR_UNIT				= 9,
+			SPT_QUEST_COMPLETE				= 10,
+			SPT_QUEST_COMPLETE_MINOR_UNIT	= 11,
+			SPT_REVIVE						= 12,
+			SPT_CREATE						= 13,
+		};
+		bool OpenSelectVoiceTable( const WCHAR* pFileName );
+		void AddVoice_LUA( int iUnitClass, int iSoundPlayType, const char* pszFileName );
+		std::wstring GetVoiceFileName( CX2Unit::UNIT_CLASS eUnitClass, int iSoundPlayType );
+	private:
+		std::map< std::pair<int,int>, std::wstring >	m_mapVoiceFileName;		// key = ( class, play type ), compared in that order
+		int												m_iVoiceRows;
+		int												m_iVoiceInserted;
+	public:
+#endif SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE
 #ifdef REFORM_SKILL_NOTE_UI
 		void GetLowRankUnitClass( OUT vector<CX2Unit::UNIT_CLASS>& vecUnitClass_, IN CX2Unit::UNIT_CLASS eUnitClass_ );
 		void AddCorrelateUnitClass_LUA();

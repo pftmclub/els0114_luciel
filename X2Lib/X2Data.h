@@ -588,7 +588,11 @@ class CX2Data : public CKTDXStage
 #endif //SERV_NEW_ITEM_SYSTEM_2013_05
 
 #ifdef REFORM_ENTRY_POINT //JHKang
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CREATE
+		float RotateYSelectCharacterType( CX2Unit::UNIT_CLASS eClass_, bool bMinorUnit_ = false );	// char-luciel NU4: June 31edf260
+#else SERV_IRUHADEV_JUNE_CHAR_CREATE
 		float RotateYSelectCharacterType( CX2Unit::UNIT_CLASS eClass_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_CREATE
 #endif //REFORM_ENTRY_POINT
 		//{{ 2012.09.08	임홍락	글로벌 미션 매니저
 #ifdef SERV_GLOBAL_MISSION_MANAGER
