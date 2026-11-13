@@ -61,3 +61,7 @@ Dodge and Slash (`32b72740` StartFuture, `32b727f0` EventProcess) already reads 
 ## Amended by CH1 (2026-11-13): the reserved-buff lines move here
 
 Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. This phase's hand-off checks: Endurance Power (28201) `at once: ... BFI 143 level 1` (state `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE`; `_MEMO` takes BFI 335); Dodge and Slash (28200) on a unit without Agility Mastery 28402 (wewe) `parse ... cleared ( learn check ... )`.
+
+## Amended by CH5 (2026-11-13)
+
+- Skill cut-ins are first castable here: the hand-off also checks `[JUNE_CHAR] ELESIS UI cut-in set 0 name HQ_CutIn_Elesis_01` once per special active cast (Wild Shock, Unlimited Blade, Mega Burster) with a `[JUNE_GFX] CUTIN play` the same second and no `ErrorEnum(135)` naming a cut-in file.

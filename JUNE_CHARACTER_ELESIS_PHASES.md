@@ -1486,6 +1486,29 @@ listed from June first: **Grand Master and Blazing Heart get their entries here*
 **Done gate:** a select-screen pass of all nine March characters with no new error; her skill and hyper cut-ins play June's art; the second-job
 names show June's strings; on the creation screen Elesis shows Saber Knight, Grand Master, Pyro Knight and Blazing Heart, each with its preview.
 
+### CH5 - Done (2026-11-13)
+
+Sonnet 5.5. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI` (`Always.h` end; `#error` without `_ELESIS_LIVE`). Review kickoff `kickoffs/char-elesis/CH5-review.md` written.
+- **`UnitTemplet.lua` (data036, core-list BOM source):** her 5 blocks (8 / 29 / 30 / 120 / 121) are June's text; June's Dark Knight 35 (after 30) and Crimson Avenger 125 (after 121) are added (57 -> 59 blocks, the other 52 untouched, BOM + CRLF kept).
+  Delta = `ch0_unittemplet_elesis.tsv`: `m_fLobbyRotationY` 30 / 25 / 1 / 15 / 1, `m_HyperCutIn` `HQ_Cutin_EGM / EBH_Transcendence` on 120 / 121, 35 (24 keys) and 125 (26 keys, `HQ_Cutin_ECA_Transcendence`) new. A 35 / 125 unit now has a templet (CH0's NULL `GetType()` crash is closed before CHNa).
+  `luasrc.py refresh` REFRESHED, `ledger --check` PASS, `core --check` PASS, `luabind.py check UnitTemplet` PASS.
+- **Cut-in table (`X2GUEL.cpp`):** `s_SkillCutInSet` = June `333a8450` (table `337ad5c0`, 4 sets x 3, GFx names): set 0 `HQ_CutIn_Elesis_01`, 1 `_GM_01`, 2 `_BH_01`, 3 `_CA_01`; March's `.dds` table in the `#else`. The InitState switch already gives 125 set 3 (CH1m), so only the table was missing.
+  New logs `[JUNE_CHAR] ELESIS UI cut-in set <set> name <gfx>` (reader) and `ELESIS UI hyper cut-in class <c> name <gfx>` (`ShowHyperSkillCutInByScript`). The 7 `.gfx` (4 skill, 3 `HQ_Cutin_E*_Transcendence`) are in data152 / data195.
+- **Creation screen:** `DLG_Unit_Create_ClassChange_Button_Elesis.lua` = June's 5284 B bytecode (`adopt-june data034`, record `june2017_re/june_adopt_20261113_093248.tsv`, `luabind.py check` 22 methods, 0 unbound, PASS): six buttons, so Grand Master and Blazing Heart now have entries.
+  `character_info_08.tga` = June's (`stage-june`, data057; TET identical), backup `kom_backup_stage_june/20261113_093252`. June's creation functions read in Ghidra = March for 8 / 29 / 30 / 120 / 121, no C++: `SelectElesis` `32554de0` (same call order), stand mesh `32551e30` (type 8 `Dummy_Village_Board8` + Elsword aura),
+  `GetUnitStatInfomationChart` `3254ee40` (8 / 29 / 120 = 2,1,2; 30 / 121 = 2,2,2 = March; 35 / 125 = 2,1,1 -> CHNa). Third-line buttons (35 / 125): `GetThirdLineElesisClassTypeByUnitClassType` is assert-only and returns `UC_NONE`, `SelectUpperClass` returns early on it: a click is harmless, no hiding needed (as Ara's).
+  The four previews' movies are loose in `data\movie` (`base` / `gm` / `bh` / `ca`).
+- **Lobby (7ah n/a):** `X2UnitViewerUI.cpp:644` BH particles read handles created only in the dead `#else` (`:2560`+): inert, not edited. The `...Readyaction` literals (`:2162`, `:5277-5280`) are dead `#else`; the live `AnimationNameTable.lua` has June's `SPK_LobbyReadyAction` (checklist l.372 closed).
+- **Packed and copied (no ask):** `COPY OK data036` md5 `4b2273a8463ee645449979985ac8b013` (1 changed = `UnitTemplet.lua`), `COPY OK data034` md5 `5c43ab1e5a668b1bcd682ef2840ad435` (1 changed), `COPY OK data057` md5 `773dd907a1fce4410ebaa68832939832` (1 changed); backups in `kom_backup_tools/*.20261113_0937*`.
+- **Hygiene:** `flagcheck JUNE_CHAR_ELESIS_UI --worktree --files KTDXLIB/Always.h X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: 2 PASS, 0 PASS~, 0 FAIL, 0 ERROR; 0 deleted, 0 non-ASCII, 1 EOL (the `#endif` before `CreateGUEL`, in an LF region), 0 token-less, RESULT: PASS.
+  `junediverge --check X2Lib/X2GUEL.cpp X2Lib/X2GUUser.cpp`: allow-listed 17, RESULT: PASS. `enumscan --check X2Lib/X2GUEL.cpp`: 0 A/B rows.
+- **Deploy:** `DEPLOY OK: X2_offline.exe is 26,382,848 B, dated 2026-11-13 09:48:43, md5 c7d1abf8e11546b8726474685ca97a2c`. `EXESTR OK: 6 of 6` (the two log tags, `HQ_CutIn_Elesis_01 / _GM_01 / _BH_01 / _CA_01`, wide), `EXESTR OK: 4 of 4 absent` (March's `HQ_CutIn_Elesis_SGM.dds` / `_SBH.dds` / `_Pyro_Knight.dds` / `_Saber_Knight.dds`).
+- **Not testable now (user, 2026-11-13: unported classes cannot cast):** the skill and hyper cut-ins. Owed: CH2a (set 0), CH3a (set 1), CH6 (all four sets, hyper on 120 / 121 / 125); kickoffs amended. Skill-icon gate n/a (no skills registered).
+- **Routed:** CHNa: 35 / 125 stat chart (2,1,1), third-line helper, `GetCharacterImageName` portraits, third-line texture pieces and `Movie_Create_Elesis_CA` on the screen (kickoff amended). Stage 12: cut-in item override `31fd8a50`.
+- **Checklist:** `(Elesis: CH5 ...)` at l.372, 603, 631, 888. `funcmap.tsv` +4 rows. `MODS.md`: "Stage 7 Elesis, CH5".
+
+**Play-test hand-off:** see the session reply. Log tag `[JUNE_CHAR]` (`ELESIS DATA`; no `ELESIS UI` line is expected, no skill is castable).
+
 ## Phase CH-N - Elesis's June-only class path: Dark Knight (35) and Crimson Avenger (125)
 
 The template block is `JUNE_CHARACTER_AISHA_PHASES.md` "Phase CH-N" as Ara's Z rewrites it; Ara ran it first. **What Elesis reuses** (Ara's CHNa,

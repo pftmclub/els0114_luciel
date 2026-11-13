@@ -42,3 +42,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH0 (2026-11-12)
 
 - S3 baseline: `june2017_re/char_elesis/ch0_s3_baseline.txt` (261 rows, 254 no_state, 35 / 125 included). Reruns: `charport_scan.py`, `charport_keys.py ELESIS_KNIGHT` (CH0: 248 keys, 9 june-only, 1 neither, 4 march-only-site, all owned).
+
+## Amended by CH5 (2026-11-13)
+
+- Skills were not castable at CH5, so its cut-in checks are owed here: every skill cast shows `[JUNE_CHAR] ELESIS UI cut-in set <n> name <gfx>` (8 / 29 / 30 -> set 0 `HQ_CutIn_Elesis_01`, 120 -> 1 `_GM_01`, 121 -> 2 `_BH_01`, 125 -> 3 `_CA_01`, 35 -> 0), each matched by a `[JUNE_GFX] CUTIN play`; the hyper on 120 / 121 / 125 shows `ELESIS UI hyper cut-in class <c> name HQ_Cutin_EGM / EBH / ECA_Transcendence`.

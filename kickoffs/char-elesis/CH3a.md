@@ -60,3 +60,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   June `@32b8c5bb` -> `32b8c5c2`) sets it to `RNSI_SA_SGM_JUGGERNAUT_BUSTER`, because June's memo body is the 28010 / 28048 case body (shared tail `@32b8d0f4`).
   Write that case under `_LIVE` as `case RNSI_SA_SGM_JUGGERNAUT_BUSTER: case RNSI_SA_SGM_JUGGERNAUT_BUSTER_UPGRADE:` (June `32b8cf8c`): the memo route then needs
   nothing more. A case body that reads `eSkillID_` gets the raw id (the base skill), as June's `param_2`.
+
+## Amended by CH5 (2026-11-13)
+
+- Grand Master's skill cut-in is `[JUNE_CHAR] ELESIS UI cut-in set 1 name HQ_CutIn_Elesis_GM_01`: the hand-off checks it once per special active cast, with a `[JUNE_GFX] CUTIN play` the same second.

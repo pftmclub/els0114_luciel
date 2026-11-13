@@ -209,6 +209,16 @@ using namespace _CONST_EL_CH1J_;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
+// char-elesis CH5: June 333a8450 ( table 337ad5c0, stride 0x90 = 3 x 0x30; GFx names without extension ): set 0 Elesis ( 8 / 29 / 30 / 35 ), 1 Grand Master, 2 Blazing Heart, 3 Crimson Avenger
+static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
+{
+	{ CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_01" ), },
+	{ CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_GM_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_GM_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_GM_01" ), },
+	{ CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_BH_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_BH_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_BH_01" ), },
+	{ CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_CA_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_CA_01" ), CX2GUUser::SkillCutIn( L"HQ_CutIn_Elesis_CA_01" ), },
+};
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
 static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
 {
 	{ 
@@ -232,6 +242,7 @@ static const CX2GUUser::SkillCutInSet s_SkillCutInSet[] =
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®
 };
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
 /*static */CX2GUEL* CX2GUEL::CreateGUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int frameBufferNum, CX2Unit* pUnit )
 {
 	return new CX2GUEL( unitIndex, teamNum, pScriptLuaState, frameBufferNum, pUnit );
@@ -5086,6 +5097,9 @@ void CX2GUEL::ShowActiveSkillCutInAndLight( float fTimeToShow_, bool bOnlyLight_
 		IF_EVENT_ENABLED( 0x8b3 )
 			cutIn = s_SkillCutInSetEvent8b3[ ( 0 == ( rand() & 1 ) ) ? 0 : 1 ];	// even rand() -> CASH_21
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS UI cut-in set %d name %s", m_iSkillCutInSetIndex, cutIn.fileName.c_str() );	// char-elesis CH5
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
 		ActiveSkillShow( L"Dummy2_Lhand", cutIn.fileName.c_str(), cutIn.vSize, cutIn.vPosition, IsHyperState(), bOnlyLight_ );
 	}
 #else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE

@@ -84,3 +84,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   and `InitStateByUnitClass` (`:2747`) carry June's bodies under `_LIVE` with the 35 / 125 arms already (June `31feaac0` by class name; cut-in table
   `32b87fec`: 35 -> 0, 125 -> 3; part 2 `32b864f0`: 35 / 125 register the SCA / SDK states). CHNa only checks in play that a 35 and a 125 unit reach them
   (`[JUNE_CHAR] ELESIS DATA` state count, a Dark Knight dash Z-Z).
+
+## Amended by CH5 (2026-11-13)
+
+- CH5 already landed: the 35 / 125 `UnitTemplet.lua` rows (so a 35 / 125 unit has a templet), cut-in set 3 (`HQ_CutIn_Elesis_CA_01`), June's six-button creation dialog, June's `character_info_08.tga`. Not done, CHNa's: `GetUnitStatInfomationChart` arms for 35 / 125 = 2,1,1 (June `3254ee40`, class ids 0x23 / 0x7d, March's chart at `X2StateCreateUnit.cpp:3901-3913`), the third-line helper arm (`GetThirdLineElesisClassTypeByUnitClassType`), the 35 / 125 `GetCharacterImageName` portrait rows, and a look at the creation screen's third-line texture pieces (`name_class_*_3`, `text_class_2_3`, `star_graph_class_2_3`) with `Movie_Create_Elesis_CA.avi` (loose in `data\movie`).

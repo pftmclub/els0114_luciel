@@ -12826,3 +12826,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG needs SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ( June's ParsingBuffFactorID ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: June character port ( Elesis ) Phase CH5 - UI and data: the skill cut-in table is June's ( 333a8450 / 337ad5c0, four sets of three:
+//              HQ_CutIn_Elesis_01, _GM_01, _BH_01, _CA_01; set 3 is Crimson Avenger's, CHNa makes her loadable ), its use logged ( ELESIS UI cut-in ),
+//              the awakening hyper cut-in logged. The UnitTemplet rows, the creation-screen button script and the character_info_08 sheet are data
+//              ( data036, data034, data057 ), not flagged.
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_UI ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ( the cut-in reader and the InitState set index )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI
+//////////////////////////////////////////////////////////////////////////
