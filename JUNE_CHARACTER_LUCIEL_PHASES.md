@@ -551,6 +551,42 @@ parser flag), Always.h. Log `[JUNE_CHAR] LUCIEL DATA` (ErrorLog, the NU1 fix-1 i
 lands (CH1's play-test). DU3-DU5: Lu and Ciel each wear their own equipment in the village, in the character window and on the select screen;
 switching the form in the window swaps the shown body; a relog keeps it.
 
+### DU2 - Done (2026-11-14)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,
+`X2GUArme_VioletMage.cpp`. funcmap rows: `grep "Char Luciel DU2" june2017_re/funcmap.tsv` (22).
+- **Scope widened to the whole damage-state band (one logical change).** The plan named 0x114 / 0x118 / 0x490 / 0x494 / 0x458, but June's readers
+  ask the band together (IsDamageState 15 getters, the stun test 16), and Lu/Ciel overrides all of it (`ch0_vtable_slots.tsv`). So DU2 makes 18
+  damage getters virtual (0x468 groggy, 0x46c-0x4a4, 0x114 / 0x118) plus `GetJumpDownStateID` (0x458). Every base was read from the exe bytes at
+  vtable `334781f4` (`mov eax, N`, N = 25 .. 42; March `USI_` = June - 1 there); 0x458 = March's riding body (`3208de10`). The other state-id
+  getters (wait / walk / dash / jump / die, 0x438-0x464) stay with CH1o's virtual wiring.
+- **Names.** March's own names are kept and made virtual where March has them (`GetDamageGroggyStateID`, `GetDamageAirDownStateID`,
+  `GetDamageDownLandFront`, `GetDamageDownLandBack`, `GetDamageAirDownLanding`, `GetJumpDownStateID`); the 13 new ones follow
+  `Get<State>StateID() const`. `GetJumpDownStateID` returns `int` under the flag (Lu/Ciel's `32b4d5b0` returns its own id); both its
+  `RIDING_SYSTEM` branches are flagged. No class in `X2Lib` declares any of the 19 names (grep), so no March class now overrides a slot by accident.
+  CH1k2 / CH1l kickoffs amended with the exact names and signatures.
+- **Readers (NU0's DU2 rows), verdicts:**
+  - routed under the flag: `PhysicProcess_Jumping` (31fd6da9 / 31fd7070: 0x114 / 0x118 / 0x494 / 0x490; 0x458 was already a getter);
+    `ForceDownAndDetonationProcess` (3202a9c0: 0x114 / 0x118 / 0x48c then riding 0x55 / 0x56; the switch head becomes an `if`, the body is shared);
+    `CommonFrameMove` stun test (@32067598-3206776c: 16 getters + riding; see the routed bullet); `IsDamageState` (0x534, inside char-elesis
+    `_LIVE`: the Elesis CH1o amendment's "make the base ask them"); `IsSocketDownTargetState` (0x538 `3208eb60`: 10 getters); Aisha's skill lookup
+    (`32cebe80 @32cec2bf`; NU0 filed it under Aisha's InitState, the chunk is uncarved: 0x114 / 0x118 / 0x490).
+  - automatic through the virtual, no edit: StateChange's force-down flush (`320348c0`, already March's three getters), BlackHole `31f6eea0`
+    (`X2DamageEffect.cpp:3757`), `IsNotCommonMoveState` (`31fd7640`, 0x458 @31fd77b1), the stun block's groggy getter (0x468).
+  - no March body, recorded: CommonEventProcess's `+0x8e74` block (@31fe7944 / @31fe7992; unported since Buff 7c), `31fd7350` (June's
+    `LT_JUMP_DOWN` line, below), `32296570` (Stage 2 bullet "attack-result / damage-react hooks"), vslot 0x530 `3208e7d0` (back damage states;
+    only caller Ain `32a50f65`, char-ain).
+- **Routed (scope rule), backlog Stage 2:** the stun -> groggy polarity in `CommonFrameMove` (June groggies a stunned unit IN a hit-reaction state,
+  March in any other: DU2 kept March's polarity with June's state set), and `LT_JUMP_DOWN` foot lines (June line type 11, handler `31fd7350`).
+- **Hygiene.** flagcheck `--worktree`: 3 PASS (`X2GUUser.h` +33, `X2GUUser.cpp` +64, `X2GUArme_VioletMage.cpp` +4), 1 OTHER (Always.h: peers'
+  blocks), 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS. `enumscan --check`: the 2 A/B rows are old `X2GUUser.h`
+  NPC ids, none in DU2's lines.
+- **Build.** Two of my runs and one queued run failed in KTDXLIB on char-elesis CH3b0's `ELESIS_SUMMON` guard (`SERV_ELESIS_SECOND_CLASS_CHANGE`
+  lives only in `ServerDefine.h`; fixed by `029ca9e1`). Deployed by the peer build `.build/logs/20261114-015742` (started 01:57, after DU2's edits at
+  01:38; `X2GUUser.cpp` / `X2GUArme_VioletMage.cpp` compiled, 0 errors): exe dated 2026-11-14 02:08:40, md5 `e9dee3d6`. No `EXESTR` line: DU2 adds
+  no string.
+- **In game:** nothing new to see; every class jumps, falls, is knocked down and stunned exactly as before (base getters = March's constants).
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under
