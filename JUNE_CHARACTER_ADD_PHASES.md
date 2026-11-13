@@ -446,6 +446,36 @@ Add's kit (`ADD_EFFECT#.OGG` 3D-position x15, `MOTION_ADD_EMOTION_CASH#.X` = Sta
 **How to see it:** the creation screen shows Add's slot, his June class buttons and info texture; create one, and he gets his beginner gear.
 Personal-shop search: Add is the last entry of the character combo (the label may show garbled, see Stage 9 bullet).
 
+### CH0c - Review (2026-11-13)
+
+**Verdict: pass, no code fix.** Commits `0aa567e7`, `fbca4d67`, `24dda967`, `61399eb6`, `a76d5fb8` reviewed against `ch0_create.tsv` and June.
+- **Ctor:** only the `UT_ADD` slot test is in `#else`; the Raven / Elesis tests and the default-select switch are untouched. June's ctor `3255bd10`
+  (Ghidra) hides only the eleven `*_Slot_Jumping` controls (under `31d41cd0(0)`), `RoseCreateUnitSlot` (`334a7688`) and the no-unit buttons; it
+  never touches `AddCreateUnitSlot`. Confirmed.
+- **Personal shop:** all seven blocks hold March's `if` verbatim in `#else`, `AddItem` stays outside, and both index readers map combo 9 to `UT_ADD`
+  (`X2UIPersonalShopBoard.cpp:2018-2021` and the `m_iComboCharacterindex` switch). Confirmed.
+- **June reads (2 of 2 spot-checked, both hold):** `SelectUpperClass` `325519d0` stores the class from `3234b390` at `+0x2c0`, and the create request
+  `325584f0` sends `+0x2c0` (event `0x480`, jumping byte `+0x71c`). `3254e410` resolves the class templet (`32373770`) and passes its ten ids
+  (`+0x2a4`-`+0x2b4`, `+0x1cc`-`+0x1dc` when `+0x50`) to `31f9c640`: a preload, not `EquipPromotionItem`. The SelectAdd floats were not re-read
+  (spot-check rule: no failure).
+- **Tutorial stand-in:** the create reply mirrors the studio's own `SERV_ELISIS_PREVIOUS_SIS_EVENT` skip (`pUnit` is in scope, the dialog cleanup and
+  state change still run); the first-select gate only adds `UT_ADD !=`, so every other class still enters its tutorial. **Not seen in game:** the
+  only Add in the save is AddCh0c (uid 142, created in play-test 1 before the fix), and play-test 2 was a relog (`m_bFirstSelect` false), so neither
+  skip line ever ran. Low risk (the studio's path); the hand-off's optional check covers it, and TU retires the skip.
+- **Play-test log:** `ADD CREATE slot shown ( US limit 8, slot found )` and `select class 9 type 9` present; uid 142 selected, class 9, no
+  `stage 0 out of range`. ErrorLog vs `ErrorLog_pre_CH0c_add.txt`: 247 new shapes, all first loads (`MESH_ADD_*` / `ADD_EFFECT_*` XET and texture
+  misses, `MOVIE_CREATE_*.LUA`, `ADD_EFFECT#.OGG`, `MOTION_ADD_EMOTION_CASH#.X`); none from CH0c's code.
+
+**Hygiene.** flagcheck `--range 0aa567e7^..0aa567e7 --with _DEBUG`: files: 3 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR; in this flag's
+files: 0 deleted line(s), 0 non-ASCII, 0 EOL-mismatched, 0 bare #else/#endif, 0 encoding change(s); RESULT: PASS. `--range 24dda967^..24dda967`:
+files: 2 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR; 1 deleted line (the `_DEBUG` description comment, reworded); RESULT: PASS. The whole-range run
+(`0aa567e7^..a76d5fb8`) crashed in peer char-elesis commits (`Unevaluable` at an `#if defined( ... CHUNG_CORE ...)` line), hence per commit.
+`git log -SJUNE_CHAR_ADD_CREATE a76d5fb8..HEAD`: nothing. junediverge `--check` on the 4 CH0c files: RESULT: PASS. `--check-all`: RESULT: FAIL, 4 hits,
+all rule b in `X2GUEL.cpp` (`ReInit` x2, `Start_SwordmanDestruction`, `GetFinalDamage_WayOfSword`): they fire because the peer char-elesis CH1
+session's uncommitted `Always.h` turns `_LIVE` / `_WOS` on. Not CH0c's; that session owns them.
+
+**Debug retired:** `//#define SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG` (only code change). Full build started, not awaited (CLAUDE.md 2026-11-03).
+
 ## Phase TU - Add's June tutorial (added by CH0c, 2026-11-13)
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_TUTORIAL`. After CH1's and CH0c's reviews.

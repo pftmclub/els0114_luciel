@@ -140,7 +140,6 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH0c | **review ready** (`CH0c-review.md`): play-test PASSED (Add created, plays, relogs); tutorial skipped for Add (stand-in -> TU); exchange shop -> Stage 9 | Opus 5.5 / high, Opus review, user play-test | CH0 (done), char-ara CHNa review (done) | `X2StateCreateUnit.*`, `X2UIPersonalShopBoard.cpp`, koms | `CH0c.md` |
 | CH0b | blocked (char-elesis CH6 walk): 7,686 June Add assets staged (new kom data207), packed, copied; PT / LP motions held for CH1 | Sonnet 5.5 / high, user play-test | CH0 (done), char-elesis CH6 | koms, save | `CH0b.md` |
 | CH1a | blocked (CH0, char-elesis Z): movement and slot-head states; no review of its own | Sonnet 5.5 / high | CH0, char-elesis Z | `X2GUAdd.*`, Always.h | `CH1a.md` |
 | CH1b | blocked (CH1a): reactions; review covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUAdd.*` | `CH1b.md` |
@@ -184,11 +183,11 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 | CH3d | blocked (CH3c2): hyper actives + transcendence rows 122 / 123 / 126; CH3 stage review (CH3a-CH3d) | Opus 5.5 / high, Opus review, user play-test | CH3c2 | `X2GUAdd.*`, `Handlers_Quest.cpp`, data036 | `CH3d.md` |
 | CH4a | blocked (CH3d review): passives, delegate lists `32a1ccb0`, `+0x92a0` rate; no review of its own | Opus 5.5 / high, user play-test | CH3d review | `X2GUAdd.*`, `X2GUUser.*` | `CH4a.md` |
 | CH4b | blocked (CH4a): overrides + memo; CH4 stage review (CH4a-CH4b) | Opus 5.5 / high, Opus review, user play-test | CH4a | `X2GUAdd.*`, `X2GUUser.*` | `CH4b.md` |
-| TU | blocked (CH1 review, CH0c review): Add's June tutorial 41230 (`325622e0` case 9), enum + DungeonData rows, emulator; retires CH0c's tutorial skip; shrinks to the skip + play-test if june-dungeons C3y-2 lands first | Sonnet 5.5 / high, Opus review, user play-test | CH1 review, CH0c review | `X2StateServerSelect.cpp`, `DungeonEnum.*`, `DungeonData.lua`, emulator | `TU.md` |
-| CH6 | blocked (CH4b, CH5, CHNb, CH0c, TU reviews): scans rerun + user walk incl. creation screen, all job changes, the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH4b, CH5, CHNb, CH0c, TU reviews | docs, save | `CH6.md` |
+| TU | blocked (CH1 review): Add's June tutorial 41230 (`325622e0` case 9), enum + DungeonData rows, emulator; retires CH0c's tutorial skip; shrinks to the skip + play-test if june-dungeons C3y-2 lands first | Sonnet 5.5 / high, Opus review, user play-test | CH1 review, CH0c review | `X2StateServerSelect.cpp`, `DungeonEnum.*`, `DungeonData.lua`, emulator | `TU.md` |
+| CH6 | blocked (CH4b, CH5, CHNb, TU reviews): scans rerun + user walk incl. creation screen, all job changes, the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH4b, CH5, CHNb, CH0c, TU reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, template paragraph, **closes Stage 7** (unparks char-luciel) | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
 
-Done: CH0 (2026-11-13; maps + asset list, 5 splits + new Opus CH1d0, no code).
+Done: CH0 (2026-11-13; maps + asset list, 5 splits + new Opus CH1d0, no code), CH0c (2026-11-13, reviewed: pass, no code fix; Add creatable, slot + shop combos; tutorial skipped until TU; debug retired).
 
 Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for all seven Add classes are derived (class 9 from June's `UT_ADD` row by Lu/Ciel's formula; first jobs = 9; second jobs = 9 with their own level 1); CH0c writes 9 / 32 / 122, CHNa the rest; the user packs `StatTable.lua`. **Moot (CH0, 2026-11-13):** the flat `StatTable.lua` (e37c9211) already has all seven Add classes; CH0c and CHNa write no stat rows.
 

@@ -12812,5 +12812,5 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-13
 // Description: char-add CH0c debug: logs [JUNE_CHAR] ADD CREATE slot shown / select class <c> type <t> / tutorial skipped. The CH0c review retires it.
-#define SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
 //////////////////////////////////////////////////////////////////////////
