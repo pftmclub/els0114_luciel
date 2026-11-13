@@ -425,6 +425,7 @@ kept March's (Add's slot exists there, only hidden; June's layout comes with Lu/
 RESULT: PASS. junediverge `--check`: RESULT: PASS. enumscan: 0 rows.
 DEPLOY OK: X2_offline.exe is 26,367,488 B, dated 2026-11-13 07:35:21, md5 a225d80fa125b7e1bf227670ea9072a4.
 EXESTR OK: 2 of 2 found (`[JUNE_CHAR] ADD CREATE slot shown`, `... select class`, wide).
+Commit `0aa567e7`; flagcheck `--range 0aa567e7^..0aa567e7 --with _DEBUG`: 3 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 
 **How to see it:** the creation screen shows Add's slot, his June class buttons and info texture; create one, and he gets his beginner gear.
 Personal-shop search: Add is the last entry of the character combo (the label may show garbled, see Stage 9 bullet).
