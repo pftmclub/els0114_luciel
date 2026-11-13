@@ -31,6 +31,12 @@
 // the client has no expat of its own, its libxml is a different library ).
 #include "GFx/AS3/AS3_Global.h"
 #pragma comment( lib, "expat.lib" )
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+#pragma push_macro( "V" )
+#undef V								// june-dungeons C3y-2c: DXUT's V( x ) breaks AS3_Value.h's member V
+#include "GFx/AS3/AS3_MovieRoot.h"		// june-dungeons C3y-2c: the AS3 VM, to release a finished scene swf's classes
+#pragma pop_macro( "V" )
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 
 // Two more zlib entry points than G1's six ( KTDGFXRuntime.cpp ): libgfx's ZLibFile::Reset wants inflateReset and AS3 ByteArray.compress
 // wants compress2. Same shim: cdecl wrappers over the client's ZLIB_WINAPI zlib 1.2.3 ( zlibstat.lib: _inflateReset@4, _compress2@20 ).
@@ -46,6 +52,18 @@ extern "C"
 namespace SF	= Scaleform;
 namespace SFG	= Scaleform::GFx;
 namespace SFR	= Scaleform::Render;
+
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+namespace _CONST_GFXSCENE_CLASS_C3Y2C_
+{
+	// june-dungeons C3y-2c: UnregisterUserDefinedClassTraits is protected in VMFile; a derived class names the member pointer
+	struct SceneFileClassRelease : public SFG::AS3::VMFile
+	{
+		static void Release( SFG::AS3::VMFile& kFile ) { ( kFile.*( &SceneFileClassRelease::UnregisterUserDefinedClassTraits ) )(); }
+	};
+}
+using namespace _CONST_GFXSCENE_CLASS_C3Y2C_;
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
 // Log lines. Everything the manager logs during Init ( OnCreateDevice, right after the koms mount ) is held and written at the first frame,
@@ -1189,6 +1207,32 @@ public:
 #ifdef SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
 	CLIKDataBindingAdapter* GetAdapter() const { return m_pAdapter.GetPtr(); }			// vslot 1 of the wrapper ( 3226aed0: mgr +0x98 vslot 1 )
 #endif SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+	// june-dungeons C3y-2c: not June - unloaded scenes stay alive here and the first EventScene registered wins, so drop its file's classes
+	void ReleaseSceneClasses()
+	{
+		if ( !m_pMovie || m_pMovie->pASMovieRoot.GetPtr() == NULL || m_pMovie->GetAVMVersion() != 2 )
+			return;
+		SFG::AS3::MovieRoot* pRoot = static_cast< SFG::AS3::MovieRoot* >( m_pMovie->pASMovieRoot.GetPtr() );
+		SFG::AS3::VM* pVM = pRoot->GetAVM();
+		if ( pVM == NULL )
+			return;
+		const SFG::ASString strClass = pVM->GetStringManager().CreateString( "EventScene" );
+		const SFG::AS3::ClassTraits::Traits* pClass = pVM->Resolve2ClassTraits( strClass, pVM->GetPublicNamespace(), pVM->GetCurrentAppDomain() );
+		SFG::AS3::VMAbcFile* pFile = ( pClass != NULL ) ? pClass->GetFilePtr() : NULL;
+		char szBuf[ 512 ] = { 0, };
+		if ( pFile == NULL )
+		{
+			_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES none registered ( %s )", pClass != NULL ? "EventScene has no file" : "no EventScene" );
+			GfxLogLine( szBuf );
+			return;
+		}
+		_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES released: the classes of %s",
+			pFile->GetAbcFile().GetSource().ToCStr() );
+		SceneFileClassRelease::Release( *pFile );
+		GfxLogLine( szBuf );
+	}
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 
 private:
 	SFG::Loader*						m_pLoader;			// +0x40 ( June keeps the manager; the loader is its +8 )
@@ -2655,6 +2699,10 @@ void CKTDGGFXManager::loadUserWidget( int iUIID, const WCHAR* wszPath, int iArg1
 {
 	if ( m_pImpl->m_pUI == NULL )
 		return;
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+	if ( iUIID == 0x2711 )		// june-dungeons C3y-2c: the scene widget ( X2GFXEventScene ) registers its own EventScene
+		m_pImpl->m_pUI->ReleaseSceneClasses();
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 	SFG::Value akArgs[4] = { SFG::Value( (SF::Double)iUIID ), SFG::Value( wszPath ), SFG::Value( (SF::Double)iArg1 ), SFG::Value( (SF::Double)iArg2 ) };
 	m_pImpl->m_pUI->Invoke( "loadUserWidget", NULL, akArgs, 4 );
 #ifdef SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
@@ -2668,6 +2716,10 @@ void CKTDGGFXManager::loadEventSceneEndFrame( int iUIID, const WCHAR* wszPath, i
 {
 	if ( m_pImpl->m_pUI == NULL )
 		return;
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+	if ( iUIID == 0x2711 )		// june-dungeons C3y-2c: same as loadUserWidget
+		m_pImpl->m_pUI->ReleaseSceneClasses();
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 	SFG::Value akArgs[3] = { SFG::Value( (SF::Double)iUIID ), SFG::Value( wszPath ), SFG::Value( (SF::Double)iFrame ) };
 	m_pImpl->m_pUI->Invoke( "loadEventSceneEndFrame", NULL, akArgs, 3 );
 }

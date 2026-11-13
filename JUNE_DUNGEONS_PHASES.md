@@ -926,3 +926,33 @@ screen until ESC / right click, then the portrait dialog.
 - **Build.** DEPLOY OK: X2_offline.exe is 26,467,328 B, dated 2026-11-13 17:52:39, md5 79b337ec61a16d5030f6e48ca280ce03 (built at main 1ccad820 + 4
   uncommitted code files, all this phase's). EXESTR OK 2 of 2 (`advance: %d call(s)`, `CreateSequence_LUA`), md5 79b337ec.
 - **User, after the run:** the fast typing also shows in other quests' scenes, so it is on the GFx side; the `advance` line decides it.
+
+### C3y-2c - run 2 (2026-11-13) and fix 2
+
+Run (exe 79b337ec, new Elsword): `Quest_22160_Start` played twice in the village first (23:33, 23:37; both right-click ended), then the tutorial.
+User: post-boss pictures fine; Banthus scene (`_02`) advances and ends; the end scene (`_03`) types normally at first but loops instead of ending;
+an Ignia voice plays in the last dialog.
+- **GFx speed is right.** `advance:` = 70-71 calls, 1.00x movie time per real second in every scene. Not a frame-rate fault.
+- **Every tutorial voice is Quest_22160_Start's.** The AS calls pass `GFX_ID_2371.ogg` .. `GFX_ID_2377.ogg` (no `Tuto_*.ogg`): `_03` frames 1-7 =
+  2371-2377, frame 8 = 2377 again, then 2371 after the wrap. `quest_22160_start.swf` holds exactly those 7 labels in 8 frames (`lastScene` = 8);
+  `tutorial_elsworld_03.swf` has 15 frames, its own 13 `Tuto_*` labels, `lastScene` = 15.
+- **Cause: the first `EventScene` class wins.** Every scene swf is document class `EventScene` (+ `SoundPlayer`, symbol classes). This Scaleform
+  loads widgets into one shared domain (`LoaderInfo::SetAppDomain`, local 2026-08-27 patch), where `VMAbcFile::RegisterUserDefinedClassTraits`
+  skips a name already registered. A scene is never freed: `EventScene.config` adds a stage `KEY_DOWN` listener that `clearBindings` never
+  removes, and the 2026-08-27 `MovieRoot::UnloadMovie` patch skips the teardown (stage listeners, timers, `RemoveLoadedMovieDef`) for content
+  reparented out of its loader, which main.gfx's `SubWidgetLoader` always does. So `_03` ran 22160's class: its 8 frame scripts (voices, `stop()`),
+  none for frames 9-15 (the timeline runs through them at 24 fps and wraps: "types fast", "loops"), and `playScene` never meets `lastScene`.
+  `_02` (2 frames) looked right by luck. Same for any quest scene after the first one of a session.
+- **Not June.** June's C++ load / unload is identical (`31c44670`, C3y-2c trace); the gap is our Scaleform build (`libgfx_as3.lib` prebuilt from the
+  ElswordPS tree, untracked, no project files here), so the lib patch itself cannot be narrowed in this tree.
+- **Fix 2.** `SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE` (`KTDGGFXManager.cpp`): before main.gfx loads widget 0x2711 (`loadUserWidget` and
+  `loadEventSceneEndFrame`), `CKTDGGFXUI::ReleaseSceneClasses` resolves `EventScene` in the VM's current domain and calls the owning file's
+  `VMFile::UnregisterUserDefinedClassTraits` (protected; named through a derived struct). Traits stay alive for the leftover instance (SPtr), so
+  only the name table changes; the next scene registers its own classes. Safe: scenes share only `DataBinding` / `GameDataFunction` with main.gfx
+  (main's own, loaded first), and no other widget in the 509 GFx files defines `EventScene` / `SoundPlayer`. Log `[JUNE_GFX] SCENE CLASSES ...`.
+  DXUT's `V( x )` macro is pushed / popped around the `AS3_MovieRoot.h` include. Leftover instances themselves stay (Stage 27 bullet, unchanged).
+- **Hygiene.** flagcheck `--worktree` GFX_SCENE_CLASS_RELEASE: 1 PASS~ (one blank line) + DEFINE (+15), 0 FAIL, 0 deleted; junediverge `RESULT: PASS`;
+  enumscan 0 A/B. The `MODS.md` entry went in with char-elesis CH3a's commit `1df5565c` (that session committed the whole file).
+- **Build.** My own run failed in char-elesis CH3a's in-progress `X2GUEL.cpp`; that session's build carries both files: DEPLOY OK
+  X2_offline.exe 26,474,496 B, 2026-11-14 00:25:13, md5 d7fa0c0e464de1f91722a03fab1431ea (main 070b4381 + KTDXLIB/Always.h, KTDGGFXManager.cpp
+  dirty). EXESTR OK 2 of 2 (`SCENE CLASSES released: the classes of %s`, `SCENE CLASSES none registered ( %s )`), md5 d7fa0c0e.

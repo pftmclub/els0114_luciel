@@ -13109,3 +13109,18 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              layer 0 as June does ( JUNE_BUGS ). Revert: comment out the #define ( JUNE_PARTICLE_LUA_LAYER ).
 #define SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: june-dungeons C3y-2c fix 2 (not June) - every scene swf defines a class EventScene ( plus SoundPlayer and its symbols ); this
+//              Scaleform loads widgets into one shared class space where the first registered class wins, and an unloaded scene stays alive
+//              ( its stage key listener is never removed: the 2026-08-27 UnloadMovie patch skips reparented content ). So a later scene ran an
+//              earlier scene's code: Quest_22160_Start's voices in the tutorial, no stop() past its 8 frames ( fast typing, the end-scene loop ).
+//              Before each scene widget ( 0x2711 ) loads, the file that owns EventScene has its classes unregistered. Log [JUNE_GFX] SCENE CLASSES.
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+#if defined( SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE ) && !defined( SERV_IRUHADEV_JUNE_GFX_EVENTSCENE )
+#error SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE needs SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( CX2GFXEventScene loads the scene widget 0x2711 )
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+//////////////////////////////////////////////////////////////////////////
