@@ -110,8 +110,8 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH2b2 | **built, play-test owed** (2026-11-13, exe `13b50b83`): Saber Knight actives 28202 / 28203 / 28204; unit 40 slotted A0 / A1 / B5; say "check logs" after | Sonnet 5.5 / high, user play-test | CH2b | `X2GUEL.*` | `CH2b2.md` |
-| CH2c | blocked (CH2b2 play-test): Pyro Knight (30) skills | Sonnet 5.5 / high, user play-test | CH2b2 | `X2GUEL.*` | `CH2c.md` |
+| CH2b2 | **done 2026-11-13** (play-test passed, exe `13b50b83`; enhanced ids 28219 / 28225 / 28226 not played: CH2d review or CH6) | Sonnet 5.5 / high, user play-test | CH2b | `X2GUEL.*` | `CH2b2.md` | Sonnet 5.5 / high, user play-test | CH2b | `X2GUEL.*` | `CH2b2.md` |
+| CH2c | **ready** (CH2b2 done 2026-11-13): Pyro Knight (30) skills | Sonnet 5.5 / high, user play-test | CH2b2 | `X2GUEL.*` | `CH2c.md` |
 | CH2d | blocked (CH2c): Dark Knight (35) skills; CH2 stage review (CH2a-CH2d) | Sonnet 5.5 / high, Opus review, user play-test | CH2c, CHNb review | `X2GUEL.*` | `CH2d.md` |
 | CH3a | blocked (CH2d review): Grand Master (120) special actives (CH0 split) | Sonnet 5.5 / high, user play-test | CH2d review | `X2GUEL.*` | `CH3a.md` |
 | CH3a2 | blocked (CH3a): Grand Master actives 28205 / 28206 / 28222 (CH0 split) | Sonnet 5.5 / high, user play-test | CH3a | `X2GUEL.*` | `CH3a2.md` |
