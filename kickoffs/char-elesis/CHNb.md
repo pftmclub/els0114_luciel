@@ -5,7 +5,7 @@
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-elesis CHNb` |
 | Plan doc | `JUNE_CHARACTER_ELESIS_PHASES.md` (branch `main`) |
 | Depends on | CHNa review |
-| Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS` (+ `..._CLASS_DEBUG`) |
+| Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS` (+ `..._CLASS_DEBUG`: the CHNa review commented it out; turn it back on for this phase's lines, the CHNb review retires it) |
 | Log tag | `[JUNE_CHAR]` (`ELESIS CLASS`), `[ADMIN_CHEAT]` |
 | Review | `kickoffs/char-elesis/CHNb-review.md` (Opus 5.5 high; the phase writes it when done) |
 

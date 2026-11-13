@@ -1580,6 +1580,30 @@ Reused unchanged from Ara's CHNa: `SERV_IRUHADEV_JUNE_CLASS_PATH` (socket-group 
   `MESH_EL_SDK_*` / `MESH_EL_BASIC_FACE` (the CH0b part-mesh frame mismatch, routed to CH1 final), `MESH_EL_SCA_BASIC_FACE.TGA.TGA` (misspelt name in June's data), the usual
   `OpenXET` optional probes, 4 `E_DISABLE_HB_CHECK_REQ`, `AddGroupChainQuest`, `Add_Skill_Page_ED`.
 
+### CHNa - Review (2026-11-13)
+
+Opus 5.5 high. **Verdict: pass, no code change.** Commit `4750f9b9` re-read against June's exe (Ghidra read-only, decompiles this session):
+- **Gauge** `X2GageManager.cpp`: June `3248e290` case 8 / 0x1d / 0x1e / 0x23 / 0x78 / 0x79 / 0x7d -> `new` 0x11c (`FUN_32498960`) + 0x80 (`FUN_32494900`) = the Elesis arm
+  with the two new labels. Exact.
+- **Compatibility** `X2Unit.h`: June `31ed6500` case 0x23 -> item class 8 or 0x23; case 0x7d -> 8, 0x23 or 0x7d. = the two new arms (no 29 / 120 for 125). Exact.
+- **Third line** `GetThirdLineElesisClassTypeByUnitClassType`: June `3234b390` reads `337a1660 + (tier + type * 4) * 0x14 + line * 4`; `3234afb0` fills Elesis's block
+  (type 8, base `337a18e0`): line 3 = `337a18ec` 8, `337a1900` 0x23, `337a1914` 0x7d. = the function and Ara CHNb's `GetUnitClassByTierAndLine` Elesis row (`X2Unit.h:2974`).
+  Divergence row present (`june_march_divergent.tsv`, last row).
+- **Chart** `GetUnitStatInfomationChart`: June `3254ee40` case 0x23 / 0x7d -> [0] 2, [1] 1, [2] 1; the Knight arm (case 8 -> 2, 1, 2 = March's MID, LOW, MID) fixes the field
+  order, so 35 / 125 = (MIDDLE, LOW, LOW). Exact.
+- **Portraits** `X2Data.cpp`: `char_image_rows.py 35:0x3b 125:0x3c` rerun: all 18 base entries (nine tables x two classes) = the rows at index 57 / 58, and the switch maps
+  35 -> 57, 125 -> 58. The Elesis blocks sit after Ara's `#endif` in every array, insert-only (flagcheck 0 deleted), so indices 0..56 are what Ara's review proved; the play-test
+  showed the right pictures at 57 / 58. Transcended pieces in June's rows (Texture100-102, `TR_EL_SDK_*` / `TR_C_AVENGER_*`; June leaves 35's `160` and `MyGage` TR piece
+  empty) stay CH3d's.
+- **Tool** `createchar.py`: CLASSES 35 / 125, PARENT 35 -> 8, 125 -> 35. Units 144-146 played.
+- **Hygiene:** `flagcheck JUNE_CHAR_ELESIS_CLASS --with _CLASS_DEBUG --range 4750f9b9^..4750f9b9`: `files: 4 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`; 0 deleted,
+  0 non-ASCII, 0 EOL-mismatched, 0 untokened, 0 encoding changes; `RESULT: PASS`. `junediverge --check-all`: allow-listed 225, `RESULT: PASS`. `enumscan --check` (4 files):
+  20 A rows, all pre-existing enum definitions / `X2Data.cpp:3106-3108`, 0 on CHNa's lines.
+- **Logs** (`logs.py --grep "ELESIS CLASS"`): `gauge class 35` x2, `125` x1 (10:52-10:55), ErrorLog 0. Matches the play-test.
+- **Debug retired:** `//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG` (bytepatch; flagcheck `--worktree` on `Always.h`: 1 DEFINE, the one deleted line is the define;
+  `RESULT: PASS`). Build not awaited (2026-11-03 rule). CHNb's kickoff amended: it turns the define back on for its own lines and its review retires it.
+- Not here (unchanged routing): `RotateYSelectCharacterType` templet reader (Lu/Ciel NU4), transcended 35 / 125 portraits (CH3d), job change + dialogs (CHNb), skills (CH2d / CH3c).
+
 ## Phase CH2 - Skills: Knight and the first jobs (classes 8, 29, 30, 35)
 
 **Run with:** Sonnet 5.5 high (transcription from CH0's map), one Opus review at CH2d (covers CH2a-CH2d), user play-test per phase. Flag
