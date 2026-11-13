@@ -60,3 +60,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   `SI_`, Init `32b8f1d0`, + `32b8f940`), 28603 -> the Sword of Relics block; any other id above 28600 returns (`@32b8ea89`). `28600 ==` id ->
   `ESI_HA_SGM_SWORD_OF_RELICS` (Init `32b8f1b0`, + `32b8f920`, `@32b8e95c`). Below 28600 -> the id switch. The three blocks end in the shared tails
   `@32b8c8ac` / `@32b8c90b` / `@32b8e9fe` (read them in the listing for the slot each pointer lands in).
+
+## Amended by CH1 (2026-11-13): the reserved-buff lines move here
+
+Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. The CH3 stage review retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (comment out its `#define`) once CH2a / CH2b / CH2c / CH3b have shown their lines; a line never seen is asked for once first.

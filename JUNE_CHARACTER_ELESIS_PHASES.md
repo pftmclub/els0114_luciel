@@ -1365,7 +1365,8 @@ virtuals, skill head, pressed-slot space and her Way of the Sword class side and
   `wait_state_change`. Not June; stays after the review.
 - **`[JUNE_CHAR] ELESIS SKILL SBUF`** (`_ELESIS_DEBUG`, `X2GUUser.cpp`, the CH1p amendment): `parse` (state, `m_iStateBuffSkillID`, level, list size; once a second
   per state), `cleared` (learn check), `at once` (time-0 rows inside the parse), `frame` (`CommonFrameMove_InsertBuffFactor`), `state end`
-  (`ApplyAllStateInsertBuffFactor`); `UT_ELESIS` only, helpers in `_CONST_GUUSER_EL_CH1_`. The review retires it with `_WOS_DEBUG`.
+  (`ApplyAllStateInsertBuffFactor`); `UT_ELESIS` only, helpers in `_CONST_GUUSER_EL_CH1_`. Unported characters cannot cast skills (user, 2026-11-13), so CH1
+  cannot show them: the checks move to CH2a / CH2b / CH2c / CH3b (kickoffs amended) and the CH3d review retires the flag.
 - **Script:** `luasrc.py adopt-june data036 ELESIS_KNIGHT.lua` (dry run first): June's file replaces March's whole as `ljconv` bytecode, 245,689 B sha1 `4c3b68b4`,
   no core-list row. Record `june2017_re/june_adopt_20261113_083005.tsv`, backup `kom_backup_stage_june\20261113_083005`.
 - **Enum gate:** `luabind.py check ELESIS_KNIGHT` first failed on CH0's 4 `ENUM MISSING NAME`; data036 `Enum.lua` gains June's `RNSI_A_SCA_BLOOD_STING` 28224,
@@ -1387,7 +1388,8 @@ virtuals, skill head, pressed-slot space and her Way of the Sword class side and
   learned at 1 now); SaberT (40): + Rushing Sword, B Sonic Assault, Unlimited Blade, Mega Burster, Extinction; eresisu (21): four upgrades, B Sword Fire, Infernal
   Blade, Big Burst, Avatar of the Fire; ElesisGM (29): four upgrades, B Extinction, Drastic Charge, Upper Slash, Victorious Sword; ElesisBH (30): four upgrades,
   B Sword Fire, Flame Sword, Infernal Blade, Flame Protection.
-- **Skills** still go through March's id switch below June's head (CH1n) until CH2a; the two-cast check is a light one, a misbehaving skill goes to CH2a.
+- **Skills** are not castable until their class phase ports them (user, 2026-11-13): no skill check in this play-test; the two-cast, held-key and `SBUF`
+  checks are CH2a-CH3b's. The play-test slots stay set for them.
 - **Checklist:** `(Elesis: CH1 ...)` at l.16, 116, 123, 150, 212, 426, 427, 428, 536, 600, 625, 682, 883. CH0b's 21 `ErrorEnum(433)` part-mesh lines
   (l.773) are re-checked on this play-test. `MODS.md`: "Stage 7 Elesis, CH1".
 
@@ -1398,11 +1400,14 @@ Hygiene: `flagcheck.py JUNE_CHAR_ELESIS_DEBUG --worktree --files X2Lib/X2GUUser.
 KTDXLIB/Always.h`: `allow-listed: 17`, `RESULT: PASS`; `--check-all`: `allow-listed: 217`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`.
 Probes (`census.cl_cmd`, `/c /Zs /EHsc`, all on): `X2GUEL.cpp`, `X2GUUser.cpp`, `X2GageData.cpp`, `X2GageUI.cpp`, `X2GUElsword_SwordMan.cpp`, `X2DamageManager.cpp`,
 `X2Game.cpp` exit 0, 0 errors.
+After the commit: `flagcheck --range 9b48ec80^..9b48ec80`: `JUNE_CHAR_ELESIS_DEBUG --files X2Lib/X2GUUser.cpp KTDXLIB/Always.h` `1 PASS, 1 OTHER, 0 FAIL, 0 ERROR`,
+`RESULT: PASS`; `JUNE_CHAR_ELESIS_LIVE --files X2Lib/X2GUEL.cpp` `1 PASS, 0 FAIL`, all zeros, `RESULT: PASS`.
 Build (`--pch force`): `DEPLOY OK: X2_offline.exe is 26,382,848 B, dated 2026-11-13 08:45:47, md5 6379174fdf3a0f9e33f20624412ae84a, equal to X2/US_SERVICE/x2.exe (2026-11-13 08:45:39); built at main fc391e7e + 3 uncommitted code file(s).`
 `EXESTR OK: 3 of 3 found in X2_offline.exe, 26382848 B, dated 2026-11-13 08:45:47, md5 6379174fdf3a0f9e33f20624412ae84a` (`ELESIS DATA`, `ELESIS SKILL SBUF parse`, `ELESIS WOS vigor start`, wide).
 
 **Play-test (user) is the gate:** the five units above, none transcended. Check: `ELESIS DATA` per class, combos, dash, jump, damage / stand-up, riding,
-the Way of the Sword both ways across a stage change and a dungeon end, the `SBUF` lines, the B-slot held key, two casts per skill, ErrorLog against the reference.
+the Way of the Sword both ways across a stage change and a dungeon end, ErrorLog against the reference. No skills (not castable yet); no riding (no Elesis unit owns a
+mount: CH6's walk).
 The review is `kickoffs/char-elesis/CH1-review.md`.
 
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen

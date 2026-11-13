@@ -57,3 +57,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1p (2026-11-13): held skill keys
 
 Extinction (`32b5b870` StartFuture, `32b5bbe0` charge, `32b5c0c0` degree up, `32b5c400` degree down) already reads June's `m_kSkillSlotKey` (`Set`, `FollowSlotSwap`, `IsKeyReleased`) under `_LIVE`, March's `CurrentSkillKeyManager` call in `#else` at each spot: transcribe the rest of the bodies around those lines. June-only key reads to add: Judgement Drive `32b50430` / `32b50480` (`Set`, `FollowSlotSwap`, `IsKeyReleased`; March's states read no key).
+
+## Amended by CH1 (2026-11-13): the reserved-buff lines move here
+
+Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. This phase's hand-off checks: Rushing Sword x3 and Dodge and Slash on a unit with Agility Mastery 28402 learned (SaberT has it at 3): `parse ... skill 28402 level 3` then `frame: ... BFI` (`BFI_BUFF_SGM_AGILITY_MASTERY`, 0.1 s).

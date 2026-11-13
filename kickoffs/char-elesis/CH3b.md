@@ -60,3 +60,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   June `@32b8c5bb` -> `32b8c72f`) sets it to `RNSI_SA_SBH_BLAZING_DANCE`, because June's memo body is the 28016 / 28052 case body (shared tail `@32b8d355`:
   START, then `1ST` 278, `ATTACK_BACK` 279, `ATTACK_FRONT` 280, `FINISH` 281). Write that case under `_LIVE` as `case RNSI_SA_SBH_BLAZING_DANCE: case
   RNSI_SA_SBH_BLAZING_DANCE_UPGRADE:` (June `32b8d2c6`): the memo route then needs nothing more.
+
+## Amended by CH1 (2026-11-13): the reserved-buff lines move here
+
+Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. This phase's hand-off checks: Flame Sword (28210) `parse ... skill 28210` then `frame: ... BFI` (`BFI_BUFF_FLAME_SWORD`), and Sword Fire on ElesisBH now reading level >= 1 from 28210.

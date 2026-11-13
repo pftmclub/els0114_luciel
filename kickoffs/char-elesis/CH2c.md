@@ -52,3 +52,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Script states:** `awk -F'\t' '$8=="CH2c"' june2017_re/char_elesis/ch0_state_skill.tsv` = 8.
 - **Skill ids** (12): 28012, 28013, 28014, 28034, 28037, 28050, 28207, 28208, 28209, 28220, 28229, 28230.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52, L429.
+
+## Amended by CH1 (2026-11-13): the reserved-buff lines move here
+
+Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. This phase's hand-off checks: Sword Fire fly / ground `frame: ... BFI` (`BFI_BUFF_FLAME_SWORD`, 1.4 s, relative 28210: level 1 without Flame Sword learned) and Infernal Blade (`BFI_BUFF_INFERNAL_BLADE`, 1.5 s).

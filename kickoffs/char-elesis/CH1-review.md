@@ -5,8 +5,8 @@
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-elesis CH1 review` |
 | Plan doc | `JUNE_CHARACTER_ELESIS_PHASES.md` (branch `main`) |
 | Depends on | CH1 done and its play-test logs read ("check logs" answered in the CH1 Done note) |
-| Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, `_WOS` (defined); `_WOS_DEBUG`, `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (defined: this review retires both) |
-| Log tag | `[JUNE_CHAR]` (`ELESIS DATA`, `ELESIS WOS`, `ELESIS SKILL SBUF`) |
+| Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE`, `_WOS` (defined); `_WOS_DEBUG` (defined: this review retires it); `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (defined, stays: unported characters cannot cast skills, so its lines move to CH2a / CH2b / CH2c / CH3b and the CH3d review retires it) |
+| Log tag | `[JUNE_CHAR]` (`ELESIS DATA`, `ELESIS WOS`) |
 
 ## Read first
 
@@ -26,14 +26,13 @@ Review CH1's deploy unit and the play-test evidence. Check at least:
   + event + slot states + `InitStateByUnitClass` + learned-skill sub-states), as Ara's review did; every count the same on every load.
 - **Way of the Sword:** `ELESIS WOS vigor start / end`, `destruction start / end`, `attack gain` per the CH1q amendment; a mode across a stage change
   (one point back, mode ends) and after a dungeon end (kept). A step the play-test did not reach is asked for once before `_WOS_DEBUG` goes.
-- **Reserved buffs:** the `ELESIS SKILL SBUF` lines for Endurance Power (BFI 143 at once, level 1), Sword Fire (BFI at 1.4 s, relative 28210) and Dodge and
-  Slash (`cleared` unless 28402 is learned); a line that never fired is a CH2a / CH2c item, not a CH1 failure (skills still run March's switch below
-  June's head until CH2a).
+- **Skills:** not cast in CH1 (unported characters cannot cast skills, user 2026-11-13); the two-cast, held-key and `SBUF` checks are the skill phases'
+  (`CH2a.md` / `CH2b.md` / `CH2c.md` / `CH3b.md` amended). Nothing to check here.
 - **ErrorLog** against `data\ErrorLog_pre_CH1_elesis.txt`: `KEM_ERROR`, `Motion Error`, `lua error`, `ELESIS_KNIGHT`, `StateID`, `Parsing Error`;
   CH0b's 21 `ErrorEnum(433)` part-mesh lines (checklist "Elesis frame count") either gone or a `JUNE_BUGS.md` row as Ara's 603.
 - **Divergence allow-list:** the three `CX2GUEL` `GT_PVP` rows CH1 added (`32b819a8`, `32b7f28f` / `32b7f312`, `32b74f14`): open one in
   `charport_adis.py elesis` and confirm type 1 only.
-- **Retire** `_WOS_DEBUG` and `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (comment out the `#define`s; `#error` guards that name them stay valid). If that is the
+- **Retire** `_WOS_DEBUG` (comment out the `#define`; leave `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` on for the skill phases). If that is the
   only code change, start the build and do not wait (CLAUDE.md, 2026-11-03). `ELESIS DATA` stays, as Rena's and Ara's did.
 - **Kickoffs:** CH5 and CH2a are ready after the review; check their line references against the post-CH1 files.
 

@@ -57,3 +57,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1p (2026-11-13): held skill keys
 
 Dodge and Slash (`32b72740` StartFuture, `32b727f0` EventProcess) already reads June's `m_kSkillSlotKey` (`Set`, `FollowSlotSwap`, `IsKeyPressedOnce`) under `_LIVE`, March's `CurrentSkillKeyManager` call in `#else` at each spot: transcribe the rest of both bodies around those lines. June-only key reads to add with their states: Attack Z `32b6eaa0` (`IsKeyPressedOnce` @32b6eaf1), Sonic Assault memo `32b4f800` / `32b4f840` (new).
+
+## Amended by CH1 (2026-11-13): the reserved-buff lines move here
+
+Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. This phase's hand-off checks: Endurance Power (28201) `at once: ... BFI 143 level 1` (state `ESI_SA_A_EL_ENDURANCE_POWER_ACTIVE`; `_MEMO` takes BFI 335); Dodge and Slash (28200) on a unit without Agility Mastery 28402 (wewe) `parse ... cleared ( learn check ... )`.
