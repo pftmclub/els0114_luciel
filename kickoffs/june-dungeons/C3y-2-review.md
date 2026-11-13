@@ -34,6 +34,10 @@ Code: the three flags' blocks in `X2StateServerSelect.cpp`, `X2StateBeginning.cp
    trailing-space name kept) against `june_src_fixed`; `python tools/luabind.py check` over the 9 scripts = PASS; `luasrc.py ledger --check`.
 3. **Hygiene:** `python tools/flagcheck.py <FLAG> --range <first C3y-2 commit>^..HEAD` for each flag (paste the RESULT lines; explain OTHER
    rows), `python tools/junediverge.py --check-all`, `python tools/enumscan.py --check` on the changed files.
+   **C3y-2c / 2d:** read "C3y-2c - trace run 1 ... fix 1", "C3y-2c - run 2 ... fix 2" and "C3y-2d - fix 3" in the plan doc; against the
+   Scaleform source (`Libs/ExternalLib/Scaleform/Src/GFx/AS3/AS3_VM.cpp` `RegisterUserDefinedClassTraits`, `FindVMAbcFileWeak`,
+   `GetUserDefinedTraits`; `AS3_MovieRoot.cpp` `ExecuteAbc`) check `CKTDGGFXUI::PrepareSceneClasses`: owner lookup, the `_fla` exclusion, release /
+   restore, the clear before the movie goes. `flagcheck --range` for `SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE` shows fix 2's 19 lines deleted inside the flag (expected).
 4. Retire `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG` and C3y-2c's `SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG` (comment out the defines; no build: debug retire only).
 5. Write "C3y-2 - Review" into the plan doc, update STATUS.md (C3y-2 to Done; char-add TU / char-luciel TU now only wait on their own
    phases), check the next kickoffs, commit.

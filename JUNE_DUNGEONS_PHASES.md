@@ -965,3 +965,40 @@ Run (exe d7fa0c0e; Elesis character in the village, then a new Elsword). User: e
   `_03`) played its voices (`GFX_ID_3854`, `2876`, `3855`, `301`, `3856`); `_03` ran on past its last line and was right-click ended.
 - **Hand-off:** user (2026-11-14) moves the rest to a new phase on Fable: **C3y-2d** (`kickoffs/june-dungeons/C3y-2d.md`). Fix 1 (slide-shot layer)
   passed and stays; fix 2's flag stays on (harmless: it logs and returns) until C3y-2d fixes or retires it. C3y-2c is done.
+
+### C3y-2d - fix 3: each scene runs its own classes (2026-11-14, Fable 5.2)
+
+- **Why fix 2 missed.** A scene swf's document class is `gfxAS3.UI_Contents.EventScene.EventScene` (its SymbolClass tag and ABC class table, read
+  from `tutorial_elsworld_03.swf` / `quest_22160_start.swf`), not a package-less `EventScene`; fix 2 asked for name `EventScene` in the public
+  namespace, which nothing registers. The domain was right: with `SF_ENABLE_APP_DOMAIN` (GFxConfig.h) the stage, main.gfx and every widget
+  (`LoaderInfo::SetAppDomain` patch) share `CurrentDomain`. main.gfx never names the scene class (no `UI_Contents.EventScene` string in it).
+- **What a scene file registers.** 39-60 classes: per-scene timeline symbols in package `<document>_fla` (unique names), and the shared names
+  `gfxAS3.UI_Contents.EventScene::EventScene` (the frame scripts live here: voices, `stop()`, `lastScene`), `::SoundPlayer`, public
+  `soundPlayer` (+ `stand_aisha_body_png` in the tutorial). `DataBinding` / `GameDataFunction` are main.gfx's (first wins) and are not touched.
+- **A plain unregister would break replays.** `MovieRoot::ExecuteAbc` reuses a live `VMAbcFile` of the same source name
+  (`VM::FindVMAbcFileWeak`) and registers nothing again; a scene's file never dies here (leftover instance). So a scene played a second time
+  after its names were dropped would find no document class.
+- **Fix 3** (`SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE`, same flag, body rewritten in place; `KTDGGFXManager.cpp` only):
+  `CKTDGGFXUI::PrepareSceneClasses( path )` before every widget 0x2711 load (`loadUserWidget`, `loadEventSceneEndFrame`).
+  1. Finds the file that owns the registered document class: `VM::GetRegisteredClassTraits( Multiname( vm, "gfxAS3...EventScene" ), domain )`
+     over the domains of `VM::GetAllLoadedAbcFiles` (the same parse the engine uses for a loaded movie's class).
+  2. First time it sees that file: lists its registered classes from the ABC class table (as `RegisterUserDefinedClassTraits` names them), minus
+     those owned by another file and minus the `_fla` package (those stay registered, so a leftover instance still builds its frames as before).
+     The list (name, namespace, traits; 3-4 entries) is kept under the path of the scene loaded last.
+  3. Same scene again: nothing (`kept`). Otherwise the owner's names leave the domain table (`VMAppDomain::RemoveClassTrait`; `released`), and if
+     the scene about to load played before and its file is still loaded, its names go back (`AddClassTrait`; `restored`).
+  Only public API of `VM` / `VMAppDomain` / `VMAbcFile`; C3y-2c's protected-member trick is gone. The lists hold VM references and are cleared
+  before the movie goes (`~CKTDGGFXUI`, `Load`). Traits stay alive (file + list), only the name table changes.
+- **Known limits (unchanged scope, Stage 27 bullet "GFx scene swf survives its unload").** Leftover instances still exist; each now keeps its own
+  class code. Two scenes started within one load latency of each other would still share. A session keeps one small list per played scene.
+- **Hygiene.** flagcheck `--worktree --files KTDXLIB/KTDGGFXManager.cpp`: 1 PASS (+177 / -19), 0 FAIL; the 19 deleted lines are fix 2's own body
+  inside the flag (the `SceneFileClassRelease` struct, `ReleaseSceneClasses` and its two calls). junediverge `RESULT: PASS`; enumscan 0 A/B.
+  `Always.h` not touched (the define's comment still reads as fix 2; a peer has that file dirty).
+- **Build.** DEPLOY OK: X2_offline.exe is 26,483,200 B, dated 2026-11-14 01:06:00, md5 2c19b61fdf8084a1495d75a2a64b3763 (built at main 6aa77bde +
+  5 uncommitted code files; `KTDGGFXManager.cpp` last saved 00:53:33, before the run's KTDXLIB step). EXESTR OK 4 of 4 (`SCENE CLASSES released:
+  %d class(es) of scene %s ( %s )`, `... restored: %d of %d class(es) of scene %s`, `... kept: %s plays again`,
+  `gfxAS3.UI_Contents.EventScene.EventScene`) and 1 of 1 absent (fix 2's `SCENE CLASSES released: the classes of %s`), md5 2c19b61f.
+- **Play-test owed** (logs `[JUNE_GFX] SCENE`): first scene of a session logs `SCENE CLASSES none registered ( first scene; ... )`; every later
+  scene logs `released: N class(es) of scene <previous> ( soundPlayer, EventScene, SoundPlayer ... )`; a scene played again later adds `restored:`;
+  the same scene twice in a row logs `kept:`. Tutorial voices are `Tuto_*.ogg`; `Tutorial_Elsworld_03` ends by the scene after its 15th line.
+- **MODS.md.** The C3y-2d line under "tutorial scene fixes" went in with char-luciel NU1's commit `6aa77bde` (that session committed the whole file).

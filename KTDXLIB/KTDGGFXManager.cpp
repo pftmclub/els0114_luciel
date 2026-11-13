@@ -36,6 +36,7 @@
 #undef V								// june-dungeons C3y-2c: DXUT's V( x ) breaks AS3_Value.h's member V
 #include "GFx/AS3/AS3_MovieRoot.h"		// june-dungeons C3y-2c: the AS3 VM, to release a finished scene swf's classes
 #pragma pop_macro( "V" )
+#include <list>							// june-dungeons C3y-2d
 #endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 
 // Two more zlib entry points than G1's six ( KTDGFXRuntime.cpp ): libgfx's ZLibFile::Reset wants inflateReset and AS3 ByteArray.compress
@@ -54,15 +55,33 @@ namespace SFG	= Scaleform::GFx;
 namespace SFR	= Scaleform::Render;
 
 #ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
-namespace _CONST_GFXSCENE_CLASS_C3Y2C_
+namespace _CONST_GFXSCENE_CLASS_C3Y2D_
 {
-	// june-dungeons C3y-2c: UnregisterUserDefinedClassTraits is protected in VMFile; a derived class names the member pointer
-	struct SceneFileClassRelease : public SFG::AS3::VMFile
+	// june-dungeons C3y-2d: every scene swf's document class, as its SymbolClass tag names it ( C3y-2c looked for a package-less EventScene )
+	const char* const SCENE_DOCUMENT_CLASS = "gfxAS3.UI_Contents.EventScene.EventScene";
+	// june-dungeons C3y-2d: Flash puts a document's unnamed timeline symbols in package <document>_fla, so those names never meet another scene's
+	const char* const SCENE_TIMELINE_PACKAGE_SUFFIX = "_fla";
+
+	// june-dungeons C3y-2d: one class a scene swf's file registered
+	struct KGfxSceneClass
 	{
-		static void Release( SFG::AS3::VMFile& kFile ) { ( kFile.*( &SceneFileClassRelease::UnregisterUserDefinedClassTraits ) )(); }
+		SFG::ASString													m_strName;
+		SFG::AS3::SPtr< const SFG::AS3::Instances::fl::Namespace >		m_pNamespace;
+		SFG::AS3::SPtr< SFG::AS3::ClassTraits::Traits >					m_pTraits;
+
+		KGfxSceneClass( const SFG::ASString& strName, const SFG::AS3::Instances::fl::Namespace* pNamespace, SFG::AS3::ClassTraits::Traits* pTraits )
+			: m_strName( strName ), m_pNamespace( pNamespace ), m_pTraits( pTraits ) {}
+	};
+
+	// june-dungeons C3y-2d: a played scene's classes, kept because a replay reuses its file and registers nothing again
+	struct KGfxSceneClassSet
+	{
+		std::wstring								m_wstrScenePath;
+		SFG::AS3::SPtr< SFG::AS3::VMAbcFile >		m_pFile;
+		std::vector< KGfxSceneClass >				m_vecClass;
 	};
 }
-using namespace _CONST_GFXSCENE_CLASS_C3Y2C_;
+using namespace _CONST_GFXSCENE_CLASS_C3Y2D_;
 #endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
@@ -1119,6 +1138,9 @@ public:
 			m_pAdapter->SetMovie( NULL );
 #endif SERV_IRUHADEV_JUNE_GFX_TALK_CUTIN
 		m_RootValue.SetUndefined();		// a managed Value goes before its movie
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+		ClearSceneClasses();			// june-dungeons C3y-2d
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 		m_hDisplay.Clear();
 		m_pMovie = NULL;
 	}
@@ -1131,6 +1153,9 @@ public:
 		SF::Ptr< SFG::MovieDef > pDef = *m_pLoader->CreateMovie( szFile, SFG::Loader::LoadAll, 0 );		// mgr vslot 1 31c43170
 		if ( !pDef )
 			return false;
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+		ClearSceneClasses();			// june-dungeons C3y-2d: a movie loaded again has a new VM
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 		m_pMovie = *pDef->CreateInstance( SFG::MemoryParams(), true, NULL );		// June's MemoryParams are the defaults ( 0.25 / ~0 / ... )
 		if ( !m_pMovie )
 			return false;
@@ -1208,8 +1233,8 @@ public:
 	CLIKDataBindingAdapter* GetAdapter() const { return m_pAdapter.GetPtr(); }			// vslot 1 of the wrapper ( 3226aed0: mgr +0x98 vslot 1 )
 #endif SERV_IRUHADEV_JUNE_GFX_EVENTSCENE
 #ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
-	// june-dungeons C3y-2c: not June - unloaded scenes stay alive here and the first EventScene registered wins, so drop its file's classes
-	void ReleaseSceneClasses()
+	// june-dungeons C3y-2d: not June - unloaded scenes stay alive here and the first registered class wins, so the last scene's class names leave the table before the next scene loads
+	void PrepareSceneClasses( const WCHAR* wszScenePath )
 	{
 		if ( !m_pMovie || m_pMovie->pASMovieRoot.GetPtr() == NULL || m_pMovie->GetAVMVersion() != 2 )
 			return;
@@ -1217,20 +1242,149 @@ public:
 		SFG::AS3::VM* pVM = pRoot->GetAVM();
 		if ( pVM == NULL )
 			return;
-		const SFG::ASString strClass = pVM->GetStringManager().CreateString( "EventScene" );
-		const SFG::AS3::ClassTraits::Traits* pClass = pVM->Resolve2ClassTraits( strClass, pVM->GetPublicNamespace(), pVM->GetCurrentAppDomain() );
-		SFG::AS3::VMAbcFile* pFile = ( pClass != NULL ) ? pClass->GetFilePtr() : NULL;
-		char szBuf[ 512 ] = { 0, };
-		if ( pFile == NULL )
+
+		std::wstring wstrScenePath = ( wszScenePath != NULL ) ? wszScenePath : L"";
+		for ( size_t i = 0; i < wstrScenePath.size(); ++i )
+			wstrScenePath[ i ] = towlower( wstrScenePath[ i ] );
+
+		// The file whose document class is registered now, asked the way the engine resolves a loaded movie's class ( in each file's own domain )
+		SF::Array< SFG::AS3::SPtr< SFG::AS3::VMAbcFile > > aLoadedFile;
+		pVM->GetAllLoadedAbcFiles( &aLoadedFile );
+		const SFG::AS3::Multiname kDocumentClass( *pVM, SF::StringDataPtr( SCENE_DOCUMENT_CLASS ) );
+		SFG::AS3::VMAbcFile* pOwnerFile = NULL;
+		SFG::AS3::VMAppDomain* pAskedDomain = NULL;
+		for ( SF::UPInt i = 0; i < aLoadedFile.GetSize() && pOwnerFile == NULL; ++i )
 		{
-			_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES none registered ( %s )", pClass != NULL ? "EventScene has no file" : "no EventScene" );
-			GfxLogLine( szBuf );
-			return;
+			SFG::AS3::VMAppDomain* pDomain = &aLoadedFile[ i ]->GetAppDomain();
+			if ( pDomain == pAskedDomain )
+				continue;
+			pAskedDomain = pDomain;
+			const SFG::AS3::ClassTraits::Traits* pClass = pVM->GetRegisteredClassTraits( kDocumentClass, *pDomain );
+			if ( pClass != NULL )
+				pOwnerFile = pClass->GetFilePtr();
 		}
-		_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES released: the classes of %s",
-			pFile->GetAbcFile().GetSource().ToCStr() );
-		SceneFileClassRelease::Release( *pFile );
-		GfxLogLine( szBuf );
+
+		// Its class list: a file seen for the first time belongs to the scene loaded last
+		KGfxSceneClassSet* pOwnerSet = NULL;
+		if ( pOwnerFile != NULL )
+		{
+			for ( std::list< KGfxSceneClassSet >::iterator it = m_listSceneClassSet.begin(); it != m_listSceneClassSet.end(); ++it )
+			{
+				if ( it->m_pFile.GetPtr() == pOwnerFile )
+					pOwnerSet = &( *it );
+			}
+			if ( pOwnerSet == NULL )
+			{
+				m_listSceneClassSet.push_back( KGfxSceneClassSet() );
+				pOwnerSet = &m_listSceneClassSet.back();
+				pOwnerSet->m_wstrScenePath	= m_wstrLastScenePath;
+				pOwnerSet->m_pFile			= pOwnerFile;
+				const SFG::AS3::Abc::ClassTable& kClassTable = pOwnerFile->GetClasses();
+				for ( SF::UPInt i = 0; i < kClassTable.GetSize(); ++i )
+				{
+					// The same name and namespace VMAbcFile::RegisterUserDefinedClassTraits registered it under
+					const SFG::AS3::Abc::Multiname& kName = kClassTable.Get( i ).GetName( pOwnerFile->GetConstPool() );
+					const SFG::ASString strName = pOwnerFile->GetInternedString( kName.GetNameInd() );
+					const SFG::AS3::Instances::fl::Namespace& kNamespace = pOwnerFile->GetInternedNamespace( kName.GetNamespaceInd() );
+					SFG::AS3::ClassTraits::Traits** ppClass = pOwnerFile->GetAppDomain().GetClassTraitNoParent( strName, kNamespace );
+					if ( ppClass == NULL || *ppClass == NULL || ( *ppClass )->GetFilePtr() != pOwnerFile )		// main.gfx's own ( DataBinding, GameDataFunction ) stay
+						continue;
+					// A timeline symbol's class ( package <document>_fla ) is this scene's alone: it stays, so a leftover instance still builds its frames
+					const SFG::ASString& strPackage = kNamespace.GetUri();
+					const size_t uSuffix = strlen( SCENE_TIMELINE_PACKAGE_SUFFIX );
+					if ( strPackage.GetSize() >= uSuffix && strcmp( strPackage.ToCStr() + strPackage.GetSize() - uSuffix, SCENE_TIMELINE_PACKAGE_SUFFIX ) == 0 )
+						continue;
+					pOwnerSet->m_vecClass.push_back( KGfxSceneClass( strName, &kNamespace, *ppClass ) );
+				}
+			}
+		}
+
+		// The classes of the scene about to load, if it played before and its file is still loaded ( the engine then reuses the file )
+		KGfxSceneClassSet* pSceneSet = NULL;
+		for ( std::list< KGfxSceneClassSet >::iterator it = m_listSceneClassSet.begin(); it != m_listSceneClassSet.end(); )
+		{
+			if ( it->m_wstrScenePath != wstrScenePath )
+			{
+				++it;
+				continue;
+			}
+			bool bLoaded = false;
+			for ( SF::UPInt i = 0; i < aLoadedFile.GetSize(); ++i )
+			{
+				if ( aLoadedFile[ i ].GetPtr() == it->m_pFile.GetPtr() )
+					bLoaded = true;
+			}
+			if ( bLoaded )
+			{
+				pSceneSet = &( *it );
+				++it;
+			}
+			else
+			{
+				it = m_listSceneClassSet.erase( it );		// never the owner's set: the owner's file is loaded
+			}
+		}
+
+		char szBuf[ 512 ] = { 0, };
+		if ( pOwnerSet != NULL && pOwnerSet == pSceneSet )
+		{
+			_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES kept: %s plays again", GfxToUTF8( wstrScenePath.c_str() ).c_str() );
+			GfxLogLine( szBuf );
+		}
+		else
+		{
+			if ( pOwnerSet != NULL )
+			{
+				SFG::AS3::VMAppDomain& kDomain = pOwnerSet->m_pFile->GetAppDomain();
+				int iReleased = 0;
+				std::string strReleased;
+				for ( size_t i = 0; i < pOwnerSet->m_vecClass.size(); ++i )
+				{
+					KGfxSceneClass& kClass = pOwnerSet->m_vecClass[ i ];
+					SFG::AS3::ClassTraits::Traits** ppClass = kDomain.GetClassTraitNoParent( kClass.m_strName, *kClass.m_pNamespace );
+					if ( ppClass != NULL && *ppClass == kClass.m_pTraits.GetPtr() )
+					{
+						kDomain.RemoveClassTrait( kClass.m_strName, *kClass.m_pNamespace );
+						strReleased += ( iReleased > 0 ) ? ", " : "";
+						strReleased += kClass.m_strName.ToCStr();
+						++iReleased;
+					}
+				}
+				_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES released: %d class(es) of scene %s ( %s )", iReleased,
+					GfxToUTF8( pOwnerSet->m_wstrScenePath.c_str() ).c_str(), strReleased.c_str() );
+				GfxLogLine( szBuf );
+			}
+			if ( pSceneSet != NULL )
+			{
+				SFG::AS3::VMAppDomain& kDomain = pSceneSet->m_pFile->GetAppDomain();
+				int iRestored = 0;
+				for ( size_t i = 0; i < pSceneSet->m_vecClass.size(); ++i )
+				{
+					KGfxSceneClass& kClass = pSceneSet->m_vecClass[ i ];
+					if ( kDomain.GetClassTrait( kClass.m_strName, *kClass.m_pNamespace ) == NULL )
+					{
+						kDomain.AddClassTrait( kClass.m_strName, *kClass.m_pNamespace, kClass.m_pTraits.GetPtr() );
+						++iRestored;
+					}
+				}
+				_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES restored: %d of %d class(es) of scene %s", iRestored,
+					(int)pSceneSet->m_vecClass.size(), GfxToUTF8( wstrScenePath.c_str() ).c_str() );
+				GfxLogLine( szBuf );
+			}
+			if ( pOwnerSet == NULL && pSceneSet == NULL )
+			{
+				_snprintf_s( szBuf, sizeof( szBuf ), _TRUNCATE, "[JUNE_GFX] SCENE CLASSES none registered ( first scene; %d abc file(s) loaded )", (int)aLoadedFile.GetSize() );
+				GfxLogLine( szBuf );
+			}
+		}
+		m_wstrLastScenePath = wstrScenePath;
+	}
+
+	// june-dungeons C3y-2d: the kept class lists hold VM objects, so they go before their movie
+	void ClearSceneClasses()
+	{
+		m_listSceneClassSet.clear();
+		m_wstrLastScenePath.clear();
 	}
 #endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 
@@ -1242,6 +1396,10 @@ private:
 	int									m_iBufW, m_iBufH, m_iLeft, m_iTop, m_iWidth, m_iHeight;	// +0x44..+0x58
 	SF::Ptr< CLIKDataBindingAdapter >	m_pAdapter;			// +0x60
 	SFG::Value							m_RootValue;		// +0x68..+0x70
+#ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
+	std::list< KGfxSceneClassSet >		m_listSceneClassSet;	// june-dungeons C3y-2d: the classes of every scene swf played with this movie
+	std::wstring						m_wstrLastScenePath;	// june-dungeons C3y-2d: the scene loaded last ( lower case )
+#endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 };
 
 #ifdef SERV_IRUHADEV_JUNE_GFX_BLEND
@@ -2701,7 +2859,7 @@ void CKTDGGFXManager::loadUserWidget( int iUIID, const WCHAR* wszPath, int iArg1
 		return;
 #ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 	if ( iUIID == 0x2711 )		// june-dungeons C3y-2c: the scene widget ( X2GFXEventScene ) registers its own EventScene
-		m_pImpl->m_pUI->ReleaseSceneClasses();
+		m_pImpl->m_pUI->PrepareSceneClasses( wszPath );
 #endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 	SFG::Value akArgs[4] = { SFG::Value( (SF::Double)iUIID ), SFG::Value( wszPath ), SFG::Value( (SF::Double)iArg1 ), SFG::Value( (SF::Double)iArg2 ) };
 	m_pImpl->m_pUI->Invoke( "loadUserWidget", NULL, akArgs, 4 );
@@ -2718,7 +2876,7 @@ void CKTDGGFXManager::loadEventSceneEndFrame( int iUIID, const WCHAR* wszPath, i
 		return;
 #ifdef SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 	if ( iUIID == 0x2711 )		// june-dungeons C3y-2c: same as loadUserWidget
-		m_pImpl->m_pUI->ReleaseSceneClasses();
+		m_pImpl->m_pUI->PrepareSceneClasses( wszPath );
 #endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 	SFG::Value akArgs[3] = { SFG::Value( (SF::Double)iUIID ), SFG::Value( wszPath ), SFG::Value( (SF::Double)iFrame ) };
 	m_pImpl->m_pUI->Invoke( "loadEventSceneEndFrame", NULL, akArgs, 3 );

@@ -1339,6 +1339,9 @@ Planning: `/x2-phase new-plan june-lua-scenes`. Not started.
   C++ is the same (`3226b6c0`, `32269f20`, `31c43890`, `31c44670` re-read), so June's runtime must drop the instance. The calls are filtered under
   `SERV_IRUHADEV_JUNE_GFX_SCENE_STALE_INSTANCE`; the instances themselves still leak (one per played scene). To do: find why
   `REMOVED_FROM_STAGE` cleanup does not run here (loader unload semantics of the SDK), then drop the filter.
+  Found by june-dungeons C3y-2c / 2d (2026-11-14): the cause is the 2026-08-27 `MovieRoot::UnloadMovie` patch in the prebuilt `libgfx_as3.lib`
+  (it skips the teardown of reparented content). Freeing the instances also retires `SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE` (the per-scene
+  class-name swap in `KTDGGFXManager.cpp`), which exists only because a scene's file never dies.
 
 ### Stage 28: June party-manager handlers (added 2026-10-19, quest-system Q10b)
 
