@@ -12857,7 +12857,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-13
 // Description: june-dungeons C3z-4t1 debug: logs JUNE_FX C3z-4t begin / step / end / refuse ( offline_server.log ). The C3z-4t2 review retires it.
-#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+//#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG

@@ -455,3 +455,42 @@ Funcmap rows `32965bd0`, `32965a60 / 329659b0`, `32965a90`, `31fbdb30 / 31fbdb60
   scene(s) ... (logged at the first begin)`, `begin 101`, `gfx show 2: 1 observer(s) on tutorialGuide.showGuide` (the widget bound),
   `step 101: gfx 2, key limit 1, stop frame 1`, `end 101`, `gfx hide`; no callback line (none expected). 0 EXCEPTION. No review of its
   own: `C3z-4t2-review.md` covers t1 + t2.
+
+## C3z-4t2 - Review (2026-11-13, Opus 5.5 high): pass, t1 + t2 match June; `_DEBUG` retired
+
+Verdict: **pass, no transcription error.** The only code change is `//#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG` (Always.h, bytepatch).
+
+- **t1 table (`31fbe4a0`).** All 51 value reads are in June's order with June's getter types (25 bool `32fe9e40`, 22 int `32fe9fd0`, 4 float
+  `32fea370`) after the 3 `BeginTable`s. Six spot checks match the key, the default and the scene offset (stack scene at ESP+0x54):
+  `GUIDE_NO` +0x00 / 0, `FIRST_GUIDE` +0x20 / false, `START_TIME` +0x24 / 0.0, `SERVER_EVENT_TYPE` 1 -> +0x54 = 0x101, `CUSTOM_EVENT_MSG`
+  +0x58 / -10 (key decoded from the XOR bytes at `3379c8b4`), `GFX_UI_NO` +0x78, `REPLASE_GUIDE` +0x80, `REPLAY_GUIDE_NO` +0x98 / 0.
+- **`CanBeginGuide` `31fc4530`.** The order is skip byte +0xd0, last custom event +0xd8, then the level blocks only outside a dungeon (unit level
+  > 7, account 10+ `31fbdf40`), then F2 off +0xc8, state +0x14 unless high priority, the dungeon test, party member / not leader
+  (`32430b80` / `32431330` +0x2c), dungeon match +0x70 (the +0x8a stand-in), and quick-quest +0x79d for condition 1. All of it matches.
+- **Step `31fc4060` / end `31fc4c40`.** Every write matches the port's order and its scene offsets (+0x3c zoom, +0x21 skill type A, +0x20
+  first guide, +0x4d stop frame, +0x28 / +0x2c inventory, +0x78 gfx, +0x3d / +0x40 MP, +0x34 key limit -> state 3, +0x4e any key).
+  The end resets +0xb4 / +0xbc / +0xc0-0xc2 / state, hides the movie, and sets +0xd8 = -20. The 3 June-only bytes are the routed stand-ins.
+- **Key wait `31fc6130`.** ESC (`31d24fb0(1)`) -> `AbortGuide` `31fc5f80`. Action ids 0x25/0x26/0x23/0x24, 0/1, 2/5 and 0x1c match March's
+  `GA_LEFT/RIGHT/UP/DOWN`, `GA_ATTACK_FAST/STRONG`, `GA_SKILL1/SKILL4` and `GA_AWAKE`. `31fc7be0` matches too: IsMyUnit, count + 0, state 0x17.
+- **Lua binder `31d95080`.** The 9 PUSHes run `31fc3e80, 31fc3f80, 31fc4fa0, 31fbdcf0, 31fbdcb0` (`mov eax,[ecx+0x18]` = GetNowGuideNo),
+  `31fbdcc0, 31fbde90, 31fc6320, 31fc5e20` (`jmp 31fc5d70`). They match the port's names and order.
+- **t2.** The ctor `32965bd0` adds the listener and then 2 bindings only when +8 != 0: an Int object `334c909c` with +8 = 0, and an 8 B trigger
+  `33471e28`. Show `32965a60` sets +8 only when the binding is found and notifies either way. Hide `329659b0` and the dtor `329659e0`
+  (listener + 2 removes) match. The callback `32965a90` compares with `tutorialGudie` and allocs the 0xc B object (`334c9c74`). It calls
+  `31ab4990` (InterlockedDecrement -> delete at 0) and returns 1, else 0. `31fc3c20` builds the adapter with +8 = 0 when there is no root
+  movie. `31fbdb30` deletes it through vslot 0, and `31fbdb60` overwrites it without a delete. Dtor `31fbe320` never touches +0xb8, so
+  JUNE_BUGS 643 is right.
+- **Load line.** offline_server.log has `[10:53:10.605] JUNE_FX C3z-4t load 24 scene(s) from TutorialGuideInfo.lua (logged at the first
+  begin)` once, before `begin 101`. That run also logged show / step / end / hide and 0 EXCEPTION.
+- **Hygiene.** flagcheck `JUNE_TUTORIAL_GUIDE --with _DEBUG` per commit:
+  - `7f27edc3`: 6 PASS, 1 DEFINE, 2 FAIL (the new files' line 1).
+  - `451b9568`: 2 PASS, 2 OTHER (the `_GFX` hunks), 2 FAIL (line 1), 1 ERROR (the `_GFX` `#error` guard).
+  - Both: 0 deleted, 0 non-ASCII, 0 encoding changes.
+  - `JUNE_TUTORIAL_GUIDE_GFX --range 451b9568^..451b9568`: 1 PASS, 3 PASS~, 1 DEFINE, 2 FAIL (line 1). All of these are house precedent.
+  - No later commit touches these files or flags. 7f27edc3's 2 deleted lines are the STATUS row and the Enum.lua ledger refresh (June's
+    `INPUT_GUIDE_STEP`), both intended.
+  - The retire's `--worktree` gives "define NOT FOUND" (expected for a retired debug flag) and 1 replaced line.
+  - junediverge `--check-all`: allow-listed 225, `RESULT: PASS`. enumscan: 0 A/B in 9 files.
+- **Build.** `build.py --deploy` started after the retire, **not awaited** (debug-retire rule). The always-on lines stay: `load failed`,
+  `gfx adapter unbound`, `gfx show %d not seen`, and the first-begin count.
+- **Next.** C3z-4t3 is ready (`kickoffs/june-dungeons/C3z-4t3.md` checked). C3y-2 is unblocked (t1 + t2 done) and runs alongside t3.
