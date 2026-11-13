@@ -1324,6 +1324,38 @@ BFI 471 / 472 / 473. Checklist L261 / L281 / L850 / L958 (CH0's L844 / L952, shi
 
 **Nothing to play-test** (`_LIVE` and `_WOS` are off). Next: `/x2-phase char-elesis CH1q review` (Opus 5.5 high).
 
+### CH1q - Review (2026-11-13, Opus 5.5): pass, no code change
+
+Read from the exe bytes (`charport_adis.py elesis`, `disasm_range.py`, `vtslot.py`) and the `.i` of `X2GUEL` / `X2GageData` / `X2GageUI`.cpp, `_WOS` off and `_LIVE` + `_WOS`:
+- **Start / End.** `32b74760`: `GetWorld` test + `GetShowCutInAndChangeWorldColor`, colour 0.133 / 0.133 / 0.333 / 1 (= `0xff222255`) faded over 4.0, vslot 0x670( 3 )
+  -> `0x1d9` (473) else `0xed` (237), pushes 0 / 0 / 1 / 0 / id = `( id, 1, NULL, 0, false )`, voice, `m_Wait` 0xbb. `32b7f0b0`: job line 3 -> `0x1d8` (472) when game
+  type (vslot 0x10c) == 1 else `0x1d7` (471); otherwise `0xf7` (247) / `0xf6` (246). `32b74930`: erase `0x1b3` (435, `3229e160`), `_DARK_FORCE_J_End`, erase `0xf0`
+  (240), `EffectSet_VigorEnd`, sound, `m_Wait` 0xd. `32b74bf0`: charge 0 on the gauge, erase `0x1b2` (434), `_S_End`, erase `0xf7` (247), `_DestructionEnd`. Both end
+  sets are in data036 `EffectSet.lua`. Values = June's `Enum.src.lua` (BTI 434 / 435, BFI 471 / 472 / 473).
+- **`GetFinalDamage_WayOfSword` `32b74ed0`.** State -2 only; type 4: game type 1 -> 1.25 else 1.5, each x `+0x971c`; types 5-6: 1.0 x `+0x971c`; three reads, as written.
+- **Getters and stand-ins.** `32b903e0` / `f0` / `32b90400` = `fld [+0x9714 / +0x9718 / +0x9720]`. `vtslot.py` 0x720 / 0x724 / 0x72c: every `CX2GU*` user class has the base
+  (`3208e1b0` / `3208e270` / `3208e1b0`), only `CX2GUEL` overrides. `31f86da5` / `32012f2e`: `CalcWayOfSwordPoint` -> `fmul` vslot 0x720 -> the inlined gain rate (the
+  `-2` / `2` state test after it), so the multiply goes before `ApplyWayOfSwordPointGainRate`, as ported. Snapshot pair: vslot 0x198 = `IsMyUnit` (`31ff1f30`), 0x678 / 0x67c.
+- **Gauge data.** `32a34a70`: outside -2, `SetMax( now MP )`, charge up, `fcomp st(1)` max < now -> max, else `fcom` 0 > now -> 0; no 300 test (Destruction arm = March).
+  `32a34c60` = `SetHyperModeRemainTime( 0 )` (`31e8c9d0`) = the base only. `32a31ee0`: `fadd` + `fstp [+0x118]` @32a31f30, no clamp; our gauge setter is a raw store;
+  JUNE_BUGS 641 holds.
+- **Gauge UI.** `32e6e060`: `InitStatusUI` `32e66e60`, vslot 0x54, `OpenScriptFile( "DLG_Elesis_WayOfSword.lua" )`, then `g_pStatic_EL_BLUE` / `_RED` (= `InitUIElswordWSP`).
+  `32e69e80`: `g_pX2Game` test in both arms (ported once before the branch, same result); -2: / 2000.0, picture 2, `EL_RED_2`; else / gauge vslot 0x10( 0 ) (`322b2d30`
+  = `GetMaxMp`, funcmap 1582), picture 1, `MP_ACTIVE`. `32e69e70`: `[gage+0x110] = 1`, jmp `32e69a80`.
+- **"= March".** `WayOfSwordStateChange` `32b7f370` re-read arm by arm: thresholds `+0x60` (>=) / `+0x64` (<=) / > 0 / < 0 / == 0, remote `+0x8160`, the five transitions
+  with March's End / Start calls and guards. `SetWayOfSwordPoint` `32b52800` (clamp to both thresholds) and `SetCriticalPercent_WayOfSword` `32b4ef90` (types 4-6 -> 1.0) = March.
+  `IsInJobLine`'s body is under `_CORE` (`X2GUEL.cpp:6647`), so `_WOS` links.
+- **`.i`.** Off: March in all three files (`SetWayOfSwordState( 0 )` in `InitWhenGameIsOver`, `min( 0, ... )`, `/ 300`). `_LIVE` + `_WOS`: the end sets, the two `+0x971c`
+  multiplies, 4 `ELESIS WOS` lines, `RefreshWayOfSwordUI`, `InitWakeOrb` before the dialog, the unclamped store; Elesis's 300 cap and `/ 300` gone.
+
+**Hygiene.** `flagcheck _WOS --range 6f9608ea^..6f9608ea` (nine files, `--with _WOS_DEBUG _CORE`): `8 PASS, 0 PASS~, 0 DEFINE, 1 OTHER, 0 FAIL, 0 ERROR` (OTHER =
+`X2BuffFactor.h`, `JUNE_ENUM_NAMES`), 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 token, 0 encoding; RESULT FAIL only for the `//#define`. `Always.h`: +20, 0 deleted.
+`_CORE`: PASS (`Always.h:12637`). `_WOS_DEBUG`: PASS (`Always.h:12672`, kept defined for CH1). `JUNE_ENUM_NAMES` (`X2BuffFactor.h`): `PASS~ +14`, PASS.
+`junediverge.py --check-all`: `allow-listed: 207`, `RESULT: PASS`. `enumscan.py --check` the three `.cpp`: `0 A/B row(s)` (D 1 / X 1 outside CH1q's lines). Probes
+(`census.cl_cmd`, `/c /Zs /EHsc`): the five `.cpp` off / `_LIVE` + `_WOS` / + `_BLOOD` + `_PASSIVE` + `_SUMMON`: 0 errors x15. Full build skipped: no play-test.
+
+**Nothing to play-test.** CH1 kickoff checked (its CH1q amendment stands; deps CH1q review and CH0b both done). Next: `/x2-phase char-elesis CH1` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.
