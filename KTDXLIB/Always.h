@@ -13135,3 +13135,24 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              Revert: comment out the #define.
 #define SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel NU3 - the unit templet reads June's minor-unit keys (June AddUnitTemplet_LUA 3237aa40): majorUnitName /
+//              minorUnitName (string ids), the second body's five promotion items, its four motions and three game motions, and
+//              the lobby rotations m_fLobbyRotationY / m_fMinorUnitLobbyRotationY. A missing key stores June's default (empty, 0).
+//              No reader yet (NU4 creation screen, DU1 second body, DU5 views).
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel NU3 - Lu/Ciel's 7 UnitTemplet.lua rows (data036, June's rows verbatim) are checked at load: ErrorLog line
+//              [JUNE_CHAR] LUCIEL DATA gives the Lu/Ciel row count, the second-body row count and both body names.
+//              Revert: comment out the #define (the rows stay in data036; nothing reads them before NU4).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA ) && !defined( SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA needs SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET ( m_MajorUnitName / m_MinorUnitName )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA
+//////////////////////////////////////////////////////////////////////////

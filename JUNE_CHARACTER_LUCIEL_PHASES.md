@@ -452,6 +452,39 @@ Opus 5.5 high. **Verdict: pass, no code change.** Covers `18460a26` + fix 1 `6ff
   `[JUNE_CHAR] LUCIEL ...`); now `--grep "JUNE_CHAR\] LUCIEL"` (re-run: 3 lines).
 - Build: none (no code change). NU2, NU3, DU2 ready (kickoffs checked: NU3 carries "Amended by NU1"; NU2 / DU2 need none).
 
+### NU3 - Done (2026-11-14)
+
+Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET` (parser) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA` (load line; `#error` without the
+parser flag), Always.h. Log `[JUNE_CHAR] LUCIEL DATA` (ErrorLog, the NU1 fix-1 idiom: offline_server.log opens after the unit manager loads).
+- **Rows** (data036 `UnitTemplet.lua`, core-list source): June's `UnitTemplet.src.lua:1723-2024` appended verbatim (7 rows: 200, 37, 38, 39, 127,
+  128, 129; CRLF kept); the 59 earlier rows are byte-identical (first 51,112 bytes `cmp`-equal). **Parsed-value diff:** both files run under the
+  vendored luajit with a stub `AddUnitTemplet` (every row's keys and values, sorted): `59a60,66`, only the 7 new rows. Each new row has the 16 keys
+  March's parser fails without (`unitType` .. `promotionFootItemID`); all 28 STR ids are in the live string table (`ch0_unittemplet_luciel.tsv`).
+- **Parser** (`X2UnitManager.cpp` `AddUnitTemplet_LUA`, `X2Unit.h` `UnitTemplet`): 17 members under June's key names (`m_MajorUnitName` /
+  `m_MinorUnitName` from `majorUnitName` / `minorUnitName`, 5 `m_MinorUnitPromotion*ItemID`, 7 `m_MinorUnit*Motion`, `m_fLobbyRotationY`,
+  `m_fMinorUnitLobbyRotationY`); the 3 minor cut-ins were already parsed (`JUNE_HYPER_CUT_IN_TIME`). Defaults from June `3237aa40`'s decompile:
+  name ids miss -> `-1` (`STR_ID_EMPTY`, empty string), ints `0`, wstrings `L""` (`3344f1f4`), floats `0`; no key fails the row. June's order:
+  names between `name` and `description`, minor items / motions after the game motions (`@3237cbcc-3237e53e`), rotations after
+  `introMovieFIleName` (`@3237efaf-3237f2fe`). Nothing reads the members yet (NU4 rotation / names, DU1 motions).
+- **Load line** (`OpenScriptFile`, after the templet script): `LUCIEL DATA unit templet rows <Lu/Ciel> of <all>, second-body rows <n>, major body
+  <name>, minor body <name>` (from `UC_LUCIEL_DUO`). Expected `7 of 66, second-body rows 7`.
+- **Other classes:** every earlier member is parsed as before (insert-only); the new members read 0 / empty for them, except `m_fLobbyRotationY`,
+  which 56 of the 59 earlier rows set (unread until NU4 ports `31edf260`).
+- **Enum.lua** (data036, routed by NU1): `UT_END = 13` (June `Enum.src.lua:313`; comment keeps "was 10"), the stale "C++ UT_END is 10" comment
+  dropped. A peer session (char-elesis, 3 `NUI_SI_SA_SB*` ids) edited Enum.lua right after and refreshed its ledger row; that row is theirs.
+- **Lua gates:** `luasrc.py refresh data036 UnitTemplet.lua`; `LEDGER CHECK PASS: 0 FAIL, 0 WARN`; `CORE CHECK PASS: 0 FAIL, 0 WARN`.
+  `PACK OK data036` (271 entries; ~ Enum.lua, ~ UnitTemplet.lua); `COPY OK data036: ... 14092104 bytes, 271 entries, md5 f7b1f8253c10c87e878c2a46175df8ba`.
+- **Hygiene:** flagcheck `MINOR_UNIT_TEMPLET --with JUNE_CHAR_LUCIEL_DATA --worktree --files <3 files>`: `files: 2 PASS, 0 PASS~ (blank/marker only),
+  0 DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR`; `in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched
+  inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS` (the OTHER is Always.h carrying a peer's
+  uncommitted C3y-2 debug retire; only NU3's 21 lines are committed).
+  junediverge `--check` (2 files): `RESULT: PASS`. enumscan: no row in NU3's lines (the 17 are the existing `UNIT_CLASS` definitions).
+- **Compile:** `/Zs` probe of `X2UnitManager.cpp` (no PCH): exit 0, 0 errors; `/P` has the DATA line, both new parse blocks and the members.
+  Build: first `build.py --deploy --pch force` failed in X2Lib on char-elesis CH3b0's uncommitted `ELESIS_SUMMON` guard (`Always.h:12769`
+  `#error`), not NU3's; nothing deployed. Re-run once that guard compiles.
+- **How to see it:** start the game to the server / character select; ErrorLog has one `[JUNE_CHAR] LUCIEL DATA` line next to the three NU1
+  `LUCIEL NEWUNIT` lines. An existing character's select / village / dungeon is unchanged.
+
 ## Phase DU - The two-body engine (DU1-DU5)
 
 | Sub-phase | Scope | Flag |

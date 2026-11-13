@@ -193,6 +193,28 @@ bool CX2UnitManager::OpenScriptFile( const WCHAR* pFileName )
 
     //ASSERT( m_UnitTempletMap.size() == m_UnitClassNameMap.size() );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA
+	{
+		// char-luciel NU3: ErrorLog, since offline_server.log opens after the unit manager loads
+		int iLucielRowCount = 0;
+		int iSecondBodyRowCount = 0;
+		for( UnitTempletMap::const_iterator itTemplet = m_UnitTempletMap.begin(); itTemplet != m_UnitTempletMap.end(); ++itTemplet )
+		{
+			if( NULL == itTemplet->second )
+				continue;
+			if( CX2Unit::UT_LUCIEL == itTemplet->second->m_UnitType )
+				++iLucielRowCount;
+			if( false == itTemplet->second->m_MinorUnitName.empty() )
+				++iSecondBodyRowCount;
+		}
+		const CX2Unit::UnitTemplet* pLucielTemplet = GetUnitTemplet( CX2Unit::UC_LUCIEL_DUO );
+		WCHAR wszLucielDataLog[256] = { 0, };
+		StringCchPrintfW( wszLucielDataLog, ARRAY_SIZE( wszLucielDataLog ), L"[JUNE_CHAR] LUCIEL DATA unit templet rows %d of %d, second-body rows %d, major body %s, minor body %s",
+			iLucielRowCount, static_cast<int>( m_UnitTempletMap.size() ), iSecondBodyRowCount,
+			( NULL != pLucielTemplet ) ? pLucielTemplet->m_MajorUnitName.c_str() : L"none", ( NULL != pLucielTemplet ) ? pLucielTemplet->m_MinorUnitName.c_str() : L"none" );
+		ErrorLogMsg( XEM_ERROR142, wszLucielDataLog );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA
     CreateUnitLuaSpace();
 
 	return true;
@@ -872,6 +894,13 @@ bool CX2UnitManager::AddUnitTemplet_LUA()
 	pUnitTemplet->m_Name = GET_STRING( stringid );
 	LUA_GET_VALUE_RETURN(	luaManager, "description",			stringid,			STR_ID_EMPTY, SAFE_DELETE(pUnitTemplet); return false; );
 	pUnitTemplet->m_Description = GET_STRING( stringid );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
+	// char-luciel NU3: June 3237aa40 reads these between name and description; a miss is -1, an empty string
+	LUA_GET_VALUE( luaManager, "majorUnitName",	stringid,	STR_ID_EMPTY );
+	pUnitTemplet->m_MajorUnitName = GET_STRING( stringid );
+	LUA_GET_VALUE( luaManager, "minorUnitName",	stringid,	STR_ID_EMPTY );
+	pUnitTemplet->m_MinorUnitName = GET_STRING( stringid );
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
 	
 #ifndef SEPARATION_MOTION
 	LUA_GET_VALUE_RETURN(	luaManager, "m_MotionFile",	pUnitTemplet->m_MotionFile,		L"", SAFE_DELETE(pUnitTemplet); return false; );
@@ -902,6 +931,21 @@ bool CX2UnitManager::AddUnitTemplet_LUA()
 	LUA_GET_VALUE( luaManager, "m_GameMotion2",		pUnitTemplet->m_GameMotion2,		L"" );	
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
+	// char-luciel NU3: June 3237aa40 @3237cbcc-3237e53e, the second body's items and motions ( a miss = 0 / L"" )
+	LUA_GET_VALUE( luaManager, "m_MinorUnitPromotionWeaponItemID",	pUnitTemplet->m_MinorUnitPromotionWeaponItemID,	0 );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitPromotionBodyItemID",	pUnitTemplet->m_MinorUnitPromotionBodyItemID,	0 );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitPromotionLegItemID",		pUnitTemplet->m_MinorUnitPromotionLegItemID,	0 );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitPromotionHandItemID",	pUnitTemplet->m_MinorUnitPromotionHandItemID,	0 );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitPromotionFootItemID",	pUnitTemplet->m_MinorUnitPromotionFootItemID,	0 );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitCommonMotion",	pUnitTemplet->m_MinorUnitCommonMotion,	L"" );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitFieldMotion",	pUnitTemplet->m_MinorUnitFieldMotion,	L"" );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitLobbyMotion",	pUnitTemplet->m_MinorUnitLobbyMotion,	L"" );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitEmotionMotion",	pUnitTemplet->m_MinorUnitEmotionMotion,	L"" );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitGameMotion0",	pUnitTemplet->m_MinorUnitGameMotion0,	L"" );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitGameMotion1",	pUnitTemplet->m_MinorUnitGameMotion1,	L"" );
+	LUA_GET_VALUE( luaManager, "m_MinorUnitGameMotion2",	pUnitTemplet->m_MinorUnitGameMotion2,	L"" );
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
 #ifdef REFORM_ENTRY_POINT	 	// 13-11-11, 진입 구조 개편, kimjh
 	LUA_GET_VALUE_RETURN( luaManager, "promotionWeaponItemID",	pUnitTemplet->m_PromotionWeaponItemID,		0, SAFE_DELETE(pUnitTemplet); return false; );
 	LUA_GET_VALUE_RETURN( luaManager, "promotionBodyItemID",	pUnitTemplet->m_PromotionBodyItemID,		0, SAFE_DELETE(pUnitTemplet); return false; );
@@ -911,6 +955,11 @@ bool CX2UnitManager::AddUnitTemplet_LUA()
 	
 	LUA_GET_VALUE( luaManager, "introMovieFIleName",	pUnitTemplet->m_IntroMovieFileName,					L"" );
 #endif // REFORM_ENTRY_POINT	// 13-11-11, 진입 구조 개편, kimjh
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
+	// char-luciel NU3: June 3237aa40 @3237efaf-3237f2fe, read after introMovieFIleName ( a miss = 0 )
+	LUA_GET_VALUE( luaManager, "m_fLobbyRotationY",			pUnitTemplet->m_fLobbyRotationY,			0.f );
+	LUA_GET_VALUE( luaManager, "m_fMinorUnitLobbyRotationY",	pUnitTemplet->m_fMinorUnitLobbyRotationY,	0.f );
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
 #ifdef SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME
 	/// June AddUnitTemplet_LUA ( 3237aa40, C3t ): the last five keys, in June's order, each a miss = L"" ( 3344f1f4 ). June reads m_fLobbyRotationY and
 	/// m_fMinorUnitLobbyRotationY between introMovieFIleName and these; March has neither ( not this phase ).

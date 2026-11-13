@@ -388,6 +388,25 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 			wstring				m_HyperCutIn_Trans;
 			wstring				m_MinorUnitHyperCutIn_Trans;
 #endif SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
+			// char-luciel NU3: June templet +0x24..+0x2d8; a non-empty m_MinorUnitName is June's has-second-body test ( 3254e410 )
+			wstring				m_MajorUnitName;
+			wstring				m_MinorUnitName;
+			int					m_MinorUnitPromotionWeaponItemID;
+			int					m_MinorUnitPromotionBodyItemID;
+			int					m_MinorUnitPromotionLegItemID;
+			int					m_MinorUnitPromotionHandItemID;
+			int					m_MinorUnitPromotionFootItemID;
+			wstring				m_MinorUnitCommonMotion;
+			wstring				m_MinorUnitFieldMotion;
+			wstring				m_MinorUnitLobbyMotion;
+			wstring				m_MinorUnitEmotionMotion;
+			wstring				m_MinorUnitGameMotion0;
+			wstring				m_MinorUnitGameMotion1;
+			wstring				m_MinorUnitGameMotion2;
+			float				m_fLobbyRotationY;
+			float				m_fMinorUnitLobbyRotationY;
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET
 		};
 
 		struct UnitData

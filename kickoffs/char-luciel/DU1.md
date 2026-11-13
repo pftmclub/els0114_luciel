@@ -75,3 +75,9 @@ Ain / Rose 9):
   - `31fdd8e0` CX2GUUser::CommonStateEndFuture ( vslot 0x7d8 base body, June version ) (confirmed; callers' phases CH1l2)
 - **CH1a0 waits for this review** (the transform link sits beside the duo members, and CH1a calls `31fd6260`).
 - Keys `CX2GUUser::CommonStateStart(Future)` parses for Lu/Ciel (`ch0_keys.tsv`), beyond the list NU0 gave: `FORCE_DYNAMIC_CAMERA_INDEX` @3205c0e8, `RETAIN_CAMERA_STATE` @3205b934, `SUPER_ARMOR_CUSTOM_COLOR` @3205941f (CH3c reads it), `MINOR_UNIT_AFTER_IMAGE` @3205b69b, `MINOR_UNIT_SPEED_X` @32052a1b / @320535e4; `MINOR_UNIT_MOTION_FILE_NAME` in InitMotion @31fe5fc6. InitSystem `3202b9e0` reads `LU` / `CIEL` / `DUNGEON_SPEECH_LUCIEL` (@3202bcf4 / @3202bd56 / @3202bc76).
+
+## Amended by NU3 (2026-11-14)
+
+- The second body's templet members exist (flag `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET`): `m_MinorUnitGameMotion0/1/2`, `m_MinorUnitEmotionMotion`
+  (`InitMotion`'s reads), plus `m_MinorUnitCommonMotion` / `m_MinorUnitFieldMotion` / `m_MinorUnitLobbyMotion` (no June reader found by NU0: look
+  again when transcribing `InitMotion`) and `m_MinorUnitName` (non-empty = June's has-second-body test, `3254e410` / `32d85650`).

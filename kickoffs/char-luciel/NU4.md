@@ -72,3 +72,11 @@ NU0 (2026-11-02), `june2017_re/char_luciel/nu0_create.tsv` (47 rows) and `nu0_ty
 
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §3 L155-156 New characters need a unit type, a unit class, a skill tree and server-side data; §5 L190-193 server side: stat rows (StatTable.lua) for 37/38/39/127/128/129/200.
 - **Stat rows: derive from June (user, 2026-11-02).** Write `StatTable:SetUnitStat` rows for 200 / 37 / 38 / 39 from `UT_LUCIEL`'s `CHARACTER_RELATIVE_STAT_TABLE` row (`CharacterStatTable.src.lua:166-173`) and for 127 / 128 / 129 from their `SECOND_CLASS_RELATIVE_STAT_TABLE` rows (:417-433): AtkPhysic / AtkMagic / DefPhysic / DefMagic = row x (0.8 + 0.0225 (L-1)), HP = row x (1 + 0.15 (L-1)), floored, levels 1-80; second jobs take 0.8 x their own row at level 1 (HP 100%) and the type curve from 2; levels 81-99 by `cap99_gen.py` as for every other class. Prove the formula first by regenerating ten existing classes' rows (`june2017_re/char_luciel/ch0_stat_fit.tsv`, `ch0_build_stat_fit.py`). A labelled stand-in under its own flag, comment says derived; `KncWX2Server/ServerResource/US/StatTable.lua` is server Lua: the user XORs and packs it into data036; confirm from the loader's row count line. Also fix `UnitTypeOf`'s fallback so 200 never reads Knight's class-10 rows.
+
+## Amended by NU3 (2026-11-14)
+
+- `CX2Unit::UnitTemplet` now holds `m_fLobbyRotationY` / `m_fMinorUnitLobbyRotationY` (flag `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET`; a row
+  without the key reads June's 0, which June's `31edf260` treats as "use the per-class constant"). 56 of the 59 earlier rows set
+  `m_fLobbyRotationY`; nothing read it before this phase. Also `m_MajorUnitName` / `m_MinorUnitName` (string-table text; empty for every non-Lu
+  row) and the five `m_MinorUnitPromotion*ItemID` (June `3254e410`'s promotion preload).
+- data036 holds Lu/Ciel's 7 templet rows (classes 200 / 37 / 38 / 39 / 127 / 128 / 129); `GetUnitTemplet( UC_LUCIEL_DUO )` is non-NULL from here.
