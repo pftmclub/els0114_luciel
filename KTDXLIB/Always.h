@@ -13086,3 +13086,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG needs SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( CKTDGGFXEventSceneBridge, CX2GFXEventScene )
 #endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: quest-system Q12 - bind AddGroupChainQuest ( user order 2026-11-13, lifts JUNE_BUGS 320 ) so ChainQuestInfo.lua runs to its
+//              end instead of stopping with a Lua error at its 6th call. The two group rows ( 4 -> 43077, 5 -> 43079 ) are stored in
+//              CX2QuestManager::m_mapChainGroup and read by nothing: June has no reader and no June quest is in chain 43077 / 43079.
+//              Revert: comment out the #define ( June's unbound name and the load-time Lua error come back ).
+#define SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+#if defined( SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN ) && !defined( SERV_IRUHADEV_JUNE_QUEST_LOAD )
+#error SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN needs SERV_IRUHADEV_JUNE_QUEST_LOAD ( AddChainQuestDays, LoadChainQuestInfo )
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+//////////////////////////////////////////////////////////////////////////

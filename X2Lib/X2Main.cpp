@@ -3645,6 +3645,10 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2QuestManager>( L, "AddGuildQuestTemplet_LUA",		&CX2QuestManager::AddQuestTemplet_LUA );
 	/// June 32322b10 ( bound @31dafded ). AddGroupChainQuest is not bound in June, so it is not bound here ( JUNE_BUGS 320 ).
 	lua_tinker::class_def<CX2QuestManager>( L, "AddChainQuestDays",				&CX2QuestManager::AddChainQuestDays_LUA );
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+	// quest-system Q12: not bound in June ( JUNE_BUGS 320 ), bound on the user's order so ChainQuestInfo.lua runs to its end
+	lua_tinker::class_def<CX2QuestManager>( L, "AddGroupChainQuest",				&CX2QuestManager::AddGroupChainQuest_LUA );
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 #endif SERV_IRUHADEV_JUNE_QUEST_LOAD
 #ifdef SERV_IRUHADEV_ELYSION_VILLAGE
 	/// June binding strings 31d95080 @31daf889 / @31dafc2c (atlas E1a)

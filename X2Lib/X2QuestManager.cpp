@@ -24,6 +24,9 @@ m_bUpdateQuest(false)
 	m_iGuildQuestSkipped		= 0;
 	m_iChainQuestDaysCalls		= 0;
 	m_iChainQuestDaysApplied	= 0;
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+	m_iChainGroupCalls			= 0;
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 #endif SERV_IRUHADEV_JUNE_QUEST_LOAD
 #ifdef SERV_IRUHADEV_JUNE_QUEST_SCENE
 	m_bSelectBGMActive		= false;
@@ -3635,6 +3638,45 @@ bool CX2QuestManager::AddChainQuestDays_LUA()
 	}
 	return true;
 }
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+/// quest-system Q12: June has no AddGroupChainQuest ( JUNE_BUGS 320 ); keys and defaults follow AddChainQuestDays ( 32322b10 ), stored only.
+bool CX2QuestManager::AddGroupChainQuest_LUA()
+{
+	KLuaManager luaManager( g_pKTDXApp->GetLuaBinder()->GetLuaState() );
+#ifndef X2OPTIMIZE_AVOID_LUA_RUNTIME_INTERPRETING
+	TableBind( &luaManager, g_pKTDXApp->GetLuaBinder() );
+#endif  X2OPTIMIZE_AVOID_LUA_RUNTIME_INTERPRETING
+
+	++m_iChainGroupCalls;
+
+	int iChainGroupID	= -1;
+	int iAllowFewDays	= -1;
+	int iTestMinute		= 0;
+	LUA_GET_VALUE( luaManager, "m_iChainGroupID",	iChainGroupID,	-1 );
+	LUA_GET_VALUE( luaManager, "m_iAllowFewDays",	iAllowFewDays,	-1 );
+	LUA_GET_VALUE( luaManager, "m_iTestMinute",		iTestMinute,	0 );
+
+	ChainGroupData kChainGroup;
+	kChainGroup.m_iAllowFewDays	= iAllowFewDays;
+	kChainGroup.m_iTestMinute	= iTestMinute;
+	if( luaManager.BeginTable( "m_iChainIDList" ) == true )
+	{
+		int index	= 1;
+		int buf		= -1;
+		while( luaManager.GetValue( index, buf ) == true )
+		{
+			if( buf > 0 )
+				kChainGroup.m_vecChainID.push_back( buf );
+			index++;
+		}
+		luaManager.EndTable();
+	}
+
+	if( -1 != iChainGroupID && -1 != iAllowFewDays )
+		m_mapChainGroup[ iChainGroupID ] = kChainGroup;
+	return true;
+}
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 
 /// Q1. June 31eeb040: Quest_Event_Scene_Info.lua defines the global QUEST_EVENT_SCENE_INFO, an array of entries. Each entry has QuestID,
 /// DEFAULT_START_SCENE / DEFAULT_END_SCENE ( strings ), DEFAULT_*_SCENE_MENT ( arrays of string ids ), DEFAULT_*_SCENE_END_FRAME ( ints ) and
@@ -3741,8 +3783,13 @@ bool CX2QuestManager::LoadChainQuestInfo()
 {
 	const bool bLoaded = OpenScriptFile( L"ChainQuestInfo.lua" );
 #ifdef SERV_IRUHADEV_OFFLINE
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+	CX2OfflineLog::Server( L"[JUNE_QUEST] LOAD ChainQuestInfo.lua loaded %d calls %d applied %d groups %d ( AddGroupChainQuest calls %d, stored unread: no June reader )",
+		( true == bLoaded ? 1 : 0 ), m_iChainQuestDaysCalls, m_iChainQuestDaysApplied, static_cast<int>( m_mapChainGroup.size() ), m_iChainGroupCalls );
+#else SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 	CX2OfflineLog::Server( L"[JUNE_QUEST] LOAD ChainQuestInfo.lua loaded %d ( false after the AddChainQuestDays calls is JUNE_BUGS 320, AddGroupChainQuest unbound ) calls %d applied %d",
 		( true == bLoaded ? 1 : 0 ), m_iChainQuestDaysCalls, m_iChainQuestDaysApplied );
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 #endif SERV_IRUHADEV_OFFLINE
 	return bLoaded;
 }
@@ -3787,10 +3834,17 @@ void CX2QuestManager::RestoreQuestSelectBGM()
 void CX2QuestManager::LogLoadCensus( int iGuildCoopRows_ ) const
 {
 #ifdef SERV_IRUHADEV_OFFLINE
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+	CX2OfflineLog::Server( L"[JUNE_QUEST] LOAD quests %d sub-quests %d guild skipped %d chain entries %d ( AddChainQuestDays calls %d applied %d ) groups %d story groups %d scene-info %d coop %d",
+		static_cast<int>( m_mapQuestTemplet.size() ), static_cast<int>( m_mapSubQuestTemplet.size() ), m_iGuildQuestSkipped,
+		static_cast<int>( m_mapChainQuest.size() ), m_iChainQuestDaysCalls, m_iChainQuestDaysApplied, static_cast<int>( m_mapChainGroup.size() ),
+		static_cast<int>( m_mapStoryQuest.size() ), static_cast<int>( m_mapQuestEventSceneInfo.size() ), iGuildCoopRows_ );
+#else SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 	CX2OfflineLog::Server( L"[JUNE_QUEST] LOAD quests %d sub-quests %d guild skipped %d chain entries %d ( AddChainQuestDays calls %d applied %d ) groups 0 ( AddGroupChainQuest unbound, JUNE_BUGS 320 ) story groups %d scene-info %d coop %d",
 		static_cast<int>( m_mapQuestTemplet.size() ), static_cast<int>( m_mapSubQuestTemplet.size() ), m_iGuildQuestSkipped,
 		static_cast<int>( m_mapChainQuest.size() ), m_iChainQuestDaysCalls, m_iChainQuestDaysApplied,
 		static_cast<int>( m_mapStoryQuest.size() ), static_cast<int>( m_mapQuestEventSceneInfo.size() ), iGuildCoopRows_ );
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 #endif SERV_IRUHADEV_OFFLINE
 }
 #endif SERV_IRUHADEV_JUNE_QUEST_LOAD

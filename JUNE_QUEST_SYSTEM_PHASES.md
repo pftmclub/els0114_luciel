@@ -1906,6 +1906,40 @@ reads June in Ghidra: is there a reader of a populated group table). **Read list
 **Done gate:** no `AddGroupChainQuest` lua error in `ErrorLog.txt`; `LOAD ChainQuestInfo.lua loaded 1 ... groups 2`; the five `AddChainQuestDays`
 calls still applied; JUNE_BUGS 320 flipped.
 
+### Q12 - Done (2026-11-13, Opus 5.5 high)
+
+**Identify (June, Ghidra).** No reader of a chain-group table exists, and none could:
+- `AddGroupChainQuest` is never bound (binder `31d95080`; `AddChainQuestDays` `32322b10` @31dafded is the last quest binding). Its keys
+  (`m_iChainGroupID`, `m_iChainIDList`) would be read only inside that binder's body, which June does not have.
+- The manager layout (Q0a, `q0a_qm_summary.md`) has no unexplained map: the chain members are `+0xfc` config, `+0x10c` startable,
+  `+0x11c` completion, all per chain id (templet `+0x278`). Nothing is keyed by a group id.
+- No June quest belongs to chain 43077 or 43079 (`m_iChainID` in `june_src_fixed/data036_kom/*.src.lua`: 183 x chain 1, one each for
+  208950 / 43648 / 208840 / 43760). So even `AddChainQuestDays`-style use (look up, no insert) would find no entry for either group.
+- The server source (`KncWX2Server/`) does not know the name either (it is older than this data).
+Result: a populated group table changes nothing in March. It is stored and read by nothing, as the one-line comments say.
+
+**Landed** (flag `SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN`, needs `JUNE_QUEST_LOAD`; 90 inserted lines, 0 deleted):
+- `X2Main.cpp`: binds `AddGroupChainQuest` -> `CX2QuestManager::AddGroupChainQuest_LUA` beside `AddChainQuestDays`.
+- `X2QuestManager.h/.cpp`: `ChainGroupData` (`m_vecChainID`, `m_iAllowFewDays`, `m_iTestMinute`), `m_mapChainGroup`, `m_iChainGroupCalls`.
+  The binder reads `m_iChainGroupID` / `m_iAllowFewDays` (default -1) and `m_iTestMinute` (default 0) as `AddChainQuestDays` does, the
+  `m_iChainIDList` array (ids > 0), and stores the row only when both ids are present.
+- `LoadChainQuestInfo` and `LogLoadCensus` lines: the "JUNE_BUGS 320" wording is dropped under the flag and `groups %d` added (originals in `#else`).
+- `JUNE_BUGS.md` 320 flipped to "bound on the user's order 2026-11-13 (Q12)"; funcmap row `32322b10` notes the March binder; `MODS.md` entry.
+- No `.lua` touched (`ChainQuestInfo.lua` stays June's bytecode). `luabind.py check ChainQuestInfo`: 2 methods, 0 unbound, `RESULT: PASS`
+  (the name was never in `lua_unbound_known.tsv`).
+
+**Hygiene.** `flagcheck --worktree`: 3 PASS, 1 DEFINE, 0 deleted, 0 FAIL, `RESULT: PASS`. `junediverge --check` (4 files): `RESULT: PASS`.
+`enumscan`: only 2 old rows at `X2QuestManager.cpp:6410-6411` (Ain classes), not in this phase's lines.
+`DEPLOY OK: X2_offline.exe is 26,466,816 B, dated 2026-11-13 17:09:49, md5 a0d1654e5f5eb0848d2291eb41ef1190` (built at main c3afbbe8 + these 4 files).
+`EXESTR OK: 1 of 1` (`AddGroupChainQuest`, narrow + wide) and `EXESTR OK: 2 of 2` (`--form wide`, the new LOAD line), same md5.
+
+**Baseline vs expected.** Before (16:58 run): `loaded 0 ( false after ... JUNE_BUGS 320 ... ) calls 5 applied 1` and the ErrorLog line
+`can't find 'AddGroupChainQuest' class variable`. Expected now: no such ErrorLog line, `LOAD ChainQuestInfo.lua loaded 1 calls 5 applied 1 groups 2
+( AddGroupChainQuest calls 2, ... )` and the census `... applied 1 ) groups 2 story groups ...`. "applied 1" is unchanged and correct: only chain 1
+has an entry in the loaded quest files (the kickoff's "5 applied" meant the 5 calls).
+
+**Review:** none (kickoff). Open questions: none.
+
 ## Phase Z - Close-out
 
 **Run with:** Sonnet 5.5 medium.

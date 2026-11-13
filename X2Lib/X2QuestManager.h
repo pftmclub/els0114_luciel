@@ -766,6 +766,17 @@ class CX2QuestManager
 
 			ChainQuestData() : m_iAllowFewDays( 0 ), m_iTestMinute( 0 ) {}
 		};
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+		/// quest-system Q12: one AddGroupChainQuest row ( June never binds the name, JUNE_BUGS 320 ), so nothing in June reads it.
+		struct ChainGroupData
+		{
+			std::vector<int>	m_vecChainID;
+			int					m_iAllowFewDays;
+			int					m_iTestMinute;
+
+			ChainGroupData() : m_iAllowFewDays( 0 ), m_iTestMinute( 0 ) {}
+		};
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 
 		/// Q1. One per-character row of a Quest_Event_Scene_Info entry ( June 31eeb040, g_pData +0x498 map's +0x74 map, keyed by CHAR ).
 		/// Missing strings are empty and missing end frames are -1 ( @31eec2de / @31eec85f ). Read by Q5b.
@@ -808,6 +819,10 @@ class CX2QuestManager
 #ifdef SERV_IRUHADEV_JUNE_QUEST_LOAD
 		/// Q1. June 32322b10 ( bound as AddChainQuestDays ). AddGroupChainQuest is NOT bound in June ( JUNE_BUGS 320 ), so it is not here either.
 		bool	AddChainQuestDays_LUA();
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+		/// quest-system Q12: bound as AddGroupChainQuest on the user's order 2026-11-13; stores the row, no reader.
+		bool	AddGroupChainQuest_LUA();
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 		/// Q1. June 31eeb040: Quest_Event_Scene_Info.lua -> m_mapQuestEventSceneInfo. Called from CX2Data::ResetQuestManager.
 		void	LoadQuestEventSceneInfo();
 		/// Q1. June 3258c470 @3258fc67: ChainQuestInfo.lua. Its 6th call is AddGroupChainQuest, which June never binds, so the file stops there ( JUNE_BUGS 320 ).
@@ -1085,6 +1100,10 @@ class CX2QuestManager
 		int									m_iGuildQuestSkipped;			/// guild quests parsed and dropped ( decision 2026-10-17 )
 		int									m_iChainQuestDaysCalls;			/// AddChainQuestDays calls received
 		int									m_iChainQuestDaysApplied;		/// ... that found an existing chain entry
+#ifdef SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
+		map<int, ChainGroupData>			m_mapChainGroup;				/// quest-system Q12: AddGroupChainQuest rows by m_iChainGroupID, unread
+		int									m_iChainGroupCalls;				/// AddGroupChainQuest calls received
+#endif SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN
 #endif SERV_IRUHADEV_JUNE_QUEST_LOAD
 
 #ifdef SERV_IRUHADEV_JUNE_QUEST_SCENE

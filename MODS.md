@@ -6916,3 +6916,11 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, retired by t
 - **Shared.** New enum names in `X2SkillTree.h` ( `RNSI_SA_SDK_BRUTAL_CUTTER(_UPGRADE)`, `RNSI_SA_SDK_EJECTION_BUSTER_UPGRADE`, `RNSI_SA_SDK_BURNING_PHANTOM_UPGRADE`, `RNSI_A_SDK_DARK_WAVE(_UPGRADE)`, `RNSI_A_SDK_INJECTION_STIGMA_UPGRADE`, `RNSI_A_SDK_SHADE_SCRATCH_UPGRADE` ) and `X2BuffFactor.h` ( `BTI_BUFF_BRUTAL_CUTTER(_MEMO)`, `BTI_BUFF_INJECTION_STIGMA`, `BFI_BUFF_BRUTAL_CUTTER(_MEMO)`, `BFI_BUFF_INJECTION_STIGMA` ); `CX2GUEL::ApplyBleedingHpCost` ( CH3c's Dark Knight / Crimson Avenger states re-use it ), `IsAnySkillKeyPressed`, the member `m_usBurningPhantomLoopCount`.
 - **Damage.** March has none of these skills; the damage is the numerical tables and effect-set rows of June's `ELESIS_KNIGHT.lua` ( Brutal Cutter's numerical-only table: `NUMERICAL_DATA_INDEX` 1 ), so the comparison is the `NUM use` lines of the play-test ( this build emits none, as CH2b / CH2c ).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
+### June quest system: AddGroupChainQuest bound (quest-system Q12, 2026-11-13)
+
+Flag `SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN` in `KTDXLIB/Always.h` (needs `JUNE_QUEST_LOAD`). Plan `JUNE_QUEST_SYSTEM_PHASES.md` "Phase Q12"; log tag `[JUNE_QUEST] LOAD`.
+- **Client.** June never binds `AddGroupChainQuest` (JUNE_BUGS 320), so `ChainQuestInfo.lua` died at its 6th call with a Lua error on every load. On the user's order
+  (2026-11-13) `X2Main.cpp` binds it to the new `CX2QuestManager::AddGroupChainQuest_LUA` (keys and defaults as `AddChainQuestDays`), which stores the row in `m_mapChainGroup`
+  (group 4 -> 43077, group 5 -> 43079). Nothing reads the map: June has no reader and no June quest is in those chains. The two `[JUNE_QUEST] LOAD` lines print `groups %d`.
+- **Revert:** comment out the define, `python tools/build.py --deploy`. No data or save change.
