@@ -17211,8 +17211,9 @@ void CX2GUEL::SI_SA_SDK_BRUTAL_CUTTER_FrameMove()
 			}
 		}
 
-		g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetFirst, this );
-		g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetSecond, this );
+		// char-elesis CH2d fix: June 32b89c10 @32b8a109 / @32b8a237 push each handle on the delete-on-state-end list
+		m_vecEffectSetToDeleteOnStateEnd.push_back( g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetFirst, this ) );
+		m_vecEffectSetToDeleteOnStateEnd.push_back( g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetSecond, this ) );
 	}
 
 	CommonFrameMove();
