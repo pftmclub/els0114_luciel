@@ -764,6 +764,9 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
   allow row until then. The scene-end hook `CX2Main::OnSceneEnded` (`31d87420`) keeps a stand-in for `CX2UIQuestNew` `323ca2a0` (a deferred
   quest REQ `0x36a` from `+0x784` / `+0x788`, `31f06270`; sets `g_pMain+0x90 +0x22f`): find the two fields' writers, then port it. The GFx scene
   end's `31d70b30` (after the hook @`3226be35`) is still out (`X2GFXEventScene.cpp` comment).
+- **Play-guide frame move (june-dungeons C3y-2, routed by the C3y-2 review 2026-11-14).** June's whole `CX2PlayGuide::OnFrameMove` `3289e490`:
+  skips main states 7-8, runs the tutorial frame-move and the jump-guide frame-move `3289e370`, then a per-guide picture layout, and has no
+  `FirstEpicGuide` call. C3y-2 inserted only the `3289e370` call at June's place; divergence row + allow row (`X2PlayGuide.cpp`) until the port.
 
 **Why UI is last and not first:** UI is not one system. Each stage above brings its own June dialogs: the region maps (1), slots and skill tree (3), quests (4), and the transcendence guides (6). A UI-first pass would port buttons with no system behind them, and then collide with every feature stage that touches the same dialog. The only UI work that must come early is the framework itself, and that is measured in Stage 2.
 

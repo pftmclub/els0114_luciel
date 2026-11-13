@@ -13007,7 +13007,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-13
 // Description: june-dungeons C3y-2 debug: logs JUNE_FX C3y-2 room <dungeon id> when the tutorial room is requested ( offline_server.log ). The C3y-2 review retires it.
-#define SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+//#define SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG needs SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
@@ -13081,7 +13081,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: june-dungeons C3y-2c (temporary) - trace of the GFx event scene: clicks / Enter, FireNextScene and the observers it reaches,
 //              createBinding / deleteBinding, every AS bridge call, Play / queue / End with the state, the scene and back widget loads, the
 //              scene object's ctor / dtor. Tag [JUNE_GFX] SCENE TRACE ( ErrorLog.txt ). The C3y-2 review retires it.
-#define SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
+//#define SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG ) && !defined( SERV_IRUHADEV_JUNE_GFX_EVENTSCENE )
 #error SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG needs SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( CKTDGGFXEventSceneBridge, CX2GFXEventScene )
 #endif SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG

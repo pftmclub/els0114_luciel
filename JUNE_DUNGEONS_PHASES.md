@@ -1009,3 +1009,33 @@ Run (exe d7fa0c0e; Elesis character in the village, then a new Elsword). User: e
   `Tutorial_Elsworld_03` ran its 13 voices and logged `End Tutorial_Elsworld_03 ... by the scene`. 0 EXCEPTION, 0 unbound Lua names. Leftover
   instances still answer ESC in the village (`SCENE STALE ... dropped`, as before). **Not exercised in this run:** a scene played a second time
   (`restored` / `kept` lines) and a new Elesis; the C3y-2 review's play-test notes carry it if it shows.
+
+## C3y-2 - Review (2026-11-14, Opus 5.5 high): pass (covers C3y-2, 2b, 2c, 2d)
+
+- **Against the disassembly (3 spot checks, Ghidra / raw bytes):** room switch `325622e0`: types 2-9 -> 0xa0c8 / a0d2 / a0e6 / a0dc / a14a / a0fa /
+  a104 / a10e, default 0xa0be = `X2StateServerSelect.cpp` 7532-7565 name for name (10-12 = 41240 / 41250 / 41420, the stand-in comment). `IsOnSomethingNow`
+  `31e4d0a0` = `8a 81 bc 80 00 00 c3` (`mov al,[ecx+0x80bc]; ret`; no function defined in Ghidra) = `X2GUUser.h:2134`. `CX2SlideShot::MsgProc` `325c74b0`:
+  `*this` (= `m_bNowPresent`, first member, no vtable) && ( 0x100 + VK_ESCAPE || 0x205 ) -> `325c7140` + `31d87420`, return 1 = `X2SlideShot.cpp:227`.
+  The rest was re-checked by each phase's own Done note.
+- **C3y-2d against the Scaleform source:** `RegisterUserDefinedClassTraits` (`AS3_VM.cpp:716`) skips a name `Resolve2ClassTraits` already finds and names
+  each class by the ABC class table (name + interned namespace), which `PrepareSceneClasses` reproduces; `ExecuteAbc` (`AS3_MovieRoot.cpp:350`) reuses a
+  live file by `FindVMAbcFileWeak` and then resolves symbol classes by name (`:1708`), so the restore is what makes a replay work. Release removes only
+  entries still pointing at the set's traits; restore adds only where nothing is registered; `_fla` classes stay; lists cleared before the VM goes
+  (`~CKTDGGFXUI`, `Load`). Note: the sets hold `SPtr<VMAbcFile>`, so a played scene's file never dies before the movie (it already outlived its unload,
+  Stage 27) and the erase branch is unreachable; harmless. Replay (`restored` / `kept`) still not play-tested.
+- **Data:** DungeonData 41150 / 41220 / 41290, NPCTemplet 5 rows (all 41 match a June block), WorldData 9 rows (Eve's `"..._STAGE0 "` byte-equal), Enum /
+  DungeonEnum members and C++ `DungeonEnum.h:484-492`: identical to `june_src_fixed`, no value collisions. June's school row reusing `WI_TUTORIAL_EL_STAGE0`
+  is not in March (not needed). `luabind.py check` over the 9 `Dungeon_Tutorial_*`: RESULT PASS (also `--receiver CX2DungeonGame --receiver-var slot1`).
+  `luasrc.py ledger --check` PASS 0 / 0, `core --check` PASS.
+- **Hygiene.** flagcheck per commit (`<c>^..<c>`): CLASS_TUTORIAL_DUNGEON, LUA_BIND, PLAY_GUIDE, SCENE_END_HOOK, TUTORIAL_ROOM_LOADING, LOADING_HERO_PICTURE,
+  STARTER_SKILL_SLOTS, GFX_SCENE_TRACE_DEBUG, PARTICLE_LUA_LAYER, GFX_SCENE_CLASS_RELEASE: every code file PASS / PASS~, 0 FAIL; the only ERRORs are the
+  Always.h `#error` guards (e57133b6, 39e785ea; precedent); OTHER rows = sibling flags in the same files. 68ac60b4: 19 deleted lines, all fix 2's body inside
+  `GFX_SCENE_CLASS_RELEASE` (expected). flagcheck crashes (`Unevaluable`) on 52951ffe's `Always.h` (a peer's `CHAR_CHUNG_CORE` guard in the same diff); its
+  code files pass one by one with `--files`, and C3y-2's Always.h blocks were re-landed and checked in e57133b6. junediverge `--check-all` RESULT: PASS
+  (allow-listed 232). enumscan over the 43 touched files: 121 A/B rows, all older than these commits (git blame), 0 new.
+- **Routing check:** `CX2SlideShot::ScenEnd` / `323ca2a0` have their Stage 9 bullet; `CX2PlayGuide::OnFrameMove` `3289e490` had a divergence + allow row
+  saying "Stage 9" but no bullet: added to `JUNE_PORT_BACKLOG_ORDER.md` Stage 9 by this review.
+- **Debug retired:** `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG` and `SERV_IRUHADEV_JUNE_GFX_SCENE_TRACE_DEBUG` commented out in `KTDXLIB/Always.h`
+  (flagcheck `--worktree`: 0 deleted, 0 FAIL rows, "not #defined" as expected for a retired flag; every use sits inside its own guard). Build skipped: debug
+  retire only (the next play-test build carries it; `JUNE_FX C3y-2 room` and `[JUNE_GFX] SCENE TRACE` lines stop then).
+- **Verdict: pass.** C3y-2 done. char-add TU and char-luciel TU now wait only on their own phases (their kickoffs already read "if C3y-2 has landed").
