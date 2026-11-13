@@ -110,8 +110,8 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH3a2 | **ready**: Grand Master actives 28205 / 28206 / 28222 (CH0 split) | Sonnet 5.5 / high, user play-test | CH3a | `X2GUEL.*` | `CH3a2.md` |
-| CH3b0 | blocked (CH3a2): four summons + vslots 0x24c / 0x250 (effect-set rate writers), flag `_SUMMON` | Opus 5.5 / high, Opus review | CH3a2 | `X2GUEL.*`, `X2UnitManager.h`, NPC scripts | `CH3b0.md` |
+| CH3a2 | **code done 2026-11-14, play-test owed**: Grand Master actives 28205 / 28206 / 28222 on unit 29 (A 0 / A 1 / B 5); the CH3d review covers it | Sonnet 5.5 / high, user play-test | CH3a | `X2GUEL.*` | `CH3a2.md` |
+| CH3b0 | ready (CH3a2 code done; its play-test may run beside): four summons + vslots 0x24c / 0x250 (effect-set rate writers), flag `_SUMMON` | Opus 5.5 / high, Opus review | CH3a2 | `X2GUEL.*`, `X2UnitManager.h`, NPC scripts | `CH3b0.md` |
 | CH3b | blocked (CH3a2, CH3b0 review): Blazing Heart (121) special actives (CH0 split) | Sonnet 5.5 / high, user play-test | CH3a2, CH3b0 review | `X2GUEL.*` | `CH3b.md` |
 | CH3b2 | blocked (CH3b): Blazing Heart actives 28210 / 28211 / 28223 (CH0 split) | Sonnet 5.5 / high, user play-test | CH3b | `X2GUEL.*` | `CH3b2.md` |
 | CH3c | blocked (CH3b2): Crimson Avenger (125) skills | Sonnet 5.5 / high, user play-test | CH3b2, CHNb review | `X2GUEL.*` | `CH3c.md` |
@@ -272,7 +272,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| NU1 | **play-test owed** (done 2026-11-14, `18460a26`, DEPLOY OK a62d6986): `UT_END` 13, script table 13, class guards, slot range test; then NU1 review | Opus 5.5 / high, Opus review | NU0, char-chung Z | `X2UnitManager.*`, `X2Unit.h`, `X2Item*`, `X2StateServerSelect.cpp`, Always.h | `NU1.md`, `NU1-review.md` |
+| NU1 | **startup-line check owed** (play-test passed 2026-11-14: existing chars unchanged; fix 1 `ErrorLog` line, DEPLOY OK 917b9e3c): one launch to select, then NU1 review | Opus 5.5 / high, Opus review | NU0, char-chung Z | `X2UnitManager.*`, `X2Unit.h`, `X2Item*`, `X2StateServerSelect.cpp`, Always.h | `NU1.md`, `NU1-review.md` |
 | NU2 | blocked (NU1 review): unit class as June's word on the wire + emulator, flag `UNIT_CLASS_WORD` (CommonPacket.h exception) | Opus 5.5 / xhigh, Opus review | NU1 review | `CommonPacket.h`, `ClientPacket.h`, `ServerDefine.h`, `Handlers_Unit.cpp`, `X2Unit.cpp`, vcxproj | `NU2.md` |
 | NU3 | blocked (NU1 review): Lu/Ciel's 7 `UnitTemplet` rows + parser for the 18 June-only keys | Opus 5.5 / high, Opus review | NU1 review | `UnitTemplet.lua`, `X2UnitManager.*`, data036 | `NU3.md` |
 | NU4 | blocked (NU2, NU3 reviews): creation-screen entry (slot, portrait, preview, job buttons) + `SelectLuciel`, emulator create-unit, 15 starter rows, stat fallback fix, `createchar.py` | Opus 5.5 / high, Opus review, user play-test | NU2 review, NU3 review | `X2StateCreateUnit.*`, `X2Offline*`, `tools/createchar.py`, data koms | `NU4.md` |

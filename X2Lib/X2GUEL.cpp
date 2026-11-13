@@ -318,6 +318,12 @@ namespace _CONST_EL_CH3A_
 	const float		JUGGERNAUT_BUSTER_FINISH_EVENT_TIME			= 0.29f;
 }
 using namespace _CONST_EL_CH3A_;
+// char-elesis CH3a2: constants of the Grand Master actives ( June 32b85aa0 )
+namespace _CONST_EL_CH3A2_
+{
+	const float		PROVOKE_REVENGE_MP_CONSUME		= 10.f;	// MP the second press of the skill key spends ( UpNowMp( -10 ) )
+}
+using namespace _CONST_EL_CH3A2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
@@ -1845,6 +1851,15 @@ CX2GUEL::~CX2GUEL(void)
 				m_StateList[stateData.stateID] = stateData;
 			}
 		} break;
+	case CX2SkillTree::RNSI_A_SGM_UPPER_SLASH:	// char-elesis CH3a2: June 32b8c470 @1264 ( EventProcess only; the hyper state takes the normal state's callbacks )
+		{
+			m_LuaManager.MakeTableReference( "ESI_A_SGM_UPPER_SLASH", normalStateData.stateID );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_A_SGM_UPPER_SLASH_EventProcess );
+
+			m_LuaManager.MakeTableReference( "ESI_A_SGM_UPPER_SLASH", hyperStateData.stateID );
+			hyperStateData.m_bHyperState	= true;
+			CopyStateCallbacks( hyperStateData, normalStateData );
+		} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	case CX2SkillTree::SI_A_SSK_CROSS_SLASH:
 		{	/// 크로스 슬래시
@@ -2189,6 +2204,10 @@ CX2GUEL::~CX2GUEL(void)
 	// 그랜드 마스터 액티브
 	// 도발
 	case CX2SkillTree::SI_A_SGM_PROVOKE :
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SGM_PROVOKE:	// char-elesis CH3a2: June 32b8c470 @989
+	case CX2SkillTree::RNSI_A_SGM_PROVOKE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{
 			m_LuaManager.MakeTableReference( "ESI_A_SGM_PROVOKE", normalStateData.stateID );			
 			// 도발 시작
@@ -2196,6 +2215,9 @@ CX2GUEL::~CX2GUEL(void)
 			normalStateData.StateStart			= SET_CB_FUNC( CX2GUEL, ESI_A_SGM_PROVOKE_StateStart );
 			normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUEL, ESI_A_SGM_PROVOKE_EventProcess );
 			normalStateData.StateEnd			= SET_CB_FUNC( CX2GUEL, ESI_A_SGM_PROVOKE_StateEnd );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_A_SGM_PROVOKE_StateStartFuture );	// char-elesis CH3a2: June 32b8f0b0 > 32b50b00
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 			
 
 			m_LuaManager.MakeTableReference( "ESI_A_SGM_PROVOKE", hyperStateData.stateID );
@@ -2204,6 +2226,9 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.StateStart			= normalStateData.StateStart;
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 			hyperStateData.StateEnd				= normalStateData.StateEnd;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;	// char-elesis CH3a2
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 
 			// 도발 성공
@@ -2220,6 +2245,10 @@ CX2GUEL::~CX2GUEL(void)
 		break;
 	// 드래스틱 차지
 	case CX2SkillTree::SI_A_SGM_DRASTIC_CHARGE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SGM_DRASTIC_CHARGE:	// char-elesis CH3a2: June 32b8c470 @1021
+	case CX2SkillTree::RNSI_A_SGM_DRASTIC_CHARGE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{
 			m_LuaManager.MakeTableReference( "ESI_A_SGM_DRASTIC_CHARGE_START", normalStateData.stateID );			
 			// 드래스틱 차지 스타트
@@ -2262,11 +2291,19 @@ CX2GUEL::~CX2GUEL(void)
 
 			if ( NULL != GetUnit() )
 			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SGM_DRASTIC_CHARGE, true );	// char-elesis CH3a2: June 32b8e07b ( the equipped upgrade id reaches the base id )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 				const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::SI_A_SGM_DRASTIC_CHARGE );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 				if ( NULL != pSkillTemplet )
 				{
 					const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+					const int iSkillTempletLevel = max( 1, userSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true ) );	// char-elesis CH3a2: June 32b8e0a7
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 					const int iSkillTempletLevel = max( 1, userSkillTree.GetSkillLevel( pSkillTemplet->m_eID ) );	/// 스킬 레벨	
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 					m_fDrasticChargeLoopDecreaseMPValue = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MP_CONSUME_REL, iSkillTempletLevel ); // 유지 시 사용되는 MP 량
 				}
 			}
@@ -13706,6 +13743,18 @@ void CX2GUEL::ESI_A_SGM_PROVOKE_Init()
 	TextureReadyInBackground(L"SGM_D_J_C_XZ_Landing2.dds");
 	TextureReadyInBackground(L"title_StarLight_Smash_spark.dds");
 	TextureReadyInBackground(L"Iron_Will_P01.DDS");
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH3a2: June 32b50a30 ( the 9 names March's list lacks )
+	TextureReadyInBackground(L"Arme_Critical.dds");
+	TextureReadyInBackground(L"Arme_Damage_Center.dds");
+	TextureReadyInBackground(L"Arme_Damage_Ring.dds");
+	TextureReadyInBackground(L"LD_Slicer_trace_01.dds");
+	TextureReadyInBackground(L"star2.dds");
+	TextureReadyInBackground(L"WhitePoint.dds");
+	TextureReadyInBackground(L"WhitePointSmall.dds");
+	XSkinMeshReadyInBackground(L"SGM_ProvokeReadyTM01.X");
+	XSkinMeshReadyInBackground(L"SI_A_SBH_SCALET_ROSE_attackSphere.X");
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 
 void CX2GUEL::ESI_A_SGM_PROVOKE_StateStart()		
@@ -13716,15 +13765,50 @@ void CX2GUEL::ESI_A_SGM_PROVOKE_StateStart()
 
 void CX2GUEL::ESI_A_SGM_PROVOKE_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH3a2: June 32b85aa0 ( a press of the skill key inside the key window spends 10 MP and arms the revenge, which starts at the state-change time or the end of the animation )
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
 	}
+	else if( true == m_FrameDataFuture.stateParam.bEventFlagList[0] &&
+		( m_fEventTime[0].stateChange < m_pXSkinAnimFuture->GetNowAnimationTime() || true == m_pXSkinAnimFuture->IsAnimationEnd() ) )
+	{
+		StateChange( ESI_A_SGM_PROVOKE_REVENGE );
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+	}
+	else if( true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) &&
+		m_pXSkinAnimFuture->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd && m_fEventTime[0].keyInputStart <= m_pXSkinAnimFuture->GetNowAnimationTime() )
+	{
+		if( PROVOKE_REVENGE_MP_CONSUME <= GetNowMp() )
+		{
+			UpNowMp( -PROVOKE_REVENGE_MP_CONSUME );
+			m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+		}
+		else
+		{
+			g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_2549 ), D3DXCOLOR(1,1,1,1),
+				D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3a2: June 32b85aa0 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -13745,10 +13829,17 @@ void CX2GUEL::ESI_A_SGM_PROVOKE_REVENGE_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3a2: June 32b5fb30 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -13888,10 +13979,17 @@ void CX2GUEL::ESI_A_SGM_DRASTIC_CHARGE_END_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3a2: June 32b5ffc0 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -17860,6 +17958,29 @@ void CX2GUEL::ESI_SA_SGM_JUGGERNAUT_BUSTER_END_FrameMove()
 		if( INVALID_EFFECTSET_HANDLE != hHandle )
 			m_vecEffectSetToDeleteOnDie.push_back( hHandle );
 	}
+}
+
+// char-elesis CH3a2: June 32b50b00 ( Provoke is a held-key skill state now: the skill key is remembered at the start )
+void CX2GUEL::ESI_A_SGM_PROVOKE_StateStartFuture()
+{
+	CommonStateStartFuture();
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+}
+
+// char-elesis CH3a2: June 32b6ced0 ( at the end of the animation, or once USEFUL_VALUE0 has passed off a line, the unit falls; the cancels need the foot on a line )
+void CX2GUEL::ESI_A_SGM_UPPER_SLASH_EventProcess()
+{
+	if( ( GetUsefulValueFuture( 0, 0 ) <= m_pXSkinAnimFuture->GetNowAnimationTime() && false == m_FrameDataFuture.unitCondition.bFootOnLine ) || true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #endif // NEW_CHARACTER_EL

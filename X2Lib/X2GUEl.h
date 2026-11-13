@@ -706,6 +706,8 @@ protected:
 	void ESI_SA_SGM_DIVINE_BLADE_EventProcess();	/// char-elesis CH3a: June 32b6bfd0
 	void ESI_SA_SGM_GIGA_BLAST_EventProcess();	/// char-elesis CH3a: June 32b6dde0
 	void ESI_SA_SGM_GIGA_BLAST_CHARGE_EventProcess();	/// char-elesis CH3a: June 32b6de10
+	void ESI_A_SGM_PROVOKE_StateStartFuture();	/// char-elesis CH3a2: June 32b50b00
+	void ESI_A_SGM_UPPER_SLASH_EventProcess();	/// char-elesis CH3a2: June 32b6ced0
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à

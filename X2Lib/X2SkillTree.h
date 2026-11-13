@@ -2712,6 +2712,13 @@ public:
 	RNSI_SA_SGM_SONIC_BLADE_UPGRADE                       = 28049,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3a2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of the Grand Master actives Provoke and Upper Slash ( the other bases are above ) ( values from June's Enum.lua )
+	RNSI_A_SGM_UPPER_SLASH                                = 28222,
+	RNSI_A_SGM_PROVOKE_UPGRADE                            = 28227,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

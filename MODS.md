@@ -6928,6 +6928,18 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, defined agai
 - **Damage.** March's Grand Master versions of these skills used March's tables; June's come from `ELESIS_KNIGHT.lua` ( Victorious Sword's DAMAGE_DATA_NEXT is numerical-only, `NUMERICAL_DATA_INDEX` 1 ), so the comparison is the `NUM use` lines of the play-test ( this build emits none, as CH2b - CH2d ).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 7 Elesis, CH3a2: Grand Master (120) actives Provoke, Drastic Charge, Upper Slash (char-elesis CH3a2, 2026-11-14)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for the CH3d review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** June's ids join March's cases: Provoke 28205 / 28227, Drastic Charge 28206 / 28228; new case Upper Slash 28222. Provoke: a press of the skill key inside the
+  EVENT_PROCESS_TIME0 window ( 0.35 s on ) with at least 10 MP spends 10 MP and arms the revenge, which starts at 0.35 s or the end of the animation ( below 10 MP: the not-enough-MP line, STR_ID_2549 );
+  the old counter-on-hit path stays. Provoke remembers its skill key at the state start ( StartFuture ); 9 more preloads. Drastic Charge: the per-tick MP cost is read from the equipped
+  id with the upgrade swap ( March read March's id 8215, which no June save holds, so the loop would have cost 0 MP ). Upper Slash ( new ): JUMP_DOWN at the end of its animation or once USEFUL_VALUE0 has passed
+  off a line; its cancels need the foot on a line. Provoke Revenge and Drastic Charge End: the walk / back-walk / dash / Z-X cancels need the foot on a line.
+- **Shared.** `X2SkillTree.h`: `RNSI_A_SGM_PROVOKE_UPGRADE` 28227, `RNSI_A_SGM_UPPER_SLASH` 28222 ( `JUNE_ENUM_NAMES` ).
+- **Damage.** Drastic Charge End and Upper Slash are numerical-only DAMAGE_DATA tables read through the engine; the comparison is the `NUM use` lines of the play-test ( none emitted by this build, as CH2b-CH3a ).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ### June quest system: AddGroupChainQuest bound (quest-system Q12, 2026-11-13)
 
 Flag `SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN` in `KTDXLIB/Always.h` (needs `JUNE_QUEST_LOAD`). Plan `JUNE_QUEST_SYSTEM_PHASES.md` "Phase Q12"; log tag `[JUNE_QUEST] LOAD`.
