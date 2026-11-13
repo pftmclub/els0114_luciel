@@ -1940,6 +1940,9 @@ has an entry in the loaded quest files (the kickoff's "5 applied" meant the 5 ca
 
 **Review:** none (kickoff). Open questions: none.
 
+**Play-test passed (2026-11-13 17:37, logs, md5 a0d1654e).** ErrorLog: no `AddGroupChainQuest` line; `LOAD ChainQuestInfo.lua loaded 1 calls 5
+applied 1 groups 2 ( AddGroupChainQuest calls 2, ... )`; census `... applied 1 ) groups 2 story groups 23 ...`; `logs.py`: 0 unbound names. Q12 done.
+
 ## Phase Z - Close-out
 
 **Run with:** Sonnet 5.5 medium.
