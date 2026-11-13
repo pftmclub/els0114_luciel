@@ -264,7 +264,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| NU4 | **play-test owed** (2026-11-14): Lu/Ciel creation slot + preview, select screen, June voice table, 15 starter rows, June lobby rotation; DEPLOY OK md5 90b3df89; then NU4 review | Opus 5.5 / high, Opus review, user play-test | NU2 review, NU3 review | `X2StateCreateUnit.*`, `X2Offline*`, `tools/createchar.py`, data koms | `NU4.md` |
+| NU4 | **review next** (2026-11-14; play-test passed: Lu preview / job previews / select screen render, 15 of 15 starter rows, voice table 400 rows; create then enters the tutorial and crashes until CH1, expected) | Opus 5.5 / high, Opus review, user play-test | NU2 review, NU3 review | `X2StateCreateUnit.*`, `X2Offline*`, `tools/createchar.py`, data koms | `NU4.md` |
 | DU1 | **ready** (2026-11-14; NU3 reviewed, char-chung Z closed): second body in `CX2GUUser`: members, minor-unit model, user sync, not-selected-body physics | Opus 5.5 / high, Opus review | NU3 review, char-chung Z | `X2GUUser.*`, `X2GameUnit.*` | `DU1.md` |
 | CH1a0 | blocked (NU1, DU1 reviews): Opus helpers CH1a calls: Lu/Ciel gauge class, `CX2GUUser` transform link (`31fc9d90` family), hold-key selector, switching guide | Opus 5.5 / high, Opus review | CH0, NU1 review, DU1 review | `X2GUUser.*`, `X2GageData.*`, `X2Game.*`, Always.h | `CH1a0.md` |
 | CH1a | blocked (CH1a0 review): new `X2GULuciel.*` skeleton (ctor / dtor / members / own virtuals, LSI enum), flags `_CORE` / `_LIVE` | Opus 5.5 / high, Opus review | CH1a0 review | `X2GULuciel.*` (new), `X2Lib_2010.vcxproj`, `X2UnitManager.h`, Always.h | `CH1a.md` |

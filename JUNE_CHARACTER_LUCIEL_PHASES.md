@@ -648,6 +648,12 @@ UNIT_TYPE_RANGE, UNIT_CLASS_WORD, MINOR_UNIT_TEMPLET and JUNE_CLASS_CHANGE_GUIDE
 - **Not ported (left):** June's jumping-character mode (`+0x71c`, `_JUMPING` msgs), the new-character badge, the minor body / rotation (DU5),
   the tutorial route (TU: a Lu/Ciel's first Game Start would enter Elsword's tutorial and the class does not exist before CH1).
 - **How to see it:** creation screen slot 10 (right of Elesis); create a Lu/Ciel; select screen lists him; `[JUNE_CHAR] LUCIEL CREATE` lines.
+- **Play-test (user, 2026-11-14): passed** (exe 90b3df89) - slot, Lu's preview, job previews and select screen all render. Logs: ErrorLog 639
+  `LUCIEL CREATE voice table SelectVoiceTable.lua loaded=1 rows=400 inserted=400`; offline_server.log `LUCIEL CREATE class 200 unit 166: 15 of
+  15 starter row(s) in the save, stat source StatTable.lua rows of the class` (gear 5 worn), `CREATE 'testlu1' class=200 -> unitUID=166`;
+  0 EXCEPTION. Then the create reply's first select sent him to the tutorial (room 1001, dungeon 41150, Elsword's: no Lu/Ciel case before TU)
+  and the client crashed at `XS_DUNGEON_GAME`: no `CX2GULuciel` before CH1, as expected. `testlu1` (uid 166) stays in the save; Game Start
+  with him crashes until CH1.
 
 ## Phase DU - The two-body engine (DU1-DU5)
 
