@@ -589,6 +589,8 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no
   01:38; `X2GUUser.cpp` / `X2GUArme_VioletMage.cpp` compiled, 0 errors): exe dated 2026-11-14 02:08:40, md5 `e9dee3d6`. No `EXESTR` line: DU2 adds
   no string.
 - **In game:** nothing new to see; every class jumps, falls, is knocked down and stunned exactly as before (base getters = March's constants).
+- **Play-test (2026-11-14, exe `e9dee3d6`): passed.** `jtLordKnight` (02:12) and `jtVoidPrincess` (02:13) in a dungeon; logs run after the
+  deploy, clean exit, 0 `EXCEPTION`, 0 unbound Lua names, only the usual `E_DISABLE_HB_CHECK_REQ` unhandled; no crash bundle from the run.
 
 ## Phase CH1 - Deploy unit: the class core
 
