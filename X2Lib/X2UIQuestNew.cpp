@@ -1653,6 +1653,9 @@ bool CX2UIQuestNew::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			int iSelectedQuickQuestIndex = pButton->GetDummyInt(0);
 			m_iSelectedQuestID = m_vecUIQuickQuest[iSelectedQuickQuestIndex].m_QuestID;
 			OpenQuestRewardWindow( m_iSelectedQuestID, GetThereIsSelectionReward() );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+			g_pMain->GetTutorialGuideManager().OnBeginGuideByGame();		// june-dungeons C3z-4t4: June 323e1bf0 case UQNCM_QUEST_INSTANTLY_COMPLETE @323e3cab
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 			/* //즉시 완료시에 퀘스트 UI 열기
 			SetNowQuestUIMode(QUM_QUEST_DETAIL);
 			ResetQuestUI();
@@ -2552,6 +2555,9 @@ bool CX2UIQuestNew::Handler_EGS_NEW_QUEST_NOT( HWND hWnd, UINT uMsg, WPARAM wPar
 #ifdef REFORM_QUEST
 	NotificationByQuickQuestInfoChange( kEvent.m_QuestInst.m_iID);
 #endif //REFORM_QUEST
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+	g_pMain->GetTutorialGuideManager().OnBeginGuideByNewQuest( kEvent.m_QuestInst.m_iID );		// june-dungeons C3z-4t4: June 323e4cb0 @323e5294, last before the return
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 	return true;
 }
 #ifdef SERV_ENTER_FIELD_QUEST_CLEAR

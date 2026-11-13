@@ -50,6 +50,32 @@ CX2StateBattleField::CX2StateBattleField()
 #endif CHARACTER_MOUSE_RBUTTON
 
 	CreateMovingSmallBar();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+	// june-dungeons C3z-4t4: June 324bbe50 @324bc040-324bc1da: as the field ctor; the id is the battle field's ( g_pData +0x134, likely the field I am in; scenes test only VMI_RUBEN )
+	if( NULL != g_pData->GetQuestManager() )
+	{
+		std::vector< int > vecGoingQuestID;
+		const map< int, CX2QuestManager::QuestInst* >& mapUnitQuest = g_pData->GetQuestManager()->GetUnitQuestMap();
+		for( map< int, CX2QuestManager::QuestInst* >::const_iterator mit = mapUnitQuest.begin(); mapUnitQuest.end() != mit; ++mit )
+		{
+			const CX2QuestManager::QuestInst* pQuestInst = mit->second;
+			if( NULL == pQuestInst )
+				continue;
+
+			if( true == pQuestInst->IsComplete() )
+			{
+				g_pMain->GetTutorialGuideManager().OnBeginGuideByCompleteQuest( pQuestInst->m_iID );
+				break;
+			}
+
+			const CX2QuestManager::SubQuestInst* pSubQuestInst = pQuestInst->GetFirstNotCompleteSubQuest();
+			if( NULL != pSubQuestInst )
+				vecGoingQuestID.push_back( pSubQuestInst->m_iID );
+		}
+		g_pMain->GetTutorialGuideManager().OnBeginGuideByGoingQuest( vecGoingQuestID, (int)g_pData->GetBattleFieldManager().GetBattleFieldIdWhereIam() );
+	}
+	m_bTutorialGuideNPCLoaded = false;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 
 #ifdef ACTIVE_KOG_GAME_PERFORMANCE_CHECK
 	KOGGamePerformanceCheck::GetInstance()->Start( true, true );
@@ -1292,6 +1318,11 @@ void CX2StateBattleField::Handler_EGS_BATTLE_FIELD_NPC_LOAD_COMPLETE_REQ()
 
 	g_pData->GetServerProtocol()->SendID( EGS_BATTLE_FIELD_NPC_LOAD_COMPLETE_REQ );
 	g_pMain->AddServerPacket( EGS_BATTLE_FIELD_NPC_LOAD_COMPLETE_ACK );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+	if( false == m_bTutorialGuideNPCLoaded )		// june-dungeons C3z-4t4: June 324b90b0 @324b9118-324b9134
+		g_pMain->GetTutorialGuideManager().OnBeginGuideWhenNPCLoaded();
+	m_bTutorialGuideNPCLoaded = true;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 
 #ifdef FIELD_BOSS_RAID
 	//CX2BossRaidManager::GetInstance()->SetSendNpcLoadReq(true);	

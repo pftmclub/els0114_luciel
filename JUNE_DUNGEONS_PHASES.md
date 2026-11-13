@@ -545,6 +545,44 @@ second per gate; the C3z-4t4 review retires it). Log tag `JUNE_FX C3z-4t gate <n
   The tutorial-dungeon slot check was skipped (C3y-2's dungeons are not playable yet: C3y-2b). No review of its own: `C3z-4t4-review.md`
   covers t3 + t4 and retires `_GATES_DEBUG`.
 
+## C3z-4t4 - Done (2026-11-13, Opus 5.5 high): the tutorial guide's walkthrough scenes (village, field, quest, party)
+
+Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK` (`#error` without `JUNE_TUTORIAL_GUIDE`) + play-test switch `_WALK_DEBUG`. t1's `_DEBUG` is on
+again (begin / step / end / refuse lines). The C3z-4t4 review retires all three debug defines and `_GATES_DEBUG`. Log tag `JUNE_FX C3z-4t`
+(offline_server.log). Funcmap rows tagged `(C3z-4t4)`.
+
+- **Manager (`X2TutorialGuideManager.*`).** `OnBeginGuideByNewQuest` (`31fc5920`, CONDITION_NEW_QUEST_ID; a PRIORITY_HIGH scene over a running one
+  reserves it at `+0xcc` and ends it), `OnBeginGuideByLevelUp` (`31fc59f0`, GOING + USE_LEVLE_UP_REPEAT), `OnBeginGuideByCompleteQuest` (`31fc5ae0`),
+  `OnBeginGuideByGoingQuest` + `GetGuideNoByGoingQuest` (`31fc5c20` / `31fbe080`: per id the first scene whose field id is 0 or matches, PRIORITY_HIGH
+  to the front, the runner-up reserved), `OnOpenClickWaitUI` (`31fc4c30`), `OnAbortGuide` (`31fc5f80`, for Stage 28's caller). Each begin logs
+  `begin N ( by new quest / level up / complete quest / going quest )`. `CX2QuestManager::QuestInst::GetFirstNotCompleteSubQuest` = `31f31990`.
+  The ids passed are sub-quest ids; the tutorial sub-quests share their quest's id (FieldSubQuest.lua 11005 / 11010), so the scenes match.
+- **Hooks.** Field ctor `32509d30` and battle-field ctor `324bbe50`: a complete unit quest begins its scene and stops the scan, then the going
+  quests' first sub-quests begin by going quest with the village id (location manager `+0x64`) or the battle-field id (`g_pData +0x134`, ported as
+  `GetBattleFieldIdWhereIam`: likely; only scene 201 tests the id). Battle field NPC-load REQ `324b90b0`: `OnBeginGuideWhenNPCLoaded` once per state
+  (`m_bTutorialGuideNPCLoaded`, June `+0x5ca`). `CX2State::Handler_EGS_UPDATE_QUEST_NOT` (`31f09b50` and `323e08c0`, merged in Q4e) and
+  `CX2UIQuestNew::Handler_EGS_NEW_QUEST_NOT` (`323e4cb0` @`323e5294`, last before the return) -> by new quest. The quick quest's instant-complete
+  button (`323e3cab`) -> `OnBeginGuideByGame`. `CX2InformerQuest::IsNowInfoChange` (`32f17780` @`32f17917`) -> by complete quest.
+  `CX2Game::Handler_EGS_UPDATE_UNIT_INFO_NOT` (`322e5b40`): a level-up (level before Reset < the packet's) -> the first unit quest's first sub-quest
+  by level-up (JUNE_BUGS 647: only the lowest quest id is looked at). `CX2PartyUI::OpenPartyDLG` (`322c2930` @`322c2cbe`) -> `OnOpenClickWaitUI`.
+- **UI events (kickoff item 3): nothing to change.** The 8 messages the scenes wait for (UQNCM_EXIT / _QUESTCLEAR_OK / _QUICK_TO_DETAIL /
+  _QUEST_INSTANTLY_COMPLETE, PUCM_PARTY_QUICK_PARTY / _PARTY_GAME_START / _SELECT_DUNGEON_MENU, LMUCM_DUNGEON_CLICKED) have the same value in the live
+  data036 `Enum.lua` and in C++, are sent by DLG lua buttons, and reach t3's hook in `CX2State::MsgProc` before the owner UI's `UICustomEventProc`.
+- **Test reach (kickoff item 4, user 2026-11-13: "dev switch, test only").** `_WALK_DEBUG` skips June's account level-10 refusal (`31fbdf40`) with a
+  `dev: account level 10+ test skipped` line; the unit's own level-7 test stays. The review turns it off (June's behaviour returns).
+- **Not ported here.** `31d87420` (`OnBeginGuideByGame` at a scene's end) was ported by the concurrent C3y-2b as `CX2Main::OnSceneEnded`
+  (`1fc6edcc` / `39e785ea`); t4 relies on it for the WAIT scenes 211 / 402 / 516 / 911. Routed (scope rule): June's `IsNowInfoChange` rework and
+  the June-only push handler `323e05f0` (0x27b) -> Stage 4; June's `OpenPartyDLG` body and the auto-party close `322c3fa0` (only caller of
+  `31fc5f80` from outside) -> Stage 28. Offline the auto-party handlers and 0x27b never fire.
+- **Hygiene.** flagcheck `--worktree --files` (12 files): 11 PASS, 1 PASS~ (one blank line after the new manager block), 0 FAIL, 0 deleted lines,
+  0 non-ASCII, 0 encoding changes, `RESULT: PASS`. junediverge `--check` (12 files) `RESULT: PASS`. enumscan: 3 A/B rows, all old lines far from the
+  edits (X2QuestManager.cpp:6356 / 6357, X2State.cpp:9326), 0 on added lines.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,437,632 B, dated 2026-11-13 13:48:24, md5 f2899679 (built at main 1fc6edcc + 20 uncommitted code files,
+  the Elesis CH2b session's included; the first run at 13:19 failed only in that session's half-saved X2GUEL.cpp / X2GUUser.cpp). EXESTR OK 4 of 4
+  (wide: `begin %d ( by %s )`, `dev: account level %d+ test skipped`, `complete quest`, `going quest`).
+- **Play-test owed** (hand-off below the STATUS row): a new level-1 character through Ruben, scenes 211 / 202 / 204, 201 on re-entry, 503-505 at
+  quest 11010, 411 when 11010 completes; one `begin` / `step` / `end` line per scene.
+
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
 A new March character's first select now enters June's class tutorial dungeon (`DI_DUNGEON_TUTORIAL_<class>`, 41150-41290) in place of
@@ -637,29 +675,3 @@ funcmap rows tagged C3y-2b; MODS.md "tutorial dungeon fixes".
   lines; 1 ERROR = the Always.h `#error` guard (precedent). The peer's `Always.h` / funcmap reorder was left out of the commit.
 - **How to see it:** the C3y-2 play-test again (hand-off in the session). offline_server.log `JUNE_FX C3y-2 room 4115x` and
   `JUNE_FX C3y-2b scene end: guide resume, dungeon 41150`; ErrorLog no `can't find 'IsRecentlyPlayedEventScene'` / `'PlayEventScene'`.
-
-### C3y-2b - play-test 1 (2026-11-13) and fix 2
-
-Play-test (new Elsword 41150, new Elesis 41220): no input lock, story skip and scene-end hook work (`JUNE_FX C3y-2b scene end: guide resume,
-dungeon 41220` x3). Three reports: images missing; the guide shows A / C while the skills sit in A / S; the boss softlocks (it never attacks,
-so no awakening orb, no guide 102, boss stays undamageable).
-- **Softlock (fixed).** All 11 tutorial boss scripts' `State_Change_to_Attack` reads `slot2:GetNowStateSkillID()` on the user: unbound in
-  March (ErrorLog x1114), the condition dies, the boss never attacks. June binds it on CX2GUUser @`31e14b58` (vslot 0x524 thunk `31e4e760`);
-  bound to March's `CX2GUUser::GetNowStateSkillID`. Also unbound: `SetLineForce` (the `Tutotial_*_Dp1` direct NPCs), June `31fff2d0` @`31e14ca3`:
-  new `CX2GUUser::SetLineForce` (line centre `31c6ad50`, Future dirDegree / land position / position, Now position, both line indices). Both
-  under `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND`. C3y-2's gate only covered the 9 dungeon scripts: `luabind.py check` over the 63 data037
-  `Tuto*` scripts now has 0 unbound (3 ENUM misses are Rose / Lu-Ciel rows, out of scope).
-- **Images (staged).** The tutorial's GFx scenes load (the 135 lines are the kom probe before the loose `data\eventscene\*.swf`). Missing were
-  particle / UI textures the census never followed: a particle census of the tutorial scripts, effect sets, `X2PlayGuide.cpp` sequences and
-  guide dialogs staged 83 June files (41 new, 42 replaced; backup `kom_backup_stage_june\20261113_133408`): `HQ_WhiteBack.tga`,
-  `inform_dungeonGate_signal*.dds` (3), `HQ_KOGLogoWinter2015.tga`, `PerturbationMap.png`, 4 Ain portal files, 72 `DLG_UI_Guide_*` images (41
-  replacing March's same-name files), `DLG_UI_Common_Texture03.tga`. Missing in June too: JUNE_BUGS 646 (extended). PACK OK + COPY OK data045
-  8c87300b, data048 29161d23, data056 af4783a1, data057 46eaff38, data064 404f081a, data212 6fad0702 (data045 / data064 also carried earlier
-  staged entries: ~31 / ~164 changed vs live).
-- **A / C prompt (open).** The new characters' two skills sit in slots 0 / 1 (A / S), as the client places learned skills; guide 101 is
-  June's GFx movie `timeLineNoTutorial_1` (`FIX_SKILL_TYPE_A`, skill keys allowed). Whether June's movie names the skill-key range (A..C) or
-  expects a skill on C is not settled: asked the user.
-- **Hygiene.** flagcheck `--worktree` TUTORIAL_LUA_BIND: X2Main.cpp PASS; X2GUUser.cpp FAIL / .h OTHER are a peer's uncommitted
-  `JUNE_CHAR_ELESIS_SKILL` hunks (not committed here; see the range line). junediverge `RESULT: PASS`; enumscan 0 A/B.
-- **Build.** DEPLOY OK: X2_offline.exe is 26,437,632 B, dated 2026-11-13 13:48:24, md5 f2899679c89d8a4e066018905a035295 (built at main
-  1fc6edcc + 20 uncommitted code files, shared with char-elesis CH2b). EXESTR OK 2 of 2 (GetNowStateSkillID, SetLineForce), md5 f2899679.

@@ -9870,12 +9870,29 @@ bool CX2Game::Handler_EGS_UPDATE_UNIT_INFO_NOT( KEGS_UPDATE_UNIT_INFO_NOT& kEGS_
 
 			if ( pSlotData->m_pUnit->GetUID() == kEGS_UPDATE_UNIT_INFO_NOT.m_kUnitInfo.m_nUnitUID )
 			{
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+				const int iLevelBeforeReset = (int)pSlotData->m_pUnit->GetUnitData().m_Level;		// june-dungeons C3z-4t4: June's Reset 32362730 keeps it at CX2Unit +0xaf8
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 				pSlotData->m_pUnit->Reset( kEGS_UPDATE_UNIT_INFO_NOT.m_kUnitInfo );
 				pSlotData->m_pUnit->AccessInventory().UpdateInventorySlotList( kEGS_UPDATE_UNIT_INFO_NOT.m_vecKInventorySlotInfo );
 
 
 				// 던전게임 끝나면서 경험치 업데이트되었기 때문에 게임중 실시간 경험치 임시로 저장하던 데이터를 초기화한다.
 				m_GetEXPInGame = 0;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+				// june-dungeons C3z-4t4: June 322e5b40 @322e5bc0-322e5c70: a level-up begins the level-up scene of the first unit quest only ( lowest id; JUNE_BUGS )
+				if( iLevelBeforeReset < (int)kEGS_UPDATE_UNIT_INFO_NOT.m_kUnitInfo.m_ucLevel && NULL != g_pData->GetQuestManager() )
+				{
+					const map< int, CX2QuestManager::QuestInst* >& mapUnitQuest = g_pData->GetQuestManager()->GetUnitQuestMap();
+					const CX2QuestManager::QuestInst* pFirstQuestInst = ( true == mapUnitQuest.empty() ? NULL : mapUnitQuest.begin()->second );
+					if( NULL != pFirstQuestInst && false == pFirstQuestInst->IsComplete() )
+					{
+						const CX2QuestManager::SubQuestInst* pSubQuestInst = pFirstQuestInst->GetFirstNotCompleteSubQuest();
+						if( NULL != pSubQuestInst )
+							g_pMain->GetTutorialGuideManager().OnBeginGuideByLevelUp( pSubQuestInst->m_iID );
+					}
+				}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 
 
 				return true;

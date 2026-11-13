@@ -237,6 +237,9 @@ private:
 	D3DXVECTOR3							m_vOldEyePt;
 	D3DXVECTOR3							m_vOldLookAtPt;
 	bool								m_bNowMovingToOtherPlace;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+	bool								m_bTutorialGuideNPCLoaded;		// june-dungeons C3z-4t4: June +0x5ca, the guide's NPC-load begin runs once per battle field state
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 	CKTDXCheckElapsedTime				m_TimerWaitingPortal;	
 	CKTDGUIControl::UITextureData		m_TexDataMovingGageBG;
 	CKTDGUIControl::UITextureData		m_TexDataMovingGage;

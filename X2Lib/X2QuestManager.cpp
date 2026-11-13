@@ -4256,6 +4256,19 @@ bool CX2QuestManager::QuestInst::IsComplete() const
 
 	return true;
 }
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+// june-dungeons C3z-4t4: June 31f31990, the first sub-quest neither complete nor successful
+const CX2QuestManager::SubQuestInst* CX2QuestManager::QuestInst::GetFirstNotCompleteSubQuest() const
+{
+	for( UINT i = 0; i < m_vecSubQuestInst.size(); ++i )
+	{
+		const SubQuestInst& kSubQuestInst = m_vecSubQuestInst[i];
+		if( false == kSubQuestInst.IsComplete() && false == kSubQuestInst.m_bIsSuccess )
+			return &kSubQuestInst;
+	}
+	return NULL;
+}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 #ifdef REFORM_QUEST //юс╫ц
 bool CX2QuestManager::QuestInst::IsCompleteVisitQuest( int iSubQuestID_ ) const
 {

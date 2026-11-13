@@ -37763,28 +37763,6 @@ void CX2GUUser::SetPositionOnLine( const D3DXVECTOR3& vPosition, const int iLine
 
 
 
-#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
-// june-dungeons C3y-2b: June 31fff2d0: put the unit at the centre of line iLineIndex ( Future dirDegree / land position / position, Now position, both line indices )
-void CX2GUUser::SetLineForce( int iLineIndex )
-{
-	if( NULL == g_pX2Game || NULL == g_pX2Game->GetWorld() || NULL == g_pX2Game->GetWorld()->GetLineMap() )
-		return;
-
-	CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
-	const CKTDGLineMap::LineData* pLineData = pLineMap->GetLineData( iLineIndex );
-	if( NULL == pLineData )
-		return;
-
-	const D3DXVECTOR3 vCenter = pLineMap->GetCenterPositionLineIndex( iLineIndex );	// June 31c6ad50
-	m_FrameDataFuture.unitCondition.dirDegree		= pLineData->dirDegree;		// +0x7e04 from line +0x60
-	m_FrameDataFuture.unitCondition.landPosition	= vCenter;					// +0x7e20
-	m_FrameDataFuture.syncData.position				= vCenter;					// +0x7e3c
-	m_FrameDataNow.syncData.position				= vCenter;					// +0x80dc
-	m_FrameDataFuture.syncData.lastTouchLineIndex	= iLineIndex;				// +0x7e54 ( short )
-	m_FrameDataNow.syncData.lastTouchLineIndex		= iLineIndex;				// +0x80f4
-}
-
-#endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 void CX2GUUser::SetEnableDash( bool bEnableDash,  CX2GameUnit::ENABLE_DASH_STATE eState /*= EDS_END*/ )
 {
 	CX2GameUnit::SetEnableDash( bEnableDash, eState );

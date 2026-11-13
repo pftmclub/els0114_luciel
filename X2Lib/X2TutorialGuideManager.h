@@ -140,6 +140,14 @@ public:
 
 	void	OnBeginGuideByGame();						// June 31fc5e30
 	void	OnBeginGuideWhenNPCLoaded();				// June 31fc5e70
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+	void	OnBeginGuideByNewQuest( int iQuestID );		// june-dungeons C3z-4t4: June 31fc5920, CONDITION_NEW_QUEST_ID
+	void	OnBeginGuideByLevelUp( int iQuestID );		// june-dungeons C3z-4t4: June 31fc59f0, CONDITION_GOING_QUEST_ID with USE_LEVLE_UP_REPEAT
+	void	OnBeginGuideByCompleteQuest( int iQuestID );	// june-dungeons C3z-4t4: June 31fc5ae0, CONDITION_COMPLETE_QUEST_ID
+	void	OnBeginGuideByGoingQuest( const std::vector< int >& vecGoingQuestID, int iFieldID );	// june-dungeons C3z-4t4: June 31fc5c20
+	void	OnOpenClickWaitUI();						// june-dungeons C3z-4t4: June 31fc4c30, a CLICK_WAIT scene plays once its UI opens
+	void	OnAbortGuide() { AbortGuide(); }			// june-dungeons C3z-4t4: June 31fc5f80 is called from outside too ( auto-party close 322c3fa0, Stage 28 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 	void	StopGuide();								// June 31fc6010
 	void	BeginReplayGuide();							// June 31fc6020
 	void	OnExitTutorial();							// June 31fc3cc0
@@ -149,6 +157,10 @@ public:
 
 private:
 	bool	SetGuideStartState();						// June 31fbdc40
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+	int		GetGuideNoByGoingQuest( const std::vector< int >& vecGoingQuestID, int iFieldID );	// june-dungeons C3z-4t4: June 31fbe080
+	void	StartFoundGuideScene( const GuideScene& kScene, const WCHAR* wszBy );	// june-dungeons C3z-4t4: the shared tail of June 31fc5920 / 59f0 / 5ae0 / 5c20
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 	bool	CanBeginGuide( bool bOutsideDungeonOnly, bool bHighPriority, int iConditionState );	// June 31fc4530
 	void	CheckAccountHasHighLevelUnit();				// June 31fbdf40
 	void	PlayGuideStep();							// June 31fc4060

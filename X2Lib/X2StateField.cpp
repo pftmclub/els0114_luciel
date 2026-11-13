@@ -170,6 +170,31 @@ m_TexDataMovingGage( L"DLG_LOADING_BAR.tga", L"LOADING_BAR" )
 #endif TOGETHER_FESTIVAL_2012_AUTUMN
 	//EGS_GET_USER_LIST_IN_SECTOR_NOT();
 	CreateMovingSmallBar();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+	// june-dungeons C3z-4t4: June 32509d30 @3250a047-3250a1e8: a completed quest begins its scene, then the going quests' first sub-quests with the village id
+	if( NULL != g_pData->GetQuestManager() && NULL != g_pData->GetLocationManager() )
+	{
+		std::vector< int > vecGoingQuestID;
+		const map< int, CX2QuestManager::QuestInst* >& mapUnitQuest = g_pData->GetQuestManager()->GetUnitQuestMap();
+		for( map< int, CX2QuestManager::QuestInst* >::const_iterator mit = mapUnitQuest.begin(); mapUnitQuest.end() != mit; ++mit )
+		{
+			const CX2QuestManager::QuestInst* pQuestInst = mit->second;
+			if( NULL == pQuestInst )
+				continue;
+
+			if( true == pQuestInst->IsComplete() )
+			{
+				g_pMain->GetTutorialGuideManager().OnBeginGuideByCompleteQuest( pQuestInst->m_iID );
+				break;
+			}
+
+			const CX2QuestManager::SubQuestInst* pSubQuestInst = pQuestInst->GetFirstNotCompleteSubQuest();
+			if( NULL != pSubQuestInst )
+				vecGoingQuestID.push_back( pSubQuestInst->m_iID );
+		}
+		g_pMain->GetTutorialGuideManager().OnBeginGuideByGoingQuest( vecGoingQuestID, (int)g_pData->GetLocationManager()->GetCurrentVillageID() );
+	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 #ifdef SERV_IRUHADEV_JUNE_SKILL_HUD_MAXHPMP
 	/// June's field state ctor 32509d30 @3250a208: the HUD max MP / HP refresh 3235a160 at the end, so entering a village sets the HUD
 	/// from unit data ( June's select-unit ACK has no such call: the KGamePlayStatus maxima March sets there stay until this )

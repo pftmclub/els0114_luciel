@@ -5069,6 +5069,14 @@ bool CX2State::Handler_EGS_UPDATE_QUEST_NOT( HWND hWnd, UINT uMsg, WPARAM wParam
 		}
 #endif SERV_EPIC_QUEST
 		g_pData->GetQuestManager()->UpdateUnitQuest( questInst.m_iID, questInst );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+		{	// june-dungeons C3z-4t4: June 31f09b50 @31f09c83-31f09ce5 ( 323e08c0 @323e09f2-323e0a55 the same ): the first unfinished sub-quest's new-quest scene
+			const CX2QuestManager::QuestInst* pUpdatedQuestInst = g_pData->GetQuestManager()->GetUnitQuest( questInst.m_iID );
+			const CX2QuestManager::SubQuestInst* pSubQuestInst = ( NULL != pUpdatedQuestInst ? pUpdatedQuestInst->GetFirstNotCompleteSubQuest() : NULL );
+			if( NULL != pSubQuestInst )
+				g_pMain->GetTutorialGuideManager().OnBeginGuideByNewQuest( pSubQuestInst->m_iID );
+		}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 
 		// 퀘스트 정보 실시간 표시
 		CX2QuestManager::QuestInst* pQuestInst = g_pData->GetQuestManager()->GetUnitQuest( questInst.m_iID );

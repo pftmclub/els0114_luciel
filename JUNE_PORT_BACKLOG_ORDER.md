@@ -348,6 +348,10 @@ mission system (carried in from skill S3c) is RM0 / RM1.
   (`32a599c0`) and RidingHyperModeStart / EventProcess send event 0x73d through ServerProtocol (`31f4b1e0`, `g_pData +0x64`) with sub-quest
   203630 ("Use Awakening 2 times", `FieldSubQuest.lua`, clear type `SQT_DUNGEON_CLEAR_COUNT`, count 2): the server counts the awakenings. No
   June event name exists (XOR-built), so it needs a registered id and an emulator handler that advances that sub-quest. CH1n2 left a stand-in line.
+- **The quest informer's June rework** (june-dungeons C3z-4t4, 2026-11-13). June's `CX2InformerQuest::IsNowInfoChange` (`32f17780`, vtable
+  `3353bf34`) has a `+0x60` early return, does not return after a newly completed quest, and pushes every such id but 11005 into a vector
+  (`31f8b860`); its play-guide call is `3289db40( 3, 1 )`. C3z-4t4 ported only the tutorial-guide call (@`32f17917`) at March's matching spot.
+  Also unported here: the June-only quest push handler `323e05f0` (event 0x27b), whose tail begins a guide scene (`31fc5920`).
 
 **Why here:** transcendence is quest-gated, and three regions' worth of inert quest keys wait on the same engine. Doing quests once, after all three regions are in and before transcendence, avoids porting the quest engine piecemeal inside each feature.
 
@@ -1348,6 +1352,10 @@ plan's subject (scope rule). Brief: `kickoffs/june-backlog/stage28-plan.md`. Pla
 *June-dungeons C3z-4t3 (2026-11-13):* the tutorial-guide lines of both auto-party handlers are ported: `31fc6010` and `+0x8a`
 (`CX2PartyManager::m_bAutoPartyMatchFound`) in the match popup `3243d4e0`, and in the close `3243c260` (event 895) the reasons 02 / 03 clear `+0x8a`
 and call `31fc6020`. Still owed here: `32461a70` / `324639a0` after the popup, and the close's June rework (0x40f / 0x410 branches, popups, sound).
+*June-dungeons C3z-4t4 (2026-11-13):* also owed here: June's `CX2PartyUI::OpenPartyDLG` rework (`322c2930`: busy / menu gates, the `+0xe4` /
+`+0xf4` / `+0x150` dialogs, `322c07b0`, the play-guide step 5; C3z-4t4 ported only its `31fc4c30` guide call @`322c2cbe`), and the June-only
+party-UI close `322c3fa0` the two auto-party handlers call (`3243bed0` / `3243c260`; it calls the guide's `31fc5f80`, exposed as
+`CX2TutorialGuideManager::OnAbortGuide`).
 
 ### Stage 29: June dungeon result screen (user, 2026-10-21; split out of Stage 9)
 

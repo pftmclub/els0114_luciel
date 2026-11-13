@@ -6857,3 +6857,16 @@ Flags in `KTDXLIB/Always.h`: inside C3y-2's `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIN
   picture before June's.
 - **Revert:** comment out `JUNE_SCENE_END_HOOK` / `JUNE_TUTORIAL_ROOM_LOADING`; the scene methods go with `JUNE_TUTORIAL_LUA_BIND`; then
   `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The dialog backup restores March's data034 entry. No save change.
+
+### June dungeons: the tutorial guide's walkthrough scenes (june-dungeons C3z-4t4, 2026-11-13)
+
+Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK` in `KTDXLIB/Always.h` (`#error`s without `JUNE_TUTORIAL_GUIDE`), play-test switch `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG`
+(skips June's account level-10 refusal and logs it; not June's behaviour, the C3z-4t4 review retires it). C3z-4t1's `_DEBUG` is on again for the play-test.
+Plan `JUNE_DUNGEONS_PHASES.md` "C3z-4t4 - Done"; log tag `JUNE_FX C3z-4t`.
+- **Client.** `X2TutorialGuideManager.*`: begin by new / going / complete quest and by level-up, the click-wait step. `X2QuestManager.*`:
+  `QuestInst::GetFirstNotCompleteSubQuest`. Hooks: `X2StateField.cpp` / `X2StateBattleField.*` ctors, the battle field's NPC-load REQ,
+  `X2State.cpp` UPDATE_QUEST_NOT, `X2UIQuestNew.cpp` NEW_QUEST_NOT and the instant-complete button, `X2InformerQuest.cpp`, `X2Game.cpp`
+  UPDATE_UNIT_INFO_NOT, `X2PartyUI.cpp` OpenPartyDLG.
+- **What changes in game.** On a fresh account the Ruben walkthrough hints (scenes 201-509, 701-702, 901-911) begin from entering a village /
+  field, quest updates, level-ups and the party UI, as in June. No data change.
+- **Revert:** comment out the define (and `_WALK_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. No save change.

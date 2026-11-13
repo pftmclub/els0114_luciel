@@ -460,6 +460,9 @@ bool CX2InformerQuest::IsNowInfoChange()
 				m_iNowInfoChangeQuestID = pQuestInst->m_iID;
 				m_bIsEverySubQuestInQuestComplete = true;
 #endif //REFORM_QUEST
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+				g_pMain->GetTutorialGuideManager().OnBeginGuideByCompleteQuest( pQuestInst->m_iID );		// june-dungeons C3z-4t4: June IsNowInfoChange 32f17780 @32f17917
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 				return true;
 			}
 		}

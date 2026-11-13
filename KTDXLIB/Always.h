@@ -12856,8 +12856,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-13
-// Description: june-dungeons C3z-4t1 debug: logs JUNE_FX C3z-4t begin / step / end / refuse ( offline_server.log ). The C3z-4t2 review retires it.
-//#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+// Description: june-dungeons C3z-4t1 debug: logs JUNE_FX C3z-4t begin / step / end / refuse ( offline_server.log ). Retired by the C3z-4t2 review, on again
+//              for the C3z-4t4 walk play-test; the C3z-4t4 review retires it.
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
@@ -12920,6 +12921,30 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GATES_DEBUG
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t4 - the tutorial guide's walkthrough scenes 2xx-9xx begin from the game: the field / battle-field state ctors ( complete quest,
+//              going quests + field id: 32509d30 / 324bbe50 -> 31fc5ae0 / 31fc5c20 ), the battle field's NPC-load REQ ( 324b90b0 -> 31fc5e70 ), the quest informer
+//              ( 32f17780 -> 31fc5ae0 ), UPDATE_QUEST_NOT / NEW_QUEST_NOT ( 31f09b50 / 323e4cb0 -> 31fc5920 ), the in-game unit-info level-up ( 322e5b40 -> 31fc59f0 ),
+//              the quest window's instant-complete ( 323e3cab -> 31fc5e30 ) and the party dialog's click wait ( 322c2930 -> 31fc4c30 ).
+//              Revert: comment out the #define ( JUNE_TUTORIAL_GUIDE_WALK ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK ) && !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ( the guide manager )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t4 play-test switch: the guide skips June's "a character on the account is level 10+" refusal ( 31fbdf40 ) and logs that it did,
+//              so the walk can be tested in a save with high-level characters. Not June's behaviour; the C3z-4t4 review retires it.
+//              Revert: comment out the #define ( JUNE_TUTORIAL_GUIDE_WALK_DEBUG ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-13

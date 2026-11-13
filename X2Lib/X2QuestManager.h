@@ -710,6 +710,9 @@ class CX2QuestManager
 // 			void SetIsEverySubQuestComplete(bool val) { m_bIsEverySubQuestComplete = val; }
 
 			bool IsComplete() const;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+			const SubQuestInst* GetFirstNotCompleteSubQuest() const;		// june-dungeons C3z-4t4: June 31f31990
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 #ifdef SERV_EPIC_QUEST_HIDE_QUESTMARK_WHEN_SUBQUEST_COMPLETED
 			bool HasNotCompletedSubQuest( int iSubQuestID ) const;
 #endif SERV_EPIC_QUEST_HIDE_QUESTMARK_WHEN_SUBQUEST_COMPLETED

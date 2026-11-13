@@ -400,6 +400,141 @@ void CX2TutorialGuideManager::OnBeginGuideWhenNPCLoaded()
 	OnBeginGuide();
 }
 
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+// june-dungeons C3z-4t4: June 31fc5920; the first scene in GUIDE_NO order whose CONDITION_NEW_QUEST_ID matches
+void CX2TutorialGuideManager::OnBeginGuideByNewQuest( int iQuestID )
+{
+	std::map< int, GuideScene >::const_iterator mit = m_mapGuideScene.begin();
+	for( ; m_mapGuideScene.end() != mit; ++mit )
+	{
+		if( iQuestID == mit->second.m_iConditionNewQuestID )
+			break;
+	}
+	if( m_mapGuideScene.end() == mit )
+		return;
+
+	const GuideScene kScene = mit->second;
+	const bool bHighPriority = ( 2 == kScene.m_iPriorityLevel );		// TutorialGuideInfo.lua PRIORITY_HIGH
+	if( false == CanBeginGuide( true, bHighPriority, kScene.m_iConditionState ) )
+		return;
+
+	if( true == bHighPriority && GS_NONE != m_iGuideState )
+	{
+		m_iReservedGuideNo = m_NowGuideScene.m_iGuideNo;		// June 31fc59a6 +0xcc = +0x18
+		EndGuide();
+	}
+	StartFoundGuideScene( kScene, L"new quest" );
+}
+
+// june-dungeons C3z-4t4: June 31fc59f0; CONDITION_GOING_QUEST_ID matches and the scene has USE_LEVLE_UP_REPEAT
+void CX2TutorialGuideManager::OnBeginGuideByLevelUp( int iQuestID )
+{
+	std::map< int, GuideScene >::const_iterator mit = m_mapGuideScene.begin();
+	for( ; m_mapGuideScene.end() != mit; ++mit )
+	{
+		if( iQuestID == mit->second.m_iConditionGoingQuestID && true == mit->second.m_bUseLevelUpRepeat )
+			break;
+	}
+	if( m_mapGuideScene.end() == mit )
+		return;
+
+	const GuideScene kScene = mit->second;
+	if( false == CanBeginGuide( true, false, kScene.m_iConditionState ) )
+		return;
+
+	StartFoundGuideScene( kScene, L"level up" );
+}
+
+// june-dungeons C3z-4t4: June 31fc5ae0; CONDITION_COMPLETE_QUEST_ID matches
+void CX2TutorialGuideManager::OnBeginGuideByCompleteQuest( int iQuestID )
+{
+	std::map< int, GuideScene >::const_iterator mit = m_mapGuideScene.begin();
+	for( ; m_mapGuideScene.end() != mit; ++mit )
+	{
+		if( iQuestID == mit->second.m_iConditionCompleteQuestID )
+			break;
+	}
+	if( m_mapGuideScene.end() == mit )
+		return;
+
+	const GuideScene kScene = mit->second;
+	if( false == CanBeginGuide( true, false, kScene.m_iConditionState ) )
+		return;
+
+	StartFoundGuideScene( kScene, L"complete quest" );
+}
+
+// june-dungeons C3z-4t4: June 31fc5c20; the ids are each going quest's first unfinished sub-quest ( the field state ctors )
+void CX2TutorialGuideManager::OnBeginGuideByGoingQuest( const std::vector< int >& vecGoingQuestID, int iFieldID )
+{
+	const int iGuideNo = GetGuideNoByGoingQuest( vecGoingQuestID, iFieldID );
+	std::map< int, GuideScene >::const_iterator mit = m_mapGuideScene.find( iGuideNo );
+	if( m_mapGuideScene.end() == mit )
+		return;
+
+	const GuideScene kScene = mit->second;
+	if( false == CanBeginGuide( false, false, kScene.m_iConditionState ) )
+		return;
+
+	StartFoundGuideScene( kScene, L"going quest" );
+}
+
+// june-dungeons C3z-4t4: June 31fc4c30
+void CX2TutorialGuideManager::OnOpenClickWaitUI()
+{
+	if( GS_WAIT_CLICK == m_iGuideState )
+		PlayGuideStep();
+}
+
+// june-dungeons C3z-4t4: June 31fbe080; per id the first matching scene, PRIORITY_HIGH ones to the front; the second in line is reserved ( +0xcc )
+int CX2TutorialGuideManager::GetGuideNoByGoingQuest( const std::vector< int >& vecGoingQuestID, int iFieldID )
+{
+	std::list< int > listGuideNo;
+	for( std::vector< int >::const_iterator vit = vecGoingQuestID.begin(); vecGoingQuestID.end() != vit; ++vit )
+	{
+		for( std::map< int, GuideScene >::const_iterator mit = m_mapGuideScene.begin(); m_mapGuideScene.end() != mit; ++mit )
+		{
+			const GuideScene& kScene = mit->second;
+			if( *vit != kScene.m_iConditionGoingQuestID || ( 0 != kScene.m_iConditionFieldID && iFieldID != kScene.m_iConditionFieldID ) )
+				continue;
+
+			if( 2 == kScene.m_iPriorityLevel )		// TutorialGuideInfo.lua PRIORITY_HIGH
+				listGuideNo.push_front( kScene.m_iGuideNo );
+			else
+				listGuideNo.push_back( kScene.m_iGuideNo );
+			break;
+		}
+	}
+
+	if( true == listGuideNo.empty() )
+		return 0;
+
+	const int iGuideNo = listGuideNo.front();
+	listGuideNo.pop_front();
+	if( false == listGuideNo.empty() )
+		m_iReservedGuideNo = listGuideNo.front();		// June 31fbe262, set even when the first scene cannot begin
+	return iGuideNo;
+}
+
+// june-dungeons C3z-4t4: the tail the four June begin-by-condition functions share ( copy to +0x18, 31fbdc40 -> 31fc4d80 / 31fc4060 )
+void CX2TutorialGuideManager::StartFoundGuideScene( const GuideScene& kScene, const WCHAR* wszBy )
+{
+	m_NowGuideScene = kScene;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+	CX2OfflineLog::Server( L"JUNE_FX C3z-4t begin %d ( by %s )", kScene.m_iGuideNo, wszBy );
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+	UNREFERENCED_PARAMETER( wszBy );
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG
+
+	if( true == SetGuideStartState() )
+	{
+		WaitEventNPC();
+		return;
+	}
+	PlayGuideStep();
+}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+
 void CX2TutorialGuideManager::StopGuide()
 {
 	m_iReservedGuideNo = 0;
@@ -494,6 +629,11 @@ bool CX2TutorialGuideManager::CanBeginGuide( bool bNotInDungeon, bool bHighPrior
 		}
 
 		CheckAccountHasHighLevelUnit();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG
+		if( true == m_bAccountHasHighLevelUnit )		// june-dungeons C3z-4t4 play-test switch: June's account test is skipped, the unit test above stays
+			CX2OfflineLog::Server( L"JUNE_FX C3z-4t dev: account level %d+ test skipped (June 31fbdf40 would refuse)", ACCOUNT_HIGH_LEVEL );
+		else
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK_DEBUG
 		if( true == m_bAccountHasHighLevelUnit )
 		{
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG

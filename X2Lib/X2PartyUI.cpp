@@ -1669,6 +1669,9 @@ void CX2PartyUI::OpenPartyDLG( bool bOpen )
 			m_bPartyDungeon = true;
 			m_pDLGParty->SetShowEnable( true, true );
 			m_pDLGPartyPVP->SetShowEnable( false, false );
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
+			g_pMain->GetTutorialGuideManager().OnOpenClickWaitUI();		// june-dungeons C3z-4t4: June OpenPartyDLG 322c2930 @322c2cbe, the dungeon side
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_WALK
 		}
 
 #ifdef REFORM_QUEST

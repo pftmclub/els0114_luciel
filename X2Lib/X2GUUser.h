@@ -2132,7 +2132,6 @@ public:
 		}
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 		bool IsOnSomethingNow() const { return m_FrameDataNow.unitCondition.bFootOnLine; }	// june-dungeons C3y-2: June 31e4d0a0 ( +0x80bc )
-		void SetLineForce( int iLineIndex );	// june-dungeons C3y-2b: June 31fff2d0 ( Lua SetLineForce )
 #endif SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND
 //{{ Iruha : 2026-10-05 // June buff port Phase 9b (JUNE_BUFF_PORT_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_BUFF_CUSTOM_FUNCTION
