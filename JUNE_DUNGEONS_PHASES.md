@@ -666,8 +666,12 @@ Covers C3z-4t3 (`52951ffe`), C3z-4t4 (`d393113b`) and C3z-4t4b (`b29b62bc`). No 
 - **Debug retired** (`KTDXLIB/Always.h`): `_GUIDE_DEBUG`, `_GATES_DEBUG`, `_WALK_DEBUG` commented out. With `_WALK_DEBUG` off the walkthrough again
   shows only on an account with no character at level 10+, as in June. Build skipped: debug retire only. The deployed exe (md5 b68f1fcc) still has all
   three on, which the scene-201 walk below uses.
-- **Owed (user):** the scene-201 walk on the deployed exe: a new level-1 character, accept 11005, leave Ruben and come back before finishing it ->
+- **Owed (user):** the scene-201 walk. The first hand-off ("leave Ruben and come back") was wrong: 11005's one sub-quest is VISIT_FIELD 40000, so
+  leaving to the field finishes it. Corrected: hand in 11000 before visiting the field, then ESC -> Character Select -> same character ->
   `begin 201 ( by going quest )`.
+- **Found in the walk (user, 2026-11-13), routed to C3z-4t4c:** 11005 completed in Ruben on accept. The emulator's `EGS_STATE_CHANGE_FIELD_REQ`
+  never leaves the room (the real server does, `GSUserField.cpp`), so `QuestCheckHereAndNow` ran `OnVisitField( 40000 )` from the stale battle-field
+  room (offline_server.log 15:14:58.704). Not a tutorial-guide defect; kickoff `C3z-4t4c.md`.
 
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
