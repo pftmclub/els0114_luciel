@@ -6808,6 +6808,10 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI` (`KTDXLIB/Always.h`; `#error` without `
 
 **Revert:** undefine `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI` (March's table returns), restore the three koms from the backups and `kom.py copy` them, `python tools/build.py --deploy`.
 
+## Stage 7 Elesis, CHNb: the level-15 / level-35 class-change guides (2026-11-13)
+
+No flag, no exe change (the job-change route and the guide runtime are Ara's class-generic CHNa / CHNb / CHNb2 code). data036 `LevelUpEvent.lua` (core-list source): Elesis's level-15 row opens `DLG_1ST_Class_Change_Guide_Elesis.lua` (was March's `Class_Change_Guide_Elesis.lua`), her level-35 row lists Saber / Pyro / Dark Knight and opens `DLG_2ND_Class_Change_Guide_Elesis.lua` (had no dialog), as June. The dialogs were staged by CH0b. data036 packed and copied (backup `kom_backup_tools/data036.kom.20261113_110737`). Save: account `unit_slots` 130 -> 133; units 147-150 (`ElGuide*`; `db_backup/els_db_20261113_110903_pre_char-elesis-CHNb.sql` is the state before). To revert: restore the data036 backup and `kom.py copy` it.
+
 ### June dungeons: the tutorial guide manager (june-dungeons C3z-4t1, 2026-11-13)
 
 Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE` in `KTDXLIB/Always.h` (`#error`s without `JUNE_DIVERGE_GET_KEY_STATE`, `JUNE_TUTORIAL_MODE`, `INIT_FOCUS_UNIT`), debug lines under `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG`. Plan `JUNE_DUNGEONS_PHASES.md` "C3z-4t1 - Done"; log tag `JUNE_FX C3z-4t`.

@@ -1604,6 +1604,29 @@ Opus 5.5 high. **Verdict: pass, no code change.** Commit `4750f9b9` re-read agai
   `RESULT: PASS`). Build not awaited (2026-11-03 rule). CHNb's kickoff amended: it turns the define back on for its own lines and its review retires it.
 - Not here (unchanged routing): `RotateYSelectCharacterType` templet reader (Lu/Ciel NU4), transcended 35 / 125 portraits (CH3d), job change + dialogs (CHNb), skills (CH2d / CH3c).
 
+### CHNb - Done (2026-11-13)
+
+Opus 5.5. **Data only: no client source changed, no flag added** (the route and the guide runtime are Ara's class-generic CHNa / CHNb / CHNb2 code).
+`_CLASS_DEBUG` stays commented out: CHNb has no lines of its own; the always-on `CLASS GUIDE` and `QUEST complete ... CLASS CHANGE` lines prove the play-test.
+- **Quest route (no change):** the shipped data036 `FieldQuest.lua` is June's: 35569-35572 (class 8, level 15, `CJT_JOB_THIRD`, 35572 -> `UC_ELESIS_DARK_KNIGHT` + 109999 + 293720)
+  and 35573-35577 (class 35, level 35, 35577 -> `UC_ELESIS_CRIMSON_AVENGER` + 110850 + 293721). `Handlers_Quest.cpp:586-625` grants any class (CH0 row).
+  Saber / Pyro routes for the side checks: 35320-35323 (-> 29), 35330-35333 (-> 30).
+- **Open check from CH0 settled by code read:** the guide's Accept (`GuideAcceptClassUpQuest`, `GetAvailableQuest( NUI_ECHO )`) finds the Lenpad / Ariel quests,
+  because `GetStartQuestList` (June `3232fbd0` @`3232fbee`, `SERV_IRUHADEV_JUNE_QUEST_RUNTIME`) lists a class-up quest with a start NPC at every NPC.
+- **Level-up guides (data036 `LevelUpEvent.lua`, core-list source):** level-15 `TYPE6` opens `DLG_1ST_Class_Change_Guide_Elesis.lua` (was March's `Class_Change_Guide_Elesis.lua`);
+  level-35 `TYPE6` lists 29 / 30 / 35 and gains `DIALOG_LIST` = `DLG_2ND_Class_Change_Guide_Elesis.lua` (had none) = June `LevelUpEvent.src.lua:103-118, :320-337`.
+  BOM + CRLF kept (455 lines); `luasrc.py refresh`; `ledger --check` / `core --check` PASS. The level-70 row stays CH3d's.
+- **Dialogs (no new staging):** CH0b's data034 `DLG_1ST_` / `DLG_2ND_Class_Change_Guide_Elesis.lua`, data034 `DLG_Class_Change_Elesis_SK` / `_PK` / `_GM` / `_BH` and data217
+  `_DK` / `_CA` are June's files as `ljconv` bytecode (same size as June's, differ only at byte 4, the 0x82 -> 0x81 header). `GetClassChangeDialogName` already names `_DK` / `_CA`.
+  `luabind.py check` on the eight: 0 unbound, ENUM 0 / 0, `RESULT: PASS`.
+- **Data:** `kom.py pack data036` + `copy`: PACK OK / COPY OK (md5 `07b3744a`, `~1 changed LevelUpEvent.lua`; backup `kom_backup_tools/data036.kom.20261113_110737`).
+- **Units** (backup `db_backup/els_db_20261113_110903_pre_char-elesis-CHNb.sql`; account `unit_slots` 130 -> 133): `ElGuideDK` 147, `ElGuideSK` 148, `ElGuidePK` 149
+  (class 8, level 14, exp 81600 = 100 below 15) and `ElGuideCA` 150 (class 35, level 34, exp 1212400 = 100 below 35).
+- **Hygiene:** no client source changed, so `flagcheck` / `junediverge --check` / `enumscan` have nothing to scan.
+- **Deploy:** full build skipped: no code change. The deployed exe (md5 `b4108783`, 2026-11-13 10:43, includes CHNa) already carries the lines:
+  `EXESTR OK: 3 of 3 found in X2_offline.exe, 26419200 B, dated 2026-11-13 10:43:12, md5 b4108783ec14ed437b94a3dacbe30d9c`.
+- **Play-test:** owed (hand-off in the commit's session). Review kickoff `kickoffs/char-elesis/CHNb-review.md` written.
+
 ## Phase CH2 - Skills: Knight and the first jobs (classes 8, 29, 30, 35)
 
 **Run with:** Sonnet 5.5 high (transcription from CH0's map), one Opus review at CH2d (covers CH2a-CH2d), user play-test per phase. Flag
