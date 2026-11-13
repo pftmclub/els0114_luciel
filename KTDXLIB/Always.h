@@ -13032,3 +13032,11 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              @324e79a3-324e7a71 ): the old Ruben-prologue pictures are set only on the exiting-tutorial branch. Revert: comment out the #define ( JUNE_TUTORIAL_ROOM_LOADING ).
 #define SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t4b - the quick-quest dialogs sit at June's y 173 + 22 i ( CX2UIQuestNew ctor 323d0ca0 ), not March's 143, so the
+//              tutorial guide's quest highlight ( scenes 211 / 202 / 411 ) lands on them. Revert: comment out the #define ( JUNE_QUICK_QUEST_POS ).
+#define SERV_IRUHADEV_JUNE_QUICK_QUEST_POS
+//////////////////////////////////////////////////////////////////////////

@@ -594,6 +594,32 @@ tutorial dungeon; ErrorLog.txt clean. Not seen: 201 (village re-entry with 11005
 off the quick-quest list. Cause (this session, June `323d0ca0` @`323d18c5`-`323d190c`): June's ctor places the quick-quest dialogs at y
 `173 + 22 * i`, March's at `143 + 22 * i` (`X2UIQuestNew.cpp:359`); the GFx timelines are drawn for June's. Fix phase C3z-4t4b (kickoff written).
 
+## C3z-4t4b - Done (2026-11-13, Opus 5.5 high): the quick-quest list at June's y, under the tutorial's quest highlight
+
+Flag `SERV_IRUHADEV_JUNE_QUICK_QUEST_POS` (no dependencies). One site: the `CX2UIQuestNew` ctor's quick-quest `SetPos`
+(`X2UIQuestNew.cpp:359`) is y `173 + 22 * i` under the flag, March's `143 + 22 * i` in `#else`. Review: `C3z-4t4-review.md` item 3 covers it.
+
+- **June's values, read from `unpacked_x2.exe`** (ctor `323d0ca0` @`323d18c5`-`323d190c`): x float `33493cd8` = 810.0, step double `33474d68` =
+  22.0, base double `33493cd0` = 173.0. March's `g_fQuickQuestMinimizeSizeY` (`X2UIQuestNew.h:11`) is 22.f, so only the base differs.
+- **No other absolute quick-quest position (kickoff item 1).** March: `ExpandUIQuickQuest` / `MinimizeUIQuickQuest` (:7953 / :7981 now) move the
+  slots below by `+-(fExpandSizeY + 4)` from their current y; the complete particle (:9158) reads the dialog's y. June: `UpdateQuickQuestDLG`
+  `323dd640` calls no `SetPos` (`31cd2060`); `MinimizeAllUIQuickQuest` / `ExpandAllUIQuickQuest` `323c96c0` @`323c9793` / `323c98c0` @`323c9b56`
+  are relative (GetPos `+0x30/+0x34` -/+ the step); `SetUIQuickQuestSlotInfo` `323da7a0` @`323da895` restores the pos saved at slot `+0x560`, which
+  only the 2017 event slot setters `323db830` / `323dc470` write (they also shift relative: `+0x560` + double `33487bb0`); those are Stage 19's and
+  never run offline.
+- **Rest of June's ctor (kickoff item 2): untouched.** Nothing else in it moves what scenes 211 / 202 / 411 point at; 411's instant-complete
+  button is a control of the same dialog, so it moves with it.
+- **Other right-side dialogs (kickoff item 3): no code offset.** The quick-quest show checkboxes (`m_pCheckListQuickQuest` /
+  `m_pCheckDetailQuickQuest`) are controls of the quest list / detail dialogs, placed by `SetPosition`'s caller as before. `X2PartyUI.cpp` sets no
+  absolute position on the party window or the bottom menu (`DLG_UI_PARTY_BOTTON_NEW*.lua`; positions come from the dialog files); 503-505 were
+  walked in the C3z-4t4 play-test with no offset reported. Nothing routed.
+- **Hygiene.** flagcheck `--worktree --files` (2): X2UIQuestNew.cpp PASS (+5, the plain `#else` is the one tokenless line), Always.h OTHER (a
+  peer's uncommitted Elesis block move; this phase's 8 lines appended at the end), 0 deleted lines, 0 non-ASCII, 0 encoding changes, `RESULT: PASS`.
+  junediverge `--check` (2 files) `RESULT: PASS`. enumscan: 0 A/B rows.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,437,632 B, dated 2026-11-13 14:18:11, md5 8cc8dc3d (built at main 76a33020 + 12 uncommitted code files, peers' included). No new strings, so no exestr check.
+- **Play-test owed** (hand-off in the STATUS row's session): a new level-1 character, scene 211's highlight on the quick-quest entry, 411's on the
+  instant-complete button; Ruben out and back with 11005 going for `begin 201 ( by going quest )`.
+
 ## C3y-2 - Done (2026-11-13, Opus 5.5 high): June's class tutorial dungeons for the March classes
 
 A new March character's first select now enters June's class tutorial dungeon (`DI_DUNGEON_TUTORIAL_<class>`, 41150-41290) in place of

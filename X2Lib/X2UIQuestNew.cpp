@@ -356,7 +356,12 @@ m_byNumOfItemThatICanGet( 0 )	// kimhc // 2009-12-18 // 가질수 있는 선택 보상 아
 		m_vecUIQuickQuest[i].m_pDLGUIQuickQuest->SetShowEnable(false, false);
 		m_vecUIQuickQuest[i].m_pDLGUIQuickQuest->SetDisableUnderWindow(true);
 
+#ifdef SERV_IRUHADEV_JUNE_QUICK_QUEST_POS
+		// june-dungeons C3z-4t4b: June 323d0ca0 @323d18c5, y 173 is where the tutorial guide's quest highlight points
+		m_vecUIQuickQuest[i].m_pDLGUIQuickQuest->SetPos(D3DXVECTOR2(810.f, 173.f + (_CONST_UIQUESTNEW_INFO_::g_fQuickQuestMinimizeSizeY * i)));
+#else
 		m_vecUIQuickQuest[i].m_pDLGUIQuickQuest->SetPos(D3DXVECTOR2(810.f, 143.f + (_CONST_UIQUESTNEW_INFO_::g_fQuickQuestMinimizeSizeY * i)));
+#endif SERV_IRUHADEV_JUNE_QUICK_QUEST_POS
 			
 
 		m_vecUIQuickQuest[i].m_pButtonMinimize = (CKTDGUIButton*) m_vecUIQuickQuest[i].m_pDLGUIQuickQuest->GetControl( L"ButtonMinimize" );
