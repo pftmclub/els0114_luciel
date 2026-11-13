@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | NU3 review, char-chung Z (user, 2026-11-02: every Lu/Ciel code phase waits for it) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` |
-| Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | kickoffs/char-luciel/DU1-review.md (Opus 5.5 high; the phase writes it when done) |
 
 ## Read first (and nothing else from the plan doc unless you need it)

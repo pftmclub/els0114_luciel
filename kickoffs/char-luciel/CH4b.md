@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | CH4a |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE` |
-| Log tag | `[JUNE_CHAR]` (`LUCIEL PASSIVE`) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (`LUCIEL PASSIVE`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | kickoffs/char-luciel/CH4b-review.md (Opus 5.5 high; the phase writes it when done). **It covers CH4a, CH4b** (user, 2026-11-10): every covered Done note, `flagcheck --range` over all of them, `--check-all`, retires any debug define |
 
 ## Read first (and nothing else from the plan doc unless you need it)

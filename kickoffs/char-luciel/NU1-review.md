@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | Phase NU1 done (its Done note and commit) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE` |
-| Log tag | `[JUNE_CHAR]` (`LUCIEL NEWUNIT`) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (`LUCIEL NEWUNIT`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 
 ## Read first
 

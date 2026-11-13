@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | NU1 review |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA` (rows), `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET` (parser) |
-| Log tag | `[JUNE_CHAR]` (`LUCIEL DATA`) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (`LUCIEL DATA`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | kickoffs/char-luciel/NU3-review.md (Opus 5.5 high; the phase writes it when done) |
 
 ## Read first (and nothing else from the plan doc unless you need it)

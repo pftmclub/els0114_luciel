@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | CH0 (may run before char-chung Z: assets only) |
 | Flag | none (assets; `_ASSET` only if a June asset breaks a March reader) |
-| Log tag | `[JUNE_CHAR]` (ErrorLog diff) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (ErrorLog diff) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | none (user play-test: select-screen pass) |
 
 ## Read first (and nothing else from the plan doc unless you need it)

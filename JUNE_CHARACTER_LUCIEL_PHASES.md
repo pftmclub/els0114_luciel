@@ -98,7 +98,7 @@ The Chung plan's Rules hold (`python tools/docsection.py JUNE_CHARACTER_CHUNG_PH
 | Ghidra | `ghidra` skill; range `0x32ae4080-0x32b4e76f`, vtable `334f06fc` (547 slots), ctor `32b1bd90`, dtor `32b39380`, InitState `32b43d10` (0x7a4), InitStateCommon `32b3e8b0`, skill setter `32b46580` (0x7b4, uncarved), factory `3230f470` (case 10 in `322ced00` / `322d5bf0`) |
 | Bring June Lua in | `/x2-adopt-june` (`luasrc.py adopt-june data036 Luciel_Duo.lua Luciel_Demonio.lua`, `--dry-run` first) |
 | Stage June assets | `python tools/kom.py stage-june <list>`, `/elstools pack dataNNN`, `/x2-kom-packed copy dataNNN` (ask first) |
-| Hygiene / build / logs | `flagcheck.py <FLAG> --worktree --files ...`, `junediverge.py --check ...`, `enumscan.py --check ...`, `build.py --deploy` (background), `logs.py --grep "JUNE_CHAR LUCIEL"` |
+| Hygiene / build / logs | `flagcheck.py <FLAG> --worktree --files ...`, `junediverge.py --check ...`, `enumscan.py --check ...`, `build.py --deploy` (background), `logs.py --grep "JUNE_CHAR\] LUCIEL"` |
 | Save / test character | `/x2-db`, `/x2-create-char <name> <class> <level>` (NU4 teaches `createchar.py` the seven classes) |
 | Dev console | auth level 3, END key; `/additem <id> [qty]`, `/qdone <id>`, `/tc 1` |
 
@@ -420,6 +420,37 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE` (Always.h). Log `[
 - **Play-test 2 (user, 2026-11-14): passed** - ErrorLog lines 634-636 at startup: types 10 (`LUCIEL_DUO.LUA`), 11, 12 skipped; none for 1-9;
   0 XEM_ERROR144 / 148, 0 EXCEPTION. The run's nine empty-name KEM_ERROR72 follow missing movie subtitle scripts (`RAVEN_OUT.LUA`,
   `MOVIE_CREATE_RENA_BASE.LUA`, `[JUNE_ENGINE] UI MOVIE subtitle script NOT loaded`): not NU1.
+
+### NU1 - Review (2026-11-14)
+
+Opus 5.5 high. **Verdict: pass, no code change.** Covers `18460a26` + fix 1 `6ffe57ee` against `nu0_unit_type_sites.tsv` and the NU1 kickoff.
+- **Enum:** with the flag `UT_LUCIEL` 10, `UT_ROSE` 11, `UT_AIN` 12, `UT_END` 13 (June `Enum.src.lua:313`); `UT_NONE`..`UT_ADD` untouched; flag off =
+  March's enum incl. the `JUNE_ENUM_NAMES` block (flagcheck PASS, 0 deleted). No `case UT_END` and no Lua binding of `UT_END` exists.
+- **`UT_END` re-grep** (`X2Lib`, `KTDXLIB`, `X2`; 60 hits): every live site is a NU0 row. `widen` rows reach 13 unedited (array, script loop,
+  getter `X2UnitManager.cpp:690` / `:702`, `InvalideDataCheck:195`, item-parse type check `:683`, picture loops `X2StateDungeonRoom.cpp:2912`,
+  `X2StatePVPResult.cpp:2258`, `X2StatePVPRoom.cpp:3814`: each null-checks `GetPicture(i)` and `CKTDGUIStatic::GetPicture` bounds the index,
+  `KTDGUIStatic.cpp:524`). The harmless live ones are the four the Done note names (`X2OfflineCashShop.cpp:174`, `X2ItemManager.cpp:547/594`,
+  `X2StateCreateUnit.cpp:4021`, `X2GUUser.cpp:51010`). Dead: `X2BeginningGame`, `X2StateBeginning`, the old `Select*` loops, `X2Item.h`,
+  `X2BuffDisplayerTemplet.cpp:1257` and `X2StateClassChange.cpp:943` (`#else` of June bodies), `X2StateServerSelect.cpp:3399` (block comment).
+  No unnamed live site.
+- **Script table:** 13 entries (index 10 `LUCIEL_DUO.LUA`, 11 / 12 NULL); the `BOOST_STATIC_ASSERT` holds the size; slot 0 is skipped silently
+  (`> UT_NONE`), a missing or unmounted script takes March's NULL branch and logs once per type.
+- **Class guards:** `X2ItemManager_Preprocessing.cpp` `UC_NONE .. UC_AIN_ANGEL` = June `325bd515` (`cmp 0xca; jbe`); `X2ItemStatCalculator.cpp`
+  `UC_ELSWORD_LORD_KNIGHT .. UC_AIN_APOSTASIA` = June `328d6ae1` / `328d6b30` (`mov esi,0x64` ... `cmp esi,0x89; jl`). `X2SocketItem.cpp:2899`:
+  one copy (char-ara CHNa), no second.
+- **`ChangeUnitButtonInfo`:** June `325651bd-325651d0` = templet NULL (`[ebx+0xaf0]`), type `<= 0`, or `>= 0xd` -> STR 707 (0x2c3) box; arguments
+  match (0x2d `DLG_UI_Selection_MessageBox_Ok_Button_New.lua`, 0x18 `UI_PopUp_Negative_01.ogg`). The unconditional templet read after it
+  (`XSkinMeshReady`) is March's, unchanged.
+- **Leave rows:** `X2OfflineStatTable` identity pinned to `<= UT_ADD`; `X2GameEdit.cpp` untouched.
+- **Ghidra spot-checks (read-only):** `3237a6b3 cmp eax,0xc; jbe` (getter `<= 12`), `328d6ad4 cmp esi,0xd` / `328d6b30 cmp esi,0x89`,
+  `325651cd cmp eax,0xd; jl`: all equal the code.
+- **Hygiene:** flagcheck `--base 18460a26^ --files <6 code files> KTDXLIB/Always.h`: `files: 6 PASS, 0 PASS~ (blank/marker only), 1 DEFINE, 0 OTHER
+  (other flags), 0 FAIL, 0 ERROR`; `in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0
+  #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. junediverge `--check-all`: `RESULT: PASS` (232 allow-listed).
+- **Play-test logs** (exe 917b9e3c, run 01:18:45): ErrorLog 634-636, three `LUCIEL NEWUNIT` lines (10 `LUCIEL_DUO.LUA`, 11, 12); 0 EXCEPTION.
+- **Doc fix:** the log command in 31 char-luciel kickoffs and this doc read `--grep "JUNE_CHAR LUCIEL"`, which matches nothing (the line is
+  `[JUNE_CHAR] LUCIEL ...`); now `--grep "JUNE_CHAR\] LUCIEL"` (re-run: 3 lines).
+- Build: none (no code change). NU2, NU3, DU2 ready (kickoffs checked: NU3 carries "Amended by NU1"; NU2 / DU2 need none).
 
 ## Phase DU - The two-body engine (DU1-DU5)
 

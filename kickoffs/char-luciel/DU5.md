@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | DU4 review |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW` |
-| Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | kickoffs/char-luciel/DU5-review.md (Opus 5.5 high; the phase writes it when done) |
 
 ## Read first (and nothing else from the plan doc unless you need it)

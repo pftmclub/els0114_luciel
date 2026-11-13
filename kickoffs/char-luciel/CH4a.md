@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | CH2d2 review
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE` |
-| Log tag | `[JUNE_CHAR]` (`LUCIEL PASSIVE`) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (`LUCIEL PASSIVE`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | none of its own (user, 2026-11-10): the CH4b review covers CH4a, CH4b; do not write `CH4a-review.md` (any debug define stays on until then) |
 
 ## Read first (and nothing else from the plan doc unless you need it)

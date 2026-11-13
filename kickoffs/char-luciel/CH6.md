@@ -6,7 +6,7 @@
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
 | Depends on | CH3d, CH4c, CH5, TU reviews |
 | Flag | none (fixes go back to their phase's flag) |
-| Log tag | `[JUNE_CHAR]` (`LUCIEL *`) (`python tools/logs.py --grep "JUNE_CHAR LUCIEL"`) |
+| Log tag | `[JUNE_CHAR]` (`LUCIEL *`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | none (user walk) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
