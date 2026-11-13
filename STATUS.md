@@ -106,7 +106,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH3b | **ready** (CH3b0 reviewed 2026-11-14): Blazing Heart (121) special actives (CH0 split) | Sonnet 5.5 / high, user play-test | CH3a2, CH3b0 review | `X2GUEL.*` | `CH3b.md` |
+| CH3b | **play-test owed** (2026-11-14; 7 skills on unit 30 ElesisBH, DEPLOY OK ae6ac230): Blazing Heart (121) special actives; no review of its own | Sonnet 5.5 / high, user play-test | CH3a2, CH3b0 review | `X2GUEL.*`, `X2GUUser.*` | `CH3b.md` |
 | CH3b2 | blocked (CH3b): Blazing Heart actives 28210 / 28211 / 28223 (CH0 split) | Sonnet 5.5 / high, user play-test | CH3b | `X2GUEL.*` | `CH3b2.md` |
 | CH3c | blocked (CH3b2): Crimson Avenger (125) skills | Sonnet 5.5 / high, user play-test | CH3b2, CHNb review | `X2GUEL.*` | `CH3c.md` |
 | CH3d | blocked (CH3c): hyper actives + transcendence rows 120 / 121 / 125; CH3 stage review (CH3a-CH3d) | Opus 5.5 / high, Opus review, user play-test | CH3c | `X2GUEL.*`, `Handlers_Quest.cpp`, data036 | `CH3d.md` |

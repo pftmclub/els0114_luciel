@@ -687,7 +687,7 @@ June's `CKTDGLineMap::GetLandPosition( pos, bool bMonster, fRadius, pLineIndex )
 true. W1c ports it with the March signature meaning `true` and gives June's `false` to the 10 shared user sites. Class code that calls it
 passes the bool June passes (`june2017_re/w1c_land_position_callers.tsv`): Eve's Dimension Link states pass `true` (already March's). June adds
 a call March lacks in Add's `ANSI_A_AN_PHASE_SHIFT_BLINK_StateStart` (`32a176c0` @`32a1787e`, `true`: lands the return position, March
-`X2GUAdd.cpp:8224` sets it unlanded) and in an Elesis anim-event NPC create (`32b7a0a0` @`32b7a354`, `true`, NPC `0x663` / `0x7b3`). Ain
+`X2GUAdd.cpp:8224` sets it unlanded) and in an Elesis anim-event NPC create (`32b7a0a0` @`32b7a354`, `true`, NPC `0x663` / `0x7b3`) (Elesis: CH3b, `ESI_SI_SA_SBH_WALL_OF_PROMINENCE_FrameMove` lifts the wall's y with `GetLandPosition( pos, true, LINE_RADIUS, &index )`). Ain
 (`32a69467` `false` then `32a6989f` `true`), Rose and Luciel (all `true`) come with their classes. Lu/Ciel's minor-body block in
 `CX2GUUser::PhysicProcess` (`@320194bb`, `false`) belongs with 7o.
 
@@ -912,7 +912,7 @@ June's decide-page ACK (`3220f2b0`) has two class branches after `InitEquippedAc
 - **Class 13 after-image toggle:** June's base of user vslot 0x850 (`31fd8230`) toggles the after-image `+0x194 / +0x1d1` for class 13 before
   `OnFrameMove`; the CH1l hook `JuneAfterImageFrameMove` keeps March's plain call in the base. Port the toggle with that class.
 - **`+0x9440`, the MP a reserved skill spent** (written @32057ce2 in CommonStateStart): read only by `32b60650` / `32b63be0`. Name that class and
-  write it into a CX2GUUser member before its states read it. (Elesis: CH2b, `m_fSkillStartMpConsumed` written in `CountReservedSkillUse` around `ReservedSkillStart`, read by Critical Dive's EventProcess `32b60650`; `32b63be0` Blazing Dance Finish stays with CH3b)
+  write it into a CX2GUUser member before its states read it. (Elesis: CH2b, `m_fSkillStartMpConsumed` written in `CountReservedSkillUse` around `ReservedSkillStart`, read by Critical Dive's EventProcess `32b60650`; `32b63be0` Blazing Dance Finish stays with CH3b) (Elesis: CH3b, `ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_EventProcess` refunds it x ( 7 - strikes made ) x 0.1 at the animation end)
 - **New CX2GUUser hooks for every class** (LIVE): `JuneAfterEquipSlotChange` (0x654), `JuneAfterImageFrameMove` (0x850), `JuneSummonedNPCInfo` (0x860), (Elesis: CH1k)
   `JuneReservedSkillStart` (512), and the virtual `UpdateEquipCollisionData( vector& )` (0x638). A class port overrides the ones June's class overrides.
 

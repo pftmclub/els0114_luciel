@@ -1921,6 +1921,43 @@ defined only in `ServerDefine.h`, which KTDXLIB never sees, and CH3b0's one-file
 `SERV_RAVEN_VETERAN_COMMANDER`); the rest of the guard stays in `Always.h`. flagcheck `--worktree --files Always.h X2GUEL.cpp`: `1 PASS, 1 OTHER, 0 FAIL`, `RESULT: PASS`.
 `DEPLOY OK: X2_offline.exe is 26,488,832 B, dated 2026-11-14 02:08:40, md5 e9dee3d698e1420fe434100dcb726b2a`.
 
+### CH3b - Done (2026-11-14)
+
+Sonnet 5.5. Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`; `_SKILL_DEBUG` stays on until the CH3d review retires it. No review of its own ( the CH3d review covers CH3a-CH3d ).
+All 24 class-map rows read from `charport_adis.py elesis --phase CH3b`, the Ghidra decompiles of `32b7ad80` / `32b63be0` / `32b7a0a0` / `32008a20` and the registration `32b8c470`: **16 written** ( 11 inside March's
+functions, 5 new ) + the shared cone seek `32008a20` + the registration, **8 = March / no code** ( the four preload lists of Eternal Fire / Wall of Prominence / Blaze Wing / Blazing Dance START, START `EventProcess`,
+FINISH `StateEnd`, FINISH `FrameMoveFuture`; Soul Ignition's Init is a bare `ret` ) . `funcmap.tsv` rows `Char Elesis CH3b` ( 26 ).
+- **Registration:** June ids as labels on March's cases ( Eternal Fire 28015 / 28051, Blaze Wing 28017 / 28053, Wall of Prominence 28018 / 28054; Blazing Dance 28016 / 28052 and, through CH1n's memo arm, 28032 / 28061 );
+  Blazing Dance's case body is June's ( START: Init, StartFuture, Start, EventProcess; hyper: StartFuture, Start, EventProcess; then the 1ST / ATTACK_BACK / ATTACK_FRONT / FINISH states ), March's is in the `#else`.
+  New cases Burst Rising 28041, Ignis Crasher 28042 ( EventProcess only ) and Soul Ignition 28063 ( `GenericSpecialActiveSkillEventProcess`; June's Init is a bare `ret` ). 7 enum names in `X2SkillTree.h` ( `JUNE_ENUM_NAMES` ).
+- **What June differs in:**
+
+| June | Function | Difference |
+|---|---|---|
+| `32b5ee60` / `32b634f0` / `32b637f0` | Eternal Fire / Wall of Prominence / Blaze Wing `EventProcess` | listing-identical to Infernal Blade's `32b5eb60` ( diffed ): the walk / back-walk / dash / Z-X cancels need the foot on a line |
+| `32b6c2d0` / `32b6c5d0` | Burst Rising / Ignis Crasher `EventProcess` ( new ) | the same template; Ignis Crasher ends in `USI_JUMP_DOWN` |
+| `32b7a0a0` | Wall of Prominence `FrameMove` | the 0.454 s damage effect is gone: at the 0.01 s oneshot the cone seek `32008a20` picks the nearest enemy ( abilities `SA_SCOPE_ABS` / `_Y` / `_Z` / `SA_PROJECTILE_RANGE_REL` of the state skill, defaults 180 / 180 / 180 / 1000 ), else `GetFixedDistancePositionInAllLine` 120 ahead, else `GetPos`; land lift with `bMonster` true ( checklist 7y ); CH3b0's `CreateWallOfProminenceNPC` |
+| `32008a20` | cone seek ( new shared `CX2GUUser::GetNearestTargetAimDegree( AimTargetCone, pos )` ) | `32008660`'s sibling: a block of up / down / yaw / reach, an NPC must be class BASIC unless the block's flag byte is set, out = hit position ( 9999 x3 when none ); the caster's other two June callers are `32ab4600` / `32ab4a70` |
+| `32b7a520` | Blazing Dance START `StartFuture` ( new ) | hit list cleared here, last target uid -1, line range 99999 then `SA_SCOPE_ABS_Z`, search range from `SA_SCOPE_ABS` ( `_PVP` in PvP / PvE ), strike count 0 |
+| `32b517a0` | START `StateStart` | keeps the start position ( `+0x96c8` ) instead of clearing the hit list |
+| `32b80e90` / `32b80ee0` | 1ST ( shared with BACK / FRONT ) / FINISH `StartFuture` | strike count +1 ( max 100 ), from the 7th strike `UpNowMp( -20 )`; FINISH counts a strike only after a target was found and sets the last-attack flag |
+| `32b63b20` / `32b63b80` | 1ST / FRONT and BACK `EventProcess` | `CommonEventProcess` first; no target -> FINISH; at the animation end `CanBlazingDanceContinue` ( `32b51930` ) picks BACK / FRONT or FINISH. March's 2ND / 3RD / 4TH are no longer registered |
+| `32b63be0` | FINISH `EventProcess` | at the animation end the unused share of seven strikes refunds `m_fSkillStartMpConsumed x ( 7 - strikes ) x 0.1` ( checklist 7al ), `USI_JUMP_DOWN` ( y -= 30 ) off a line, else WAIT; cancels need the foot on a line |
+| `32b7ad80` / `32b6f8b0` | target search / target test | March's two functions replaced: bosses of a raid and NPCs that escape lock-on skipped ( `+0x8fb6` ); in PvP / PvE the target's distance from her facing line must be within `+0x975c`; a unit on the hit list is skipped, then a listed unit that is not the last target, then the last one; reach = `+0x97b4` squared in double; the target spot is the unit's bone nearest her on the lines ( its own position when that is within 500 ); no line-type or can-down test |
+
+- **Kept as June has it:** the yaw fold `360 - yaw` in the cone seek ( the same as `32008660` ); the target spot falls back to the unit's own position only when the bone point is within 500 ( `32b6f9ac` ); the second-chance search skips the PvP line-distance test. No `JUNE_BUGS` row: none of these is clearly unintended.
+  Stand-in: a null line map in the Wall of Prominence fallback ( June dereferences it ) falls back to `GetPos`.
+- **Not here, routed:** Flame Sword / Scalet Rose upgrade ids 28231 / 28232 ( CH0 tagged them CH3b ) label CH3b2's own cases ( 28210 / 28231, 28211 / 28232 ): `kickoffs/char-elesis/CH3b2.md` is amended. `m_fWallOfProminenceLifeTime` ( March's damage-effect life time ) is no longer read by June's FrameMove: CH4a's `InitPassiveSkillState` leaves it.
+  `NUM use`: all seven skills are numerical-only tables read by the engine ( `MODS.md` "Stage 7 Elesis, CH3b" ). No `SetEquippedSkillLevel` work ( CH1i wrote Blazing Dance's block; the other six have none ).
+- **Checklist** `(Elesis: CH3b ...)`: 7y ( `GetLandPosition` bMonster ) and 7al ( `+0x9440` read by Blazing Dance Finish ).
+- **Hygiene:** `flagcheck JUNE_CHAR_ELESIS_SKILL --with _SKILL_DEBUG --worktree --files ...`: `5 PASS ( Always.h +3, X2GUEL.cpp +474, X2GUEl.h +15, X2GUUser.cpp +61, X2GUUser.h +12 ), 1 OTHER ( X2SkillTree.h = JUNE_ENUM_NAMES ), 0 FAIL`, 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 untokened, 0 encoding change; `RESULT: PASS`.
+  `junediverge --check` the 5 files ( spell `X2Lib/X2GUEL.cpp`, the allow-list is case-sensitive ): `allow-listed: 17`, `RESULT: PASS`. `enumscan --check X2GUEL.cpp X2GUUser.cpp`: `0 A/B row(s) remain`.
+  `stateends.py check X2GUEL.cpp ELESIS_KNIGHT`: 309 tables, 0 STUCK, `RESULT: PASS`. `luabind check ELESIS_KNIGHT`: `RESULT: PASS`. `skillicons check` 28015-28018 / 28041-28042 / 28051-28054 / 28063: `misses 0`, PASS.
+- **Deploy:** `DEPLOY OK: X2_offline.exe is 26,493,440 B, dated 2026-11-14 02:51:13, md5 ae6ac23005d46b8ad1fefdf5b67d64de, equal to X2/US_SERVICE/x2.exe (2026-11-14 02:51:05); built at main 0343cf6b + 6 uncommitted code file(s).` `EXESTR OK` ( md5 ae6ac230 ): narrow `ESI_SA_SBH_BURST_RISING`, `ESI_SA_SBH_IGNIS_CRASHER`, `ESI_SA_SBH_SOUL_IGNITION`; wide `blazing dance target uid`.
+- **Save:** unit 30 ( `ElesisBH`, class 121, lv 80, not transcended; backup `db_backup/els_db_<stamp>_pre_sql.sql` ): A 0 Eternal Fire 28015, A 1 Blazing Dance 28016, A 2 Blaze Wing 28017, A 3 Wall of Prominence 28018; B 5 Burst Rising 28041,
+  B 6 Ignis Crasher 28042, B 7 Soul Ignition 28063 ( 28017 / 28042 / 28063 newly learned at level 1; the earlier slots are cleared; slots 4 / 8 / 9 empty ). Upgrade ids not learned.
+- **Play-test:** owed ( see the hand-off ). Log tag `[JUNE_CHAR]` ( `ELESIS SKILL`, `ELESIS SUMMON`, `SUMMON` ).
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, one Opus review at CH4c (covers CH4a-CH4c), user play-test (three engine pieces, planned as three from the start).

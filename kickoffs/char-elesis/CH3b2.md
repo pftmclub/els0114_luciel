@@ -60,3 +60,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   thunk `32b90830`, `@32b8e372`). The same state's Start `32b51550` zeroes `m_ucScaletRoseHitCount` (+0x9788): write it here. The per-hit increment is the attack-result
   delegate `32b524b0` that `InitPassiveSkillState` pushes when 28211 is learned (CH4a); until CH4a the count stays 0 and the End spawns nothing, so this phase's play-test
   checks the End runs (no stuck state) and CH4a's checks the blossoms (`[JUNE_CHAR] ELESIS SUMMON req npc 1567 scalet rose <i> of <n> ...`, `[JUNE_CHAR] SUMMON npc 1567 ... skill 28211`).
+
+## Amended by CH3b (2026-11-14)
+
+- **Upgrade ids:** 28231 / 28232 (Flame Sword / Scalet Rose upgrades, tagged CH3b by CH0) label this phase's own cases (28210 / 28231, 28211 / 28232): add them as labels on March's cases together with the bodies. CH3b did not label them.
+- Scalet Rose's success blossoms (June `32b79db0`, `m_ucScaletRoseHitCount` +0x9788) are CH3b0's; this phase writes the hit-count increments.

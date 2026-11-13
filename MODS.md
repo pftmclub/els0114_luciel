@@ -6989,3 +6989,23 @@ and `X2ServerProtocol_2010.vcxproj`'s X2TOOL defines (`SERV_IRUHADEV_JUNE_CHAR_U
   `CX2Main::ChangeUnitClass` follow. `[JUNE_CHAR] LUCIEL NEWUNIT` logs once per unit whose class a char would have wrapped. Packet sizes
   grow by one byte per member; the save is unchanged (the class was already an int there).
 - **Revert:** comment out all three defines together, `python tools/build.py --deploy --pch force` (CommonPacket.h is in the PCH).
+
+## Stage 7 Elesis, CH3b: Blazing Heart (121) special actives Eternal Fire, Blazing Dance, Blaze Wing, Wall of Prominence, Burst Rising, Ignis Crasher, Soul Ignition (char-elesis CH3b, 2026-11-14)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for the CH3d review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** June's ids join March's cases: Eternal Fire 28015 / 28051, Blazing Dance 28016 / 28052 ( and the memo ids 28032 / 28061 through the memo arm ), Blaze Wing 28017 / 28053,
+  Wall of Prominence 28018 / 28054; new cases Burst Rising 28041, Ignis Crasher 28042, Soul Ignition 28063 ( EventProcess only; its buff is CH3b0's ). Eternal Fire, Blaze Wing, Wall of Prominence,
+  Burst Rising, Ignis Crasher: the walk / back-walk / dash / Z-X cancels need the foot on a line ( Ignis Crasher falls to JUMP_DOWN at the end of the motion ).
+  Wall of Prominence: the wall is an NPC now ( CH3b0 ): at 0.01 s the nearest enemy in the skill's cone ( up / down / yaw degrees and reach from the skill's data, 180 / 180 / 180 / 1000 without ) takes the wall,
+  else it stands 120 ahead on the lines, else on her; the height is lifted to the line below. March's 0.454 s damage effect is in the #else.
+  Blazing Dance: the strike chain is START -> first -> back -> front -> back ... -> FINISH ( March: first, second, third, fourth, FINISH ); the target search reaches as far as the skill's data says ( SA_SCOPE_ABS, PvP / PvE:
+  SA_SCOPE_ABS_PVP ), skips bosses of a raid and NPCs that escape lock-on, tries a unit not hit yet first, then a unit hit before ( not the last one ), then the last one; the last strike returns her to where she started ( or the last
+  lined target spot ); from the seventh strike on every strike costs 20 MP; the dance goes on while fewer than six strikes are made ( the transcended memo: while she has 20 MP ); at the end the unused share of seven strikes refunds
+  MP ( the MP the skill start spent x ( 7 - strikes ) x 0.1 ).
+- **Shared.** `X2SkillTree.h`: `RNSI_SA_SBH_ETERNAL_FIRE` 28015, `_BLAZE_WING` 28017, `_BURST_RISING` 28041, `_IGNIS_CRASHER` 28042, `_ETERNAL_FIRE_UPGRADE` 28051, `_BLAZING_DANCE_UPGRADE` 28052, `_BLAZE_WING_UPGRADE` 28053
+  ( `JUNE_ENUM_NAMES` ). `X2GUUser.*`: `CX2GUUser::GetNearestTargetAimDegree( AimTargetCone, vTargetPos )` ( June 32008a20, the sibling of 32008660; two more June classes call it ).
+  `Always.h`: a second dependency guard for `_SKILL` ( `_SUMMON`, `JUNE_USER_AIM_TARGET`, `JUNE_NPC_ESCAPE_FROM_LOCK_ON`, `ELYSION_INVINCIBLE_ATTACK_TYPE` ).
+- **Damage.** All seven skills' damage tables are June's numerical-only DAMAGE_DATA blocks, read by the engine ( no March row exists: `skill_in_march_templets` False in `plan_numerical_rows.tsv` ); this phase changes no number.
+  June's L1 values ( x100, PvP rate ): Eternal Fire 220 ( 0.28 ), Burst Rising 462 ( 0.4 ), Blaze Wing main 1443 ( 0.28 ), Blazing Dance main 1544 / sub 288 / final 288 ( 0.28 ), Wall of Prominence main 279 / sub 70 ( 0.28 ),
+  Ignis Crasher 286 ( 0.4 ), Soul Ignition 3534 ( 0.28 ). The play-test emits no `NUM use` line ( as CH2b-CH3a2 ).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.

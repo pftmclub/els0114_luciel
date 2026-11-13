@@ -4131,6 +4131,18 @@ public:
 #ifdef SERV_IRUHADEV_JUNE_USER_AIM_TARGET
 		bool GetTargetHitPos( IN const CX2GameUnit* pTarget_, IN const bool bCenter_, IN const BYTE byMode_, OUT D3DXVECTOR3& vOut_ );	/// June 31fd5ef0
 		D3DXVECTOR3 GetNearestTargetAimDegree( IN const float fMaxUpDegree_, IN const float fMaxDownDegree_, IN const float fYawRangeDegree_, IN const float fMaxDistance_ );	/// June 32008660
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+		struct AimTargetCone	/// char-elesis CH3b: June 32008a20's parameter block ( byte flag, then up / down / yaw degrees and the reach )
+		{
+			bool	m_bAnyNpcClass;	/// false: only an NPC of class NCT_BASIC is a target
+			float	m_fMaxUpDegree;
+			float	m_fMaxDownDegree;
+			float	m_fYawRangeDegree;
+			float	m_fMaxDistance;
+			AimTargetCone() : m_bAnyNpcClass( false ), m_fMaxUpDegree( 0.f ), m_fMaxDownDegree( 0.f ), m_fYawRangeDegree( 0.f ), m_fMaxDistance( 0.f ) {}
+		};
+		D3DXVECTOR3 GetNearestTargetAimDegree( IN const AimTargetCone& kCone_, OUT D3DXVECTOR3& vTargetPos_ );	/// char-elesis CH3b: June 32008a20 ( the nearest target in the cone: its degrees, and its hit position out; 9999 x3 when none )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #endif SERV_IRUHADEV_JUNE_USER_AIM_TARGET
 #ifdef SERV_IRUHADEV_JUNE_USER_NUMERICAL_BY_NAME
 		float GetSkillNumericalByName( const WCHAR* pwszName_, const int iSkillID_, const bool bUpgradeSwap_ ) const;	/// June 32007910

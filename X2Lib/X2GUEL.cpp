@@ -329,6 +329,34 @@ namespace _CONST_EL_CH3A2_
 	const float		PROVOKE_REVENGE_MP_CONSUME		= 10.f;	// MP the second press of the skill key spends ( UpNowMp( -10 ) )
 }
 using namespace _CONST_EL_CH3A2_;
+// char-elesis CH3b: constants of the Blazing Heart special actives ( June 32b51930 / 32b63be0 / 32b6f8b0 / 32b7a0a0 / 32b7a520 / 32b7ad80 / 32b80e90 )
+namespace _CONST_EL_CH3B_
+{
+	const float		WALL_OF_PROMINENCE_SPAWN_EVENT_TIME			= 0.01f;
+	const float		WALL_OF_PROMINENCE_DEFAULT_SCOPE_DEGREE		= 180.f;	// the up, down and yaw reach of the target seek when the skill data has none
+	const float		WALL_OF_PROMINENCE_DEFAULT_SCOPE_DISTANCE	= 1000.f;
+	const float		WALL_OF_PROMINENCE_NO_TARGET_DISTANCE		= 120.f;	// the wall stands this far ahead of her when no target is in reach
+	const float		SEEK_NO_TARGET_POSITION						= 9999.f;	// the seek's out position when it found nothing
+	const float		BLAZING_DANCE_NO_RANGE_LIMIT				= 99999.f;
+	const int		BLAZING_DANCE_MAX_ATTACK_COUNT				= 100;
+	const int		BLAZING_DANCE_EXTRA_COST_FROM_COUNT			= 7;	// a strike from this count on costs MP
+	const float		BLAZING_DANCE_EXTRA_ATTACK_MP_COST			= 20.f;
+	const int		BLAZING_DANCE_CONTINUE_BELOW_COUNT			= 6;	// a next strike needs fewer strikes than this
+	const float		BLAZING_DANCE_MEMO_CONTINUE_MIN_MP			= 20.f;
+	const int		BLAZING_DANCE_REFUND_COUNT					= 7;	// the unused share of seven strikes comes back as MP
+	const double	BLAZING_DANCE_REFUND_RATE_PER_STRIKE		= 0.10000000149011612;	// June multiplies by the double of 0.1f
+	const float		BLAZING_DANCE_FAR_TARGET_DISTANCE			= 500.f;
+
+	// June 32b7ad80 @32b7b183: a unit of the hit list, the user list first and then the NPC list
+	CX2GameUnit* FindUnitByUid( const UidType uidUnit_ )
+	{
+		CX2GameUnit* pUnit = g_pX2Game->GetUserUnitByUID( uidUnit_ );
+		if ( NULL == pUnit )
+			pUnit = g_pX2Game->GetNPCUnitByUID( static_cast<int>( uidUnit_ ) );
+		return pUnit;
+	}
+}
+using namespace _CONST_EL_CH3B_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 // char-elesis CH3b0: constants of the summons and the Blood Runaway cleanse check ( June 32b79db0 / 32b8b0c0 / 32b6fb10 )
@@ -420,6 +448,11 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 , m_iWaltzOfSwordDodgeAbility(0)
 , m_fDodgeAndSlashConsumedMp(0.f)
 , m_usBurningPhantomLoopCount(0)	// char-elesis CH2d
+, m_vec3BlazingDanceReturnPos(0.f, 0.f, 0.f)	// char-elesis CH3b
+, m_uidBlazingDanceNowTarget(-1)
+, m_fBlazingDanceLineRange(0.f)
+, m_fBlazingDanceSearchRange(0.f)
+, m_cBlazingDanceAttackCount(0)
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_usDashComboZZZLoopCount(0)	// char-elesis CH1g2
@@ -1495,6 +1528,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_SA_SPK_ETERNAL_FIRE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SBH_ETERNAL_FIRE:	// char-elesis CH3b: June 32b8c470 @541
+	case CX2SkillTree::RNSI_SA_SBH_ETERNAL_FIRE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{ // 이터널 파이어
 		 	m_LuaManager.MakeTableReference( "ESI_SI_SA_SPK_ETERNAL_FIRE", normalStateData.stateID );
 		 	normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SPK_ETERNAL_FIRE_Init );
@@ -1522,6 +1559,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_SA_SBH_WALL_OF_PROMINENCE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SBH_WALL_OF_PROMINENCE:	// char-elesis CH3b: June 32b8c470 @577
+	case CX2SkillTree::RNSI_SA_SBH_WALL_OF_PROMINENCE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//파이어 월
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_WALL_OF_PROMINENCE", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_WALL_OF_PROMINENCE_Init );
@@ -1534,6 +1575,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_SA_SBH_BLAZE_WING:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SBH_BLAZE_WING:	// char-elesis CH3b: June 32b8c470 @570
+	case CX2SkillTree::RNSI_SA_SBH_BLAZE_WING_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//블레이즈 윙
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZE_WING", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZE_WING_Init );
@@ -1544,6 +1589,56 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_SA_SBH_BLAZING_DANCE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE:	// char-elesis CH3b: June 32b8c470 @548 ( the memo arm enters with the base id )
+	case CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE_UPGRADE:
+		{	// START carries the skill's callbacks; the strike states are registered with it ( June @32b8d389-32b8d44e )
+			m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZING_DANCE_START", normalStateData.stateID );
+			normalStateData.StateInit			= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_START_Init );
+			normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_START_StateStartFuture );
+			normalStateData.StateStart			= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_START_StateStart );
+			normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_START_EventProcess );
+
+			m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZING_DANCE_START", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+			hyperStateData.StateStart			= normalStateData.StateStart;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			{
+				UserUnitStateData stateData;
+
+				stateData.Init();
+				stateData.stateID			= ESI_SI_SA_SBH_BLAZING_DANCE_1ST;
+				m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZING_DANCE_1ST", stateData.stateID );
+				stateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_1ST_StartFuture );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_1ST_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID			= ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK;
+				m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK", stateData.stateID );
+				stateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_1ST_StartFuture );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID			= ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_FRONT;
+				m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_FRONT", stateData.stateID );
+				stateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_1ST_StartFuture );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_1ST_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID			= ESI_SI_SA_SBH_BLAZING_DANCE_FINISH;
+				m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZING_DANCE_FINISH", stateData.stateID );
+				stateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_StartFuture );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_EventProcess );
+				stateData.StateEnd			= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_StateEnd );
+				stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_FrameMoveFuture );
+				m_StateList[stateData.stateID] = stateData;
+			}
+		} break;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//블레이징 댄스
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_BLAZING_DANCE_START", normalStateData.stateID );
 			normalStateData.StateInit			= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_BLAZING_DANCE_START_Init );
@@ -1596,6 +1691,7 @@ CX2GUEL::~CX2GUEL(void)
 				m_StateList[stateData.stateID] = stateData;
 			}
 		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	case CX2SkillTree::SI_HA_SBH_ANCIENT_FIRE:
 		{	//에이션트 파이어
 			m_LuaManager.MakeTableReference( "ESI_SI_HA_SBH_ANCIENT_FIRE", normalStateData.stateID );
@@ -1883,6 +1979,33 @@ CX2GUEL::~CX2GUEL(void)
 			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_A_SGM_UPPER_SLASH_EventProcess );
 
 			m_LuaManager.MakeTableReference( "ESI_A_SGM_UPPER_SLASH", hyperStateData.stateID );
+			hyperStateData.m_bHyperState	= true;
+			CopyStateCallbacks( hyperStateData, normalStateData );
+		} break;
+	case CX2SkillTree::RNSI_SA_SBH_BURST_RISING:	// char-elesis CH3b: June 32b8c470 @771 ( EventProcess only; the hyper state takes the normal state's callbacks )
+		{
+			m_LuaManager.MakeTableReference( "ESI_SA_SBH_BURST_RISING", normalStateData.stateID );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SA_SBH_BURST_RISING_EventProcess );
+
+			m_LuaManager.MakeTableReference( "ESI_SA_SBH_BURST_RISING", hyperStateData.stateID );
+			hyperStateData.m_bHyperState	= true;
+			CopyStateCallbacks( hyperStateData, normalStateData );
+		} break;
+	case CX2SkillTree::RNSI_SA_SBH_IGNIS_CRASHER:	// char-elesis CH3b: June 32b8c470 @779 ( EventProcess only )
+		{
+			m_LuaManager.MakeTableReference( "ESI_SA_SBH_IGNIS_CRASHER", normalStateData.stateID );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SA_SBH_IGNIS_CRASHER_EventProcess );
+
+			m_LuaManager.MakeTableReference( "ESI_SA_SBH_IGNIS_CRASHER", hyperStateData.stateID );
+			hyperStateData.m_bHyperState	= true;
+			CopyStateCallbacks( hyperStateData, normalStateData );
+		} break;
+	case CX2SkillTree::RNSI_SA_SBH_SOUL_IGNITION:	// char-elesis CH3b: June 32b8c470 @825 ( June's Init 32b8f1f0 is a bare ret: not registered; its buff is CH3b0's )
+		{
+			m_LuaManager.MakeTableReference( "ESI_SA_SBH_SOUL_IGNITION", normalStateData.stateID );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+
+			m_LuaManager.MakeTableReference( "ESI_SA_SBH_SOUL_IGNITION", hyperStateData.stateID );
 			hyperStateData.m_bHyperState	= true;
 			CopyStateCallbacks( hyperStateData, normalStateData );
 		} break;
@@ -13637,6 +13760,19 @@ void CX2GUEL::ESI_SI_SA_SPK_ETERNAL_FIRE_Init()
 }
 void CX2GUEL::ESI_SI_SA_SPK_ETERNAL_FIRE_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )	// char-elesis CH3b: June 32b5ee60 ( the walk, back-walk, dash and Z-X cancels need the foot on a line )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -13648,6 +13784,7 @@ void CX2GUEL::ESI_SI_SA_SPK_ETERNAL_FIRE_EventProcess()
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
@@ -15522,6 +15659,22 @@ void CX2GUEL::ESI_SI_SA_SBH_WALL_OF_PROMINENCE_Init()
 	TextureReadyInBackground(L"secretVelder_perpit_fire_flame.dds");
 	XSkinMeshReadyInBackground(L"SI_SA_SBH_WALL_OF_PROMINENCE_01.X");
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+void CX2GUEL::ESI_SI_SA_SBH_WALL_OF_PROMINENCE_EventProcess()
+{
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )	// char-elesis CH3b: June 32b634f0 ( the cancels need the foot on a line )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 void CX2GUEL::ESI_SI_SA_SBH_WALL_OF_PROMINENCE_EventProcess()	
 {
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
@@ -15536,6 +15689,46 @@ void CX2GUEL::ESI_SI_SA_SBH_WALL_OF_PROMINENCE_EventProcess()
 
 	CommonEventProcess();
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+void CX2GUEL::ESI_SI_SA_SBH_WALL_OF_PROMINENCE_FrameMove()
+{
+	// char-elesis CH3b: June 32b7a0a0 ( the wall is an NPC now, CH3b0's CreateWallOfProminenceNPC; March's 0.454 s damage effect is in the #else )
+	if ( true == m_pXSkinAnim->EventTimerOneshot( WALL_OF_PROMINENCE_SPAWN_EVENT_TIME ) )
+	{
+		AimTargetCone kSeekCone;
+		kSeekCone.m_bAnyNpcClass = false;
+		kSeekCone.m_fMaxUpDegree = WALL_OF_PROMINENCE_DEFAULT_SCOPE_DEGREE;
+		kSeekCone.m_fMaxDownDegree = WALL_OF_PROMINENCE_DEFAULT_SCOPE_DEGREE;
+		kSeekCone.m_fYawRangeDegree = WALL_OF_PROMINENCE_DEFAULT_SCOPE_DEGREE;
+		kSeekCone.m_fMaxDistance = WALL_OF_PROMINENCE_DEFAULT_SCOPE_DISTANCE;
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_SCOPE_ABS, GetNowStateSkillID(), true, kSeekCone.m_fMaxUpDegree );
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_SCOPE_ABS_Y, GetNowStateSkillID(), true, kSeekCone.m_fMaxDownDegree );
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_SCOPE_ABS_Z, GetNowStateSkillID(), true, kSeekCone.m_fYawRangeDegree );
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_PROJECTILE_RANGE_REL, GetNowStateSkillID(), true, kSeekCone.m_fMaxDistance );
+
+		D3DXVECTOR3 vPos( 0.f, 0.f, 0.f );
+		GetNearestTargetAimDegree( kSeekCone, vPos );
+		CKTDGLineMap* pLineMap = ( NULL != g_pX2Game->GetWorld() ? g_pX2Game->GetWorld()->GetLineMap() : NULL );
+		if ( SEEK_NO_TARGET_POSITION == vPos.x && SEEK_NO_TARGET_POSITION == vPos.y && SEEK_NO_TARGET_POSITION == vPos.z )
+		{
+			int iFixedLineIndex = -1;
+			if ( NULL == pLineMap || false == pLineMap->GetFixedDistancePositionInAllLine( GetDirVector(), GetPos( false ), WALL_OF_PROMINENCE_NO_TARGET_DISTANCE, GetIsRight(), vPos, iFixedLineIndex ) )
+				vPos = GetPos();
+		}
+		if ( NULL != pLineMap )
+		{
+			int iLandLineIndex = -1;
+			const D3DXVECTOR3 vLandPos = pLineMap->GetLandPosition( vPos, true, LINE_RADIUS, &iLandLineIndex );	// checklist 7y: bMonster true
+			if ( -1 != iLandLineIndex )
+				vPos.y = vLandPos.y;
+		}
+		CreateWallOfProminenceNPC( vPos );
+	}
+
+	CommonFrameMove();
+}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 void CX2GUEL::ESI_SI_SA_SBH_WALL_OF_PROMINENCE_FrameMove()
 {
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -15568,6 +15761,7 @@ void CX2GUEL::ESI_SI_SA_SBH_WALL_OF_PROMINENCE_FrameMove()
 
 	CommonFrameMove();
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 // 블레이즈 윙
 void CX2GUEL::ESI_SI_SA_SBH_BLAZE_WING_Init()
@@ -15586,6 +15780,19 @@ void CX2GUEL::ESI_SI_SA_SBH_BLAZE_WING_Init()
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZE_WING_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )	// char-elesis CH3b: June 32b637f0 ( the cancels need the foot on a line )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_WAIT );
@@ -15597,6 +15804,7 @@ void CX2GUEL::ESI_SI_SA_SBH_BLAZE_WING_EventProcess()
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 
 // 블레이징 댄스
@@ -15619,7 +15827,11 @@ void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_START_StateStart()
 {
 	CommonStateStart();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	m_vec3BlazingDanceReturnPos = GetPos();	// char-elesis CH3b: June 32b517a0 ( the hit list is cleared in StartFuture )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	m_vecBlazingDanceTargetUid.clear();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_START_EventProcess()
 {
@@ -15632,12 +15844,27 @@ void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_START_EventProcess()
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_1ST_StartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	CommonStateStartFuture();	// char-elesis CH3b: June 32b80e90 ( shared by the first, back and front strike )
+	m_cBlazingDanceAttackCount = static_cast<char>( min( static_cast<int>( m_cBlazingDanceAttackCount ) + 1, BLAZING_DANCE_MAX_ATTACK_COUNT ) );
+	if ( BLAZING_DANCE_EXTRA_COST_FROM_COUNT <= m_cBlazingDanceAttackCount )
+		UpNowMp( -BLAZING_DANCE_EXTRA_ATTACK_MP_COST );
+	BlazingDanceFindTargetAndMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonStateStartFuture();
 
 	BlazingDanceFindTargetAndMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_1ST_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	CommonEventProcess();	// char-elesis CH3b: June 32b63b20 ( shared by the first and the front strike; the common process runs first )
+	if ( false == m_bIsThereBlazingDanceTarget )
+		StateChange( ESI_SI_SA_SBH_BLAZING_DANCE_FINISH );
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+		StateChange( true == CanBlazingDanceContinue() ? ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK : ESI_SI_SA_SBH_BLAZING_DANCE_FINISH );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( true == m_bIsThereBlazingDanceTarget && true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( ESI_SI_SA_SBH_BLAZING_DANCE_2ND );
@@ -15648,6 +15875,7 @@ void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_1ST_EventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_2ND_StartFuture()
 {
@@ -15704,13 +15932,49 @@ void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_4TH_EventProcess()
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_StartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	CommonStateStartFuture();	// char-elesis CH3b: June 32b80ee0 ( the last strike counts only when it found a target )
+	++m_cBlazingDanceAttackCount;
+	if ( false == m_bIsThereBlazingDanceTarget )
+		--m_cBlazingDanceAttackCount;
+	m_bIsBlazingDanceLastAttack = true;
+	BlazingDanceFindTargetAndMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonStateStartFuture();
 
 	m_bIsBlazingDanceLastAttack = true;
 	BlazingDanceFindTargetAndMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )	// char-elesis CH3b: June 32b63be0 ( the MP of the strikes not made comes back; the cancels need the foot on a line )
+	{
+		if ( false == m_bIsThereBlazingDanceTarget )
+			--m_cBlazingDanceAttackCount;
+		m_cBlazingDanceAttackCount = static_cast<char>( min( static_cast<int>( m_cBlazingDanceAttackCount ), BLAZING_DANCE_REFUND_COUNT ) );
+		m_cBlazingDanceAttackCount = static_cast<char>( max( static_cast<int>( m_cBlazingDanceAttackCount ), 0 ) );
+		const float fRefundRate = static_cast<float>( static_cast<double>( BLAZING_DANCE_REFUND_COUNT - m_cBlazingDanceAttackCount ) * BLAZING_DANCE_REFUND_RATE_PER_STRIKE );
+		const float fMpSpent = m_fSkillStartMpConsumed;
+		m_fSkillStartMpConsumed = 0.f;
+		UpNowMpWithText( fMpSpent * fRefundRate );
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		if( false == IsOnSomethingFuture() )
@@ -15728,6 +15992,7 @@ void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_EventProcess()
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_FINISH_StateEnd()
 {
@@ -16042,6 +16307,182 @@ void CX2GUEL::FireBlossomsProc_FrameMove()
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+// char-elesis CH3b: June 32b7a520 ( the hit list is cleared here, not in StateStart; the search range comes from the skill's data )
+void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_START_StateStartFuture()
+{
+	m_vecBlazingDanceTargetUid.clear();
+	m_uidBlazingDanceNowTarget = -1;
+	m_fBlazingDanceLineRange = BLAZING_DANCE_NO_RANGE_LIMIT;
+	TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_SCOPE_ABS_Z, CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE, true, m_fBlazingDanceLineRange );
+	m_fBlazingDanceSearchRange = 0.f;
+	const bool bPvpOrPve = ( NULL != g_pX2Game && true == g_pX2Game->GetIsNowPVPCorrectionGame() );	// June 322cc1a0
+	TryGetAcquiredSkillAbilityValue( GetUnit(), ( true == bPvpOrPve ? CX2SkillTree::SA_SCOPE_ABS_PVP : CX2SkillTree::SA_SCOPE_ABS ), CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE, true, m_fBlazingDanceSearchRange );
+	m_cBlazingDanceAttackCount = 0;
+	CommonStateStartFuture();
+}
+
+// char-elesis CH3b: June 32b63b80 ( the back strike is followed by the front strike )
+void CX2GUEL::ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK_EventProcess()
+{
+	CommonEventProcess();
+	if ( false == m_bIsThereBlazingDanceTarget )
+		StateChange( ESI_SI_SA_SBH_BLAZING_DANCE_FINISH );
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+		StateChange( true == CanBlazingDanceContinue() ? ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_FRONT : ESI_SI_SA_SBH_BLAZING_DANCE_FINISH );
+}
+
+// char-elesis CH3b: June 32b51930 ( the next strike needs a target and fewer than six strikes made, or the memo's 20 MP )
+bool CX2GUEL::CanBlazingDanceContinue()
+{
+	if ( false == m_bIsThereBlazingDanceTarget )
+		return false;
+
+	const int iMemoSkillID = GetTranscendenceMemoSkillID( CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE );
+	if ( ( CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE_TRANS == iMemoSkillID || CX2SkillTree::RNSI_SA_SBH_BLAZING_DANCE_TRANS_UPGRADE == iMemoSkillID )
+		&& BLAZING_DANCE_MEMO_CONTINUE_MIN_MP <= GetNowMp() )
+		return true;
+	return m_cBlazingDanceAttackCount < BLAZING_DANCE_CONTINUE_BELOW_COUNT;
+}
+
+// char-elesis CH3b: June 32b6c2d0
+void CX2GUEL::ESI_SA_SBH_BURST_RISING_EventProcess()
+{
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH3b: June 32b6c5d0 ( falls to the ground state at the end of the motion )
+void CX2GUEL::ESI_SA_SBH_IGNIS_CRASHER_EventProcess()
+{
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH3b: June 32b7ad80 @32b7b01b / @32b7b2b3 / @32b7b512 ( the first search also puts the unit on the hit list )
+void CX2GUEL::SetBlazingDanceTarget( CX2GameUnit* pTarget_, const CKTDGLineMap::LineData* pLineData_, const D3DXVECTOR3& vTargetPos_, const bool bRememberTarget_ )
+{
+	m_FrameDataFuture.syncData.position = vTargetPos_;
+	m_bIsThereBlazingDanceTarget = true;
+	if ( true == bRememberTarget_ )
+		m_vecBlazingDanceTargetUid.push_back( pTarget_->GetUnitUID() );
+	m_uidBlazingDanceNowTarget = pTarget_->GetUnitUID();
+	if ( CKTDGLineMap::LT_NORMAL == pLineData_->lineType && true == pLineData_->bEnable )
+	{
+		if ( true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( vTargetPos_, LINE_RADIUS, NULL, NULL, NULL, false, false, true, false ) )
+			m_vec3BlazingDanceReturnPos = vTargetPos_;
+	}
+	if ( true == m_bIsBlazingDanceLastAttack )
+	{
+		m_vec3BlazingDanceTargetPos = vTargetPos_;
+		m_FrameDataFuture.syncData.position = m_vec3BlazingDanceReturnPos;
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL blazing dance target uid %I64d count %d last %d remember %d", static_cast<__int64>( pTarget_->GetUnitUID() ), static_cast<int>( m_cBlazingDanceAttackCount ), static_cast<int>( m_bIsBlazingDanceLastAttack ), static_cast<int>( bRememberTarget_ ) );	// char-elesis CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+}
+
+// char-elesis CH3b: June 32b7ad80 ( a unit not hit yet first, then one hit before but not the last one, then the last one )
+void CX2GUEL::BlazingDanceFindTargetAndMove()
+{
+	m_bIsThereBlazingDanceTarget = false;
+	if ( NULL == g_pX2Game->GetWorld() || NULL == g_pX2Game->GetWorld()->GetLineMap() )
+		return;
+
+	CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+	const double dSearchRangeSq = static_cast<double>( m_fBlazingDanceSearchRange ) * static_cast<double>( m_fBlazingDanceSearchRange );
+	D3DXVECTOR3 vTargetPos( 0.f, 0.f, 0.f );
+
+	for ( int iUnit = 0; iUnit < g_pX2Game->GetUnitNum(); ++iUnit )
+	{
+		CX2GameUnit* pUnit = g_pX2Game->GetUnit( iUnit );
+		if ( NULL == pUnit || true == pUnit->GetIsBosRaidNPC() )
+			continue;
+		if ( GUT_NPC == pUnit->GetGameUnitType() && true == static_cast<CX2GUNPC*>( pUnit )->GetEscapeFromLockOn() )
+			continue;
+
+		const CKTDGLineMap::LineData* pLineData = pLineMap->GetLineData( pUnit->GetLastTouchLineIndex() );
+		if ( NULL == pLineData || false == BlazindDanceCheckTargetPosition( pUnit, pLineData, vTargetPos ) )
+			continue;
+
+		if ( true == g_pX2Game->GetIsNowPVPCorrectionGame() )
+		{
+			const float fLineDistance = GetDistanceFromDirLineXZ( GetPos( false ), GetDirVector(), pUnit->GetPos( false ) );
+			if ( m_fBlazingDanceLineRange < fLineDistance )
+				continue;
+		}
+
+		bool bAlreadyHit = false;
+		for ( UINT uiHit = 0; uiHit < m_vecBlazingDanceTargetUid.size(); ++uiHit )
+		{
+			if ( m_vecBlazingDanceTargetUid[uiHit] == pUnit->GetUnitUID() )
+			{
+				bAlreadyHit = true;
+				break;
+			}
+		}
+		if ( true == bAlreadyHit )
+			continue;
+
+		if ( GetDistance3Sq( GetPos(), vTargetPos ) < dSearchRangeSq )
+		{
+			SetBlazingDanceTarget( pUnit, pLineData, vTargetPos, true );
+			break;
+		}
+	}
+	if ( true == m_bIsThereBlazingDanceTarget )
+		return;
+
+	if ( false == m_vecBlazingDanceTargetUid.empty() )
+	{
+		const D3DXVECTOR3 vMyPos = GetPos();
+		for ( UINT uiHit = 0; uiHit < m_vecBlazingDanceTargetUid.size(); ++uiHit )
+		{
+			CX2GameUnit* pUnit = FindUnitByUid( m_vecBlazingDanceTargetUid[uiHit] );
+			if ( NULL == pUnit )
+				continue;
+			const CKTDGLineMap::LineData* pLineData = pLineMap->GetLineData( pUnit->GetLastTouchLineIndex() );
+			if ( NULL == pLineData || false == BlazindDanceCheckTargetPosition( pUnit, pLineData, vTargetPos ) )
+				continue;
+			if ( pUnit->GetUnitUID() == m_uidBlazingDanceNowTarget )
+				continue;
+			if ( GetDistance3Sq( vMyPos, vTargetPos ) < dSearchRangeSq )
+			{
+				SetBlazingDanceTarget( pUnit, pLineData, vTargetPos, false );
+				break;
+			}
+		}
+	}
+	if ( true == m_bIsThereBlazingDanceTarget || m_uidBlazingDanceNowTarget < 0 )
+		return;
+
+	const D3DXVECTOR3 vMyPos = GetPos();
+	CX2GameUnit* pUnit = FindUnitByUid( m_uidBlazingDanceNowTarget );
+	if ( NULL == pUnit )
+		return;
+	const CKTDGLineMap::LineData* pLineData = pLineMap->GetLineData( pUnit->GetLastTouchLineIndex() );
+	if ( NULL != pLineData && true == BlazindDanceCheckTargetPosition( pUnit, pLineData, vTargetPos ) && GetDistance3Sq( vMyPos, vTargetPos ) < dSearchRangeSq )
+		SetBlazingDanceTarget( pUnit, pLineData, vTargetPos, false );
+}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 void CX2GUEL::BlazingDanceFindTargetAndMove()
 {
 	// 내 유닛이 이동가능한 지점에 있는 타겟의 위치만 찾아 내 유닛을 이동시킴
@@ -16133,6 +16574,38 @@ void CX2GUEL::BlazingDanceFindTargetAndMove()
 		}
 	}
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+// char-elesis CH3b: June 32b6f8b0 ( no line type or can-down test; the spot is the unit's bone nearest the dancer on the line, the unit's own position when that is within 500 )
+const bool CX2GUEL::BlazindDanceCheckTargetPosition( CX2GameUnit* pUnit_, const CKTDGLineMap::LineData* pLineData_, D3DXVECTOR3& vOutPos_ )
+{
+	if ( pUnit_->GetTeam() == GetTeam() )
+		return false;
+
+	const bool bInvincible = ( GUT_NPC == pUnit_->GetGameUnitType() ?
+		static_cast<CX2GUNPC*>( pUnit_ )->GetInvincibleByAttackTypeId( CX2DamageManager::AT_SPECIAL ) : pUnit_->GetInvincible() );	// June slot 94 with attack type 1
+	if ( true == bInvincible )
+		return false;
+	if ( false == ( 0.f < pUnit_->GetNowHp() ) )
+		return false;
+
+	vOutPos_ = pUnit_->GetBoneLinePos( GetPos() );
+	if ( GetDistance( vOutPos_, pUnit_->GetPos() ) <= BLAZING_DANCE_FAR_TARGET_DISTANCE )
+		vOutPos_ = pUnit_->GetPos();
+
+	if ( NULL == pLineData_ )
+		return false;
+	if ( GUT_NPC == pUnit_->GetGameUnitType() )
+	{
+		CX2GUNPC* pMonster = static_cast<CX2GUNPC*>( pUnit_ );
+		if ( NULL != pMonster->GetNPCAI() && true == pMonster->GetNPCAI()->GetAIFly() && vOutPos_.y < pLineData_->startPos.y )
+			return false;
+		if ( CX2UnitManager::NCT_THING_TRAP == pMonster->GetNPCTemplet().m_ClassType || CX2UnitManager::NCT_THING_CHECKER == pMonster->GetNPCTemplet().m_ClassType )
+			return false;
+	}
+	return true;
+}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 const bool CX2GUEL::BlazindDanceCheckTargetPosition( CX2GameUnit* pUnit_, const CKTDGLineMap::LineData* pLineData_  )
 {
 	// 타겟의 상태, 위치가 내 유닛을 이동시키기에 적절한지 체크
@@ -16196,6 +16669,7 @@ const bool CX2GUEL::BlazindDanceCheckTargetPosition( CX2GameUnit* pUnit_, const 
 	return bValiedTargetPosition;
 }
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 const bool CX2GUEL::GetUnitClassLine( UNIT_CLASS_LINE UnitClassLine_ )
 {
 	switch( UnitClassLine_ )

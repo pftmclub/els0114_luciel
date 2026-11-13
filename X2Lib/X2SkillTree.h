@@ -2621,6 +2621,18 @@ public:
 		RNSI_SA_SBH_SOUL_IGNITION                             = 28063,	// June's Enum.lua; vslot 0x24c reads its effect-set rate
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names the Blazing Heart special actives register on ( values from June's Enum.lua )
+	RNSI_SA_SBH_ETERNAL_FIRE                              = 28015,
+	RNSI_SA_SBH_BLAZE_WING                                = 28017,
+	RNSI_SA_SBH_BURST_RISING                              = 28041,
+	RNSI_SA_SBH_IGNIS_CRASHER                             = 28042,
+	RNSI_SA_SBH_ETERNAL_FIRE_UPGRADE                      = 28051,
+	RNSI_SA_SBH_BLAZING_DANCE_UPGRADE                     = 28052,
+	RNSI_SA_SBH_BLAZE_WING_UPGRADE                        = 28053,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-12 // char-elesis CH1k
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June SKILL_ID names Elesis's skill-use functions spell ( values from June's Enum.lua )

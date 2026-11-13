@@ -23513,6 +23513,67 @@ D3DXVECTOR3 CX2GUUser::GetNearestTargetAimDegree( IN const float fMaxUpDegree_, 
 	}
 	return vAimDegree;
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+// char-elesis CH3b: June 32008a20 ( 32008660's sibling: the cone and the reach come in a block, the position out is the target's hit position )
+D3DXVECTOR3 CX2GUUser::GetNearestTargetAimDegree( IN const AimTargetCone& kCone_, OUT D3DXVECTOR3& vTargetPos_ )
+{
+	D3DXVECTOR3 vAimDegree( 0.f, 0.f, 0.f );
+	float fNearestDistance = kCone_.m_fMaxDistance;
+	vTargetPos_ = D3DXVECTOR3( 9999.f, 9999.f, 9999.f );	// June DAT_3346ede8: nothing found
+	if ( NULL == g_pX2Game )
+		return vAimDegree;
+
+	const D3DXVECTOR3 vMyCenterPos = GetUnitCenterPos( this );
+	for ( int iUnit = 0; iUnit < g_pX2Game->GetUnitNum(); ++iUnit )
+	{
+		CX2GameUnit* pUnit = g_pX2Game->GetUnit( iUnit );
+		if ( NULL == pUnit || false == g_pX2Game->IsValidUnit( pUnit ) )
+			continue;
+		if ( GetTeam() == pUnit->GetTeam() )
+			continue;
+		if ( false == ( 0.f < pUnit->GetNowHp() ) )
+			continue;
+
+		D3DXVECTOR3 vTargetCenterPos = GetUnitCenterPos( pUnit );
+		if ( GUT_NPC == pUnit->GetGameUnitType() )
+		{
+			if ( ( false == kCone_.m_bAnyNpcClass && CX2UnitManager::NCT_BASIC != static_cast<CX2GUNPC*>( pUnit )->GetNPCTemplet().m_ClassType )
+				|| true == pUnit->GetInvincible()
+				|| false == GetTargetHitPos( pUnit, true, 1, vTargetCenterPos ) )
+				continue;
+		}
+		else if ( IsPosAlongLastTouchLine( vTargetCenterPos ) != GetIsRight() )
+			continue;
+
+		const float fDistance = GetDistance( vTargetCenterPos, vMyCenterPos );
+		if ( fNearestDistance < fDistance )
+			continue;
+
+		const D3DXVECTOR3 vDegree = GetDirVecToDegree( vTargetCenterPos - vMyCenterPos );
+		if ( vDegree.z < -kCone_.m_fMaxDownDegree || kCone_.m_fMaxUpDegree < vDegree.z )
+			continue;
+
+		float fTargetYaw = vDegree.y;
+		if ( fTargetYaw < 0.f )
+			fTargetYaw = 360.f - fTargetYaw;	// June: 360 - yaw, not 360 + yaw
+		float fMyYaw = GetRotateDegree().y;
+		if ( fMyYaw < 0.f )
+			fMyYaw = 360.f - fMyYaw;
+		float fYawGap = fabs( fTargetYaw - fMyYaw );
+		if ( 180.f < fYawGap )
+			fYawGap = 360.f - fYawGap;
+
+		const float fHalfYawRange = kCone_.m_fYawRangeDegree * 0.5f;
+		if ( fYawGap < -fHalfYawRange || fHalfYawRange < fYawGap )
+			continue;
+
+		fNearestDistance = fDistance;
+		vAimDegree = vDegree;
+		vTargetPos_ = vTargetCenterPos;
+	}
+	return vAimDegree;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #endif SERV_IRUHADEV_JUNE_USER_AIM_TARGET
 #ifdef SERV_IRUHADEV_JUNE_USER_NUMERICAL_BY_NAME
 // June 32007910 ( name / skill / upgrade swap ): the numerical row at the learned level x its PvP rate in PvP or PvE; 1.0 with no tree, unit, level or templet

@@ -714,6 +714,12 @@ protected:
 	void ESI_SA_SGM_GIGA_BLAST_CHARGE_EventProcess();	/// char-elesis CH3a: June 32b6de10
 	void ESI_A_SGM_PROVOKE_StateStartFuture();	/// char-elesis CH3a2: June 32b50b00
 	void ESI_A_SGM_UPPER_SLASH_EventProcess();	/// char-elesis CH3a2: June 32b6ced0
+	void ESI_SI_SA_SBH_BLAZING_DANCE_START_StateStartFuture();	/// char-elesis CH3b: June 32b7a520
+	void ESI_SI_SA_SBH_BLAZING_DANCE_ATTACK_BACK_EventProcess();	/// char-elesis CH3b: June 32b63b80
+	bool CanBlazingDanceContinue();	/// char-elesis CH3b: June 32b51930
+	void SetBlazingDanceTarget( CX2GameUnit* pTarget_, const CKTDGLineMap::LineData* pLineData_, const D3DXVECTOR3& vTargetPos_, const bool bRememberTarget_ );	/// char-elesis CH3b: June 32b7ad80 @32b7b01b / @32b7b2b3 / @32b7b512
+	void ESI_SA_SBH_BURST_RISING_EventProcess();	/// char-elesis CH3b: June 32b6c2d0
+	void ESI_SA_SBH_IGNIS_CRASHER_EventProcess();	/// char-elesis CH3b: June 32b6c5d0
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// 도약
@@ -1111,8 +1117,12 @@ public:
 
 	//// 블레이징 댄스 ////
 	void BlazingDanceFindTargetAndMove();												// 타겟 위치를 찾아 이동시키는 함수.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	const bool BlazindDanceCheckTargetPosition( CX2GameUnit* pUnit_, const CKTDGLineMap::LineData* pLineData_, D3DXVECTOR3& vOutPos_ );	/// char-elesis CH3b: June 32b6f8b0 ( adds the position out )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	const bool BlazindDanceCheckTargetPosition( CX2GameUnit* pUnit_, const CKTDGLineMap::LineData* pLineData_ );			// 적절한 타겟 위치인지 체크하는 함수.
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CFirstStrikeData & GetFirstStrikeData ( void ) { return m_cFirstStrikeData; }
 
 	bool  IsFirstStrikeRelateState ( void )
@@ -1240,6 +1250,11 @@ protected:
 	int m_iWaltzOfSwordDodgeAbility;		/// char-elesis CH2a: June +0x9654 ( KProtectedType, ported plain ): ability 0x1b of RNSI_P_SGM_WALTZ_OF_SWORD; CH4a writes it
 	float m_fDodgeAndSlashConsumedMp;		/// char-elesis CH2a: June +0x9778 ( MP the Dodge and Slash start spent while that ability is set; CH4a resets it )
 	USHORT m_usBurningPhantomLoopCount;		/// char-elesis CH2d: June +0x96fa ( loop ticks of Burning Phantom: 0 at the ready state, grows by 1 per 0.15 s of the loop state )
+	D3DXVECTOR3 m_vec3BlazingDanceReturnPos;	/// char-elesis CH3b: June +0x96c8 ( where she stood at the start, or the last lined target spot; the last strike returns here )
+	UidType m_uidBlazingDanceNowTarget;			/// char-elesis CH3b: June +0x96b0 ( UID of the unit the dance jumped to last, -1 at the start )
+	float m_fBlazingDanceLineRange;				/// char-elesis CH3b: June +0x975c ( SA_SCOPE_ABS_Z of Blazing Dance, 99999 without it: how far off her facing line a PvP / PvE target may stand )
+	float m_fBlazingDanceSearchRange;			/// char-elesis CH3b: June +0x97b4 ( SA_SCOPE_ABS / SA_SCOPE_ABS_PVP: how far the dance reaches for its next target )
+	char m_cBlazingDanceAttackCount;			/// char-elesis CH3b: June +0x9789 ( strikes made, 0 to 100; a strike from the seventh on costs 20 MP )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )
