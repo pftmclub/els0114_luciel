@@ -1625,7 +1625,11 @@ Opus 5.5. **Data only: no client source changed, no flag added** (the route and 
 - **Hygiene:** no client source changed, so `flagcheck` / `junediverge --check` / `enumscan` have nothing to scan.
 - **Deploy:** full build skipped: no code change. The deployed exe (md5 `b4108783`, 2026-11-13 10:43, includes CHNa) already carries the lines:
   `EXESTR OK: 3 of 3 found in X2_offline.exe, 26419200 B, dated 2026-11-13 10:43:12, md5 b4108783ec14ed437b94a3dacbe30d9c`.
-- **Play-test:** owed (hand-off in the commit's session). Review kickoff `kickoffs/char-elesis/CHNb-review.md` written.
+- **Play-test (2026-11-13 11:12-11:16, user: all passed):** `CLASS GUIDE 1st: 3 class description(s) wrapped to 180` x3 (147 / 148 / 149);
+  `CLASS GUIDE 2nd: class 35 line 3 -> next class 125, buttons 1543 / 1547` + `2nd skills: next class 125, description 36261, 4 skill icon(s), 3 command row(s)` (150);
+  Accept took `35569` / `35573` (`QUEST accepted`); `CLASS CHANGE` 147 8 -> 35, 148 8 -> 29, 149 8 -> 30, 150 35 -> 125; every `/qdone` NetError 0; save after relog:
+  147 = 35, 148 = 29, 149 = 30, 150 = 125, 140-146 unchanged; 0 EXCEPTION, ErrorLog 0. `AddGroupChainQuest` unbound x1 is pre-existing (backlog line 314).
+  Review kickoff `kickoffs/char-elesis/CHNb-review.md` written.
 
 ## Phase CH2 - Skills: Knight and the first jobs (classes 8, 29, 30, 35)
 
