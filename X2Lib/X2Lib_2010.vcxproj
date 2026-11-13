@@ -2042,6 +2042,7 @@
     <ClInclude Include="X2TrainingGameUI.h" />
     <ClInclude Include="X2TutorSystem.h" />
     <ClInclude Include="X2TutorialGuideManager.h" />
+    <ClInclude Include="X2TutorialGuideAdapter.h" />
     <ClInclude Include="X2UDPPacket.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_SV|Win32'">true</ExcludedFromBuild>
@@ -3005,6 +3006,7 @@
     <ClCompile Include="X2TrainingGameUI.cpp" />
     <ClCompile Include="X2TutorSystem.cpp" />
     <ClCompile Include="X2TutorialGuideManager.cpp" />
+    <ClCompile Include="X2TutorialGuideAdapter.cpp" />
     <ClCompile Include="X2UDPPacket.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_SV|Win32'">true</ExcludedFromBuild>

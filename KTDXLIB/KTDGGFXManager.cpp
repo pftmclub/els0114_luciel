@@ -653,6 +653,9 @@ enum GFX_BINDING_KIND
 	JGBK_RESULT_INFO	= 3,	// R1: "GameResult.updateDungeonInfo" ( DW_DUNGEON_RESULT_VALUE, vtable 3353a0b0, GetValue 32eeb1d0 )
 	JGBK_RESULT_ITEM	= 4,	// R1: "GameResult.getItemN" ( vtable 3353a080, GetValue 32eeaff0 ): { itemID, iconPath, iNum }
 #endif SERV_IRUHADEV_JUNE_RESULT_WIDGET
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	JGBK_INT			= 5,	// june-dungeons C3z-4t2: "tutorialGuide.showGuide" ( vtable 334c909c, GetValue 32948fe0 = VT_Int at +8 )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 };
 
 struct KGfxBindingObserver
@@ -660,6 +663,14 @@ struct KGfxBindingObserver
 	SFG::Value	m_kClosure;		// record +0x00: the Value the notify invokes
 	SFG::Value	m_kExtra;		// record +0x18: compared on delete only
 };
+
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+struct KGfxIntValue		// june-dungeons C3z-4t2: the 0xc B Int value object ( vtable 334c909c ), +8 starts at 0
+{
+	int			m_iValue;
+	KGfxIntValue() : m_iValue( 0 ) {}
+};
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 
 struct KGfxBinding
 {
@@ -670,6 +681,9 @@ struct KGfxBinding
 	KGfxResultInfo	m_kResultInfo;		// R1: the 0x88 B value object
 	KGfxResultItem	m_kResultItem;		// R1: the 0x40 B value object
 #endif SERV_IRUHADEV_JUNE_RESULT_WIDGET
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	KGfxIntValue	m_kIntValue;		// june-dungeons C3z-4t2: the Int value object
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 #ifdef SERV_IRUHADEV_JUNE_GFX_TALK_CUTIN
 	int			m_iWidgetID;		// value object +8
 	std::string	m_strFileName;		// +0xc
@@ -801,6 +815,19 @@ public:
 			it->second.m_kResultItem = kItem;
 	}
 #endif SERV_IRUHADEV_JUNE_RESULT_WIDGET
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	void SetBindingInt( const std::string& strName, int iValue )		// june-dungeons C3z-4t2: the Int value object's +8 ( 32965a60 )
+	{
+		std::map< std::string, KGfxBinding >::iterator it = m_mapBinding.find( strName );
+		if ( it != m_mapBinding.end() )
+			it->second.m_kIntValue.m_iValue = iValue;
+	}
+	int GetObserverCount( const std::string& strName ) const			// june-dungeons C3z-4t2: port check only, no June counterpart
+	{
+		std::map< std::string, KGfxBinding >::const_iterator it = m_mapBinding.find( strName );
+		return ( it != m_mapBinding.end() ) ? (int)it->second.m_vecObserver.size() : 0;
+	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 	void ClearBindings()
 	{
 		m_mapBinding.clear();
@@ -824,6 +851,10 @@ public:
 		else if ( it->second.m_iKind == JGBK_RESULT_ITEM )
 			BuildResultItemValue( it->second.m_kResultItem, &kValue );
 #endif SERV_IRUHADEV_JUNE_RESULT_WIDGET
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+		else if ( it->second.m_iKind == JGBK_INT )
+			kValue = SFG::Value( (SF::SInt32)it->second.m_kIntValue.m_iValue );		// june-dungeons C3z-4t2: GetValue 32948fe0, type 3
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 		else
 			kValue.SetNull();
 		std::vector< KGfxBindingObserver > vecObserver = it->second.m_vecObserver;
@@ -2367,6 +2398,98 @@ void CKTDGGFXResultBridge::NotifyTabKey()																{ m_pImpl->NotifyTabKey
 void CKTDGGFXResultBridge::SetFunctionDispatcher( void ( *pfnDispatch )( int iID ) )					{ s_pfnResultDispatch = pfnDispatch; }
 #endif SERV_IRUHADEV_JUNE_RESULT_NOW_STATE_CALL
 #endif SERV_IRUHADEV_JUNE_RESULT_WIDGET
+
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+// june-dungeons C3z-4t2: June's CX2TutorialGuideAdapter, vtable 334c9c60 ( slot 1 32965d60 name, slot 2 32965a90 callback, slot 3 331a4950 = false )
+namespace _CONST_GFX_TUTORIAL_GUIDE_C3Z4T2_
+{
+	const char* const	TUTORIAL_GUIDE_LISTENER_NAME	= "tutorialGuide";				// 334c9c8c
+	const char* const	TUTORIAL_GUIDE_BINDING_SHOW		= "tutorialGuide.showGuide";	// 334c9c44
+	const char* const	TUTORIAL_GUIDE_BINDING_HIDE		= "tutorialGuide.hideGuide";	// 334c9c2c
+	const char* const	TUTORIAL_GUIDE_CALLBACK_NAME	= "tutorialGudie";				// 334c9c7c, June's spelling
+}
+using namespace _CONST_GFX_TUTORIAL_GUIDE_C3Z4T2_;
+
+class CKTDGGFXTutorialGuideBridge::CImpl : public IGfxListener
+{
+public:
+	CImpl( CKTDGGFXManagerImpl* pMgrImpl, IGfxTutorialGuideHost* pHost )
+		: m_pHost( pHost )
+	{
+		if ( pMgrImpl != NULL && pMgrImpl->m_pUI != NULL )
+			m_pAdapter = pMgrImpl->m_pUI->GetAdapter();
+		if ( m_pAdapter )		// 32965bd0: 31d1f690, then 31d1f900 x 2
+		{
+			m_pAdapter->AddListener( this );
+			m_pAdapter->AddBinding( TUTORIAL_GUIDE_BINDING_SHOW, JGBK_INT );
+			m_pAdapter->AddBinding( TUTORIAL_GUIDE_BINDING_HIDE, JGBK_TRIGGER );	// the 8 B trigger, vtable 33471e28
+		}
+	}
+
+	~CImpl()
+	{
+		if ( m_pAdapter )		// 329659e0: 31d1f550, then 31d1f600 x 2
+		{
+			m_pAdapter->RemoveListener( GetListenerName() );
+			m_pAdapter->RemoveBinding( TUTORIAL_GUIDE_BINDING_SHOW );
+			m_pAdapter->RemoveBinding( TUTORIAL_GUIDE_BINDING_HIDE );
+		}
+	}
+
+	virtual std::string GetListenerName() const { return TUTORIAL_GUIDE_LISTENER_NAME; }		// 32965d60
+
+	// 32965a90: answered true; June's 0xc B function object ( vtable 334c9c74 ) is released at once ( 31ab4990 ), so nothing else follows
+	virtual bool OnExternalCall( SFG::Movie* /*pMovie*/, const char* szMethod, const SFG::Value* /*pArgs*/, unsigned /*uArgCount*/ )
+	{
+		if ( szMethod == NULL || strcmp( szMethod, TUTORIAL_GUIDE_CALLBACK_NAME ) != 0 )
+			return false;
+		if ( m_pHost != NULL )
+			m_pHost->OnTutorialGuideAsCallback();
+		return true;
+	}
+
+	bool IsBound() const { return m_pAdapter.GetPtr() != NULL; }
+
+	void ShowGuide( int iGuideNo )		// 32965a60
+	{
+		if ( !m_pAdapter )
+			return;
+		if ( m_pAdapter->HasBinding( TUTORIAL_GUIDE_BINDING_SHOW ) == true )
+			m_pAdapter->SetBindingInt( TUTORIAL_GUIDE_BINDING_SHOW, iGuideNo );
+		m_pAdapter->NotifyBinding( TUTORIAL_GUIDE_BINDING_SHOW );
+	}
+
+	void HideGuide()					// 329659b0
+	{
+		if ( m_pAdapter )
+			m_pAdapter->NotifyBinding( TUTORIAL_GUIDE_BINDING_HIDE );
+	}
+
+	int GetShowGuideObserverCount() const
+	{
+		return m_pAdapter ? m_pAdapter.GetPtr()->GetObserverCount( TUTORIAL_GUIDE_BINDING_SHOW ) : 0;
+	}
+
+private:
+	IGfxTutorialGuideHost*				m_pHost;
+	SF::Ptr< CLIKDataBindingAdapter >	m_pAdapter;		// June's adapter +8
+};
+
+CKTDGGFXTutorialGuideBridge::CKTDGGFXTutorialGuideBridge( CKTDGGFXManager* pManager, IGfxTutorialGuideHost* pHost )
+	: m_pImpl( new CImpl( pManager != NULL ? pManager->m_pImpl : NULL, pHost ) )
+{
+}
+
+CKTDGGFXTutorialGuideBridge::~CKTDGGFXTutorialGuideBridge()
+{
+	SAFE_DELETE( m_pImpl );
+}
+
+bool CKTDGGFXTutorialGuideBridge::IsBound() const					{ return m_pImpl->IsBound(); }
+void CKTDGGFXTutorialGuideBridge::ShowGuide( int iGuideNo )			{ m_pImpl->ShowGuide( iGuideNo ); }
+void CKTDGGFXTutorialGuideBridge::HideGuide()						{ m_pImpl->HideGuide(); }
+int CKTDGGFXTutorialGuideBridge::GetShowGuideObserverCount() const	{ return m_pImpl->GetShowGuideObserverCount(); }
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 
 // ---------------------------------------------------------------------------------------------------------------------------------------
 // CKTDGGFXManager

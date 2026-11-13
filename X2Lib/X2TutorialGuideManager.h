@@ -5,6 +5,9 @@
 #ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE
 
 class CX2TutorialGuideAdapter;
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+class CKTDGGFXManager;		// june-dungeons C3z-4t2
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 
 class CX2TutorialGuideManager
 {
@@ -93,6 +96,10 @@ public:
 	virtual ~CX2TutorialGuideManager();				// June 31fbe320
 
 	void	Load();									// June 31fc3c20
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	void	OnReleaseGfxUI();						// june-dungeons C3z-4t2: June vslot 1 31fbdb30
+	void	OnRecreateGfxUI( CKTDGGFXManager* pGfxManager );	// june-dungeons C3z-4t2: June vslot 3 31fbdb60
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 	HRESULT	OnFrameMove( double fTime, float fElapsedTime );	// June 31fc6510
 
 	bool	IsGuideRunning() const { return GS_NONE != m_iGuideState; }								// June 31fbda90

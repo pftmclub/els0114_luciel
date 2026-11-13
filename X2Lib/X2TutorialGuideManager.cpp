@@ -8,6 +8,9 @@
 #ifdef SERV_IRUHADEV_OFFLINE
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_OFFLINE
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+#include "X2TutorialGuideAdapter.h"
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 
 // june-dungeons C3z-4t1: log tag JUNE_FX C3z-4t ( offline_server.log ); every function names its June address.
 
@@ -135,9 +138,29 @@ CX2TutorialGuideManager::~CX2TutorialGuideManager()
 void CX2TutorialGuideManager::Load()
 {
 	LoadTutorialGuideInfo();
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	// june-dungeons C3z-4t2: June 31fc3c20 makes it even without the root movie ( it then binds nothing )
+	m_pTutorialGuideAdapter = new CX2TutorialGuideAdapter( this, g_pKTDXApp->GetGFXManager() );
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 	// stand-in: GFx adapter is t2 ( June 31fc3c20 creates it on g_pKTDXApp+0x1c8 +0x98 here )
 	m_pTutorialGuideAdapter = NULL;
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 }
+
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+void CX2TutorialGuideManager::OnReleaseGfxUI()
+{
+	// june-dungeons C3z-4t2: June vslot 1 31fbdb30; no March caller ( June's root-movie recreate notice is not ported )
+	SAFE_DELETE( m_pTutorialGuideAdapter );
+}
+
+void CX2TutorialGuideManager::OnRecreateGfxUI( CKTDGGFXManager* pGfxManager )
+{
+	// june-dungeons C3z-4t2: June vslot 3 31fbdb60 ( no delete of the old adapter, as June ); no March caller
+	if( NULL != pGfxManager )
+		m_pTutorialGuideAdapter = new CX2TutorialGuideAdapter( this, pGfxManager );
+}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 
 bool CX2TutorialGuideManager::LoadTutorialGuideInfo()
 {
@@ -709,6 +732,14 @@ void CX2TutorialGuideManager::CheckCameraArrive()
 
 void CX2TutorialGuideManager::BeginGuideScene( int iGuideNo )
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	static bool s_bSceneCountLogged = false;	// june-dungeons C3z-4t2: Load's own count line runs before offline_server.log opens
+	if( false == s_bSceneCountLogged )
+	{
+		s_bSceneCountLogged = true;
+		CX2OfflineLog::Server( L"JUNE_FX C3z-4t load %d scene(s) from TutorialGuideInfo.lua (logged at the first begin)", (int)m_mapGuideScene.size() );
+	}
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 	std::map< int, GuideScene >::const_iterator mit = m_mapGuideScene.find( iGuideNo );
 	if( m_mapGuideScene.end() == mit )
 		return;
@@ -1332,12 +1363,22 @@ void CX2TutorialGuideManager::OnFrameMoveInputGuideStep( float fElapsedTime )
 
 void CX2TutorialGuideManager::ShowGuideMovie( int iGFxUINo )
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	if( NULL != m_pTutorialGuideAdapter )
+		m_pTutorialGuideAdapter->ShowGuide( iGFxUINo );	// june-dungeons C3z-4t2: June 32965a60
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 	// stand-in: GFx adapter is t2 ( June 32965a60 showGuide )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 }
 
 void CX2TutorialGuideManager::HideGuideMovie()
 {
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	if( NULL != m_pTutorialGuideAdapter )
+		m_pTutorialGuideAdapter->HideGuide();	// june-dungeons C3z-4t2: June 329659b0
+#else SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 	// stand-in: GFx adapter is t2 ( June 329659b0 hideGuide )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 }
 
 CX2TutorialGuideManager* CX2Game::GetTutorialGuideManager()

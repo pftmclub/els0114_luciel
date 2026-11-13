@@ -421,3 +421,35 @@ Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE` (+ `_DEBUG`: begin / step / end / refus
   `end 101` (ended by the skill key after 4 s and 26 s); nothing on screen, as expected until t2's movie. Key-hint boxes (`ShowInputGuideUI`
   0 / 2, `HideInputGuideUI`) showed and faded. No `can't find` for the guide names. The start-up `load 24 scene(s)` line is lost:
   `LoadData` runs before offline_server.log opens (scene 101 was found, so the table loaded); the C3z-4t2 review moves that line.
+
+## C3z-4t2 - Done (2026-11-13, Opus 5.5 high): the tutorial guide's GFx movie (CX2TutorialGuideAdapter)
+
+Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX` (`#error` without `JUNE_TUTORIAL_GUIDE`, `JUNE_GFX_MANAGER`, `JUNE_GFX_EVENTSCENE`, `OFFLINE`;
+all four defined at the guard by a `cl /P` probe). Show / hide / callback lines under t1's `_DEBUG`. Log tag `JUNE_FX C3z-4t`.
+Funcmap rows `32965bd0`, `32965a60 / 329659b0`, `32965a90`, `31fbdb30 / 31fbdb60`.
+
+- **Adapter.** New `X2Lib/X2TutorialGuideAdapter.h/.cpp` (vcxproj entries): June's `CX2TutorialGuideAdapter` (vtable `334c9c60`): ctor
+  `32965bd0` (+4 = the manager, no June reader; +8 = main.gfx's data-binding adapter), show `32965a60`, hide `329659b0`, dtor `329659e0`.
+  The Scaleform half is `CKTDGGFXTutorialGuideBridge` in `KTDGGFXManager.*` (R1's pattern): listener `tutorialGuide` (`32965d60`),
+  bindings `tutorialGuide.showGuide` (Int value object `334c909c`, GetValue `32948fe0` = VT_Int, new binding kind `JGBK_INT`) and
+  `tutorialGuide.hideGuide` (trigger `33471e28`). Show sets the value only when the binding exists, then notifies either way (as June).
+- **Callback.** `32965a90` answers the AS call `tutorialGudie` (June's spelling) with true; its 0xc B function object (vtable `334c9c74`)
+  is released at once (`31ab4990`), so nothing follows. The string is in neither main.gfx nor tutorial_guide.gfx, so it never fires;
+  the port logs it only. vslot 3 is `331a4950` (return false), the listener default.
+- **Manager seam.** `Load()` makes the adapter after the table (`31fc3c20`, even without a root movie: it then binds nothing and logs
+  `gfx adapter unbound`). `ShowGuideMovie` / `HideGuideMovie` call it; t1 held no key limit or scene end for t2, so no stand-in retires.
+  vslots `31fbdb30` / `31fbdb60` = `OnReleaseGfxUI` / `OnRecreateGfxUI`: June calls them indirectly (no xref) and builds its root movie
+  once (`31c456e0` from OnCreateDevice), so they have no March caller. The scene count is logged once at the first `BeginGuideScene`
+  (t1's start-up line runs before offline_server.log opens).
+- **June bug kept (JUNE_BUGS 643).** The manager dtor `31fbe320` never deletes the adapter; kept (also the safe order at exit).
+- **Movie check.** `tutorial_guide.gfx` (data194, CFX) names the AS3 class `gfxAS3.tutorialGuide.TutorialGuide`, both binding names and
+  the `timeLineNo*` labels of `GFX_GUIDE_NO`; main.gfx loads it as `WIDGET_TUTORIAL_GUIDE` at start-up (G2 play-test). Scene 101's
+  `GFX_UI_NO` = `timeLineNoTutorial_1` = 2. June drops a binding the AS asks for before the C++ name exists (`31d1f0a0`), and so does the
+  port; `Load` runs in the StartUp ctor, before the frame loop, and a show with 0 observers logs `gfx show %d not seen`.
+- **Hygiene.** flagcheck `--worktree` (8 files): 1 PASS, 3 PASS~ (blank/marker lines), 1 DEFINE, 2 FAIL = the new files'
+  `#include "StdAfx.h"` / `#pragma once` (t1 precedent); 0 deleted lines, 0 non-ASCII, 0 encoding changes. junediverge `RESULT: PASS`;
+  enumscan 0 A/B.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,419,200 B, dated 2026-11-13 10:43:12, md5 b4108783. EXESTR OK 3 of 3 (wide: `gfx show %d`,
+  `gfx hide`, `(logged at the first begin)`) and 2 of 2 (`tutorialGuide.showGuide`, `tutorialGudie`).
+- **Play-test (owed).** Console scene 101 in a dungeon (the account quirk of t1 still blocks Benders' own call outside one): the guide
+  movie on screen, then gone when the skill key ends the scene. No review of its own: `C3z-4t2-review.md` covers t1 + t2.

@@ -76,6 +76,9 @@ private:
 #ifdef SERV_IRUHADEV_JUNE_RESULT_WIDGET
 	friend class CKTDGGFXResultBridge;			// reaches the root movie's data-binding adapter ( KTDGGFXManager.cpp )
 #endif SERV_IRUHADEV_JUNE_RESULT_WIDGET
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+	friend class CKTDGGFXTutorialGuideBridge;	// june-dungeons C3z-4t2: reaches the root movie's data-binding adapter
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 	CKTDGGFXManagerImpl*	m_pImpl;
 };
 
@@ -249,6 +252,33 @@ private:
 	CImpl*	m_pImpl;
 };
 #endif SERV_IRUHADEV_JUNE_RESULT_WIDGET
+
+#ifdef SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+// june-dungeons C3z-4t2: what June's tutorial guide callback ( 32965a90 ) asks of the owner, CX2TutorialGuideAdapter
+class IGfxTutorialGuideHost
+{
+public:
+	virtual ~IGfxTutorialGuideHost() {}
+	virtual void	OnTutorialGuideAsCallback() = 0;		// 32965a90: the AS call "tutorialGudie" ( June's spelling )
+};
+
+// june-dungeons C3z-4t2: the Scaleform half of June's CX2TutorialGuideAdapter ( vtable 334c9c60 ): listener "tutorialGuide", bindings showGuide / hideGuide
+class CKTDGGFXTutorialGuideBridge
+{
+public:
+	CKTDGGFXTutorialGuideBridge( CKTDGGFXManager* pManager, IGfxTutorialGuideHost* pHost );	// 32965bd0
+	~CKTDGGFXTutorialGuideBridge();															// 329659e0
+
+	bool	IsBound() const;						// June's adapter +8 != 0
+	void	ShowGuide( int iGuideNo );				// 32965a60: "tutorialGuide.showGuide"
+	void	HideGuide();							// 329659b0: "tutorialGuide.hideGuide"
+	int		GetShowGuideObserverCount() const;		// port check: 0 = the movie never bound "tutorialGuide.showGuide"
+
+private:
+	class CImpl;
+	CImpl*	m_pImpl;
+};
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
 
 #ifdef SERV_IRUHADEV_JUNE_GFX_DEBUG
 // Dev-console hooks ( C++ Lua bindings, CKTDXApp::RegisterLuabind ): no .lua is involved.

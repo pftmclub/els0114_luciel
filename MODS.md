@@ -6815,3 +6815,10 @@ Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE` in `KTDXLIB/Always.h` (`#error`s withou
 - **What changes in game.** `TutorialGuideInfo.lua` loads at start-up (24 scenes); Lua scripts can call the guide manager (Benders' death runs `OnBeginGuideNo(101)` when the account qualifies) and show June's move / dash / attack / skill / awaken key-hint dialogs. No GFx movie yet (C3z-4t2).
 - **Data.** New June bytecode: data036 `TutorialGuideInfo.lua`, data034 `DLG_UI_Tutorial_Input_Guide.lua`, `DLG_UI_Tutorial_Input_Side_Guide.lua` (records `june2017_re/june_adopt_20261113_091510.tsv`, `_091515.tsv`). New assets: data057 `DLG_UI_Common_Texture_Tutorial_01.tga/.TET`, data081 `Tuto_Ui_Notice01.ogg`. data036 `Enum.lua` (core source): `INPUT_GUIDE_STEP`. Nothing replaced.
 - **Revert:** comment out the define, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The new Lua / assets can stay (unused without the flag); live-kom backups in `kom_backup_tools\data034/036/057/081.kom.20261113_0917*`. No save change.
+
+### June dungeons: the tutorial guide's GFx movie (june-dungeons C3z-4t2, 2026-11-13)
+
+Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX` in `KTDXLIB/Always.h` (`#error`s without `JUNE_TUTORIAL_GUIDE`, `JUNE_GFX_MANAGER`, `JUNE_GFX_EVENTSCENE`, `OFFLINE`); its show / hide / callback lines use C3z-4t1's `_DEBUG`. Plan `JUNE_DUNGEONS_PHASES.md` "C3z-4t2 - Done"; log tag `JUNE_FX C3z-4t`.
+- **Client.** New `X2Lib/X2TutorialGuideAdapter.h/.cpp` (vcxproj entries): June's `CX2TutorialGuideAdapter`. `KTDXLIB/KTDGGFXManager.h/.cpp`: `CKTDGGFXTutorialGuideBridge` (listener `tutorialGuide`, bindings `tutorialGuide.showGuide` / `hideGuide`) and an Int binding kind. `X2TutorialGuideManager.h/.cpp`: the adapter is made in `Load()`, the show / hide stand-ins call it, the scene count is logged at the first begin.
+- **What changes in game.** A running guide scene shows its `GFX_UI_NO` timeline of main.gfx's `tutorial_guide.gfx` widget and hides it when the scene ends. No data change (the widget was staged by GFx GA, data194).
+- **Revert:** comment out the define, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. No save change.

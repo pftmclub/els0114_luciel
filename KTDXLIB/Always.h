@@ -12885,3 +12885,15 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS_DEBUG
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: june-dungeons C3z-4t2 - June's CX2TutorialGuideAdapter ( 32965bd0 ): the tutorial guide manager shows its scene's GFX_UI_NO in
+//              main.gfx's tutorial_guide.gfx widget ( binding tutorialGuide.showGuide / hideGuide ) and hides it at the scene's end.
+//              Revert: comment out the #define ( JUNE_TUTORIAL_GUIDE_GFX ).
+#define SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+#if defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX ) && ( !defined( SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE ) || !defined( SERV_IRUHADEV_JUNE_GFX_MANAGER ) || !defined( SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX needs SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE, SERV_IRUHADEV_JUNE_GFX_MANAGER, SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( data bindings ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_GFX
+//////////////////////////////////////////////////////////////////////////
