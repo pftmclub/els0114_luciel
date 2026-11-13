@@ -280,7 +280,12 @@ void CX2OfflineStatTable::SetUnitStat_LUA( int iUnitClass, int iLevel )
 	}
 
 	// Identity for the eight base classes; anything else is unknown.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+	// char-luciel NU1: classes 10-12 are job classes, so the identity stops at UT_ADD, not at June's UT_END
+	if( iUnitClass > 0 && iUnitClass <= (int)CX2Unit::UT_ADD )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 	if( iUnitClass > 0 && iUnitClass < (int)CX2Unit::UT_END )
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 		return iUnitClass;
 
 	return (int)CX2Unit::UT_NONE;

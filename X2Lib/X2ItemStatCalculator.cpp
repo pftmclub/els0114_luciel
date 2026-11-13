@@ -200,7 +200,12 @@ bool CX2ItemStatCalculator::InvalideDataCheck() const
 	}
 
 	// 2차 전직 ID 첫번 째 값 CX2Unit::UC_ELSWORD_LORD_KNIGHT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+	// char-luciel NU1: June 328d6b30 checks classes 100 .. 136 ( cmp esi, 0x89; jl )
+	for( int iUnitClass = CX2Unit::UC_ELSWORD_LORD_KNIGHT ; iUnitClass <= CX2Unit::UC_AIN_APOSTASIA; ++iUnitClass )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 	for( int iUnitClass = CX2Unit::UC_ELSWORD_LORD_KNIGHT ; iUnitClass < CX2Unit::UC_VALIDE_END; ++iUnitClass )
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 	{
 		if( m_mapClassStatDataTable.find( static_cast<CX2Unit::UNIT_CLASS>(iUnitClass) ) 
 			== m_mapClassStatDataTable.end() )

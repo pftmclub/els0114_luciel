@@ -685,7 +685,12 @@ bool    CX2ItemManager::KProxy2::AddItemTemplet_LUA()
             sprintf_s( aszError, ARRAY_SIZE( aszError ), "ITEMID_%d: INVALID_UNITTYPE_%d", dwItemID, eUnitType );
             ErrorLogMsg( XEM_ERROR144, aszError );
         }//if
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+        // char-luciel NU1: June 325bd515 accepts class 0 .. 202 ( cmp eax, 0xca; jbe )
+        if ( false == ( eUnitClass >= CX2Unit::UC_NONE && eUnitClass <= CX2Unit::UC_AIN_ANGEL ) )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
         if ( false == ( eUnitClass >= CX2Unit::UNIT_TYPE(0) && eUnitClass < CX2Unit::UC_END ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
         {
             sprintf_s( aszError, ARRAY_SIZE( aszError ), "ITEMID_%d: INVALID_UNITCLASS_%d", dwItemID, eUnitClass );
             ErrorLogMsg( XEM_ERROR144, aszError );

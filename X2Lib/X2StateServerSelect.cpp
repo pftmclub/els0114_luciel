@@ -11445,6 +11445,13 @@ void CX2StateServerSelect::ChangeUnitButtonInfo ()
 			}
 #endif //REFORM_ENTRY_POINT
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+			// char-luciel NU1: June 32564d50 @325651bd tests the templet's type range, not a case list
+			if ( NULL == pUnit->GetUnitTemplet() || pUnit->GetUnitTemplet()->m_UnitType <= CX2Unit::UT_NONE || pUnit->GetUnitTemplet()->m_UnitType >= CX2Unit::UT_END )
+			{
+				g_pMain->KTDGUIOKMsgBox( D3DXVECTOR2(305, 375), GET_STRING( STR_ID_707 ), this, -1, -1.f, L"DLG_UI_Selection_MessageBox_Ok_Button_New.lua", D3DXVECTOR2 (0, 0),L"UI_PopUp_Negative_01.ogg" );
+			}
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 			switch( pUnit->GetType() )
 			{
 			case CX2Unit::UT_ELSWORD:
@@ -11476,6 +11483,7 @@ void CX2StateServerSelect::ChangeUnitButtonInfo ()
 					g_pMain->KTDGUIOKMsgBox( D3DXVECTOR2(305, 375), GET_STRING( STR_ID_707 ), this, -1, -1.f, L"DLG_UI_Selection_MessageBox_Ok_Button_New.lua", D3DXVECTOR2 (0, 0),L"UI_PopUp_Negative_01.ogg" );
 				}break;
 			}
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 			XSkinMeshReady( pUnit->GetUnitTemplet()->m_MotionFile.c_str() );
 
 

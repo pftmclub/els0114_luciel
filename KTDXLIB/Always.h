@@ -13124,3 +13124,14 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE needs SERV_IRUHADEV_JUNE_GFX_EVENTSCENE ( CX2GFXEventScene loads the scene widget 0x2711 )
 #endif SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel NU1 - June's unit-type range: UT_END becomes June's 13 after UT_LUCIEL / UT_ROSE / UT_AIN (no member
+//              renumbered), so the unit-type arrays and loops reach 13; the unit-script table gets June's 13 slots (LUCIEL_DUO.LUA,
+//              Rose / Ain empty) and a type with no mounted script is skipped and logged ([JUNE_CHAR] LUCIEL NEWUNIT); the class
+//              guards accept June's ids (item parse 0..202, class stat check 100..136); the server-select slot tests June's type
+//              range instead of a case list; the emulator's class -> type identity stays at the nine base classes.
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+//////////////////////////////////////////////////////////////////////////

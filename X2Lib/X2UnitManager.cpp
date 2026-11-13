@@ -4,6 +4,9 @@
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_EXTRA_NPC_STAT
 #ifdef SERV_IRUHADEV_EXTRA_NPC_STAT_PARITY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+#include "Offline/X2OfflineLog.h"
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 #include <float.h>	// Iruha : 2026-09-27 // _finite(), Phase 4 NaN guard
 #endif SERV_IRUHADEV_EXTRA_NPC_STAT_PARITY
 
@@ -420,13 +423,31 @@ void    CX2UnitManager::CreateUnitLuaSpace()
 #else       SERV_9TH_NEW_CHARACTER
             , NULL
 	#endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+			// char-luciel NU1: June 337341b8 holds 13 names; Rose / Ain (11, 12) are not ported
+			, L"LUCIEL_DUO.LUA"
+			, NULL
+			, NULL
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
         };//apszScript[]
 
 		ASSERT( ARRAY_SIZE( apszScript ) == CX2Unit::UT_END );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+		// char-luciel NU1: the ASSERT above compiles out, so a short table would be read past
+		BOOST_STATIC_ASSERT( sizeof( apszScript ) / sizeof( apszScript[ 0 ] ) == CX2Unit::UT_END );
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 
 		for( int iUnitType = 0; iUnitType < CX2Unit::UT_END; iUnitType++ )
         {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+            // char-luciel NU1: no script (Rose / Ain) or one not mounted yet (Lu before CH1) takes the NULL path, logged
+            const bool bUnitScriptMissing = ( apszScript[ iUnitType ] == NULL || false == g_pKTDXApp->GetDeviceManager()->GetMassFileManager()->IsValidFile( apszScript[ iUnitType ] ) );
+            if ( true == bUnitScriptMissing && iUnitType > CX2Unit::UT_NONE )
+                CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL NEWUNIT unit type %d has no mounted script ( %s ): type skipped", iUnitType, ( apszScript[ iUnitType ] != NULL ) ? apszScript[ iUnitType ] : L"none" );
+            if ( true == bUnitScriptMissing )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
             if ( apszScript[ iUnitType ] == NULL )
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
             {
 #ifdef	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
 				m_aUnitTypeLuaTemplet[ iUnitType ].m_pUnitTypeTemplet = NULL;

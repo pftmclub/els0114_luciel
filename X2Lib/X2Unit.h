@@ -31,12 +31,20 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 			UT_ADD,			/// 김태환 // 2013-10-25 // 신캐릭터 애드
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
+			// char-luciel NU1: June Enum.lua UT_END = 13, after Lu / Rose / Ain
+			UT_LUCIEL	= 10,
+			UT_ROSE		= 11,
+			UT_AIN		= 12,
+			UT_END		= 13,
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 			UT_END,
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 			UT_LUCIEL	= 10,	// June class; shares UT_END's value
 			UT_ROSE		= 11,	// June class
 			UT_AIN		= 12,	// June class, after UT_END so it keeps its value
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 		};
 
 		enum UNIT_CLASS
