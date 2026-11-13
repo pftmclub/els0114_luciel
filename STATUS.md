@@ -256,6 +256,7 @@ Done: Q0a, Q0b, RM0, Q1, Q2, Q3, Q4, Q4b, Q4d, Q4e, Q5a, Q5b, Q5c, Q5c review, Q
 |---|---|---|---|---|---|
 | Q4c | built + deployed 2026-10-19 (flag `SERV_IRUHADEV_JUNE_QUEST_RESULT_RANK`; DEPLOY OK md5 b304f506): March's room-server ranks from its own `ResultData_new.lua` (new `X2OfflineDungeonRank`, server getters bound by ...) | Opus 5.5 / high, then review | Q4 review; not with Q4b / RM1 (`X2Lib/Offline/`) | `X2Lib/Offline/Handlers_Room.cpp` (result data, end game), new rank module, Always.h, data036 (user ...) | `Q4c.md`, review `Q4c-review.md` |
 | Q9 | paused at A3, waiting on Q4d (A1 / A2 passed: 22160 auto-opened in Lanox and completed on arrival; 22209 also opened and completed out of order, a Q4 question for after the walk). Before that: prepared 2026-10-19, ... | Sonnet 5.5 / medium, then user play-test | Q3, Q4, Q5b, Q6, Q7, Q8 | save (snapshot), checklist | `Q9.md` |
+| Q12 | **ready** (user order 2026-11-13): bind `AddGroupChainQuest` so `ChainQuestInfo.lua` runs to its end (ends the Lua error every play-test logs; lifts JUNE_BUGS 320's keep-verbatim) | Opus 5.5 / high, user loads the game once | Q1 | `X2QuestManager.*`, JUNE_BUGS 320, funcmap | `Q12.md` |
 | Z | waiting (all; Q10c routed to Stage 9) | Sonnet 5.5 / medium | all except Q10c | `MODS.md`, backlog, memory, Always.h (`_DEBUG` off) | `Z.md` |
 
 ## june-result - June dungeon result screen: the in-state GFx result UI

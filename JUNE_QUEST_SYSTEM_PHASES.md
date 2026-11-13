@@ -1897,6 +1897,15 @@ The checklist and its tooling are written; the user's play-test is the rest of t
 - **Logs** (`logs.py --tag JUNE_QUEST --grep "BATCH|CRASH"`, run after deploy, exe md5 2540fffd): 3 `BATCH quest 11000 refused ( NetError 155 )`, 0 `CRASH`,
   0 EXCEPTION, UNHANDLED = baseline `E_DISABLE_HB_CHECK_REQ`; the one unbound Lua name `AddGroupChainQuest` is JUNE_BUGS 320 (kept). No newer crash bundle.
 
+## Phase Q12 - Bind AddGroupChainQuest (added 2026-11-13, user order)
+
+**Scope:** `ChainQuestInfo.lua` ends in two `AddGroupChainQuest` calls (chain groups 4 / 5, chains 43077 / 43079). June never binds the name
+(`JUNE_BUGS.md` 320; binder `31d95080`), so the script dies at its 6th statement and every play-test logs the Lua error. Q1 kept that verbatim;
+the user ordered it ended on 2026-11-13 ("it has been there for too long"), so this phase binds it. **Run with:** Opus 5.5 high (the identify half
+reads June in Ghidra: is there a reader of a populated group table). **Read list / task / gate:** `kickoffs/quest-system/Q12.md`.
+**Done gate:** no `AddGroupChainQuest` lua error in `ErrorLog.txt`; `LOAD ChainQuestInfo.lua loaded 1 ... groups 2`; the five `AddChainQuestDays`
+calls still applied; JUNE_BUGS 320 flipped.
+
 ## Phase Z - Close-out
 
 **Run with:** Sonnet 5.5 medium.
