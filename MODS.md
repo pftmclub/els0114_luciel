@@ -7009,3 +7009,16 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for
   June's L1 values ( x100, PvP rate ): Eternal Fire 220 ( 0.28 ), Burst Rising 462 ( 0.4 ), Blaze Wing main 1443 ( 0.28 ), Blazing Dance main 1544 / sub 288 / final 288 ( 0.28 ), Wall of Prominence main 279 / sub 70 ( 0.28 ),
   Ignis Crasher 286 ( 0.4 ), Soul Ignition 3534 ( 0.28 ). The play-test emits no `NUM use` line ( as CH2b-CH3a2 ).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
+## Stage 7 Elesis, CH3b2: Blazing Heart (121) actives Flame Sword, Scalet Rose, Flame Protection (char-elesis CH3b2, 2026-11-14)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for the CH3d review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** June's ids join March's cases: Flame Sword 28210 / 28231, Scalet Rose 28211 / 28232; new case Flame Protection 28223 ( EventProcess only ).
+  Flame Sword: the hit time ( 0.235 s ) is read off the future animation; Flame Sword and its finish state, Scalet Rose and its success state: the walk / back-walk / dash / Z-X cancels need the foot on a line.
+  Scalet Rose: an upgraded one ( 28232 equipped ) that hits nothing gives MP back at the end of the motion ( the skill's MP cost x its `SA_MP_RETAKE_ABS` ); its success state now starts with a zero hit count
+  and ends through June's End ( the Fire Blossoms of CH3b0 ); the hit-count increments are CH4a's attack-result delegate ( June 32b524b0 ), so no blossom appears before CH4a.
+  Flame Protection: a motion with the buff `BFI_BUFF_A_SBH_FLAME_PROTECTION` ( 928, 0.95 s ) and the effect set `EffectSet_A_SBH_FLAME_PROTECTION`, ends at the end of the motion.
+- **Shared.** `X2SkillTree.h`: `RNSI_A_SBH_FLAME_PROTECTION` 28223, `_FLAME_SWORD_UPGRADE` 28231, `_SCALET_ROSE_UPGRADE` 28232 ( `JUNE_ENUM_NAMES` ). No `Always.h` change.
+- **Damage.** The numbers are June's numerical-only tables read by the engine ( no March row exists ); this phase changes no number. June's L1 values ( x100, PvP rate ): Flame Sword finish effect 345 ( 0.28 ),
+  Scalet Rose start 290 / attack 275 ( 0.32 ), Flame Protection 1305 ( 0.28 ); the Flame Sword state's own table is `NUMERICAL_DATA_INDEX` 1 of skill 28210.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.

@@ -720,6 +720,8 @@ protected:
 	void SetBlazingDanceTarget( CX2GameUnit* pTarget_, const CKTDGLineMap::LineData* pLineData_, const D3DXVECTOR3& vTargetPos_, const bool bRememberTarget_ );	/// char-elesis CH3b: June 32b7ad80 @32b7b01b / @32b7b2b3 / @32b7b512
 	void ESI_SA_SBH_BURST_RISING_EventProcess();	/// char-elesis CH3b: June 32b6c2d0
 	void ESI_SA_SBH_IGNIS_CRASHER_EventProcess();	/// char-elesis CH3b: June 32b6c5d0
+	void ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_StateStart();	/// char-elesis CH3b2: June 32b51550
+	void ESI_A_SBH_FLAME_PROTECTION_EventProcess();	/// char-elesis CH3b2: June 32b6d1e0
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à

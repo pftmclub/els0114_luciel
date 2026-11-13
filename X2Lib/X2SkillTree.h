@@ -2633,6 +2633,14 @@ public:
 	RNSI_SA_SBH_BLAZE_WING_UPGRADE                        = 28053,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3b2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names the Blazing Heart actives register on ( values from June's Enum.lua )
+	RNSI_A_SBH_FLAME_PROTECTION                           = 28223,
+	RNSI_A_SBH_FLAME_SWORD_UPGRADE                        = 28231,
+	RNSI_A_SBH_SCALET_ROSE_UPGRADE                        = 28232,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-12 // char-elesis CH1k
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June SKILL_ID names Elesis's skill-use functions spell ( values from June's Enum.lua )

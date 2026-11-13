@@ -1958,6 +1958,38 @@ FINISH `StateEnd`, FINISH `FrameMoveFuture`; Soul Ignition's Init is a bare `ret
   B 6 Ignis Crasher 28042, B 7 Soul Ignition 28063 ( 28017 / 28042 / 28063 newly learned at level 1; the earlier slots are cleared; slots 4 / 8 / 9 empty ). Upgrade ids not learned.
 - **Play-test: passed (2026-11-14, exe `ae6ac230`).** Logs: 7 equip lines ( states 49 / 51 / 53 / 55 bank A, 59 / 61 / 63 bank B ); `blazing dance target uid ... count 1 / 2 / 3`; `ELESIS SUMMON req npc 1635 wall ...` then `SUMMON npc 1635 uid 1000021 skill 28018 lv 1 flags 0x1`; `SBUF` state 63 BFI 995, `soul ignition level 1 effect set rate 1.000`, `ES_CREATE EffectSet_SA_SBH_Soul_Ignition`; ErrorLog 0 lines, 0 Motion Error, 0 MIG no-state, 0 EXCEPTION, 0 unbound Lua names ( 2 UNHANDLED `E_DISABLE_HB_CHECK_REQ` are old ). Log tag `[JUNE_CHAR]`.
 
+### CH3b2 - Done (2026-11-14)
+
+Sonnet 5.5. Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`; `_SKILL_DEBUG` stays on until the CH3d review retires it. No review of its own ( the CH3d review covers CH3a-CH3d ).
+All 11 class-map rows read from `charport_adis.py elesis --phase CH3b2` and the registration `32b8c470` ( cases @1138 / @1158 / @1272 ): **7 written** ( 4 inside March's functions, 3 new ), **4 = March / no code**
+( Flame Sword Init and Scalet Rose Init preload lists, Scalet Rose `FrameMove` and `End`: the listing equals March's `X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE` branch ). `funcmap.tsv` rows `Char Elesis CH3b2` ( 8 ).
+- **Registration:** June ids as labels on March's cases ( Flame Sword 28210 / 28231, Scalet Rose 28211 / 28232 ); Scalet Rose SUCCESS gets `StateStart` ( `32b51550` ) and `StateEnd` ( CH3b0's `32b79db0`, the thunk `32b90830` ) beside March's
+  EventProcess; new case Flame Protection 28223 ( EventProcess only, hyper state = `CopyStateCallbacks` ). Flame Sword FINISH has no `StateInit` in June either. 3 enum names in `X2SkillTree.h` ( `JUNE_ENUM_NAMES` ).
+- **What June differs in:**
+
+| June | Function | Difference |
+|---|---|---|
+| `32b625b0` | Flame Sword `EventProcess` | hit test reads the **future** animation time ( March: the now animation ) `> 0.235` with `GetAttackSuccess( true )` -> FINISH; cancels need the foot on a line |
+| `32b628f0` / `32b62ef0` | Flame Sword FINISH / Scalet Rose SUCCESS `EventProcess` | listing-identical to the Burst Rising template ( diffed against `32b5eb60`, 0 lines ): the cancels need the foot on a line |
+| `32b796e0` | Scalet Rose `EventProcess` | the 0.33-0.465 s damage-effect test is March's; new at the animation end: an upgraded skill ( `IsNowStateSkillUpgraded` ) with 28232 learned and equipped gives `GetActualMPConsume( 28232, level ) x SA_MP_RETAKE_ABS ( 0x42 )` back through `UpNowMpWithText`, then WAIT; cancels need the foot on a line |
+| `32b51550` | SUCCESS `StateStart` ( new ) | `CommonStateStart`, then the Fire Blossom hit count `+0x9788` = 0 |
+| `32b6d1e0` | Flame Protection `EventProcess` ( new ) | the Burst Rising template ( diffed, 0 lines ) |
+
+- **Kept as June has it:** June reads the user skill tree off `GetUnit()` with no null test before the 28232 level ( `32b797b7` ); the port does the same ( the unit exists in play ). No `JUNE_BUGS` row: nothing is clearly unintended.
+- **Routed, not here:** the Scalet Rose hit-count **increment** is the attack-result delegate `32b524b0` that `InitPassiveSkillState` pushes ( CH4a ): until CH4a the count stays 0 and the End spawns no blossom. The CH3b amendment of the
+  kickoff said CH3b2 writes the increments; CH3b0's amendment ( later, the same day ) and checklist 7am assign them to CH4a, which this phase follows. March's `ApplyDebuffFlameSword` / `m_uiSkillLevelFlameSword` ( the `SI_A_SBH_FLAME_SWORD` passive-object
+  block in `InitPassiveSkillState` ) and June's `m_bIsFrameSword` reader are CH4a / CH3b0's. Upgrade ids 28231 / 28232 are labels only; not learned on the test save.
+  `NUM use`: all three are numerical-only tables read by the engine ( `MODS.md` "Stage 7 Elesis, CH3b2" ). No `SetEquippedSkillLevel` work ( CH1i wrote the 28210 / 28211 blocks ).
+- **Checklist** `(Elesis: CH3b2 ...)`: row 117 ( `NUMERICAL_DATA_INDEX`, L52 ) and 7ai ( the reserved-buff path, L876 ).
+- **Hygiene:** `flagcheck JUNE_CHAR_ELESIS_SKILL --with _SKILL_DEBUG --worktree --files ...`: `2 PASS ( X2GUEL.cpp +93, X2GUEl.h +2 ), 1 OTHER ( X2SkillTree.h = JUNE_ENUM_NAMES ), 0 FAIL`, 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 untokened, 0 encoding change; `RESULT: PASS`.
+  `junediverge --check` the 3 files: `allow-listed: 10`, `RESULT: PASS`. `enumscan --check X2GUEL.cpp`: `0 A/B row(s) remain`. `stateends.py check X2GUEL.cpp ELESIS_KNIGHT`: 311 tables, 0 STUCK, `RESULT: PASS`.
+  `luabind check ELESIS_KNIGHT`: `RESULT: PASS`. `skillicons check 28210-28232`: `misses 0`, PASS ( 1 known June gap, Avatar of Fire's Enhanced icon ).
+- **Deploy:** `DEPLOY OK: X2_offline.exe is 26,494,464 B, dated 2026-11-14 04:56:19, md5 871680f00b62d9471c85810fdf2d2d90, equal to X2/US_SERVICE/x2.exe (2026-11-14 04:56:09); built at main 0d103817 + 3 uncommitted code file(s).`
+  `EXESTR OK: 1 of 1 found` ( md5 871680f0 ): narrow `ESI_A_SBH_FLAME_PROTECTION`.
+- **Save:** unit 30 ( `ElesisBH`, class 121, lv 80, not transcended; backup `db_backup/els_db_20261114_044735_pre_sql.sql` ): A 0 Flame Sword 28210, A 1 Scalet Rose 28211, A 2 Flame Protection 28223 ( all learned at level 1 already );
+  the CH3b skills are unslotted ( learned ), slots 3-9 empty.
+- **Play-test: owed.** Log tag `[JUNE_CHAR]` ( `ELESIS SKILL` equip lines, `ELESIS SKILL SBUF` for Flame Sword 28210 BFI 299 and Flame Protection BFI 928 ).
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, one Opus review at CH4c (covers CH4a-CH4c), user play-test (three engine pieces, planned as three from the start).

@@ -357,6 +357,12 @@ namespace _CONST_EL_CH3B_
 	}
 }
 using namespace _CONST_EL_CH3B_;
+// char-elesis CH3b2: constant of the Blazing Heart actives ( June 32b625b0 )
+namespace _CONST_EL_CH3B2_
+{
+	const float		FLAME_SWORD_HIT_TIME		= 0.235f;	// the animation time from which a hit goes on to the finish state
+}
+using namespace _CONST_EL_CH3B2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 // char-elesis CH3b0: constants of the summons and the Blood Runaway cleanse check ( June 32b79db0 / 32b8b0c0 / 32b6fb10 )
@@ -1706,6 +1712,10 @@ CX2GUEL::~CX2GUEL(void)
 
 		} break;
 	case CX2SkillTree::SI_A_SBH_FLAME_SWORD:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SBH_FLAME_SWORD:	// char-elesis CH3b2: June 32b8c470 @1138
+	case CX2SkillTree::RNSI_A_SBH_FLAME_SWORD_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//È«·ÃÀÇ °Ë
 			m_LuaManager.MakeTableReference( "ESI_SI_A_SBH_FLAME_SWORD", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SBH_FLAME_SWORD_Init );
@@ -1742,6 +1752,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_A_SBH_SCALET_ROSE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SBH_SCALET_ROSE:	// char-elesis CH3b2: June 32b8c470 @1158
+	case CX2SkillTree::RNSI_A_SBH_SCALET_ROSE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//ºÒ²É Àå¹Ì
 			m_LuaManager.MakeTableReference( "ESI_SI_A_SBH_SCALET_ROSE", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SBH_SCALET_ROSE_Init );
@@ -1760,6 +1774,10 @@ CX2GUEL::~CX2GUEL(void)
 				stateData.Init();
 				stateData.stateID			= ESI_SI_A_SBH_SCALET_ROSE_SUCCESS;
 				m_LuaManager.MakeTableReference( "ESI_SI_A_SBH_SCALET_ROSE_SUCCESS", stateData.stateID );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+				stateData.StateStart		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_StateStart );	// char-elesis CH3b2: June 32b8c470 @32b8e356 ( the Fire Blossoms come at the End )
+				stateData.StateEnd			= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_End );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_EventProcess );
 				m_StateList[stateData.stateID] = stateData;
 			}
@@ -2006,6 +2024,15 @@ CX2GUEL::~CX2GUEL(void)
 			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
 
 			m_LuaManager.MakeTableReference( "ESI_SA_SBH_SOUL_IGNITION", hyperStateData.stateID );
+			hyperStateData.m_bHyperState	= true;
+			CopyStateCallbacks( hyperStateData, normalStateData );
+		} break;
+	case CX2SkillTree::RNSI_A_SBH_FLAME_PROTECTION:	// char-elesis CH3b2: June 32b8c470 @1272 ( EventProcess only; the hyper state takes the normal state's callbacks )
+		{
+			m_LuaManager.MakeTableReference( "ESI_A_SBH_FLAME_PROTECTION", normalStateData.stateID );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_A_SBH_FLAME_PROTECTION_EventProcess );
+
+			m_LuaManager.MakeTableReference( "ESI_A_SBH_FLAME_PROTECTION", hyperStateData.stateID );
 			hyperStateData.m_bHyperState	= true;
 			CopyStateCallbacks( hyperStateData, normalStateData );
 		} break;
@@ -15427,7 +15454,11 @@ void CX2GUEL::ESI_SI_A_SBH_FLAME_SWORD_Init()
 }
 void CX2GUEL::ESI_SI_A_SBH_FLAME_SWORD_EventProcess()			
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	if( m_pXSkinAnimFuture->GetNowAnimationTime() > FLAME_SWORD_HIT_TIME && GetAttackSuccess(true) == true )	// char-elesis CH3b2: June 32b625b0 ( the hit time is read off the future animation )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( m_pXSkinAnim->GetNowAnimationTime() > 0.235f && GetAttackSuccess(true) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	{
 		StateChange( ESI_SI_A_SBH_FLAME_SWORD_FINISH );
 	}
@@ -15436,10 +15467,17 @@ void CX2GUEL::ESI_SI_A_SBH_FLAME_SWORD_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3b2: June 32b625b0 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -15450,10 +15488,17 @@ void CX2GUEL::ESI_SI_A_SBH_FLAME_SWORD_FINISH_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3b2: June 32b628f0 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -15528,13 +15573,32 @@ void CX2GUEL::ESI_SI_A_SBH_SCALET_ROSE_EventProcess()
 	}
 	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
 	{	
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+		if ( true == IsNowStateSkillUpgraded() )	// char-elesis CH3b2: June 32b796e0 @32b79795 ( an upgraded Scalet Rose that hit nothing gives part of its MP back )
+		{
+			const int iUpgradedSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_SBH_SCALET_ROSE_UPGRADE, false, 0, true );
+			const CX2SkillTree::SkillTemplet* pUpgradedSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SBH_SCALET_ROSE_UPGRADE, true );
+			if ( 0 < iUpgradedSkillLevel && NULL != pUpgradedSkillTemplet )
+			{
+				const float fMpRetake = pUpgradedSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MP_RETAKE_ABS, iUpgradedSkillLevel, false );
+				UpNowMpWithText( GetActualMPConsume( pUpgradedSkillTemplet->m_eID, iUpgradedSkillLevel ) * fMpRetake );
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3b2: June 32b796e0 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -15603,10 +15667,17 @@ void CX2GUEL::ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3b2: June 32b62ef0 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -18660,6 +18731,28 @@ void CX2GUEL::ESI_A_SGM_UPPER_SLASH_EventProcess()
 	if( ( GetUsefulValueFuture( 0, 0 ) <= m_pXSkinAnimFuture->GetNowAnimationTime() && false == m_FrameDataFuture.unitCondition.bFootOnLine ) || true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		StateChange( USI_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
+// char-elesis CH3b2: June 32b51550
+void CX2GUEL::ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_StateStart()
+{
+	CommonStateStart();
+	m_ucScaletRoseHitCount = 0;
+}
+
+// char-elesis CH3b2: June 32b6d1e0
+void CX2GUEL::ESI_A_SBH_FLAME_PROTECTION_EventProcess()
+{
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
 	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
