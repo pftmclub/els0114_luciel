@@ -29,7 +29,9 @@ Review NU1's commit against `nu0_unit_type_sites.tsv` and the kickoff's amendmen
 - **`ChangeUnitButtonInfo`.** June `32564d50 @325651bd-325651d0`: templet NULL or type outside 1..12 pops STR 707 with the same arguments.
 - **Leave rows.** `X2OfflineStatTable.cpp` stays March's identity for the nine base classes (pinned to `UT_ADD`); `X2GameEdit.cpp` untouched.
 
-Hygiene is one command: `python tools/flagcheck.py JUNE_CHAR_UNIT_TYPE_RANGE --range <NU1 commit>^..HEAD`. Paste its `files:` /
+NU1 is `18460a26` (code) + `6aa77bde` (docs); **fix 1** (the NEWUNIT line moved to ErrorLog, include dropped) landed inside char-elesis
+CH3a2's commit `00665c59` (a shared-index sweep: its `X2UnitManager.cpp`, Luciel Done-note and NU1-row hunks are NU1's).
+Hygiene: `python tools/flagcheck.py JUNE_CHAR_UNIT_TYPE_RANGE --base 18460a26^ --files <the 6 NU1 code files> KTDXLIB/Always.h`. Paste its `files:` /
 `in this flag's files:` / `RESULT:` lines; explain every OTHER row and deleted line. `python tools/junediverge.py --check-all` must PASS.
 Spot-check 2-3 bounds in Ghidra (read-only), e.g. `3237a6b3`, `328d6b30`, `325651cd`. Read the user's NU1 play-test logs if they ran it.
 Fix clear transcription errors under the same flag (then `tools/build.py --deploy`, play-test only if the fix changes behaviour); hand design
