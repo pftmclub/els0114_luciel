@@ -434,7 +434,7 @@ client quit and hung. **User decision: skip it for now.** Stand-in under `_CREAT
 (`X2StateCreateUnit.cpp`, the studio's own `SERV_ELISIS_PREVIOUS_SIS_EVENT` skip, off on US) and on the first select (`X2StateServerSelect.cpp`,
 `JUNE_TUTORIAL_MODE` gate); debug `ADD CREATE tutorial skipped ...`. Tutorials give no quest credit offline (`IsQuestTutorialDungeon`), so nothing is
 lost. June's Add tutorial = new phase **TU** (`kickoffs/char-add/TU.md`); Lu/Ciel's TU kickoff amended (Add's case is char-add TU's).
-flagcheck `--worktree` (2 files): 1 PASS, 1 OTHER (debug block), 0 FAIL, RESULT: PASS; junediverge PASS; enumscan 0. DEPLOY OK: X2_offline.exe 26,368,000 B, 2026-11-13 08:24:17, md5 fa47ddb445faeba7c18f234517b2cb8d; EXESTR OK 2/2 (both skip lines).
+flagcheck `--worktree` (2 files): 1 PASS, 1 OTHER (debug block), 0 FAIL, RESULT: PASS; junediverge PASS; enumscan 0. DEPLOY OK: X2_offline.exe 26,368,000 B, 2026-11-13 08:24:17, md5 fa47ddb445faeba7c18f234517b2cb8d; EXESTR OK 2/2 (both skip lines). Commit `24dda967`; flagcheck `--range` 2 PASS, 1 DEFINE, 0 FAIL, RESULT: PASS; its 1 deleted line is the `_DEBUG` description comment in Always.h, reworded.
 
 **How to see it:** the creation screen shows Add's slot, his June class buttons and info texture; create one, and he gets his beginner gear.
 Personal-shop search: Add is the last entry of the character combo (the label may show garbled, see Stage 9 bullet).
