@@ -2671,6 +2671,22 @@ public:
 	RNSI_A_SSK_POWER_BREAK_UPGRADE                        = 28225,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2c
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of the Pyro Knight skills Swordfire, Scaldic Sword, Infernal Blade, Big Burst, Avatar of the Fire and Fireworks and their upgrades ( values from June's Enum.lua )
+	RNSI_SA_SPK_SWORDFIRE_UPGRADE                         = 28034,
+	RNSI_SA_SPK_SCALDIC_SWORD                             = 28013,
+	RNSI_SA_SPK_SCALDIC_SWORD_UPGRADE                     = 28037,
+	RNSI_SA_SPK_INFERNAL_BLADE                            = 28014,
+	RNSI_SA_SPK_INFERNAL_BLADE_UPGRADE                    = 28050,
+	RNSI_A_SPK_BIG_BURST                                  = 28207,
+	RNSI_A_SPK_BIG_BURST_UPGRADE                          = 28220,
+	RNSI_A_SPK_AVATAR_OF_THE_FIRE                         = 28208,
+	RNSI_A_SPK_AVATAR_OF_THE_FIRE_UPGRADE                 = 28229,
+	RNSI_A_SPK_FIREWORKS                                  = 28209,
+	RNSI_A_SPK_FIREWORKS_UPGRADE                          = 28230,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

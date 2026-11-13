@@ -277,6 +277,9 @@ public:
 		ESI_SA_SGM_GIGA_BLAST_CHARGE,				/// char-elesis CH1i: June script id 336 ( Giga Blast charge; CH1m maps, CH3a owns the state )
 		ESI_SA_SGM_GIGA_BLAST_END,					/// char-elesis CH1i: June script id 337 ( Giga Blast end; CH1m maps, CH3a owns the state )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+		ESI_SI_A_SPK_AVATAR_OF_THE_FIRE,			/// char-elesis CH2c: Avatar of the Fire ( a June script table; March's enum has no member )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -662,6 +665,11 @@ protected:
 	void ESI_SI_A_EL_RUSHING_SWORD_StateEndFuture();	/// char-elesis CH2b2: June 32b72d70
 	void ESI_SI_A_EL_LEAP_CRASH_JUMP_StateStartFuture();	/// char-elesis CH2b2: June 32b70d30
 	void ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_FrameMove();	/// char-elesis CH2b2: June 32b75210
+	void ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_Init();	/// char-elesis CH2c: June 32b52460
+	void ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_FrameMove();	/// char-elesis CH2c: June 32b7db80
+	void ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_EventProcess();	/// char-elesis CH2c: June 32b6b9c0
+	void ESI_SI_SA_SPK_SWORDFIRE_FLY_EventProcess();	/// char-elesis CH2c: June 32b6f160
+	void ESI_SI_SA_SPK_SWORDFIRE_GROUND_EventProcess();	/// char-elesis CH2c: June 32b5e860
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à

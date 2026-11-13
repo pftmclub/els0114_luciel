@@ -6895,3 +6895,13 @@ Plan `JUNE_DUNGEONS_PHASES.md` "C3z-4t4 - Done"; log tag `JUNE_FX C3z-4t`.
 - **What changes in game.** On a fresh account the Ruben walkthrough hints (scenes 201-509, 701-702, 901-911) begin from entering a village /
   field, quest updates, level-ups and the party UI, as in June. No data change.
 - **Revert:** comment out the define (and `_WALK_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. No save change.
+
+## Stage 7 Elesis, CH2c: Pyro Knight (30) skills Swordfire, Scaldic Sword, Infernal Blade, Big Burst, Avatar of the Fire, Fireworks (char-elesis CH2c, 2026-11-13)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, still on until the CH2d review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** Swordfire ( 28012 / 28034 ), Scaldic Sword ( 28013 / 28037 ), Infernal Blade ( 28014 / 28050 ), Big Burst ( 28207 / 28220 ) and Fireworks ( 28209 / 28230 ) bind March's states on March's cases; their walk / back-walk / dash / Z-X cancels need the foot on a line.
+  Swordfire: the skill state only picks a ground or an air state on its first frame ( new states 234 / 233, EventProcess only ): the ground one ends in wait with the usual cancels, the air one lands at its end and keeps the walk speed while a forward direction is held. Swordfire and Infernal Blade preload more meshes and textures.
+  Avatar of the Fire ( 28208 / 28229, new case ): at 0.01 s the aura effect set plays ( the Fire King one with Blaze Absolu learned ) and every valid living unit within 1000 loses its Fire and Enchant Blaze extra damage and the Fire ( 37 ) and Unextinguishable Fire ( 293 ) buffs, each loss pulling an absorb particle in and refunding 10 MP ( capped at the max MP ); at 0.1 s the damage effect set plays; the enhanced skill's size ability scales both effect sets.
+- **Shared.** New enum names `RNSI_SA_SPK_SWORDFIRE_UPGRADE`, `RNSI_SA_SPK_SCALDIC_SWORD(_UPGRADE)`, `RNSI_SA_SPK_INFERNAL_BLADE(_UPGRADE)`, `RNSI_A_SPK_BIG_BURST(_UPGRADE)`, `RNSI_A_SPK_AVATAR_OF_THE_FIRE(_UPGRADE)`, `RNSI_A_SPK_FIREWORKS(_UPGRADE)` in `X2SkillTree.h`; the state `ESI_SI_A_SPK_AVATAR_OF_THE_FIRE` in `EL_STATE_ID`.
+- **Damage.** The skills' damage is the numerical tables and effect-set rows of June's `ELESIS_KNIGHT.lua` states ( Big Burst's numerical-only table: `NUMERICAL_DATA_INDEX` 1 ), so the March / June comparison is the `NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.

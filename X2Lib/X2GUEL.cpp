@@ -249,6 +249,15 @@ namespace _CONST_EL_CH2B2_
 	const int	EFFECT_MODIFIER_TAG_SCALE						= 15;		// June 321dad70 tag with no enum name ( as Eve's )
 }
 using namespace _CONST_EL_CH2B2_;
+// char-elesis CH2c: constants of Avatar of the Fire ( June 32b7db80 )
+namespace _CONST_EL_CH2C_
+{
+	const float AVATAR_OF_THE_FIRE_AURA_EVENT_TIME			= 0.01f;
+	const float AVATAR_OF_THE_FIRE_DAMAGE_EVENT_TIME		= 0.1f;
+	const float AVATAR_OF_THE_FIRE_ABSORB_RANGE				= 1000.f;
+	const float AVATAR_OF_THE_FIRE_MP_PER_ABSORBED_EFFECT	= 10.f;
+}
+using namespace _CONST_EL_CH2C_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
@@ -1342,6 +1351,10 @@ CX2GUEL::~CX2GUEL(void)
  			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
  		} break;
 	case CX2SkillTree::SI_SA_SPK_SWORDFIRE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SPK_SWORDFIRE:	// char-elesis CH2c: June 32b8c470 @503
+	case CX2SkillTree::RNSI_SA_SPK_SWORDFIRE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	/// 소드 파이어
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SPK_SWORDFIRE", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SPK_SWORDFIRE_Init );
@@ -1351,8 +1364,29 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.m_bHyperState		= true;
 			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			{	// char-elesis CH2c: June 32b8c470 @503 ( the air and the ground state, EventProcess only )
+				UserUnitStateData stateData;
+
+				stateData.Init();
+				stateData.stateID			= ESI_SI_SA_SPK_SWORDFIRE_FLY;
+				m_LuaManager.MakeTableReference( "ESI_SI_SA_SPK_SWORDFIRE_FLY", stateData.stateID );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SPK_SWORDFIRE_FLY_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID			= ESI_SI_SA_SPK_SWORDFIRE_GROUND;
+				m_LuaManager.MakeTableReference( "ESI_SI_SA_SPK_SWORDFIRE_GROUND", stateData.stateID );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SPK_SWORDFIRE_GROUND_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		} break;
 	case CX2SkillTree::SI_SA_SPK_INFERNAL_BLADE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SPK_INFERNAL_BLADE:	// char-elesis CH2c: June 32b8c470 @534
+	case CX2SkillTree::RNSI_SA_SPK_INFERNAL_BLADE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{ // 인페르날 블레이드
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SPK_INFERNAL_BLADE", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SPK_INFERNAL_BLADE_Init );
@@ -1376,6 +1410,10 @@ CX2GUEL::~CX2GUEL(void)
 		} break;
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE //김창한
 	case CX2SkillTree::SI_SA_SBH_SCALDIC_SWORD:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_SA_SPK_SCALDIC_SWORD:	// char-elesis CH2c: June 32b8c470 @527
+	case CX2SkillTree::RNSI_SA_SPK_SCALDIC_SWORD_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//스칼딕 소드
 			m_LuaManager.MakeTableReference( "ESI_SI_SA_SBH_SCALDIC_SWORD", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_SA_SBH_SCALDIC_SWORD_Init );
@@ -1496,6 +1534,10 @@ CX2GUEL::~CX2GUEL(void)
 			}
 		} break;
 	case CX2SkillTree::SI_A_SBH_FIREWORKS:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SPK_FIREWORKS:	// char-elesis CH2c: June 32b8c470 @1123
+	case CX2SkillTree::RNSI_A_SPK_FIREWORKS_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//불놀이
 			m_LuaManager.MakeTableReference( "ESI_SI_A_SBH_FIREWORKS", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SBH_FIREWORKS_Init );
@@ -1542,6 +1584,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_A_SPK_BIG_BURST:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SPK_BIG_BURST:	// char-elesis CH2c: June 32b8c470 @1089
+	case CX2SkillTree::RNSI_A_SPK_BIG_BURST_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
  	{	/// 대폭살
  		m_LuaManager.MakeTableReference( "ESI_SI_A_SPK_BIG_BURST", normalStateData.stateID );
  		normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SPK_BIG_BURST_Init );
@@ -1552,6 +1598,21 @@ CX2GUEL::~CX2GUEL(void)
  		hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
  		hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
  	} break;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SPK_AVATAR_OF_THE_FIRE:	// char-elesis CH2c: June 32b8c470 @1104
+	case CX2SkillTree::RNSI_A_SPK_AVATAR_OF_THE_FIRE_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "ESI_SI_A_SPK_AVATAR_OF_THE_FIRE", normalStateData.stateID );
+			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_Init );
+			normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_FrameMove );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_EventProcess );
+
+			m_LuaManager.MakeTableReference( "ESI_SI_A_SPK_AVATAR_OF_THE_FIRE", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	case CX2SkillTree::SI_A_SSK_CROSS_SLASH:
 		{	/// 크로스 슬래시
 			m_LuaManager.MakeTableReference( "ESI_SI_A_SSK_CROSS_SLASH", normalStateData.stateID );
@@ -10610,6 +10671,136 @@ void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_EventProcess()
 	CommonEventProcess();
 }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+// char-elesis CH2c: June 32b52460 ( Avatar of the Fire preloads nothing )
+void CX2GUEL::ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_Init()
+{
+}
+
+// char-elesis CH2c: June 32b6b9c0 ( at the end the unit lands or falls; the walk / back-walk / dash cancels need the foot on a line, no Z-X cancel )
+void CX2GUEL::ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? USI_WAIT : USI_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-elesis CH2c: June 32b7db80 ( the aura absorbs the fire debuffs of every living unit within range for 10 MP each, then the damage effect set plays; no team test )
+void CX2GUEL::ESI_SI_A_SPK_AVATAR_OF_THE_FIRE_FrameMove()
+{
+	CommonFrameMove();
+
+	if ( true == m_pXSkinAnim->EventTimerOneshot( AVATAR_OF_THE_FIRE_AURA_EVENT_TIME ) )
+	{
+		const CX2EffectSet::Handle hAura = g_pX2Game->GetEffectSet()->PlayEffectSet(
+			0 == m_usBlazeAbsoluLevel ? L"EffectSet_A_SPK_Avatar_Of_TheFire" : L"EffectSet_A_SPK_Avatar_Of_TheFire_FireKing", this );
+		vector<DELETE_CONDITION_EFFECT_SET> vecAuraDeleteCondition;
+		vecAuraDeleteCondition.push_back( DCES_DAMAGE_REACT );
+		AddEffectSetDeleteCondition( hAura, vecAuraDeleteCondition );
+
+		float fSizeRate = 1.f;
+		if ( true == TryGetEquippedSkillAbilityValue( CX2SkillTree::SA_SIZE_ABS, CX2SkillTree::RNSI_A_SPK_AVATAR_OF_THE_FIRE_UPGRADE, true, fSizeRate ) )
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hAura, EFFECT_MODIFIER_TAG_SCALE, D3DXVECTOR3( fSizeRate, fSizeRate, fSizeRate ), false );
+
+		int iAbsorbedCount = 0;
+		for ( int i = 0; i < g_pX2Game->GetUnitNum(); ++i )
+		{
+			CX2GameUnit* pUnit = g_pX2Game->GetUnit( i );
+			if ( NULL == pUnit || false == g_pX2Game->IsValidUnit( pUnit ) || CX2GameUnit::GUSI_DIE == pUnit->GetGameUnitState() || false == ( 0.f < pUnit->GetNowHp() ) )
+				continue;
+			if ( GetDistance( GetPos(), pUnit->GetPos() ) > AVATAR_OF_THE_FIRE_ABSORB_RANGE )
+				continue;
+
+			int iUnitAbsorbed = 0;
+			if ( 0.f < pUnit->GetExtraDamagePack().m_Fire.m_fTime )
+			{
+				pUnit->AccessExtraDamagePack().Init( CX2DamageManager::EDT_FIRE );
+				++iUnitAbsorbed;
+			}
+			if ( 0.f < pUnit->GetExtraDamagePack().m_EnchantBlaze.m_fTime )
+			{
+				pUnit->AccessExtraDamagePack().Init( CX2DamageManager::EDT_ENCHANT_BLAZE );
+				++iUnitAbsorbed;
+			}
+			if ( true == pUnit->HaveThisBuff( BTI_DEBUFF_FIRE ) )
+			{
+				pUnit->EraseBuffTempletFromGameUnit( BTI_DEBUFF_FIRE );
+				++iUnitAbsorbed;
+			}
+			if ( true == pUnit->HaveThisBuff( BTI_DEBUFF_UNEXTINGUISHABLE_FIRE ) )
+			{
+				iUnitAbsorbed += max( 1, static_cast<int>( pUnit->GetBuffAccumulationCountNowInFactor( BTI_DEBUFF_UNEXTINGUISHABLE_FIRE ) ) );
+				pUnit->EraseBuffTempletFromGameUnit( BTI_DEBUFF_UNEXTINGUISHABLE_FIRE );
+			}
+
+			if ( 0 < iUnitAbsorbed )
+			{
+				CKTDGParticleSystem::CParticleEventSequence* pAbsorbSeq = g_pX2Game->GetMajorParticle()->CreateSequence(
+					static_cast<CKTDGObject*>( this ), L"Avatar_of_the_Fire_Absorb_P01", pUnit->GetBonePos( L"Bip01" ) );
+				if ( NULL != pAbsorbSeq )
+					pAbsorbSeq->SetBlackHolePosition( GetBonePos( L"Bip01" ) );
+			}
+			iAbsorbedCount += iUnitAbsorbed;
+		}
+
+		const float fMpRefund = min( static_cast<float>( iAbsorbedCount ) * AVATAR_OF_THE_FIRE_MP_PER_ABSORBED_EFFECT, GetMaxMp() );
+		if ( 0 < iAbsorbedCount )
+			UpNowMpWithText( fMpRefund );
+	}
+
+	if ( true == m_pXSkinAnim->EventTimerOneshot( AVATAR_OF_THE_FIRE_DAMAGE_EVENT_TIME ) )
+	{
+		const CX2EffectSet::Handle hDamage = g_pX2Game->GetEffectSet()->PlayEffectSet(
+			0 == m_usBlazeAbsoluLevel ? L"EffectSet_A_SPK_Avatar_of_the_Fire_Damage" : L"EffectSet_A_SPK_Avatar_of_the_Fire_Damage_FireKing", this );
+		vector<DELETE_CONDITION_EFFECT_SET> vecDamageDeleteCondition;
+		vecDamageDeleteCondition.push_back( DCES_NONE );
+		AddEffectSetDeleteCondition( hDamage, vecDamageDeleteCondition );
+
+		float fSizeRate = 1.f;
+		if ( true == TryGetEquippedSkillAbilityValue( CX2SkillTree::SA_SIZE_ABS, CX2SkillTree::RNSI_A_SPK_AVATAR_OF_THE_FIRE_UPGRADE, true, fSizeRate ) )
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hDamage, EFFECT_MODIFIER_TAG_SCALE, D3DXVECTOR3( fSizeRate, fSizeRate, fSizeRate ), false );
+	}
+}
+
+// char-elesis CH2c: June 32b6f160 ( Swordfire in the air: lands at the end, a held direction keeps the walk speed )
+void CX2GUEL::ESI_SI_SA_SPK_SWORDFIRE_FLY_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( true == IsOnSomethingFuture() )
+		{
+			StateChange( USI_JUMP_LANDING );
+		}
+		else if ( ( true == m_InputData.pureRight && true == m_FrameDataFuture.syncData.bIsRight ) ||
+			( true == m_InputData.pureLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
+		{
+			m_PhysicParam.nowSpeed.x = GetWalkSpeed();
+		}
+	}
+	CommonEventProcess();
+}
+
+// char-elesis CH2c: June 32b5e860 ( Swordfire on the ground: the usual skill end and cancels )
+void CX2GUEL::ESI_SI_SA_SPK_SWORDFIRE_GROUND_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
 // char-elesis CH2b2: June 32b70d30 ( a forward and upward speed burst at the start of the jump )
 void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_StateStartFuture()
 {
@@ -12697,10 +12888,17 @@ void CX2GUEL::ESI_SI_A_SPK_BIG_BURST_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2c: June 32b5df30
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -12771,10 +12969,22 @@ void CX2GUEL::ESI_SI_SA_SPK_BURST_WAVE_EventProcess()
 // 소드 파이어
 void CX2GUEL::ESI_SI_SA_SPK_SWORDFIRE_Init()			
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	TextureReadyInBackground(L"Blur_16.dds");	// char-elesis CH2c: June 32b507d0 ( March preloads nothing )
+	TextureReadyInBackground(L"Rose_explosion_01.Tga");
+	TextureReadyInBackground(L"secretVelder_perpit_fire_flame.dds");
+	XMeshReadyInBackground(L"BumBleBee_C_SkillC_E1.Y");
+	XSkinMeshReadyInBackground(L"Darkcloud_AttackBox01.x");
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 }
 void CX2GUEL::ESI_SI_SA_SPK_SWORDFIRE_EventProcess()
 {	
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH2c: June 32b5e830 ( the skill state only picks the ground or the air state )
+	StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? ESI_SI_SA_SPK_SWORDFIRE_GROUND : ESI_SI_SA_SPK_SWORDFIRE_FLY );
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
 	{
 		if( true == IsOnSomethingFuture() )
@@ -12798,6 +13008,7 @@ void CX2GUEL::ESI_SI_SA_SPK_SWORDFIRE_EventProcess()
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 // 인페르날 블레이드
 void CX2GUEL::ESI_SI_SA_SPK_INFERNAL_BLADE_Init()
@@ -12811,6 +13022,14 @@ void CX2GUEL::ESI_SI_SA_SPK_INFERNAL_BLADE_Init()
 	TextureReadyInBackground(L"SA_EL_MEGA_SLASH_FIRE02.dds");
 	XSkinMeshReadyInBackground(L"SA_SPK_INFERNAL_BLADE_Weapon_Dummy.x");
 	TextureReadyInBackground(L"Whitecircle03.dds");
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	TextureReadyInBackground(L"EL_FIRE_10.dds");	// char-elesis CH2c: June 32b50820 ( 6 more names than March )
+	TextureReadyInBackground(L"Field_Boss_Dark_Snake_Smoke01.dds");
+	TextureReadyInBackground(L"SA_EL_MEGA_SLASH_FIRE01.dds");
+	TextureReadyInBackground(L"Whitecircle03.dds");
+	XMeshReadyInBackground(L"SPK_InfernalBlade_WeaponM01.Y");
+	XSkinMeshReadyInBackground(L"SPK_InfernalBlade_WeaponM01.x");
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_SA_SPK_INFERNAL_BLADE_EventProcess()
 {
@@ -12819,10 +13038,17 @@ void CX2GUEL::ESI_SI_SA_SPK_INFERNAL_BLADE_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2c: June 32b5eb60
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonEventProcess();
 }
 // 이터널 파이어
@@ -14427,10 +14653,17 @@ void CX2GUEL::ESI_SI_A_SBH_FIREWORKS_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2c: June 32b62bf0
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -14572,10 +14805,17 @@ void CX2GUEL::ESI_SI_SA_SBH_SCALDIC_SWORD_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2c: June 32b631f0
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
