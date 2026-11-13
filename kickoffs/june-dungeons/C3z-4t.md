@@ -38,3 +38,11 @@ Also owed (quest-system Q5b review, 2026-10-19), two quest gates the manager dri
 - StateChange `31d88bf0` skips quest-system Q5b's deferred quest scene while a guide runs (`31fbda90` @31d896aa-31d896b7; in the state-14
   village block @31d8946f-31d89493 it calls `31fbdfa0` instead). Q5b's `CX2UIQuestNew::JunePlayDeferredQuestScene` (`X2UIQuestNewJune.cpp`) plays it
   unconditionally because March has no manager: add the `31fbda90` test there.
+
+Also owed (june-dungeons C3y-2, 2026-11-13; that phase is blocked on this one): June's 9 class tutorial dungeons
+(`Dungeon_Tutorial_{Elsword,Aisha,Lena,Raven,Eve,Chung,Ara,EL,Add}.lua`, 41150-41290, staged in data035, not yet registered) drive the
+manager from their triggers. `luabind.py check Dungeon_Tutorial_Elsword` lists the 7 names this phase binds: `GetTutorialGuideManager` (CX2Game),
+`ShowInputGuideUI`, `HideInputGuideUI`, `CheckEventTriggerNPCPosX`, `CheckAndResetInputAlarm`, `OnBeginGuideNo`, `GetNowGuideNo`. It also needs
+June's `INPUT_GUIDE_STEP` table (IGS_MOVE / DASH / ATTACK / SKILL / AWAKE) in data036 `Enum.lua`. Their sub-stage 0 cannot clear without
+`CheckEventTriggerNPCPosX` (Done note "C3y-2 - Stopped" in `JUNE_DUNGEONS_PHASES.md`). Scope these with the rest, and leave C3y-2's other 5
+bindings and the dungeon registration to C3y-2. The play-test that proves the manager is C3y-2's (a new Elsword through his tutorial).

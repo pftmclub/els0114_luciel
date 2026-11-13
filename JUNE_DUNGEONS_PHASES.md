@@ -305,3 +305,31 @@ W3c fix `SERV_IRUHADEV_JUNE_FIELD_CHANGE_ACK` stays on). User decision (2026-11-
 - **Re-test 3 (user, 2026-11-12): passed.** Cobo rows show icon + name; logs: `button warp 20003 -> 1000, cost=21780` and `1000 -> 1002,
   cost=27720`, each followed by `entering mapID=1000 / 1002 (warp item)`; 0 EXCEPTION. W3f done. (Unrelated, not this phase: `ChainQuestInfo.lua`
   calls the unbound `AddGroupChainQuest`.)
+
+## C3y-2 - Stopped (2026-11-13, Opus 5.5): blocked on C3z-4t
+
+No code, no flag, no build, no pack. The kickoff's stop rule applied ("if the exit or the latch needs June's
+`CX2TutorialGuideManager`, stop and report"). User 2026-11-13: stop here, C3z-4t first, then C3y-2 ports in one go.
+
+- **June's handler, confirmed.** `CX2StateServerSelect::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ` `325622e0`, dumped whole: unit type 2-12
+  -> 41160 / 41170 / 41190 / 41180 / 41290 / 41210 / 41220 / 41230 / 41240 / 41250 / 41420, default 41150 (Elsword). That is the
+  kickoff table exactly. Every other room field is set the way March sets it, then send 0x5c and wait for 0x5d. **Elesis has no early
+  `return`**: she gets 41220. It is June's only tutorial-room builder (the `L"tutorial"` string has one xref, `32562322`), so June has
+  no `CX2StateBeginning` copy. March's copy (`X2StateBeginning.cpp:4057`) still sends the old `DI_TUTORIAL_*` 30030-30035. Callers:
+  `325712b0` (inventory ACK) and `325672c0` (a popup path). funcmap row `325622e0` updated.
+- **Why it stops: the scripts can't be finished without the guide manager.** `luabind.py check` over the 9 `Dungeon_Tutorial_*` gives
+  RESULT: FAIL with 12 unbound names, the same set in every script. `CreateCurtain` / `DeleteCurtain` appear only in Lena's and Raven's.
+  - 7 are the manager's: `GetTutorialGuideManager` (CX2Game), `ShowInputGuideUI`, `HideInputGuideUI`, `CheckEventTriggerNPCPosX`,
+    `CheckAndResetInputAlarm`, `OnBeginGuideNo`, `GetNowGuideNo`.
+  - 5 are not: `PopTalkBox` (CX2Game), `IsOnSomethingNow` (CX2GUUser), `ShowJumpGuide` (CX2DungeonGame), and `CreateCurtain` /
+    `DeleteCurtain` (CX2DungeonSubStage).
+  - Enum gate: 117 failures. In every script: June's `INPUT_GUIDE_STEP` table (IGS_MOVE / DASH / ATTACK / SKILL / AWAKE), the
+    `NUI_TUTORIAL_*` ids and the `WI_TUTORIAL_*_STAGE0` world ids.
+  - Softlock, Elsword's script: sub-stage 0 clears on `CC_KILL_ALL_ACTIVE_NPC`, and its only active NPC is `NUI_TUTORIAL_DUMY2`.
+    DUMY2 is killed only by `RF_STAGE0_SUB0_TRIGGER5`, whose condition is `GetTutorialGuideManager():CheckEventTriggerNPCPosX(DUMY2)
+    < 3`. Sub-stage 2 waits on `GetNowGuideNo() == 102`. With March's binder the player cannot get past sub-stage 0, so pointing new
+    characters at 41150-41230 now would trap them. March's battle-field tutorials stay live (8 classes; Add keeps CH0c's skip).
+- **Routed.**
+  - C3z-4t's kickoff now carries the 7 manager names, `INPUT_GUIDE_STEP`, and these 9 scripts as its play-test material.
+  - C3y-2's kickoff now depends on C3z-4t and carries the 5 non-manager bindings, which stay its own. Its task is otherwise unchanged.
+  - char-add TU and char-luciel TU already wait on C3y-2, so they now wait on C3z-4t too. No edit needed.
