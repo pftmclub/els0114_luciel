@@ -509,6 +509,38 @@ Log `[JUNE_CHAR] LUCIEL NEWUNIT unit <uid> class <n> read as a word ( a char wou
   (`X2State.cpp:8772` / `:8915`, no class field), not NU2. The scratch unit was deleted afterwards (no other table held uid 165; backup
   `els_db_20261114_021901_pre_sql.sql`).
 
+### NU2 - Review (2026-11-14)
+
+Opus 5.5 high. **Pass, no code change.** Reviewed `0c915cba` against `nu0_unit_class_width.tsv` and the Done note.
+- **Members:** `cl /P` of a stdafx-only X2Lib probe (census.py's `cl_cmd`, flag and `SERV_IRUHADEV_OFFLINE` on, exit 0) leaves 33 unit-class
+  members, all `short`: CommonPacket.h 19, ClientPacket.h 10 (+ March's own `short m_sNewUnitClass`), `ClientPacket_Global.h`
+  `KEGS_FINAL_DELETE_UNIT_ACK` (reached), `RoomNpcSlot`, `GuildMemberInfo`, `RelationshipCommunityInfo`; plus the emulator's `KBotCastEntry` /
+  `KPartyBot` outside stdafx = the Done note's 35. **0 `char` unit-class members survive.** Not findings: `KItemFormatTemplet::m_byUnitClass`
+  (item.kim record byte, unsigned, every class id <= 202 fits; item-templet fields are DU3's), `KPVPChannelInfo::m_cPVPChannelClass` (PvP
+  channel), unit types `m_cUnitType` / `m_cAttUnitType`.
+- **Layout (Ghidra, read-only):** `3235eb7b` `MOVZX ECX, word ptr [EBP + 0x15]` then `3235eb84` dword at +0x17 (KUnitInfo); `32361e4f` word
+  at +0x4a then `32361e56` dword at +0x4c (KSquareUserInfo). June's serializer: handler `3255b100` -> `3255c7c0` -> packet GET `320ed1f0` ->
+  KUnitInfo GET `320eb310` calls `33051f40( +0x15 )`, the same getter as `+0x53` (`m_usPort`), and `33051f40` reads 2 bytes (`33052870( p, 2 )`).
+  So June's wire class is 2 bytes, as NU2's `Put( short )` / `Get( short& )`.
+- **Narrowing:** re-grep of `(char)` / `static_cast< char >` / `char` locals and parameters near a class in X2Lib / KTDXLIB / X2ServerProtocol:
+  every hit is the `#else` copy of an NU2 site, the dead `UPGRADE_SKILL_SYSTEM_2013` `#else`, `SetChungUIClass` (Chung UI index) or
+  X2SkillNoteManager.cpp:119 (a class-line count). The four widened parameters, X2Room.cpp:1105 and X2UIPersonalShopBoard.cpp:2258 are `short`.
+- **Left rows:** confirmed. X2SkillTree.h 4072 / 4119, .cpp 1822 / 5404 and X2UIInventory.cpp:6650 sit in the `#else` of
+  `UPGRADE_SKILL_SYSTEM_2013` (Always.h:1643); `KPartyUserInfo`'s `char` copy (now CommonPacket.h:4719) is the `#else` of `SERV_CHANNEL_PARTY`
+  (ServerDefine.h:201); `m_cGetCharClass` is under the undefined `SERV_EVENT_CHUNG_GIVE_ITEM`; `BOT_CAST`'s `(char)UC_*` are base classes.
+- **Second homes:** Always.h:13162, ServerDefine.h:4801, `X2ServerProtocol_2010.vcxproj:1037` (X2TOOL|Win32, `NAME=` empty),
+  `tools/flagcheck.py:65` `SECOND_HOMES` row.
+- **Hygiene:** flagcheck `--range 0c915cba^..0c915cba` (19 code files + Always.h + ServerDefine.h): `files: 19 PASS, 0 PASS~ (blank/marker
+  only), 2 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`; `in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 6
+  EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`. The 6 EOL rows are the
+  `KGuildMemberInfo` / `KGuildMemberMessageInfo` LF lines the Done note names. junediverge `--check-all`: `RESULT: PASS`. enumscan: 190 A/B
+  rows in X2Unit.cpp, none on an NU2 line.
+- **Play-test logs:** exe e9dee3d6; offline_server.log:193 `[JUNE_CHAR] LUCIEL NEWUNIT unit 165 class 200 read as a word ( a char would read
+  -56 )`, once; 0 EXCEPTION; 5 UNHANDLED `E_DISABLE_HB_CHECK_REQ` (not NU2). Save: no unit 165, no class 200 (31 units, highest class 125).
+- **Kickoff:** NU4's "Amended by NU0" said `InitDummyUnits` keeps the class in a signed `char`; that field is `KUnitInfo::m_cUnitClass`, a
+  `short` since NU2. NU4's "Amended by NU2" now says so.
+- Build skipped: no code change, no play-test.
+
 ### NU3 - Done (2026-11-14)
 
 Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET` (parser) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DATA` (load line; `#error` without the

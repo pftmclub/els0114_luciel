@@ -86,6 +86,8 @@ NU0 (2026-11-02), `june2017_re/char_luciel/nu0_create.tsv` (47 rows) and `nu0_ty
 - The unit class is a `short` on the wire and in the emulator (`SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD`): a created class 200 reaches the
   client as 200 (`[JUNE_CHAR] LUCIEL NEWUNIT ... class 200 read as a word`). `MakeDefaultUnitInfo` takes a `short`; the create-unit echo in
   `Handlers_Unit.cpp` already casts to `short`.
+  NU2 review: `InitDummyUnits` writes `KUnitInfo::m_cUnitClass`, now a `short`, so NU0's "signed `char`" note above no longer holds; class 200
+  fits.
 - **Server-select trap:** `CX2StateServerSelect::ChangeUnitButtonInfo` reads `pUnit->GetUnitTemplet()->m_MotionFile` unconditionally after
   NU1's 707 test, and the ACK handler calls `GetType()` on the top unit: a unit whose class has no templet crashes the select screen. Lu/Ciel's
   seven classes have templets (NU3); keep that true for every class NU4 can create, and check June `32564d50` before adding a guard.
