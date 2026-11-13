@@ -659,7 +659,11 @@ bool CX2UIPersonalShopBoard::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPa
 #endif // NEW_CHARACTER_EL
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 #ifdef SERV_LIMIT_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				// char-add CH0c: Add is creatable on US, so his entry ignores the limit
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 				if( static_cast< CX2Unit::UNIT_TYPE >( _CONST_LIMIT_UNIT_::iLimitType ) >= CX2Unit::UT_ADD )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 				m_pComboCharacter->AddItem(L"#C0000FF애드#CX", NULL, false);		/// 변경이 필요 하다.
 #endif //SERV_9TH_NEW_CHARACTER
@@ -710,7 +714,11 @@ bool CX2UIPersonalShopBoard::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPa
 #endif // NEW_CHARACTER_EL
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 #ifdef SERV_LIMIT_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				// char-add CH0c: Add is creatable on US, so his entry ignores the limit
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 				if( static_cast< CX2Unit::UNIT_TYPE >( _CONST_LIMIT_UNIT_::iLimitType ) >= CX2Unit::UT_ADD )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 				m_pComboCharacter->AddItem(L"#C0000FF애드#CX", NULL, false);		/// 변경이 필요 하다.
 #endif //SERV_9TH_NEW_CHARACTER
@@ -765,7 +773,11 @@ bool CX2UIPersonalShopBoard::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPa
 #endif // NEW_CHARACTER_EL
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 #ifdef SERV_LIMIT_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				// char-add CH0c: Add is creatable on US, so his entry ignores the limit
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 				if( static_cast< CX2Unit::UNIT_TYPE >( _CONST_LIMIT_UNIT_::iLimitType ) >= CX2Unit::UT_ADD )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 				m_pComboCharacter->AddItem(L"#C0000FF애드#CX", NULL, false);		/// 변경이 필요 하다.
 #endif //SERV_9TH_NEW_CHARACTER
@@ -812,7 +824,11 @@ bool CX2UIPersonalShopBoard::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPa
 #endif // NEW_CHARACTER_EL
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 #ifdef SERV_LIMIT_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				// char-add CH0c: Add is creatable on US, so his entry ignores the limit
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 				if( static_cast< CX2Unit::UNIT_TYPE >( _CONST_LIMIT_UNIT_::iLimitType ) >= CX2Unit::UT_ADD )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 				m_pComboCharacter->AddItem(L"#C0000FF애드#CX", NULL, false);
 #endif //SERV_9TH_NEW_CHARACTER
@@ -859,7 +875,11 @@ bool CX2UIPersonalShopBoard::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPa
 #endif // NEW_CHARACTER_EL
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 #ifdef SERV_LIMIT_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				// char-add CH0c: Add is creatable on US, so his entry ignores the limit
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 				if( static_cast< CX2Unit::UNIT_TYPE >( _CONST_LIMIT_UNIT_::iLimitType ) >= CX2Unit::UT_ADD )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 				m_pComboCharacter->AddItem(L"#C0000FF애드#CX", NULL, false);		/// 변경이 필요 하다.
 #endif //SERV_9TH_NEW_CHARACTER
@@ -906,7 +926,11 @@ bool CX2UIPersonalShopBoard::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPa
 #endif // NEW_CHARACTER_EL
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 #ifdef SERV_LIMIT_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				// char-add CH0c: Add is creatable on US, so his entry ignores the limit
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 				if( static_cast< CX2Unit::UNIT_TYPE >( _CONST_LIMIT_UNIT_::iLimitType ) >= CX2Unit::UT_ADD )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 				m_pComboCharacter->AddItem(L"#C0000FF애드#CX", NULL, false);		/// 변경이 필요 하다.
 #endif //SERV_9TH_NEW_CHARACTER
@@ -953,7 +977,11 @@ bool CX2UIPersonalShopBoard::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wPa
 #endif // NEW_CHARACTER_EL
 #ifdef SERV_9TH_NEW_CHARACTER // 김태환 ( 캐릭터 추가용 )
 #ifdef SERV_LIMIT_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+				// char-add CH0c: Add is creatable on US, so his entry ignores the limit
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 				if( static_cast< CX2Unit::UNIT_TYPE >( _CONST_LIMIT_UNIT_::iLimitType ) >= CX2Unit::UT_ADD )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 				m_pComboCharacter->AddItem(L"#C0000FF애드#CX", NULL, false);		/// 변경이 필요 하다.
 #endif //SERV_9TH_NEW_CHARACTER

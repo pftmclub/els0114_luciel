@@ -744,6 +744,11 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
   sub-maps), plus `MapData.lua` `AddLocalMapInfo` (June 201 rows, March 186) and `DLG_Map_Select_Window(_Instance).lua`. The village minimap dialogs
   (`DLG_Map_Village_*`) already equal June's. The user's 2026-10-09 rollback keeps the core-list region-map files March's (MODS "June partial ports
   replaced"), so the wave is done whole here or not at all. Evidence: `june2017_re/w3b_village_census.tsv`.
+- **Two Add-limit leftovers (char-add CH0c, 2026-11-13).** (1) The item exchange shop: March's US `g_iNumOfSlotInSlotSet = 8`
+  (`X2UIItemExchangeShop.h:11-21`, `SERV_LIMIT_UNIT`) leaves no slot for a ninth class's item; June rebuilt the shop (its slot-set refresh
+  `32924ac0` walks 5 set statics, the item list in sets of 5, and has no per-set slot constant), so the fix is June's exchange UI whole, not a
+  raised constant. (2) The personal-shop search combo's Add entry (lifted by CH0c) is March's hard-coded CP949 label `L"#C0000FF<Add>#CX"`
+  (`X2UIPersonalShopBoard.cpp`, seven blocks, studio TODO); if it shows garbled, June's combo text goes with June's search board (ctor `32d8e980`).
 
 **Why UI is last and not first:** UI is not one system. Each stage above brings its own June dialogs: the region maps (1), slots and skill tree (3), quests (4), and the transcendence guides (6). A UI-first pass would port buttons with no system behind them, and then collide with every feature stage that touches the same dialog. The only UI work that must come early is the framework itself, and that is measured in Stage 2.
 

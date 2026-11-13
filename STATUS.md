@@ -141,7 +141,7 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH0c | **ready**: lift the US limit for `UT_ADD` (create screen + 7 shop combos), June's 6-button class dialog + `character_info_09`, emulator comments; no stat rows | Opus 5.5 / high, Opus review, user play-test | CH0 (done), char-ara CHNa review (done) | `X2StateCreateUnit.*`, `X2UIPersonalShopBoard.cpp`, koms | `CH0c.md` |
+| CH0c | **user play-test, then review** (`CH0c-review.md`): Add's slot shown on US (create screen + 7 shop combos), June's class-button dialog + `character_info_09` live; exchange shop -> Stage 9 | Opus 5.5 / high, Opus review, user play-test | CH0 (done), char-ara CHNa review (done) | `X2StateCreateUnit.*`, `X2UIPersonalShopBoard.cpp`, koms | `CH0c.md` |
 | CH0b | blocked (char-elesis CH6 walk): 7,686 June Add assets staged (new kom data207), packed, copied; PT / LP motions held for CH1 | Sonnet 5.5 / high, user play-test | CH0 (done), char-elesis CH6 | koms, save | `CH0b.md` |
 | CH1a | blocked (CH0, char-elesis Z): movement and slot-head states; no review of its own | Sonnet 5.5 / high | CH0, char-elesis Z | `X2GUAdd.*`, Always.h | `CH1a.md` |
 | CH1b | blocked (CH1a): reactions; review covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUAdd.*` | `CH1b.md` |

@@ -392,6 +392,43 @@ gear, enters the village and a dungeon, survives a relog; no other character's s
 **Done gate:** a new Add made on the creation screen plays; the stat loader logs his rows (or the logged fallback until the user packs); no new error
 against a pre-CH0c log.
 
+### CH0c - Done (2026-11-13)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE` (+ `_DEBUG`, on until the CH0c review). Pre-phase log saved: `data\ErrorLog_pre_CH0c_add.txt`.
+
+**Code (3 files + Always.h).**
+- `X2StateCreateUnit.cpp` ctor: the `UT_ADD` test that hid `AddCreateUnitSlot` is in `#else` (June's ctor `3255bd10` has no limit test); the other
+  slot tests and the default-select switch (`:175-230`) keep March's limit (June opens on Ain = Stage 8). Debug: `ADD CREATE slot shown` (ctor),
+  `ADD CREATE select class 9 type 9` (SelectAdd).
+- `X2UIPersonalShopBoard.cpp`: the seven `iLimitType >= UT_ADD` tests in `#else`; combo index 9 already maps to `UT_ADD` (`:1990`, `:3275`).
+- `Offline/X2OfflineInventory.cpp`: the class-9 row's "unreachable" comments superseded under the flag (comments only; nothing in
+  `Handlers_Unit.cpp` refuses class 9: `BuildCreateUnitAck` checks nickname, duplicate name and slot count only).
+
+**June reads (Ghidra, read-only; funcmap rows `Char Add CH0c`).**
+- `SelectAdd` `32555320` = March's `:2346`: the floats too (Move 0 / -50 / 200, Scale 1.2, light -250 / 100 / -600). June inlines March's
+  `ChangeCreateUnitTypeChangeInfoDlg`; its extra event lookup (0x8f2 / 0x90e -> `3254fdb0`) is the jumping-slot gate (Lu/Ciel NU4 / Stage 9). No code.
+- `SelectUpperClass` `325519d0` writes the previewed class to `+0x2c0`, and the create request `325584f0` sends `+0x2c0`. March sends
+  `m_SelectUnitType`, so a preview of 32 / 122 still creates base Add. Kept March's packet (kickoff); for base Add both send 9.
+- `3254e410` is a promotion-item **preload** from the class templet, not March's `EquipPromotionItem` (char-ara CH5 read it the same). March's
+  `ADD_PROMOTION_ITEM_ID` 41757-41761 stays. No code.
+- Create voice `L"%d.ogg "`: `buff[6]` truncates it to `"1.ogg"`, so the trailing space never reaches `PlaySound`. Same for every class. No fix.
+- Exchange shop: June rebuilt it (`32924ac0`: 5 set statics, sets of 5, no per-set slot constant), so March's US 8 stays. Routed to Stage 9 (bullet
+  "Two Add-limit leftovers", with the personal-shop combo's hard-coded CP949 Add label).
+
+**Data.** `adopt-june` (bytecode) `DLG_Unit_Create_ClassChange_Button_Add.lua` (data034, replaced, backup `kom_backup_stage_june/20261113_072012`);
+`luabind.py check`: 22 calls, 0 unbound, ENUM 0 missing, RESULT: PASS. `stage-june` `DLG_UI_Common_Texture_GUI_character_info_09.tga` / `.TET`
+(data057, replaced, backup `_072017`). PACK OK / COPY OK data034 (md5 732ebdd5...) and data057 (md5 99c65915...). `DLG_Unit_Create_Unit_Button_New.lua`
+kept March's (Add's slot exists there, only hidden; June's layout comes with Lu/Ciel NU4). Movies, background and voices are byte-identical (CH0).
+**Stat rows:** none (the flat StatTable already has 9 / 32 / 122, CH0 amendment).
+
+**Hygiene.** flagcheck `--worktree --files` (4 files): 2 PASS, 2 OTHER (Always.h defines; the `_DEBUG` blocks), 0 FAIL, 0 deleted lines,
+RESULT: PASS. junediverge `--check`: RESULT: PASS. enumscan: 0 rows.
+DEPLOY OK: X2_offline.exe is 26,367,488 B, dated 2026-11-13 07:35:21, md5 a225d80fa125b7e1bf227670ea9072a4.
+EXESTR OK: 2 of 2 found (`[JUNE_CHAR] ADD CREATE slot shown`, `... select class`, wide).
+
+**How to see it:** the creation screen shows Add's slot, his June class buttons and info texture; create one, and he gets his beginner gear.
+Personal-shop search: Add is the last entry of the character combo (the label may show garbled, see Stage 9 bullet).
+
 ## Phase CH0b - Every June Add asset, whole, first
 
 **Run with:** Sonnet 5.5 high, then a user play-test. No C++ unless CH0 found a March reader a June asset breaks (`..._ASSET`). Sub-tag `DATA`.

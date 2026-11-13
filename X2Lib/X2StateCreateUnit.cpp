@@ -1,4 +1,7 @@
 #include "StdAfx.h"
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+#include "Offline/X2OfflineLog.h"	// char-add CH0c: the ADD CREATE lines
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
 #ifndef ELSWORD_NEW_BEGINNING
 #include ".\x2statecreateunit.h"
 
@@ -129,10 +132,18 @@ m_pDLGMSGOkBoxEnterTutorial( NULL )
 	{
 		static_cast<CKTDGUIRadioButton *>( m_pDLGCreateUnitFront->GetControl( L"Elesis_Slot") )->SetShowEnable( false, false );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+	// char-add CH0c: June's ctor 3255bd10 has no limit test, AddCreateUnitSlot stays shown
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ADD CREATE slot shown ( US limit %d, slot %s )", _CONST_LIMIT_UNIT_::iLimitType,
+		( NULL != m_pDLGCreateUnitFront->GetControl( L"AddCreateUnitSlot" ) ) ? L"found" : L"MISSING" );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 	if( eLimitType < CX2Unit::UT_ADD && NULL != m_pDLGCreateUnitFront->GetControl( L"AddCreateUnitSlot") )
 	{
 		static_cast<CKTDGUIRadioButton *>( m_pDLGCreateUnitFront->GetControl( L"AddCreateUnitSlot") )->SetShowEnable( false, false );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 #endif //SERV_LIMIT_UNIT
 
 	if ( NULL != g_pData->GetMyUser() )
@@ -2409,6 +2420,9 @@ void CX2StateCreateUnit::SelectAdd()
 
 	m_SelectUnitClass = CX2Unit::UC_ADD_NASOD_RULER;
 	m_SelectUnitType = CX2Unit::UT_ADD;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ADD CREATE select class %d type %d", static_cast<int>( m_SelectUnitClass ), static_cast<int>( m_SelectUnitType ) );	// char-add CH0c
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
 	ChangeCreateUnitTypeChangeInfoDlg ( CX2Unit::UT_ADD );
 	ChangeCreateUnitStandMeshInstance ( CX2Unit::UT_ADD );
 

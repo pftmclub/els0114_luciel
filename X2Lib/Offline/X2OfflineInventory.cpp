@@ -1216,6 +1216,9 @@ namespace
 	/// K3: with June's item.kim the class-9 ids (112991.., 41757..) now resolve to
 	/// templets too. The row stays unreachable for the reason above.
 #endif SERV_IRUHADEV_JUNE_ITEM_KIM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+	/// char-add CH0c: the creation screen shows Add and the emulator takes class 9, so his row is reached offline.
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 	struct KBaseItemSet
 	{
 		int	m_iUnitClass;
@@ -1233,7 +1236,11 @@ namespace
 		{ 6, { 111114, 111115, 111116, 111117, 111118 }, { 133125, 133126, 133127, 133128, 133129 } },	///< Chung
 		{ 7, { 112700, 112701, 112702, 112703, 112704 }, {  41460,  41470,  41480,  41490,  41500 } },	///< Ara
 		{ 8, { 112985, 112986, 112987, 112988, 112989 }, {  41720,  41721,  41722,  41723,  41724 } },	///< Elesis
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
+		{ 9, { 112991, 112992, 112993, 112994, 112995 }, {  41757,  41758,  41759,  41760,  41761 } },	///< Add ( char-add CH0c )
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 		{ 9, { 112991, 112992, 112993, 112994, 112995 }, {  41757,  41758,  41759,  41760,  41761 } },	///< unreachable, see above
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE
 	};
 
 	/// Where each half's five pieces go, in the same order the arrays list them.

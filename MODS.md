@@ -6784,3 +6784,11 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_elesis/ch0b_stage_li
 - **Files:** `X2GUUser.cpp/.h`, `KTDXLIB/Always.h` (description lines only).
 - **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4a's); debug `[JUNE_STATCALC] REACT ... special=` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` in `KTDXLIB/Always.h`, rebuild (reverts D4a too).
+
+## Stage 7 Add, CH0c: Add on the creation screen (char-add CH0c, 2026-11-13)
+
+- **What:** the US `SERV_LIMIT_UNIT` limit (`_CONST_LIMIT_UNIT_::iLimitType = 8`) no longer hides `AddCreateUnitSlot` on the creation screen (June's ctor `3255bd10` has no limit test) nor Add's entry in the seven personal-shop character combos. The default-select switch keeps March's limit (June opens on Ain, Stage 8). Create Add there: he gets the live-DB class-9 gear (112991-112995) and costume (41757-41761) that `SeedBeginnerGear` already held.
+- **Data:** June's `DLG_Unit_Create_ClassChange_Button_Add.lua` (data034, June bytecode via `adopt-june`; 6 class buttons, the 4 June-only lines return `UC_NONE` until char-add CHNa) and June's `DLG_UI_Common_Texture_GUI_character_info_09.tga` / `.TET` (data057, byte-exact). Backups `kom_backup_stage_june/20261113_072012` (lua) and `_072017` (texture); data034 and data057 packed and copied.
+- **Files:** `X2StateCreateUnit.cpp`, `X2UIPersonalShopBoard.cpp`, `Offline/X2OfflineInventory.cpp` (comments), `KTDXLIB/Always.h`.
+- **Flags:** `SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE`; debug `[JUNE_CHAR] ADD CREATE` lines under `SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG` (retired by the CH0c review).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE` in `KTDXLIB/Always.h` and rebuild; restore the three files from the two backup folders and `kom.py pack` / `copy` data034 and data057. Add characters already created stay in the save and still load.
