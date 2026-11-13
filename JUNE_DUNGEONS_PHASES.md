@@ -417,3 +417,7 @@ Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE` (+ `_DEBUG`: begin / step / end / refus
 - **The account quirk and the play-test.** Every unit type in the save has a level 10+ character, so `CheckToNeedTutorialGuide` (Benders,
   `31fbde90`) returns false for any new character and `CanBeginGuide` would refuse outside a dungeon anyway. The play-test drives scene 101
   from the console inside a dungeon (level checks skipped there, as June). t4 owns the fresh-account walk.
+- **Play-test (2026-11-13, user): pass.** Console scene 101 in a dungeon, twice: `begin 101` / `step 101: gfx 2, key limit 1, stop frame 1` /
+  `end 101` (ended by the skill key after 4 s and 26 s); nothing on screen, as expected until t2's movie. Key-hint boxes (`ShowInputGuideUI`
+  0 / 2, `HideInputGuideUI`) showed and faded. No `can't find` for the guide names. The start-up `load 24 scene(s)` line is lost:
+  `LoadData` runs before offline_server.log opens (scene 101 was found, so the table loaded); the C3z-4t2 review moves that line.
