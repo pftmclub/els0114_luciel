@@ -783,7 +783,7 @@ Files: `X2GUUser.h`, `X2GUUser.cpp`, `X2Unit.h`, `X2Unit.cpp`, `Always.h`. No `_
   `UpdateShowViewListByActiveBody`), CH1o (vslot 0x848, vslot 0x648 clears `m_bActiveBodyChanged`), CH1a0 (the pair is declared).
 - **Hygiene.** flagcheck `--worktree` (my five files): 2 PASS, 2 PASS~ (one blank line each), 1 OTHER (Always.h: a peer's uncommitted
   char-elesis CH3c2 block, not staged), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS. enumscan: no row in
-  DU1b's lines.
+  DU1b's lines. Commit `ab1b6f5a`; `--range ab1b6f5a^..ab1b6f5a`: 3 PASS, 2 PASS~, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2Unit.cpp`, `X2GUChung.cpp`: 0 errors each; a flag probe shows
   every dependency on. Full build skipped: no play-test (DU1d builds and hands off the regression pass).
 - **In game:** nothing to see. Every other class has no `DUO_TYPE` (miss 3 -> `UpdateDuo` returns at the unit-type test) and form 0.
