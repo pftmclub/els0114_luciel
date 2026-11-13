@@ -491,6 +491,6 @@ Verdict: **pass, no transcription error.** The only code change is `//#define SE
     `INPUT_GUIDE_STEP`), both intended.
   - The retire's `--worktree` gives "define NOT FOUND" (expected for a retired debug flag) and 1 replaced line.
   - junediverge `--check-all`: allow-listed 225, `RESULT: PASS`. enumscan: 0 A/B in 9 files.
-- **Build.** `build.py --deploy` started after the retire, **not awaited** (debug-retire rule). The always-on lines stay: `load failed`,
+- **Build.** Skipped: debug retire only (the queued build was cancelled; rule amended 2026-11-13: no build for a debug retire). The always-on lines stay: `load failed`,
   `gfx adapter unbound`, `gfx show %d not seen`, and the first-begin count.
 - **Next.** C3z-4t3 is ready (`kickoffs/june-dungeons/C3z-4t3.md` checked). C3y-2 is unblocked (t1 + t2 done) and runs alongside t3.

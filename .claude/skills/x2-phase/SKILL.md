@@ -146,9 +146,10 @@ step needs the answer, otherwise let it run). The user has authorised this for O
    Exception (user, 2026-11-09): only a phase or review that hands off a play-test runs the full build. Any other
    phase proves compilation with a one-file probe build (0 errors) and writes "full build skipped: no play-test"
    in place of the `DEPLOY OK` line.
-   Exception (user, 2026-11-03): if the only code change is commenting out a `_DEBUG` `#define`
-   (a review retiring its debug lines), start the build in the background and do not wait for it;
-   write "not awaited" in place of the `DEPLOY OK` line, then commit and hand off.
+   Exception (user, 2026-11-13; replaces the 2026-11-03 "start it, don't wait"): if the only code change is
+   commenting out a `_DEBUG` `#define` (a review retiring its debug lines), run no build at all (no full
+   build, no probe); write "build skipped: debug retire only" in place of the `DEPLOY OK` line, then commit
+   and hand off. Older kickoffs that say "start the build, not awaited" mean "no build".
 3. **Done note** in the plan doc, under the phase: what landed (commit, flag), hygiene lines
    from flagcheck, the deploy line, per-item "how to see it in game", open questions for the
    user. **Keep it under ~60 lines**; long RE tables go to a
