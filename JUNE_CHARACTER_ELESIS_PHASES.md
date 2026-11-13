@@ -1356,6 +1356,55 @@ Read from the exe bytes (`charport_adis.py elesis`, `disasm_range.py`, `vtslot.p
 
 **Nothing to play-test.** CH1 kickoff checked (its CH1q amendment stands; deps CH1q review and CH0b both done). Next: `/x2-phase char-elesis CH1` (Opus 5.5 high).
 
+### CH1 - Done (2026-11-13)
+
+Opus 5.5. **The deploy unit is live.** Defined in `Always.h`: `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` (:12624), `_WOS` (:12649); `_WOS_DEBUG` (:12672, CH1q's)
+and the new `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (:12823) for the play-test. Elesis (8 / 29 / 30 / 120 / 121) now runs June's registration, state bodies,
+virtuals, skill head, pressed-slot space and her Way of the Sword class side and gauge twins (CH1a-CH1q). Every `#error` guard holds (probes below).
+- **`[JUNE_CHAR] ELESIS DATA`** (`_LIVE`, end of June's `InitState`, `X2GUEL.cpp:493`; include `:6-8`), Ara's line: class, script, motion, state count,
+  `wait_state_change`. Not June; stays after the review.
+- **`[JUNE_CHAR] ELESIS SKILL SBUF`** (`_ELESIS_DEBUG`, `X2GUUser.cpp`, the CH1p amendment): `parse` (state, `m_iStateBuffSkillID`, level, list size; once a second
+  per state), `cleared` (learn check), `at once` (time-0 rows inside the parse), `frame` (`CommonFrameMove_InsertBuffFactor`), `state end`
+  (`ApplyAllStateInsertBuffFactor`); `UT_ELESIS` only, helpers in `_CONST_GUUSER_EL_CH1_`. The review retires it with `_WOS_DEBUG`.
+- **Script:** `luasrc.py adopt-june data036 ELESIS_KNIGHT.lua` (dry run first): June's file replaces March's whole as `ljconv` bytecode, 245,689 B sha1 `4c3b68b4`,
+  no core-list row. Record `june2017_re/june_adopt_20261113_083005.tsv`, backup `kom_backup_stage_june\20261113_083005`.
+- **Enum gate:** `luabind.py check ELESIS_KNIGHT` first failed on CH0's 4 `ENUM MISSING NAME`; data036 `Enum.lua` gains June's `RNSI_A_SCA_BLOOD_STING` 28224,
+  `RNSI_A_SGM_UPPER_SLASH` 28222, `RNSI_P_SBH_BLAZE_ABSOLU` 28418, `RNSI_SA_SCA_CHASING_SWORD` 28043 (`Enum.src.lua:14308 / 16063 / 15734 / 15564`, one
+  `-- char-elesis CH1` comment each), `luasrc.py refresh data036 Enum.lua`. Rerun: 0 methods, 0 unbound, `ENUM 0 table(s) missing, 0 member(s) missing, 3 nil in June
+  too` (`CT_NORMAL_LOOK_DIRECTE`, `CT_NORMAL_LOOK_TRACKING`, `CT_PARTS_LOOK_TRACKINGT`), `RESULT: PASS`. `core --check` / `ledger --check`: PASS, 0 FAIL, 0 WARN.
+  No C++ member added: no C++ reads the four names yet (CH3a2 / CH3b2 / CH3c / CH4 own them).
+- **Held motions** (`ch1_held_motions.tsv`): `kom.py stage-june`: June's `MOTION_EL_GM.x` (3,400,722 B) / `Motion_EL_BH.x` (3,083,072 B) replace March's in data033
+  (backup `kom_backup_stage_june\20261113_083036`). The five names each that March's script played go with March's script.
+- **Packed / copied (no ask):** `PACK OK data036` (~2: the script, `Enum.lua`), `PACK OK data033` (~2: the motions);
+  `COPY OK data036 ... 14088772 bytes, 270 entries, md5 5a83c1d0d4d03483090ee888a65a8ec6`, `COPY OK data033 ... 187855678 bytes, 165 entries, md5 883d4aac3ce8c73ea315a51521244185`.
+- **Divergence gate:** with `_LIVE` + `_WOS` on, `junediverge` saw four `GT_PVP` tests (rule b): `ReInit` x2 (June body and `_WOS`'s March `#else`),
+  `Start_SwordmanDestruction`, `GetFinalDamage_WayOfSword`. June `32b81900` @32b819a8 (`dec eax / jne`), `32b7f0b0` @32b7f28f / @32b7f312 and `32b74ed0` @32b74f14
+  (`cmp eax, 1`) call vslot 0x10c and test type 1 only: three allow-list rows with those addresses.
+- **Reference log:** `data\ErrorLog_pre_CH1_elesis.txt` (254,291 B, the run of 2026-11-13 08:29).
+- **Scans:** `charport_keys.py ELESIS_KNIGHT`: `june-only=9 neither=1 march-only-site=4 both=234` = CH0's `plan_charport_keys.txt` (only the reader label of
+  `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` now reads `CX2GUEL::ReservedSkillStart`).`charport_scan.py`: running at commit time; its diff against `plan_charport_scan_20261111.txt` follows below.
+- **Play-test save** (`elsdb x`, backup taken): slots A 0-3 / B 5-8, 4 / 9 empty. wewe (20): Spiral Blast, Dodge and Slash, Wild Shock, Endurance Power (28201
+  learned at 1 now); SaberT (40): + Rushing Sword, B Sonic Assault, Unlimited Blade, Mega Burster, Extinction; eresisu (21): four upgrades, B Sword Fire, Infernal
+  Blade, Big Burst, Avatar of the Fire; ElesisGM (29): four upgrades, B Extinction, Drastic Charge, Upper Slash, Victorious Sword; ElesisBH (30): four upgrades,
+  B Sword Fire, Flame Sword, Infernal Blade, Flame Protection.
+- **Skills** still go through March's id switch below June's head (CH1n) until CH2a; the two-cast check is a light one, a misbehaving skill goes to CH2a.
+- **Checklist:** `(Elesis: CH1 ...)` at l.16, 116, 123, 150, 212, 426, 427, 428, 536, 600, 625, 682, 883. CH0b's 21 `ErrorEnum(433)` part-mesh lines
+  (l.773) are re-checked on this play-test. `MODS.md`: "Stage 7 Elesis, CH1".
+
+Hygiene: `flagcheck.py JUNE_CHAR_ELESIS_DEBUG --worktree --files X2Lib/X2GUUser.cpp KTDXLIB/Always.h`: `1 PASS, 0 PASS~, 0 DEFINE, 1 OTHER, 0 FAIL, 0 ERROR`; 0 deleted,
+0 non-ASCII, 0 EOL, 0 token, 0 encoding; `RESULT: PASS`. `JUNE_CHAR_ELESIS_LIVE --with _WOS _WOS_DEBUG --files X2Lib/X2GUEL.cpp KTDXLIB/Always.h`: `X2GUEL.cpp` PASS +7;
+`Always.h` ERROR only (guard `:12682` `_BLOOD && !_LIVE` cannot be evaluated with `_LIVE` stripped, as Ara's CH1); 2 deleted = the two `//#define` lines.
+`_WOS --files KTDXLIB/Always.h`: `1 OTHER, 0 FAIL`, `RESULT: PASS`. `junediverge.py --check X2Lib/X2GUEL.cpp X2Lib/X2GUEl.h X2Lib/X2GUUser.cpp X2Lib/X2GUUser.h
+KTDXLIB/Always.h`: `allow-listed: 17`, `RESULT: PASS`; `--check-all`: `allow-listed: 217`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: `0 A/B row(s)`.
+Probes (`census.cl_cmd`, `/c /Zs /EHsc`, all on): `X2GUEL.cpp`, `X2GUUser.cpp`, `X2GageData.cpp`, `X2GageUI.cpp`, `X2GUElsword_SwordMan.cpp`, `X2DamageManager.cpp`,
+`X2Game.cpp` exit 0, 0 errors.
+Build (`--pch force`): `DEPLOY OK: X2_offline.exe is 26,382,848 B, dated 2026-11-13 08:45:47, md5 6379174fdf3a0f9e33f20624412ae84a, equal to X2/US_SERVICE/x2.exe (2026-11-13 08:45:39); built at main fc391e7e + 3 uncommitted code file(s).`
+`EXESTR OK: 3 of 3 found in X2_offline.exe, 26382848 B, dated 2026-11-13 08:45:47, md5 6379174fdf3a0f9e33f20624412ae84a` (`ELESIS DATA`, `ELESIS SKILL SBUF parse`, `ELESIS WOS vigor start`, wide).
+
+**Play-test (user) is the gate:** the five units above, none transcended. Check: `ELESIS DATA` per class, combos, dash, jump, damage / stand-up, riding,
+the Way of the Sword both ways across a stage change and a dungeon end, the `SBUF` lines, the B-slot held key, two casts per skill, ErrorLog against the reference.
+The review is `kickoffs/char-elesis/CH1-review.md`.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

@@ -9,6 +9,9 @@
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
 #include "Offline/X2OfflineLog.h"	// char-elesis CH1q
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+#include "Offline/X2OfflineLog.h"	// char-elesis CH1
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 #ifdef SERV_IRUHADEV_JUNE_GFX_GATES
 #include "KTDGGFXManager.h"
 #endif SERV_IRUHADEV_JUNE_GFX_GATES
@@ -48918,6 +48921,30 @@ static void ParseStateInsertBuffFactorTable( KLuaManager& luaManager_, std::vect
 	luaManager_.EndTable();
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+namespace _CONST_GUUSER_EL_CH1_	// char-elesis CH1: the SBUF play-test lines
+{
+	bool IsElesisUser( const CX2GUUser* pUser_ )
+	{
+		return NULL != pUser_ && NULL != pUser_->GetUnit() && CX2Unit::UT_ELESIS == pUser_->GetUnit()->GetType();
+	}
+
+	bool IsElesisStateBuffParseLogDue( const CX2GUUser* pUser_ )
+	{
+		static int s_iLastStateID = -1;
+		static DWORD s_dwLastTick = 0;
+		if ( false == IsElesisUser( pUser_ ) )
+			return false;
+		const DWORD dwNow = ::GetTickCount();
+		if ( pUser_->GetNowStateID() == s_iLastStateID && 1000 > dwNow - s_dwLastTick )
+			return false;
+		s_iLastStateID = pUser_->GetNowStateID();
+		s_dwLastTick = dwNow;
+		return true;
+	}
+}
+using namespace _CONST_GUUSER_EL_CH1_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 /** @function : ParsingBuffFactorID
 	@brief : S3e, June2017 31fe32d0, whole. The level ( +0x9270 ) is reset and the list ( +0x865c ) cleared. When the caller's flag is set
 			 ( the state's skill is an upgraded one ) BUFF_FACTOR_ID_AND_APPLY_TIME_ULTIMATE is read, else, or when it is absent,
@@ -48956,12 +48983,21 @@ static void ParseStateInsertBuffFactorTable( KLuaManager& luaManager_, std::vect
 	if ( CX2SkillTree::SI_NONE != eSkillID && NULL != GetUnit() )
 		m_uiNowStateSkillLevel = static_cast<UINT>( GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID, false, 0, true ) );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+	const bool bLogStateBuff = IsElesisStateBuffParseLogDue( this );	// char-elesis CH1
+	if ( true == bLogStateBuff )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL SBUF parse: state %d skill %d level %u list %u", GetNowStateID(), m_iStateBuffSkillID, m_uiNowStateSkillLevel, static_cast<UINT>( m_vecStateInsertBuffFactor.size() ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 	bool bCheckSkillLevel = false;
 	LUA_GET_VALUE( luaManager_, "RELATIVE_SKILL_LEARN_CHECK", bCheckSkillLevel, false );
 
 
 	if ( true == bCheckSkillLevel && 0 == m_uiNowStateSkillLevel )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+		if ( true == bLogStateBuff )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL SBUF parse: state %d cleared ( learn check, skill %d not learned )", GetNowStateID(), m_iStateBuffSkillID );	// char-elesis CH1
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 		m_vecStateInsertBuffFactor.clear();
 		return;
 	}
@@ -48971,6 +49007,10 @@ static void ParseStateInsertBuffFactorTable( KLuaManager& luaManager_, std::vect
 	{
 		if ( 0.f == m_vecStateInsertBuffFactor[uiIndex].second )
 		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+			if ( true == bLogStateBuff )
+				CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL SBUF at once: state %d BFI %u level %u", GetNowStateID(), m_vecStateInsertBuffFactor[uiIndex].first, max( m_uiNowStateSkillLevel, 1 ) );	// char-elesis CH1
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 			SetBuffFactorToGameUnitByBuffFactorID( m_vecStateInsertBuffFactor[uiIndex].first, max( m_uiNowStateSkillLevel, 1 ), NULL, 0, false );
 			m_vecStateInsertBuffFactor.erase( m_vecStateInsertBuffFactor.begin() + uiIndex );
 		}
@@ -48996,6 +49036,10 @@ void CX2GUUser::CommonFrameMove_InsertBuffFactor()
 			const UINT uiBuffFactorID = m_vecStateInsertBuffFactor[uiIndex].first;
 			SetBuffFactorToGameUnitByBuffFactorID( uiBuffFactorID, max( m_uiNowStateSkillLevel, 1 ), NULL, 0, false );
 			OnStateInsertBuffFactorApplied( uiBuffFactorID, max( m_uiNowStateSkillLevel, 1 ) );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+			if ( true == IsElesisUser( this ) )
+				CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL SBUF frame: state %d BFI %u level %u", GetNowStateID(), uiBuffFactorID, max( m_uiNowStateSkillLevel, 1 ) );	// char-elesis CH1
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 			if ( uiIndex < m_vecStateInsertBuffFactor.size() )
 				m_vecStateInsertBuffFactor.erase( m_vecStateInsertBuffFactor.begin() + uiIndex );
 		}
@@ -49015,6 +49059,10 @@ void CX2GUUser::ApplyAllStateInsertBuffFactor()
 		const UINT uiBuffFactorID = m_vecStateInsertBuffFactor.front().first;
 		SetBuffFactorToGameUnitByBuffFactorID( uiBuffFactorID, max( m_uiNowStateSkillLevel, 1 ), NULL, 0, false );
 		OnStateInsertBuffFactorApplied( uiBuffFactorID, max( m_uiNowStateSkillLevel, 1 ) );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+		if ( true == IsElesisUser( this ) )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL SBUF state end: state %d BFI %u level %u", GetNowStateID(), uiBuffFactorID, max( m_uiNowStateSkillLevel, 1 ) );	// char-elesis CH1
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 		if ( false == m_vecStateInsertBuffFactor.empty() )
 			m_vecStateInsertBuffFactor.erase( m_vecStateInsertBuffFactor.begin() );
 	}

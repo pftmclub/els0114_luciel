@@ -12621,7 +12621,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: June character port ( Elesis ) Phase CH1a - Elesis runs on June's class core: June's bodies inside March's own CX2GUEL functions.
 //              Stays commented out until CH1's final sub-phase ships it with June's ELESIS_KNIGHT.lua and motions ( one deploy unit ).
 //              Revert: comment out the #define ( JUNE_CHAR_ELESIS_LIVE ).
-//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifndef SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE needs SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK ( IsQuickSlotSpecialItemWaiting, CanHyperMode )
@@ -12646,7 +12646,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: June character port ( Elesis ) Phase CH1h - her Way of the Sword class side: June's InitComponent / ReInit blocks and the gain getter in
 //              DamageReact ( the lines that call a June piece CH1q has not written ). Stays commented out until CH1q; only with _LIVE.
 //              Revert: comment out the #define ( JUNE_CHAR_ELESIS_WOS ).
-//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
@@ -12813,4 +12813,15 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-13
 // Description: char-add CH0c debug: logs [JUNE_CHAR] ADD CREATE slot shown / select class <c> type <t> / tutorial skipped. The CH0c review retires it.
 //#define SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: char-elesis CH1 debug: logs [JUNE_CHAR] ELESIS SKILL SBUF parse / at once / cleared / frame / state end ( her reserved-buff path, Elesis only,
+//              the parse line once a second per state ). The CH1 review retires it. Revert: undefine the flag ( JUNE_CHAR_ELESIS_DEBUG ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG needs SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ( June's ParsingBuffFactorID ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 //////////////////////////////////////////////////////////////////////////
