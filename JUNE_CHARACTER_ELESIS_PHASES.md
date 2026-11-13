@@ -1509,6 +1509,8 @@ Sonnet 5.5. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI` (`Always.h` end; `#error` w
 
 **Play-test hand-off:** see the session reply. Log tag `[JUNE_CHAR]` (`ELESIS DATA`; no `ELESIS UI` line is expected, no skill is castable).
 
+**Play-test (user, 2026-11-13 09:51-09:53, exe `c7d1abf8`; logs read).** Select screen: all nine characters loaded (user's word; the log has only the `MESH_PC_ELESIS_STAND` XET probe). Creation screen: six Elesis class clicks logged `MOVIE_CREATE_ELESIS_BASE` / `_BH` / `_GM` / `_BH` / `_GM` / `_BH` (the name probe, `ErrorEnum(136)` + `(72)` as Raven's `RAVEN_OUT.LUA`); no missing control. June's `EffectSet_SBH_LobbyWait` row played 3 times (3 particles each). `KEM_ERROR` 0, `Motion Error` 0, `ErrorEnum(135)` / `(36)` 0, `EXCEPTION` 0, `UNHANDLED` only `E_DISABLE_HB_CHECK_REQ`. Not reached: a village entry (no `ELESIS DATA`), skill cut-ins (owed to CH2a / CH3a / CH6).
+
 ## Phase CH-N - Elesis's June-only class path: Dark Knight (35) and Crimson Avenger (125)
 
 The template block is `JUNE_CHARACTER_AISHA_PHASES.md` "Phase CH-N" as Ara's Z rewrites it; Ara ran it first. **What Elesis reuses** (Ara's CHNa,
