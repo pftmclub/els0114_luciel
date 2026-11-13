@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase june-dungeons C3y-2 review` |
 | Plan doc | `JUNE_DUNGEONS_PHASES.md` (branch `main`) |
-| Depends on | C3y-2, C3y-2b and C3y-2c done, and their play-tests passed (amended 2026-11-13: this review covers C3y-2b and C3y-2c; C3y-2c's fix flag joins the Flags row when it lands) |
+| Depends on | C3y-2, C3y-2b, C3y-2c and C3y-2d done, and their play-tests passed (amended 2026-11-14: this review covers C3y-2b / 2c / 2d; Flags row gains `SERV_IRUHADEV_JUNE_PARTICLE_LUA_LAYER`, `SERV_IRUHADEV_GFX_SCENE_CLASS_RELEASE` and any C3y-2d flag) |
 | Flags | `SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON` (+ `_DEBUG`), `SERV_IRUHADEV_JUNE_TUTORIAL_LUA_BIND`, `SERV_IRUHADEV_JUNE_TUTORIAL_PLAY_GUIDE`; C3y-2b: `SERV_IRUHADEV_JUNE_SCENE_END_HOOK`, `SERV_IRUHADEV_JUNE_TUTORIAL_ROOM_LOADING` |
 | Log tag | `JUNE_FX C3y-2` (offline_server.log; `python tools/logs.py --grep "JUNE_FX C3y-2"`) |
 

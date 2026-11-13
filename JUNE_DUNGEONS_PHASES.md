@@ -956,3 +956,12 @@ an Ignia voice plays in the last dialog.
 - **Build.** My own run failed in char-elesis CH3a's in-progress `X2GUEL.cpp`; that session's build carries both files: DEPLOY OK
   X2_offline.exe 26,474,496 B, 2026-11-14 00:25:13, md5 d7fa0c0e464de1f91722a03fab1431ea (main 070b4381 + KTDXLIB/Always.h, KTDGGFXManager.cpp
   dirty). EXESTR OK 2 of 2 (`SCENE CLASSES released: the classes of %s`, `SCENE CLASSES none registered ( %s )`), md5 d7fa0c0e.
+
+### C3y-2c - run 3 (2026-11-14)
+
+Run (exe d7fa0c0e; Elesis character in the village, then a new Elsword). User: every issue still there (wrong voice, fast typing, end-scene loop).
+- **Fix 2 never fired:** all 6 scene loads log `SCENE CLASSES none registered ( no EventScene )`; the `GetCurrentAppDomain()` lookup misses the scenes' classes.
+- **Cause confirmed a third time:** the first scene was `Quest_11000_ELESIS_End`; every later scene (`Quest_22160_Start`, `Tutorial_Elsworld_01` / `_02` /
+  `_03`) played its voices (`GFX_ID_3854`, `2876`, `3855`, `301`, `3856`); `_03` ran on past its last line and was right-click ended.
+- **Hand-off:** user (2026-11-14) moves the rest to a new phase on Fable: **C3y-2d** (`kickoffs/june-dungeons/C3y-2d.md`). Fix 1 (slide-shot layer)
+  passed and stays; fix 2's flag stays on (harmless: it logs and returns) until C3y-2d fixes or retires it. C3y-2c is done.
