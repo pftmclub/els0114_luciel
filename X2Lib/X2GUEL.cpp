@@ -378,6 +378,20 @@ namespace _CONST_EL_CH3C_
 	const float		BLOOD_FALLS_EVENT_TIME						= 0.4f;
 }
 using namespace _CONST_EL_CH3C_;
+// char-elesis CH3c2: constants of Shadow Edge ( June 32b84390 / 32b813d0 )
+namespace _CONST_EL_CH3C2_
+{
+	const float		SHADOW_EDGE_EVENT_TIME					= 0.31f;
+	const float		SHADOW_EDGE_SEARCH_RANGE_PVP_OR_PVE		= 700.f;
+	const float		SHADOW_EDGE_SEARCH_RANGE				= 1200.f;
+	const USHORT	SHADOW_EDGE_MAX_TARGET_COUNT			= 3;
+	const float		SHADOW_EDGE_MAX_HP_RATE_PVP				= 0.1f;		// share of her max HP the mark records in PvP
+	const float		SHADOW_EDGE_BONE_HEIGHT					= 25.f;
+	const float		SHADOW_EDGE_NO_BONE_HEIGHT				= 100.f;	// above the target's position when it has no Bip01 bone
+	const float		SHADOW_EDGE_LINK_RANGE					= 1200.f;	// a mark farther than this ends
+	const int		SHADOW_EDGE_ATTACK_TYPE					= -1;		// June passes -1 to slot 94: no ATTACK_TYPE member has it
+}
+using namespace _CONST_EL_CH3C2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 // char-elesis CH3b0: constants of the summons and the Blood Runaway cleanse check ( June 32b79db0 / 32b8b0c0 / 32b6fb10 )
@@ -2111,6 +2125,19 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
+	case CX2SkillTree::RNSI_A_SCA_SHADOW_EDGE:	// char-elesis CH3c2: June 32b8c470 @32b8e4c9
+	case CX2SkillTree::RNSI_A_SCA_SHADOW_EDGE_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_A_SCA_SHADOW_EDGE", normalStateData.stateID );
+			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, SI_A_SCA_SHADOW_EDGE_Init );
+			normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, SI_A_SCA_SHADOW_EDGE_FrameMove );
+			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, SI_A_SCA_SHADOW_EDGE_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_A_SCA_SHADOW_EDGE", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
+			hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+		} break;
 	case CX2SkillTree::RNSI_SA_SCA_DREAD_WEAPON:	// char-elesis CH3c: June 32b8c470 @720
 	case CX2SkillTree::RNSI_SA_SCA_DREAD_WEAPON_UPGRADE:
 		{
@@ -3315,9 +3342,13 @@ CX2GUEL::~CX2GUEL(void)
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 	BloodRunawayProc_FrameMove();	// June 32b734d0: body in CH4a
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	ShadowEdgeRecordFrameMove();	// char-elesis CH3c2: June 32b813d0
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	ShadowEdgeRecordFrameMove();	// June 32b813d0: body in CH4c
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	// June @32b88185: the dash time runs while a dash state lasts and stays through Leap Crash
 	if( true == IsDashState() )
@@ -6518,10 +6549,15 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH3c2: every unit, after the Way of the Sword block ( June 32b81b85 )
+	ClearShadowEdgeRecords();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	// every unit, after the Way of the Sword block ( June 32b81b85 )
 	ClearShadowEdgeRecords();
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	CX2GUUser::ReInit( bTeamPos, iStartPosIndex );
 #ifdef ELSWORD_WAY_OF_SWORD // ∞À¿« ±Ê
@@ -19348,6 +19384,205 @@ void CX2GUEL::ESI_A_SCA_BLOOD_STING_EventProcess()
 	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
 
+	CommonEventProcess();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+// char-elesis CH3c2: June 32b81220 ( UID above 0; the unit of that UID whose NPC-ness matches the record )
+CX2GameUnit* CX2GUEL::ShadowEdgeRecord::GetTargetUnit() const
+{
+	if ( 0 < m_uidTargetUID && NULL != g_pX2Game )
+	{
+		for ( int i = 0; i < g_pX2Game->GetUnitNum(); ++i )
+		{
+			CX2GameUnit* pUnit = g_pX2Game->GetUnit( i );
+			if ( NULL == pUnit )
+				continue;
+
+			const bool bIsNPC = ( CX2GameUnit::GUT_NPC == pUnit->GetGameUnitType() );
+			if ( bIsNPC == m_bIsNPC && pUnit->GetUnitUID() == m_uidTargetUID )
+				return pUnit;
+		}
+	}
+	return NULL;
+}
+
+// char-elesis CH3c2: June 32b81300 ( only the time and rate are zeroed; the mark debuff goes, the Link effect is destroyed )
+void CX2GUEL::ShadowEdgeRecord::ResetShadowEdgeRecord()
+{
+	m_fRemainTime = 0.f;
+	m_fTransitionDamageRate = 0.f;
+
+	CX2GameUnit* pTargetUnit = GetTargetUnit();
+	if ( NULL != pTargetUnit )
+		pTargetUnit->EraseBuffTempletFromGameUnit( BTI_DEBUFF_SHADOW_EDGE );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL shadow edge mark end uid %I64d found %d", static_cast<__int64>( m_uidTargetUID ), static_cast<int>( NULL != pTargetUnit ) );	// char-elesis CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+
+	m_uidTargetUID = 0;
+	if ( NULL != g_pX2Game && NULL != g_pX2Game->GetDamageEffect() )
+		g_pX2Game->GetDamageEffect()->DestroyInstanceHandle( m_hLinkEffect, false );
+}
+
+// char-elesis CH3c2: June 32b81900 tail and 32b84390 @32b843fb ( each mark is reset, then the list is emptied )
+void CX2GUEL::ClearShadowEdgeRecords()
+{
+	for ( std::vector<ShadowEdgeRecord>::iterator vit = m_vecShadowEdgeRecord.begin(); vit != m_vecShadowEdgeRecord.end(); ++vit )
+		vit->ResetShadowEdgeRecord();
+	m_vecShadowEdgeRecord.clear();
+}
+
+// char-elesis CH3c2: June 32b813d0 ( each mark runs down, keeps its Link on the target and heals her once a second; June ends the walk at the first removal )
+void CX2GUEL::ShadowEdgeRecordFrameMove()
+{
+	for ( std::vector<ShadowEdgeRecord>::iterator vit = m_vecShadowEdgeRecord.begin(); vit != m_vecShadowEdgeRecord.end(); ++vit )
+	{
+		ShadowEdgeRecord& record = *vit;
+		if ( false == ( 0.f < record.m_fRemainTime ) )
+			continue;
+
+		record.m_fRemainTime -= m_fElapsedTime;
+		if ( record.m_fRemainTime <= 0.f )
+		{
+			record.m_fRemainTime = 0.f;
+			record.ResetShadowEdgeRecord();
+			m_vecShadowEdgeRecord.erase( vit );
+			return;
+		}
+
+		CX2GameUnit* pTargetUnit = record.GetTargetUnit();
+		if ( NULL == pTargetUnit || pTargetUnit->GetNowHp() <= 0.f )
+		{
+			record.ResetShadowEdgeRecord();
+			m_vecShadowEdgeRecord.erase( vit );
+			return;
+		}
+
+		D3DXVECTOR3 vMyPos = GetBonePos( L"Bip01" );
+		vMyPos.y += SHADOW_EDGE_BONE_HEIGHT;
+
+		D3DXVECTOR3 vTargetPos;
+		if ( false == pTargetUnit->GetBonePos( L"Bip01", vTargetPos ) )
+		{
+			vTargetPos = pTargetUnit->GetPos();
+			vTargetPos.y += SHADOW_EDGE_NO_BONE_HEIGHT;
+		}
+		else
+			vTargetPos.y += SHADOW_EDGE_BONE_HEIGHT;
+
+		if ( SHADOW_EDGE_LINK_RANGE < GetDistance( vMyPos, vTargetPos ) )
+		{
+			record.m_fRemainTime = 0.f;
+			record.ResetShadowEdgeRecord();
+			m_vecShadowEdgeRecord.erase( vit );
+			return;
+		}
+
+		CX2DamageEffect::CEffect* pLinkEffect = g_pX2Game->GetDamageEffect()->GetInstance( record.m_hLinkEffect, true );
+		if ( NULL != pLinkEffect )
+			pLinkEffect->SetLinkMainEffectByPos( vMyPos, vTargetPos );
+
+		if ( floor( record.m_fRemainTime ) < floor( record.m_fRemainTime + m_fElapsedTime ) )
+		{
+			const float fHeal = GetLearnedSkillAbilityValue( CX2SkillTree::SA_ATK_PHYSIC_REL, CX2SkillTree::RNSI_A_SCA_SHADOW_EDGE ) * GetPhysicAttackValue();
+			UpNowHp( fHeal, 0.f );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL shadow edge heal %.1f uid %I64d time %.2f", fHeal, static_cast<__int64>( record.m_uidTargetUID ), record.m_fRemainTime );	// char-elesis CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+		}
+	}
+}
+
+// char-elesis CH3c2: June 32b520f0
+void CX2GUEL::SI_A_SCA_SHADOW_EDGE_Init()
+{
+	XSkinMeshReadyInBackground( L"BREAKING_FIST_Attack_Box.x" );
+	TextureReadyInBackground( L"WhiteImage.dds" );
+	XMeshReadyInBackground( L"SDK_BURNING_PHANTOM_Storm001.Y" );
+}
+
+// char-elesis CH3c2: June 32b84390 ( 0.31 s: the old marks go; up to 3 nearest enemies in front, each once, get an explosion, a mark with a Link and the skill's buff factor )
+void CX2GUEL::SI_A_SCA_SHADOW_EDGE_FrameMove()
+{
+	if ( true == m_pXSkinAnim->EventTimerOneshot( SHADOW_EDGE_EVENT_TIME ) )
+	{
+		ClearShadowEdgeRecords();
+
+		if ( NULL == g_pX2Game || NULL == g_pX2Game->GetDamageEffect() )
+			return;	// June skips CommonFrameMove here
+
+		const float fMaxHpRate = ( CX2Game::GT_PVP == g_pX2Game->GetGameType() ) ? SHADOW_EDGE_MAX_HP_RATE_PVP : 1.f;
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_SCA_SHADOW_EDGE, true );
+		const float fRemainTime = GetLearnedSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, pSkillTemplet->m_eID );
+		const float fMaxTransitionDamage = GetMaxHp() * fMaxHpRate;
+
+		D3DXVECTOR3 vMyPos = GetBonePos( L"Bip01" );
+		vMyPos.y += SHADOW_EDGE_BONE_HEIGHT;
+
+		const float fSearchRange = ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ) ? SHADOW_EDGE_SEARCH_RANGE_PVP_OR_PVE : SHADOW_EDGE_SEARCH_RANGE;
+		std::set<UidType> setMarkedUnitUID;
+		USHORT usMarkCount = 0;
+		for ( ; usMarkCount < SHADOW_EDGE_MAX_TARGET_COUNT; ++usMarkCount )
+		{
+			CX2GameUnit* pTargetUnit = g_pX2Game->GetFrontNearestEnemyUnit( this, fSearchRange, setMarkedUnitUID, SHADOW_EDGE_ATTACK_TYPE );
+			if ( NULL == pTargetUnit )
+				break;
+
+			setMarkedUnitUID.insert( pTargetUnit->GetUnitUID() );
+			const bool bIsNPC = ( CX2GameUnit::GUT_NPC == pTargetUnit->GetGameUnitType() );
+
+			D3DXVECTOR3 vTargetPos;
+			if ( false == pTargetUnit->GetBonePos( L"Bip01", vTargetPos ) )
+			{
+				vTargetPos = pTargetUnit->GetPos();
+				vTargetPos.y += SHADOW_EDGE_NO_BONE_HEIGHT;
+			}
+			else
+				vTargetPos.y += SHADOW_EDGE_BONE_HEIGHT;
+
+			g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SCA_SHADOW_EDGE_Projectile_EXPLOSION", GetPowerRate(),
+				vTargetPos, GetRotateDegree(), GetRotateDegree() );
+			CX2DamageEffect::CEffect* pLinkEffect = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DAMAGE_EFFECT_SCA_SHADOW_EDGE_Link", GetPowerRate(),
+				vMyPos, GetRotateDegree(), GetRotateDegree() );
+			if ( NULL == pLinkEffect )
+				continue;
+
+			pLinkEffect->SetLinkMainEffectByPos( vMyPos, vTargetPos );
+			m_vecShadowEdgeRecord.push_back( ShadowEdgeRecord( fMaxTransitionDamage, 0.f, fRemainTime, 0.f, pTargetUnit->GetUnitUID(), bIsNPC, pLinkEffect->GetHandle() ) );
+
+			const int iSkillLevel = max( 1, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true ) );
+			CX2BuffFactorPtr ptrBuffFactorClone = pSkillTemplet->m_vecBuffFactorPtr[0]->GetClonePtr( static_cast<UINT>( iSkillLevel ) );
+			pTargetUnit->SetBuffFactorToGameUnit( *ptrBuffFactorClone );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL shadow edge mark %d uid %I64d npc %d time %.2f level %d", static_cast<int>( usMarkCount ), static_cast<__int64>( pTargetUnit->GetUnitUID() ), static_cast<int>( bIsNPC ), fRemainTime, iSkillLevel );	// char-elesis CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+		}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SKILL shadow edge cast marks %d range %.0f", static_cast<int>( m_vecShadowEdgeRecord.size() ), fSearchRange );	// char-elesis CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+	}
+	CommonFrameMove();
+}
+
+// char-elesis CH3c2: June 32b6a340 ( the template of Shade Scratch's attack, 0 lines diffed against 32b69040 )
+void CX2GUEL::SI_A_SCA_SHADOW_EDGE_EventProcess()
+{
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+			StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
 	CommonEventProcess();
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL

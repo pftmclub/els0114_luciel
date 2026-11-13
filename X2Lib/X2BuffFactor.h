@@ -574,6 +574,7 @@ enum BUFF_TEMPLET_ID
 	// June BTI names of Elesis's Dark Knight skills Brutal Cutter and Injection Stigma
 	BTI_BUFF_BRUTAL_CUTTER                = 429,
 	BTI_BUFF_INJECTION_STIGMA             = 433,
+	BTI_DEBUFF_SHADOW_EDGE                = 432,	// char-elesis CH3c2: Shadow Edge's mark
 	BTI_BUFF_BRUTAL_CUTTER_MEMO           = 509,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}

@@ -2645,6 +2645,9 @@ public:
 	RNSI_SA_SCA_BLOOD_FALLS                               = 28064,
 	RNSI_A_SCA_ASSAULT_STRIKE                             = 28216,
 	RNSI_A_SCA_BLOOD_STING                                = 28224,
+	// char-elesis CH3c2: Shadow Edge
+	RNSI_A_SCA_SHADOW_EDGE                                = 28215,
+	RNSI_A_SCA_SHADOW_EDGE_UPGRADE                        = 28235,
 	RNSI_A_SCA_ASSAULT_STRIKE_UPGRADE                     = 28236,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}

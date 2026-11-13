@@ -13260,3 +13260,10 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs SKILL_STATE_PTR ( CommonStateStart's state data ) and SKILL_TREE_PANELS ( SetCommandGroup ), char-luciel DU1b
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-elesis CH3c2 - CX2Game::GetFrontNearestEnemyUnit ( June 322d7b30 ): the nearest live, not invincible enemy in front of a
+//              unit within a range, skipping a set of unit UIDs ( Elesis's Shadow Edge; Lu/Ciel's caller 32b318e0 can reuse it ). Class-agnostic,
+//              unreferenced until a caller's flag. Revert: comment out the #define ( and the callers' flags ).
+#define SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
+//////////////////////////////////////////////////////////////////////////

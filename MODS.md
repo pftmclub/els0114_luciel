@@ -7055,3 +7055,12 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for
 - **Shared.** `X2SkillTree.h`: 10 `RNSI_*` names; `X2BuffFactor.h`: `BFI_BUFF_BRANDISH_BREAKER_MEMO` 594 ( `JUNE_ENUM_NAMES` ). No `Always.h` change.
 - **Damage.** All of these are June's script tables ( numerical-only for Blood Sting and Chasing Sword ); no March row exists, so no number is compared. The bleeding cost uses the shared `ApplyBleedingHpCost` ( CH2d ).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
+## Stage 7 Elesis, CH3c2: Shadow Edge (char-elesis CH3c2, 2026-11-14)
+
+Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for the CH3d review) and new `SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY`. Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** Shadow Edge 28215 / 28235 gets June's state: at 0.31 s her old marks end, then up to 3 nearest enemies in front of her ( 1200, or 700 in PvP / PvE ), each once, get an explosion, a Link effect from her and the skill's buff ( BTI 432 mark ).
+  Each mark lasts the skill's effective time, follows its target, ends at 1200 distance or when the target dies, and heals her once a second by the skill's physical-attack share of her physical attack. June's version of Add's March Reverse Reactor.
+- **Shared.** `CX2Game::GetFrontNearestEnemyUnit` ( June `322d7b30`, class-agnostic, own flag ). `X2SkillTree.h`: `RNSI_A_SCA_SHADOW_EDGE` / `_UPGRADE`; `X2BuffFactor.h`: `BTI_DEBUFF_SHADOW_EDGE` 432 ( `JUNE_ENUM_NAMES` ). The mark record, its clear and its per-frame upkeep moved from `_BLOOD` ( CH1h / CH1j declarations ) to `_SKILL`.
+- **Damage.** June's script tables only ( explosion and buff ); no March row, nothing compared. The heal is June's: `SA_ATK_PHYSIC_REL` of 28215 x physical attack per second per mark.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( and `SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY` ), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.

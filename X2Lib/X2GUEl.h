@@ -557,10 +557,18 @@ protected:
 	void RestoreGageSnapshot();	/// char-elesis CH1q: June 32b6acb0 ( user vslot 0x744, base 3204da60 Crest of Time restore not ported )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH3c2: declared with Shadow Edge's record
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	void ClearShadowEdgeRecords();	/// char-elesis CH1h: June 32b81900 tail ( RemoveShadowEdgeRecord 32b81300 on each record of the +0x9700 list, then the list is cleared ): body in CH4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	virtual void OnAttackerDamageReact_Slot4F8( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH1h: June 32b7beb0: body in CH4c
 	virtual void OnAttackerDamageReact_Slot4FC( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH1h: June 32b898a0: body in CH4c
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH3c2: declared with Shadow Edge's record
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	void ShadowEdgeRecordFrameMove();		/// char-elesis CH1j: June 32b813d0 ( per-frame upkeep of the Shadow Edge records, called by CommonFrameMove ): body in CH4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	void TranscendenceBerserkerFrameMove();	/// char-elesis CH1j: June 32b7e9a0 ( RNSI_P_SCA_TRANSCENDENCE ): body in CH4c
 	void MadnessFrameMove();				/// char-elesis CH1j: June 32b6ff20 ( RNSI_P_SCA_MADNESS, tail-jumped from CommonFrameMove ): body in CH4c
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
@@ -751,6 +759,31 @@ protected:
 	void ESI_SA_SCA_CHASING_SWORD_EventProcess();	/// char-elesis CH3c: June 32b6c8d0
 	void ESI_SA_SCA_SHADE_EventProcess();	/// char-elesis CH3c: June 32b6cbd0
 	void ESI_A_SCA_BLOOD_STING_EventProcess();	/// char-elesis CH3c: June 32b6d4e0
+	/// char-elesis CH3c2: June's 0x20-byte Shadow Edge mark ( list +0x9700; the layout of Add's ReverseReactorTargetInfo )
+	struct ShadowEdgeRecord
+	{
+		float							m_fMaxTransitionDamage;		/// +0x00: her max HP, x0.1 in PvP ( nothing reads it )
+		float							m_fCumulativeDamage;		/// +0x04: 0
+		float							m_fRemainTime;				/// +0x08: SA_EFFECTIVE_TIME of the skill
+		float							m_fTransitionDamageRate;	/// +0x0c: 0
+		UidType							m_uidTargetUID;				/// +0x10
+		bool							m_bIsNPC;					/// +0x18
+		CX2DamageEffect::CEffectHandle	m_hLinkEffect;				/// +0x1c
+
+		ShadowEdgeRecord( float fMaxTransitionDamage_, float fCumulativeDamage_, float fRemainTime_, float fTransitionDamageRate_,
+						  UidType uidTargetUID_, bool bIsNPC_, CX2DamageEffect::CEffectHandle hLinkEffect_ )
+			: m_fMaxTransitionDamage( fMaxTransitionDamage_ ), m_fCumulativeDamage( fCumulativeDamage_ ), m_fRemainTime( fRemainTime_ )
+			, m_fTransitionDamageRate( fTransitionDamageRate_ ), m_uidTargetUID( uidTargetUID_ ), m_bIsNPC( bIsNPC_ ), m_hLinkEffect( hLinkEffect_ )
+		{}
+
+		CX2GameUnit* GetTargetUnit() const;	/// June 32b81220
+		void ResetShadowEdgeRecord();		/// June 32b81300
+	};
+	void ClearShadowEdgeRecords();		/// char-elesis CH3c2: June 32b81900 tail / 32b84390 @32b843fb
+	void ShadowEdgeRecordFrameMove();	/// char-elesis CH3c2: June 32b813d0
+	void SI_A_SCA_SHADOW_EDGE_Init();	/// char-elesis CH3c2: June 32b520f0
+	void SI_A_SCA_SHADOW_EDGE_FrameMove();	/// char-elesis CH3c2: June 32b84390
+	void SI_A_SCA_SHADOW_EDGE_EventProcess();	/// char-elesis CH3c2: June 32b6a340
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à
@@ -1289,6 +1322,7 @@ protected:
 	USHORT m_usDreadWeaponLoopCount;				/// char-elesis CH3c: June +0x96fc ( passes of the Dread Weapon loop state: 0 at the start state, +1 per loop entered )
 	CX2EffectSet::Handle m_hCrimsonAvengerSkillEffectSet;	/// char-elesis CH3c: June +0x9710 ( the effect set of Dread Weapon / Assault Strike / Blood Falls; the next replaces it )
 	char m_cBlazingDanceAttackCount;			/// char-elesis CH3b: June +0x9789 ( strikes made, 0 to 100; a strike from the seventh on costs 20 MP )
+	std::vector<ShadowEdgeRecord> m_vecShadowEdgeRecord;	/// char-elesis CH3c2: June +0x9700 ( Shadow Edge's marks, up to 3 per cast )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )

@@ -2017,6 +2017,32 @@ Class-map rows read from `charport_adis.py elesis --phase CH3c`, Ghidra `FUN_32b
 - **Play-test: passed (2026-11-14, exe `af5a6da4`, run 06:08-06:13).** Logs: 8 equip lines on unit 146 ( states 49 / 51 / 53 / 55 / 59 / 61 / 63 / 65 ); Blood Cutter `ELESIS SUMMON req npc 1641 blood cutter mine 1` + `SUMMON npc 1641 ... skill 28023` x4; `ES_CREATE` `EffectSet_SI_SA_SCA_DREAD_WEAPON_Loop` ( state 53 / 54 ), `..._SHADE_THE_ILLUSION_Attack` ( 55 / 56 ), `EffectSet_SI_A_SCA_ASSAULT_STRIKE_Attack` ( 59 / 60 ), `EffectSet_SA_SCA_Blood_Falls` ( 62 ); ErrorLog 0 lines, 0 Motion Error / BLANK / EXCEPTION, 0 unbound Lua names ( 3 old UNHANDLED `E_DISABLE_HB_CHECK_REQ` ).
   Shade 28044 ( unit 145 ) reached the select screen's slot list only: no equip line, so its registration is judged by the user's pass, not by a log line; Brandish Breaker, Chasing Sword and Blood Sting write no effect-set line ( equip lines for all three are present ).
 
+### CH3c2 - Done (2026-11-14)
+
+Opus 5.5. Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( + `_SKILL_DEBUG`, stays on until the CH3d review ) and new `SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY` ( class-agnostic ). No review of its own ( the CH3d review covers CH3a-CH3d and CH3c2 ).
+**Finding:** Shadow Edge is June's copy of Add's March Reverse Reactor ( `CX2GUAdd::ANSI_SA_ALP_REVERSE_REACTOR_FrameMove` / `ProcessReverseReactorTargetInfo` ): same 0.31 s, Bip01 +25 / +100, 1200 link range, and June's 0x20-byte record is Add's `ReverseReactorTargetInfo` layout. June made it a list of up to 3 marks, a UID skip set, a cloned templet buff in place of `BFI_DEBUFF_PLASMA_LINK`, and a heal tick in place of Add's damage transfer.
+
+| June | March | What it does |
+|---|---|---|
+| `32b84390` | `SI_A_SCA_SHADOW_EDGE_FrameMove` | 0.31 s: `ClearShadowEdgeRecords`; up to 3 x target search ( 700 in PvP / PvE by `322cc1a0`, else 1200 ); explosion `DamageEffect_SCA_SHADOW_EDGE_Projectile_EXPLOSION` at the target, `DAMAGE_EFFECT_SCA_SHADOW_EDGE_Link` from her, aimed; record ( max HP x0.1 in `GT_PVP` only, `SA_EFFECTIVE_TIME` ); buff factor [0] cloned at max( 1, skill level ) onto the target |
+| `32b520f0` / `32b6a340` | `_Init` / `_EventProcess` | 3 preloads; the Shade Scratch template ( 0 lines diffed against `32b69040` ) |
+| `32b81220` / `32b81300` | `ShadowEdgeRecord::GetTargetUnit` / `ResetShadowEdgeRecord` | find by UID + NPC-ness; reset zeroes time / rate, erases `BTI_DEBUFF_SHADOW_EDGE` 432, destroys the Link |
+| `32b813d0` | `ShadowEdgeRecordFrameMove` | countdown; end on time, target lost / dead or > 1200; re-aim; once a second `UpNowHp( SA_ATK_PHYSIC_REL x GetPhysicAttackValue )` ( `+0x4424` = physic attack, `statcalc/gfd_blocks.tsv` ) |
+| `32b81900` tail | `ClearShadowEdgeRecords` | reset each, clear ( ReInit and the FrameMove ) |
+| `322d7b30` | `CX2Game::GetFrontNearestEnemyUnit` ( new, own flag ) | UID set, `IsValidUnit`, team, `GUSI_DIE`, HP, slot 94 invincible with attack type -1 ( NPC `GetInvincibleByAttackTypeId` ), `IsFront` ( `322ce900` = March ), NPC `NCT_BASIC` + `( GetOrgUnitSize x + y ) / 4` offset ( Add's; June `+0x3e30 / +0x3e34` ), keeps distance <= range |
+| `31f75980` | = March `CEffect::SetLinkMainEffectByPos` | same body ( 99999 sentinel, `LINK_EFFECT_RATE` 530 for this Link ); no port |
+
+- **Decision ( kickoff ):** the record, list, reset, clear and upkeep are written here under `_SKILL` ( they are Shadow Edge's own ). CH1h / CH1j's `_BLOOD` declarations and the two `_BLOOD` call sites ( `CommonFrameMove`, `ReInit` ) are kept, insert-only, in the `#else` of new `_SKILL` blocks. CH4c told ( `kickoffs/char-elesis/CH4c.md` amended ); Lu/Ciel CH1l30 told ( `322d7b30` ported, `31f75980` = March ).
+- **Registration:** `32b8c470` @`32b8e4c9` cases 28215 / 28235: Init + FrameMove + EventProcess, the hyper state copies FrameMove + EventProcess ( struct slots 0x18 / 0x38 / 0x48 read in the listing ). No `SetEquippedSkillLevel` block.
+- **Kept as June has it:** the upkeep returns after the first removal ( `JUNE_BUGS` 658 ); no null test on the templet or its buff vector; the record's max-HP field is written and never read; the FrameMove returns before `CommonFrameMove` when there is no game.
+- **Names:** `RNSI_A_SCA_SHADOW_EDGE` 28215 / `_UPGRADE` 28235 ( `X2SkillTree.h` ), `BTI_DEBUFF_SHADOW_EDGE` 432 ( `X2BuffFactor.h` ), `JUNE_ENUM_NAMES`. Attack type -1 has no `ATTACK_TYPE` member ( constant with a comment ). `funcmap.tsv` rows `Char Elesis CH3c2` ( 3 updated, 7 added ).
+- **Hygiene:** `flagcheck JUNE_CHAR_ELESIS_SKILL --with _SKILL_DEBUG --worktree --files` ( 7 files ): `2 PASS ( X2GUEL.cpp +235, X2GUEl.h +34 ), 5 OTHER, 0 FAIL`, 0 deleted, `RESULT: PASS`; `JUNE_GAME_FRONT_NEAREST_ENEMY`: `2 PASS ( X2Game.cpp +48, X2Game.h +3 ), 0 FAIL, RESULT: PASS`; `JUNE_ENUM_NAMES`: `2 PASS, RESULT: PASS`. `junediverge --check` 6 files: `allow-listed: 20`, `RESULT: PASS` ( new allow row: the max-HP share is `GT_PVP` only, June `@32b844df` ). `enumscan --check`: 0 A/B rows. `stateends`: 335 tables, 0 STUCK, PASS. `luabind check ELESIS_KNIGHT`: PASS. `skillicons check 28215-28236`: misses 0, PASS. /Zs probes of X2Game.cpp / X2GUEL.cpp: 0 errors.
+- **Build note:** a first run failed in KTDXLIB on my own `#error` guard ( a needed flag is not visible from KTDXLIB ); the guard was removed, X2Lib's compile is the dependency proof.
+- **Deploy:** `DEPLOY OK: X2_offline.exe is 26,548,736 B, dated 2026-11-14 06:50:30, md5 1cf32172859e1dffd879a1f87b249f64, equal to X2/US_SERVICE/x2.exe (2026-11-14 06:50:23); built at main 633d4817 + 7 uncommitted code file(s).`
+  `EXESTR OK: 3 of 3` ( wide `DamageEffect_SCA_SHADOW_EDGE_Projectile_EXPLOSION`, `DAMAGE_EFFECT_SCA_SHADOW_EDGE_Link`, the `shadow edge cast marks` log ) and `1 of 1` ( narrow `SI_A_SCA_SHADOW_EDGE` ), md5 1cf32172.
+- **Save** ( backup `db_backup/els_db_20261114_063955_pre_sql.sql` ): unit 146 `CAvenger80`: Shadow Edge 28215 ( level 1 ) into A 0, Brandish Breaker 28022 unslotted; the rest as CH3c.
+- **Play-test:** owed.
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, one Opus review at CH4c (covers CH4a-CH4c), user play-test (three engine pieces, planned as three from the start).

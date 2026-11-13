@@ -54,3 +54,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - `32b7e580` moved to CH4a ( it is the Grand Master transcendence passive, not a blood function ): `awk -F'	' '$7=="CH4c"' june2017_re/char_elesis/ch0_class_map.tsv` lists 10 rows. CH1j declared `ShadowEdgeRecordFrameMove` `32b813d0`, `TranscendenceBerserkerFrameMove` `32b7e9a0` and `MadnessFrameMove` `32b6ff20` under `_BLOOD` and calls them from `CommonFrameMove` ( `32b6ff20` last ); write the bodies in place of the declarations.
 - `m_fDashChargeTime` ( +0x9790 ) belongs to the Grand Master transcendence tick ( CH4a ), not to a blood function.
+
+## Amended by CH3c2 (2026-11-14)
+
+- Shadow Edge's mark is done under `_SKILL`, not `_BLOOD`: the `ShadowEdgeRecord` struct ( `+0x9700`, Add's `ReverseReactorTargetInfo` layout ), `m_vecShadowEdgeRecord`, `GetTargetUnit` `32b81220`, `ResetShadowEdgeRecord` `32b81300`, `ClearShadowEdgeRecords` and the upkeep `ShadowEdgeRecordFrameMove` `32b813d0`. The CH1h / CH1j `_BLOOD` declarations and the two `_BLOOD` call sites now sit in the `#else` of a `_SKILL` block: when CH4c turns `_BLOOD` on, delete nothing; those `#else` lines stay dead.
+- Still CH4c's: the 0x730 walk `32b816a0` ( it calls `ShadowEdgeRecord::GetTargetUnit` and uses nothing else ).

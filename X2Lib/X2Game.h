@@ -1436,6 +1436,9 @@ class CX2Game : public CKTDXStage
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_SKILL
 		bool IsUnitInViewCone( CX2GameUnit* pMyUnit_, CX2GameUnit* pTargetUnit_, float fUpDegree_, float fDownDegree_, float fSideDegree_ );	/// June 322f0e60
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_SKILL
+#ifdef SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
+		CX2GameUnit* GetFrontNearestEnemyUnit( CX2GameUnit* pUnit_, float fRange_, const std::set<UidType>& setExceptUnitUID_, const int iAttackType_ );	/// char-elesis CH3c2: June 322d7b30
+#endif SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
 		void						UpdateEveElectraSkillSlotIcon();
 	#ifdef SERV_RENA_NIGHT_WATCHER
 		void						UpdateNightWatcherSkillSlotIcon();

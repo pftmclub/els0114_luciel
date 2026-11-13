@@ -20079,6 +20079,54 @@ bool CX2Game::IsFront( CX2GameUnit *pMyUnit, CX2GameUnit *pTargetUnit )
 }
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
+// char-elesis CH3c2: June 322d7b30 ( Add's March Reverse Reactor search made a function, plus a UID skip set and slot 94's attack type )
+CX2GameUnit* CX2Game::GetFrontNearestEnemyUnit( CX2GameUnit* pUnit_, float fRange_, const std::set<UidType>& setExceptUnitUID_, const int iAttackType_ )
+{
+	CX2GameUnit* pNearestUnit = NULL;
+	for ( int i = 0; i < GetUnitNum(); ++i )
+	{
+		CX2GameUnit* pTargetUnit = GetUnit( i );
+		if ( NULL == pTargetUnit )
+			continue;
+		if ( setExceptUnitUID_.end() != setExceptUnitUID_.find( pTargetUnit->GetUnitUID() ) )
+			continue;
+		if ( false == IsValidUnit( pTargetUnit ) )
+			continue;
+		if ( pUnit_->GetTeam() == pTargetUnit->GetTeam() )
+			continue;
+		if ( CX2GameUnit::GUSI_DIE == pTargetUnit->GetGameUnitState() )
+			continue;
+		if ( pTargetUnit->GetNowHp() <= 0.f )
+			continue;
+
+		const bool bInvincible = ( CX2GameUnit::GUT_NPC == pTargetUnit->GetGameUnitType() ?
+			static_cast<CX2GUNPC*>( pTargetUnit )->GetInvincibleByAttackTypeId( iAttackType_ ) : pTargetUnit->GetInvincible() );	// June slot 94
+		if ( true == bInvincible )
+			continue;
+		if ( false == IsFront( pUnit_, pTargetUnit ) )
+			continue;
+
+		float fOffset = 0.f;
+		if ( CX2GameUnit::GUT_NPC == pTargetUnit->GetGameUnitType() )
+		{
+			CX2GUNPC* pNpc = static_cast<CX2GUNPC*>( pTargetUnit );
+			if ( CX2UnitManager::NCT_BASIC != pNpc->GetClassType() )
+				continue;
+			fOffset = ( pNpc->GetOrgUnitSize().x + pNpc->GetOrgUnitSize().y ) * 0.25f;	// June +0x3e30 / +0x3e34, Add's GetOrgUnitSize / 4
+		}
+
+		D3DXVECTOR3 vDistance = pTargetUnit->GetPos() - pUnit_->GetPos();
+		const float fDistance = D3DXVec3Length( &vDistance ) - fOffset;
+		if ( fDistance <= fRange_ )
+		{
+			fRange_ = fDistance;
+			pNearestUnit = pTargetUnit;
+		}
+	}
+	return pNearestUnit;
+}
+#endif SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_SKILL
 // June 322f0e60: target in my view cone ( height band on the land offset, side angle to my last touched line ); June ignores this
 bool CX2Game::IsUnitInViewCone( CX2GameUnit* pMyUnit_, CX2GameUnit* pTargetUnit_, float fUpDegree_, float fDownDegree_, float fSideDegree_ )
