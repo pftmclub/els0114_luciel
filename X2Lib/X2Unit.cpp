@@ -56,6 +56,9 @@ CX2Unit::CX2Unit( const KFieldUserInfo& pKFieldUserInfo )
 void CX2Unit::Init()
 {
 	m_pUnitTemplet				= g_pData->GetUnitManager()->GetUnitTemplet( m_UnitData.m_UnitClass );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	m_bMinorUnitForm			= false;	// char-luciel DU1: June +0xe40; DU5 ports its writer
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     ASSERT( m_pUnitTemplet != NULL );
 
 	m_bIsLevelUp				= false;	

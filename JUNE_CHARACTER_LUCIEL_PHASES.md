@@ -711,6 +711,40 @@ Opus 5.5 high. **Verdict: pass after one hygiene fix** (a missing flag-dependenc
 lands (CH1's play-test). DU3-DU5: Lu and Ciel each wear their own equipment in the village, in the character window and on the select screen;
 switching the form in the window swaps the shown body; a relog keeps it.
 
+### DU1 - Done (2026-11-14)
+
+Opus 5.5 high. Part 1 of 4. Flags `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` and `SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE` (Always.h, `#error` guards on
+UNIT_TYPE_RANGE, MINOR_UNIT_TEMPLET, RENDER_MOTION_CASH_EMOTION, BUFF_BEHAVIOR_PARITY, SEPARATION_MOTION). No `_DEBUG`, no log line (nothing runs
+before CH1). Files: `X2GUUser.h`, `X2GUUser.cpp`, `X2Unit.h`, `X2Unit.cpp`. funcmap rows: `grep "Char Luciel DU1" june2017_re/funcmap.tsv` (17).
+- **Split (scope rule, one logical change):** 440 `DU1` rows over ~80 June functions do not fit one session. DU1 = data model and lifetime;
+  **DU1b** = `SetActiveBody` / `UpdateDuo` / `SetDuoEnabled`, `CommonStateStart` keys, `CommonFrameMove(Future)`, `CommonStateEnd`,
+  PhysicProcess's not-selected body; **DU1c** = user sync, per-body float pairs, readers outside `CX2GUUser`; **DU1d** = the base-function
+  readers in `X2GUUser.cpp`, then the full build and the regression play-test. One review (`DU1-review.md`) after DU1d; CH1a0 / CH1p / CH3c
+  still wait on "DU1 review". Kickoffs written.
+- **Members** (June user +0x8e7c..+0x8e92, +0x4214..+0x4228): `m_pMinorUnitMotionFuture` / `m_pMinorUnitMotion`, `m_pMinorUnitXSkinAnimFuture` /
+  `m_pMinorUnitXSkinAnim`, seven `m_pFrame_MinorUnit_*`, `m_bMinorUnitActive` (+0x8e90), `m_bDuoEnabled` (+0x8e91), `m_bEndDuoAtAnimEnd`
+  (+0x8e92). Ctor (`3203e850 @32042429-32042479`): NULLs, active body = the unit's form byte. Dtor (`3203a620`): close both meshes, delete the
+  future anim, reset the now anim. The latch (+0x8e93) and the not-select block (+0x8f50..) come with their readers in DU1b.
+- **Unit form byte:** `CX2Unit::m_bMinorUnitForm` (+0xe40) + `IsMinorUnitForm()`, false in `Init()`. Read only; its writer `3234b8c0` is DU5's.
+- **Accessors** (X2GUUser.h): `GetXSkinAnim` (`32071d60`) and `GetXSkinAnimPtr` (`32071d80`) follow the active body; new `GetXSkinAnimFuture`
+  (`32070cf0`), `GetNotSelectXSkinAnimFuture` (`32070d10`), `GetNotSelectXSkinAnimPtr` (`32071db0`), `GetMinorUnitXSkinAnimPtr` (`32071d40`),
+  `IsMinorUnitActive` (`31e4d0b0`), `IsDuoEnabled`. `GetSkinAnimPtr` (user vslot 22) stays the first body: June's slot is `32071d20` in both
+  `CX2GUUser` and `CX2GULuciel` (vtslot 0x58).
+- **InitMotion** (`31fe5860 @31fe5f31-31fe6670`), unit type `UT_LUCIEL` only: `MINOR_UNIT_MOTION_FILE_NAME`, both meshes from
+  `m_MinorUnitGameMotion0`, skin anims, collision, the mix list [key, Motion1 (grade > 0), Motion2 (grade > 1), Emotion, cash emotion `false`]
+  only when Motion0 is set (June mixes Motion1 before Motion2 here, Motion2 first for the first body: kept), detail %, seven clone frames.
+- **Anims:** `AnimStop` / `AnimPlay` / `AnimPlayByPlayType` (`31fe7f70` / `31fe8130` / `31fe8050`) and both one-shot resets (`31fd4290` /
+  `31fd4340`) include the second body.
+- **Divergent function found and replaced:** `GetX2UnitClassGrade`. June's inline (`@31fe5c5c`): class 10-99 -> 1, 100-199 -> 2, else 0 (Lu/Ciel's
+  base 200 is a base class); March gave 200 grade 2. Row added to `june_march_divergent.tsv`. Callers: InitMotion, the motion preload
+  (`X2GUUser.cpp:5066`), `X2ItemStatCalculator.cpp:361`; only Lu/Ciel classes are >= 200.
+- **Hygiene.** flagcheck `DUO_BODY --with CLASS_GRADE --worktree`: 4 PASS (`X2GUUser.cpp` +114, `X2GUUser.h` +44, `X2Unit.h` +14, `X2Unit.cpp`
+  +3), 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS. enumscan: no hit on DU1's lines
+  (the grade threshold 19 is not an enum id).
+- **Compile:** `/Zs` probes (no PCH, census `cl_cmd`) of `X2GUUser.cpp`, `X2Unit.cpp`, `X2ItemStatCalculator.cpp`, `X2GUChung.cpp`: 0 errors each;
+  a `/P` probe shows both flags on. Full build skipped: no play-test (DU1d builds and hands off the regression pass).
+- **In game:** nothing to see. Every other class has form 0 and reads March's anims.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

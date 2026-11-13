@@ -754,6 +754,9 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
         CX2Inventory&   AccessInventory()                           { return m_UnitData.m_Inventory;				}
 //}} robobeg : 2013-11-01
 		const UnitTemplet*	GetUnitTemplet() const					{ return m_pUnitTemplet;						}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		bool			IsMinorUnitForm() const						{ return m_bMinorUnitForm; }	// char-luciel DU1: June unit +0xe40, 1 = Ciel; the writer 3234b8c0 is DU5's
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		UidType			GetUID() const								{ return m_UnitData.m_UnitUID;				}
 		UidType			GetOwnerUserUID() const						{ return m_UnitData.m_UserUID;				}
@@ -1354,6 +1357,9 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 		//UnitData*					m_pUnitData;
         UnitData					m_UnitData;
 		const UnitTemplet*			m_pUnitTemplet;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		bool						m_bMinorUnitForm;	// char-luciel DU1: June +0xe40
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		bool						m_bIsLevelUp;
 
@@ -2267,10 +2273,18 @@ inline int GetX2UnitClassGrade( CX2Unit::UNIT_CLASS unitClass )
 	if( iGrade <= 9 )
 		return 1;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE
+	// char-luciel DU1: June 31fe5860 @31fe5c5c, class 10-99 -> 1, 100-199 -> 2, any other ( Lu/Ciel's base 200 ) -> 0
+	if( iGrade <= 19 )
+		return 2;
+
+	return 0;
+#else SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE
 	if( iGrade <= 99 )
 		return 2;
 
 	return -1;
+#endif SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE
 }
 #endif
 

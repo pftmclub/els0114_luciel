@@ -1047,6 +1047,22 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_AdvanceTimeCount			= 1;
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	m_pFrame_Bip01_Spine		= NULL;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1: June ctor 3203e850 @32042429-32042479; the active body starts as the unit's form byte ( unit +0xe40 )
+	m_pMinorUnitMotionFuture			= NULL;
+	m_pMinorUnitMotion					= NULL;
+	m_pMinorUnitXSkinAnimFuture			= NULL;
+	m_pFrame_MinorUnit_Bip01			= NULL;
+	m_pFrame_MinorUnit_Bip01_Head		= NULL;
+	m_pFrame_MinorUnit_Bip01_R_Foot		= NULL;
+	m_pFrame_MinorUnit_Bip01_L_Foot		= NULL;
+	m_pFrame_MinorUnit_Bip01_R_UpperArm	= NULL;
+	m_pFrame_MinorUnit_Bip01_L_UpperArm	= NULL;
+	m_pFrame_MinorUnit_Bip01_Spine		= NULL;
+	m_bMinorUnitActive					= ( NULL != m_pUnit ) ? m_pUnit->IsMinorUnitForm() : false;
+	m_bDuoEnabled						= false;
+	m_bEndDuoAtAnimEnd					= false;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 	m_bHyperModeUsed					= false;
@@ -1622,6 +1638,13 @@ CX2GUUser::~CX2GUUser(void)
 	m_pXSkinAnim.reset();
 
 	SAFE_CLOSE( m_pOrgMotionFuture );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1: June dtor 3203a620 @3203a8d0-3203a92c, the second body's meshes and future anim
+	SAFE_CLOSE( m_pMinorUnitMotionFuture );
+	SAFE_CLOSE( m_pMinorUnitMotion );
+	SAFE_DELETE_KTDGOBJECT( m_pMinorUnitXSkinAnimFuture );
+	m_pMinorUnitXSkinAnim.reset();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_ADD_ARME_BATTLE_MAGICIAN
 	if( bDeleteOrgMotion == true )
 		SAFE_CLOSE( m_pOrgMotion );
@@ -5218,6 +5241,63 @@ void CX2GUUser::InitMotion()
 		m_pFrame_Bip01_R_UpperArm	= m_pXSkinAnim->GetCloneFrame( L"Bip01_R_UpperArm" );
 		m_pFrame_Bip01_L_UpperArm	= m_pXSkinAnim->GetCloneFrame( L"Bip01_L_UpperArm" );
 		m_pFrame_Bip01_Spine		= m_pXSkinAnim->GetCloneFrame( L"Bip01_Spine" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1: June 31fe5860 @31fe5f31-31fe6670, the second body for unit type 10; mixes Motion1 before Motion2, unlike the first
+		if( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
+		{
+			const CX2Unit::UnitTemplet* pMinorUnitTemplet = GetUnit()->GetUnitTemplet();
+			wstring wstrMinorUnitMotion;
+			LUA_GET_VALUE( m_LuaManager, "MINOR_UNIT_MOTION_FILE_NAME", wstrMinorUnitMotion, L"" );
+
+			m_pMinorUnitMotionFuture	= g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( pMinorUnitTemplet->m_MinorUnitGameMotion0.c_str() );
+			m_pMinorUnitMotion			= g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( pMinorUnitTemplet->m_MinorUnitGameMotion0.c_str() );
+
+			m_pMinorUnitXSkinAnimFuture	= CKTDGXSkinAnim::CreateSkinAnim();
+			m_pMinorUnitXSkinAnim		= CKTDGXSkinAnim::CreateSkinAnimPtr();
+
+			m_pMinorUnitXSkinAnimFuture->SetAnimXSkinMesh( m_pMinorUnitMotionFuture );
+			m_pMinorUnitXSkinAnim->SetAnimXSkinMesh( m_pMinorUnitMotion );
+#ifdef SERV_IRUHADEV_JUNE_RENDER_MOTION_COLLISION
+			m_pMinorUnitXSkinAnim->AddCollisionData( m_pMinorUnitMotion );
+#endif SERV_IRUHADEV_JUNE_RENDER_MOTION_COLLISION
+
+			std::vector<wstring> vecMinorUnitMotion;
+			if( false == pMinorUnitTemplet->m_MinorUnitGameMotion0.empty() )
+			{
+				const int iMinorUnitGrade = GetX2UnitClassGrade( pMinorUnitTemplet->m_UnitClass );
+				vecMinorUnitMotion.push_back( wstrMinorUnitMotion );
+				if( 0 < iMinorUnitGrade && false == pMinorUnitTemplet->m_MinorUnitGameMotion1.empty() )
+					vecMinorUnitMotion.push_back( pMinorUnitTemplet->m_MinorUnitGameMotion1 );
+				if( 1 < iMinorUnitGrade && false == pMinorUnitTemplet->m_MinorUnitGameMotion2.empty() )
+					vecMinorUnitMotion.push_back( pMinorUnitTemplet->m_MinorUnitGameMotion2 );
+				if( false == pMinorUnitTemplet->m_MinorUnitEmotionMotion.empty() )
+					vecMinorUnitMotion.push_back( pMinorUnitTemplet->m_MinorUnitEmotionMotion );
+				AppendCashEmotionMotion( (int)pMinorUnitTemplet->m_UnitType, false, vecMinorUnitMotion );
+			}
+
+			for( UINT i = 0; i < vecMinorUnitMotion.size(); ++i )
+			{
+				CKTDXDeviceXSkinMesh* pMinorUnitMixMotion = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( vecMinorUnitMotion[i] );
+				if( NULL != pMinorUnitMixMotion )
+				{
+					m_pMinorUnitXSkinAnimFuture->MixAnim( pMinorUnitMixMotion );
+					m_pMinorUnitXSkinAnim->MixAnim( pMinorUnitMixMotion );
+					SAFE_CLOSE( pMinorUnitMixMotion );
+				}
+			}
+
+			m_pMinorUnitXSkinAnimFuture->SetModelDetailPercent( g_pData->GetModelDetailPercent() );
+			m_pMinorUnitXSkinAnim->SetModelDetailPercent( g_pData->GetModelDetailPercent() );
+
+			m_pFrame_MinorUnit_Bip01				= m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01" );
+			m_pFrame_MinorUnit_Bip01_Head			= m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01_Head" );
+			m_pFrame_MinorUnit_Bip01_R_Foot			= m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01_R_Foot" );
+			m_pFrame_MinorUnit_Bip01_L_Foot			= m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01_L_Foot" );
+			m_pFrame_MinorUnit_Bip01_R_UpperArm		= m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01_R_UpperArm" );
+			m_pFrame_MinorUnit_Bip01_L_UpperArm		= m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01_L_UpperArm" );
+			m_pFrame_MinorUnit_Bip01_Spine			= m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01_Spine" );
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	
 #ifdef ELSWORD_SECOND_CLASS_CHANGE
 		SetUnitReForm();
@@ -31683,6 +31763,14 @@ void CX2GUUser::AnimStop()
 
 	if ( m_pXSkinAnim != NULL )
 		m_pXSkinAnim->Wait();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1: June AnimStop 31fe7f70, the second body's anims too
+	if ( m_pMinorUnitXSkinAnimFuture != NULL )
+		m_pMinorUnitXSkinAnimFuture->Wait();
+
+	if ( m_pMinorUnitXSkinAnim != NULL )
+		m_pMinorUnitXSkinAnim->Wait();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	m_FrameDataNow.stateParam.bSuperArmor = true;
 	m_FrameDataNow.stateParam.bSuperArmorNotRed = true;
@@ -31699,6 +31787,14 @@ void CX2GUUser::AnimPlay()
 
 	if ( m_pXSkinAnim != NULL )
 		m_pXSkinAnim->Play( m_pXSkinAnim->GetPlayType() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1: June AnimPlay 31fe8130, the second body's anims resume their own play type
+	if ( m_pMinorUnitXSkinAnimFuture != NULL )
+		m_pMinorUnitXSkinAnimFuture->Play( m_pMinorUnitXSkinAnimFuture->GetPlayType() );
+
+	if ( m_pMinorUnitXSkinAnim != NULL )
+		m_pMinorUnitXSkinAnim->Play( m_pMinorUnitXSkinAnim->GetPlayType() );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	m_FrameDataNow.stateParam.bSuperArmor = false;
 	m_FrameDataNow.stateParam.bSuperArmorNotRed = false;
@@ -31712,6 +31808,14 @@ void CX2GUUser::AnimPlayByPlayType( const CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE eP
 
 	if ( m_pXSkinAnim != NULL )
 		m_pXSkinAnim->Play( ePlayType_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1: June AnimPlay( playType ) 31fe8050, the second body's anims too
+	if ( m_pMinorUnitXSkinAnimFuture != NULL )
+		m_pMinorUnitXSkinAnimFuture->Play( ePlayType_ );
+
+	if ( m_pMinorUnitXSkinAnim != NULL )
+		m_pMinorUnitXSkinAnim->Play( ePlayType_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	m_FrameDataNow.stateParam.bSuperArmor = false;
 	m_FrameDataNow.stateParam.bSuperArmorNotRed = false;
@@ -50952,6 +51056,11 @@ void    CX2GUUser::ClearAnimEventTimerOneshotNow()
 {
     if ( m_pXSkinAnim != NULL )
 	    m_pXSkinAnim->ResetOneshotPerformed();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1: June 31fd4290, the second body's now anim before the riding pet's
+	if ( m_pMinorUnitXSkinAnim != NULL )
+		m_pMinorUnitXSkinAnim->ResetOneshotPerformed();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if ( NULL != m_ptrRidingPet && NULL != m_ptrRidingPet->GetXSkinAnimPtr() )
         m_ptrRidingPet->GetXSkinAnimPtr()->ResetOneshotPerformed();
 }
@@ -50960,6 +51069,11 @@ void    CX2GUUser::ClearAnimEventTimerOneshotFuture()
 {
     if ( m_pXSkinAnimFuture != NULL )
 	    m_pXSkinAnimFuture->ResetOneshotPerformed();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1: June 31fd4340, the second body's future anim before the riding pet's
+	if ( m_pMinorUnitXSkinAnimFuture != NULL )
+		m_pMinorUnitXSkinAnimFuture->ResetOneshotPerformed();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if ( NULL != m_ptrRidingPet && NULL != m_ptrRidingPet->GetXSkinAnimFuturePtr() )
         m_ptrRidingPet->GetXSkinAnimFuturePtr()->ResetOneshotPerformed();
 }

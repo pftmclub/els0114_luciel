@@ -265,7 +265,10 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU1 | **ready** (2026-11-14; NU3 reviewed, char-chung Z closed): second body in `CX2GUUser`: members, minor-unit model, user sync, not-selected-body physics | Opus 5.5 / high, Opus review | NU3 review, char-chung Z | `X2GUUser.*`, `X2GameUnit.*` | `DU1.md` |
+| DU1 | done 2026-11-14 (part 1 of 4): second-body members, accessors, ctor / dtor, InitMotion, anim play / stop; class grade replaced; probe 0 errors | Opus 5.5 / high, review after DU1d | NU3 review, char-chung Z | `X2GUUser.*`, `X2Unit.*` | `DU1.md` |
+| DU1b | **ready**: SetActiveBody / UpdateDuo / SetDuoEnabled, CommonStateStart duo keys, CommonFrameMove(Future), CommonStateEnd, not-selected-body physics | Opus 5.5 / high, no review of its own (DU1-review covers it) | DU1 | `X2GUUser.*` | `DU1b.md` |
+| DU1c | blocked (DU1b): user sync bits + converters, per-body float pairs, readers outside `CX2GUUser` | Opus 5.5 / high, no review of its own (DU1-review covers it) | DU1b | `X2GUUser.*`, `X2GameUnit.*`, `X2Game.cpp`, sync struct | `DU1c.md` |
+| DU1d | blocked (DU1c): base-function second-body readers in `X2GUUser.cpp` (accessor sites, bones, hands, sounds), full build, regression play-test; then `DU1 review` | Opus 5.5 / high, Opus review (`DU1-review.md`, covers DU1-DU1d) | DU1c | `X2GUUser.*` | `DU1d.md` |
 | CH1a0 | blocked (NU1, DU1 reviews): Opus helpers CH1a calls: Lu/Ciel gauge class, `CX2GUUser` transform link (`31fc9d90` family), hold-key selector, switching guide | Opus 5.5 / high, Opus review | CH0, NU1 review, DU1 review | `X2GUUser.*`, `X2GageData.*`, `X2Game.*`, Always.h | `CH1a0.md` |
 | CH1a | blocked (CH1a0 review): new `X2GULuciel.*` skeleton (ctor / dtor / members / own virtuals, LSI enum), flags `_CORE` / `_LIVE` | Opus 5.5 / high, Opus review | CH1a0 review | `X2GULuciel.*` (new), `X2Lib_2010.vcxproj`, `X2UnitManager.h`, Always.h | `CH1a.md` |
 | CH1b | blocked (CH1a review): Lu common states (CH1c merged in by CH0), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1f2 review covers it) | CH1a review | `X2GULuciel.*` | `CH1b.md` |

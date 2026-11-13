@@ -13233,3 +13233,27 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS needs SERV_IRUHADEV_JUNE_CHAR_CREATE ( CX2OfflineStatTable::GetStatSource in the CREATE line )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel DU1 - June's class grade (31fe5860 @31fe5c5c): class 10-99 = 1, 100-199 = 2, anything else = 0, so
+//              Lu/Ciel's base class 200 is grade 0 (March gave it 2). Read by both bodies' motion mix and the item-stat grade test.
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE ) && !defined( SEPARATION_MOTION )
+#error SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE needs SEPARATION_MOTION ( GetX2UnitClassGrade )
+#endif SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel DU1 - the second body (Ciel) in CX2GUUser, class-agnostic: members (June user +0x8e7c..+0x8e92,
+//              +0x4214..+0x4228), ctor / dtor, the duo-aware anim accessors, InitMotion's second motion / skin anims / frames for
+//              unit type 10, the second body in AnimStop / AnimPlay / the one-shot resets, and the unit's form byte (read only; DU5
+//              writes it). Every other class has form 0 and sees March's anims. Parts 2 and 3 (DU1b / DU1c) add the state machine,
+//              physics, sync and the base-function readers. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE ) && defined( SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET ) && defined( SERV_IRUHADEV_JUNE_RENDER_MOTION_CASH_EMOTION ) && defined( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY ) && defined( SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs UNIT_TYPE_RANGE ( UT_LUCIEL ), MINOR_UNIT_TEMPLET ( motions ), RENDER_MOTION_CASH_EMOTION, BUFF_BEHAVIOR_PARITY ( AnimPlay ) and JUNE_CHAR_CLASS_GRADE
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+//////////////////////////////////////////////////////////////////////////

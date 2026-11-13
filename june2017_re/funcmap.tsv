@@ -11299,3 +11299,20 @@ UQNCM_* / PUCM_* / LMUCM_* (C3z-4t4)	the 8 UI messages TutorialGuideInfo.lua wai
 32b6cbd0	CX2GUEL::ESI_SA_SCA_SHADE_EventProcess	PORTED	Char Elesis CH3c: the Cross Slash template ( 0 lines )
 32b6d4e0	CX2GUEL::ESI_A_SCA_BLOOD_STING_EventProcess	PORTED	Char Elesis CH3c: the Cross Slash template ( 0 lines )
 32b84390	CX2GUEL::SI_A_SCA_SHADOW_EDGE_FrameMove	NEEDS OPUS	Char Elesis CH3c: not ported: 0.31 s, three times a nearest enemy outside a (UID) exclusion set ( CX2Game 322d7b30, range 700 PvP / PvE or 1200 ), Projectile / Link damage effects aimed with 31f75980, a 0x20-byte record pushed on +0x9700 ( the CH4c record type, upkeep 32b813d0 ) and the skill's buff factor cloned onto the target; Init 32b520f0 and EventProcess 32b6a340 wait with it
+32070cf0	CX2GUUser::GetXSkinAnimFuture	PORTED	Char Luciel DU1: m_bMinorUnitActive ( +0x8e90 ) ? m_pMinorUnitXSkinAnimFuture ( +0x8e84 ) : m_pXSkinAnimFuture ( +0x87d0 ); X2GUUser.h under SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+32070d10	CX2GUUser::GetNotSelectXSkinAnimFuture	PORTED	Char Luciel DU1: NULL unless m_bDuoEnabled ( +0x8e91 ); else the future anim of the body not active
+32071d60	CX2GUUser::GetXSkinAnim	PORTED	Char Luciel DU1: raw active-body now anim ( +0x8e90 ? +0x8e88 : +0x87d4 )
+32071d80 (DU1)	CX2GUUser::GetXSkinAnimPtr	PORTED	Char Luciel DU1: smart active-body now anim, add-ref
+32071d40	CX2GUUser::GetMinorUnitXSkinAnimPtr	PORTED	Char Luciel DU1: smart second-body now anim ( +0x8e88 ), add-ref
+32071db0 (DU1)	CX2GUUser::GetNotSelectXSkinAnimPtr	PORTED	Char Luciel DU1: NULL unless m_bDuoEnabled; else the body not active, add-ref
+32071d20 (DU1)	CX2GUUser::GetSkinAnimPtr ( user vslot 22 )	same	Char Luciel DU1: always the first body ( +0x87d4 ), Lu/Ciel does not override slot 22 ( vtslot 0x58 ): March unchanged
+31e4d0b0	CX2GUUser::IsMinorUnitActive	PORTED	Char Luciel DU1: returns +0x8e90 == 1
+31fe5860 (DU1)	CX2GUUser::InitMotion second body	PORTED	Char Luciel DU1: @31fe5f31-31fe6670 type 10: MINOR_UNIT_MOTION_FILE_NAME, mesh = templet m_MinorUnitGameMotion0 ( +0x250 ) x2, skin anims, collision, mix [ key, Motion1 ( grade > 0, +0x26c ), Motion2 ( grade > 1, +0x288 ), Emotion ( +0x234 ), cash emotion false ] only when Motion0 is set, detail %, 7 frames ( +0x4214..+0x4228, +0x8e8c )
+31fe5860 @31fe5c5c	GetX2UnitClassGrade ( inlined )	PORTED	Char Luciel DU1: ( unsigned )( class - 10 ) < 190 ? ( class > 99 ) + 1 : 0; divergent row, SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE
+3203e850 (DU1)	CX2GUUser::CX2GUUser duo members	PORTED	Char Luciel DU1: @32042429-32042479: +0x8e88 released, +0x8e8c = 0, +0x8e90 = unit +0xe40, word +0x8e91 = 0, +0x8e93 = 0 ( latch: DU1b )
+3203a620 (DU1)	CX2GUUser::~CX2GUUser second body	PORTED	Char Luciel DU1: close +0x8e7c / +0x8e80, delete +0x8e84; +0x8e88 dropped with the member
+31fe7f70 (DU1)	CX2GUUser::AnimStop	PORTED	Char Luciel DU1: Wait() on +0x8e84 / +0x8e88 too ( the +0x8080 byte stays unported, as in BUFF_BEHAVIOR_PARITY )
+31fe8130 (DU1)	CX2GUUser::AnimPlay	PORTED	Char Luciel DU1: the second body's anims resume their own play type
+31fe8050 (DU1)	CX2GUUser::AnimPlayByPlayType	PORTED	Char Luciel DU1: the second body's anims play the given type
+31fd4290 (DU1)	CX2GUUser::ClearAnimEventTimerOneshotNow	PORTED	Char Luciel DU1: +0x8e88 +0x24c = 0 before the riding pet
+31fd4340 (DU1)	CX2GUUser::ClearAnimEventTimerOneshotFuture	PORTED	Char Luciel DU1: +0x8e84 +0x24c = 0 before the riding pet

@@ -2110,9 +2110,36 @@ public:
 		float						GetDamageUpPercentBySMA( int npcID ); // SpecificMonsterAttack
 		float						GetEvadeUpPerBySMA( int npcID );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		/// char-luciel DU1: June 32071d60, the active body's skin anim
+		const CKTDGXSkinAnim* GetXSkinAnim() const { return true == m_bMinorUnitActive ? m_pMinorUnitXSkinAnim.get() : m_pXSkinAnim.get(); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		const CKTDGXSkinAnim* GetXSkinAnim() const { return m_pXSkinAnim.get(); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		//{{ kimhc // 실시간 엘소드 중 실시간 레벨업 이펙트 효과
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		/// char-luciel DU1: June 32071d80 active body, 32071d40 second body, 32071db0 the body not selected ( NULL out of duo )
+		CKTDGXSkinAnimPtr GetXSkinAnimPtr() const { return true == m_bMinorUnitActive ? m_pMinorUnitXSkinAnim : m_pXSkinAnim; }
+		CKTDGXSkinAnimPtr GetMinorUnitXSkinAnimPtr() const { return m_pMinorUnitXSkinAnim; }
+		CKTDGXSkinAnimPtr GetNotSelectXSkinAnimPtr() const
+		{
+			if( false == m_bDuoEnabled )
+				return CKTDGXSkinAnimPtr();
+			return true == m_bMinorUnitActive ? m_pXSkinAnim : m_pMinorUnitXSkinAnim;
+		}
+		/// char-luciel DU1: June 32070cf0 active body's future anim, 32070d10 the one not selected ( NULL out of duo )
+		CKTDGXSkinAnim* GetXSkinAnimFuture() const { return true == m_bMinorUnitActive ? m_pMinorUnitXSkinAnimFuture : m_pXSkinAnimFuture; }
+		CKTDGXSkinAnim* GetNotSelectXSkinAnimFuture() const
+		{
+			if( false == m_bDuoEnabled )
+				return NULL;
+			return true == m_bMinorUnitActive ? m_pXSkinAnimFuture : m_pMinorUnitXSkinAnimFuture;
+		}
+		bool IsMinorUnitActive() const { return m_bMinorUnitActive; }	/// char-luciel DU1: June 31e4d0b0
+		bool IsDuoEnabled() const { return m_bDuoEnabled; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		CKTDGXSkinAnimPtr GetXSkinAnimPtr() const { return m_pXSkinAnim; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		//{{ kimhc // 실시간 엘소드 중 실시간 레벨업 이펙트 효과
 		const CKTDXDeviceXSkinMesh* GetMotion() const { return m_pMotion; }
 
@@ -4694,6 +4721,23 @@ public:
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 
 		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_Bip01_Spine;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1: June user +0x8e7c..+0x8e92 and +0x4214..+0x4228, the second body ( unit type 10 only )
+		CKTDXDeviceXSkinMesh*							m_pMinorUnitMotionFuture;		/// June +0x8e7c
+		CKTDXDeviceXSkinMesh*							m_pMinorUnitMotion;				/// June +0x8e80
+		CKTDGXSkinAnim*									m_pMinorUnitXSkinAnimFuture;	/// June +0x8e84
+		CKTDGXSkinAnimPtr								m_pMinorUnitXSkinAnim;			/// June +0x8e88
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_MinorUnit_Bip01;		/// June +0x4214
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_MinorUnit_Bip01_Head;	/// June +0x4218
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_MinorUnit_Bip01_R_Foot;	/// June +0x421c
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_MinorUnit_Bip01_L_Foot;	/// June +0x4220
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_MinorUnit_Bip01_R_UpperArm;	/// June +0x4224
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_MinorUnit_Bip01_L_UpperArm;	/// June +0x4228
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_MinorUnit_Bip01_Spine;	/// June +0x8e8c
+		bool											m_bMinorUnitActive;				/// June +0x8e90: the minor unit ( Ciel ) is the active body
+		bool											m_bDuoEnabled;					/// June +0x8e91: both bodies are shown
+		bool											m_bEndDuoAtAnimEnd;				/// June +0x8e92: the duo ends when the state's anim ends
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		
 
 		bool						m_bHyperModeUsed;	/// 튜토리얼에서 각성을 사용했는지 체크하기 위한 용도
