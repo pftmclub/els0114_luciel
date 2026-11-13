@@ -1956,7 +1956,7 @@ FINISH `StateEnd`, FINISH `FrameMoveFuture`; Soul Ignition's Init is a bare `ret
 - **Deploy:** `DEPLOY OK: X2_offline.exe is 26,493,440 B, dated 2026-11-14 02:51:13, md5 ae6ac23005d46b8ad1fefdf5b67d64de, equal to X2/US_SERVICE/x2.exe (2026-11-14 02:51:05); built at main 0343cf6b + 6 uncommitted code file(s).` `EXESTR OK` ( md5 ae6ac230 ): narrow `ESI_SA_SBH_BURST_RISING`, `ESI_SA_SBH_IGNIS_CRASHER`, `ESI_SA_SBH_SOUL_IGNITION`; wide `blazing dance target uid`.
 - **Save:** unit 30 ( `ElesisBH`, class 121, lv 80, not transcended; backup `db_backup/els_db_<stamp>_pre_sql.sql` ): A 0 Eternal Fire 28015, A 1 Blazing Dance 28016, A 2 Blaze Wing 28017, A 3 Wall of Prominence 28018; B 5 Burst Rising 28041,
   B 6 Ignis Crasher 28042, B 7 Soul Ignition 28063 ( 28017 / 28042 / 28063 newly learned at level 1; the earlier slots are cleared; slots 4 / 8 / 9 empty ). Upgrade ids not learned.
-- **Play-test:** owed ( see the hand-off ). Log tag `[JUNE_CHAR]` ( `ELESIS SKILL`, `ELESIS SUMMON`, `SUMMON` ).
+- **Play-test: passed (2026-11-14, exe `ae6ac230`).** Logs: 7 equip lines ( states 49 / 51 / 53 / 55 bank A, 59 / 61 / 63 bank B ); `blazing dance target uid ... count 1 / 2 / 3`; `ELESIS SUMMON req npc 1635 wall ...` then `SUMMON npc 1635 uid 1000021 skill 28018 lv 1 flags 0x1`; `SBUF` state 63 BFI 995, `soul ignition level 1 effect set rate 1.000`, `ES_CREATE EffectSet_SA_SBH_Soul_Ignition`; ErrorLog 0 lines, 0 Motion Error, 0 MIG no-state, 0 EXCEPTION, 0 unbound Lua names ( 2 UNHANDLED `E_DISABLE_HB_CHECK_REQ` are old ). Log tag `[JUNE_CHAR]`.
 
 ## Phase CH4 - Passives and class mechanics
 
