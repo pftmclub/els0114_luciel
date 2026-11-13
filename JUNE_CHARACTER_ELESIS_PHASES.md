@@ -1631,6 +1631,29 @@ Opus 5.5. **Data only: no client source changed, no flag added** (the route and 
   147 = 35, 148 = 29, 149 = 30, 150 = 125, 140-146 unchanged; 0 EXCEPTION, ErrorLog 0. `AddGroupChainQuest` unbound x1 is pre-existing (backlog line 314).
   Review kickoff `kickoffs/char-elesis/CHNb-review.md` written.
 
+### CHNb - Review (2026-11-13)
+
+Opus 5.5 high. **Verdict: pass, no change to data or code.** Commits `f3befad7` / `e3867379` re-checked against June's data (no Ghidra: no log line disagreed).
+- **`LevelUpEvent.lua`** (data036 core-list source, 8734 B, BOM, 455 CRLF / 0 lone LF): level-15 `TYPE6` (:103-119) and level-35 `TYPE6` (:269-286) = June
+  `LevelUpEvent.src.lua:103-118` / `:320-337` line for line (class list, dialog, both `ElesisVoice_ClassUpReady0x.ogg`). Diff against the pre-CHNb kom
+  (`kom_backup_tools/data036.kom.20261113_110737`, extracted to the scratchpad): exactly three hunks, :112 dialog name, :274-275 `UC_ELESIS_DARK_KNIGHT` added,
+  :279-281 `DIALOG_LIST` added; nothing else changed. `luasrc.py ledger --check`: `LEDGER CHECK PASS: 0 FAIL, 0 WARN`; `core --check`: `CORE CHECK PASS: 0 FAIL, 0 WARN`.
+- **Dialogs:** all eight are byte-identical to `luasrc.reference_of( June, "june" )` = `ljconv(June bytecode)`: data034 `DLG_1ST_` / `DLG_2ND_Class_Change_Guide_Elesis`
+  (8482 / 7025 B, from June data034), data034 `DLG_Class_Change_Elesis_SK` / `_PK` / `_GM` / `_BH` and data217 `_DK` / `_CA` (1392 B, from June data217).
+  (Correction to the CHNb note: against June's raw 0x82 file they differ beyond byte 4, at the remapped opcodes; against `ljconv` they are identical.)
+  `luabind.py check` on the eight: 21 methods each, 0 unbound, ENUM 0 / 0, `RESULT: PASS`. March's old `Class_Change_Guide_Elesis.lua` stays in data034, now unreferenced.
+- **Play-test logs** (run 11:12:39-11:16:31, after the `b4108783` deploy): `CLASS GUIDE 1st: 3 class description(s) wrapped to 180` x3; `CLASS GUIDE 2nd: class 35 line 3 ->
+  next class 125, buttons 1543 / 1547` + `2nd skills: ... 4 skill icon(s), 3 command row(s)`; `QUEST accepted 35569 'Dark Knight 1/4' (from NPC 10025)`, `35320`, `35330`,
+  `35573 'Crimson Avenger 1/5' (from NPC 10025)` (the guide's Accept); `QUEST complete 35572 CLASS CHANGE unitUID=147 8 -> 35`, `35323 ... 148 8 -> 29`, `35333 ... 149 8 -> 30`,
+  `35577 ... 150 35 -> 125`: exactly 4 `CLASS CHANGE` lines, so no other unit changed. Packets 0 EXCEPTION (5 UNHANDLED = `E_DISABLE_HB_CHECK_REQ`, pre-existing), ErrorLog 0 matches.
+- **Save** (`elsdb.py chars`): 147 = 35, 148 = 29, 149 = 30, 150 = 125; 140-146 unchanged (119 / 124 / 9 / 4 / 35 / 125 / 125).
+- **Deployed kom:** `kom.py status data036`: packed vs live `~0 changed` (CHNb's copy is live). It also reports `PACK NEEDED: Enum.lua newer than packed (11:18:54)`:
+  a peer's edit after CHNb's 11:07 pack, not CHNb's; left to its owner.
+- **Kickoffs:** CH2d / CH3c name no quest ids (they need a 35 / 125 unit; 144-147 / 145-146 / 150 exist). CH6's walk said "CHNb's quests": amended to name them
+  (35569-35572 -> 35, 35320-35323 -> 29, 35330-35333 -> 30, 35573-35577 -> 125, start NPC 10025, Accept from the guide).
+- **Hygiene:** no client source changed, so no flagcheck range. `junediverge --check-all`: allow-listed 225, `RESULT: PASS`. No debug define to retire
+  (`_CHAR_ELESIS_CLASS_DEBUG` stayed commented out). Full build skipped: no code change.
+
 ## Phase CH2 - Skills: Knight and the first jobs (classes 8, 29, 30, 35)
 
 **Run with:** Sonnet 5.5 high (transcription from CH0's map), one Opus review at CH2d (covers CH2a-CH2d), user play-test per phase. Flag

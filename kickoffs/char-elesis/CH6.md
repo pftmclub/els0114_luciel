@@ -22,7 +22,8 @@ Do "Phase CH6": back up the save; units of 8 / 29 / 30 / 35 / 120 / 121 / 125 an
 `charport_scan.py`, `charport_keys.py ELESIS_KNIGHT` and `s3_no_state.py --family X2GUEL.cpp --preprocess`; before / after numbers in the Done note
 (0 unexplained `no_state`). Hand the user the walk: every skill in an A and a B slot (each cast twice), a hyper, the Way of the Sword (fill both
 ways, vigor, destruction, a stage change), each of the four summons, blood sucking and Blood Runaway on 35 / 125, the passives, one dungeon per
-job, the level-15 class-change dialog with all three paths on fresh units (CHNb's quests) and the level-35 one to Crimson Avenger, the creation
+job, the level-15 class-change dialog with all three paths on fresh units (CHNb's quests: Accept in the guide, then `/qdone` 35569-35572 -> 35,
+35320-35323 -> 29, 35330-35333 -> 30) and the level-35 one to Crimson Avenger (35573-35577 -> 125; start NPC 10025), the creation
 screen's six Elesis entries, then leave the game and return to the village; **the becoming-transcended transition** on un-transcended 120 / 121 /
 125 by `/tc 1`, `/qdone 42030`, `/additem 288493 1` (guide popup with the class picture, new skill-tree rows, HUD portrait, relog).
 
