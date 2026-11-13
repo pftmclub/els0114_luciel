@@ -34,8 +34,6 @@ Review CH1's deploy unit and the play-test evidence. Check at least:
   `charport_adis.py elesis` and confirm type 1 only.
 - **Retire** `_WOS_DEBUG` (comment out the `#define`; leave `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` on for the skill phases). If that is the
   only code change, start the build and do not wait (CLAUDE.md, 2026-11-03). `ELESIS DATA` stays, as Rena's and Ara's did.
-- **Scan:** rerun `june2017_re/charport_scan.py <scratch>` (CH1's was still decompiling at the logs check) and diff it against
-  `june2017_re/char_elesis/plan_charport_scan_20261111.txt`.
 - **Kickoffs:** CH5 and CH2a are ready after the review; check their line references against the post-CH1 files.
 
 Hygiene: `flagcheck --range <CH1 commit>^..<CH1 commit>` per flag (Always.h ERROR from the `--with` guard evaluation is expected, as Ara's CH1),

@@ -1383,7 +1383,7 @@ virtuals, skill head, pressed-slot space and her Way of the Sword class side and
   (`cmp eax, 1`) call vslot 0x10c and test type 1 only: three allow-list rows with those addresses.
 - **Reference log:** `data\ErrorLog_pre_CH1_elesis.txt` (254,291 B, the run of 2026-11-13 08:29).
 - **Scans:** `charport_keys.py ELESIS_KNIGHT`: `june-only=9 neither=1 march-only-site=4 both=234` = CH0's `plan_charport_keys.txt` (only the reader label of
-  `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` now reads `CX2GUEL::ReservedSkillStart`).`charport_scan.py`: still decompiling its June copies at the logs check; the CH1 review diffs it against `plan_charport_scan_20261111.txt`.
+  `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` now reads `CX2GUEL::ReservedSkillStart`).`charport_scan.py`: identical to `plan_charport_scan_20261111.txt` (line endings aside; `ELESIS_KNIGHT` `no NUMERICAL_DATA_INDEX` 69 / `no DAMAGE table` 20). Nothing new.
 - **Play-test save** (`elsdb x`, backup taken): slots A 0-3 / B 5-8, 4 / 9 empty. wewe (20): Spiral Blast, Dodge and Slash, Wild Shock, Endurance Power (28201
   learned at 1 now); SaberT (40): + Rushing Sword, B Sonic Assault, Unlimited Blade, Mega Burster, Extinction; eresisu (21): four upgrades, B Sword Fire, Infernal
   Blade, Big Burst, Avatar of the Fire; ElesisGM (29): four upgrades, B Extinction, Drastic Charge, Upper Slash, Victorious Sword; ElesisBH (30): four upgrades,
