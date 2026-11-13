@@ -6,6 +6,9 @@
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_WOS_DEBUG
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_WOS_DEBUG
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+#include "Offline/X2OfflineLog.h"	// char-elesis CH1q
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
 #ifdef SERV_IRUHADEV_JUNE_GFX_GATES
 #include "KTDGGFXManager.h"
 #endif SERV_IRUHADEV_JUNE_GFX_GATES
@@ -14965,11 +14968,28 @@ void CX2GUUser::AttackResult()
 			else if( CX2Unit::UT_ELESIS == GetUnit()->GetType() )
 			{
 				float fWSPGain = g_pData->GetDamageManager()->CalcWayOfSwordPoint( m_DamageData.m_WayofSwordType, m_DamageData.damage.GetAllDamage(), GetWayOfSwordState() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+				fWSPGain *= GetWayOfSwordPointMultiplier();	// char-elesis CH1q: June 32012f2e ( user vslot 0x720 )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 				// stand-in: CX2GUEL not ported ( June 32012f2e also multiplies by her vslot 0x720 rate, base 1.0 )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 				fWSPGain = ApplyWayOfSwordPointGainRate( fWSPGain );
 				SetWayOfSwordPoint( GetWayOfSwordPoint() + fWSPGain );
 
 				fIncreaseMpRate *= g_pData->GetDamageManager()->CalcVigorMpUpOnAttack_Elesis( m_DamageData.m_WayofSwordType, GetWayOfSwordState() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+				// char-elesis CH1q: the own unit's attack gain, once a second
+				static DWORD s_dwLastElesisWayOfSwordGainLogTick = 0;
+				const DWORD dwElesisLogTick = GetTickCount();
+				if ( dwElesisLogTick - s_dwLastElesisWayOfSwordGainLogTick >= 1000 )
+				{
+					s_dwLastElesisWayOfSwordGainLogTick = dwElesisLogTick;
+					CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS WOS attack gain %.2f ( type %d, state %d, rate x%.2f ): point %.1f, mp rate x%.2f",
+						fWSPGain, static_cast<int>( m_DamageData.m_WayofSwordType ), GetWayOfSwordState(), GetWayOfSwordPointMultiplier(), GetWayOfSwordPoint(), fIncreaseMpRate );
+				}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 			}
 #endif NEW_CHARACTER_EL
 #else SERV_IRUHADEV_JUNE_CHAR_ELSWORD_WOS

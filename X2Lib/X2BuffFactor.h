@@ -620,6 +620,12 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_GUNGNIR_SCOPE                = 537,	// June's Enum.lua; Grand Archer's Gungnir aim, its states test it
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH1q
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_ANNIHILATION_WAY_OF_SWORD_DARK_KNIGHT = 434,	// June's Enum.lua; Elesis's End_SwordmanDestruction erases it
+	BTI_BUFF_GALE_WAY_OF_SWORD_DARK_KNIGHT         = 435,	// June's Enum.lua; Elesis's End_SwordmanVigor erases it
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID
@@ -873,6 +879,14 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_ENDURANCE_POWER_PVP          = 423,
 	BFI_BUFF_PUNISH                       = 479,
 	BFI_BUFF_PUNISH_PVP                   = 480,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-13 // char-elesis CH1q
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June BFI names of Elesis's Dark Knight Way of the Sword
+	BFI_BUFF_ANNIHILATION_WAY_OF_SWORD_DARK_KNIGHT     = 471,
+	BFI_BUFF_ANNIHILATION_WAY_OF_SWORD_PVP_DARK_KNIGHT = 472,
+	BFI_BUFF_GALE_WAY_OF_SWORD_DARK_KNIGHT             = 473,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };

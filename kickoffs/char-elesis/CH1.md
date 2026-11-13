@@ -76,3 +76,8 @@ CH0's run (2026-11-11, pre-port): 4 `SKILL_ID` names missing (`RNSI_A_SCA_BLOOD_
   states carry June ids through CH1i's `SetEquippedSkillLevel`.
 - The play-test also casts a B-slot skill that holds a key (Extinction or Drastic Charge from slot B, then swap slots while holding): CH1p moved her 11
   key-holding states to June's 0-9 `m_kSkillSlotKey`; with `_LIVE` on, March's 4 + 4 read would watch the wrong key (B 5-9 read as W..R or none).
+
+## Amended by CH1q (2026-11-13): the Way of the Sword lines
+
+- `_WOS_DEBUG` is defined: with `_WOS` on, the play-test must show `[JUNE_CHAR] ELESIS WOS vigor start` / `vigor end` / `destruction start` / `destruction end` (point, class, `dark knight line 0` on 8 / 29 / 30 / 120 / 121) and `attack gain` (once a second, `rate x1.00` without Dark Force). Read with `python tools/logs.py --grep "ELESIS WOS"`.
+- What to check in game: the gauge moves both ways on hits given and taken ( `attack gain` lines ); entering each mode plays its colour and voice; the mode ends with `EffectSet_VigorEnd` / `_DestructionEnd` (the Dark Knight end sets play too but draw nothing without their buff); the MP bar's detonation part now fills up to the whole MP (no 300 cap) outside Destruction; after a stage change the mode steps one point back toward the centre and ends (June's `ReInit`); after a dungeon ends the mode is kept (June's `InitWhenGameIsOver`). The CH1 review retires `_WOS_DEBUG`.

@@ -1088,12 +1088,20 @@ void CX2AraGageData::CopyGageData( IN CX2GageData* pGageData_ )
 
 			const float fNowChargeMp = GetNowChargeMpForDetonation();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+			// char-elesis CH1q: June 32a34a70 ( no THREE_CHARGE cap: the charge runs up to the now MP )
+			if( fNowChargeMp > GetMaxChargeMpForDetonation() )
+				SetNowChargeMpForDetonation( GetMaxChargeMpForDetonation() );
+			else if( fNowChargeMp < 0.0f )
+				SetNowChargeMpForDetonation( 0.0f );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 			if( fNowChargeMp > THREE_CHARGE )
 				SetNowChargeMpForDetonation( THREE_CHARGE );
 			else if( fNowChargeMp > GetMaxChargeMpForDetonation() )
 				SetNowChargeMpForDetonation( GetMaxChargeMpForDetonation() );
 			else if( fNowChargeMp < 0.0f )
 				SetNowChargeMpForDetonation( 0.0f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 
 			SetCanChargeMpForDetonation( false );
 		}
@@ -1129,8 +1137,12 @@ void CX2AraGageData::CopyGageData( IN CX2GageData* pGageData_ )
 /*virtual*/ void CX2ElesisGageData::InitWhenGameIsOver()
 {
 	CX2GageData::InitWhenGameIsOver();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	// char-elesis CH1q: June 32a34c60: the base only; the Way of the Sword state is kept
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	SetWayOfSwordState( 0 );
 	SetChangedWayOfSwordState( true );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 }
 
 bool CX2ElesisGageData::GetMyPlayStatusToPacket( OUT KGamePlayStatus& kGamePlayStatus ) const
@@ -1169,7 +1181,11 @@ void CX2ElesisGageData::CopyGageData( IN CX2GageData* pGageData_ )
 			fWayOfSwordPoint += fConsumeWspForDetonation;
 
 			// 소모로 인해 질풍 수치로 변하지 않도록 최대값 제한
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+			SetWayOfSwordPoint( fWayOfSwordPoint );	// char-elesis CH1q: June 32a31ee0 @32a31f30 ( no clamp at 0: JUNE_BUGS )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 			SetWayOfSwordPoint( min( 0.f, fWayOfSwordPoint ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 			return true;
 		}
 		else

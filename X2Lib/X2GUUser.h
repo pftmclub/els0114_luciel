@@ -2943,6 +2943,11 @@ public:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_WOS
 		float				ApplyWayOfSwordPointGainRate( float fWSPGain_ );	/// June 31f86c13-31f86d0d / 32012d8c-32012e86 ( inlined at both AttackResult sites )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+		virtual float		GetWayOfSwordPointMultiplier() const { return 1.f; }		/// char-elesis CH1q: June user vslot 0x720 ( base 3208e1b0; only Elesis overrides it, 32b903e0 )
+		virtual float		GetVigorHpIntakeRate() const { return 0.f; }				/// char-elesis CH1q: June user vslot 0x724 ( base 3208e270; only Elesis overrides it, 32b903f0 )
+		virtual float		GetDestructionBleedingDamageRate() const { return 1.f; }	/// char-elesis CH1q: June user vslot 0x72c ( base 3208e1b0; only Elesis overrides it, 32b90400 )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 #endif ELSWORD_WAY_OF_SWORD
 #ifdef ELSWORD_SHEATH_KNIGHT
 //		void				AddComboToBrutalSlayer();

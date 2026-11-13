@@ -59,3 +59,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1p review (2026-11-13): held skill keys
 
 June-only key read to add with its states: Ejection Buster `32b51b90` (charge / attack StartFuture: `m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 )` @32b51bab, `31fce6d0`; March's states read no key). No `FollowSlotSwap` / `IsKeyReleased` site in its range: check where the charge's release is read before transcribing.
+
+## Amended by CH1q (2026-11-13)
+
+- The bleeding helper `32b89470` reads `+0x9720` at `@32b896a2` (state -2 and attack WoS type 4-6: a local damage factor x `+0x9720`): that member is `m_fDestructionBleedingDamageRate` (CH1q, `_WOS`, always 1.0 in this exe; getter vslot 0x72c `GetDestructionBleedingDamageRate()`, no caller). Read the member directly as June does, inside a `_WOS` line.

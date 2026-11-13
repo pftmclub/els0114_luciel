@@ -539,6 +539,14 @@ protected:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	float GetWayOfSwordPointMultiplier() const;	/// char-elesis CH1h: June 32b903e0 ( vslot 0x720, +0x9714 ): body in CH1q
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	virtual float GetVigorHpIntakeRate() const;				/// char-elesis CH1q: June 32b903f0 ( user vslot 0x724, +0x9718; read by the 0x4f8 hook, CH4c )
+	virtual float GetDestructionBleedingDamageRate() const;	/// char-elesis CH1q: June 32b90400 ( user vslot 0x72c, +0x9720; no caller in June )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+	void StoreGageSnapshot();	/// char-elesis CH1q: June 32b6ac80 ( user vslot 0x740, base 32009780 Crest of Time snapshot not ported )
+	void RestoreGageSnapshot();	/// char-elesis CH1q: June 32b6acb0 ( user vslot 0x744, base 3204da60 Crest of Time restore not ported )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	void ClearShadowEdgeRecords();	/// char-elesis CH1h: June 32b81900 tail ( RemoveShadowEdgeRecord 32b81300 on each record of the +0x9700 list, then the list is cleared ): body in CH4c
 	virtual void OnAttackerDamageReact_Slot4F8( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH1h: June 32b7beb0: body in CH4c
@@ -1156,6 +1164,15 @@ protected:
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )
 	bool m_bIsMadnessActive;			/// char-elesis CH1h: June +0x97ac ( set while the HP share is under the Madness threshold; CH4c writes it )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	float m_fWayOfSwordPointMultiplier;		/// char-elesis CH1q: June +0x9714 ( ctor 1.0; SA_WAY_OF_SWORD_POINT_MULTIPLIER of RNSI_P_SDK_DARK_FORCE, CH4a writes it )
+	float m_fVigorHpIntakeRate;				/// char-elesis CH1q: June +0x9718 ( ctor 0.0; SA_HP_INTAKE_REL_DAMAGE of Dark Force, CH4a writes it )
+	float m_fDestructionDamageRate;			/// char-elesis CH1q: June +0x971c ( ctor 1.0; SA_DAMAGE_REL of Dark Force, CH4a writes it; GetFinalDamage_WayOfSword reads it )
+	float m_fDestructionBleedingDamageRate;	/// char-elesis CH1q: June +0x9720 ( ctor 1.0; never written from data )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+	float m_fSnapshotWayOfSwordPoint;		/// char-elesis CH1q: June +0x92b8 ( CX2GUUser snapshot region ): the point StoreGageSnapshot keeps
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	//~ protected 변수
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트

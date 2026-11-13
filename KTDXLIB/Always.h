@@ -12654,6 +12654,26 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
+// Date: 2026-11-13
+// Description: June character port ( Elesis ) Phase CH1q - guard only ( no new flag ): JUNE_CHAR_ELESIS_WOS now also holds her Start / End Vigor and
+//              Destruction ( Dark Knight buffs ), GetFinalDamage_WayOfSword x the Dark Force rate, the user getters 0x720 / 0x724 / 0x72c, her gauge data
+//              ( no 300 charge cap, no clamp after a detonation, the state kept after a game ) and gauge UI twins; it calls Elsword's shared half,
+//              June's buff names and the five-argument buff factor call.
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELSWORD_WOS ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS needs SERV_IRUHADEV_JUNE_CHAR_ELSWORD_WOS ( ApplyWayOfSwordPointGainRate, the RefreshWayOfSwordUI base ), SERV_IRUHADEV_JUNE_ENUM_NAMES ( the Dark Knight buff ids ) and SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ( the five-argument buff factor call )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-13
+// Description: June character port ( Elesis ) Phase CH1q - temporary [JUNE_CHAR] ELESIS WOS lines ( vigor / destruction start and end, the attack gain once a
+//              second ) for CH1's play-test; they sit inside JUNE_CHAR_ELESIS_WOS code only. Revert: undefine the flag ( JUNE_CHAR_ELESIS_WOS_DEBUG ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
 // Date: 2026-11-12
 // Description: June character port ( Elesis ) Phase CH1h - her blood lines ( the Shadow Edge list clear in ReInit, the Madness doubling in DamageReact, the
 //              two attacker hit hooks ): declared here, bodies in CH4c. Stays commented out until CH4c; only with _LIVE.

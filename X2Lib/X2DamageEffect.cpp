@@ -5540,7 +5540,11 @@ void CX2DamageEffect::CEffect::AttackResult()
 					{
 						iOwnerUnitWayOfSwordState = pUser->GetWayOfSwordState();
 						float fWSPGain = g_pData->GetDamageManager()->CalcWayOfSwordPoint( m_DamageData.m_WayofSwordType, m_DamageData.damage.GetAllDamage(), iOwnerUnitWayOfSwordState );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+						fWSPGain *= pUser->GetWayOfSwordPointMultiplier();	// char-elesis CH1q: June 31f86da5 ( user vslot 0x720 )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 						// stand-in: CX2GUEL not ported ( June 31f86da5 also multiplies by her vslot 0x720 rate, base 1.0 )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 						fWSPGain = pUser->ApplyWayOfSwordPointGainRate( fWSPGain );
 						pUser->SetWayOfSwordPoint( pUser->GetWayOfSwordPoint() + fWSPGain );
 

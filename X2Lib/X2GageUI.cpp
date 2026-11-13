@@ -4466,15 +4466,33 @@ CX2ElesisMyGageUI::~CX2ElesisMyGageUI()
 void CX2ElesisMyGageUI::InitUI()
 {
 #if !defined(WORLD_TOOL)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	// char-elesis CH1q: June 32e6e060: the wake orb ( vslot 0x54 ) before the Way of the Sword dialog
+	InitStatusUI();
+	InitWakeOrb();
+
+	m_pDLGMyUnit->OpenScriptFile( L"DLG_Elesis_WayOfSword.lua" );
+
+	InitUIElswordWSP();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	InitStatusUI();
 
 	m_pDLGMyUnit->OpenScriptFile( L"DLG_Elesis_WayOfSword.lua" ); 
 
 	InitUIElswordWSP();
 	InitWakeOrb();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 #endif //WORLD_TOOL
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+// char-elesis CH1q: June 32e69e70 ( vslot 0x5c ): the changed flag, then the gauge refresh
+/*virtual*/ void CX2ElesisMyGageUI::RefreshWayOfSwordUI()
+{
+	static_cast<CX2ElesisGageData*>( m_pGageData )->SetChangedWayOfSwordState( true );
+	UpdateUIElswordWSP();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 /*virtual*/ void CX2ElesisMyGageUI::SetShow( const bool bShow_ )
 {
 	CX2MyGageUI::SetShow( bShow_ );
@@ -4928,6 +4946,20 @@ void CX2ElesisMyGageUI::SetShowWspParticle( const bool bShowWspParticle_ )
 	CX2ElesisGageData* pElesisGageData = static_cast<CX2ElesisGageData*>(m_pGageData);
 	if( NULL != pElesisGageData )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+		// char-elesis CH1q: June 32e69e80 ( the charge reads 0 with no game; outside Destruction it is a share of the max MP, not of THREE_CHARGE )
+		const float fNowDetonation = ( NULL != g_pX2Game ) ? pElesisGageData->GetNowChargeMpForDetonation() : 0.f;
+		if( CX2GUUser::WSS_DESTRUCTION == pElesisGageData->GetWayOfSwordState() )
+		{
+			const float fDetonationPercent = fNowDetonation / _CONST_ELESIS_DETONATION_::MAX_CHARGE_DETONATION_VALUE;
+			UpdateGageForUV( pStaticStateBar_, WOSDP_DETONATION_CHARGE, L"EL_RED_2", fDetonationPercent, true );
+		}
+		else
+		{
+			const float fDetonationPercent = fNowDetonation / pElesisGageData->GetMaxMp();
+			UpdateGageForUV( pStaticStateBar_, PGUB_MY_ACTIVE_MP, L"MP_ACTIVE", fDetonationPercent, true );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 #ifdef ELSWORD_WAY_OF_SWORD
 		if( CX2GUUser::WSS_DESTRUCTION == pElesisGageData->GetWayOfSwordState() )
 		{
@@ -4942,6 +4974,7 @@ void CX2ElesisMyGageUI::SetShowWspParticle( const bool bShowWspParticle_ )
 			const float fDetonationPercent = fNowDetonation / THREE_CHARGE;
 			UpdateGageForUV( pStaticStateBar_, PGUB_MY_ACTIVE_MP, L"MP_ACTIVE", fDetonationPercent, true );
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	}
 }
 #endif // NEW_CHARACTER_EL

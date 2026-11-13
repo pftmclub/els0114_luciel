@@ -806,6 +806,9 @@ public:
 	void PlayUIEffectVigor();	
 	void UIFrameMoveElswordWSP();
 	void UpdateUIElswordWSP();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	virtual void RefreshWayOfSwordUI();	/// char-elesis CH1q: June 32e69e70 ( vslot 0x5c )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 
 protected:
 	bool GetShowWspParticle() const { return m_bShowWspParticle; }

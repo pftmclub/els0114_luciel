@@ -1271,6 +1271,59 @@ Full build skipped: no play-test.
 
 **Nothing to play-test.** CH1q kickoff checked (unchanged). Next: `/x2-phase char-elesis CH1q` (Opus 5.5 high).
 
+### CH1q - Done (2026-11-13)
+
+Her Way of the Sword class side and gauge twins are June's under `SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS` (still `//#define`; CH1 defines it with `_LIVE`). `Always.h` gains a
+guard (`_WOS` needs `JUNE_CHAR_ELSWORD_WOS`, `JUNE_ENUM_NAMES`, `JUNE_SKILL_STATE_BUFF`) and `SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG` (defined; its five
+`[JUNE_CHAR] ELESIS WOS` lines sit inside `_WOS` code). The snapshot pair is `_CORE`. Every body below was re-read from the listing (`charport_adis.py elesis`,
+`disasm_range.py`), not taken from `ch0_wos.tsv`. Funcmap rows `Char Elesis CH1q`: 16. numstat +14 / +5 / +20 / +17 / +127 / +4 / +16 / +3 / +33, 0 deleted.
+
+| June | Site | June differs from March |
+|---|---|---|
+| `32b74760` / `32b7f0b0` | `Start_SwordmanVigor` / `Start_SwordmanDestruction` | job line 3 (35 / 125) takes BFI 473 / 471 (472 in PvP), else 237 / 246 (247); the five-argument call `( id, 1, NULL, 0, false )` (vslot 0x21c pushes); the PvP test stays game type 1 only, as March |
+| `32b74930` / `32b74bf0` | `End_SwordmanVigor` / `End_SwordmanDestruction` | every class erases BTI 435 / 434 and plays `EffectSet_P_SDK_DARK_FORCE_J_End` / `_S_End` first (erase = `3229e160`), then March's lines |
+| `32b74ed0` | `GetFinalDamage_WayOfSword` | x `m_fDestructionDamageRate` (`+0x971c`, Dark Force SA 15); active / special enter it at 1.0 x the rate |
+| `32b903e0` / `32b903f0` / `32b90400` | user vslots 0x720 / 0x724 / 0x72c | new `CX2GUUser` virtuals `GetWayOfSwordPointMultiplier` / `GetVigorHpIntakeRate` / `GetDestructionBleedingDamageRate` (bases `3208e1b0` 1.0 / `3208e270` 0.0 / 1.0; `vtslot.py`: only `CX2GUEL` overrides); members `+0x9714` / `+0x9718` / `+0x971c` / `+0x9720`, ctor 1 / 0 / 1 / 1 |
+| `31f86da5`, `32012f2e` | the two Elesis AttackResult stand-ins | now `fWSPGain *= GetWayOfSwordPointMultiplier()` before `ApplyWayOfSwordPointGainRate` (`X2DamageEffect.cpp`, `X2GUUser.cpp`) |
+| `32b6ac80` / `32b6acb0` (new, `_CORE`) | `StoreGageSnapshot` / `RestoreGageSnapshot` | own unit keeps / restores the point (`m_fSnapshotWayOfSwordPoint`, `+0x92b8`), not the state; Crest bases unported (char-add) |
+| `32a34a70` | `CX2ElesisGageData::DetonationFrameMove` | outside Destruction no `THREE_CHARGE` 300 cap: the charge runs to the now MP |
+| `32a34c60` | `CX2ElesisGageData::InitWhenGameIsOver` | the base only: the state is kept after a game |
+| `32a31ee0` | `CX2ElesisGageData::DamageFlushMp` | the detonation gain is stored with no `min( 0, ... )` clamp (`@32a31f30`): JUNE_BUGS 641 |
+| `32e6e060` | `CX2ElesisMyGageUI::InitUI` | `InitWakeOrb` (vslot 0x54) before the dialog |
+| `32e69e80` | `CX2ElesisMyGageUI::UpdateDetonationGage` | charge reads 0 with no game; outside Destruction the bar is charge / `GetMaxMp()` (gage vslot 0x10 `322b2d30`, arg 0), not / 300 |
+| `32e69e70` | `CX2ElesisMyGageUI::RefreshWayOfSwordUI` (vslot 0x5c) | changed flag, then `UpdateUIElswordWSP`; CH1h's `InitComponent` call now reaches it |
+
+**= March or already June, no code:** Get / Set state and point (`32b52790` / `32b527b0` / `32b527e0` / `32b52800` clamp), `WayOfSwordStateChange` `32b7f370`
+(CH0's arm-by-arm read; CH1j's lead "CH1q replaces its body" does not hold), `GaleBuffFrameMove`, sword wait Start / StartFuture / EventProcess, `CanSpecialReactProcess`,
+`SetCriticalPercent_WayOfSword` `32b4ef90`, the die StartFuture hooks `32b74f80` / `32b74fc0`, the CommonFrameMove(Future) lines, the Wait gate, `CreateGageData`
+`32b7ef90` (as Elsword's), the gauge data's UpdateData / packet / Clone / Copy, the gauge UI ctor / dtor / SetShow / OnFrameMove / Play / UIFrameMove / particle /
+`UpdateMpAndHyperAndDetonationGage`, `UpdateUIElswordWSP` `32e69a80` (June's `XS_GUILD_AGIT_GAME` skip has no March state, as Elsword's CH1q2). Already June: the
+`InitComponent` / `ReInit` / `DamageReact` blocks (CH1h), `DetonationStateChange` + state 207 (CH1h / CH1m), `CommonRender_Prepare` (CH1j), the fatal 0.15
+(CH1a, `m_uiChivalryLevel` = `+0x95d0`). `_CONST_EL_::GALE_*` = June's hard floats; no `Const_Elesis_*` key of `WayOfSword.lua` is read. Emulator: `CAC_WSP`
+answered already (`SERV_NEW_CHARACTER_EL` ON; the comment at `X2OfflineStatTable.cpp:292-295` is stale, left).
+
+**Routed:** `InitPassiveSkillState`'s Dark Force writes -> CH4a (kickoff amended); `GetActualMPConsume` / `GetActualCoolTime`'s Gale exemption (8023 + memo 608111)
+and `SetDamageExceptionProcess` -> CH4b (kickoff has it); the 0x4f8 hook's `GetVigorHpIntakeRate` -> CH4c (has it); `32b89470`'s `+0x9720` -> CH2d (amended);
+the 35 / 125 gauge-manager arm -> CHNa (has it); `32b704c0` / `32b705b0` / `32b75760` / `32b7e9a0` as CH0 routed. The BFI 471-473 / BTI 434-435 data rows are only
+reached on 35 / 125 (CHNa).
+
+**Bookkeeping.** Divergence: 10 new rows (the four Start / End, `GetFinalDamage_WayOfSword`, three gauge data, two gauge UI), all "ported under `..._ELESIS_WOS`";
+rows 417 / 420 / 421 / 424 / 427 settled (417 / 427 no code, 420 / 421 / 424 their Elesis twin ported). `X2BuffFactor.h` (`JUNE_ENUM_NAMES`): BTI 434 / 435,
+BFI 471 / 472 / 473. Checklist L261 / L281 / L850 / L958 (CH0's L844 / L952, shifted) marked `(Elesis: CH1q)`. `ch1_offsets.tsv`: `+0x9714`-`+0x9720` named,
+`+0x92b8` added. Kickoffs amended: CH1 (the WOS log lines and checks), CH4a, CH2d.
+
+**Gates.**
+- flagcheck `--worktree --files` (ten files) `_WOS --with _WOS_DEBUG _LIVE _CORE`: `8 PASS, 1 OTHER, 1 ERROR` (OTHER = `X2BuffFactor.h`, `JUNE_ENUM_NAMES`; ERROR = `Always.h`,
+  flagcheck cannot evaluate the neighbouring `_BLOOD && !_LIVE` guard while `_LIVE` is "with"; `Always.h` alone `--with _WOS_DEBUG`: `1 DEFINE`). RESULT FAIL only for
+  the commented-out `#define`. `_WOS_DEBUG --with _WOS`: PASS. `_CORE --with _WOS` (`X2GUEl.h`, `X2GUEL.cpp`): PASS. `JUNE_ENUM_NAMES`: `1 PASS~`, PASS. Every run:
+  0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 token, 0 encoding changes.
+- `junediverge.py --check` (nine files): `allow-listed: 13`, `RESULT: PASS`; `--open-rows`: 187 done, 5 open (none of this phase). `enumscan.py --check` (three .cpp): `0 A/B row(s)`.
+- Probes (`census.cl_cmd`, `/c /Zs /EHsc`): `X2GUEL` / `X2GUUser` / `X2DamageEffect` / `X2GageData` / `X2GageUI`.cpp, off and `_LIVE` + `_WOS`: `PROBES: 0 of 10 failed`;
+  `_WOS` alone stops at `Always.h(12651)` C1189 (the probes read `Always.h`).
+- Full build skipped: no play-test.
+
+**Nothing to play-test** (`_LIVE` and `_WOS` are off). Next: `/x2-phase char-elesis CH1q review` (Opus 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, the creation screen
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_UI`. Sub-tag `UI`.

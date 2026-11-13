@@ -1,5 +1,8 @@
 #include "StdAfx.h"
 #include "X2GUEL.h"
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+#include "Offline/X2OfflineLog.h"	// char-elesis CH1q
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
 
 #ifdef NEW_CHARACTER_EL
 
@@ -274,6 +277,15 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 , m_usMadnessLevel(0)	// char-elesis CH1h
 , m_bIsMadnessActive(false)
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+, m_fWayOfSwordPointMultiplier(1.f)	// char-elesis CH1q: June 32b70ee0 @32b71fb6 / @32b71fd3 / @32b71fbc / @32b71fc4
+, m_fVigorHpIntakeRate(0.f)
+, m_fDestructionDamageRate(1.f)
+, m_fDestructionBleedingDamageRate(1.f)
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+, m_fSnapshotWayOfSwordPoint(0.f)	// char-elesis CH1q
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_uiDodgeAndSlashMaxReuseCount(0)
 , m_uiDodgeAndSlashReuseCount(0)
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®
@@ -6164,6 +6176,22 @@ void CX2GUEL::SetWayOfSwordState( const int iWayOfSwordState_ )
 // ÁúÇ³ ½ÃÀÛ
 void CX2GUEL::Start_SwordmanVigor()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	// char-elesis CH1q: June 32b74760 ( job line 3 = Dark Knight / Crimson Avenger takes its own gale buff )
+	if ( NULL != g_pX2Game->GetWorld() && GetShowCutInAndChangeWorldColor() )
+	{
+		g_pX2Game->GetWorld()->SetWorldColor( 0xff222255 );
+		g_pX2Game->GetWorld()->FadeWorldColor( g_pX2Game->GetWorld()->GetOriginColor(), 4.0f );
+	}
+
+	SetBuffFactorToGameUnitByBuffFactorID( ( true == IsInJobLine( 3 ) ) ? BFI_BUFF_GALE_WAY_OF_SWORD_DARK_KNIGHT : BFI_BUFF_GALE_WAY_OF_SWORD, 1, NULL, 0, false );
+	PlaySound( L"elsword_vitality_use_VOX.ogg" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS WOS vigor start: point %.1f, class %d, dark knight line %d", GetWayOfSwordPoint(), static_cast<int>( GetUnit()->GetClass() ), IsInJobLine( 3 ) ? 1 : 0 );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+
+	m_CommonState.m_Wait = ESI_SWORD_WAIT;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	if ( NULL != g_pX2Game->GetWorld() && GetShowCutInAndChangeWorldColor() )
 	{
 		g_pX2Game->GetWorld()->SetWorldColor( 0xff222255 );
@@ -6174,20 +6202,57 @@ void CX2GUEL::Start_SwordmanVigor()
 	PlaySound( L"elsword_vitality_use_VOX.ogg" );
 
 	m_CommonState.m_Wait = ESI_SWORD_WAIT;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 }
 // ÁúÇ³ Á¾·á
 void CX2GUEL::End_SwordmanVigor()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	// char-elesis CH1q: June 32b74930 ( every class: the Dark Knight gale buff and its end set go first )
+	EraseBuffTempletFromGameUnit( BTI_BUFF_GALE_WAY_OF_SWORD_DARK_KNIGHT );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_P_SDK_DARK_FORCE_J_End", this );
+	EraseBuffTempletFromGameUnit( BTI_BUFF_GALE_WAY_OF_SWORD );
+
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_VigorEnd", this );
+	PlaySound( L"elsword_vitality_end.ogg" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS WOS vigor end: point %.1f", GetWayOfSwordPoint() );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+
+	m_CommonState.m_Wait = USI_WAIT;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	EraseBuffTempletFromGameUnit(BTI_BUFF_GALE_WAY_OF_SWORD);
 
 	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_VigorEnd", this ); 	
 	PlaySound( L"elsword_vitality_end.ogg" );
 
 	m_CommonState.m_Wait = USI_WAIT;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 }
 // ¼¶¸ê ½ÃÀÛ
 void CX2GUEL::Start_SwordmanDestruction()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	// char-elesis CH1q: June 32b7f0b0 ( job line 3 takes its own annihilation buffs; the PvP test is game type 1 only, as March )
+	if ( NULL != g_pX2Game->GetWorld() && GetShowCutInAndChangeWorldColor() )
+	{
+		g_pX2Game->GetWorld()->SetWorldColor( 0xff552222 );
+		g_pX2Game->GetWorld()->FadeWorldColor( g_pX2Game->GetWorld()->GetOriginColor(), 4.0f );
+	}
+
+	const bool bPvpGame = ( NULL != g_pX2Game && CX2Game::GT_PVP == g_pX2Game->GetGameType() );
+	if( true == IsInJobLine( 3 ) )
+		SetBuffFactorToGameUnitByBuffFactorID( bPvpGame ? BFI_BUFF_ANNIHILATION_WAY_OF_SWORD_PVP_DARK_KNIGHT : BFI_BUFF_ANNIHILATION_WAY_OF_SWORD_DARK_KNIGHT, 1, NULL, 0, false );
+	else
+		SetBuffFactorToGameUnitByBuffFactorID( bPvpGame ? BFI_BUFF_ANNIHILATION_WAY_OF_SWORD_PVP : BFI_BUFF_ANNIHILATION_WAY_OF_SWORD, 1, NULL, 0, false );
+
+	PlaySound( L"elsword_demolition_use_VOX.ogg" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS WOS destruction start: point %.1f, class %d, dark knight line %d", GetWayOfSwordPoint(), static_cast<int>( GetUnit()->GetClass() ), IsInJobLine( 3 ) ? 1 : 0 );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+
+	m_CommonState.m_Wait = ESI_SWORD_WAIT;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	if ( NULL != g_pX2Game->GetWorld() && GetShowCutInAndChangeWorldColor() )
 	{
 		g_pX2Game->GetWorld()->SetWorldColor( 0xff552222 );
@@ -6202,10 +6267,26 @@ void CX2GUEL::Start_SwordmanDestruction()
 	PlaySound( L"elsword_demolition_use_VOX.ogg" );
 
 	m_CommonState.m_Wait = ESI_SWORD_WAIT;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 }
 // ¼¶¸ê Á¾·á
 void CX2GUEL::End_SwordmanDestruction()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	// char-elesis CH1q: June 32b74bf0 ( every class: the Dark Knight annihilation buff and its end set go first )
+	SetNowChargeMpForDetonation( 0.f );
+	EraseBuffTempletFromGameUnit( BTI_BUFF_ANNIHILATION_WAY_OF_SWORD_DARK_KNIGHT );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_P_SDK_DARK_FORCE_S_End", this );
+	EraseBuffTempletFromGameUnit( BTI_BUFF_ANNIHILATION_WAY_OF_SWORD );
+
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_DestructionEnd", this );
+	PlaySound( L"elsword_demolition_end.ogg" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS WOS destruction end: point %.1f", GetWayOfSwordPoint() );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS_DEBUG
+
+	m_CommonState.m_Wait = USI_WAIT;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	SetNowChargeMpForDetonation( 0.f ) ;
 	EraseBuffTempletFromGameUnit(BTI_BUFF_ANNIHILATION_WAY_OF_SWORD);
 
@@ -6213,6 +6294,7 @@ void CX2GUEL::End_SwordmanDestruction()
 	PlaySound( L"elsword_demolition_end.ogg" );
 
 	m_CommonState.m_Wait = USI_WAIT;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 }
 
 void CX2GUEL::WayOfSwordStateChange()
@@ -6641,6 +6723,30 @@ int CX2GUEL::GetHpTier()
 */
 /*virtual*/float CX2GUEL::GetFinalDamage_WayOfSword( CX2DamageManager::WAY_OF_SWORD_TYPE eWayOfSwordType_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+	// char-elesis CH1q: June 32b74ed0 ( the Destruction rates are scaled by the Dark Force damage rate; active / special now enter it too )
+	float fDamageMagnifications = 1.f;
+	if( WSS_DESTRUCTION == GetWayOfSwordState() )
+	{
+		switch( eWayOfSwordType_ )
+		{
+		case CX2DamageManager::WST_DESTRUCTION_NORMAL:
+			{
+				fDamageMagnifications = ( CX2Game::GT_PVP == g_pX2Game->GetGameType() ) ? 1.25f : 1.5f;
+				fDamageMagnifications = m_fDestructionDamageRate * fDamageMagnifications;
+			} break;
+		case CX2DamageManager::WST_DESTRUCTION_ACTIVE:
+		case CX2DamageManager::WST_DESTRUCTION_SPECIAL:
+			{
+				fDamageMagnifications = m_fDestructionDamageRate * fDamageMagnifications;
+			} break;
+		default:
+			break;
+		}
+	}
+
+	return fDamageMagnifications;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	float fDamageMagnifications = 1.f;
 	if( WSS_DESTRUCTION == GetWayOfSwordState() )
 	{
@@ -6659,6 +6765,7 @@ int CX2GUEL::GetHpTier()
 	}
 
 	return fDamageMagnifications;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 }
 /** @function : GetCriticalPercent_WayOfSword
 	@brief : °ËÀÇ±æ Å¸ÀÔ¿¡ µû¸¥ Å©¸®Æ¼ÄÃ ¹èÀ² º¯°æ
@@ -6681,6 +6788,26 @@ int CX2GUEL::GetHpTier()
 		}
 	}
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+// char-elesis CH1q: June 32b903e0 / 32b903f0 / 32b90400 ( user vslots 0x720 / 0x724 / 0x72c )
+float CX2GUEL::GetWayOfSwordPointMultiplier() const { return m_fWayOfSwordPointMultiplier; }
+float CX2GUEL::GetVigorHpIntakeRate() const { return m_fVigorHpIntakeRate; }
+float CX2GUEL::GetDestructionBleedingDamageRate() const { return m_fDestructionBleedingDamageRate; }
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+// char-elesis CH1q: June 32b6ac80 ( user vslot 0x740 ): the own unit keeps the point, not the state; base 32009780 not ported
+void CX2GUEL::StoreGageSnapshot()
+{
+	if( true == IsMyUnit() )
+		m_fSnapshotWayOfSwordPoint = GetWayOfSwordPoint();
+}
+// char-elesis CH1q: June 32b6acb0 ( user vslot 0x744 ): base 3204da60 not ported
+void CX2GUEL::RestoreGageSnapshot()
+{
+	if( true == IsMyUnit() )
+		SetWayOfSwordPoint( m_fSnapshotWayOfSwordPoint );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 #endif // ELSWORD_WAY_OF_SWORD
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

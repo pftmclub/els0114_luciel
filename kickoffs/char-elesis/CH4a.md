@@ -60,3 +60,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - **0x83c is done, and it is not what the Task line says.** `32b732e0` is March's `ChangeDamageData` (First Strike; no buff erase, no weapon type): CH1o put June's body inside it under `_LIVE` and gated it on `RNSI_P_SSK_FIRST_STRIKE` (28401) learned. Drop 0x83c from this phase.
 - So `InitPassiveSkillState` must write `m_cFirstStrikeData` from 28401: June `32b88898-32b888ac` stores abilities 0x4e / 0xf / 0x2b of that templet into `+0x9660` / `+0x9664` / `+0x9668` (stop time / damage / MP rate); March's writer (`X2GUEL.cpp:759`) reads `SI_P_SGM_FIRST_STRIKE` (8406).
+
+## Amended by CH1q (2026-11-13)
+
+- **Dark Force members are declared (under `_WOS`).** `InitPassiveSkillState` `32b88300` first resets `m_fWayOfSwordPointMultiplier` (`+0x9714`) = 1.0, `m_fVigorHpIntakeRate` (`+0x9718`) = 0.0, `m_fDestructionDamageRate` (`+0x971c`) = 1.0, `m_fDestructionBleedingDamageRate` (`+0x9720`) = 1.0 (`@32b88cf2-32b88d0f`), then, when `RNSI_P_SDK_DARK_FORCE` (28410) is learned and its templet exists, writes SA 147 `SA_WAY_OF_SWORD_POINT_MULTIPLIER` / SA 49 `SA_HP_INTAKE_REL_DAMAGE` / SA 15 `SA_DAMAGE_REL` into the first three (`@32b88d4a` / `@32b88d61` / `@32b88d78`, `GetSkillAbilityValue( sa, level, 0, 0.0 )`: a learned Dark Force whose data lacks a key writes 0.0, keep it). Those writes sit in `_WOS` lines inside your `_PASSIVE` / `_LIVE` body (the members exist only with `_WOS`).
