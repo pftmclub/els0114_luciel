@@ -2663,6 +2663,14 @@ public:
 	RNSI_SA_SSK_JUDGEMENT_DRIVE_UPGRADE                   = 28045,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-13 // char-elesis CH2b2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of the Saber Knight actives Rushing Sword and Power Break and their upgrades ( values from June's Enum.lua )
+	RNSI_A_SSK_RUSHING_SWORD_UPGRADE                      = 28219,
+	RNSI_A_SSK_POWER_BREAK                                = 28203,
+	RNSI_A_SSK_POWER_BREAK_UPGRADE                        = 28225,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

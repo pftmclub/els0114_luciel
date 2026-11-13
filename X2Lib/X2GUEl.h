@@ -659,6 +659,9 @@ protected:
 	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE_StateStart();	/// char-elesis CH2a: June 32b4f8a0
 	void ESI_SI_A_EL_SONIC_ASSAULT_STING_MEMO_FIRE_FrameMove();	/// char-elesis CH2a: June 32b70db0
 	void ESI_SI_SA_EL_WILD_SHOCK_FrameMove();	/// char-elesis CH2a: June 32b75760
+	void ESI_SI_A_EL_RUSHING_SWORD_StateEndFuture();	/// char-elesis CH2b2: June 32b72d70
+	void ESI_SI_A_EL_LEAP_CRASH_JUMP_StateStartFuture();	/// char-elesis CH2b2: June 32b70d30
+	void ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_FrameMove();	/// char-elesis CH2b2: June 32b75210
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	void ESI_SI_A_EL_LEAP_CRASH_Init();						// µµ¾à

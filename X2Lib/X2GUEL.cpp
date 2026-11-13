@@ -236,6 +236,19 @@ namespace _CONST_EL_CH2B_
 	const float CRITICAL_DIVE_MP_REFUND_RATE						= 0.5f;
 }
 using namespace _CONST_EL_CH2B_;
+// char-elesis CH2b2: constants of the Saber Knight actives ( June 32b75210 / 32b70d30 )
+namespace _CONST_EL_CH2B2_
+{
+	const float LEAP_CRASH_JUMP_SPEED_X							= 2200.f;
+	const float LEAP_CRASH_JUMP_SPEED_X_AFTER_DASH				= 2700.f;	// used while the dash time ( +0x977c ) is above 0
+	const float LEAP_CRASH_JUMP_SPEED_Y							= 1000.f;
+	const float LEAP_CRASH_LANDING_EVENT_TIME					= 0.01f;
+	const float LEAP_CRASH_LANDING_SCALE_PER_DASH_TIME			= 0.4f;
+	const float LEAP_CRASH_LANDING_SCALE_LIMIT					= 2.f;
+	const int	LEAP_CRASH_UPGRADE_NUMERICAL_INDEX				= 3;		// the 4th numerical table of the enhanced skill ( June @32b75456 )
+	const int	EFFECT_MODIFIER_TAG_SCALE						= 15;		// June 321dad70 tag with no enum name ( as Eve's )
+}
+using namespace _CONST_EL_CH2B2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
@@ -1551,6 +1564,10 @@ CX2GUEL::~CX2GUEL(void)
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		} break;
 	case CX2SkillTree::SI_A_SSK_POWER_BREAK:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SSK_POWER_BREAK:	// char-elesis CH2b2: June 32b8c470 @954
+	case CX2SkillTree::RNSI_A_SSK_POWER_BREAK_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	/// 파워 브레이크
 			m_LuaManager.MakeTableReference( "ESI_SI_A_SSK_POWER_BREAK", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL,ESI_SI_A_SSK_POWER_BREAK_Init );
@@ -1713,6 +1730,10 @@ CX2GUEL::~CX2GUEL(void)
 		hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 	} break;
 	case CX2SkillTree::SI_A_EL_LEAP_CRASH:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SSK_LEAP_CRASH:	// char-elesis CH2b2: June 32b8c470 @961
+	case CX2SkillTree::RNSI_A_SSK_LEAP_CRASH_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	{ // 도약
 		m_LuaManager.MakeTableReference( "ESI_SI_A_EL_LEAP_CRASH", normalStateData.stateID );
 		normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_LEAP_CRASH_Init );
@@ -1729,16 +1750,26 @@ CX2GUEL::~CX2GUEL(void)
 			stateData.stateID			= ESI_SI_A_EL_LEAP_CRASH_JUMP;
 			m_LuaManager.MakeTableReference( "ESI_SI_A_EL_LEAP_CRASH_JUMP", stateData.stateID );
 			stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_LEAP_CRASH_JUMP_EventProcess );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			stateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_LEAP_CRASH_JUMP_StateStartFuture );	// char-elesis CH2b2: June 32b70d30
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 			m_StateList[stateData.stateID] = stateData;
 
 			stateData.Init();
 			stateData.stateID			= ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING;
 			m_LuaManager.MakeTableReference( "ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING", stateData.stateID );
 			stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_EventProcess );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			stateData.OnFrameMove		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_FrameMove );	// char-elesis CH2b2: June 32b75210
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 			m_StateList[stateData.stateID] = stateData;
 		}
 	} break;
 	case CX2SkillTree::SI_A_EL_RUSHING_SWORD:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_A_SSK_RUSHING_SWORD:	// char-elesis CH2b2: June 32b8c470 @908
+	case CX2SkillTree::RNSI_A_SSK_RUSHING_SWORD_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{ // 러싱 소드
 			m_LuaManager.MakeTableReference( "ESI_SI_A_EL_RUSHING_SWORD", normalStateData.stateID );
 			normalStateData.StateStartFuture = SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_StartFuture );
@@ -1748,10 +1779,16 @@ CX2GUEL::~CX2GUEL(void)
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트				
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_Init );
 			normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_EventProcess );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			normalStateData.StateEndFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_StateEndFuture );	// char-elesis CH2b2: June 32b72d70
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 			m_LuaManager.MakeTableReference( "ESI_SI_A_EL_RUSHING_SWORD", hyperStateData.stateID );
 			hyperStateData.m_bHyperState		= true;
 			hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			hyperStateData.StateEndFuture		= normalStateData.StateEndFuture;	// char-elesis CH2b2: June 32b72d70
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 			// 그랜드 마스터 패시브, 검의 왈츠 추가를 위해 StateStart 함수 추가
 			hyperStateData.StateStart			= normalStateData.StateStart;
@@ -1764,6 +1801,10 @@ CX2GUEL::~CX2GUEL(void)
 				stateData.stateID			= ESI_SI_A_EL_RUSHING_SWORD_2nd;
 				m_LuaManager.MakeTableReference( "ESI_SI_A_EL_RUSHING_SWORD_2nd", stateData.stateID );
 				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_2nd_EventProcess );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+				stateData.StateStart		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_StateStart );	// char-elesis CH2b2: June 32b705b0
+				stateData.StateEndFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_StateEndFuture );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 				stateData.StateStartFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_2nd_StartFuture );
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
@@ -1773,6 +1814,10 @@ CX2GUEL::~CX2GUEL(void)
 				stateData.stateID			= ESI_SI_A_EL_RUSHING_SWORD_3rd;
 				m_LuaManager.MakeTableReference( "ESI_SI_A_EL_RUSHING_SWORD_3rd", stateData.stateID );
 				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_3rd_EventProcess );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+				stateData.StateStart		= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_StateStart );	// char-elesis CH2b2: June 32b705b0
+				stateData.StateEndFuture	= SET_CB_FUNC( CX2GUEL, ESI_SI_A_EL_RUSHING_SWORD_StateEndFuture );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 				m_StateList[stateData.stateID] = stateData;
 			}
 		} break;
@@ -10510,10 +10555,17 @@ void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_EventProcess()
 		StateChange( ESI_SI_A_EL_LEAP_CRASH_JUMP );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b2: June 32b57350 ( its memo branch to state 312 is dead: 31fca9e0 returns 0 )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonEventProcess();
 }
 void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_EventProcess()
@@ -10523,10 +10575,17 @@ void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_EventProcess()
 		StateChange( ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b2: June 32b57680 ( its memo branch to state 313 is dead: 31fca9e0 returns 0 )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	CommonEventProcess();
 }
 void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_EventProcess()
@@ -10536,13 +10595,74 @@ void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b2: June 32b57960
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+// char-elesis CH2b2: June 32b70d30 ( a forward and upward speed burst at the start of the jump )
+void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	TIME_SPEED timeSpeed;
+	timeSpeed.vSpeed = D3DXVECTOR3( LEAP_CRASH_JUMP_SPEED_X, LEAP_CRASH_JUMP_SPEED_Y, 0.f );
+	timeSpeed.iFlag = 1;	// no enum: 1 adds to the speed ( X2GameUnit.h TIME_SPEED )
+	if ( 0.f < m_fDashElapsedTime )
+		timeSpeed.vSpeed.x = LEAP_CRASH_JUMP_SPEED_X_AFTER_DASH;
+	m_vecSpeedFactor.push_back( timeSpeed );
+}
+
+// char-elesis CH2b2: June 32b75210 ( the landing shock wave grows with the dash time before the jump )
+void CX2GUEL::ESI_SI_A_EL_LEAP_CRASH_JUMP_LANDING_FrameMove()
+{
+	CommonFrameMove();
+
+	if ( true == m_pXSkinAnim->EventTimerOneshot( LEAP_CRASH_LANDING_EVENT_TIME ) )
+	{
+		const float fScale = min( m_fDashElapsedTime * LEAP_CRASH_LANDING_SCALE_PER_DASH_TIME + 1.f, LEAP_CRASH_LANDING_SCALE_LIMIT );
+		// June passes false for the hyper flag here ( JUNE_BUGS )
+		const CX2EffectSet::Handle hEffect = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_EL_LEAP_CRASH_Landing", this, NULL,
+			false, GetPowerRate() * fScale, -1.f, D3DXVECTOR3( fScale, fScale, fScale ) );
+
+		float fSizeRate = 1.f;
+		if ( true == TryGetEquippedSkillAbilityValue( CX2SkillTree::SA_SIZE_ABS, CX2SkillTree::RNSI_A_SSK_LEAP_CRASH_UPGRADE, true, fSizeRate ) )
+		{
+			const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_A_SSK_LEAP_CRASH_UPGRADE );
+			if ( NULL != pSkillTemplet && static_cast<size_t>( LEAP_CRASH_UPGRADE_NUMERICAL_INDEX ) < pSkillTemplet->m_vecNumericalData.size() )
+			{
+				CX2SkillTree::SkillTemplet::NumericalRow row;
+				pSkillTemplet->GetNumericalRowByIndex( LEAP_CRASH_UPGRADE_NUMERICAL_INDEX, 1, row );
+				fSizeRate = ( ( fScale - 1.f ) * ( row.m_fValue - 1.f ) + 1.f ) * fSizeRate;
+			}
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffect, EFFECT_MODIFIER_TAG_SCALE, D3DXVECTOR3( fSizeRate, fSizeRate, fSizeRate ), false );
+		}
+		else if ( true == TryGetEquippedSkillAbilityValue( CX2SkillTree::SA_SIZE_ABS, CX2SkillTree::RNSI_A_SSK_LEAP_CRASH, true, fSizeRate ) )
+		{
+			fSizeRate = ( fScale - 1.f ) * ( fSizeRate - 1.f ) + 1.f;
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffect, EFFECT_MODIFIER_TAG_SCALE, D3DXVECTOR3( fSizeRate, fSizeRate, fSizeRate ), false );
+		}
+	}
+}
+
+// char-elesis CH2b2: June 32b72d70 ( the loop count restarts unless the next state is another Rushing Sword hit )
+void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_StateEndFuture()
+{
+	if ( ESI_SI_A_EL_RUSHING_SWORD_2nd != m_FrameDataFuture.unitCondition.nextState && ESI_SI_A_EL_RUSHING_SWORD_3rd != m_FrameDataFuture.unitCondition.nextState )
+		m_iRushingSwordNowLoopValue = 0;
+	CommonStateEndFuture();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 /** @function : ESI_SI_A_EL_RUSHING_SWORD_StartFuture
 	@brief : 러싱 소드
 			 2회 추가 공격에 대해서 모두 스테이트 를 분리 함.
@@ -10553,6 +10673,9 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_StartFuture()
 {
 	CommonStateStartFuture();
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	m_iRushingSwordNowLoopValue = 1;	// char-elesis CH2b2: June 32b72cc0 @32b72cd5 ( the count starts at 1 here; March's StateStart reset it to 0 )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );	// char-elesis CH1p: June 32b72cc0 @32b72d5c
 #else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_sCurrentSkillKeyManager.InitCurrentSkillKeyManager( m_iNowSpecialAttack - 1 );
@@ -10571,6 +10694,47 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_Init()
 }
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	// char-elesis CH2b2: June 32b85470 ( serves the 1st and the 2nd hit; the next hit's MP is June's skill-use value, the loop count one more for the enhanced skill )
+	m_kSkillSlotKey.FollowSlotSwap();
+	if ( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if ( m_fSkillCancelAfter >= 0.f && m_fSkillCancelAfter < m_pXSkinAnimFuture->GetNowAnimationTime() &&
+		true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) )
+	{
+		const CX2SkillTree::SKILL_ID eSkillID = GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_A_SSK_RUSHING_SWORD );
+		const int iSkillLevel = max( 1, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID, false, 0, true ) );
+		const float fMpConsume = GetActualMPConsume( eSkillID, iSkillLevel );
+		if ( GetNowMp() < fMpConsume )
+		{
+			g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_2549 ), D3DXCOLOR(1,1,1,1),
+				D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+		}
+		else
+		{
+			if ( true == m_InputData.pureRight )
+				m_FrameDataFuture.syncData.bIsRight = true;
+			else if ( true == m_InputData.pureLeft )
+				m_FrameDataFuture.syncData.bIsRight = false;
+
+			UpNowMp( -fMpConsume );
+			const int iLastLoopValue = m_iRushingSwordAddLoopValue + ( true == IsNowStateSkillUpgraded() ? 1 : 0 ) + 1;
+			if ( iLastLoopValue >= m_iRushingSwordNowLoopValue )
+				StateChange( ESI_SI_A_EL_RUSHING_SWORD_2nd );
+			else
+				StateChange( ESI_SI_A_EL_RUSHING_SWORD_3rd );
+		}
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b85470 @32b854b9
 #else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
@@ -10621,13 +10785,20 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_EventProcess()
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_StateStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	CommonStateStart();	// char-elesis CH2b2: June 32b705b0 ( the same body as 32b704c0, now for all three hits )
+	if ( 0 < m_iWaltzOfSwordDodgeAbility && WSS_DESTRUCTION == GetWayOfSwordState() )
+		m_DamageData.damage.fPhysic *= GetSkillNumericalByName( L"ATK_REL", CX2SkillTree::RNSI_P_SGM_WALTZ_OF_SWORD, true );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	m_iRushingSwordNowLoopValue = 0;
 	CommonStateStart();
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 
@@ -10643,6 +10814,9 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_2nd_StartFuture()
 
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_2nd_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	ESI_SI_A_EL_RUSHING_SWORD_EventProcess();	// char-elesis CH2b2: June 32b85470 is the 2nd hit's EventProcess too
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 	m_kSkillSlotKey.FollowSlotSwap();	// char-elesis CH1p: June 32b85470 @32b854b9 ( the 2nd state shares the function )
 #else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
@@ -10700,6 +10874,7 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_2nd_EventProcess()
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_3rd_EventProcess()
 {
@@ -10708,10 +10883,17 @@ void CX2GUEL::ESI_SI_A_EL_RUSHING_SWORD_3rd_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b2: June 32b57c60
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 		CommonEventProcess();
 }
@@ -11440,8 +11622,26 @@ void CX2GUEL::ESI_SI_A_SSK_CROSS_SLASH_EventProcess()
 // 파워 브레이크
 void CX2GUEL::ESI_SI_A_SSK_POWER_BREAK_Init()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	TextureReadyInBackground(L"Arme_Ring2.dds");	// char-elesis CH2b2: June 32b4fdc0 ( 13 more names than March )
+	TextureReadyInBackground(L"ColorBallFire.dds");
+	TextureReadyInBackground(L"Arme_Critical.dds");
+	TextureReadyInBackground(L"Arme_Damage_Center.dds");
+	TextureReadyInBackground(L"Arme_Damage_Ring.dds");
+	TextureReadyInBackground(L"Armor_Crack.dds");
+	TextureReadyInBackground(L"HA_RRF_Reckless_Fiste_FX_Map01.tga");
+	TextureReadyInBackground(L"PET_FIREFOX_MIHOEffect02.tga");
+	TextureReadyInBackground(L"star2.dds");
+	TextureReadyInBackground(L"WhitePoint.dds");
+	TextureReadyInBackground(L"WhitePointSmall.dds");
+	XMeshReadyInBackground(L"ADE_PE01.Y");
+	XMeshReadyInBackground(L"ALS_SHAKE_CHAOS_02.Y");
+	XSkinMeshReadyInBackground(L"aisha_SA_SCREWDRIVER_circle.X");
+	XSkinMeshReadyInBackground(L"SI_A_SBH_SCALET_ROSE_attackSphere.X");
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	TextureReadyInBackground(L"Arme_Ring2.dds");
 	TextureReadyInBackground(L"ColorBallFire.dds");
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 }
 void CX2GUEL::ESI_SI_A_SSK_POWER_BREAK_EventProcess()
 {
@@ -11450,10 +11650,17 @@ void CX2GUEL::ESI_SI_A_SSK_POWER_BREAK_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH2b2: June 32b5af20
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 		BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 		DASH_CANCEL_AFTER( m_fDashCancelAfter )
 		ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }

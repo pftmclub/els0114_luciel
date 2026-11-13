@@ -6831,6 +6831,17 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, still on unt
 - **Damage.** The skills' damage is the numerical tables of June's `ELESIS_KNIGHT.lua` states ( effect sets carry the numbers; March's script is bytecode ), so the March / June comparison is the `NUM use` lines of the play-test.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 7 Elesis, CH2b2: Saber Knight (29) actives Rushing Sword, Power Break, Leap Crash (char-elesis CH2b2, 2026-11-13)
+
+Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, still on until the CH2d review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** Rushing Sword ( 28202 / 28219 ), Power Break ( 28203 / 28225 ) and Leap Crash ( 28204 / 28226 ) bind March's states on March's cases; their walk / back-walk / dash / Z-X cancels need the foot on a line.
+  Rushing Sword: one state function serves the 1st and 2nd hit ( the 2nd gains the common event process ); the next hit costs June's skill-use MP ( upgrade-swapped skill, level at least 1 ) and the hit limit is the Waltz of Sword count + 1 for the enhanced skill; the loop count starts at 1 ( June ) and goes to 0 when the chain ends; all three hits apply the Waltz of Sword physic-damage factor ( ATK_REL ) in the destruction Way of the Sword state.
+  Leap Crash: the jump adds a forward / upward speed burst ( x 2200, 2700 after a dash; y 1000 ); the landing plays the shock-wave effect set once with scale and power x min( 1 + 0.4 x dash time, 2 ) and a size modifier from the skill's size ability ( enhanced: numerical table 3 ).
+  Power Break: 13 more preloads. Dead in June, so not ported: the Leap Crash memo branches ( memo 608026 to states 312 / 313 ).
+- **Shared.** New enum names `RNSI_A_SSK_RUSHING_SWORD_UPGRADE` ( 28219 ), `RNSI_A_SSK_POWER_BREAK` ( 28203 ), `RNSI_A_SSK_POWER_BREAK_UPGRADE` ( 28225 ) in `X2SkillTree.h`.
+- **Damage.** The skills' damage is the numerical tables of June's `ELESIS_KNIGHT.lua` states ( Rushing Sword's three: `NUMERICAL_DATA_INDEX` 1 ), so the March / June comparison is the `NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ### June dungeons: the tutorial guide manager (june-dungeons C3z-4t1, 2026-11-13)
 
 Flag `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE` in `KTDXLIB/Always.h` (`#error`s without `JUNE_DIVERGE_GET_KEY_STATE`, `JUNE_TUTORIAL_MODE`, `INIT_FOCUS_UNIT`), debug lines under `SERV_IRUHADEV_JUNE_TUTORIAL_GUIDE_DEBUG`. Plan `JUNE_DUNGEONS_PHASES.md` "C3z-4t1 - Done"; log tag `JUNE_FX C3z-4t`.
