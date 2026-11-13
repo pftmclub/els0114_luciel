@@ -582,4 +582,5 @@ the battle-field tutorial. Flags (`KTDXLIB/Always.h`): `SERV_IRUHADEV_JUNE_CLASS
 - **Build.** First run failed only in C3z-4t3's then-unfinished files (X2GUUser / X2CashShop / camera zoom; 0 errors in C3y-2's); after their fix: DEPLOY OK: X2_offline.exe is 26,430,464 B, dated 2026-11-13 11:51:19, md5 62a1a6211612ef8d77162e5087f6fc12 (built at main 5b50392e + 34 uncommitted code files, shared with C3z-4t3). EXESTR OK: 3 of 3 (wide: the room line, Tuto_Ui_Jump01.ogg, JumpGuide) and 5 of 5 (the Lua names), md5 62a1a621.
 - **How to see it:** create a new Elsword (and an Elesis); the first select loads `Ruben Forest` (Elsword) / `Ruben Training Ground`
   (Elesis), the guide hints run, the stage clears to the village. offline_server.log `JUNE_FX C3y-2 room 41150` / `41220`.
+- **Range flagcheck** (`52951ffe^..e57133b6`, C3y-2 files): CLASS_TUTORIAL_DUNGEON 4 PASS, LUA_BIND 5 PASS, PLAY_GUIDE 3 PASS, 0 FAIL, 0 deleted; 1 ERROR each = the Always.h `#error` guards. 52951ffe also carries C3z-4t3's staged files (index race; e57133b6 restored C3y-2's lost hunks).
 - **Debug define stays on** until the review. Next: user play-test, then `C3y-2-review.md`.
