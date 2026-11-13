@@ -6940,6 +6940,19 @@ Same flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for
 - **Damage.** Drastic Charge End and Upper Slash are numerical-only DAMAGE_DATA tables read through the engine; the comparison is the `NUM use` lines of the play-test ( none emitted by this build, as CH2b-CH3a ).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 7 Elesis, CH3b0: summons and the buff vslots 0x24c / 0x250 (char-elesis CH3b0, 2026-11-14)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON` (defined by this phase; + `_SUMMON_DEBUG`, retired in the CH3d stage review). Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** Her buff set / unset hooks are June's: Victorious Sword's dodge-and-slash cool-time rate reads June's skill id (28008) and also follows the enhanced
+  buff (565); Soul Ignition (940) sets the chance her states' CREATE_EFFECT_SET plays and clears it on the buff's end; a Blood Runaway saved debuff is kept beside Fire Blossoms'.
+  The Fire Blossom on the Fire Blossoms buff's end is requested only by the owner's client. Summoned Fire Blossoms now take her stats (helper flags 0) and their related skill
+  level is Scalet Rose's (any class), not the Blazing Heart passive's. New: the Scalet Rose success End (up to 3 blossoms), the Wall of Prominence / Fire King and Blood Cutter
+  spawn helpers, and their NPC info cases (walls: fixed HP). CheckSummonSpecialAttack now gates her summon skills. The new pieces are reached once CH3b / CH3b2 / CH3c / CH4a wire them.
+- **Shared.** `X2Game.cpp` `SetUserSummonedNPCInfo` cases 1567 (March's in `#else`) / 1635 / 1971 / 1641; enum names `NUI_SI_SA_SBH_WALL_OF_PROMINENCE` 1635,
+  `NUI_SI_SA_SCA_BLOOD_CUTTER` 1641, `NUI_SI_SA_SBH_WALL_OF_PROMINENCE_FIREKING` 1971, `BTI_BUFF_SOUL_IGNITION` 940, `RNSI_SA_SBH_SOUL_IGNITION` 28063 (`JUNE_ENUM_NAMES`);
+  core `Enum.lua` (data036) the three NUI names, core `NPCTemplet.lua` (data037) June's three rows verbatim (live `data037.kom` backed up to `kom_backup_tools\data037.kom.20261114_014047`).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`; the Lua rows are inert without a spawn.
+
 ### June quest system: AddGroupChainQuest bound (quest-system Q12, 2026-11-13)
 
 Flag `SERV_IRUHADEV_JUNE_QUEST_GROUP_CHAIN` in `KTDXLIB/Always.h` (needs `JUNE_QUEST_LOAD`). Plan `JUNE_QUEST_SYSTEM_PHASES.md` "Phase Q12"; log tag `[JUNE_QUEST] LOAD`.

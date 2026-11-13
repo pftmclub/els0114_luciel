@@ -64,3 +64,11 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1q (2026-11-13)
 
 - **Dark Force members are declared (under `_WOS`).** `InitPassiveSkillState` `32b88300` first resets `m_fWayOfSwordPointMultiplier` (`+0x9714`) = 1.0, `m_fVigorHpIntakeRate` (`+0x9718`) = 0.0, `m_fDestructionDamageRate` (`+0x971c`) = 1.0, `m_fDestructionBleedingDamageRate` (`+0x9720`) = 1.0 (`@32b88cf2-32b88d0f`), then, when `RNSI_P_SDK_DARK_FORCE` (28410) is learned and its templet exists, writes SA 147 `SA_WAY_OF_SWORD_POINT_MULTIPLIER` / SA 49 `SA_HP_INTAKE_REL_DAMAGE` / SA 15 `SA_DAMAGE_REL` into the first three (`@32b88d4a` / `@32b88d61` / `@32b88d78`, `GetSkillAbilityValue( sa, level, 0, 0.0 )`: a learned Dark Force whose data lacks a key writes 0.0, keep it). Those writes sit in `_WOS` lines inside your `_PASSIVE` / `_LIVE` body (the members exist only with `_WOS`).
+
+## Amended by CH3b0 (2026-11-14)
+
+- CH3b0 declared (under `_SUMMON`, ctor 0) and reads, but does not write: `m_usBloodRunawayLevel` (+0x9724, level of 28414), `m_fBloodRunawayCleanseIntervalTier1-3`
+  (+0x9728 / +0x972c / +0x9730, abilities 0x94 / 0x95 / 0x96), `m_fBloodRunawayCleanseElapsedTime` (+0x9734), `m_eBloodRunawaySaveDebuffID` (+0x9738), `m_ucScaletRoseHitCount`
+  (+0x9788). `InitPassiveSkillState` writes the level / intervals, `BloodRunawayProc_FrameMove` (`32b734d0`) runs the timer and uses `IsBloodRunawayCleanseReady()`
+  (`32b6fb10`, written) and the saved debuff, the delegate `32b524b0` counts Scalet Rose hits (28211 / 28232, DD+0x3dc > -500). Widen `_SUMMON`'s members, never copy them.
+- Vslot 0x24c's Fire Blossoms tail reads March's `m_uiFireBlossomsSkillLevel` / `m_bIsFireBlossoms` (+0x95f4 / +0x95f0): June's writers are this phase's.

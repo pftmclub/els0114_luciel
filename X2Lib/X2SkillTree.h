@@ -2616,6 +2616,11 @@ public:
 		RNSI_A_SDK_SHADE_SCRATCH                              = 28214,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3b0
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		RNSI_SA_SBH_SOUL_IGNITION                             = 28063,	// June's Enum.lua; vslot 0x24c reads its effect-set rate
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-12 // char-elesis CH1k
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June SKILL_ID names Elesis's skill-use functions spell ( values from June's Enum.lua )

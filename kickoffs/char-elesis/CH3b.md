@@ -64,3 +64,14 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1 (2026-11-13): the reserved-buff lines move here
 
 Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. This phase's hand-off checks: Flame Sword (28210) `parse ... skill 28210` then `frame: ... BFI` (`BFI_BUFF_FLAME_SWORD`), and Sword Fire on ElesisBH now reading level >= 1 from 28210.
+
+## Amended by CH3b0 (2026-11-14)
+
+- **Wall of Prominence** (`32b7a0a0`, March's `ESI_SI_SA_SBH_WALL_OF_PROMINENCE_FrameMove`): June's body inside March's. At the 0.01 oneshot it computes the position
+  (target seek `32008a20`, **not ported**: port it whole as a `CX2GUUser` helper, the sibling of `31fd5ef0` / `32008660`, with its params = abilities 0x1d / 0x9e / 0x9f / 0x1f
+  of `GetNowStateSkillID()` via `32007c40`, defaults 180 / 180 / 180 / 1000; fallback `GetFixedDistancePositionInAllLine` `31c68ec0` 120.0, then `GetPos()`; land lift
+  `CKTDGLineMap::GetLandPosition( pos, true, 30.0 )` `31c7bb00` when a line map exists, checklist 7y L685) and then calls CH3b0's **`CreateWallOfProminenceNPC( vPos )`**
+  (picks 1635 / 1971 by `m_usBlazeAbsoluLevel`, level = hyper state read before the seek, owner gate). Ends with `CommonFrameMove`.
+- **Soul Ignition** 28063: its buff (BTI 940) sets `m_fCreateEffectSetRate` through CH3b0's vslot 0x24c and clears it on 0x250: the play-test shows
+  `[JUNE_CHAR] ELESIS SUMMON soul ignition level <n> effect set rate <r>` and the states' `CREATE_EFFECT_SET` lines.
+- Hand-off log lines: `[JUNE_CHAR] ELESIS SUMMON req npc 1635 wall ...` (1971 with Blaze Absolu learned), then `[JUNE_CHAR] SUMMON npc 1635 ... skill 28018 ... flags 0x1`.

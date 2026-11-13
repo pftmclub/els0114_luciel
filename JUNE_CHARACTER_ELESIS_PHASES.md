@@ -1850,6 +1850,46 @@ All 16 class-map rows read from `charport_adis.py elesis --phase CH3a2` and the 
 - **Save:** unit 29 ( `ElesisGM`, class 120, lv 80, not transcended; backup `db_backup/els_db_20261114_010407_pre_sql.sql` ): A 0 Provoke 28205, A 1 Drastic Charge 28206; B 5 Upper Slash 28222, B 6 Divine Blade 28040, B 7 Giga Blast 28062 ( the earlier specials are unslotted; the three actives already learned at level 1 ). Slots 4 / 8 / 9 empty. Upgrade ids not learned.
 - **Play-test ( user, 2026-11-14 01:19-01:20, exe `917b9e3c` ): all passed.** Logs: equip lines 28205 slot 0 bank A state 49, 28206 slot 1 bank A state 51, 28222 slot 0 bank B state 59; `ES_CREATE` `EffectSet_A_SGM_Provoke_Damage` / `EffectSet_A_SGM_PROVOKE` ( ownerState 49 ), `EffectSet_A_SGM_UPPER_SLASH` ( 59 ), `EffectSet_A_SGM_DRASTIC_CHARGE_LOOP` ( 51, hits ), `ES_UPDATE` `EffectSet_A_SGM_DRASTIC_CHARGE_END`; no `MIG no-state` line, packets EXCEPTION 0 ( 2 `E_DISABLE_HB_CHECK_REQ` UNHANDLED ), 0 unbound Lua names, ErrorLog 0 `Motion Error`. One new ErrorLog line: `OpenXET` failed for `SGM_PROVOKEREADYTM01.XET` ( the optional companion of the new Provoke preload; same class as Scaldic Sword's, no visible effect ). The `[JUNE_CHAR] LUCIEL NEWUNIT` lines are another plan's. Log tag `[JUNE_CHAR]` ( `ELESIS SKILL` ).
 
+### CH3b0 - Done (2026-11-14)
+
+Opus 5.5. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON` now **defined** (`Always.h`; its `#error` names `_LIVE`, `_CORE`, `JUNE_CHAR_CHUNG_SKILL`, `JUNE_USER_CREATE_EFFECT_SET`,
+`JUNE_SKILL_TEMPLET`, `JUNE_ENUM_NAMES`, `JUNE_BUFF_ENUM`, `SERV_ELESIS_SECOND_CLASS_CHANGE`, `BALANCE_PATCH_20131107`, `RIDING_SYSTEM`, all on by `/Zs` probe) and a temporary
+`_SUMMON_DEBUG` (`[JUNE_CHAR] ELESIS SUMMON` lines; stays for CH3b / CH3c, CH3d's stage review retires it). Own review: `CH3b0-review.md`. Read from Ghidra (read-only) and
+`charport_adis.py elesis 32b8b0c0`; jump tables of `3230c1a0` read from the exe. Funcmap rows `Char Elesis CH3b0` (8).
+
+| June | Port | June differs from March |
+|---|---|---|
+| `32b89260` vslot 0x24c | whole inside March's (`#else` March) | June's skill id 28008 for Victorious Sword's cool-time rate; BTI 565 (enhanced) joins 239 / 326; **BTI 940 Soul Ignition** writes `m_fCreateEffectSetRate` = `SA_EFFECTIVE_RATE` of 28063 (skipped when the equipped templet is null); the **Blood Runaway saved debuff** (`+0x9738`) beside March's Fire Blossoms one |
+| `32b74500` vslot 0x250 | whole inside March's | the Fire Blossom spawn on BTI 294's end only on the owner's client (`IsMyUnit`, June's `31f8b010` gate); 565 resets with 239 / 326; 940 zeroes the rate |
+| `32b6fb10` | new `IsBloodRunawayCleanseReady` | riding -> false; interval by HP tier (`32b6fa50` = `GetHpTier`'s body) else 9999; ready when the timer reaches it |
+| `32b79db0` | new `ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_End` (unregistered) | June-only: a blossom per hit on the success state, at most 3, 50-500 ahead on the line (`GetFixedDistancePositionForWeaponTaker`), the fire effect at each spot; then the count is zeroed |
+| `32b7a0a0` @32b7a3c0-32b7a4f5 | new `CreateWallOfProminenceNPC( vPos )` | June-only NPC wall: 1635, or 1971 Fire King once Blaze Absolu (`m_usBlazeAbsoluLevel`) is learned; level = hyper state |
+| `32b8b0c0` @32b8b2e6-32b8b3b7 | new `CreateBloodCutterNPC()` | June-only: 1641 at her position, 0.3 s delay |
+| `3230c1a0` | `X2Game.cpp` cases (March's 1567 in `#else`) | 1567 and 1641 take June's default (helper flags 0 with Scalet Rose 28211 / Blood Cutter 28023), 1635 / 1971 flag 1 (fixed HP) with 28018. **1567's related level** (`ELESIS_FIRE_BLOSSOM.lua` reads it) is now `max( 1, Scalet Rose level )` for any class, not March's Blazing-Heart-only Fire Blossoms passive level, and its stats come from her (March set none) |
+
+Every spawn keeps March's `CreateNPCReq` argument list; June's trailing `IsMyUnit` / `0` arguments become the owner gate (as Chung CH3b0 / Rena CH2d0). No count cap: none of
+the four ids is in June's summon-buff map `31fc96b0`. `CheckSummonSpecialAttack` (CH1k's call in `CanUseSpecialAttack`) goes live with the flag; its body and the 54-id
+`IsSummonSkillBy` list were already June's (D0c-1) with 28018 / 28023 / 28054 / 28057. `+0x8e74` is the base writer `322ece70` (`SetSummonHelperInfo`), no class code.
+- **Members** (`X2GUEl.h`, `_SUMMON`, ctor 0): `m_ucScaletRoseHitCount` (+0x9788), `m_usBloodRunawayLevel` (+0x9724), `m_fBloodRunawayCleanseIntervalTier1-3`
+  (+0x9728 / +0x972c / +0x9730), `m_fBloodRunawayCleanseElapsedTime` (+0x9734), `m_eBloodRunawaySaveDebuffID` (+0x9738). Their writers are CH3b2's and CH4a's (kickoffs amended).
+- **Enum names** (`JUNE_ENUM_NAMES`): `NUI_SI_SA_SBH_WALL_OF_PROMINENCE` 1635, `NUI_SI_SA_SCA_BLOOD_CUTTER` 1641, `NUI_SI_SA_SBH_WALL_OF_PROMINENCE_FIREKING` 1971
+  (`X2UnitManager.h`), `BTI_BUFF_SOUL_IGNITION` 940 (`X2BuffFactor.h`), `RNSI_SA_SBH_SOUL_IGNITION` 28063 (`X2SkillTree.h`); values read back from the compiler.
+- **NPC data:** core `Enum.lua` (data036) gains the three NUI names; core `NPCTemplet.lua` (data037) June's rows 1635 / 1971 / 1641 verbatim (1567 present); `luasrc
+  refresh` both, `ledger --check` / `core --check` PASS. `adopt-june --dry-run` of the four scripts: identical to June. `luabind.py check ELESIS_FIRE_BLOSSOM Elesis_FireWall
+  Elesis_FireWall_FireKing Elesis_BloodCutter`: 15 / 9 / 9 / 8 methods, 0 unbound, ENUM 0 missing, `RESULT: PASS`. The 36 assets they and the rows name are all present.
+  `PACK OK data036` (identical to live, nothing copied), `PACK OK data037`, `COPY OK data037` md5 `8ea49b1b`.
+- **Routed:** the Wall's position (target seek `32008a20`, not ported; fallback `31c68ec0`; land lift `31c7bb00`) is CH3b's FrameMove; the Scalet Rose Start reset and End
+  registration CH3b2's; the hit-count delegate `32b524b0` and the Blood Runaway / Fire Blossoms passive writers CH4a's; Blood Cutter's state CH3c's. No JUNE_BUGS row.
+- **Checklist:** L258 / L283 `(Elesis: CH3b0 ...)`.
+
+**Hygiene.** `flagcheck JUNE_CHAR_ELESIS_SUMMON --with _SUMMON_DEBUG --worktree --files` the 7 code files: `3 PASS, 0 PASS~, 0 DEFINE, 4 OTHER, 0 FAIL, 0 ERROR`
+(`Always.h` = the define blocks plus a peer's uncommitted DU2 block, not committed here; the three enum headers = `JUNE_ENUM_NAMES`); `0 deleted line(s), 0 non-ASCII
+inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`, `RESULT: PASS`. `junediverge.py --check` (6 files):
+`allow-listed: 19`, `RESULT: PASS`. `enumscan.py --check X2GUEL.cpp X2Game.cpp`: `0 A/B row(s)`. `stateends.py`: n/a (no state registered).
+One-file `/Zs` probes (`census.cl_cmd`, no PCH): `X2GUEL.cpp` and `X2Game.cpp` 0 errors, no warning on the new lines. **Full build skipped: no play-test** (Soul Ignition,
+Wall, Blood Cutter and Scalet Rose have no skill case until CH3b / CH3b2 / CH3c, and the Fire Blossoms buff needs CH4a's passive on a June-id save; their hand-offs carry
+`[JUNE_CHAR] ELESIS SUMMON req npc ...` and `[JUNE_CHAR] SUMMON npc ...`).
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, one Opus review at CH4c (covers CH4a-CH4c), user play-test (three engine pieces, planned as three from the start).

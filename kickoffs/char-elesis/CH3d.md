@@ -64,3 +64,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1 (2026-11-13): the reserved-buff lines move here
 
 Unported characters cannot cast skills (user, 2026-11-13), so CH1's play-test could not reach `[JUNE_CHAR] ELESIS SKILL SBUF` (`SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`, defined, `X2GUUser.cpp` `ParsingBuffFactorID` / `CommonFrameMove_InsertBuffFactor` / `ApplyAllStateInsertBuffFactor`). Read with `python tools/logs.py --grep "ELESIS SKILL SBUF"`. The CH3 stage review retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (comment out its `#define`) once CH2a / CH2b / CH2c / CH3b have shown their lines; a line never seen is asked for once first.
+
+## Amended by CH3b0 (2026-11-14)
+
+- The CH3 stage review also retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG` (5 lines in `X2GUEL.cpp`, CH3b0) once CH3b / CH3c's play-tests have read them.

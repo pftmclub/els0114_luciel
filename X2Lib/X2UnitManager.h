@@ -2963,6 +2963,12 @@ class CX2UnitManager
 			NUI_NASOD_ELEMENT_FIRE_HENIR            = 1805,
 			NUI_NASOD_ELEMENT_ICE_HENIR             = 1806,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			// char-elesis CH3b0: Elesis's June-only summons ( June's Enum.lua )
+			NUI_SI_SA_SBH_WALL_OF_PROMINENCE          = 1635,
+			NUI_SI_SA_SCA_BLOOD_CUTTER                = 1641,
+			NUI_SI_SA_SBH_WALL_OF_PROMINENCE_FIREKING = 1971,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 //}}
 //}} robobeg : 2013-02-27

@@ -12758,13 +12758,27 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-12
-// Description: June character port ( Elesis ) Phase CH1k - her skill lookup's summon-limit check ( CheckSummonSpecialAttack, June 32b84a50 @32b84d19 ):
-//              waits for the summon list CH3b0 registers. Stays commented out until CH3b0; only with _LIVE.
+// Description: June character port ( Elesis ) Phase CH1k - her skill lookup's summon-limit check ( CheckSummonSpecialAttack, June 32b84a50 @32b84d19 ).
+//              CH3b0 ( 2026-11-14 ): defined. Vslots 0x24c / 0x250 whole ( June 32b89260 / 32b74500: June's skill ids, the enhanced Victorious Sword,
+//              Soul Ignition's effect-set rate, the Blood Runaway saved debuff, the owner-only Fire Blossom spawn ), the Scalet Rose success End
+//              ( 32b79db0, three blossoms at most ), the Wall of Prominence / Fire King and Blood Cutter spawn helpers ( 32b7a0a0 / 32b8b0c0 ), and
+//              June 3230c1a0's cases for NPC 1567 / 1635 / 1971 / 1641 in CX2Game::SetUserSummonedNPCInfo.
 //              Revert: comment out the #define ( JUNE_CHAR_ELESIS_SUMMON ).
-//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
-#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
-#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_CHUNG_SKILL ) || !defined( SERV_IRUHADEV_JUNE_USER_CREATE_EFFECT_SET ) || !defined( SERV_IRUHADEV_JUNE_SKILL_TEMPLET ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_JUNE_BUFF_ENUM ) || !defined( SERV_ELESIS_SECOND_CLASS_CHANGE ) || !defined( BALANCE_PATCH_20131107 ) || !defined( RIDING_SYSTEM ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON needs _LIVE, _CORE ( GetHpTier ), JUNE_CHAR_CHUNG_SKILL ( SetSummonHelperInfo ), JUNE_USER_CREATE_EFFECT_SET, JUNE_SKILL_TEMPLET, JUNE_ENUM_NAMES, JUNE_BUFF_ENUM, SERV_ELESIS_SECOND_CLASS_CHANGE, BALANCE_PATCH_20131107 ( IsNonControlDebuff ) and RIDING_SYSTEM
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: June character port ( Elesis ) Phase CH3b0 - temporary [JUNE_CHAR] ELESIS SUMMON lines ( one per spawn request and Soul Ignition rate ) for the CH3b / CH3c play-tests; the CH3b0 review keeps it for them, CH3d's stage review retires it.
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_SUMMON_DEBUG ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////

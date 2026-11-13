@@ -18791,6 +18791,24 @@ void CX2Game::SetUserSummonedNPCInfo( CX2NPCAI::NPC_AI_TYPE eAIType, UidType iAl
 #endif SERV_CHUNG_TACTICAL_TROOPER
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE //김창한
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+			// char-elesis CH3b0: June 3230c1a0 has no case for 0x61f: the default's flags 0 with Scalet Rose, whose level the blossom's script reads
+			case CX2UnitManager::NUI_ELESIS_FIRE_BLOSSOM:
+				{
+					pUser->SetSummonHelperInfo( pNPC, npcStat, fStatScale * fHyperModeStatScale, fStatAtkRate, CX2SkillTree::RNSI_A_SBH_SCALET_ROSE, 0 );
+				} break;
+			// char-elesis CH3b0: June 3230c1a0 0x663 / 0x7b3 -> 3230cb83: flag 1 fixes the HP
+			case CX2UnitManager::NUI_SI_SA_SBH_WALL_OF_PROMINENCE:
+			case CX2UnitManager::NUI_SI_SA_SBH_WALL_OF_PROMINENCE_FIREKING:
+				{
+					pUser->SetSummonHelperInfo( pNPC, npcStat, fStatScale * fHyperModeStatScale, fStatAtkRate, CX2SkillTree::RNSI_SA_SBH_WALL_OF_PROMINENCE, CX2GUUser::SHF_FIXED_HP );
+				} break;
+			// char-elesis CH3b0: June 3230c1a0 has no case for 0x669: the default's flags 0 with Blood Cutter
+			case CX2UnitManager::NUI_SI_SA_SCA_BLOOD_CUTTER:
+				{
+					pUser->SetSummonHelperInfo( pNPC, npcStat, fStatScale * fHyperModeStatScale, fStatAtkRate, CX2SkillTree::RNSI_SA_SCA_BLOOD_CUTTER, 0 );
+				} break;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 			case CX2UnitManager::NUI_ELESIS_FIRE_BLOSSOM:		/// 블레이징 하트 - 불꽃 개화.
 				{
 					if( NULL != pUser->GetUnit() && pUser->GetUnitClass() == CX2Unit::UC_ELESIS_BLAZING_HEART )
@@ -18804,6 +18822,7 @@ void CX2Game::SetUserSummonedNPCInfo( CX2NPCAI::NPC_AI_TYPE eAIType, UidType iAl
 					ApplySummonPowerRate( pNPC, pUser, CX2SkillTree::SI_A_SBH_SCALET_ROSE );
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
 				} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 #endif //SERV_ELESIS_SECOND_CLASS_CHANGE //김창한
 #ifdef SERV_9TH_NEW_CHARACTER
 			case CX2UnitManager::NUI_PARTICLE_PRISM_START: // 파티클 프리즘

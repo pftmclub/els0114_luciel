@@ -577,6 +577,11 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_BRUTAL_CUTTER_MEMO           = 509,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3b0
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_SOUL_IGNITION                = 940,	// June's Enum.lua; Elesis's vslots 0x24c / 0x250 set and clear its effect-set rate
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-10-26 // June character port Phase CH1l3 (JUNE_CHARACTER_EVE_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June BTI names the Eve skill use spells

@@ -106,7 +106,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH3b0 | ready (CH3a2 code done; its play-test may run beside): four summons + vslots 0x24c / 0x250 (effect-set rate writers), flag `_SUMMON` | Opus 5.5 / high, Opus review | CH3a2 | `X2GUEL.*`, `X2UnitManager.h`, NPC scripts | `CH3b0.md` |
+| CH3b0 | code done (2026-11-14): `_SUMMON` on; vslots 0x24c / 0x250 whole, 3 spawn helpers + Scalet End, 4 NPC-info cases, NPC rows packed; no play-test, full build skipped; review next | Opus 5.5 / high, Opus review | CH3a2 | `X2GUEL.*`, `X2Game.cpp`, enum headers, data036 / data037 | `CH3b0-review.md` |
 | CH3b | blocked (CH3a2, CH3b0 review): Blazing Heart (121) special actives (CH0 split) | Sonnet 5.5 / high, user play-test | CH3a2, CH3b0 review | `X2GUEL.*` | `CH3b.md` |
 | CH3b2 | blocked (CH3b): Blazing Heart actives 28210 / 28211 / 28223 (CH0 split) | Sonnet 5.5 / high, user play-test | CH3b | `X2GUEL.*` | `CH3b2.md` |
 | CH3c | blocked (CH3b2): Crimson Avenger (125) skills | Sonnet 5.5 / high, user play-test | CH3b2, CHNb review | `X2GUEL.*` | `CH3c.md` |

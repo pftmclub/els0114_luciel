@@ -325,6 +325,18 @@ namespace _CONST_EL_CH3A2_
 }
 using namespace _CONST_EL_CH3A2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+// char-elesis CH3b0: constants of the summons and the Blood Runaway cleanse check ( June 32b79db0 / 32b8b0c0 / 32b6fb10 )
+namespace _CONST_EL_CH3B0_
+{
+	const unsigned char	SCALET_ROSE_MAX_FIRE_BLOSSOM_COUNT		= 3;
+	const double		FIRE_BLOSSOM_RANDOM_DISTANCE			= 450.0;	// June multiplies and adds in double, then stores a float
+	const double		FIRE_BLOSSOM_MIN_DISTANCE				= 50.0;
+	const float			BLOOD_CUTTER_NPC_DELAY					= 0.3f;
+	const float			BLOOD_RUNAWAY_NO_TIER_CLEANSE_INTERVAL	= 9999.f;	// over 70 % HP the timer never reaches it
+}
+using namespace _CONST_EL_CH3B0_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
@@ -426,6 +438,15 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 , m_fSnapshotWayOfSwordPoint(0.f)	// char-elesis CH1q
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+, m_ucScaletRoseHitCount(0)	// char-elesis CH3b0: June 32b70ee0
+, m_usBloodRunawayLevel(0)
+, m_fBloodRunawayCleanseIntervalTier1(0.f)
+, m_fBloodRunawayCleanseIntervalTier2(0.f)
+, m_fBloodRunawayCleanseIntervalTier3(0.f)
+, m_fBloodRunawayCleanseElapsedTime(0.f)
+, m_eBloodRunawaySaveDebuffID(BTI_NONE)
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 , m_uiDodgeAndSlashMaxReuseCount(0)
 , m_uiDodgeAndSlashReuseCount(0)
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
@@ -6608,6 +6629,68 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 */
 /*virtual*/ void CX2GUEL::SetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+	// char-elesis CH3b0: June 32b89260 ( vslot 0x24c ): June's skill ids, the enhanced Victorious Sword, Soul Ignition's effect-set rate, the Blood Runaway saved debuff
+	CX2GUUser::SetSpecificValueByBuffTempletID( eBuffTempletId_ );
+
+	switch ( eBuffTempletId_ )
+	{
+	case BTI_BUFF_FLAME_SWORD:
+		m_bIsFrameSword = true;
+		break;
+
+	case BTI_BUFF_ENDURANCE_POWER:
+		m_bIsActiveEndurancePower = true;
+		break;
+
+	case BTI_BUFF_VICTORIOUS_SWORD:
+	case BTI_BUFF_SGM_VICTORIOUS_SWORD:
+	case BTI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE:
+		{
+			m_fDodgeAndSlashCoolTimeDecreaseRate = 1.f;
+
+			const int iSkillLevel = ( NULL != GetUnit() ? GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_SGM_VICTORIOUS_SWORD, false, 0, true ) : 0 );
+			if ( 0 < iSkillLevel )
+			{
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SGM_VICTORIOUS_SWORD, true );
+				if ( NULL != pSkillTemplet )
+					m_fDodgeAndSlashCoolTimeDecreaseRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DECREASE_REL, iSkillLevel, false );
+			}
+
+			m_bIsApplyVictoriousSword = true;
+		} break;
+
+	case BTI_BUFF_SOUL_IGNITION:
+		{
+			const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_SBH_SOUL_IGNITION, true );
+			if ( NULL != pSkillTemplet )
+			{
+				const int iSkillLevel = ( NULL != GetUnit() ? GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_SBH_SOUL_IGNITION, false, 0, true ) : 0 );
+				m_fCreateEffectSetRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+				CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SUMMON soul ignition level %d effect set rate %.3f", iSkillLevel, m_fCreateEffectSetRate );	// char-elesis CH3b0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+			}
+		} break;
+
+	default:
+		break;
+	}
+
+	if ( 0 < m_uiFireBlossomsSkillLevel && true == m_bIsFireBlossoms )
+	{
+		CX2BuffTempletPtr ptrBuffTemplet = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( eBuffTempletId_ );
+		if ( NULL != ptrBuffTemplet && true == ptrBuffTemplet->IsDeBuff() && false == ptrBuffTemplet->IsWorldBuff() && false == ptrBuffTemplet->IsNonControlDebuff() )
+			m_eFireBlossomsSaveDebuffID = eBuffTempletId_;
+	}
+
+	if ( 0 != m_usBloodRunawayLevel && true == IsBloodRunawayCleanseReady() )
+	{
+		CX2BuffTempletPtr ptrBuffTemplet = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( eBuffTempletId_ );
+		if ( NULL != ptrBuffTemplet && true == ptrBuffTemplet->IsDeBuff() && false == ptrBuffTemplet->IsWorldBuff() && false == ptrBuffTemplet->IsNonControlDebuff() )
+			m_eBloodRunawaySaveDebuffID = eBuffTempletId_;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 	CX2GUUser::SetSpecificValueByBuffTempletID( eBuffTempletId_ );
 
  	switch ( eBuffTempletId_ )
@@ -6678,6 +6761,7 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 		}
 	}
 #endif //SERV_ELESIS_SECOND_CLASS_CHANGE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 }
 /** @function	: UnSetSpecificValueByBuffTempletID
 	@brief		: 각 유닛마다 특정 버프가 해제 될 때 셋팅해야 하는 함수 실행(ex: 매지컬메이크업이 해제 됬다는 플래그 설정 등...)
@@ -6685,6 +6769,49 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 */
 /*virtual*/ void CX2GUEL::UnSetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+	// char-elesis CH3b0: June 32b74500 ( vslot 0x250 ): the owner's client spawns the blossom, the enhanced Victorious Sword, Soul Ignition's reset
+	CX2GUUser::UnSetSpecificValueByBuffTempletID( eBuffTempletId_ );
+
+	switch ( eBuffTempletId_ )
+	{
+	case BTI_BUFF_FLAME_SWORD:
+		m_bIsFrameSword = false;
+		break;
+
+	case BTI_BUFF_ENDURANCE_POWER:
+		m_bIsActiveEndurancePower = false;
+		break;
+
+	case BTI_BUFF_FIRE_BLOSSOMS:
+		{
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_P_SBH_FIRE_BLOSSOMS_Fire", this );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SUMMON req npc %d fire blossoms end mine %d pos %.0f %.0f %.0f", static_cast<int>( CX2UnitManager::NUI_ELESIS_FIRE_BLOSSOM ), static_cast<int>( IsMyUnit() ), GetLandPosition().x, GetLandPosition().y, GetLandPosition().z );	// char-elesis CH3b0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+			if ( true == IsMyUnit() )
+			{
+				g_pX2Game->CreateNPCReq( CX2UnitManager::NUI_ELESIS_FIRE_BLOSSOM, 0, true, GetLandPosition(),
+					GetIsRight(), 0.f, true, -1, (CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID() );
+			}
+		} break;
+
+	case BTI_BUFF_VICTORIOUS_SWORD:
+	case BTI_BUFF_SGM_VICTORIOUS_SWORD:
+	case BTI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE:
+		m_bIsApplyVictoriousSword = false;
+		m_fDodgeAndSlashCoolTimeDecreaseRate = 1.f;
+		break;
+
+	case BTI_BUFF_SOUL_IGNITION:
+		m_fCreateEffectSetRate = 0.f;
+		break;
+
+	default:
+		break;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 	CX2GUUser::UnSetSpecificValueByBuffTempletID( eBuffTempletId_ );
 
 	switch ( eBuffTempletId_ )
@@ -6728,9 +6855,90 @@ void CX2GUEL::StateChangeSpecialAttack( IN const CX2SkillTree::SkillTemplet* pSk
 	default:
 		break;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 }
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+// char-elesis CH3b0: June 32b6fb10: the cleanse timer reached the interval of her HP tier ( 32b6fa50 = GetHpTier's body )
+bool CX2GUEL::IsBloodRunawayCleanseReady()
+{
+	if ( true == GetRidingOn() )
+		return false;
+
+	float fCleanseInterval = BLOOD_RUNAWAY_NO_TIER_CLEANSE_INTERVAL;
+	switch ( GetHpTier() )
+	{
+	case 1:
+		fCleanseInterval = m_fBloodRunawayCleanseIntervalTier1;
+		break;
+
+	case 2:
+		fCleanseInterval = m_fBloodRunawayCleanseIntervalTier2;
+		break;
+
+	case 3:
+		fCleanseInterval = m_fBloodRunawayCleanseIntervalTier3;
+		break;
+	}
+
+	return ( m_fBloodRunawayCleanseElapsedTime >= fCleanseInterval );
+}
+
+// char-elesis CH3b0: June 32b79db0 ( slot 0x58, CH3b2 registers it ): a Fire Blossom per Scalet Rose hit, at most 3, 50 to 500 ahead
+void CX2GUEL::ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_End()
+{
+	for ( unsigned char ucBlossomIndex = 0; ucBlossomIndex < min( m_ucScaletRoseHitCount, SCALET_ROSE_MAX_FIRE_BLOSSOM_COUNT ); ++ucBlossomIndex )
+	{
+		D3DXVECTOR3 vPos = GetPos();
+		const float fDistance = static_cast<float>( GetRandomFloat( ucBlossomIndex ) * FIRE_BLOSSOM_RANDOM_DISTANCE + FIRE_BLOSSOM_MIN_DISTANCE );
+		g_pX2Game->GetWorld()->GetLineMap()->GetFixedDistancePositionForWeaponTaker( &GetPos(), fDistance, GetIsRight(), vPos );
+
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_P_SBH_FIRE_BLOSSOMS_Fire", this, NULL, false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ), true, vPos );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SUMMON req npc %d scalet rose %d of %d mine %d distance %.0f", static_cast<int>( CX2UnitManager::NUI_ELESIS_FIRE_BLOSSOM ), static_cast<int>( ucBlossomIndex ) + 1, static_cast<int>( m_ucScaletRoseHitCount ), static_cast<int>( IsMyUnit() ), fDistance );	// char-elesis CH3b0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+		if ( true == IsMyUnit() )
+		{
+			g_pX2Game->CreateNPCReq( CX2UnitManager::NUI_ELESIS_FIRE_BLOSSOM, 0, true, vPos,
+				GetIsRight(), 0.f, true, -1, (CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID() );
+		}
+	}
+
+	m_ucScaletRoseHitCount = 0;
+	CommonStateEnd();
+}
+
+// char-elesis CH3b0: June 32b7a0a0 @32b7a3c0-32b7a4f5 ( CH3b's FrameMove passes the position ): the Fire King wall once Blaze Absolu is learned
+void CX2GUEL::CreateWallOfProminenceNPC( const D3DXVECTOR3& vPos_ )
+{
+	const CX2UnitManager::NPC_UNIT_ID eWallNPCID = ( 0 == m_usBlazeAbsoluLevel ?
+		CX2UnitManager::NUI_SI_SA_SBH_WALL_OF_PROMINENCE : CX2UnitManager::NUI_SI_SA_SBH_WALL_OF_PROMINENCE_FIREKING );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SUMMON req npc %d wall blaze absolu %d mine %d pos %.0f %.0f %.0f", static_cast<int>( eWallNPCID ), static_cast<int>( m_usBlazeAbsoluLevel ), static_cast<int>( IsMyUnit() ), vPos_.x, vPos_.y, vPos_.z );	// char-elesis CH3b0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+	if ( true == IsMyUnit() )
+	{
+		g_pX2Game->CreateNPCReq( eWallNPCID, ( true == IsHyperState() ? 1 : 0 ), true, vPos_,
+			GetIsRight(), 0.f, true, -1, (CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID() );
+	}
+}
+
+// char-elesis CH3b0: June 32b8b0c0 @32b8b2e6-32b8b3b7 ( CH3c's FrameMove calls it )
+void CX2GUEL::CreateBloodCutterNPC()
+{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS SUMMON req npc %d blood cutter mine %d", static_cast<int>( CX2UnitManager::NUI_SI_SA_SCA_BLOOD_CUTTER ), static_cast<int>( IsMyUnit() ) );	// char-elesis CH3b0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+	if ( true == IsMyUnit() )
+	{
+		g_pX2Game->CreateNPCReq( CX2UnitManager::NUI_SI_SA_SCA_BLOOD_CUTTER, 0, true, GetPos(),
+			GetIsRight(), BLOOD_CUTTER_NPC_DELAY, true, -1, (CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID() );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 #ifdef ELSWORD_WAY_OF_SWORD // 검의 길
 // 검의 길
 /*virtual*/ int	CX2GUEL::GetWayOfSwordState() const

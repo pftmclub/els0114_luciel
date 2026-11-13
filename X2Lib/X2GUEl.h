@@ -539,6 +539,12 @@ protected:
 	void GrandMasterTranscendenceProc_FrameMove();	/// char-elesis CH1j: June 32b7e580 ( RNSI_P_SGM_TRANSCENDENCE ): body in CH4a
 	void ApplyGrandMasterAura();					/// char-elesis CH1j: June 32b7e740 ( Dignity of Grand Master aura ): body in CH4a
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+	bool IsBloodRunawayCleanseReady();	/// char-elesis CH3b0: June 32b6fb10
+	void ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_End();	/// char-elesis CH3b0: June 32b79db0 ( CH3b2 registers it )
+	void CreateWallOfProminenceNPC( const D3DXVECTOR3& vPos_ );	/// char-elesis CH3b0: June 32b7a0a0 @32b7a3c0-32b7a4f5
+	void CreateBloodCutterNPC();	/// char-elesis CH3b0: June 32b8b0c0 @32b8b2e6-32b8b3b7
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	float GetWayOfSwordPointMultiplier() const;	/// char-elesis CH1h: June 32b903e0 ( vslot 0x720, +0x9714 ): body in CH1q
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
@@ -1248,6 +1254,15 @@ protected:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	float m_fSnapshotWayOfSwordPoint;		/// char-elesis CH1q: June +0x92b8 ( CX2GUUser snapshot region ): the point StoreGageSnapshot keeps
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+	unsigned char m_ucScaletRoseHitCount;	/// char-elesis CH3b0: June +0x9788 ( hits on the Scalet Rose success state; CH3b2 / CH4a write it )
+	USHORT m_usBloodRunawayLevel;	/// char-elesis CH3b0: June +0x9724 ( level of RNSI_P_SCA_BLOOD_RUNAWAY; CH4a writes it )
+	float m_fBloodRunawayCleanseIntervalTier1;	/// char-elesis CH3b0: June +0x9728 ( ability 0x94 of Blood Runaway; CH4a writes it )
+	float m_fBloodRunawayCleanseIntervalTier2;	/// char-elesis CH3b0: June +0x972c ( ability 0x95 )
+	float m_fBloodRunawayCleanseIntervalTier3;	/// char-elesis CH3b0: June +0x9730 ( ability 0x96 )
+	float m_fBloodRunawayCleanseElapsedTime;	/// char-elesis CH3b0: June +0x9734 ( CH4a's frame move runs it )
+	BUFF_TEMPLET_ID m_eBloodRunawaySaveDebuffID;	/// char-elesis CH3b0: June +0x9738 ( the debuff the next cleanse removes )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 	//~ protected 변수
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트

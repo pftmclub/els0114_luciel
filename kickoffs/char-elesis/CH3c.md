@@ -53,3 +53,9 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Skill ids** (16): 28022, 28023, 28024, 28025, 28043, 28044, 28056, 28057, 28058, 28059, 28064, 28215, 28216, 28224, 28235, 28236.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52.
 - The 10 bare `SI_` Crimson Avenger tables are here; Blood Cutter `32b8b0c0` spawns NPC 1641 (CH3b0 wrote it).
+
+## Amended by CH3b0 (2026-11-14)
+
+- Blood Cutter's FrameMove (`32b8b0c0`, listing-only): at the 0.01 oneshot, after the dummy damage effect and the `32b89470` self-bleed (+0x7cc8 rate x1.3 / x1.4), call
+  CH3b0's **`CreateBloodCutterNPC()`** (1641, 0.3 s delay, owner gate) at `@32b8b3b7`'s place, then destroy the dummy effect. Hand-off lines:
+  `[JUNE_CHAR] ELESIS SUMMON req npc 1641 blood cutter mine 1`, `[JUNE_CHAR] SUMMON npc 1641 ... skill 28023 ... flags 0x0`.

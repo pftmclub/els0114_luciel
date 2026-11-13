@@ -53,3 +53,10 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - **Skill ids** (3): 28210, 28211, 28223.
 - **Checklist rows** (`june2017_re/char_elesis/ch0_checklist_rows.tsv` col 5): L52, L876.
 - CH0 split off CH3b: actives 28210 Flame Sword (reserved-buff path, `[JUNE_SKILL] SBUF` lines), 28211 Scalet Rose (Fire Blossom spawn `32b79db0`, written by CH3b0), 28223 Flame Protection.
+
+## Amended by CH3b0 (2026-11-14)
+
+- **Scalet Rose success End** is written: `ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_End()` (June `32b79db0`, under `_SUMMON`). Register it on the success state's End slot (0x58,
+  thunk `32b90830`, `@32b8e372`). The same state's Start `32b51550` zeroes `m_ucScaletRoseHitCount` (+0x9788): write it here. The per-hit increment is the attack-result
+  delegate `32b524b0` that `InitPassiveSkillState` pushes when 28211 is learned (CH4a); until CH4a the count stays 0 and the End spawns nothing, so this phase's play-test
+  checks the End runs (no stuck state) and CH4a's checks the blossoms (`[JUNE_CHAR] ELESIS SUMMON req npc 1567 scalet rose <i> of <n> ...`, `[JUNE_CHAR] SUMMON npc 1567 ... skill 28211`).
