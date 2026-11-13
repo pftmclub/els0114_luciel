@@ -436,6 +436,13 @@ client quit and hung. **User decision: skip it for now.** Stand-in under `_CREAT
 lost. June's Add tutorial = new phase **TU** (`kickoffs/char-add/TU.md`); Lu/Ciel's TU kickoff amended (Add's case is char-add TU's).
 flagcheck `--worktree` (2 files): 1 PASS, 1 OTHER (debug block), 0 FAIL, RESULT: PASS; junediverge PASS; enumscan 0. DEPLOY OK: X2_offline.exe 26,368,000 B, 2026-11-13 08:24:17, md5 fa47ddb445faeba7c18f234517b2cb8d; EXESTR OK 2/2 (both skip lines). Commit `24dda967`; flagcheck `--range` 2 PASS, 1 DEFINE, 0 FAIL, RESULT: PASS; its 1 deleted line is the `_DEBUG` description comment in Always.h, reworded.
 
+**Play-test 2 (2026-11-13): PASSED (user: "all passed, he plays").** Log (last run): `ADD CREATE slot shown ( US limit 8, slot found )`,
+`select class 9 type 9`, `SELECT 'AddCh0c' (unitUID=142, class=9, lv=1)` -> village 20000 -> Ruben field 40000, Add's `AN_*` combos and kills; no
+`stage 0 out of range`. No skip line this run: AddCh0c's select was not a first select (the create run's log was overwritten). ErrorLog vs
+`ErrorLog_pre_CH0c_add.txt`: new shapes are first loads only: `.XET` / texture misses for every class shown, `MOVIE_CREATE_<class>.LUA` + error 72
+for every class (Elesis, Elsword, Add alike), 4 `ClassChange*` controls missing from **Elesis's** March dialog (screen opens on her; not CH0c),
+Add's kit (`ADD_EFFECT#.OGG` 3D-position x15, `MOTION_ADD_EMOTION_CASH#.X` = Stage 10 / CH0b). Nothing traces to CH0c's code.
+
 **How to see it:** the creation screen shows Add's slot, his June class buttons and info texture; create one, and he gets his beginner gear.
 Personal-shop search: Add is the last entry of the character combo (the label may show garbled, see Stage 9 bullet).
 
