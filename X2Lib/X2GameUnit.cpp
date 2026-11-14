@@ -19926,6 +19926,80 @@ void CX2GameUnit::ChangeBuffFinalizerTempletPtrList( const BUFF_TEMPLET_ID eBuff
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS
+#if !defined( SERV_IRUHADEV_JUNE_BUFF_BINDING ) || !defined( SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE ) || !defined( FIX_BUFF_FINALIZE_DURATION_TIME_CONTROL_BUG )
+#error SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS needs CX2BuffTimeFinalizerTemplet::SetDurationTime / GetDurationTime
+#endif
+// char-luciel CH1k0: June 3227bcb0
+void CX2GameUnit::AddBuffTimeFinalizerDuration( const BUFF_TEMPLET_ID eBuffTempletID_, const float fAddTime_ )
+{
+	vector<CX2BuffFinalizerTempletPtr> vecFinalizerPtr;
+	GetBuffFinalizerTempletPtrList( eBuffTempletID_, vecFinalizerPtr );
+	BOOST_FOREACH( CX2BuffFinalizerTempletPtr ptrFinalizer, vecFinalizerPtr )
+	{
+		CX2BuffTimeFinalizerTemplet* pTimeFinalizer = dynamic_cast<CX2BuffTimeFinalizerTemplet*>( ptrFinalizer.get() );
+		if ( NULL != pTimeFinalizer )
+			pTimeFinalizer->SetDurationTime( pTimeFinalizer->GetDurationTime() + fAddTime_ );
+	}
+	ChangeBuffFinalizerTempletPtrList( eBuffTempletID_, vecFinalizerPtr );
+}
+
+// char-luciel CH1k0: June 322a7000; per factor it edits the first buff of that BTI ( JUNE_BUGS 690 / 691 )
+void CX2GameUnit::AddAllBuffTimeFinalizerDuration( const float fAddTime_ )
+{
+	vector<KBuffFactor> vecBuffFactor;
+	GetBuffFactor( vecBuffFactor );
+	BOOST_FOREACH( const KBuffFactor& kBuffFactor, vecBuffFactor )
+	{
+		const BUFF_TEMPLET_ID eBuffTempletID = static_cast<BUFF_TEMPLET_ID>( kBuffFactor.m_BuffIdentity.m_eBuffTempletID );
+		const CX2BuffTempletPtr ptrBuffTemplet = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( eBuffTempletID );
+		if ( NULL != ptrBuffTemplet && ptrBuffTemplet->IsDeBuff() )
+			continue;
+
+		vector<CX2BuffFinalizerTempletPtr> vecFinalizerPtr;
+		GetBuffFinalizerTempletPtrList( eBuffTempletID, vecFinalizerPtr );
+		BOOST_FOREACH( CX2BuffFinalizerTempletPtr ptrFinalizer, vecFinalizerPtr )
+		{
+			CX2BuffTimeFinalizerTemplet* pTimeFinalizer = dynamic_cast<CX2BuffTimeFinalizerTemplet*>( ptrFinalizer.get() );
+			if ( NULL == pTimeFinalizer )
+				continue;
+
+			pTimeFinalizer->SetDurationTime( pTimeFinalizer->GetDurationTime() + fAddTime_ );
+			if ( ( BTI_HYPER_MODE == eBuffTempletID || BTI_TRANSCENDENTAL_HYPER_MODE == eBuffTempletID )
+				&& NULL != GetGageData() && 0.f < GetGageData()->GetHyperModeRemainTime() )
+				GetGageData()->SetHyperModeRemainTime( GetGageData()->GetHyperModeRemainTime() + fAddTime_ );
+		}
+		ChangeBuffFinalizerTempletPtrList( eBuffTempletID, vecFinalizerPtr );
+	}
+}
+
+// char-luciel CH1k0: June 322a74a0; per factor it edits the first buff of that BTI ( JUNE_BUGS 690 )
+void CX2GameUnit::MultiplyAllDebuffTimeFinalizerDuration( const float fRate_ )
+{
+	if ( fRate_ < 0.f )
+		return;
+
+	vector<KBuffFactor> vecBuffFactor;
+	GetBuffFactor( vecBuffFactor );
+	BOOST_FOREACH( const KBuffFactor& kBuffFactor, vecBuffFactor )
+	{
+		const BUFF_TEMPLET_ID eBuffTempletID = static_cast<BUFF_TEMPLET_ID>( kBuffFactor.m_BuffIdentity.m_eBuffTempletID );
+		const CX2BuffTempletPtr ptrBuffTemplet = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( eBuffTempletID );
+		if ( NULL != ptrBuffTemplet && false == ptrBuffTemplet->IsDeBuff() )
+			continue;
+
+		vector<CX2BuffFinalizerTempletPtr> vecFinalizerPtr;
+		GetBuffFinalizerTempletPtrList( eBuffTempletID, vecFinalizerPtr );
+		BOOST_FOREACH( CX2BuffFinalizerTempletPtr ptrFinalizer, vecFinalizerPtr )
+		{
+			CX2BuffTimeFinalizerTemplet* pTimeFinalizer = dynamic_cast<CX2BuffTimeFinalizerTemplet*>( ptrFinalizer.get() );
+			if ( NULL != pTimeFinalizer )
+				pTimeFinalizer->SetDurationTime( pTimeFinalizer->GetDurationTime() * fRate_ );
+		}
+		ChangeBuffFinalizerTempletPtrList( eBuffTempletID, vecFinalizerPtr );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS
 /** @function : HaveThisBuff
 	@brief : 해당 버프를 가지고 있는지를 조사 하는 함수
 	@param : 버프 템플릿 아이디

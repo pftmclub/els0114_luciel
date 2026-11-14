@@ -13445,3 +13445,13 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              is compiled before Always.h is reachable. Revert: comment out all three together ( a v23 save then refuses to open ).
 #define SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel CH1k0 - June's buff Time-finalizer passes on CX2GameUnit, class-agnostic: AddBuffTimeFinalizerDuration
+//              ( 3227bcb0, one BTI ), AddAllBuffTimeFinalizerDuration ( 322a7000, every non-debuff buff; the awakening clock follows
+//              BTI 5 / 822 ) and MultiplyAllDebuffTimeFinalizerDuration ( 322a74a0, every debuff, rate >= 0 ). Inert until Lu/Ciel's
+//              callers ( CH1k / CH1m ) go live. Needs SERV_IRUHADEV_JUNE_BUFF_BINDING and SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE ( #error guard ).
+#define SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS
+//////////////////////////////////////////////////////////////////////////

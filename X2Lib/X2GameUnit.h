@@ -3296,6 +3296,11 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		
 		bool GetBuffFinalizerTempletPtrList( const BUFF_TEMPLET_ID eBuffTempletID_, OUT vector<CX2BuffFinalizerTempletPtr>& vecFinalizerPtr_ );
 		void ChangeBuffFinalizerTempletPtrList( const BUFF_TEMPLET_ID eBuffTempletID_, OUT vector<CX2BuffFinalizerTempletPtr>& vecFinalizerPtr_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS
+		void AddBuffTimeFinalizerDuration( const BUFF_TEMPLET_ID eBuffTempletID_, const float fAddTime_ );	// char-luciel CH1k0: June 3227bcb0
+		void AddAllBuffTimeFinalizerDuration( const float fAddTime_ );	// char-luciel CH1k0: June 322a7000
+		void MultiplyAllDebuffTimeFinalizerDuration( const float fRate_ );	// char-luciel CH1k0: June 322a74a0
+#endif SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS
 
 		void PushNewBuffTempletToGameUnit( IN CX2BuffTempletPtr ptrBuffTemplet_, const CX2BuffFactor& buffFactor_, const UINT uiUniqueNum_ );
 		void EraseBuffTempletFromGameUnit( const BUFF_TEMPLET_ID eBuffTempletID_ );
