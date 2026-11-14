@@ -4327,16 +4327,8 @@ void CX2GULuciel::PlayComboProjectileEffectSet( const WCHAR* pwszEffectSetName_,
 	if( NULL == g_pX2Game || NULL == g_pX2Game->GetEffectSet() || false == IsEnoughMPForAttack( fConsumeMP_, vBonePos ) )
 		return;
 
-	// June passes m_fSoulCollectorDamageRate as the life time too ( JUNE_BUGS )
-	const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName_, this, NULL, IsHyperState(),
-		GetPowerRate() * m_fPowerOfOriaxDamageRate, m_fSoulCollectorDamageRate, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
-
-	g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME, m_fSoulCollectorDamageRate, false );
-
-	if( true == bAddMaxCountModifier_ )
-	{
-		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT, static_cast<float>( m_usSoulCollectorMaxCount ), true );
-	}
+	// char-luciel CH1g2: the body moved to PlayRatedProjectileEffectSet, the Royal Guard and Chiliarch combos test the MP themselves
+	PlayRatedProjectileEffectSet( pwszEffectSetName_, bAddMaxCountModifier_ );
 }
 
 // char-luciel CH1f2: June 32b23820
@@ -5093,6 +5085,874 @@ void CX2GULuciel::LSI_LLC_M_DASH_COMBO_XXX_EventProcess()
 	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: Chiliarch / Royal Guard combos part 2 ( June 32af91e0 - 32b3bc70 )
+namespace _CONST_LUCIEL_CH1G2_
+{
+	const float		SNIPING_X_FIRE_POWER_RATE_BASE				= 1.f;		// June 32b1cba0: the state power rate is multiplied by charge + 1.0 ( added as a double )
+	const float		LLC_COMBO_ZZZX_EFFECT_TIME					= 0.4f;		// June 32b22240
+	const float		LLC_M_COMBO_ZZZX_EFFECT_TIME				= 0.28f;	// June 32b27b60
+	const float		LLC_COMBO_ZZZX_EFFECT_MP					= 3.f;		// June 32b22240 / 32b27b60
+	const float		LLC_COMBO_ZZZX_EXPLOSIVE_RANDOM_LIMIT		= 0.5f;		// June 32b22240: a random above it plays the explosive set
+	const float		LLC_COMBO_ZZZX_ENHANCE_RANDOM_LIMIT			= 0.2f;		// June 32b22240: else a random above it plays the enhance set, else the healing set
+	const float		SNIPING_Z_EFFECT_TIME						= 0.04f;	// June 32b26030
+	const float		SNIPING_Z_EFFECT_MP							= 5.f;
+	const float		SNIPING_X_FIRE_EFFECT_TIME					= 0.01f;	// June 32b266a0
+	const float		DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_1		= 0.03f;	// June 32b26a40 / 32b287b0: any of the three times plays the effect
+	const float		DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_2		= 0.1f;
+	const float		DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_3		= 0.16f;
+	const float		DASH_JUMP_SNIPING_LOOP_EFFECT_MP			= 2.f;
+	const float		F_COMBO_ZZZXX_END_EFFECT_TIME				= 0.01f;	// June 32b28020
+	const float		F_COMBO_ZZZXZ_LOOP_EFFECT_TIME_1			= 0.0864f;	// June 32b282c0: any of the three times plays the effect
+	const float		F_COMBO_ZZZXZ_LOOP_EFFECT_TIME_2			= 0.216f;
+	const float		F_COMBO_ZZZXZ_LOOP_EFFECT_TIME_3			= 0.367f;
+	const float		F_COMBO_ZZZXZ_LOOP_EFFECT_MP				= 1.f;
+	const double	COMBO_EFFECT_ROTATE_RANGE					= 4.0;		// June 32b26030 / 32b26a40 / 32b282c0 / 32b287b0: z rotation = random * 4 - 2 degrees
+	const double	COMBO_EFFECT_ROTATE_BASE					= 2.0;
+	const float		SNIPING_READY_MIN_MP						= 10.f;		// June 32b3b530 / 32b3bc70: less MP than this and the X key shows the lack of MP
+}
+using namespace _CONST_LUCIEL_CH1G2_;
+
+// char-luciel CH1g2: the projectile effect set of the Royal Guard and Chiliarch combos, no MP test ( the callers test it ); PlayComboProjectileEffectSet runs it after its own test
+CX2EffectSet::Handle CX2GULuciel::PlayRatedProjectileEffectSet( const WCHAR* pwszEffectSetName_, const bool bAddMaxCountModifier_ )
+{
+	// June passes m_fSoulCollectorDamageRate as the life time too ( JUNE_BUGS 699 )
+	const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName_, this, NULL, IsHyperState(),
+		GetPowerRate() * m_fPowerOfOriaxDamageRate, m_fSoulCollectorDamageRate, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+
+	g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME, m_fSoulCollectorDamageRate, false );
+
+	if( true == bAddMaxCountModifier_ )
+	{
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+	}
+
+	return hEffectSet;
+}
+
+// char-luciel CH1g2: the effect set's local z rotation ( June writes the instance's +0xe4 .. +0xec with 0, 0, degree )
+void CX2GULuciel::SetEffectSetLocalRotateZ( const CX2EffectSet::Handle hEffectSet_, const float fRotateDegree_ )
+{
+	CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet_ );
+	if( NULL != pEffectSetInstance )
+	{
+		pEffectSetInstance->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, fRotateDegree_ ) );
+	}
+}
+
+// char-luciel CH1g2: a held direction in the air sets the facing and the walk speed ( the block of LSI_LU_JUMP_DOWN_NO_ATTACK_FrameMoveFuture; June inlines it in each dash jump combo )
+void CX2GULuciel::SetAirWalkSpeedByInput()
+{
+	bool bSetWalkSpeed = true;
+
+	if( false == m_InputData.pureRight || false == m_InputData.pureLeft )
+	{
+		if( true == m_InputData.pureRight )
+		{
+			m_FrameDataFuture.syncData.bIsRight = true;
+		}
+		else if( true == m_InputData.pureLeft )
+		{
+			m_FrameDataFuture.syncData.bIsRight = false;
+		}
+		else
+		{
+			bSetWalkSpeed = false;
+		}
+	}
+	else if( true == m_InputData.oneRight )
+	{
+		m_FrameDataFuture.syncData.bIsRight = true;
+	}
+	else if( true == m_InputData.oneLeft )
+	{
+		m_FrameDataFuture.syncData.bIsRight = false;
+	}
+
+	if( true == bSetWalkSpeed )
+	{
+		m_PhysicParam.nowSpeed.x = GetWalkSpeed();
+	}
+}
+
+// char-luciel CH1g2: June 32af91e0 ( the animation end test is an if of its own; the cancels run walk, dash, skill )
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZX_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LCG_F_COMBO_ZZZX_WAIT );
+	}
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32af9400 ( the cancels run skill, walk, back walk, dash )
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_END_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32af98c0 ( the cancels run skill, walk, back walk, dash )
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZXZ_END_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32af9690 ( the cancels run walk, dash, skill )
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZXZ_LOOP_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( ( m_iSnipingComboCount < SNIPING_Z_FINISH_COUNT ) ? LSI_LCG_F_COMBO_ZZZX_WAIT : LSI_LCG_F_COMBO_ZZZXZ_END );
+	}
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32af9b90
+void CX2GULuciel::LSI_LCG_F_DASH_COMBO_Z_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LCG_F_DASH_COMBO_ZX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32af9e80 ( event 1: Down + X on a Noblesse unit )
+void CX2GULuciel::LSI_LCG_F_DASH_COMBO_ZX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		( true == m_InputData.pureDown && true == m_InputData.oneX && NULL != GetUnit() && CX2Unit::UC_LUCIEL_NOBLESSE == GetUnit()->GetClass() ), LSI_LCN_F_DASH_COMBO_ZX_DOWN_X )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		( true == m_InputData.oneX && true == IsInJobLine( 2 ) ), LSI_LCG_F_DASH_COMBO_ZXX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32afa2d0 ( event 1: Down + X on a Noblesse unit )
+void CX2GULuciel::LSI_LCG_F_DASH_COMBO_XX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		( true == m_InputData.pureDown && true == m_InputData.oneX && NULL != GetUnit() && CX2Unit::UC_LUCIEL_NOBLESSE == GetUnit()->GetClass() ), LSI_LCN_F_DASH_COMBO_XX_DOWN_X )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		( true == m_InputData.oneX && true == IsInJobLine( 2 ) ), LSI_LCG_F_DASH_COMBO_XXX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32afa720
+void CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_ZXX_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32afa750
+void CX2GULuciel::LSI_LCG_M_DASH_JUMP_COMBO_ZXX_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32afa780
+void CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY_EventProcess()
+{
+	if( true == m_InputData.oneZ && m_iSnipingComboMaxCount < SNIPING_DASH_JUMP_MAX_COUNT )
+	{
+		++m_iSnipingComboMaxCount;
+	}
+
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32afa7f0 ( the cancel chain has the awakening branch only, no special attack )
+void CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_EventProcess()
+{
+	if( true == m_InputData.oneZ && m_iSnipingComboMaxCount < SNIPING_DASH_JUMP_MAX_COUNT )
+	{
+		++m_iSnipingComboMaxCount;
+	}
+
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( ( m_iSnipingComboMaxCount > m_iSnipingComboCount ) ? LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP : LSI_LCG_F_DASH_JUMP_COMBO_XZZ_END );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_XX_START )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32afaac0
+void CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_END_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_XX_START )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b105d0 ( events 2 and 3: Up and Down go to the two follow-up dashes )
+void CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_LU_JUMP_COMBO_Z )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneUp, LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_UP )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneDown, LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_DOWN )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b10980
+void CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_UP_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_LU_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b10bd0
+void CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_DOWN_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_LU_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b10e20 ( events 2 and 3: Up and Down go to the two follow-up dashes )
+void CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_XX_START )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_LU_JUMP_COMBO_Z )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneUp, LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_UP )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneDown, LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_DOWN )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b111d0
+void CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_UP_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_XX_START )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_LU_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b11420
+void CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_DOWN_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_LU_DASH_JUMP_COMBO_XX_START )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_LU_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b11d80 ( events 2 and 3: Up and Down go to the two follow-up dashes )
+void CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_CIEL_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_CIEL_JUMP_COMBO_Z )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneUp, LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_UP )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneDown, LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_DOWN )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b12130
+void CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_UP_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_CIEL_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_CIEL_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b12380
+void CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_DOWN_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_CIEL_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_CIEL_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b125d0 ( events 2 and 3: Up and Down go to the two follow-up dashes )
+void CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_CIEL_DASH_JUMP_COMBO_XX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_CIEL_JUMP_COMBO_Z )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneUp, LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_UP )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneDown, LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_DOWN )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b12980
+void CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_UP_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_CIEL_DASH_JUMP_COMBO_XX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_CIEL_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b12bd0
+void CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_DOWN_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX, LSI_CIEL_DASH_JUMP_COMBO_XX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ, LSI_CIEL_JUMP_COMBO_Z )
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		SetAirWalkSpeedByInput();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b1cba0 ( the charge grows the state power rate )
+void CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_FIRE_StateStart()
+{
+	CommonStateStart();
+	m_fNowStatePowerRate *= static_cast<float>( m_fChargeTime + static_cast<double>( SNIPING_X_FIRE_POWER_RATE_BASE ) );
+}
+
+// char-luciel CH1g2: June 32b1cc60 ( also the start of three other F END states )
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_END_StateStart()
+{
+	CommonStateStart();
+	m_fNowStatePowerRate *= static_cast<float>( m_fChargeTime + static_cast<double>( SNIPING_X_FIRE_POWER_RATE_BASE ) );
+}
+
+// char-luciel CH1g2: June 32b22240
+void CX2GULuciel::LSI_LLC_COMBO_ZZZX_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( LLC_COMBO_ZZZX_EFFECT_TIME ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() && true == IsEnoughMPForAttack( LLC_COMBO_ZZZX_EFFECT_MP, vBonePos ) )
+		{
+			PlaySound( L"LuCiel_SwordFall.ogg", true, false );
+
+			const WCHAR* pwszEffectSetName = L"EffectSet_LLC_F_Combo_ZZZX_HEALING";
+			if( LLC_COMBO_ZZZX_EXPLOSIVE_RANDOM_LIMIT < GetRandomFloat( 0 ) )
+			{
+				pwszEffectSetName = L"EffectSet_LLC_F_Combo_ZZZX_EXPLOSIVE";
+			}
+			else if( LLC_COMBO_ZZZX_ENHANCE_RANDOM_LIMIT < GetRandomFloat( 0 ) )
+			{
+				pwszEffectSetName = L"EffectSet_LLC_F_Combo_ZZZX_ENHANCE";
+			}
+
+			g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName, this, NULL, IsHyperState(), GetPowerRate() );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b27b60 ( the M state plays the F effect sets: June has no M ones )
+void CX2GULuciel::LSI_LLC_M_COMBO_ZZZX_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( LLC_M_COMBO_ZZZX_EFFECT_TIME ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() && true == IsEnoughMPForAttack( LLC_COMBO_ZZZX_EFFECT_MP, vBonePos ) )
+		{
+			PlaySound( L"LuCiel_SwordFall.ogg", true, false );
+
+			const WCHAR* pwszEffectSetName = L"EffectSet_LLC_F_Combo_ZZZX_HEALING";
+			if( LLC_COMBO_ZZZX_EXPLOSIVE_RANDOM_LIMIT < GetRandomFloat( 0 ) )
+			{
+				pwszEffectSetName = L"EffectSet_LLC_F_Combo_ZZZX_EXPLOSIVE";
+			}
+			else if( LLC_COMBO_ZZZX_ENHANCE_RANDOM_LIMIT < GetRandomFloat( 0 ) )
+			{
+				pwszEffectSetName = L"EffectSet_LLC_F_Combo_ZZZX_ENHANCE";
+			}
+
+			g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName, this, NULL, IsHyperState(), GetPowerRate() );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b26030
+void CX2GULuciel::LSI_LCG_COMBO_SNIPING_Z_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( SNIPING_Z_EFFECT_TIME ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() && true == IsEnoughMPForAttack( SNIPING_Z_EFFECT_MP, vBonePos ) )
+		{
+			const float fRotateDegree = static_cast<float>( GetRandomFloat( 0 ) * COMBO_EFFECT_ROTATE_RANGE - COMBO_EFFECT_ROTATE_BASE );
+
+			const CX2EffectSet::Handle hLoopEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_M_ComboZZZXZ_Loop", this );
+			SetEffectSetLocalRotateZ( hLoopEffectSet, fRotateDegree );
+			m_vecEffectSetToDeleteOnStateEnd.push_back( hLoopEffectSet );
+
+			const CX2EffectSet::Handle hProjectileEffectSet = PlayRatedProjectileEffectSet( L"EffectSet_LCG_M_Sniping_Z_Projectile", true );
+			SetEffectSetLocalRotateZ( hProjectileEffectSet, fRotateDegree );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b266a0 ( June reads the minor unit's animation here: the Sniping states are Ciel's )
+void CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_FIRE_FrameMove()
+{
+	if( true == m_pMinorUnitXSkinAnim->EventTimerOneshot( SNIPING_X_FIRE_EFFECT_TIME ) )
+	{
+		const CX2EffectSet::Handle hFinishEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_M_ComboZZZXX_Finish", this );
+		m_vecEffectSetToDeleteOnStateEnd.push_back( hFinishEffectSet );
+
+		PlayRatedProjectileEffectSet( L"EffectSet_LCG_M_Sniping_X_Projectile", true );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b26a40 ( not enough MP ends the loop: the count goes to the max count + 1 )
+void CX2GULuciel::LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_1 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_2 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_3 ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() && true == IsEnoughMPForAttack( DASH_JUMP_SNIPING_LOOP_EFFECT_MP, vBonePos ) )
+		{
+			const float fRotateDegree = static_cast<float>( GetRandomFloat( 0 ) * COMBO_EFFECT_ROTATE_RANGE - COMBO_EFFECT_ROTATE_BASE );
+
+			const CX2EffectSet::Handle hLoopEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_M_DashJumpComboXZ_Loop", this );
+			SetEffectSetLocalRotateZ( hLoopEffectSet, fRotateDegree );
+			m_vecEffectSetToDeleteOnStateEnd.push_back( hLoopEffectSet );
+
+			const CX2EffectSet::Handle hProjectileEffectSet = PlayRatedProjectileEffectSet( L"EffectSet_LCG_M_Dash_Jump_Combo_XZ_Projectile", true );
+			SetEffectSetLocalRotateZ( hProjectileEffectSet, fRotateDegree );
+		}
+		else
+		{
+			m_iSnipingComboCount = m_iSnipingComboMaxCount + 1;
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b28020
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_END_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( F_COMBO_ZZZXX_END_EFFECT_TIME ) )
+	{
+		PlayRatedProjectileEffectSet( L"EffectSet_LCG_F_ComboZZZXX_Loop", true );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b282c0
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZXZ_LOOP_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( F_COMBO_ZZZXZ_LOOP_EFFECT_TIME_1 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( F_COMBO_ZZZXZ_LOOP_EFFECT_TIME_2 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( F_COMBO_ZZZXZ_LOOP_EFFECT_TIME_3 ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() && true == IsEnoughMPForAttack( F_COMBO_ZZZXZ_LOOP_EFFECT_MP, vBonePos ) )
+		{
+			const float fRotateDegree = static_cast<float>( GetRandomFloat( 0 ) * COMBO_EFFECT_ROTATE_RANGE - COMBO_EFFECT_ROTATE_BASE );
+
+			const CX2EffectSet::Handle hEffectSet = PlayRatedProjectileEffectSet( L"EffectSet_LCG_F_ComboZZZXZ_Loop", true );
+			SetEffectSetLocalRotateZ( hEffectSet, fRotateDegree );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b287b0 ( not enough MP ends the loop: the count goes to the max count + 1 )
+void CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_1 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_2 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( DASH_JUMP_SNIPING_LOOP_EFFECT_TIME_3 ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() && true == IsEnoughMPForAttack( DASH_JUMP_SNIPING_LOOP_EFFECT_MP, vBonePos ) )
+		{
+			const float fRotateDegree = static_cast<float>( GetRandomFloat( 0 ) * COMBO_EFFECT_ROTATE_RANGE - COMBO_EFFECT_ROTATE_BASE );
+
+			const CX2EffectSet::Handle hEffectSet = PlayRatedProjectileEffectSet( L"EffectSet_LCG_F_DashJumpComboXZ_Loop", true );
+			SetEffectSetLocalRotateZ( hEffectSet, fRotateDegree );
+		}
+		else
+		{
+			m_iSnipingComboCount = m_iSnipingComboMaxCount + 1;
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1g2: June 32b3a290 ( both bodies leave their transformed form, then the shared win start )
+void CX2GULuciel::LSI_WIN_StateStart()
+{
+	EndTransformedForm( 0, false );
+	EndTransformedForm( 1, false );
+	WinStateStart();
+}
+
+// char-luciel CH1g2: June 32b3a2b0
+void CX2GULuciel::LSI_LOSE_StateStart()
+{
+	EndTransformedForm( 0, false );
+	EndTransformedForm( 1, false );
+	LoseStateStart();
+}
+
+// char-luciel CH1g2: June 32b3b530 ( event 3 reads event 2's times, JUNE_BUGS 702; event 1 shows the lack of MP first, then goes on to its own state )
+void CX2GULuciel::LSI_LCG_COMBO_SNIPING_READY_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ, LSI_LCG_COMBO_SNIPING_Z )
+	else if( true == m_FrameDataFuture.stateParam.bEventFlagList[1]
+		&& ( (float)m_fEventTime[1].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		&& GetNowMp() < SNIPING_READY_MIN_MP )
+	{
+		g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_2549 ), D3DXCOLOR(1,1,1,1), D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+		m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		( true == m_InputData.pureUp && true == m_InputData.oneX ), LSI_LCN_SNIPING_COMBO_UP_X )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		( true == m_InputData.pureDown && true == m_InputData.oneX ), LSI_LCN_SNIPING_COMBO_DOWN_X )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.pureX, LSI_LCG_COMBO_SNIPING_X_CHARGE )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1g2: June 32b3bc70 ( event 3 reads event 2's times, JUNE_BUGS 702; event 1 shows the lack of MP first, then goes on to its own state )
+void CX2GULuciel::LSI_LCG_F_COMBO_ZZZX_WAIT_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ, LSI_LCG_F_COMBO_ZZZXZ_LOOP )
+	else if( true == m_FrameDataFuture.stateParam.bEventFlagList[1]
+		&& ( (float)m_fEventTime[1].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		&& GetNowMp() < SNIPING_READY_MIN_MP )
+	{
+		g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_2549 ), D3DXCOLOR(1,1,1,1), D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+		m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		( true == m_InputData.pureUp && true == m_InputData.oneX ), LSI_LCN_F_COMBO_ZZZX_UP_X )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		( true == m_InputData.pureDown && true == m_InputData.oneX ), LSI_LCN_F_COMBO_ZZZX_DOWN_X )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.pureX, LSI_LCG_F_COMBO_ZZZXX_LOOP )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
 
 	CommonEventProcess();
 }

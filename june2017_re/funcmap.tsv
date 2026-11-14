@@ -11791,3 +11791,41 @@ du1d_body_reads.tsv (DU1d)	every June user-band function that reads a body acces
 32af8910 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_ZXXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 0 time passed -> tail call of Lu DASH_JUMP_COMBO_X ( 32aef160 ); cancels with back walk
 32af8bc0 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_XX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 0 Z + job line 1 -> LSI_LLC_M_DASH_COMBO_XXX
 32af8f30 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_XXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); same as 32af8910
+32af91e0 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZX_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); anim end -> F ZZZX_WAIT, off the line -> JUMP_DOWN ( y - 45 ); cancels walk, dash, skill
+32af9400 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_END_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); = LU ZZZZX shape ( 32aed0f0 ) with the back walk cancel; cancels skill, walk, back walk, dash
+32af9690 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXZ_LOOP_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); = 32af6330 shape; Z count < 5 -> F ZZZX_WAIT else F ZZZXZ_END
+32af98c0 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXZ_END_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32af9400
+32af9b90 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_COMBO_Z_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); = LU XXXZ_END shape ( 32aee1b0 ); event 0 X -> F DASH_COMBO_ZX
+32af9e80 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_COMBO_ZX_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); = 32af8230 shape; event 1 Down + X on a Noblesse unit -> LCN F dash ZX DOWN_X, event 0 X + job line 2 -> F dash ZXX
+32afa2d0 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_COMBO_XX_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32af9e80 with the XX / XXX states
+32afa720 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_ZXX_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); landing only
+32afa750 (CH1g2)	CX2GULuciel::LSI_LCG_M_DASH_JUMP_COMBO_ZXX_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32afa720
+32afa780 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); = 32af69b0 shape; Z count to 8, anim end -> XZZ_LOOP
+32afa7f0 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); = 32af6a20 shape; anim end -> LOOP while max > count else END; event 0 X -> LU dash jump XX_START; awakening cancel only
+32afaac0 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_END_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); = CIEL dash jump XX ( 32af5690 ) shape; event 0 X -> LU dash jump XX_START
+32b105d0 (CH1g2)	CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); four events ( X, Z, Up, Down ), air special attack, anim end sets the air walk speed
+32b10980 (CH1g2)	CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_UP_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); two events ( X, Z ), air special attack, air walk speed
+32b10bd0 (CH1g2)	CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_DOWN_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b10980
+32b10e20 (CH1g2)	CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b105d0, X -> LU dash jump XX_START
+32b111d0 (CH1g2)	CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_UP_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b10980, X -> XX_START
+32b11420 (CH1g2)	CX2GULuciel::LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_DOWN_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b10980, X -> XX_START
+32b11d80 (CH1g2)	CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b105d0 with the Ciel states ( dash jump ZX, jump combo Z )
+32b12130 (CH1g2)	CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_UP_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b10980 with the Ciel states
+32b12380 (CH1g2)	CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_DOWN_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b10980 with the Ciel states
+32b125d0 (CH1g2)	CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b105d0 with Ciel dash jump XX
+32b12980 (CH1g2)	CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_UP_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b10980 with Ciel dash jump XX
+32b12bd0 (CH1g2)	CX2GULuciel::LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_DOWN_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b10980 with Ciel dash jump XX
+32b1cba0 (CH1g2)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_FIRE_StateStart	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); CommonStateStart, then the state power rate *= charge + 1.0 ( +0x7cc8 = m_fNowStatePowerRate )
+32b1cc60 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_END_StateStart	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b1cba0; Start of four F END states
+32b22240 (CH1g2)	CX2GULuciel::LSI_LLC_COMBO_ZZZX_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); 0.4 s one-shot: 3 MP, LuCiel_SwordFall.ogg, random > 0.5 explosive / > 0.2 enhance / else healing effect set
+32b26030 (CH1g2)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_Z_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); 0.04 s one-shot: 5 MP, random z rotation ( random * 4 - 2 ) on the Loop set ( deleted at state end ) and the rated Projectile set
+32b266a0 (CH1g2)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_FIRE_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); 0.01 s one-shot on the minor unit anim: Finish set ( deleted at state end ) and the rated Projectile set; no MP test
+32b26a40 (CH1g2)	CX2GULuciel::LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); 0.03 / 0.1 / 0.16 s one-shots: 2 MP, as 32b26030; not enough MP -> count = max count + 1
+32b27b60 (CH1g2)	CX2GULuciel::LSI_LLC_M_COMBO_ZZZX_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b22240 at 0.28 s
+32b28020 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_END_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); 0.01 s one-shot: the rated Loop set, no MP test
+32b282c0 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXZ_LOOP_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); 0.0864 / 0.216 / 0.367 s one-shots: 1 MP, rated Loop set with the random z rotation
+32b287b0 (CH1g2)	CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_FrameMove	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); 0.03 / 0.1 / 0.16 s one-shots: 2 MP, rated Loop set with the random z rotation; not enough MP -> count = max count + 1
+32b3a290 (CH1g2)	CX2GULuciel::LSI_WIN_StateStart	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); EndTransformedForm( 0 ), ( 1 ), then WinStateStart ( 320004b0 )
+32b3a2b0 (CH1g2)	CX2GULuciel::LSI_LOSE_StateStart	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); EndTransformedForm( 0 ), ( 1 ), then LoseStateStart ( 320007e0 )
+32b3b530 (CH1g2)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_READY_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); events: Z -> Sniping Z, X charge ( X held ), Up + X, Down + X ( reads event 2 times ); MP < 10 shows STR_ID_2549; cancels walk, dash, skill
+32b3bc70 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZX_WAIT_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b3b530 with the F states
