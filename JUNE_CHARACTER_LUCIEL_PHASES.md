@@ -1928,7 +1928,8 @@ Opus 5.5 high ( Ghidra `disassemble_function` on `322f1a90`, `32295360`, `31e4f9
   `junediverge RESULT: PASS`, `junediverge --check-all RESULT: PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`. `JUNE_DAMAGEDATA` /
   `JUNE_DAMAGEEFFECT_RUNTIME` SKIPPED: targets of the guard ( a run without the skip lists their `#if` guard lines in `Always.h` as ERROR and the
   scan's files as OTHER, nothing of theirs changed ). Fix, worktree: `flagcheck JUNE_CHAR_ENEMY_SCAN PASS` ( 1 PASS; the 1 deleted line is the
-  replaced HP test inside this flag's own block ), `junediverge PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`.
+  replaced HP test inside this flag's own block ), `junediverge PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`. Commit `b199de72`, `--range
+  b199de72^..b199de72`: the same verdicts, `FINISH RESULT: PASS`.
 - **Compile:** `/Zs` probe of `X2GameUnit.cpp` ( census `cl_cmd`, no PCH ): 0 errors. Full build skipped: no play-test.
 
 ### CH1b - Done (2026-11-14)
