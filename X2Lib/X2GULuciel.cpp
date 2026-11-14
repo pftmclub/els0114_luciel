@@ -7741,5 +7741,634 @@ void CX2GULuciel::LSI_RIDING_HYPER_MODE_FrameMove()
 	CommonHyperModeFrameMove( 0.f, RIDING_HYPER_MODE_SHOCK_TIME, true );
 }
 
+
+// char-luciel CH1k: overrides band 1 part 1 ( June 32ae4080 - 32b1e8e0 )
+namespace _CONST_LUCIEL_CH1K_
+{
+	const float		BOUNDING_KEY_DIALOG_MOVE_TIME			= 0.07f;	// June 32b1e8e0 @32b1ea11 ( 3344b78c )
+	const int		TRANSFORMED_AFTER_IMAGE_NUM				= 10;		// June 32b162e0 @32b1662b
+	const float		TRANSFORMED_AFTER_IMAGE_COLOR_RATE		= 0.8f;		// June 32b162e0 @32b16654 ( 3344a514 )
+	const int		MODEL_INDEX_COUNT						= 8;		// June 32b151b0 @32b151e7, CX2Item::MAX_MODEL_COUNT_A_ITEM
+}
+using namespace _CONST_LUCIEL_CH1K_;
+
+// char-luciel CH1k: June 32b1e8e0 ( vslot 0x40 ); the Combination Point follows into the synced int, both transformed skins load, the bounding key dialog opens hidden
+/*virtual*/ void CX2GULuciel::Init( bool bUseTeamPos_, int iStartPosIndex_ )
+{
+	CX2GUUser::Init( bUseTeamPos_, iStartPosIndex_ );
+
+	SetHyperModeCountByBuff( 0 );	// June 32b4dd50
+
+	if ( true == IsMyUnit() )
+	{
+		const CX2LucielGageData* pLucielGageData = static_cast<const CX2LucielGageData*>( GetGageData() );
+		const int iNowCombinationPoint = ( NULL != pLucielGageData ) ? pLucielGageData->GetNowCombinationPoint() : 0;
+		if ( m_FrameDataFuture.syncData.iClassSyncInt != iNowCombinationPoint )
+			m_FrameDataFuture.syncData.iClassSyncInt = iNowCombinationPoint;
+	}
+
+	LoadTransformedSkinAnim( 0 );
+	LoadTransformedSkinAnim( 1 );
+
+	if ( true == IsMyUnit() )
+	{
+		m_pDlgBoundingKey = new CKTDGUIDialog( g_pMain->GetNowState(), L"DLG_LUCIEL_BOUNDING_KEY.lua", BOUNDING_KEY_DIALOG_MOVE_TIME, 0 );
+		if ( m_pDlgBoundingKey != NULL )
+		{
+			g_pKTDXApp->GetDGManager()->GetDialogManager()->AddDlg( m_pDlgBoundingKey );
+			m_pDlgBoundingKey->SetShow( false );
+		}
+	}
+}
+
+// char-luciel CH1k: June 32b0f080 ( vslot 0x3c ); the resting form's MP regeneration, and the Combination Point / gauges at the start of PvP and training
+/*virtual*/ void CX2GULuciel::InitComponent()
+{
+	CX2GUUser::InitComponent();
+
+	if ( true == m_LuaManager.BeginTable( "INIT_COMPONENT" ) )
+	{
+		LUA_GET_VALUE( m_LuaManager, "DEFAULT_UNSELECTED_UNIT_MP_CHARGE_VALUE_PER_SECOND_AT_PVP", m_afFormMpRegenerationRate[0], 1.f );
+		LUA_GET_VALUE( m_LuaManager, "DEFAULT_UNSELECTED_UNIT_MP_CHARGE_VALUE_PER_SECOND", m_afFormMpRegenerationRate[1], 1.f );
+
+		// June also takes the PvP value in its state 0x17 ( XS_PVE_GAME ), which March lacks
+		const float fRestFormMpPerSecond = ( CX2Main::XS_PVP_GAME == g_pMain->GetNowStateID() ) ? m_afFormMpRegenerationRate[0] : m_afFormMpRegenerationRate[1];
+		if ( NULL != m_pGageData )
+			static_cast<CX2LucielGageData*>( m_pGageData )->SetRestFormMpPerSecond( fRestFormMpPerSecond );
+
+		m_LuaManager.EndTable();
+	}
+
+	if ( true == IsMyUnit() && NULL != m_pGageData )
+	{
+		const int iNowStateID = g_pMain->GetNowStateID();
+		// June's XS_PVE_GAME ( 0x17 ) branch ( the main gauge full, the other form's empty ) has no March state
+		if ( CX2Main::XS_PVP_GAME == iNowStateID || CX2Main::XS_TRAINING_GAME == iNowStateID )
+		{
+			CX2LucielGageData* pLucielGageData = static_cast<CX2LucielGageData*>( m_pGageData );
+			pLucielGageData->SetNowCombinationPoint( 0 );
+			pLucielGageData->SetCombinationPointChanged( true );
+
+			m_pGageData->SetNowMp( 0.f, false, 0 );
+			m_pGageData->SetNowMp( 0.f, false, 1 );
+		}
+	}
+}
+
+// char-luciel CH1k: June 32ae4f30 ( vslot 0x48 )
+/*virtual*/ void CX2GULuciel::InitEffect()
+{
+	CX2GUUser::InitEffect();
+
+	CreateMajorParticleArray();
+	CreateMinorParticleArray();
+}
+
+// char-luciel CH1k: June 32ae4080 ( vslot 0x60 ); June's base DamageReact no longer changes the state, the class does
+/*virtual*/ void CX2GULuciel::DamageReact( CX2DamageManager::DamageData* pDamageData_ )
+{
+	CX2GUUser::DamageReact( pDamageData_ );
+	CX2GUUser::DamageReactStateChange( pDamageData_, -1, -1 );
+}
+
+// char-luciel CH1k: June 32aea610 ( vslot 0x90 )
+/*virtual*/ void CX2GULuciel::Win()
+{
+	CX2GUUser::Win();
+
+	if ( true == GetRidingOn() && NULL != m_ptrRidingPet )
+		StateChange( LSI_RIDING_WAIT_HABIT );
+	else
+		StateChange( LSI_WIN );
+}
+
+// char-luciel CH1k: June 32b0eff0 ( vslot 0x94 )
+/*virtual*/ void CX2GULuciel::Lose()
+{
+	CX2GUUser::Lose();
+
+	if ( true == IsMyUnit() && 0.f < GetNowHp() )
+	{
+		if ( true == GetRidingOn() && NULL != m_ptrRidingPet )
+			StateChange( LSI_RIDING_WAIT );
+		else
+			StateChange( LSI_LOSE );
+	}
+}
+
+// char-luciel CH1k: June 32aea650 ( vslot 0x98 )
+/*virtual*/ void CX2GULuciel::Draw()
+{
+	CX2GUUser::Draw();
+
+	if ( true == GetRidingOn() && NULL != m_ptrRidingPet )
+		StateChange( LSI_RIDING_WAIT_HABIT );
+	else
+		StateChange( LSI_WIN );
+}
+
+// char-luciel CH1k: June 32aeb0c0 ( vslot 0xd8 ); the MP functions answer for the gauge of the form in play ( 1 = Ciel )
+/*virtual*/ float CX2GULuciel::GetNowMp() const
+{
+	if ( NULL == GetGageData() )
+		return 0.f;
+
+	return GetGageData()->GetNowMp( true == IsMinorUnitActive() ? 1 : 0 );
+}
+
+// char-luciel CH1k: June 32aeb0f0 ( vslot 0xdc )
+/*virtual*/ float CX2GULuciel::GetMaxMp() const
+{
+	if ( NULL == GetGageData() )
+		return 0.f;
+
+	return GetGageData()->GetMaxMp( true == IsMinorUnitActive() ? 1 : 0 );
+}
+
+// char-luciel CH1k: June 32aeb120 ( vslot 0xe0 )
+/*virtual*/ void CX2GULuciel::SetMaxMp( const float fMaxMp_ )
+{
+	if ( NULL != GetGageData() )
+		GetGageData()->SetMaxMp( fMaxMp_, true == IsMinorUnitActive() ? 1 : 0 );
+}
+
+// char-luciel CH1k: June 32aeb280 ( vslot 0xe4 ); June reads the gauge pointer with no test here
+/*virtual*/ bool CX2GULuciel::FlushMp( const float fFlushMp_, const int iMpGageIndex_ )
+{
+	return GetGageData()->FlushMp( fFlushMp_, IsMyUnit(), iMpGageIndex_ );
+}
+
+// char-luciel CH1k: June 32aeb160 ( vslot 0xf0 ); a tracked change on the form in play
+/*virtual*/ void CX2GULuciel::UpNowMp( const float fChangeOfNowMp_ )
+{
+	if ( NULL != GetGageData() )
+		GetGageData()->UpNowMp( fChangeOfNowMp_, true, true == IsMinorUnitActive() ? 1 : 0 );
+}
+
+// char-luciel CH1k: June 32aeb240 ( vslot 0xf8 )
+/*virtual*/ void CX2GULuciel::SetNowMp( float fNowMp_, bool bTrackMp_ )
+{
+	if ( NULL != GetGageData() )
+		GetGageData()->SetNowMp( fNowMp_, bTrackMp_, true == IsMinorUnitActive() ? 1 : 0 );
+}
+
+// char-luciel CH1k: June 32ae50f0; the gauge's SetNowMp for a form index, with no unit-side form lookup
+void CX2GULuciel::SetGageNowMp( const float fNowMp_, const bool bTrackMp_, const int iMpGageIndex_ )
+{
+	if ( NULL != GetGageData() )
+		GetGageData()->SetNowMp( fNowMp_, bTrackMp_, iMpGageIndex_ );
+}
+
+// char-luciel CH1k: June 32b0e620; the MP of the form in play, or of the other form when bCurrentForm_ is false
+void CX2GULuciel::SetGageNowMpOfForm( const float fNowMp_, const bool bTrackMp_, const bool bCurrentForm_ )
+{
+	int iForm = ( true == IsMinorUnitActive() ? 1 : 0 );
+	if ( false == bCurrentForm_ )
+		iForm = ( 0 == iForm ? 1 : ( 1 == iForm ? 0 : iForm ) );
+
+	if ( NULL != GetGageData() )
+		GetGageData()->SetNowMp( fNowMp_, bTrackMp_, iForm );
+}
+
+// char-luciel CH1k: June 32aeb090; the Combination Point is flagged changed first, then stored
+void CX2GULuciel::SetNowCombinationPoint( const int iCombinationPoint_ )
+{
+	CX2LucielGageData* pLucielGageData = static_cast<CX2LucielGageData*>( GetGageData() );
+	if ( NULL == pLucielGageData )
+		return;
+
+	pLucielGageData->SetCombinationPointChanged( true );
+	pLucielGageData->SetNowCombinationPoint( iCombinationPoint_ );
+}
+
+// char-luciel CH1k: June 32ae5480 ( vslot 0x29c ); the crowd-control debuffs run for the reduced rate
+/*virtual*/ float CX2GULuciel::GetReduceDebuffDurationRate( BUFF_TEMPLET_ID eBuffTempletID_ )
+{
+	float fRate = 1.f;
+	if ( 0.0 < m_fReduceDebuffDurationRate )
+	{
+		switch ( eBuffTempletID_ )
+		{
+		case BTI_DEBUFF_STUN:	// June 32d40b80's list: 11 entries
+		case BTI_BUFF_TROCKTA_MAGICATTACKB_STUN:
+		case BTI_STONE_GOD_ANGER:
+		case BTI_DEBUFF_FATE_SPACE:
+		case BTI_DEBUFF_RAINCOAT_CAT_STEB1_ATTACK_A:
+		case BTI_DEBUFF_RAINCOAT_CAT_STEB2_ATTACK_A:
+		case BTI_DEBUFF_RAINCOAT_CAT_STEB3_ATTACK_A:
+		case BTI_DEBUFF_ANCIENT_FIRE:
+		case BTI_DEBUFF_POWER_STUN:
+		case BTI_DEBUFF_ERDA_RAUL:
+		case BTI_DEBUFF_SLEEP:
+		case BTI_DEBUFF_CONFUSION:	// 32d40ba0
+		case BTI_DEBUFF_PANIC:	// 32d40bc0: panic, stone god anger ( listed above )
+		case BTI_DEBUFF_PANDEMONIUM_FEAR:	// 32d40be0
+		case BTI_DEBUFF_SUPPRESSION:	// 32d40c00
+		case BTI_DEBUFF_AGING:	// 32d40c20
+		case BTI_DEBUFF_CURSE:	// 32d40c40: curse, curse of abyss
+		case BTI_DEBUFF_CURSE_OF_ABYSS:
+			fRate = m_fReduceDebuffDurationRate;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	return fRate;
+}
+
+// char-luciel CH1k: June 32aea530 ( vslot 0x2b8 ); Soul Collector's stacks multiply the Rain of Chaos hit and are spent
+/*virtual*/ void CX2GULuciel::SetDamageExceptionProcess( CX2DamageManager::DamageData* pDamageData_, float& fPowerRate_ )
+{
+	CX2GUUser::SetDamageExceptionProcess( pDamageData_, fPowerRate_ );
+
+	if ( true == pDamageData_->IsAttackTrigger( CX2DamageManager::DTT_RAIN_OF_CHAOS_GUN ) )
+	{
+		const float fSoulCollectorCount = static_cast<float>( GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR ) + 1 );
+		pDamageData_->damage.fPhysic *= fSoulCollectorCount;
+		pDamageData_->damage.fMagic *= fSoulCollectorCount;
+		EraseBuffTempletFromGameUnit( BTI_BUFF_SOUL_COLLECTOR );
+	}
+
+	CountDamageEffectHit( pDamageData_ );
+}
+
+// char-luciel CH1k: June 32b0e3f0 ( vslot 0x318 ); a kill while transformed shortens the debuffs and the transform skills' cool time
+/*virtual*/ void CX2GULuciel::DoProcessWhenKillEnemy( const CX2GameUnit* pDefender_ )
+{
+	UNREFERENCED_PARAMETER( pDefender_ );
+
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) && 0.f < m_fMadnessDestroyRate )
+	{
+		MultiplyAllDebuffTimeFinalizerDuration( m_fMadnessDestroyCoolTime );
+		ApplyTransformSkillCoolTime( m_fMadnessDestroyRate, false );
+	}
+}
+
+// char-luciel CH1k: June 32b0efc0 ( vslot 0x248 ); the effect set remembers the damage effect index of its caster
+/*virtual*/ void CX2GULuciel::StampEffectSetIndex( CX2EffectSet::EffectSetInstance* pEffectSetInstance_ )
+{
+	if ( NULL != pEffectSetInstance_ )
+		pEffectSetInstance_->m_iDamageEffectIndex = m_iDamageEffectIndex;
+}
+
+// char-luciel CH1k: June 32b0efe0 ( vslot 0x2e0 )
+/*virtual*/ int CX2GULuciel::GetDamageEffectIndex() const
+{
+	return m_iDamageEffectIndex;
+}
+
+// char-luciel CH1k: June 32b14cd0 ( vslot 0x324 ); the resource bonus is a share of the maximum Combination Point
+/*virtual*/ void CX2GULuciel::ChangeMaxCharacterAddResource( const float fRate_ )
+{
+	const CX2LucielGageData* pLucielGageData = static_cast<const CX2LucielGageData*>( GetGageData() );
+	if ( NULL == pLucielGageData )
+		return;
+
+	UpCombinationPoint( static_cast<int>( static_cast<double>( pLucielGageData->GetMaxCombinationPoint() ) * static_cast<double>( fRate_ ) ) );
+}
+
+// char-luciel CH1k: June 32b151b0 ( vslot 0x2b0 ); the first weapon with a model at the index for the body in play ( Ciel: the normal anim, Lu: CX2Eqip +0x5a4 ), else 0
+/*virtual*/ int CX2GULuciel::GetWeaponIndexHavingModel( const int iModelIndex_ ) const
+{
+	const bool bMinorUnitActive = IsMinorUnitActive();
+
+	int iWeaponIndex = 0;
+	for ( std::vector<Weapon*>::const_iterator vit = m_vecpWeapon.begin(); vit != m_vecpWeapon.end(); ++vit, ++iWeaponIndex )
+	{
+		Weapon* pWeapon = *vit;
+		if ( NULL == pWeapon || NULL == pWeapon->m_pUserWeaponEquip )	// stand-in: June tests only the weapon, `NULL == pWeapon && ...`, and dereferences the equip
+			continue;
+
+		if ( iModelIndex_ < 0 || MODEL_INDEX_COUNT <= iModelIndex_ )
+			continue;
+
+		if ( true == bMinorUnitActive )
+		{
+			if ( NULL != pWeapon->m_pUserWeaponEquip->GetNormalAnim( iModelIndex_ ) )
+				return iWeaponIndex;
+		}
+		else
+		{
+			if ( NULL != pWeapon->m_pUserWeaponEquip->GetHyperModel( iModelIndex_ ) )	// June +0x5a4 = the array after the normal model's
+				return iWeaponIndex;
+		}
+	}
+
+	return 0;
+}
+
+// char-luciel CH1k: June 32b16810; one hit of the damage's skill and damage effect is taken back, the entry goes at 0
+void CX2GULuciel::EraseDamageEffectIndexEntry( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( true == m_vecDamageEffectHitCount.empty() || NULL == pDamageData_ )
+		return;
+
+	if ( 0 > pDamageData_->m_iDamageEffectIndex || 0 >= pDamageData_->m_iAppliedSkillID )
+		return;
+
+	std::vector<SDamageEffectHitCount>::iterator vit = m_vecDamageEffectHitCount.begin();
+	for ( ; vit != m_vecDamageEffectHitCount.end(); ++vit )
+	{
+		if ( vit->m_iDamageEffectIndex == pDamageData_->m_iDamageEffectIndex && vit->m_iSkillID == pDamageData_->m_iAppliedSkillID )
+			break;
+	}
+
+	if ( vit == m_vecDamageEffectHitCount.end() )
+		return;
+
+	--vit->m_iHitCount;
+	if ( 0 >= vit->m_iHitCount )
+		m_vecDamageEffectHitCount.erase( vit );
+}
+
+// char-luciel CH1k: June 32b17660 ( vslot 0x2e4, base 3208ddc0 ); called on the attacker when a damage data is made
+/*virtual*/ void CX2GULuciel::DoProcessWhenDamageDataCreated( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL != pDamageData_ )
+		EraseDamageEffectIndexEntry( pDamageData_ );
+}
+
+// char-luciel CH1k: June 32b17680 ( vslot 0x2fc, base 3208ddc0 ); called on the attacker when a damage data is destroyed
+/*virtual*/ void CX2GULuciel::DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL != pDamageData_ )
+		EraseDamageEffectIndexEntry( pDamageData_ );
+}
+
+// char-luciel CH1k: June 32b16260; the unit is one of the Invasion of Dark Energy targets
+bool CX2GULuciel::IsInvasionOfDarkEnergyTarget( const CX2GameUnit* pGameUnit_ )
+{
+	if ( NULL == pGameUnit_ )
+		return false;
+
+	for ( std::vector<STimedGameUnitKey>::const_iterator vit = m_vecInvasionOfDarkEnergyTarget.begin(); vit != m_vecInvasionOfDarkEnergyTarget.end(); ++vit )
+	{
+		const CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( vit->m_GameUnitKey.m_uidGameUnit, vit->m_GameUnitKey.m_eGameUnitType );
+		if ( NULL != pTargetUnit && pTargetUnit->GetGameUnitType() == pGameUnit_->GetGameUnitType() && pTargetUnit->GetUnitUID() == pGameUnit_->GetUnitUID() )
+			return true;
+	}
+
+	return false;
+}
+
+// char-luciel CH1k: June 32b166e0; the unit leaves the Invasion of Dark Energy targets
+void CX2GULuciel::EraseInvasionOfDarkEnergyTarget( const CX2GameUnit* pGameUnit_ )
+{
+	if ( NULL == pGameUnit_ )
+		return;
+
+	for ( std::vector<STimedGameUnitKey>::iterator vit = m_vecInvasionOfDarkEnergyTarget.begin(); vit != m_vecInvasionOfDarkEnergyTarget.end(); ++vit )
+	{
+		if ( vit->m_GameUnitKey.m_eGameUnitType == pGameUnit_->GetGameUnitType() && vit->m_GameUnitKey.m_uidGameUnit == pGameUnit_->GetUnitUID() )
+		{
+			m_vecInvasionOfDarkEnergyTarget.erase( vit );
+			return;
+		}
+	}
+}
+
+// char-luciel CH1k: June 32b1e720 ( vslot 0x300 ); Soul Strike's extra damage, the Bounding force down, and the Invasion of Dark Energy mark on the defender
+/*virtual*/ void CX2GULuciel::AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ )
+		return;
+
+	if ( CX2SkillTree::RNSI_A_LCG_SOUL_STRIKE == pDamageData_->m_iAppliedSkillID )
+	{
+		const float fExtraDamage = pDamageData_->m_ExtraDamage.m_Damage;
+		const float fSoulStrikeExtraDamage = fExtraDamage * m_fSoulStrikeSpeedRate;
+		if ( fSoulStrikeExtraDamage != fExtraDamage )
+			pDamageData_->m_ExtraDamage.m_Damage = fSoulStrikeExtraDamage;
+	}
+
+	if ( CX2DamageManager::AT_COMMAND == pDamageData_->attackType )
+	{
+		const float fBoundingDamageRateEx = m_fBoundingDamageRateEx;
+		if ( 0.f <= fBoundingDamageRateEx )
+			pDamageData_->fForceDownValue *= fBoundingDamageRateEx;
+	}
+
+	if ( CX2DamageManager::AT_SPECIAL != pDamageData_->attackType && false == pDamageData_->m_bNoDamage && CX2DamageManager::RT_NO_DAMAGE != pDamageData_->reActType
+		&& 0.f < pDamageData_->damage.fMagic + pDamageData_->damage.fPhysic && null != pDamageData_->optrDefenderGameUnit && true == IsInvasionOfDarkEnergyActive() )
+	{
+		CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+		if ( true == IsInvasionOfDarkEnergyTarget( pDefenderUnit ) )
+		{
+			pDamageData_->m_fDecreaseForceDown += m_fInvasionOfDarkEnergyDuration;
+			pDamageData_->damage.fPhysic *= m_fInvasionOfDarkEnergyTime;
+			pDamageData_->damage.fMagic *= m_fInvasionOfDarkEnergyTime;
+			EraseInvasionOfDarkEnergyTarget( pDefenderUnit );
+		}
+	}
+}
+
+// char-luciel CH1k: June 32b162e0; the form's transformed skin ( Lu: Motion_Lu_LDB_Evil.x, Ciel: Motion_Ciel_LDN_Evil.x ) loads into its set
+void CX2GULuciel::LoadTransformedSkinAnim( const int iForm_ )
+{
+	STransformedSkin& transformedSkin = m_aTransformedSkin[0 != iForm_ ? 1 : 0];
+
+	if ( NULL != transformedSkin.m_pMotion )
+		ReleaseTransformedSkinAnim( iForm_ );
+
+	const WCHAR* wszMotionName = ( 0 == iForm_ ) ? L"Motion_Lu_LDB_Evil.x" : L"Motion_Ciel_LDN_Evil.x";
+
+	transformedSkin.m_pMotion = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( wszMotionName, L"Bip01" );
+
+	transformedSkin.m_pXSkinAnim.reset();
+	transformedSkin.m_pXSkinAnim = CKTDGXSkinAnim::CreateSkinAnimPtr();
+	if ( NULL != transformedSkin.m_pXSkinAnim.get() )
+	{
+		transformedSkin.m_pXSkinAnim->SetAnimXSkinMesh( transformedSkin.m_pMotion );
+		transformedSkin.m_pXSkinAnim->AddModelXSkinMesh( transformedSkin.m_pMotion, NULL, NULL, NULL, false, true );	// June adds __FILEW__ / __LINE__ for a log only
+		transformedSkin.m_pXSkinAnim->SetModelDetailPercent( g_pData->GetModelDetailPercent() );
+	}
+
+	transformedSkin.m_pMotionFuture = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( wszMotionName, L"Bip01" );
+
+	transformedSkin.m_pXSkinAnimFuture = CKTDGXSkinAnim::CreateSkinAnim();
+	if ( NULL != transformedSkin.m_pXSkinAnimFuture )
+	{
+		transformedSkin.m_pXSkinAnimFuture->SetAnimXSkinMesh( transformedSkin.m_pMotionFuture );
+		transformedSkin.m_pXSkinAnimFuture->AddModelXSkinMesh( transformedSkin.m_pMotionFuture, NULL, NULL, NULL, false, true );
+		transformedSkin.m_pXSkinAnimFuture->SetModelDetailPercent( g_pData->GetModelDetailPercent() );
+	}
+
+	CKTDGXSkinAfterImage* pAfterImage = NULL;
+	if ( NULL != transformedSkin.m_pXSkinAnim.get() )
+		pAfterImage = CKTDGXSkinAfterImage::CreateSkinAfterImage( transformedSkin.m_pXSkinAnim.get(), TRANSFORMED_AFTER_IMAGE_NUM, XL_EFFECT_0 );
+
+	transformedSkin.m_pAfterImage = pAfterImage;
+	if ( NULL != m_pAfterImage && NULL != pAfterImage )
+	{
+		pAfterImage->SetAfterImageColor( D3DXCOLOR( TRANSFORMED_AFTER_IMAGE_COLOR_RATE, TRANSFORMED_AFTER_IMAGE_COLOR_RATE, TRANSFORMED_AFTER_IMAGE_COLOR_RATE, 1.f ) );
+		pAfterImage->AddMesh( transformedSkin.m_pMotion );
+	}
+}
+
+// char-luciel CH1k: June 32aeb450; the state id of a common state for the body in play, and the transformed set while either body is transformed
+int CX2GULuciel::GetStateIDByForm( const int iStateID_ )
+{
+	const bool bMinorUnitActive = IsMinorUnitActive();
+
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+	{
+		switch ( iStateID_ )
+		{
+		case LSI_LU_DIE_FRONT:
+		case LSI_LU_DIE_BACK:
+		case LSI_WIN:
+		case LSI_LOSE:
+			return iStateID_;
+
+		case LSI_LU_WALK:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK;
+		case LSI_LU_JUMP_READY:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY;
+		case LSI_LU_JUMP_UP:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP;
+		case LSI_LU_JUMP_DOWN:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN;
+		case LSI_LU_JUMP_LANDING:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING;
+		case LSI_LU_DASH:
+		case LSI_CIEL_DASH:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH;
+		case LSI_LU_DASH_END:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_END;
+		case LSI_LU_DASH_JUMP:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP;
+		case LSI_LU_DASH_JUMP_LANDING:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING;
+		case LSI_LU_THROW_ITEM:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_THROW_ITEM : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_THROW_ITEM;
+		case LSI_LU_COMBO_Z:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z;
+		case LSI_LU_COMBO_X:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X;
+		case LSI_LU_JUMP_COMBO_Z:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z;
+		case LSI_LU_JUMP_COMBO_X:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X;
+
+		case LSI_LU_HYPER_MODE:
+			{
+				const bool bTranscended = ( NULL != GetUnit() && 0 != GetUnit()->GetUnitData().m_iUnitClassTran );	// June 32070d40
+				if ( false == bMinorUnitActive )
+					return ( true == bTranscended ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_HYPER_MODE_TR : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_HYPER_MODE;
+
+				return ( true == bTranscended ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE_TR : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE;
+			}
+
+		default:
+			return ( false == bMinorUnitActive ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT;
+		}
+	}
+
+	if ( false == bMinorUnitActive )
+		return iStateID_;
+
+	switch ( iStateID_ )
+	{
+	case LSI_LU_DIE_FRONT:
+		return LSI_CIEL_DIE_FRONT;
+	case LSI_LU_DIE_BACK:
+		return LSI_CIEL_DIE_BACK;
+	case LSI_LU_WAIT:
+		return LSI_CIEL_WAIT;
+	case LSI_LU_WALK:
+		return LSI_CIEL_WALK;
+	case LSI_LU_JUMP_READY:
+		return LSI_CIEL_JUMP_READY;
+	case LSI_LU_JUMP_UP:
+		return LSI_CIEL_JUMP_UP;
+	case LSI_LU_JUMP_DOWN:
+		return LSI_CIEL_JUMP_DOWN;
+	case LSI_LU_JUMP_LANDING:
+		return LSI_CIEL_JUMP_LANDING;
+	case LSI_LU_DASH:
+		return LSI_CIEL_DASH;
+	case LSI_LU_DASH_END:
+		return LSI_CIEL_DASH_END;
+	case LSI_LU_DASH_JUMP:
+		return LSI_CIEL_DASH_JUMP;
+	case LSI_LU_DASH_JUMP_LANDING:
+		return LSI_CIEL_DASH_JUMP_LANDING;
+	case LSI_LU_HYPER_MODE:
+		return LSI_CIEL_HYPER_MODE;
+	case LSI_LU_DAMAGE_GROGGY:
+		return LSI_CIEL_DAMAGE_GROGGY;
+	case LSI_LU_DAMAGE_SMALL_FRONT:
+		return LSI_CIEL_DAMAGE_SMALL_FRONT;
+	case LSI_LU_DAMAGE_SMALL_BACK:
+		return LSI_CIEL_DAMAGE_SMALL_BACK;
+	case LSI_LU_DAMAGE_BIG_FRONT:
+		return LSI_CIEL_DAMAGE_BIG_FRONT;
+	case LSI_LU_DAMAGE_BIG_BACK:
+		return LSI_CIEL_DAMAGE_BIG_BACK;
+	case LSI_LU_DAMAGE_DOWN_FRONT:
+		return LSI_CIEL_DAMAGE_DOWN_FRONT;
+	case LSI_LU_DAMAGE_DOWN_BACK:
+		return LSI_CIEL_DAMAGE_DOWN_BACK;
+	case LSI_LU_DAMAGE_STANDUP_FRONT:
+		return LSI_CIEL_DAMAGE_STANDUP_FRONT;
+	case LSI_LU_DAMAGE_STANDUP_BACK:
+		return LSI_CIEL_DAMAGE_STANDUP_BACK;
+	case LSI_LU_DAMAGE_AIR_SMALL:
+		return LSI_CIEL_DAMAGE_AIR_SMALL;
+	case LSI_LU_DAMAGE_AIR_DOWN:
+		return LSI_CIEL_DAMAGE_AIR_DOWN;
+	case LSI_LU_DAMAGE_AIR_DOWN_INVINCIBLE:
+		return LSI_CIEL_DAMAGE_AIR_DOWN_INVINCIBLE;
+	case LSI_LU_DAMAGE_AIR_DOWN_LANDING:
+		return LSI_CIEL_DAMAGE_AIR_DOWN_LANDING;
+	case LSI_LU_DAMAGE_AIR_FALL:
+		return LSI_CIEL_DAMAGE_AIR_FALL;
+	case LSI_LU_DAMAGE_AIR_UP:
+		return LSI_CIEL_DAMAGE_AIR_UP;
+	case LSI_LU_DAMAGE_AIR_FLY_FRONT:
+		return LSI_CIEL_DAMAGE_AIR_FLY_FRONT;
+	case LSI_LU_DAMAGE_AIR_FLY_BACK:
+		return LSI_CIEL_DAMAGE_AIR_FLY_BACK;
+	case LSI_LU_DAMAGE_REVENGE:
+		return LSI_CIEL_DAMAGE_REVENGE;
+	case LSI_LU_PEPPER_RUN_READY:
+		return LSI_CIEL_PEPPER_RUN_READY;
+	case LSI_LU_PEPPER_RUN:
+		return LSI_CIEL_PEPPER_RUN;
+	case LSI_LU_PEPPER_RUN_END:
+		return LSI_CIEL_PEPPER_RUN_END;
+	case LSI_LU_PEPPER_RUN_JUMP_UP:
+		return LSI_CIEL_PEPPER_RUN_JUMP_UP;
+	case LSI_LU_PEPPER_RUN_JUMP_DOWN:
+		return LSI_CIEL_PEPPER_RUN_JUMP_DOWN;
+	case LSI_LU_THROW_ITEM:
+		return LSI_CIEL_THROW_ITEM;
+	case LSI_LU_DAMAGE_BOUNDING_DOWN:
+		return LSI_CIEL_DAMAGE_BOUNDING_DOWN;
+	case LSI_LU_DAMAGE_BOUNDING_LANDCRASH:
+		return LSI_CIEL_DAMAGE_BOUNDING_LANDCRASH;
+	case LSI_LU_DAMAGE_BOUNDING_UP:
+		return LSI_CIEL_DAMAGE_BOUNDING_UP;
+	case LSI_LU_AMUSEMENT_ITEM_PHOENIX_RUN:
+		return LSI_CIEL_AMUSEMENT_ITEM_PHOENIX_RUN;
+	case 124:	// no state of that name in Luciel_Duo.lua
+		return 572;	// June 0x23c
+	case 125:
+		return 573;	// June 0x23d
+	case LSI_LU_AMUSEMENT_ITEM_PHOENIX_RUN_END:
+		return LSI_CIEL_AMUSEMENT_ITEM_PHOENIX_RUN_END;
+	case LSI_LU_DANCE_Z:
+		return LSI_CIEL_DANCE_Z;
+	case LSI_LU_DANCE_X:
+		return LSI_CIEL_DANCE_X;
+	case LSI_LU_DANCE_WAIT:
+		return LSI_CIEL_DANCE_WAIT;
+	default:
+		return iStateID_;
+	}
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}

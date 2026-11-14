@@ -13482,3 +13482,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER needs RAVEN_WEAPON_TAKER and JUNE_LINEMAP_LAND_MONSTER_ROAD, char-luciel CH1i2
 #endif SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel CH1k - CX2GameUnit's GetNowMp / GetMaxMp / SetMaxMp / FlushMp / UpNowMp / SetNowMp are virtual ( June unit vslots 0xd8 /
+//              0xdc / 0xe0 / 0xe4 / 0xf0 / 0xf8, bases 3208dc30 .. 3208dd20 ), so Lu/Ciel's overrides ( 32aeb0c0 .. 32aeb280 ) pick the gauge of the
+//              form in play for every base caller. Base bodies and signatures stay March's; FlushMp gains June's second argument ( the gauge index ).
+//              Inert until Lu/Ciel is live. Needs SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE ( the indexed gauge calls ) and SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY.
+#define SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
+#if defined( SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE ) && defined( SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY ) )
+#error SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL needs JUNE_CHAR_FORM_MP_GAGE and JUNE_DIVERGE_GAGE_TALLY, char-luciel CH1k
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
+//////////////////////////////////////////////////////////////////////////

@@ -996,6 +996,7 @@ public:
 	// char-luciel CH1a1: June vt 3349b2a4; slots 13 / 16 are the base bodies, 17 / 18 ( the play-status pair ) are CH1a2's
 	void operator=( const CX2LucielGageData& rhs_ );	// June 32a36f70
 	void SetMaxCombinationPoint( const int iMaxCombinationPoint_ ) { m_iMaxCombinationPoint = iMaxCombinationPoint_; }	// June 32a36ef0
+	void SetRestFormMpPerSecond( const float fRestFormMpPerSecond_ ) { m_fRestFormMpPerSecond = fRestFormMpPerSecond_; }	// char-luciel CH1k: June 32b0f080 @32b0f80e stores +0x12c
 
 	virtual float	GetNowMp( const int iMpGageIndex_ = 0 ) const;	// June 32a31a90
 	virtual void	SetNowMp( const float fNowMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// June 32a328d0

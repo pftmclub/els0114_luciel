@@ -67,6 +67,12 @@ class CX2DamageManager
 			DTT_EVE_HYPER_OPTICAL_RESEARCH_CHECK  = 39,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-luciel CH1k
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			// after DTT_END: DTT_END is relied on as the March count
+			DTT_RAIN_OF_CHAOS_GUN                 = 41,	// June's Enum.lua; Lu/Ciel's SetDamageExceptionProcess ( Soul Collector ) reads it
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-10-28 // June character Eve Phase CH4b (JUNE_CHARACTER_EVE_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 			DTT_ECB_KUGELBLITZ_SELF_DAMAGE        = 25,

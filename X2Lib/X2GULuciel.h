@@ -599,6 +599,31 @@ public:
 							const CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ );	// own virtual 0x884, June 32b3acf0
 	virtual void		PreloadAuraAccelResources();	// own virtual 0x888, June 32ae6130
 
+	// char-luciel CH1k: overrides band 1 part 1 ( June 32ae4080 - 32b1e8e0 ); bases in X2GUUser.h / X2GameUnit.h, the three marked ( + ) wait for CH1o's base declarations
+	virtual void		Init( bool bUseTeamPos_, int iStartPosIndex_ );	// June 32b1e8e0 ( vslot 0x40 )
+	virtual void		InitComponent();	// June 32b0f080 ( vslot 0x3c )
+	virtual void		InitEffect();	// June 32ae4f30 ( vslot 0x48 )
+	virtual void		DamageReact( CX2DamageManager::DamageData* pDamageData_ );	// June 32ae4080 ( vslot 0x60 )
+	virtual void		Win();	// June 32aea610 ( vslot 0x90 )
+	virtual void		Lose();	// June 32b0eff0 ( vslot 0x94 )
+	virtual void		Draw();	// June 32aea650 ( vslot 0x98 )
+	virtual float		GetNowMp() const;	// June 32aeb0c0 ( vslot 0xd8 )
+	virtual float		GetMaxMp() const;	// June 32aeb0f0 ( vslot 0xdc )
+	virtual void		SetMaxMp( const float fMaxMp_ );	// June 32aeb120 ( vslot 0xe0 )
+	virtual bool		FlushMp( const float fFlushMp_, const int iMpGageIndex_ = 0 );	// June 32aeb280 ( vslot 0xe4 )
+	virtual void		UpNowMp( const float fChangeOfNowMp_ );	// June 32aeb160 ( vslot 0xf0 )
+	virtual void		SetNowMp( float fNowMp_, bool bTrackMp_ = false );	// June 32aeb240 ( vslot 0xf8 )
+	virtual void		StampEffectSetIndex( CX2EffectSet::EffectSetInstance* pEffectSetInstance_ );	// June 32b0efc0 ( vslot 0x248 )
+	virtual int			GetWeaponIndexHavingModel( const int iModelIndex_ ) const;	// June 32b151b0 ( vslot 0x2b0 )
+	virtual void		SetDamageExceptionProcess( CX2DamageManager::DamageData* pDamageData_, float& fPowerRate_ );	// June 32aea530 ( vslot 0x2b8 )
+	virtual float		GetReduceDebuffDurationRate( BUFF_TEMPLET_ID eBuffTempletID_ );	// June 32ae5480 ( vslot 0x29c )
+	virtual int			GetDamageEffectIndex() const;	// June 32b0efe0 ( vslot 0x2e0 )
+	virtual void		DoProcessWhenDamageDataCreated( const CX2DamageManager::DamageData* pDamageData_ );	// + June 32b17660 ( vslot 0x2e4, base 3208ddc0 )
+	virtual void		DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ );	// + June 32b17680 ( vslot 0x2fc ), base: char-ara CH1o
+	virtual void		AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData_ );	// + June 32b1e720 ( vslot 0x300 ), base: char-raven CH1o
+	virtual void		DoProcessWhenKillEnemy( const CX2GameUnit* pDefender_ );	// June 32b0e3f0 ( vslot 0x318 )
+	virtual void		ChangeMaxCharacterAddResource( const float fRate_ );	// June 32b14cd0 ( vslot 0x324 )
+
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 #ifdef	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
@@ -621,6 +646,16 @@ protected:
 	void				UpCombinationPoint( const int iCombinationPoint_ );	// June 32b14860
 	int					GetSkillCombinationPointCost( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ );	// June 32b14f70
 	void				KillMySummonedNPC( const CX2UnitManager::NPC_UNIT_ID eNPCUnitID_ );	// June 32b20100
+	// char-luciel CH1k: helpers of the overrides
+	void				SetGageNowMp( const float fNowMp_, const bool bTrackMp_, const int iMpGageIndex_ );	// June 32ae50f0
+	void				SetGageNowMpOfForm( const float fNowMp_, const bool bTrackMp_, const bool bCurrentForm_ );	// June 32b0e620
+	void				SetNowCombinationPoint( const int iCombinationPoint_ );	// June 32aeb090
+	int					GetStateIDByForm( const int iStateID_ );	// June 32aeb450
+	void				LoadTransformedSkinAnim( const int iForm_ );	// June 32b162e0
+	void				EraseDamageEffectIndexEntry( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b16810
+	bool				IsInvasionOfDarkEnergyTarget( const CX2GameUnit* pGameUnit_ );	// June 32b16260
+	void				EraseInvasionOfDarkEnergyTarget( const CX2GameUnit* pGameUnit_ );	// June 32b166e0
+	bool				IsInvasionOfDarkEnergyActive() const;	// June 32b4b580: body in CH1k2
 	void				ResetPhantomRushReady();	// June 32b34920
 	void				ClearAltarOfEvilEffectSet();	// June 32b35540
 	void				ReleaseTransformedSkinAnim( const int iForm_ );	// char-luciel CH1a4: June 32b13d30

@@ -2423,9 +2423,16 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		float						GetMaxHp()	const					{ return GetGageData()->GetMaxHp(); }
 		void						SetMaxHp( const float maxHP )		{ GetGageData()->SetMaxHp( maxHP ); }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
+		// char-luciel CH1k: June unit vslots 0xd8 / 0xdc / 0xe0 ( bases 3208dc30 / 3208dc40 / 3208dc50 ); Lu/Ciel answers with the gauge of its form in play
+		virtual float					GetNowMp()	const					{ return GetGageData()->GetNowMp(); }
+		virtual float					GetMaxMp()	const					{ return GetGageData()->GetMaxMp(); }
+		virtual void					SetMaxMp( const float maxMP )		{ GetGageData()->SetMaxMp( maxMP ); }
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 		float						GetNowMp()	const					{ return GetGageData()->GetNowMp(); }
 		float						GetMaxMp()	const					{ return GetGageData()->GetMaxMp(); }
 		void						SetMaxMp( const float maxMP )		{ GetGageData()->SetMaxMp( maxMP ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 
 		bool						VerifyNowHp() { return GetGageData()->VerifyNowHp(); }
 
@@ -2433,7 +2440,11 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		void						SetEnableHPRelativeChangeRate( const bool bHpRelativeChangeRate_ ) { GetGageData()->SetEnableHPRelativeChangeRate( bHpRelativeChangeRate_ ); }
 
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
+		virtual bool					FlushMp( const float fFlushMp_, const int iMpGageIndex_ = 0 )	{ return GetGageData()->FlushMp( fFlushMp_, IsMyUnit(), iMpGageIndex_ ); }	/// char-luciel CH1k: June 3208dc70 ( vslot 0xe4, ret 8 )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 		bool						FlushMp( const float fFlushMp_ )	{ return GetGageData()->FlushMp( fFlushMp_, IsMyUnit() ); }	/// June 3208dc70
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 #else
 		bool						FlushMp( const float fFlushMp_ )	{ return GetGageData()->FlushMp( fFlushMp_ ); }
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
@@ -2474,7 +2485,11 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		void UpNowHp( const float hpIncrement, const float hpMinimum = 0.f ) { GetGageData()->UpNowHp( hpIncrement, hpMinimum ); }
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FLAG
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
+		virtual void UpNowMp( const float mpIncrement ) { GetGageData()->UpNowMp( mpIncrement, true ); }	/// char-luciel CH1k: June 3208dd00 ( vslot 0xf0 )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 		void UpNowMp( const float mpIncrement ) { GetGageData()->UpNowMp( mpIncrement, true ); }	/// June 3208dd00
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 #else
 		void UpNowMp( const float mpIncrement ) { GetGageData()->UpNowMp( mpIncrement ); }
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
@@ -2487,7 +2502,11 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		void SetNowHp( float fHPNow );
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FLAG
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
+		virtual void SetNowMp( float fMPNow, bool bTrackMp = false )	{ GetGageData()->SetNowMp( fMPNow, bTrackMp ); }	/// char-luciel CH1k: June 3208dd20 ( vslot 0xf8 )
+#else SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 		void SetNowMp( float fMPNow, bool bTrackMp = false )	{ GetGageData()->SetNowMp( fMPNow, bTrackMp ); }	/// June 3208dd20
+#endif SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 #else
 		void SetNowMp( float fMPNow )			{ GetGageData()->SetNowMp( fMPNow ); }
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY

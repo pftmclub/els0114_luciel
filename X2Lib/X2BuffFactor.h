@@ -587,6 +587,12 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_SOUL_IGNITION                = 940,	// June's Enum.lua; Elesis's vslots 0x24c / 0x250 set and clear its effect-set rate
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-luciel CH1k
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_SOUL_COLLECTOR               = 462,	// June's Enum.lua; Lu/Ciel's Soul Collector stack ( SetDamageExceptionProcess )
+	BTI_DEBUFF_CURSE_OF_ABYSS             = 471,	// June's Enum.lua; in Lu/Ciel's reduce-debuff-duration list ( GetReduceDebuffDurationRate )
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-14 // char-elesis CH4a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	BTI_BUFF_P_SGM_TRANSCENDENCE_1_ON_1   = 879,	// June's Enum.lua; the Grand Master transcendence one-on-one buff
