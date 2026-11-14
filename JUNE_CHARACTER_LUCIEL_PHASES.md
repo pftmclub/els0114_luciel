@@ -1611,7 +1611,8 @@ Elesis's base rows ); `ch0_class_map.tsv` names / phases updated.
 ### CH1a3 - Done (2026-11-14)
 
 Opus 5.5 high, Ghidra read-only. Files: `X2GageUI.h` / `.cpp`, `X2GageManager.h` / `.cpp` ( CP949, `bytepatch.py`; 382 insertions, 0 deletions ).
-funcmap `grep "Char Luciel CH1a3" june2017_re/funcmap.tsv` ( 19 rows ); `JUNE_BUGS.md` 682-684. Commit: see the follow-up line below.
+funcmap `grep "Char Luciel CH1a3" june2017_re/funcmap.tsv` ( 19 rows ); `JUNE_BUGS.md` 682-684. Commit `c29941ce`; flagcheck `--range
+c29941ce^..c29941ce --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: `RESULT: PASS` ( same tallies as the worktree run below ).
 - **`CX2LucielMyGageUI` ( `_CORE` ):** RTTI vt `3353375c`, 29 slots vs base `3353336c`, 0x64 bytes ( base 0x5c + `m_bMinorUnitFormCharacterImage`
   +0x5c + `m_hSeqCombinationPointFull` +0x60; ctor `32e647d0`, made only by `CreateMyGageUI` ). Ported: 0 dtor `32e72770` / `32e6ad10`, 1 `InitUI`
   `32e6e230` ( Rena's order, opens `DLG_Luciel_CombinationPoint.lua`, shows `StaticPVPGameInfo_UnSelected` and `Luciel_Combination_Point_BG` ),
