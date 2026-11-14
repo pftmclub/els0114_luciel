@@ -4314,6 +4314,23 @@ bool CX2GUEL::IsNotCommonMoveState()
 	return fDefenceRate;
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4b2: June 32b524f0: Advanced Knight Mastery's guard roll ( June's compare is random <= rate )
+bool CX2GUEL::IsAdvancedKnightMasteryGuard()
+{
+	if ( !( 0.f < m_fAdvancedKnightMasteryEffectiveRate ) )
+		return false;
+	const float fRandom = GetRandomFloat( 0 );
+	if ( !( fRandom <= m_fAdvancedKnightMasteryEffectiveRate ) )
+		return false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	static DWORD s_dwGuardLogTime = 0;
+	if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwGuardLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE advanced knight mastery guard ( roll %.3f <= rate %.3f, damage x %.3f )", fRandom, m_fAdvancedKnightMasteryEffectiveRate, m_fAdvancedKnightMasteryDamagedRate );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	return true;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 /*virtual*/ CX2GageData* CX2GUEL::CreateGageData()
 {
 	if ( true == IsMyUnit() )

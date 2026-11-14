@@ -5601,6 +5601,9 @@ private:
 		bool	m_bQuickenGuardBlocking;		/// 1-2차 번득이는 기지 패시브 막기
 		bool	m_bQuickenGuardTurning;			/// 1-2차 번득이는 기지 패시브 뒤돌아맞기
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+		bool	m_bAdvancedKnightMasteryGuard;	/// char-elesis CH4b2: June +0x9175 ( Elesis's Advanced Knight Mastery guard: DamageReact sets it, DamageReactStateChange clears it )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 
 #ifdef HYPER_MODE_FIX
 		bool m_bReserveHyperModeZero;

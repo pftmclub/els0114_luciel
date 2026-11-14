@@ -2235,6 +2235,42 @@ CH4a's carried `burst fire` x9 ( Big Burst into a burning group ): closed. Not s
 the slotted id in June too, `32024b00` @`32024d2c`, and June names only 28014: **JUNE_BUGS 667**, verbatim; the base-skill check goes to CH4b2's play-test on unit 30, which has
 28014 ) and CH4a's `blood runaway cleanse` ( no debuff reached unit 146 ): carried to CH4c, the Crimson Avenger phase. User owes nothing more for CH4b.
 
+### CH4b2 - Done (2026-11-14)
+**Landed.** Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` (on since CH4a; `_PASSIVE_DEBUG` stays on for the CH4c stage review). No review of its own: the CH4c
+stage review covers it, with its own verdict line for the `X2GUUser.*` hunks (shared file). Files: `X2GUEL.cpp`, `X2GUEl.h`, `X2GUUser.cpp`, `X2GUUser.h`, `Always.h`.
+Read from Ghidra (`320462a0`, `31feabd0`), `charport_adis.py elesis 32b524f0`, and an operand scan of `.text` for `+0x9175` (6 sites, all ported below).
+- **The roll** `32b524f0` = `CX2GUEL::IsAdvancedKnightMasteryGuard()`: `0 < m_fAdvancedKnightMasteryEffectiveRate` (+0x978c), then `GetRandomFloat( 0 ) <= ` it.
+  June's compare is `<=` (`fcompp`, `test ah, 1`: only rate < random fails), not the kickoff's `<`. Public getter `GetAdvancedKnightMasteryDamagedRate()` (+0x9784).
+- **The byte** +0x9175 = new `CX2GUUser::m_bAdvancedKnightMasteryGuard` beside `m_bQuickenGuardTurning` (+0x9174); cleared in the ctor (@`32042dbf`) and at
+  `DamageReact`'s start (@`32046321`, one dword store clears +0x9172-+0x9175 = parrying, quicken blocking / turning, guard), both beside March's quicken resets.
+- **The set site** @`320475a5`-`320476b5`: June's guard chain is Raven, Ara, **Elesis**, Eve, else; Elesis's `else if` goes between March's Ara and Eve blocks.
+  Tests named from the Raven / Ara blocks June compiles at the same offsets: `GetUnit()->GetType() == UT_ELESIS`, `bCheckExtraDamage` false, DD `m_bNoDamage` false,
+  `m_fHpPercentUp <= 0`, `m_fIncreaseMP <= 0`, reActResult `RT_SMALL_DAMAGE` or `RT_BIG_DAMAGE` (Raven / Ara test != dummy / sensor instead), `GetHold()` / `GetGrap()` false
+  (+0x8a48 / +0x9108), `GetRidingOn()` false (vslot 0x200), `IsSuperArmor()` false (vslot 0x264), `GetFrameData().unitCondition.bFootOnLine` (+0x80bc),
+  `m_FrameDataFuture.unitCondition.bAttackerFront` (+0x7e2d), gage +0xc04's force-down gage (+0x5c: now +0x60, max +0x6c) `GetNowForceDown() < GetMaxForceDown()`, then the roll.
+  A passed roll sets the byte and skips `DamageReact_ExtraDamage` (jump @`32047810`); a failed roll goes to it (@`320473ee`). A failed test before the roll falls into
+  the Eve test (fails for type 8) and the else (`DamageReact_ExtraDamage`): the `else if` with the roll last is the same flow.
+- **The enchant gate** @`32047844` (found by the scan, not in the kickoff): March's `false == m_bParryingState && ... && false == m_bManeuverParryingState` gets
+  `&& false == m_bAdvancedKnightMasteryGuard`, June's order: a guarded hit rolls no enchant extra damage.
+- **The multiply** @`320492ba`-`320492d5` replaces D4b's stand-in comment (kept in `#else`): `fFinalDamage *=` her damaged rate while the byte is set, after Ara's x0.
+  It sits in `JUNE_STATCALC_DAMAGE_REACT`'s block, so `Always.h` gains a guard: `_PASSIVE` needs `JUNE_STATCALC_DAMAGE_REACT` (defined at 12765, before the guard; the probes compile it).
+- **The state branch** @`31feacf4`-`31fead30` in `DamageReactStateChange`, after March's `m_bQuickenGuardBlocking` block, before the turning block: byte cleared,
+  `RT_SMALL_DAMAGE` -> `ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_SMALL` (June 0x14d), else `ESI_P_SGM_ADVANCED_KNIGHT_MASTERY` (0x14c), `StateChange( id, true )`, return.
+- No `june_march_divergent.tsv` row: `DamageReact` / `DamageReactStateChange` are piecewise ports with rows 96 / 97 already; no JUNE_BUGS row (nothing wrong-looking kept).
+  Checklist L463 / L482 marked `(Elesis: CH4b2)`; funcmap rows `320462a0 @320492ba` / `32b524f0` marked PORTED.
+
+**Gates.** One-file probes (`/Zs /EHsc`) `X2GUEL.cpp`, `X2GUUser.cpp`: exit 0, 0 errors each.
+`flagcheck --worktree` (5 files): my files PASS; `X2GUUser.cpp` FAIL / `X2GUUser.h` OTHER came from a peer's uncommitted `JUNE_CHAR_DUO_BODY` hunks; the range run below
+covers my commit only. `junediverge.py --check` (4 files): `allow-listed: 21`, `RESULT: PASS`. `enumscan.py --check X2GUUser.cpp X2GUEL.cpp`: 4 A rows, all
+pre-existing (`X2GUUser.cpp:27704-27710` NUI_BEE*, char-luciel `04d2cacf`), 0 in this phase's hunks. `stateends.py check X2GUEL.cpp ELESIS_KNIGHT`: 337 tables, 0 STUCK,
+`RESULT: PASS` (both guard states have `OnEventProcess`, lines 5922 / 5929).
+`DEPLOY OK: X2_offline.exe is 26,599,424 B, dated 2026-11-14 10:59:12, md5 30b80d107a871237f182caa0fb37bf29, equal to X2/US_SERVICE/x2.exe (2026-11-14 10:59:05); built at main 6c48182a + 5 uncommitted code file(s).` (the 5 = this phase's)
+`EXESTR OK: 2 of 2 found in X2_offline.exe, 26599424 B, dated 2026-11-14 10:59:12, md5 30b80d107a871237f182caa0fb37bf29` (wide: the guard roll and guard damage lines).
+**Save** (backup `db_backup/els_db_20261114_104831_pre_sql.sql`): unit 30 `ElesisBH` Infernal Blade 28014 into slot 8 (B-4), Scaldic Sword 28013 out. Unit 29 unchanged
+(28404 learned, rate 0.150 since CH4a).
+**In game:** `[JUNE_CHAR] ELESIS PASSIVE advanced knight mastery guard ( roll ... <= rate 0.150, damage x ... )` and `... guard damage A -> B` (each at most once a second);
+CH4b's carried `infernal blade defence rate` on unit 30.
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended

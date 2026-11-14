@@ -308,6 +308,10 @@ public:
 			float GetFirstStrikeAddDamage ( void ) const			{ return m_fFirstStrikeAddDamage > 0 ? m_fFirstStrikeAddDamage : 1.f; }
 			float GetFirstStrikeAddIncreaseMPRate ( void ) const	{ return m_fFirstStrikeAddIncreaseMPRate > 0 ? m_fFirstStrikeAddIncreaseMPRate : 1.f; }
 	};
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	bool IsAdvancedKnightMasteryGuard();	// char-elesis CH4b2: June 32b524f0 ( called by CX2GUUser::DamageReact @320476a2 )
+	float GetAdvancedKnightMasteryDamagedRate() const { return m_fAdvancedKnightMasteryDamagedRate; }	// char-elesis CH4b2: June +0x9784, read @320492c3
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 
 
 private:

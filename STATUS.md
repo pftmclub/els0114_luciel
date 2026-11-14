@@ -106,7 +106,7 @@ Plan `JUNE_CHARACTER_ELESIS_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH0b | **done 2026-11-12** (play-test passed, logs clean; 21 KEM 433 lines on her part meshes routed to CH1 final) | Sonnet 5.5 / high, user play-test | CH0 | koms | `CH0b.md` |
-| CH4b2 | **ready** (CH4b done): Advanced Knight Mastery guard (roll `32b524f0`, `DamageReact` byte `+0x9175`, states 332 / 333), split from CH4b | Opus 5.5 / high, user play-test | CH4b | `X2GUEL.*`, `X2GUUser.*` | `CH4b2.md` |
+| CH4b2 | **play-test** (2026-11-14): guard roll, `DamageReact` chain / enchant gate / damage x rate, states 332 / 333; user tests unit 29 guard + unit 30 Infernal Blade 28014 | Opus 5.5 / high, user play-test | CH4b | `X2GUEL.*`, `X2GUUser.*` | `CH4b2.md` |
 | CH4c | blocked (CH4b2): blood hooks (0x4f8 / 0x4fc / 0x734, Blood Runaway, Madness), flag `_BLOOD`; CH4 stage review (CH4a-CH4c, CH4b2) | Opus 5.5 / high, Opus review, user play-test | CH4b2 | `X2GUEL.*`, `X2GUUser.*`, `X2BuffFactor.h` | `CH4c.md` |
 | CH6 | blocked (CH4c review; CH5 / CHNb reviews done): scans rerun + user walk incl. both job changes, the creation screen and the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH4c review, CH5 review (done), CHNb review (done) | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, template paragraph, `stage7-plan` -> `char-add` | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |

@@ -1334,6 +1334,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_bQuickenGuardBlocking = false;
 	m_bQuickenGuardTurning = false;
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	m_bAdvancedKnightMasteryGuard = false;	// char-elesis CH4b2: June ctor @32042dbf
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 
 #ifdef SERV_ADD_ARME_BATTLE_MAGICIAN
 	m_bIsTransformed = false;
@@ -9418,6 +9421,9 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 	m_bQuickenGuardBlocking = false;
 	m_bQuickenGuardTurning = false;
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	m_bAdvancedKnightMasteryGuard = false;	// char-elesis CH4b2: June @32046321 ( one dword store clears +0x9172-+0x9175 )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 
 #ifdef ADD_EVE_SYSTEM_2014		// 김종훈, 2014 - 이브 추가 시스템, 나소드 코어
 	// 이브의 기동 코어 Parrying 상태 인가?
@@ -10512,6 +10518,25 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			}
 		}
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+		// char-elesis CH4b2: June @320475a5-320476b5: Advanced Knight Mastery's guard ( a failed roll falls through to the extra damage )
+		else if ( GetUnit() != NULL && GetUnit()->GetType() == CX2Unit::UT_ELESIS
+			&& bCheckExtraDamage == false && pDamageData->m_bNoDamage == false
+			&& pDamageData->m_fHpPercentUp <= 0.f && pDamageData->m_fIncreaseMP <= 0.f
+			&& ( CX2DamageManager::RT_SMALL_DAMAGE == pDamageData->reActResult || CX2DamageManager::RT_BIG_DAMAGE == pDamageData->reActResult )
+			&& GetHold() == false && GetGrap() == false
+#ifdef RIDING_SYSTEM
+			&& false == GetRidingOn()
+#endif //RIDING_SYSTEM
+			&& IsSuperArmor() != true
+			&& true == GetFrameData().unitCondition.bFootOnLine
+			&& true == m_FrameDataFuture.unitCondition.bAttackerFront
+			&& GetGageData()->GetNowForceDown() < GetGageData()->GetMaxForceDown()
+			&& true == static_cast<CX2GUEL*>( this )->IsAdvancedKnightMasteryGuard() )
+		{
+			m_bAdvancedKnightMasteryGuard = true;
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #ifdef ADD_EVE_SYSTEM_2014		// 김종훈, 2014 - 이브 추가 시스템, 나소드 코어
 		// 이브의 기동 코어 Parrying 상태 인가?
 		else if( GetUnit() != NULL && GetUnit()->GetType() == CX2Unit::UT_EVE &&
@@ -10573,8 +10598,14 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 #ifdef UPGRADE_RAVEN
 	#ifdef ARA_CHANGE_CLASS_FIRST
 		#ifdef ADD_EVE_SYSTEM_2014		// 김종훈, 2014 - 이브 추가 시스템, 나소드 코어
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+			// char-elesis CH4b2: June @32047844: no enchant extra damage on a guarded hit
+			if( false == m_bParryingState && false == m_bQuickenGuardBlocking &&
+				false == pDamageData->m_bNoDamage && false == m_bManeuverParryingState && false == m_bAdvancedKnightMasteryGuard )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 			if( false == m_bParryingState && false == m_bQuickenGuardBlocking && 
 				false == pDamageData->m_bNoDamage && false == m_bManeuverParryingState )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 		#else  // ADD_EVE_SYSTEM_2014		// 김종훈, 2014 - 이브 추가 시스템, 나소드 코어
 			if( false == m_bParryingState && false == m_bQuickenGuardBlocking && 
 				false == pDamageData->m_bNoDamage )
@@ -11413,7 +11444,27 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		}
 #endif
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+		// char-elesis CH4b2: June @320492ba-320492d5: a guarded hit takes her SA_DAMAGED_REL share
+		if ( true == m_bAdvancedKnightMasteryGuard )
+		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			const float fDamageBeforeGuard = fFinalDamage;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			fFinalDamage *= static_cast<CX2GUEL*>( this )->GetAdvancedKnightMasteryDamagedRate();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			static DWORD s_dwGuardDamageLogTime = 0;
+			const DWORD dwGuardDamageLogNow = timeGetTime();
+			if ( dwGuardDamageLogNow - s_dwGuardDamageLogTime >= 1000 )
+			{
+				s_dwGuardDamageLogTime = dwGuardDamageLogNow;
+				CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE advanced knight mastery guard damage %.1f -> %.1f", fDamageBeforeGuard, fFinalDamage );
+			}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 		// stand-in: Elesis's +0x9175 guard not ported; June @320492ba-320492d5: set by her roll 32b524f0 ( +0x978c ), it scales the damage by her +0x9784 ( char-elesis )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 		// stand-in: Rose not ported; June @320492d9-320492f9: a UT_ROSE defender multiplies the damage by 32a7ff70( DD ) ( Stage 8 )
 #endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 
@@ -13843,6 +13894,18 @@ void CX2GUUser::DamageReactStateChange( CX2DamageManager::DamageData* pDamageDat
 		}
 		return;
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	// char-elesis CH4b2: June @31feacf4-31fead30: Advanced Knight Mastery's guard motion
+	if ( true == m_bAdvancedKnightMasteryGuard )
+	{
+		m_bAdvancedKnightMasteryGuard = false;
+		if ( CX2DamageManager::RT_SMALL_DAMAGE == pDamageData->reActResult )
+			StateChange( CX2GUEL::ESI_P_SGM_ADVANCED_KNIGHT_MASTERY_SMALL, true );
+		else
+			StateChange( CX2GUEL::ESI_P_SGM_ADVANCED_KNIGHT_MASTERY, true );
+		return;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 
 	if ( true == m_bQuickenGuardTurning )
 	{

@@ -13324,6 +13324,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) && ( !defined( SERV_IRUHADEV_ELYSION_SCRIPT_B ) || !defined( SERV_IRUHADEV_JUNE_MP_CHANGE_TEXT ) || !defined( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY ) || !defined( SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE ) || !defined( SERV_IRUHADEV_JUNE_DIVERGE_SKILL_LEVEL_VALUE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_RENA_TRAP ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE needs ELYSION_SCRIPT_B + JUNE_MP_CHANGE_TEXT ( UpNowHp / UpNowMp with text ), JUNE_BUFF_BEHAVIOR_PARITY + JUNE_CHAR_EVE_PASSIVE ( finalizer duration, stack count ), JUNE_DIVERGE_SKILL_LEVEL_VALUE and JUNE_CHAR_RENA_TRAP ( the public GetLearnedSkillAbilityValue )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) && !defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE needs SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ( char-elesis CH4b2: the guard's damage multiply sits in its block )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
