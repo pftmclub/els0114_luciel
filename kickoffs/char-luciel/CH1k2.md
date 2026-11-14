@@ -57,3 +57,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - `CreateGageData` ( `32b37c70` ) news `CX2LucielGageData` ( default ctor `32498e40`, copy ctor `32a38250` when the gage manager already holds my
   gauge ); both exist ( CH1a0 ), the virtuals are CH1a1's. Depends also on CH1a1 review.
+
+## Amended by char-luciel CH1k (2026-11-14)
+
+- **`GetStateIDByForm( const int )`** ( `32aeb450`, protected ) is written ( CH1k ): the state-id getters call it by that name. Also written: the vslot 0x2e4 / 0x2fc / 0x300 overrides,
+  `DoProcessWhenKillEnemy` ( 0x318 ), the MP accessors ( 0xd8 .. 0xf8 ), `SetNowCombinationPoint( int )` ( `32aeb090` ), `SetGageNowMp` / `SetGageNowMpOfForm`.
+- **`32b4b580`** ( `0 < m_fInvasionOfDarkEnergyTime` ) is declared as `bool IsInvasionOfDarkEnergyActive() const` ( `X2GULuciel.h`, "body in CH1k2" ): write its body here. It is called by
+  `AdjustDamageDataBeforeDamageReact`.
+- The CH1k2 review also covers CH1k: it checks the one inference there, `GetWeaponIndexHavingModel`'s Lu array `CX2Eqip +0x5a4` ( taken as the hyper model array; `+0x544` normal anim, `+0x564` hyper anim ).

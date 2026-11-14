@@ -2232,6 +2232,41 @@ Opus 5.5 high. **Verdict: pass, no code change.** Reviewed commit `5d7b09ce` aga
 - **Build:** none ( no code change, no play-test ). No debug define to retire.
 - **Next:** CH3c's CH1i2 dependency is met; the CH1i review is independent ( `/x2-phase char-luciel CH1i review`, Opus 5.5 high ).
 
+### CH1k - Done (2026-11-14)
+
+Sonnet 5.5 high. All 31 CH1k rows of the class map written whole under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.cpp` +629, `.h` +35; inert, `_LIVE` stays
+`//#define` ). Code commit `da5999ca`. funcmap: `grep "(CH1k)" june2017_re/funcmap.tsv` ( 22 rows ). `JUNE_BUGS.md` 707. Listings: `charport_adis.py luciel --phase CH1k`.
+- **Overrides ( June vslot ):** `Init` `32b1e8e0` ( 0x40 ), `InitComponent` `32b0f080` ( 0x3c ), `InitEffect` `32ae4f30` ( 0x48 ), `DamageReact` `32ae4080` ( 0x60 ), `Win` `32aea610` /
+  `Lose` `32b0eff0` / `Draw` `32aea650` ( 0x90 / 0x94 / 0x98 ), `GetNowMp` `32aeb0c0` / `GetMaxMp` `32aeb0f0` / `SetMaxMp` `32aeb120` / `FlushMp` `32aeb280` / `UpNowMp` `32aeb160` /
+  `SetNowMp` `32aeb240` ( 0xd8 / 0xdc / 0xe0 / 0xe4 / 0xf0 / 0xf8 ), `StampEffectSetIndex` `32b0efc0` ( 0x248 ), `GetWeaponIndexHavingModel` `32b151b0` ( 0x2b0, DU1c2's name ),
+  `GetReduceDebuffDurationRate` `32ae5480` ( 0x29c ), `SetDamageExceptionProcess` `32aea530` ( 0x2b8 ), `GetDamageEffectIndex` `32b0efe0` ( 0x2e0 ), `ChangeMaxCharacterAddResource`
+  `32b14cd0` ( 0x324 ), `DoProcessWhenKillEnemy` `32b0e3f0` ( 0x318 ), `DoProcessWhenDamageDataDestroyed` `32b17680` ( 0x2fc ), `AdjustDamageDataBeforeDamageReact` `32b1e720` ( 0x300 ).
+- **Names settled ( the `?` rows ):** 0x318 is **March's `DoProcessWhenKillEnemy( const CX2GameUnit* )`** ( Rena / Ara use it; the hint said `void()`, the body ends `ret 4` ); 0x2fc = Ara's
+  `DoProcessWhenDamageDataDestroyed`; **0x2e4 = `DoProcessWhenDamageDataCreated`** ( new: June's DamageData init `32610da0`, caller `31f8ee59`, calls the attacker's vslot 0x2e4; the sibling of
+  Ara's `32610d50` ); `32b16260` = `IsInvasionOfDarkEnergyTarget`, `32b166e0` = `EraseInvasionOfDarkEnergyTarget`, `32aeb090` = `SetNowCombinationPoint( int )`, `32aeb450` = `GetStateIDByForm`.
+- **Helpers:** `SetGageNowMp` `32ae50f0`, `SetGageNowMpOfForm` `32b0e620`, `LoadTransformedSkinAnim` `32b162e0` ( the two `Motion_*_Evil.x`, strings read in Ghidra ), `EraseDamageEffectIndexEntry`
+  `32b16810`. `32b4b580` ( CH1k2's row, `0 < m_fInvasionOfDarkEnergyTime` ) is **declared** `IsInvasionOfDarkEnergyActive`, body in CH1k2.
+- **`GetStateIDByForm`:** the jump tables ( `32aeb870` / `32aeb8b4`, `32aeb978` / `32aeba38` ) were decoded from the exe and every id is an `LSI_*` member; ids 124 / 125 ( Lu phoenix run mid states ) have
+  no name or state in `Luciel_Duo.lua` and stay numbers with a comment.
+- **Engine, class-agnostic ( `Always.h`, flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL`, `#error` unless `FORM_MP_GAGE` + `DIVERGE_GAGE_TALLY` ):** `CX2GameUnit::GetNowMp / GetMaxMp / SetMaxMp / FlushMp /
+  UpNowMp / SetNowMp` are virtual ( bases `3208dc30` .. `3208dd20`; March's bodies and signatures kept, `FlushMp` gains June's gauge index, default 0 ); the CH1a0 amendment is met. Enum names under
+  `JUNE_ENUM_NAMES`: `DTT_RAIN_OF_CHAOS_GUN = 41`, `BTI_BUFF_SOUL_COLLECTOR = 462`, `BTI_DEBUFF_CURSE_OF_ABYSS = 471` ( June's `Enum.lua` ). `CX2LucielGageData::SetRestFormMpPerSecond` ( `X2GageData.h` ).
+- **Decisions / differences:** `InitComponent` skips June's `XS_PVE_GAME` ( 0x17 ) branch ( no March state; the PvP value is taken in `XS_PVP_GAME` only ); `0x12` = `XS_TRAINING_GAME`. The three
+  `AddModelXSkinMesh` calls drop June's `__FILEW__` / `__LINE__` ( a log only ). `GetWeaponIndexHavingModel` guards a null weapon / equip ( JUNE_BUGS 707 ); Lu's array `CX2Eqip +0x5a4` is the hyper
+  model array by March's member order ( `+0x544` normal anim, `+0x564` hyper anim, `+0x584` normal model ) - **not seen named in June, CH1k2's review may check it**. Soul Collector's stack count is read before
+  the buff is erased ( June's order ). Constants in `_CONST_LUCIEL_CH1K_` ( dialog fade 0.07, after image 10 / 0.8, model count 8 ).
+- **Routed:** the base declarations of vslots 0x2e4 ( `DoProcessWhenDamageDataCreated` + the `SimpleInit` call ), 0x2fc ( `ARA_LIVE` guard ) and 0x300 ( Raven's `_LIVE` guards, `X2GUUser.h:1674` and the four
+  `X2DamageManager.cpp` sites ) -> **CH1o** ( kickoff amended ); CH1k2's state-id getters call `GetStateIDByForm`.
+- **Gates:** `finish.py --files X2GULuciel.h/.cpp X2GageData.h`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `3 PASS, 0 OTHER, 0 FAIL, 0 ERROR` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0; `--files Always.h X2GameUnit.h
+  X2BuffFactor.h X2DamageManager.h --skip-flag GAGE_TALLY / FORM_MP_GAGE ( the `#error` guard's targets ) --skip-flag ENUM_NAMES`: `flagcheck JUNE_CHAR_UNIT_MP_VIRTUAL` `1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL`
+  / `RESULT: PASS`, `junediverge` PASS. `JUNE_ENUM_NAMES` on the two header blocks alone: `PASS~` x 2 ( blank / marker lines ), its only ERROR is `Always.h`'s unevaluable `#if` guard. **`enumscan`** on
+  `X2BuffFactor.h` lists 212 class A rows: every `BFI_` / `BTI_` definition line of that table ( mine are two of them ); the other six files 0 rows. stateends / skillicons / luabind: nothing registered or staged.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, real `Always.h` ) of `X2GULuciel.cpp` ( plain, `/W3`, and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ), `X2Main.cpp` ( the `lua_tinker` `&CX2GameUnit::SetNowMp` pointers ),
+  `X2GameUnit.cpp`, `X2GUNPC.cpp`, `X2GUUser.cpp`, `X2DamageManager.cpp`, `X2GageData.cpp`: 0 errors each; `XL_EFFECT_0 == 14` ( June's layer 0xe ) proved by a static probe. Full build skipped: no play-test.
+- **Range gate** ( `finish.py --range da5999ca^..da5999ca --skip-flag GAGE_TALLY / FORM_MP_GAGE` ): `flagcheck JUNE_CHAR_UNIT_MP_VIRTUAL` `1 PASS, 1 DEFINE, 5 OTHER, 0 FAIL, 0 ERROR` / `RESULT: PASS`; `JUNE_CHAR_LUCIEL_CORE` `3 PASS, 3 OTHER, 0 FAIL, 1 ERROR` and `JUNE_ENUM_NAMES` `2 PASS~, 4 OTHER, 0 FAIL, 1 ERROR`: the ERROR in both is `Always.h`'s existing `#if` guard ( line 13430 / 10175 ) that the tool cannot evaluate once `Always.h` joins the set ( as CH1a2 ); resolved by hand: the commit's `Always.h` hunk is the 13-line `UNIT_MP_VIRTUAL` block. `junediverge` PASS; `enumscan` as above.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1k2` ( Sonnet 5.5 high; its review also covers CH1k ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

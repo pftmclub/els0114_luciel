@@ -49,3 +49,12 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **User vslot 0x848** (base `31f3f070` empty; Lu/Ciel `32b18170`): June's Now `CommonStateStart` calls it when `IsActiveBodyChangeReached()`
   (`31fc9510`), just before clearing `m_bActiveBodyChangeWaitNow`. DU1b left a stand-in comment there: declare the virtual (name it by what
   `32b18170` does) and add the call. **Vslot 0x648**'s Lu/Ciel override (`32b0fa20`) clears `m_bActiveBodyChanged` (+0x84dc, DU1b's member).
+
+## Amended by char-luciel CH1k (2026-11-14)
+
+- Three Lu/Ciel overrides were written with no March base to override ( `X2GULuciel.h`, marked `+` ): declare the bases and widen the guards with `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`.
+  **Vslot 0x2e4** `DoProcessWhenDamageDataCreated( const CX2DamageManager::DamageData* )` ( new, base `3208ddc0` empty ): add it to `CX2GameUnit` next to `DoProcessWhenDamageDataDestroyed` and the
+  call June's DamageData init `32610da0` makes ( caller `31f8ee59`: the attacker's vslot 0x2e4( this ), the sibling of Ara's `32610d50` dtor hook ). **Vslot 0x2fc**
+  `DoProcessWhenDamageDataDestroyed` ( `X2GameUnit.h`, `SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE` guard ) and **0x300** `AdjustDamageDataBeforeDamageReact` ( `X2GUUser.h:1674` and the four user-attacker call
+  sites, Raven's `_LIVE` guards ): widen to Lu/Ciel as the CH1k kickoff text says ( Lu/Ciel has summoned NPCs: CH1o decides `CX2GUNPC`'s `32778fe0` by that text ).
+- `CX2GameUnit::GetNowMp / GetMaxMp / SetMaxMp / FlushMp / UpNowMp / SetNowMp` are already virtual ( flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL`, CH1k ): the wiring list needs nothing for them.
