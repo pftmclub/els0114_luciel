@@ -59,3 +59,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1l30 (2026-11-14)
 
 - `32295360` is ported: `bool CX2GameUnit::GetNearestEnemyUnitDistance( OUT float& )` ( start 9999999.0 ) under `SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN`; `32b3e470` calls it by that name.
+
+## Amended by char-luciel CH1l3 (2026-11-15)
+
+- `FrameMoveAltarOfEvilEnd` ( `32b35c60` ) changes state with id 444, which has no `LSI_*` name ( between `LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END` 443 and `..._DEATH_TOUCH` 446 ): `STATE_ID_ALTAR_OF_EVIL_UNNAMED` in `_CONST_LUCIEL_CH1L3_`.
+  When InitState registers 444 ( or 445 ), say which state it is in the registration comment so the review can name the constant.

@@ -45,3 +45,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - Tree rows: 16 (part 3, col 10).
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §4 L178-181 June-only SKILL_ID members fail silently (52 SI_ 10000-10699 + 143 RNSI_ 30001-3; §7 L240 SetBuffAccumulationCount 322a7660 / AddBuffAccumulationCount 322a8a70 callers in; §7i L436-437 class code multiplies m_fNowStatePowerRate, never the entry; §7ae L713-720 June skill-tree ids with no March class state (reform ids 21000+, RNSI_*); §7ae L729-733 June skill types 14-16 / 17 / 18 named in the class switch; ResetLeftSkillCoolTi; §7ai L835-841 pass June skip / adjust / level / creator at every ported BFI call.
 - Prefix `LCN` = 128. Shadow Bolt spawns 1908 from `LSI_SA_LCN_SHADOW_BOLT_START_FrameMove` `32b2fba0` (`@32b2fe73`).
+
+## Amended by char-luciel CH1l3 (2026-11-15)
+
+- `+0x969c` is the Twilight Judgement buff's stack count: `m_ucTwilightJudgementStackCount` ( UCHAR, was `m_bTwilightJudgementReattack` ); `+0x9690` is the Shadow Bolt spear NPC's UID: `m_iShadowBoltNpcUID` ( was `m_iShadowBoltControlIndex` ).
+  `FrameMoveTwilightJudgementMp` ( `32aebb60` ) and `FrameMoveShadowBoltSpear` ( `32b20780` ) exist.

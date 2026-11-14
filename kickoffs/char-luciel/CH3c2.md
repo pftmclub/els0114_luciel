@@ -43,3 +43,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **States:** the ones whose callbacks are listed above (the state table's col 8 keeps the unsplit `CH3c`).
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7y L680 GetLandPosition bMonster true in Luciel class code; §7ac L774 ProcessLockOn (3200fa20) is shared with Luciel; §7ai L835-841 pass June skip / adjust / level / creator at every ported BFI call.
 - **Depends on CH3c20** (ProcessLockOn, Garden binders). Garden of Haures spawns 2269 from `32b33dc0` (`@32b340ce`).
+
+## Amended by char-luciel CH1l3 (2026-11-15)
+
+- `RegisterDesperadoTarget` ( `32b18060` ) pushes each target with its float time set to the raw word -1 ( a NaN, JUNE_BUGS 720 ); the Desperado frame move reads `m_vecDesperadoTarget` as June does ( no clamp or compare on that time unless June has one ).

@@ -2376,6 +2376,35 @@ funcmap: `grep "(CH1l2)" june2017_re/funcmap.tsv` ( 11 rows, grouped ). `JUNE_BU
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Next:** `/x2-phase char-luciel CH1l3` ( Sonnet 5.5 high ).
 
+### CH1l3 - Done (2026-11-15)
+
+Sonnet 5.5 high. All 32 CH1l3 rows of the class map written under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.cpp` +715, `.h` +15 -6, `X2BuffFactor.h` +14; inert, `_LIVE` stays `//#define` ). Code commit `bc8eefb8`.
+funcmap: `grep "(CH1l3)" june2017_re/funcmap.tsv` ( 15 rows, grouped ). `JUNE_BUGS.md` 718-720. No debug define. Review: `CH1l3-review.md` ( Opus 5.5 high; covers CH1l, CH1l2, CH1l3 ).
+- **Written ( June address ):** `UpGageNowMp` `32aeb1a0`, `FrameMoveTwilightJudgementMp` `32aebb60`, `AccumulateShadowFuryDamage` `32b0e4e0`, `FrameMoveBoundingKeyDialog` `32b0e550`, `UpdateStableDarkEnergyBuff` `32b0eed0`, `GetOpenMindSkillID` `32b0ef80`, `UpdateOpenMindBuff` `32b14d10`,
+  `CheckBoundingStrikeHit` `32b153d0`, `FrameMoveAuraOfFear` `32b15780`, `UpdateInvasionOfDarkEnergyTargetTime` `32b16760`, `AddCombinationPointByDamageEffectHit` `32b16880`, `ShowActiveSkillCutInAndLight` `32b16940`, `GetFormEquipItemList` `32b176a0`, `RegisterDesperadoTarget` `32b18060`,
+  `SetLucielMinorParticleByEnum` `32b1eca0`, `FrameMoveChaserOfDarknessEffect` `32b1f650`, `CreateChaserOfDarknessDamageEffect` `32b1f800`, `CancelSummonDarkness` `32b204d0`, `FrameMoveShadowBoltSpear` `32b20780`, `ProcessPhantomRushHit` `32b347f0`, `ClearDeathTouch` `32b349f0`,
+  `FrameMoveDeathTouchEffect` `32b34a90`, `PlayPunisherEffectSet` `32b34c70`, `PlayAltarOfEvilEffectSet` `32b35600`, `FrameMoveAltarOfEvilEnd` `32b35c60`, `PlayBluffEffectSet` `32b37090`, `IsOpenMindConditionMet` `32b4c7f0`.
+  No body owed: `32b4cb40` ( written inline in CH1l2 ) and the STL instances `32b4cef0` / `32b4cff0` / `32b4d140` / `32b4d260` ( `vector<STimedGameUnitKey>::push_back` and its helpers ).
+- **Names CH0 left `?`:** `ClearDeathTouch` ( `32b349f0` ) and `PlayAltarOfEvilEffectSet` are new declarations in `X2GULuciel.h`; the rest follow CH1l / CH1l2's declarations and the CH0 hints.
+- **Corrections to CH1a members ( header + ctor; the later readers are in the amended kickoffs ):** `+0x9678` is a stack count ( `m_ucAuraOfFearStackCount`, UCHAR ), `+0x969c` the Twilight Judgement buff's stack count ( `m_ucTwilightJudgementStackCount`, UCHAR ), `+0x9690` the spear NPC's UID
+  ( `m_iShadowBoltNpcUID` ), `+0x97b8` / `+0x97bc` two damage effect handles ( `m_hDeathTouchBeamEffect` / `m_hDeathTouchTargetEffect`, replacing the one `UidType` ), `m_AltarOfEvilData.m_fDuration` is the MP paid per altar ( `m_fMpCostPerEffectSet` ).
+  `m_fRapidImpactRange` ( `+0x97c4` ) is a timer that counts down every frame: name kept, CH4a renames it with its readers.
+- **Where Ghidra overruled the class map:** `GetOpenMindSkillID` maps class 127 -> 30416, 128 -> 30418, 129 -> 30420 ( CH0 hint and CH1l2's comment had it reversed ); `IsOpenMindConditionMet` tests `points <= threshold` ( JUNE_BUGS 719 ).
+- **Unmapped callees identified:** `3241d2a0` = `g_pMain +0x180` ( the game option ) `+0x2c == arg` = the effect option ( `m_eEffect` ) test, used with `OL_LOW`; `+0x8a48` = `m_bHold`, `+0x9108` = `m_bGrap` ( Chung's shot cancel has the same pair ); `IsOpenMindConditionMet` reads the gauge's combination point inline ( = `GetNowCombinationPoint`, `32b0fa00` );
+  vslot `0xa8` of the game = `GetNPCUnitByUID`; `31fcef00 == 5` = the now state's skill is `ST_HYPER_ACTIVE_SKILL` ( inline, as `GetShowActiveSkillShow` does ); `321db1b0`'s tags 9 / 10 / 11 name the damage data's force down value, extra damage and relate skill index ( inferred from the funcmap row, a review item ).
+- **Shape.** The hit readers of `AttackResultByType` map DamageData by June offset to March members ( probed with `offsetof`: `+0x14` hAttackerEffect, `+0x28` reActResult, `+0x46c` defenderType, `+0x470` optrDefenderGameUnit, `+0x590` m_eUsedSkillID, `+0x5c4` m_iAppliedSkillID, `+0x5a8` m_RelateSkillData, `+0x638` m_iDamageEffectIndex ).
+  The cut-in tables of `ShowActiveSkillCutInAndLight` are file-local ( `_CONST_LUCIEL_CH1L3_`: 12 + 3 + 6 names read from June's three static initializers `333a78e0` / `333a8080` / `333a74e0` ); CH5 confirms them. The customize-manager cut-in override is a stand-in ( `bCustomizeCutInApplied` false ).
+- **Quirks kept ( JUNE_BUGS 718-720 ):** the cut-in function ignores its sub index argument; Open Mind's `<=`; the Desperado target's time is the raw word -1. Not rows: `CancelSummonDarkness` calls the base's cost ( not the class's zero ), `CreateChaserOfDarknessDamageEffect` passes 1.0 as the reserve time,
+  the Punisher loop is guarded against an empty list on a boss ( June would read element 0 ).
+- **Enum names ( `X2BuffFactor.h`, `JUNE_ENUM_NAMES` ):** `BTI_BUFF_DEATH_TOUCH` 760, `BTI_BUFF_P_LUCIEL_OPEN_MIND` 877, `BTI_BUFF_P_LDN_STABLE_DARKENERGY` 895, `BFI_BUFF_CHASER_OF_DARKNESS_MEMO` 603, `BFI_BUFF_P_LUCIEL_OPEN_MIND` 906, `BFI_BUFF_P_LDN_STABLE_DARKENERGY` 925 ( checked against `Enum.src.lua` ).
+  No name: state id 444 ( `STATE_ID_ALTAR_OF_EVIL_UNNAMED` ), the modifier tags, the event code 0x8b3.
+- **Gates:** `finish.py --files X2GULuciel.cpp X2GULuciel.h X2BuffFactor.h`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 1 OTHER, 0 FAIL, 0 ERROR` ( the OTHER row is the `X2BuffFactor.h` name block, flag `JUNE_ENUM_NAMES`, also PASS ), `junediverge` PASS, `enumscan` on the two class files exit 0
+  ( the finish run's `enumscan FAIL` lists only the existing `X2BuffFactor.h` enum definitions, every registered name there, mine too ). The 10 deleted lines are the renamed members: 6 in the header ( altar member + ctor, three members, the UID ) and 4 ctor initializers. Range gate `--range bc8eefb8^..bc8eefb8`: identical tallies.
+  stateends / skillicons / luabind: nothing registered or staged.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp` plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, and `X2GUUser.cpp` ( includes the changed `X2BuffFactor.h` ): 0 errors, 0 warnings in the new block. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1l3 review` ( Opus 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

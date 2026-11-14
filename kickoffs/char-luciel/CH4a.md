@@ -54,3 +54,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Name the three provisional members from their writer:** `m_fPowerOfOriaxDamageRate` ( `+0x9614` ), `m_fSoulCollectorDamageRate` ( `+0x9618` ), `m_usSoulCollectorMaxCount` ( `+0x961c` ).
   CH1f2's projectile FrameMoves read them as a power rate, an effect-set life time ( and modifier tag 2 ) and a modifier-tag-4 count. Keep CH1a's names if the passive that writes them
   agrees, else rename them in `X2GULuciel.h` / `.cpp` in this phase.
+
+## Amended by char-luciel CH1l3 (2026-11-15)
+
+- `+0x9678` is the Aura of Fear stack count: `m_ucAuraOfFearStackCount` ( UCHAR, was `m_bAuraOfFearActive` ); `FrameMoveAuraOfFear` ( `32b15780` ) pays it ( 10 at most ) and resets it. `+0x97c4` ( `m_fRapidImpactRange`, ctor 9999.0 ) is counted down every frame by
+  `UpdateInvasionOfDarkEnergyTargetTime` ( `32b16760` ): rename it with its readers here ( it is a timer, not a range ). `IsOpenMindConditionMet` ( `32b4c7f0` ) is true while the combination points are at or below the threshold ( JUNE_BUGS 719 ).

@@ -47,3 +47,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1l30 (2026-11-14)
 
 - `322d7b30` is char-elesis's `CX2Game::GetFrontNearestEnemyUnit( pUnit, fRange, set, iAttackType )`: `32b318e0` passes an empty set and -1 ( June's `const int&` = March's by-value int ). `31f75980` is March's `CEffect::SetLinkMainEffectByPos`.
+
+## Amended by char-luciel CH1l3 (2026-11-15)
+
+- The Altar of Evil data member `m_AltarOfEvilData.m_fDuration` is now `m_fMpCostPerEffectSet` ( June `32b35600` pays it with `FlushMp` per altar, eight altars at most ); the two Death Touch handles are `m_hDeathTouchBeamEffect` / `m_hDeathTouchTargetEffect`
+  ( `+0x97b8` / `+0x97bc`, damage effect handles, CH1a's single `m_uidDeathTouchUnit` was wrong ). `ClearDeathTouch` ( `32b349f0` ), `PlayAltarOfEvilEffectSet` ( `32b35600` ) and `FrameMoveDeathTouchEffect` ( `32b34a90` ) exist: call them, do not rewrite them.

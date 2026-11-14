@@ -44,3 +44,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   the live dialogs are March's with 9: `DLG_PVP_Result_Card_Back.lua`, `DLG_PVP_Result_Card_Back_MatchPvp.lua`, `DLG_PVP_Room_Character_Slot.lua`
   (data034, no `LUCIEL` key). June's copies (`june_src_fixed/data034_kom/*.src.lua`) carry `LUCIEL_DUEL` etc. Adopt them (`adopt-june`, asset
   rule), then a Lu/Ciel shows his picture in the dungeon-room slot. PvP is not reachable offline, so only the dungeon-room slot is testable.
+
+## Amended by char-luciel CH1l3 (2026-11-15)
+
+- `ShowActiveSkillCutInAndLight` ( `32b16940` ) reads file-local tables in `_CONST_LUCIEL_CH1L3_` of `X2GULuciel.cpp` ( `s_aSkillCutIn` 4 sets x 3, `s_aTransformedFormSkillCutIn`, `s_aEventSkillCutInFirst` / `Second`; June `337ad268` / `337ad4a8` / `337ad148` / `337ad1d8`,
+  names with no extension ). This phase confirms the asset names against the staged `.gfx` and the set index ( `SetSkillCutInSetIndexByUnitClass` ), and moves the tables if the creation-screen work needs them; the customize-manager cut-in override stays a stand-in ( backlog Stage 12 ).
