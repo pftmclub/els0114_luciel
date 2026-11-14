@@ -1141,6 +1141,44 @@ Opus 5.5 high. Part 10b of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new 
   skipped: no play-test (DU1d4 builds and hands off the regression pass, now with DU1d3b's paths).
 - **In game:** nothing to see. March classes have one body, so the active anim is `m_pXSkinAnim` and every path is as before.
 
+### DU1d4 - Done (2026-11-14)
+
+Opus 5.5 high. Part 11 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new define, Always.h untouched). File: `X2GUUser.cpp` (+95, insert-only,
+21 blocks, each tagged `// char-luciel DU1d4`). No `_DEBUG`, no log line. funcmap rows: `grep "(DU1d4)" june2017_re/funcmap.tsv` (8).
+- **Function starts re-checked** (DU1d3's method: the int3 start, then each `ret` before the site and a call / jump / pointer to the next byte).
+  Nine of the 25 census rows filed a read under the previous function: `31fd3180` -> `31fd3260` (IsChangeWorldColorNow); `31ff5440` ->
+  `31ff5df0` (CommonCameraMove); `31ffb4f0` -> uncarved `31ffba50` (SUMMON_MAGIC_SPEAR_FrameMove, thunk `32d25f70`, after `31ffb7f0`'s tail
+  `jmp` @`31ffba4e`); `31ffc5c0` @`31ffcbd4` / @`31ffcc26` -> `31ffcba0` (DieFrameMove); `3200bc20` -> `3200c030` (June auto-potion gate);
+  `32045dc0` -> `320462a0` (DamageReact); `3204ace2` -> a jump-table case `3204af38` of EmotionFrameMove `3204a860`. Census owners rewritten.
+- **Ported (March's line in `#else`, `GetXSkinAnimPtr()` at June's call):** DamageReact's revenge and reflex-magic windows (@`32046849` /
+  `689d` / `6952` / `699e`), `CommonFrameMove_Invincible` = `31fe7180` (@`31fe7216` / `7255`), `CommonFrameMoveStateAbnormalityWaterHold` =
+  vslot `0x38c` `31ff4800` (`EventTimer( 0.1f )` @`31ff4b4b`), `CommonCameraMove` (June's body, D0c-1: now / before time @`31ff5f91`-`5fd8`,
+  sub-camera timing @`31ff618f`), both bone `ActiveSkillShow` overloads (`31fddfd0` @`31fddffc`, `31fde0f0` @`31fde11b`),
+  `SUMMON_MAGIC_SPEAR_FrameMove` (0.55 / 0.65 one-shots), `StartIntrudeFrameMove` (four timers), `DieFrameMove` (June's body: anim end
+  @`31ffcbd4`, step dust @`31ffcc26`), `DamageAirDownLandingFrameMove`, `COMMON_RELATIONSHIP_SKILL_FrameMove`, `DamageDataChangeProcess`,
+  `IsChangeWorldColorNow` (C3r's function), `ShowHyperSkillCutInByScript` (C3t's function). Only live branches were touched (probe below).
+- **Already right (no edit):** `SetLeftHandScale` (Raven CH2c0 reads `GetXSkinAnimPtr()`), `CommonFrameMove` @`32063946`-`39a4` (DU1b duo end),
+  @`32063b24` (Elsword CH4a2), @`32064acb` (DU1b2), `SoundEventTimer` (DU1d3b), `THROW_ITEM_FrameMove` (DU1d). `MACHINE_GUN_ATTACK_FrameMove`
+  `31ffb4f0` reads `+0x87d4` inline: March's line stays. `PEPPER_RUN_END_FrameMove`'s read is inside the Stage 10 stand-in.
+- **Split again (kickoff's own rule): DU1d5 = the two-body render** (kickoff written). June's `CommonRender_Prepare` `31fd07b0` calls a per-body
+  prepare (vslot `0x7e4` = `31ff03d0`, none in March) for the active body and then the not-selected one, and June's `OnFrameRender_Draw`
+  (`31fd0880`, user vtable slot 3; the census called it "none in March") draws both bodies. That is a whole divergent function trio with
+  June-only lines (`+0x8fa4` body override, `3227baf0( 0x3b1 )`, R5's `+0x160`), not a getter swap, and nothing draws Ciel without it.
+  `DU1-review.md` now covers DU1d5 and runs after it.
+- **Routed:** june-engine R5 (kickoff amended) = `31fd4460` (CRS setup, @`31fd44c8` / `44fb`) and `CommonFrameMove` @`32065a11` / `5a4c` (CRS
+  window; also DU3's); CH1a0 (kickoff amended) = Lu/Ciel-only base helpers `31fd2d60` / `31fd2e30` (DIE_FRONT / DIE_BACK start) with DU1d's
+  `31fcd0f0` family; backlog Stage 10 (bullet) = the cash-shop frame `32044f80` (none in March), EmotionFrameMove case `3204af38`, and
+  `CommonStateStart @32060bb3` (anim `+0x2b4` unless an avatar emotion); Stage 2 = the drift block reads (@`32064fc6`-`5241`, DU1b2's bullet);
+  parked PvP item bar = auto-potion gate `3200c030` (note on that line).
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files X2Lib/X2GUUser.cpp`: 1 PASS (+95), 0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII,
+  RESULT: PASS. `junediverge --check X2GUUser.cpp`: RESULT: PASS (allow-listed 8, unchanged). `enumscan --check X2GUUser.cpp`: the 4 known DU1b3
+  rows only. No JUNE_BUGS row, no new divergent function. Flag probe (`/Zs`): DUO_BODY, X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE, EDT_WATER_HOLD_TEST,
+  DIVERGE_DIE_FRAME_MOVE, DIVERGE_COMMON_CAMERA_MOVE, JUNE_WORLD_COLOR_WINDOW, JUNE_HYPER_CUT_IN_TIME, JUNE_DAMAGE_REACT_ORDER, GUILD_SKILL_PART_2 on.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,600,960 B, dated 2026-11-14 12:17:46, md5 8e5646f370573b533533a5e21a6190cf, equal to
+  X2/US_SERVICE/x2.exe (2026-11-14 12:17:38); built at main d3cfe730 + 1 uncommitted code file(s).` (the file is this phase's).
+- **In game:** March classes have one body, so every new line reads `m_pXSkinAnim` as before. The play-test below is the DU1 regression pass
+  (DU1b4-DU1d4's every-class lines).
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

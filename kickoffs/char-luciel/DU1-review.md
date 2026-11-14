@@ -91,3 +91,10 @@ and commit.
 - **Finding for the review:** DU1b's `_CONST_GUUSER_DU1B_` says DUO_TYPE has "no Enum entry in June", but June's `Enum.lua` has `DUO_TYPE`
   (`DT_MAJOR` 0, `DT_MINOR` 1, `DT_BOTH` 2, `DT_KEEP` 3; `june_src_fixed/data036_kom/Enum.src.lua:17515`). DU1b's `DUO_TYPE_NONE = 3` ("the duo
   ends") shares `DT_KEEP`'s value: decide whether the constants take June's names (enum rule) and whether value 3 keeps or ends the duo.
+
+## Amended by DU1d4 (2026-11-14)
+
+- DU1d4 split again: the review also covers **DU1d5** (the two-body render) and runs after it. Add `"DU1d4 - Done"` and `"DU1d5 - Done"` to the
+  docsection line. Check DU1d4's hunks (`X2GUUser.cpp`, `grep -n "char-luciel DU1d4"`, 21 blocks) against the funcmap rows `(DU1d4)` and the
+  census's corrected function starts (`du1d_body_reads.tsv` rows whose owner begins `DU1d4`).
+- The DU1 regression play-test ran in DU1d4 (its Done note has the result); DU1d5 hands off its own render check.

@@ -44,3 +44,10 @@ No hardcoded enum literals and no `June` prefix (CLAUDE.md rules): use the membe
 
 - The pair `+0x8f6e` / `+0x8f6f` is declared: `m_bFirstUnitTransformed` / `m_bMinorUnitTransformed` (ctor false, June `@320431f6`). `UpdateDuo`
   skips the equipment pass while either is set. `31fc9d50` / `31fc9d90` use these members; rename them here if the setter shows a better name.
+
+## Amended by char-luciel DU1d4 (2026-11-14)
+
+- Two more Lu/Ciel-only `CX2GUUser` base helpers (no March counterpart, only Lu/Ciel's thunks register them) belong with the class's helpers:
+  the shared DIE_FRONT / DIE_BACK starts `31fd2d60` / `31fd2e30` (thunks `32b4abc0` / `32b4abd0`: vslot `0x7c4` CommonStateStart, vslot `0x338`
+  DyingStart, `SetPlaySpeed( 0.5f )` on `GetXSkinAnimPtr()`), and DU1d's `31fcd0f0` / `31fcd160` / `31fcd1b0` / `31fcd220` (thunks `32b4aa20..70`).
+  Write them here or in CH1m with the registrations; they read the active body (`GetXSkinAnimPtr()` / `GetXSkinAnimFuture()`).

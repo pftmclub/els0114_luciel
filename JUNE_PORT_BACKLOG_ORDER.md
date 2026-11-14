@@ -854,6 +854,11 @@ which this stage widens). Lu/Ciel, Rose and Ain rows stay inert until Stage 8, a
   motion found in the body's motion), `31fdf5d0` (EmotionData voice `31ecc150( class, +0x8e90 )`), the unit form `+0xe40` passed to `32351900`
   (`@32043d92`), `31fac950` (`@320442bb`, and OnFrameMove `@3206ecb7`), `31ecc150` (`@320446c0`), and `EmotionFrameMove`'s sit-item body filter
   (`@3204a9f5` / `@3204aa03`: type 10, entry `+0x40` 2 = Lu only, 3 = Ciel only). DU1d3b ported the reads March's own functions have.
+- **June's cash-shop frame and two more emotion reads** (char-luciel DU1d4, 2026-11-14). None in March, port with the emotion rewrite:
+  `32044f80` (OnFrameMove `@32070016`): while `m_bEnterCashShop` the `EnterCashShop` particle follows the unit (+y), and when not riding the
+  active anim's `Emotion_SitReady` end plays `Emotion_SitWait` (`32043380` type 0x11; riding: `SitReady` / `SitWait` on the pet). The rewritten
+  `EmotionFrameMove`'s jump-table case `3204af38` (table `3204b474`) tests the active anim's end (`@3204af53` / `@3204af74`). `CommonStateStart`
+  `@32060bb3` sets the active anim's `+0x2b4` unless `IsAvatarEmotion( m_ePlayedEmotion )` (June's data-driven `3234cb00`). All read `GetXSkinAnimPtr()`.
 
 ### Stage 11: division item templets (june-effect C9f, 2026-10-07)
 
@@ -1640,7 +1645,7 @@ to go. Plan `JUNE_HUD_PHASES.md` (`june-hud`, H0-H4, review, Z; evidence `june20
   - Amusement item-bar labels and icon fill (`329506d0`), and the option byte `+0x2a8` default (`ms_bAmusementDescriptionChecked`, false): **Stage 9** (the mode is never set offline);
   - the rest of `SetShowUI`, `SetShowBuffIcon` (`3248ac30`) and the gage-manager cooltime UI (`324943c0`, `32489e30`): **Stage 9**;
   - PC-room buff text (`326c8280`, `326c86b0`) and the `BTI_NONE_INT` end-time line (`32e5d050`): **Stage 9** (no PC room or premium end time offline);
-  - the PvP item bar `329515f0`: parked (no PvP offline);
+  - the PvP item bar `329515f0`: parked (no PvP offline); its auto-potion gate `3200c030` reads the active body (char-luciel DU1d4);
   - the party-gauge no-timer check was not seen in play (no party on screen): fold into the next party play-test.
   Lua `SetBuffFactorToGameUnitByBuffFactorID_LUA` was re-bound to June's slot 134 (H2b).
 

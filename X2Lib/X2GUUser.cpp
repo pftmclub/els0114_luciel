@@ -9931,15 +9931,27 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 	bool bReflexMagic = false;	
 
 	// 반격여부검사
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d4: June 320462a0 @32046849 / @3204689d, the active body's clock
+	if( m_FrameDataNow.stateParam.fRevengeStartTime < GetXSkinAnimPtr()->GetNowAnimationTime()
+		&& m_FrameDataNow.stateParam.fRevengeEndTime > GetXSkinAnimPtr()->GetNowAnimationTime()
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_FrameDataNow.stateParam.fRevengeStartTime < m_pXSkinAnim->GetNowAnimationTime() 
 		&& m_FrameDataNow.stateParam.fRevengeEndTime > m_pXSkinAnim->GetNowAnimationTime() 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		&& m_FrameDataNow.unitCondition.bAttackerFront == true )
 	{
 		bRevenge = true;
 	}	
 	// 마법반사여부 검사
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d4: June 320462a0 @32046952 / @3204699e, the active body's clock
+	if( m_FrameDataNow.stateParam.fReflexMagicStartTime < GetXSkinAnimPtr()->GetNowAnimationTime()
+		&& m_FrameDataNow.stateParam.fReflexMagicEndTime > GetXSkinAnimPtr()->GetNowAnimationTime()
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_FrameDataNow.stateParam.fReflexMagicStartTime < m_pXSkinAnim->GetNowAnimationTime() 
 		&& m_FrameDataNow.stateParam.fReflexMagicEndTime > m_pXSkinAnim->GetNowAnimationTime() 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		&& m_FrameDataNow.unitCondition.bAttackerFront == true )
 	{
 		bReflexMagic = true;
@@ -22772,8 +22784,14 @@ void CX2GUUser::CommonFrameMove_Invincible()
 	if( m_FrameDataNow.stateParam.invincibleTime.m_fX != -1.0f
 		&& m_FrameDataNow.stateParam.invincibleTime.m_fY != -1.0f )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d4: June 31fe7180 @31fe7216 / @31fe7255, the active body's clock
+		if( m_FrameDataNow.stateParam.invincibleTime.m_fX <= GetXSkinAnimPtr()->GetNowAnimationTime()
+			&& m_FrameDataNow.stateParam.invincibleTime.m_fY > GetXSkinAnimPtr()->GetNowAnimationTime() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( m_FrameDataNow.stateParam.invincibleTime.m_fX <= m_pXSkinAnim->GetNowAnimationTime()
 			&& m_FrameDataNow.stateParam.invincibleTime.m_fY > m_pXSkinAnim->GetNowAnimationTime() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			m_FrameDataNow.stateParam.bInvincible = true;
 		else
 			m_FrameDataNow.stateParam.bInvincible = false;
@@ -23580,7 +23598,11 @@ void CX2GUUser::CommonFrameMoveStateAbnormalityWaterHold()
 //				m_FrameDataFuture.syncData.position.y				= 	m_FrameDataFuture.unitCondition.landPosition.y + 50.f;
 //				m_FrameDataNow.syncData.position.y				= 	m_FrameDataFuture.unitCondition.landPosition.y + 50.f;
 //			}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			if ( GetXSkinAnimPtr()->EventTimer( 0.1f ) == true )	// char-luciel DU1d4: June 31ff4800 @31ff4b4b, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			if ( m_pXSkinAnim->EventTimer( 0.1f ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				AnimStop();
 		}
 	}
@@ -24363,8 +24385,14 @@ void CX2GUUser::CommonCameraMove()
 			}
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d4: June 31ff5df0 @31ff5f91 / @31ff5fbf / @31ff5fd8, the active body's clock
+		const float fNowAnimTime = GetXSkinAnimPtr()->GetNowAnimationTime();
+		float fLinearTrackingTime = fNowAnimTime - GetXSkinAnimPtr()->GetBeforeAnimationTime();
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		const float fNowAnimTime = m_pXSkinAnim->GetNowAnimationTime();
 		float fLinearTrackingTime = fNowAnimTime - m_pXSkinAnim->GetBeforeAnimationTime();	// June @31ff5fff: anim +0x214 - +0x21c
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( fLinearTrackingTime < 0.f )
 			fLinearTrackingTime = 0.f;
 
@@ -24391,7 +24419,11 @@ void CX2GUUser::CommonCameraMove()
 			bool bDone = false;
 			for( int i=0; i<(int)vecSubCameraTiming.size(); i++ )
 			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				if( GetXSkinAnimPtr()->GetNowAnimationTime() < vecSubCameraTiming[i] )	// char-luciel DU1d4: June 31ff5df0 @31ff618f
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				if( m_pXSkinAnim->GetNowAnimationTime() < vecSubCameraTiming[i] )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				{
 					const float fSubCameraStartTime = ( 0 < i ? vecSubCameraTiming[i - 1] : 0.f );
 					char tableName[64] = "";
@@ -32381,7 +32413,11 @@ float CX2GUUser::GetEvadeUpPerBySMA( int npcID )
 */
 void CX2GUUser::ActiveSkillShow( const WCHAR* pBoneName, const SkillCutInSet *s_SkillCutInSet, int iCutInSet, int iCutIn, bool bHyper, bool bOnlyLight)
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	D3DXVECTOR3 bonePos = GetXSkinAnimPtr()->GetCloneFramePosition( pBoneName );	// char-luciel DU1d4: June 31fddfd0 @31fddffc, the active body's bone
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	D3DXVECTOR3 bonePos = m_pXSkinAnim->GetCloneFramePosition( pBoneName );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	ActiveSkillShow( bonePos, 
 		s_SkillCutInSet[iCutInSet].cutIn[iCutIn].fileName.c_str(), 
@@ -32397,7 +32433,11 @@ void CX2GUUser::ActiveSkillShow( const WCHAR* pBoneName, const SkillCutInSet *s_
 */
 void CX2GUUser::ActiveSkillShow( const WCHAR* pBoneName, const WCHAR* pBackFaceTexName, D3DXVECTOR2 size, D3DXVECTOR3 pos, bool bHyper, bool bOnlyLight )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	D3DXVECTOR3 bonePos = GetXSkinAnimPtr()->GetCloneFramePosition( pBoneName );	// char-luciel DU1d4: June 31fde0f0 @31fde11b, the active body's bone
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	D3DXVECTOR3 bonePos = m_pXSkinAnim->GetCloneFramePosition( pBoneName );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	ActiveSkillShow( bonePos, pBackFaceTexName, size, pos, bHyper, bOnlyLight );
 }
 
@@ -34757,7 +34797,11 @@ void CX2GUUser::SUMMON_MAGIC_SPEAR_FrameMove()
 	}
 	else*/ 
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+    if( GetXSkinAnimPtr()->EventTimerOneshot( 0.55f ) == true )	// char-luciel DU1d4: June 31ffba50 @31ffbb09, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if( m_pXSkinAnim->EventTimerOneshot( 0.55f ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
     if( m_pXSkinAnim->EventTimer( 0.55f ) == true && EventCheck( 0.55f, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -34765,7 +34809,11 @@ void CX2GUUser::SUMMON_MAGIC_SPEAR_FrameMove()
 		g_pX2Game->GetMajorParticle()->CreateSequence( (CKTDGObject*) this,  L"LizardMan_Older_PowerBooster01", GetPos() );
 	}
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+    else if( GetXSkinAnimPtr()->EventTimerOneshot( 0.65f ) == true )	// char-luciel DU1d4: June 31ffba50 @31ffbbed
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     else if( m_pXSkinAnim->EventTimerOneshot( 0.65f ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	else if( m_pXSkinAnim->EventTimer( 0.65f ) == true && EventCheck( 0.65f, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -35090,7 +35138,11 @@ void CX2GUUser::StartIntrudeStart()
 */
 void CX2GUUser::StartIntrudeFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( true == GetXSkinAnimPtr()->EventTimer( 0.1f ) )	// char-luciel DU1d4: June 31ffc5c0 @31ffc5ee, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnim->EventTimer( 0.1f ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		D3DXVECTOR3 vDirVector = GetDirVector();
 		D3DXVECTOR3 vUpVector(0, 1, 0);
@@ -35099,7 +35151,11 @@ void CX2GUUser::StartIntrudeFrameMove()
 	}
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( true == GetXSkinAnimPtr()->EventTimer( 0.26f ) )	// char-luciel DU1d4: June 31ffc5c0 @31ffc75b
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnim->EventTimer( 0.26f ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		D3DXVECTOR3 vDirVector = GetDirVector();
 		D3DXVECTOR3 vUpVector(0, 1, 0);
@@ -35108,7 +35164,11 @@ void CX2GUUser::StartIntrudeFrameMove()
 	}
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( true == GetXSkinAnimPtr()->EventTimer( 0.39f ) )	// char-luciel DU1d4: June 31ffc5c0 @31ffc8bf
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnim->EventTimer( 0.39f ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		D3DXVECTOR3 vDirVector = GetDirVector();
 		D3DXVECTOR3 vUpVector(0, 1, 0);
@@ -35117,7 +35177,11 @@ void CX2GUUser::StartIntrudeFrameMove()
 	}
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( true == GetXSkinAnimPtr()->EventTimer( 0.52f ) )	// char-luciel DU1d4: June 31ffc5c0 @31ffca23
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnim->EventTimer( 0.52f ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		D3DXVECTOR3 vDirVector = GetDirVector();
 		D3DXVECTOR3 vUpVector(0, 1, 0);
@@ -35154,7 +35218,11 @@ void CX2GUUser::DieFrameMove( float fTimeCreateStepDust_, float fTimeSacrificeOf
 {
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_DIE_FRAME_MOVE
 	// June 31ffcba0: one one-shot ( step dust ); Sacrifice of Hero is not called here, so fTimeSacrificeOfHero_ is unused
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( GetXSkinAnimPtr()->IsAnimationEnd() == true )	// char-luciel DU1d4: June 31ffcba0 @31ffcbd4, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnim->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		SetRemainHyperModeTime( 0.0f );
 
@@ -35177,7 +35245,11 @@ void CX2GUUser::DieFrameMove( float fTimeCreateStepDust_, float fTimeSacrificeOf
 		}
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( GetXSkinAnimPtr()->EventTimerOneshot( fTimeCreateStepDust_ ) == true )	// char-luciel DU1d4: June 31ffcba0 @31ffcc26
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnim->EventTimerOneshot( fTimeCreateStepDust_ ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		CreateStepDust();
 
 #ifdef SUMMON_MONSTER_CARD_SYSTEM
@@ -35745,7 +35817,11 @@ void CX2GUUser::DamageAirDownLandingStart()
 void CX2GUUser::DamageAirDownLandingFrameMove()
 {
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( 0.029f ) || true == GetXSkinAnimPtr()->EventTimerOneshot( 0.46f ) )	// char-luciel DU1d4: June 31ffd160 @31ffd194 / @31ffd1d5
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnim->EventTimerOneshot( 0.029f ) || true == m_pXSkinAnim->EventTimerOneshot( 0.46f ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	if( ( true == m_pXSkinAnim->EventTimer( 0.029f ) && true == EventCheck( 0.029f, false ) )
 		|| ( true == m_pXSkinAnim->EventTimer( 0.46f ) && true == EventCheck( 0.46f, false ) ) )
@@ -46209,9 +46285,16 @@ bool CX2GUUser::IsChangeWorldColorNow()
 {
 	if ( true == m_bChangeWorldColor )
 		return true;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d4: June 31fd3260 @31fd3283, the active body's clock
+	if ( 0.f <= m_fWorldColorStartTime && NULL != GetXSkinAnimPtr() )
+	{
+		const float fWorldColorTime = GetXSkinAnimPtr()->GetNowAnimationTime();
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( 0.f <= m_fWorldColorStartTime && NULL != m_pXSkinAnim )
 	{
 		const float fWorldColorTime = m_pXSkinAnim->GetNowAnimationTime();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if ( m_fWorldColorStartTime <= fWorldColorTime && fWorldColorTime <= m_fWorldColorEndTime )
 			return true;
 	}
@@ -46234,7 +46317,11 @@ bool CX2GUUser::IsChangeWorldColorNow()
 //   size, pos, false, bOnlyLight ) ( 31fde0f0, ret 0x24 ). June passes bHyper = 0 ( @320151bb ), where March's class cut-ins pass IsHyperState().
 /*virtual*/ void CX2GUUser::ShowHyperSkillCutInByScript( float fTimeToShow_, bool bOnlyLight_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if ( NULL == GetXSkinAnimPtr() || false == GetXSkinAnimPtr()->EventTimerOneshot( fTimeToShow_ ) )	// char-luciel DU1d4: June 32014fc0 @32014ff9, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( NULL == m_pXSkinAnim || false == m_pXSkinAnim->EventTimerOneshot( fTimeToShow_ ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		return;
 
 	if ( false == GetShowCutInAndChangeWorldColor() || false == GetShowActiveSkillShow() )
@@ -48607,7 +48694,11 @@ void CX2GUUser::COMMON_RELATIONSHIP_SKILL_FrameMove()
 {
 	// 던지기 모션을 사용 하기 때문에 m_fThrowStartTime 통해 타이밍 설정.
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+    if( GetXSkinAnimPtr()->EventTimerOneshot( m_fThrowStartTime ) == true )	// char-luciel DU1d4: June 320018c0 @320018f9, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if( m_pXSkinAnim->EventTimerOneshot( m_fThrowStartTime ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	if( m_pXSkinAnim->EventTimer( m_fThrowStartTime ) == true && EventCheck( m_fThrowStartTime, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -50825,7 +50916,11 @@ void CX2GUUser::ForceDownAndDetonationProcess()
 		return;
 
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+    if( true == GetXSkinAnimPtr()->EventTimerOneshot( m_fCommonDamageChangeTime ) )	// char-luciel DU1d4: June 320454a0 @320454e6, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if( true == m_pXSkinAnim->EventTimerOneshot( m_fCommonDamageChangeTime ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	if( true == m_pXSkinAnim->EventTimer( m_fCommonDamageChangeTime ) && true == EventCheck( m_fCommonDamageChangeTime, false ) )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
