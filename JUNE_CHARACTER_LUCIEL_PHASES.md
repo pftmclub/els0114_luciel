@@ -1531,6 +1531,7 @@ Elesis's base rows ); `ch0_class_map.tsv` names / phases updated.
 - **Compile:** `/Zs` probes of `X2GULuciel.cpp` ( census `cl_cmd` ), plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each ( an earlier
   abstract-class error proved the guarded code compiles; neither `#error` guard fires ). Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** `ab709d9f`; flagcheck `--range ab709d9f^..ab709d9f`: `LUCIEL_CORE` ( the two class files ) `0 PASS, 1 PASS~, 1 FAIL` ( the precedented new `.cpp` ), `JUNE_ENUM_NAMES` ( 4 files ) `1 PASS, 2 PASS~, 1 OTHER, 0 FAIL` / `RESULT: PASS`, same tallies as the worktree run ( the `eol!` on `X2UnitManager.h` is the tool's mixed-EOL file note: the inserted line is CRLF like its neighbours ).
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
