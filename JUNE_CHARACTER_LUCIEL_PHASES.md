@@ -2053,6 +2053,8 @@ Opus 5.5 high. Covers CH1b `8716f6b7`, CH1d `814dc0e6`, CH1f `1335ce1b`, CH1f2 `
   16 deleted lines = the 16 replaced timer lines, in this flag's own new code ( no March line touched ); `junediverge` PASS; `enumscan` exit 0.
 - **Compile:** `/Zs` probes of `X2GULuciel.cpp` ( census `cl_cmd`, no PCH ), plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each. Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** `c7a6dced`; `finish.py --range c7a6dced^..c7a6dced`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `1 PASS, 0 OTHER, 0 FAIL` ( 16 deleted = the replaced timer lines ) / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
+- **Next:** `/x2-phase char-luciel CH1g` ( Sonnet 5.5 high ).
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
