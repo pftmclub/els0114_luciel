@@ -1882,6 +1882,26 @@ Code commit `feb8091e`. funcmap: `grep "(CH1l30)" june2017_re/funcmap.tsv` ( 4 r
 - **Peer:** char-luciel CH1k0 ran at the same time in `X2GameUnit.*` / `Always.h`; this phase applied its hunks there only after `88c14ed5` landed.
 - **How to see it in game:** nothing yet ( inert ); CH1l3 / CH1m / CH2d2's callers reach it when `_LIVE` lands.
 
+### CH1b - Done (2026-11-14)
+
+Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.h` / `.cpp`, nothing references it until CH1 ). funcmap `grep "(CH1b)" june2017_re/funcmap.tsv` ( 43 rows ); JUNE_BUGS 692; no review of its own ( CH1f2 covers it ).
+- **41 functions, June addresses** ( every row of `ch0_class_map.tsv` col 6 = CH1b, name as CH0 proposed ): `32ae5540` JUMP_UP EventProcess; `32ae55e0` / `32ae5610` DASH_JUMP_POWER_LANDING StartFuture / Start;
+  the eight StandUp StateEnds `32ae5630 32ae5670 32ae56b0 32ae56f0 32ae5730 32ae5770 32ae58a0 32ae58e0` ( CommonStateEnd, SetForceInvincible and SetShowInvincible 0.3 );
+  `32ae5920` SWITCHING StartFuture ( `m_fSwitchingCoolTime` = 1.0 ); `32aebc10` / `32b0fd90` WAIT StartFuture / Start; `32aebc60` JUMP_DOWN, `32af1150` JUMP_DOWN_NO_ATTACK, `32b0fde0` JUMP_READY, `32b20b30` WAIT,
+  `32b20d70` WALK, `32b20f70` JUMP_LANDING, `32b21250` DASH, `32b214c0` DASH_END, `32b0ff90` DASH_JUMP, `32b21830` DASH_JUMP_LANDING, `32b21a70` DASH_JUMP_POWER_LANDING EventProcess;
+  `32aebd10` / `32aebeb0` DAMAGE_DOWN FRONT / BACK, the six StandUp rolling / attack EventProcess `32aec060 32aec0f0 32aec180 32aec210 32aec2a0 32aec330` and `32af0150` ( uncarved: read from `charport_adis.py`, no decompile ) / `32af01e0`;
+  FrameMove `32b0fef0` DASH_END, `32b10260` / `32b10310` DAMAGE_DOWN FRONT / BACK, FrameMoveFuture `32b11670` JUMP_DOWN_NO_ATTACK; `32b3a250` / `32b3a270` DIE_FRONT / BACK StateStart. The 43 thunks are CH1m's registration.
+- **State ids are Lu's own names** ( `LSI_LU_*`, `LSI_RIDING_ON` ), never `USI_*`: June inserts a state at 24, so ids of 24 and up ( damage air fall 38, stand-up front 32, riding on 73 ) are not March's `USI_` values. Job-class dash combos use `LSI_LLC_` / `LSI_LCG_F_` / `LSI_LDB_F_DASH_COMBO_Z` ( 270 / 323 / 551 ).
+- **Active body:** the future anim is `GetXSkinAnimFuture()`, the now anim `GetXSkinAnimPtr()` ( DU1 ); `IsAnimationEnd` / `GetNowAnimationTime` / `GetMaxAnimationTime` ( = +0x220 - +0x2b0 ) read them. The June byte `+0x8e90` ? `+0x8e84` : `+0x87d0` is the getter, nothing else.
+- **Shared June body ported as members:** `DieFrontStart()` / `DieBackStart()` = June `31fd2d60` / `31fd2e30` ( CommonStateStart, DyingStart vslot 0x338, active anim `SetPlaySpeed( 0.5 )`; March has one per class, `CX2GUEL::DieFrontStart`; CH1d's Ciel dies through them ). `IsInJobLine( int )` is declared ( June `32aeb380`, vslot 0x670, body CH1l2; Chung's name and shape ).
+- **Callees kept as March:** `StateChangeDashIfPossible()` ( June vslot 0x668, Lu override `32ae5400` is CH1l2's ), `PlayAnimationWaitStart` ( `june_march_divergent.tsv` replace row: June's extra branch reads member `+0x89e0`, null in ported classes; `junediverge --check` passes ), `TryHyperModeStateChange` through `ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE`, `ELSE_IF_KEY_PRESSED_AT_SKIP_POINT_ZXCAS` ( the 15-key test of JUMP_LANDING ), `CanDown`, `GetEnableDash( EDS_END )`, `SpecialAttackEventProcess( ASUT_GROUND / ASUT_AIR )`, `GetRidingOn`.
+- **June's shapes kept:** DAMAGE_DOWN tests flag [1] before [4] ( Eve's order is the reverse ) and rolls `GetRandomInt()` against `m_iNoDownDamageAtStandUpAttackPercent` into NO_DOWN or the plain attack; the roll states sink 30 or 45 as June; DASH_JUMP's tail ( oneUp flag [0], oneDown `m_bDownForce` + `fMaxGSpeed`, riding ) runs on every path; DAMAGE_DOWN_BACK_FrameMove uses `EventTimer( 0.32 )` without the one-shot. JUNE_BUGS 692: DASH_JUMP_LANDING has no `else` after its off-the-line block ( Eve's `32982790` too ).
+- **Not in this phase:** the checklist row §7 L254 ( scale `m_fNowStatePowerRate`, never assign ) has no site here ( none of the 41 reads `+0x7cc8` ); skill 900 `SI_ETC_WS_COMMON_LOVE` ( LSI_LU_THROW_ITEM ) has no own function of its own in this group ( shared callbacks, CH1m ); no state is registered, so `stateends` / `skillicons` / `luabind` do not apply.
+- **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge --check` `RESULT: PASS`; `enumscan --check` exit 0 ( job lines 1 / 2 / 3 are no Enum, commented ).
+- **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GULuciel.cpp`, plain and `/D_LIVE`: 0 errors; `/P` shows the hyper-mode macro and `LINE_RADIUS` expanded. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** COMMIT_HASH; flagcheck `--range COMMIT_HASH^..COMMIT_HASH`: RANGE_LINE.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

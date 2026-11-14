@@ -837,5 +837,1219 @@ bool CX2GULuciel::StateChangeBySkillID( const CX2SkillTree::SKILL_ID eSkillID_ )
 		CX2RandomMissionManager::GetInstance()->OnSkillUse( pSkillTemplet->m_eID );
 }
 
+// char-luciel CH1b: Lu's common states ( June 32ae5540 - 32b3a270 ); the constants are June's immediates
+namespace _CONST_LUCIEL_CH1B_
+{
+	const float		STAND_UP_INVINCIBLE_TIME				= 0.3f;		// June 3345993c
+	const float		SWITCHING_COOL_TIME_AFTER_START			= 1.f;		// June 32ae5920 stores 0x3f800000
+	const float		DASH_END_STEP_DUST_TIME					= 0.4f;		// June 33446fa0
+	const float		DAMAGE_DOWN_FRONT_STEP_DUST_TIME		= 0.19f;	// June 33475a18
+	const float		DAMAGE_DOWN_BACK_STEP_DUST_TIME			= 0.32f;	// June 334ad0ac
+	const float		DAMAGE_DOWN_STAND_UP_INPUT_TIME			= 0.33f;	// June 3343bd70 ( the double of 0.33f )
+	const float		DASH_END_COMBO_INPUT_RATE				= 0.125f;	// June 33439ba8
+	const double	DASH_JUMP_POWER_LANDING_INPUT_DIVISOR	= 6.0;		// June 3343a468
+	const float		DASH_JUMP_POWER_LANDING_SPEED_RATE		= 0.5f;		// June 3342ebc8
+	const float		DIE_PLAY_SPEED							= 0.5f;		// June 3343777c
+}
+using namespace _CONST_LUCIEL_CH1B_;
+
+// char-luciel CH1b: June 31fd2d60 ( CX2GUUser's shared DIE_FRONT start; March's CX2GUEL::DieFrontStart )
+void CX2GULuciel::DieFrontStart()
+{
+	CommonStateStart();
+	DyingStart();
+
+	GetXSkinAnimPtr()->SetPlaySpeed( DIE_PLAY_SPEED );
+}
+
+// char-luciel CH1b: June 31fd2e30 ( identical to 31fd2d60 )
+void CX2GULuciel::DieBackStart()
+{
+	CommonStateStart();
+	DyingStart();
+
+	GetXSkinAnimPtr()->SetPlaySpeed( DIE_PLAY_SPEED );
+}
+
+// char-luciel CH1b: June 32ae5540
+void CX2GULuciel::LSI_LU_JUMP_UP_EventProcess()
+{
+	if( true == m_InputData.pureDoubleLeft || true == m_InputData.pureDoubleRight )
+	{
+		if( true == GetEnableDash( EDS_END ) )
+		{
+			StateChange( LSI_LU_DASH_JUMP );
+		}
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_Z );
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_X );
+	}
+	else if( 0.f < m_PhysicParam.nowSpeed.y )
+	{
+		if( true == GetRidingOn() )
+		{
+			StateChange( LSI_RIDING_ON );
+		}
+	}
+	else
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32ae55e0
+void CX2GULuciel::LSI_LU_DASH_JUMP_POWER_LANDING_StateStartFuture()
+{
+	CommonStateStartFuture();
+	m_PhysicParam.nowSpeed.x *= DASH_JUMP_POWER_LANDING_SPEED_RATE;
+}
+
+// char-luciel CH1b: June 32ae5610
+void CX2GULuciel::LSI_LU_DASH_JUMP_POWER_LANDING_StateStart()
+{
+	CommonStateStart();
+	CreateStepDust();
+}
+
+// char-luciel CH1b: June 32ae5630
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_FRONT_FRONT_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae5670
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_FRONT_BACK_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae56b0
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_BACK_FRONT_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae56f0
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_BACK_BACK_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae5730
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_FRONT_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae5770
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_BACK_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae58a0
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae58e0
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN_StateEnd()
+{
+	CommonStateEnd();
+	SetForceInvincible( STAND_UP_INVINCIBLE_TIME );
+	SetShowInvincible( STAND_UP_INVINCIBLE_TIME );
+}
+
+// char-luciel CH1b: June 32ae5920
+void CX2GULuciel::LSI_LU_SWITCHING_StateStartFuture()
+{
+	CommonStateStartFuture();
+	m_fSwitchingCoolTime = SWITCHING_COOL_TIME_AFTER_START;
+}
+
+// char-luciel CH1b: June 32aebc10 ( the active body's future anim )
+void CX2GULuciel::LSI_LU_WAIT_StateStartFuture()
+{
+	CommonStateStartFuture();
+	PlayAnimationWaitStart( GetXSkinAnimFuture(), m_FrameDataFuture );
+}
+
+// char-luciel CH1b: June 32aebc60
+void CX2GULuciel::LSI_LU_JUMP_DOWN_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_LANDING );
+	}
+	else if( true == m_InputData.pureDoubleLeft || true == m_InputData.pureDoubleRight )
+	{
+		if( true == GetEnableDash( EDS_END ) )
+		{
+			StateChange( LSI_LU_DASH_JUMP );
+		}
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_Z );
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_X );
+	}
+	else if( 0.f > m_PhysicParam.nowSpeed.y )
+	{
+		if( true == GetRidingOn() )
+		{
+			StateChange( LSI_RIDING_ON );
+		}
+	}
+	else
+	{
+		StateChange( LSI_LU_JUMP_UP );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aebd10 ( the thunk 32aec050 is the same body )
+void CX2GULuciel::LSI_LU_DAMAGE_DOWN_FRONT_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DAMAGE_AIR_FALL );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( true == m_FrameDataFuture.stateParam.bEventFlagList[1] )
+		{
+			StateChange( LSI_LU_STANDUP_ATTACK_FRONT );
+		}
+		else if( true == m_FrameDataFuture.stateParam.bEventFlagList[4] )
+		{
+			if( GetRandomInt() < m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent )
+			{
+				StateChange( LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN );
+			}
+			else
+			{
+				StateChange( LSI_LU_STANDUP_ATTACK_FRONT );
+			}
+		}
+		else if( true == m_FrameDataFuture.stateParam.bEventFlagList[2] )
+		{
+			StateChange( LSI_LU_STANDUP_ROLLING_FRONT_FRONT );
+		}
+		else if( true == m_FrameDataFuture.stateParam.bEventFlagList[3] )
+		{
+			StateChange( LSI_LU_STANDUP_ROLLING_FRONT_BACK );
+		}
+		else
+		{
+			StateChange( LSI_LU_DAMAGE_STANDUP_FRONT );
+		}
+	}
+	else if( GetXSkinAnimFuture()->GetNowAnimationTime() > DAMAGE_DOWN_STAND_UP_INPUT_TIME )
+	{
+		if( true == m_InputData.oneZ )
+		{
+			m_FrameDataFuture.stateParam.bEventFlagList[1] = true;
+			m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+		}
+		else if( true == m_InputData.oneX )
+		{
+			m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[4] = true;
+		}
+		else if( true == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( true == m_InputData.pureRight )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+		}
+		else
+		{
+			if( true == m_InputData.pureRight )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aebeb0 ( = 32aebd10 with the back-side states )
+void CX2GULuciel::LSI_LU_DAMAGE_DOWN_BACK_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DAMAGE_AIR_FALL );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( true == m_FrameDataFuture.stateParam.bEventFlagList[1] )
+		{
+			StateChange( LSI_LU_STANDUP_ATTACK_BACK );
+		}
+		else if( true == m_FrameDataFuture.stateParam.bEventFlagList[4] )
+		{
+			if( GetRandomInt() < m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent )
+			{
+				StateChange( LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN );
+			}
+			else
+			{
+				StateChange( LSI_LU_STANDUP_ATTACK_BACK );
+			}
+		}
+		else if( true == m_FrameDataFuture.stateParam.bEventFlagList[2] )
+		{
+			StateChange( LSI_LU_STANDUP_ROLLING_BACK_FRONT );
+		}
+		else if( true == m_FrameDataFuture.stateParam.bEventFlagList[3] )
+		{
+			StateChange( LSI_LU_STANDUP_ROLLING_BACK_BACK );
+		}
+		else
+		{
+			StateChange( LSI_LU_DAMAGE_STANDUP_BACK );
+		}
+	}
+	else if( GetXSkinAnimFuture()->GetNowAnimationTime() > DAMAGE_DOWN_STAND_UP_INPUT_TIME )
+	{
+		if( true == m_InputData.oneZ )
+		{
+			m_FrameDataFuture.stateParam.bEventFlagList[1] = true;
+			m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+		}
+		else if( true == m_InputData.oneX )
+		{
+			m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+			m_FrameDataFuture.stateParam.bEventFlagList[4] = true;
+		}
+		else if( true == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( true == m_InputData.pureRight )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+		}
+		else
+		{
+			if( true == m_InputData.pureRight )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[2] = true;
+				m_FrameDataFuture.stateParam.bEventFlagList[3] = false;
+				m_FrameDataFuture.stateParam.bEventFlagList[4] = false;
+			}
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aec060 ( the roll stand-ups: not on the line is a jump down, the end of the roll walks on or waits )
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_FRONT_FRONT_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aec0f0
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_FRONT_BACK_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aec180 ( the back rolls sink by 1.5 line radii )
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_BACK_FRONT_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aec210
+void CX2GULuciel::LSI_LU_STANDUP_ROLLING_BACK_BACK_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aec2a0 ( the attack stand-ups test the anim end first )
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_FRONT_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32aec330
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_BACK_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32af0150 ( uncarved in Ghidra: read from the listing )
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32af01e0
+void CX2GULuciel::LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32af1150
+void CX2GULuciel::LSI_LU_JUMP_DOWN_NO_ATTACK_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_LANDING );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b0fd90 ( the active body's now anim )
+void CX2GULuciel::LSI_LU_WAIT_StateStart()
+{
+	CommonStateStart();
+	PlayAnimationWaitStart( GetXSkinAnimPtr().get(), m_FrameDataNow );
+}
+
+// char-luciel CH1b: June 32b0fde0
+void CX2GULuciel::LSI_LU_JUMP_READY_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_Z );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_X );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+	{
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() || true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b0fef0
+void CX2GULuciel::LSI_LU_DASH_END_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimer( DASH_END_STEP_DUST_TIME ) )
+	{
+		CreateStepDust();
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1b: June 32b0ff90 ( the tail after the chain runs on every path, state change or not )
+void CX2GULuciel::LSI_LU_DASH_JUMP_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		if( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+		{
+			StateChange( LSI_LU_DASH_JUMP );
+			m_PhysicParam.nowSpeed.y = GetDashJumpSpeed();
+		}
+		else if( true == m_bDownForce )
+		{
+			StateChange( LSI_LU_DASH_JUMP_POWER_LANDING );
+		}
+		else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else
+		{
+			StateChange( LSI_LU_DASH_JUMP_LANDING );
+		}
+
+		m_bDownForce = false;
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_DASH_JUMP_COMBO_Z );
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_DASH_JUMP_COMBO_X );
+	}
+	else
+	{
+		// turning against the dash direction ends the dash jump: held keys decide the side, a double press needs a fresh press of the other way
+		bool bTurnAround = false;
+		if( false == m_InputData.pureRight || false == m_InputData.pureLeft )
+		{
+			if( false == m_InputData.pureRight )
+			{
+				bTurnAround = ( true == m_InputData.pureLeft && true == m_FrameDataFuture.syncData.bIsRight );
+			}
+			else
+			{
+				bTurnAround = ( false == m_FrameDataFuture.syncData.bIsRight );
+			}
+		}
+		else
+		{
+			bTurnAround = ( true == m_InputData.oneRight && false == m_FrameDataFuture.syncData.bIsRight )
+				|| ( true == m_InputData.oneLeft && true == m_FrameDataFuture.syncData.bIsRight );
+		}
+
+		if( true == bTurnAround )
+		{
+			if( GetJumpSpeed() < m_PhysicParam.nowSpeed.y )
+			{
+				m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+			}
+
+			if( m_PhysicParam.nowSpeed.y <= 0.f )
+			{
+				StateChange( LSI_LU_JUMP_DOWN );
+			}
+			else
+			{
+				StateChange( LSI_LU_JUMP_UP );
+			}
+		}
+	}
+
+	if( true == m_InputData.oneUp && m_PhysicParam.nowSpeed.y <= 0.f )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+
+	if( true == m_InputData.oneDown )
+	{
+		m_bDownForce = true;
+		m_PhysicParam.nowSpeed.y = m_PhysicParam.fMaxGSpeed;
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+	}
+	else if( true == GetRidingOn() )
+	{
+		StateChange( LSI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b10260 ( the active body's now anim )
+void CX2GULuciel::LSI_LU_DAMAGE_DOWN_FRONT_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( DAMAGE_DOWN_FRONT_STEP_DUST_TIME ) )
+	{
+		CreateStepDust();
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1b: June 32b10310 ( no one-shot here, as June )
+void CX2GULuciel::LSI_LU_DAMAGE_DOWN_BACK_FrameMove()
+{
+	if( true == GetXSkinAnimPtr()->EventTimer( DAMAGE_DOWN_BACK_STEP_DUST_TIME ) )
+	{
+		CreateStepDust();
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1b: June 32b11670
+void CX2GULuciel::LSI_LU_JUMP_DOWN_NO_ATTACK_FrameMoveFuture()
+{
+	bool bSetWalkSpeed = true;
+
+	if( false == m_InputData.pureRight || false == m_InputData.pureLeft )
+	{
+		if( true == m_InputData.pureRight )
+		{
+			m_FrameDataFuture.syncData.bIsRight = true;
+		}
+		else if( true == m_InputData.pureLeft )
+		{
+			m_FrameDataFuture.syncData.bIsRight = false;
+		}
+		else
+		{
+			bSetWalkSpeed = false;
+		}
+	}
+	else if( true == m_InputData.oneRight )
+	{
+		m_FrameDataFuture.syncData.bIsRight = true;
+	}
+	else if( true == m_InputData.oneLeft )
+	{
+		m_FrameDataFuture.syncData.bIsRight = false;
+	}
+
+	if( true == bSetWalkSpeed )
+	{
+		m_PhysicParam.nowSpeed.x = GetWalkSpeed();
+	}
+
+	if( true == m_InputData.pureDown && false == m_InputData.pureUp )
+	{
+		m_PhysicParam.nowSpeed.y -= m_PhysicParam.fGAccel * m_fElapsedTime;
+	}
+
+	CommonFrameMoveFuture();
+}
+
+// char-luciel CH1b: June 32b20b30
+void CX2GULuciel::LSI_LU_WAIT_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_InputData.oneSit && m_fSwitchingCoolTime <= 0.f )
+	{
+		StateChange( LSI_LU_SWITCHING );
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_COMBO_Z );
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_COMBO_X );
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+	{
+	}
+	else if( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_WALK );
+	}
+	else if( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_LU_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == GetRidingOn() )
+	{
+		StateChange( LSI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b20d70
+void CX2GULuciel::LSI_LU_WALK_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_InputData.oneSit && m_fSwitchingCoolTime <= 0.f )
+	{
+		StateChange( LSI_LU_SWITCHING );
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_COMBO_Z );
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_COMBO_X );
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+	{
+	}
+	else if( false == m_InputData.pureRight && false == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	else if( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_LU_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == GetRidingOn() )
+	{
+		StateChange( LSI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b20f70
+void CX2GULuciel::LSI_LU_JUMP_LANDING_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	else if( true == m_InputData.oneSit && m_fSwitchingCoolTime <= 0.f )
+	{
+		StateChange( LSI_LU_SWITCHING );
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_COMBO_Z );
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_COMBO_X );
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+	{
+	}
+	else if( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_WALK );
+	}
+	else if( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_LU_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	ELSE_IF_KEY_PRESSED_AT_SKIP_POINT_ZXCAS
+	{
+		StateChange( LSI_LU_WAIT, false );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b21250 ( a dash that leaves the line is a dash jump; the Z branch picks the job line's dash combo: line 1 Chiliarch, 2 Royal Guard, 3 Diablura, no Enum )
+void CX2GULuciel::LSI_LU_DASH_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_DASH_JUMP );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_InputData.oneSit && m_fSwitchingCoolTime <= 0.f )
+	{
+		StateChange( LSI_LU_SWITCHING );
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		if( true == IsInJobLine( 1 ) )
+		{
+			StateChange( LSI_LLC_DASH_COMBO_Z );
+		}
+		else if( true == IsInJobLine( 2 ) )
+		{
+			StateChange( LSI_LCG_F_DASH_COMBO_Z );
+		}
+		else if( true == IsInJobLine( 3 ) )
+		{
+			StateChange( LSI_LDB_F_DASH_COMBO_Z );
+		}
+		else
+		{
+			StateChange( LSI_LU_DASH_COMBO_Z );
+		}
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_DASH_COMBO_X_START );
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+	{
+	}
+	else if( true == m_InputData.oneUp )
+	{
+		StateChange( LSI_LU_DASH_JUMP );
+		m_PhysicParam.nowSpeed.y = GetDashJumpSpeed();
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if( ( false == m_InputData.pureRight && false == m_InputData.pureLeft )
+		|| ( true == m_InputData.pureRight && ( true == m_InputData.pureLeft || false == m_FrameDataFuture.syncData.bIsRight ) )
+		|| ( true == m_InputData.pureLeft && true == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		StateChange( LSI_LU_DASH_END );
+	}
+	else if( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_DASH_JUMP );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == GetRidingOn() )
+	{
+		StateChange( LSI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b214c0 ( the combo keys in the first eighth of the dash end give the dash combos )
+void CX2GULuciel::LSI_LU_DASH_END_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_InputData.oneSit && m_fSwitchingCoolTime <= 0.f )
+	{
+		StateChange( LSI_LU_SWITCHING );
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		if( GetXSkinAnimFuture()->GetNowAnimationTime() <= GetXSkinAnimFuture()->GetMaxAnimationTime() * DASH_END_COMBO_INPUT_RATE )
+		{
+			if( true == IsInJobLine( 1 ) )
+			{
+				StateChange( LSI_LLC_DASH_COMBO_Z );
+			}
+			else if( true == IsInJobLine( 2 ) )
+			{
+				StateChange( LSI_LCG_F_DASH_COMBO_Z );
+			}
+			else
+			{
+				StateChange( LSI_LU_DASH_COMBO_Z );
+			}
+		}
+		else
+		{
+			StateChange( LSI_LU_COMBO_Z );
+		}
+	}
+	else if( true == m_InputData.oneX )
+	{
+		if( GetXSkinAnimFuture()->GetNowAnimationTime() <= GetXSkinAnimFuture()->GetMaxAnimationTime() * DASH_END_COMBO_INPUT_RATE )
+		{
+			StateChange( LSI_LU_DASH_COMBO_X_START );
+		}
+		else
+		{
+			StateChange( LSI_LU_COMBO_X );
+		}
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+	{
+	}
+	else if( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft
+		|| ( true == m_InputData.oneRight && true == m_FrameDataFuture.syncData.bIsRight )
+		|| ( true == m_InputData.oneLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_WALK );
+	}
+	else if( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_InputData.oneUp )
+	{
+		StateChange( LSI_LU_JUMP_READY );
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	else if( true == GetRidingOn() )
+	{
+		StateChange( LSI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b21830 ( June's first block has no else: a unit off the line also runs the chain below, JUNE_BUGS 692 )
+void CX2GULuciel::LSI_LU_DASH_JUMP_LANDING_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+
+	if( true == m_InputData.oneSit && m_fSwitchingCoolTime <= 0.f )
+	{
+		StateChange( LSI_LU_SWITCHING );
+	}
+	else if( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_COMBO_Z );
+	}
+	else if( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_COMBO_X );
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+	{
+	}
+	else if( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft
+		|| ( true == m_InputData.oneRight && true == m_FrameDataFuture.syncData.bIsRight )
+		|| ( true == m_InputData.oneLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_WALK );
+	}
+	else if( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_LU_JUMP_READY );
+	}
+	else if( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b21a70 ( the power landing waits a sixth of the anim before it takes input )
+void CX2GULuciel::LSI_LU_DASH_JUMP_POWER_LANDING_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_InputData.oneRight || true == m_InputData.oneLeft )
+	{
+		StateChange( LSI_LU_WALK );
+	}
+	else if( GetXSkinAnimFuture()->GetNowAnimationTime() > static_cast<float>( GetXSkinAnimFuture()->GetMaxAnimationTime() / DASH_JUMP_POWER_LANDING_INPUT_DIVISOR ) )
+	{
+		if( true == m_InputData.oneSit && m_fSwitchingCoolTime <= 0.f )
+		{
+			StateChange( LSI_LU_SWITCHING );
+		}
+		else if( true == m_InputData.oneZ )
+		{
+			StateChange( LSI_LU_COMBO_Z );
+		}
+		else if( true == m_InputData.oneX )
+		{
+			StateChange( LSI_LU_COMBO_X );
+		}
+		else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_GROUND ) )
+		{
+		}
+		else if( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft
+			|| true == m_InputData.pureRight || true == m_InputData.pureLeft )
+		{
+			StateChangeDashIfPossible();
+		}
+		else if( true == m_InputData.pureUp )
+		{
+			StateChange( LSI_LU_JUMP_READY );
+		}
+		else if( true == m_InputData.oneDown
+			&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1b: June 32b3a250 ( both bodies leave their transformed form, then the shared die start )
+void CX2GULuciel::LSI_LU_DIE_FRONT_StateStart()
+{
+	EndTransformedForm( 0, true );
+	EndTransformedForm( 1, true );
+	DieFrontStart();
+}
+
+// char-luciel CH1b: June 32b3a270
+void CX2GULuciel::LSI_LU_DIE_BACK_StateStart()
+{
+	EndTransformedForm( 0, true );
+	EndTransformedForm( 1, true );
+	DieBackStart();
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}

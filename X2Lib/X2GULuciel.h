@@ -626,6 +626,52 @@ protected:
 	void				ReleaseTransformedSkinAnim( const int iForm_ );	// char-luciel CH1a4: June 32b13d30
 	void				SetFormSkinAnim( const int iForm_, STransformedSkin& transformedSkin_ );	// char-luciel CH1a4: June 32b13e20
 	void				EndTransformedForm( const int iForm_, const bool bByDie_ );	// char-luciel CH1a4: June 32b38f30
+	bool				IsInJobLine( int iJobLine_ );	// June 32aeb380 ( vslot 0x670 ): body in CH1l2
+	void				DieFrontStart();	// char-luciel CH1b: June 31fd2d60 ( CX2GUUser's shared body )
+	void				DieBackStart();	// char-luciel CH1b: June 31fd2e30 ( CX2GUUser's shared body )
+
+	// char-luciel CH1b: Lu's common states ( June 32ae5540 - 32b3a270 )
+	void				LSI_LU_JUMP_UP_EventProcess();	// June 32ae5540
+	void				LSI_LU_DASH_JUMP_POWER_LANDING_StateStartFuture();	// June 32ae55e0
+	void				LSI_LU_DASH_JUMP_POWER_LANDING_StateStart();	// June 32ae5610
+	void				LSI_LU_STANDUP_ROLLING_FRONT_FRONT_StateEnd();	// June 32ae5630
+	void				LSI_LU_STANDUP_ROLLING_FRONT_BACK_StateEnd();	// June 32ae5670
+	void				LSI_LU_STANDUP_ROLLING_BACK_FRONT_StateEnd();	// June 32ae56b0
+	void				LSI_LU_STANDUP_ROLLING_BACK_BACK_StateEnd();	// June 32ae56f0
+	void				LSI_LU_STANDUP_ATTACK_FRONT_StateEnd();	// June 32ae5730
+	void				LSI_LU_STANDUP_ATTACK_BACK_StateEnd();	// June 32ae5770
+	void				LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN_StateEnd();	// June 32ae58a0
+	void				LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN_StateEnd();	// June 32ae58e0
+	void				LSI_LU_SWITCHING_StateStartFuture();	// June 32ae5920
+	void				LSI_LU_WAIT_StateStartFuture();	// June 32aebc10
+	void				LSI_LU_JUMP_DOWN_EventProcess();	// June 32aebc60
+	void				LSI_LU_DAMAGE_DOWN_FRONT_EventProcess();	// June 32aebd10 ( also the thunk 32aec050 )
+	void				LSI_LU_DAMAGE_DOWN_BACK_EventProcess();	// June 32aebeb0
+	void				LSI_LU_STANDUP_ROLLING_FRONT_FRONT_EventProcess();	// June 32aec060
+	void				LSI_LU_STANDUP_ROLLING_FRONT_BACK_EventProcess();	// June 32aec0f0
+	void				LSI_LU_STANDUP_ROLLING_BACK_FRONT_EventProcess();	// June 32aec180
+	void				LSI_LU_STANDUP_ROLLING_BACK_BACK_EventProcess();	// June 32aec210
+	void				LSI_LU_STANDUP_ATTACK_FRONT_EventProcess();	// June 32aec2a0
+	void				LSI_LU_STANDUP_ATTACK_BACK_EventProcess();	// June 32aec330
+	void				LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN_EventProcess();	// June 32af0150
+	void				LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN_EventProcess();	// June 32af01e0
+	void				LSI_LU_JUMP_DOWN_NO_ATTACK_EventProcess();	// June 32af1150
+	void				LSI_LU_WAIT_StateStart();	// June 32b0fd90
+	void				LSI_LU_JUMP_READY_EventProcess();	// June 32b0fde0
+	void				LSI_LU_DASH_END_FrameMove();	// June 32b0fef0
+	void				LSI_LU_DASH_JUMP_EventProcess();	// June 32b0ff90
+	void				LSI_LU_DAMAGE_DOWN_FRONT_FrameMove();	// June 32b10260
+	void				LSI_LU_DAMAGE_DOWN_BACK_FrameMove();	// June 32b10310
+	void				LSI_LU_JUMP_DOWN_NO_ATTACK_FrameMoveFuture();	// June 32b11670
+	void				LSI_LU_WAIT_EventProcess();	// June 32b20b30
+	void				LSI_LU_WALK_EventProcess();	// June 32b20d70
+	void				LSI_LU_JUMP_LANDING_EventProcess();	// June 32b20f70
+	void				LSI_LU_DASH_EventProcess();	// June 32b21250
+	void				LSI_LU_DASH_END_EventProcess();	// June 32b214c0
+	void				LSI_LU_DASH_JUMP_LANDING_EventProcess();	// June 32b21830
+	void				LSI_LU_DASH_JUMP_POWER_LANDING_EventProcess();	// June 32b21a70
+	void				LSI_LU_DIE_FRONT_StateStart();	// June 32b3a250
+	void				LSI_LU_DIE_BACK_StateStart();	// June 32b3a270
 
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )
