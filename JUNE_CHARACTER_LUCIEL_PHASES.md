@@ -897,6 +897,7 @@ No `_DEBUG`, no log line (nothing runs before CH1). funcmap rows: `grep "(DU1b4)
 - **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --with JUNE_DIVERGE_COMMON_STATE_END_FUTURE --worktree --files` (3 files): 2 PASS (+168, +3), 1 DEFINE,
   0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS. `enumscan --check X2GUUser.cpp`: the 4 known
   DU1b3 rows only (`GetUserUnitRelativePos` codes). Flag probe (`cl /P`): both flags and `SPEED_TIME` on, no `#error`.
+  Commit `32fb86be`; `--range 32fb86be^..32fb86be` (with both flags): 2 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp` and `X2GUChung.cpp`: 0 errors each. Full build skipped: no play-test.
 - **In game:** nothing new for Lu/Ciel yet. Other classes: form 0, none of the duo keys, the minor list stays empty; the only live change is
   the untimed SPEED_TIME entries applying at state end and the Future anim placed at the Future position there (June's behaviour).
