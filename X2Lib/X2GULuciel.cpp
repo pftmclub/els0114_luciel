@@ -8370,5 +8370,341 @@ int CX2GULuciel::GetStateIDByForm( const int iStateID_ )
 	}
 }
 
+// char-luciel CH1k2: overrides band 1 part 2 ( June 32b1f0a0 - 32b4db90 )
+namespace _CONST_LUCIEL_CH1K2_
+{
+	const int		KILL_LEAD_FOR_HALF_MP					= 1;		// June 32b373e0 @32b375ac: a lead of exactly one kill halves the other form's MP, a larger lead empties it
+	const double	KILL_LEAD_OTHER_FORM_MP_RATE			= 0.5;		// June 32b373e0 @32b37646 ( 3342ebc8 )
+	const double	AMUSEMENT_OTHER_FORM_MP_DIVIDER			= 3.0;		// June 32b373e0 @32b376c6 ( 33439b50 )
+}
+using namespace _CONST_LUCIEL_CH1K2_;
+
+// char-luciel CH1k2: June 32b1f0a0 ( vslot 0x4c ); the base's handles go first, then the class's
+/*virtual*/ void CX2GULuciel::DeleteMinorParticle()
+{
+	CX2GUUser::DeleteMinorParticle();
+
+	DeleteLucielMinorParticle();
+}
+
+// char-luciel CH1k2: June 32b1f0b0 ( vslot 0xc4 ); no hyper boost for a transcended unit or one with an awakening effect set
+/*virtual*/ void CX2GULuciel::HyperModeBuffEffectStart()
+{
+	CX2GUUser::HyperModeBuffEffectStart();
+
+	if ( NULL != GetUnit() && 0 != GetUnit()->GetUnitData().m_iUnitClassTran )
+		return;
+
+	if ( true == AwakeningEffectSetPresent() )
+		return;
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostRFoot )
+		m_hHyperBoostRFoot = g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this, L"HyperBoostRight_Luciel", 0, 0, 0, 0, 0 );
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostLFoot )
+		m_hHyperBoostLFoot = g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this, L"HyperBoostLeft_Luciel", 0, 0, 0, 0, 0 );
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostRArm )
+		m_hHyperBoostRArm = g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this, L"HyperBoostRight_Luciel", 0, 0, 0, 0, 0 );
+
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hHyperBoostLArm )
+		m_hHyperBoostLArm = g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this, L"HyperBoostLeft_Luciel", 0, 0, 0, 0, 0 );
+}
+
+// char-luciel CH1k2: June 32b373e0 ( vslot 0x44 ); a revived unit drops its summons, follows the Combination Point, and the other form's MP and the Combination Point follow the PvP score
+/*virtual*/ void CX2GULuciel::ReInit( bool bUseTeamPos_, int iStartPosIndex_ )
+{
+	CX2GUUser::ReInit( bUseTeamPos_, iStartPosIndex_ );
+
+	KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS );
+	KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP );
+	KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LCN_SHADOW_BOLT );
+
+	if ( true == IsMyUnit() )
+	{
+		const CX2LucielGageData* pLucielGageData = static_cast<const CX2LucielGageData*>( GetGageData() );
+		const int iNowCombinationPoint = ( NULL != pLucielGageData ) ? pLucielGageData->GetNowCombinationPoint() : 0;
+		if ( m_FrameDataFuture.syncData.iClassSyncInt != iNowCombinationPoint )
+			m_FrameDataFuture.syncData.iClassSyncInt = iNowCombinationPoint;
+	}
+
+	if ( CX2Room::TN_RED == GetTeam() || CX2Room::TN_BLUE == GetTeam() )
+	{
+		CX2PVPRoom* pPVPRoom = g_pData->GetPVPRoom();	// June tests the PvP room, not the game type
+		if ( NULL != pPVPRoom )
+		{
+			const int iOtherForm = ( true == IsMinorUnitActive() ) ? 0 : 1;
+
+			if ( CX2PVPRoom::PGT_AMUSEMENT_ITEM == pPVPRoom->GetPVPGameType() )
+			{
+				const float fOtherFormNowMp = GetGageData()->GetNowMp( iOtherForm );	// June reads the gauge pointer with no test here
+				if ( NULL != m_pGageData )
+					m_pGageData->SetNowMp( static_cast<float>( fOtherFormNowMp / AMUSEMENT_OTHER_FORM_MP_DIVIDER ), false, iOtherForm );
+			}
+			else
+			{
+				int iKillLead = 0;
+				if ( CX2Room::TN_RED == GetTeam() )
+					iKillLead = g_pX2Game->GetRedTeamKill() - g_pX2Game->GetBlueTeamKill();
+				else
+					iKillLead = g_pX2Game->GetBlueTeamKill() - g_pX2Game->GetRedTeamKill();
+
+				if ( KILL_LEAD_FOR_HALF_MP < iKillLead )
+				{
+					if ( NULL != m_pGageData )
+						m_pGageData->SetNowMp( 0.f, false, iOtherForm );
+
+					if ( NULL != m_pGageData )
+					{
+						CX2LucielGageData* pLucielGageData = static_cast<CX2LucielGageData*>( m_pGageData );
+						pLucielGageData->SetCombinationPointChanged( true );
+						pLucielGageData->SetNowCombinationPoint( 0 );
+					}
+				}
+				else if ( KILL_LEAD_FOR_HALF_MP == iKillLead )
+				{
+					const float fOtherFormNowMp = GetGageData()->GetNowMp( iOtherForm );	// June reads the gauge pointer with no test here
+					SetGageNowMpOfForm( static_cast<float>( fOtherFormNowMp * KILL_LEAD_OTHER_FORM_MP_RATE ), false, false );
+					SetNowCombinationPoint( 0 );
+				}
+			}
+		}
+	}
+
+	ResetPhantomRushReady();
+	ClearAltarOfEvilEffectSet();
+
+	if ( NULL != m_pTransformSkillSlotUI )
+	{
+		// stand-in: CH2d20 adds the window's dialog release ( 31fd03f0 ) before this delete, as in the destructor
+		SAFE_DELETE( m_pTransformSkillSlotUI );
+	}
+
+	KillMySummonedNPC( CX2UnitManager::NUI_SA_LDN_GARDEN_OF_HAURES );
+}
+
+// char-luciel CH1k2: June 32b37c70 ( vslot 0xd0 ); the local player's new gauge copies the one the gauge manager holds
+/*virtual*/ CX2GageData* CX2GULuciel::CreateGageData()
+{
+	if ( true == IsMyUnit() )
+	{
+		const CX2LucielGageData* pLucielGageData = static_cast<const CX2LucielGageData*>( CX2GageManager::GetInstance()->GetMyGageData() );
+
+		if ( NULL != pLucielGageData )
+			return new CX2LucielGageData( *pLucielGageData );
+
+		return new CX2LucielGageData();
+	}
+
+	return new CX2LucielGageData();
+}
+
+// char-luciel CH1k2: June 32b4b580; the time is a damage multiplier ( -1 = off ), June tests 0 <= time where CH0's hint read 0 < time
+bool CX2GULuciel::IsInvasionOfDarkEnergyActive() const
+{
+	return 0.f <= m_fInvasionOfDarkEnergyTime;
+}
+
+// char-luciel CH1k2: June 32b4db90 ( vslot 0x5c ); the state id is mapped for the body in play before the base queues it
+/*virtual*/ bool CX2GULuciel::StateChange( int iState_, bool bDirectChange_ )
+{
+	return CX2GUUser::StateChange( GetStateIDByForm( iState_ ), bDirectChange_ );
+}
+
+// char-luciel CH1k2: June 32b4dbb0 ( vslot 0x434 )
+/*virtual*/ bool CX2GULuciel::StateChange( int iState_, int iSubState_, bool bDirectChange_ )
+{
+	return CX2GUUser::StateChange( GetStateIDByForm( iState_ ), iSubState_, bDirectChange_ );
+}
+
+// char-luciel CH1k2: June 32b4d3c0 ( vslot 0x438 ); riding first, then the wait state of the body in play
+/*virtual*/ int CX2GULuciel::GetWaitStateID()
+{
+	if ( true == GetRidingOn() )
+		return LSI_RIDING_WAIT;
+
+	return GetStateIDByForm( m_CommonState.m_Wait );
+}
+
+// char-luciel CH1k2: June 32b4d3f0 ( vslot 0x43c ); the common state getters below pick the transformed set while either body is transformed, then Ciel's id or Lu's
+/*virtual*/ int CX2GULuciel::GetWalkStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_WALK : LSI_LU_WALK;
+}
+
+// char-luciel CH1k2: June 32b4d430 ( vslot 0x440 )
+/*virtual*/ int CX2GULuciel::GetDashStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DASH : LSI_LU_DASH;
+}
+
+// char-luciel CH1k2: June 32b4d470 ( vslot 0x444 )
+/*virtual*/ int CX2GULuciel::GetDashEndStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DASH_END : LSI_LU_DASH_END;
+}
+
+// char-luciel CH1k2: June 32b4d4b0 ( vslot 0x448 )
+/*virtual*/ int CX2GULuciel::GetDashJumpStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DASH_JUMP : LSI_LU_DASH_JUMP;
+}
+
+// char-luciel CH1k2: June 32b4d4f0 ( vslot 0x44c )
+/*virtual*/ int CX2GULuciel::GetDashJumpLandingStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DASH_JUMP_LANDING : LSI_LU_DASH_JUMP_LANDING;
+}
+
+// char-luciel CH1k2: June 32b4d530 ( vslot 0x450 )
+/*virtual*/ int CX2GULuciel::GetJumpReadyStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_JUMP_READY : LSI_LU_JUMP_READY;
+}
+
+// char-luciel CH1k2: June 32b4d570 ( vslot 0x454 )
+/*virtual*/ int CX2GULuciel::GetJumpUpStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_JUMP_UP : LSI_LU_JUMP_UP;
+}
+
+// char-luciel CH1k2: June 32b4d610 ( vslot 0x45c )
+/*virtual*/ int CX2GULuciel::GetJumpLandingStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_JUMP_LANDING : LSI_LU_JUMP_LANDING;
+}
+
+// char-luciel CH1k2: June 32b4d650 ( vslot 0x460 ); a transformed unit dies in Lu's state
+/*virtual*/ int CX2GULuciel::GetDieFrontStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return LSI_LU_DIE_FRONT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DIE_FRONT : LSI_LU_DIE_FRONT;
+}
+
+// char-luciel CH1k2: June 32b4d690 ( vslot 0x464 )
+/*virtual*/ int CX2GULuciel::GetDieBackStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return LSI_LU_DIE_BACK;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DIE_BACK : LSI_LU_DIE_BACK;
+}
+
+// char-luciel CH1k2: June 32b4d6d0 ( vslot 0x468 ); a transformed unit reacts to every damage in its transformed wait state
+/*virtual*/ int CX2GULuciel::GetDamageGroggyStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_GROGGY : LSI_LU_DAMAGE_GROGGY;
+}
+
+// char-luciel CH1k2: June 32b4d710 ( vslot 0x46c )
+/*virtual*/ int CX2GULuciel::GetDamageSmallFrontStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_SMALL_FRONT : LSI_LU_DAMAGE_SMALL_FRONT;
+}
+
+// char-luciel CH1k2: June 32b4d750 ( vslot 0x470 )
+/*virtual*/ int CX2GULuciel::GetDamageSmallBackStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_SMALL_BACK : LSI_LU_DAMAGE_SMALL_BACK;
+}
+
+// char-luciel CH1k2: June 32b4d790 ( vslot 0x474 )
+/*virtual*/ int CX2GULuciel::GetDamageBigFrontStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_BIG_FRONT : LSI_LU_DAMAGE_BIG_FRONT;
+}
+
+// char-luciel CH1k2: June 32b4d7d0 ( vslot 0x478 )
+/*virtual*/ int CX2GULuciel::GetDamageBigBackStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_BIG_BACK : LSI_LU_DAMAGE_BIG_BACK;
+}
+
+// char-luciel CH1k2: June 32b4d890 ( vslot 0x47c )
+/*virtual*/ int CX2GULuciel::GetDamageStandUpFrontStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_STANDUP_FRONT : LSI_LU_DAMAGE_STANDUP_FRONT;
+}
+
+// char-luciel CH1k2: June 32b4d8d0 ( vslot 0x480 )
+/*virtual*/ int CX2GULuciel::GetDamageStandUpBackStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_STANDUP_BACK : LSI_LU_DAMAGE_STANDUP_BACK;
+}
+
+// char-luciel CH1k2: June 32b4d910 ( vslot 0x484 )
+/*virtual*/ int CX2GULuciel::GetDamageAirSmallStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_SMALL : LSI_LU_DAMAGE_AIR_SMALL;
+}
+
+// char-luciel CH1k2: June 32b4d950 ( vslot 0x488 )
+/*virtual*/ int CX2GULuciel::GetDamageAirDownStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_DOWN : LSI_LU_DAMAGE_AIR_DOWN;
+}
+
+// char-luciel CH1k2: June 32b4da50 ( vslot 0x498 )
+/*virtual*/ int CX2GULuciel::GetDamageAirUpStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_UP : LSI_LU_DAMAGE_AIR_UP;
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}

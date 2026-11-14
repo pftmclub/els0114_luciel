@@ -624,6 +624,35 @@ public:
 	virtual void		DoProcessWhenKillEnemy( const CX2GameUnit* pDefender_ );	// June 32b0e3f0 ( vslot 0x318 )
 	virtual void		ChangeMaxCharacterAddResource( const float fRate_ );	// June 32b14cd0 ( vslot 0x324 )
 
+	// char-luciel CH1k2: overrides band 1 part 2 ( June 32b1f0a0 - 32b4db90 ); ( + ) = the base is not virtual or not declared in March, CH1o declares it virtual
+	virtual void		DeleteMinorParticle();	// June 32b1f0a0 ( vslot 0x4c )
+	virtual void		HyperModeBuffEffectStart();	// June 32b1f0b0 ( vslot 0xc4 )
+	virtual void		ReInit( bool bUseTeamPos_ = true, int iStartPosIndex_ = -1 );	// June 32b373e0 ( vslot 0x44 )
+	virtual CX2GageData*	CreateGageData();	// June 32b37c70 ( vslot 0xd0 )
+	virtual bool		StateChange( int iState_, bool bDirectChange_ = false );	// June 32b4db90 ( vslot 0x5c ): the state id goes through GetStateIDByForm
+	virtual bool		StateChange( int iState_, int iSubState_, bool bDirectChange_ = false );	// June 32b4dbb0 ( vslot 0x434 )
+	virtual int			GetWaitStateID();	// + June 32b4d3c0 ( vslot 0x438 )
+	virtual int			GetWalkStateID();	// + June 32b4d3f0 ( vslot 0x43c )
+	virtual int			GetDashStateID();	// + June 32b4d430 ( vslot 0x440 )
+	virtual int			GetDashEndStateID();	// + June 32b4d470 ( vslot 0x444 )
+	virtual int			GetDashJumpStateID();	// + June 32b4d4b0 ( vslot 0x448 )
+	virtual int			GetDashJumpLandingStateID();	// + June 32b4d4f0 ( vslot 0x44c )
+	virtual int			GetJumpReadyStateID();	// + June 32b4d530 ( vslot 0x450 )
+	virtual int			GetJumpUpStateID();	// + June 32b4d570 ( vslot 0x454 )
+	virtual int			GetJumpLandingStateID();	// + June 32b4d610 ( vslot 0x45c )
+	virtual int			GetDieFrontStateID();	// + June 32b4d650 ( vslot 0x460 )
+	virtual int			GetDieBackStateID();	// + June 32b4d690 ( vslot 0x464 )
+	virtual int			GetDamageGroggyStateID() const;	// June 32b4d6d0 ( vslot 0x468 ), base: DU2
+	virtual int			GetDamageSmallFrontStateID() const;	// June 32b4d710 ( vslot 0x46c )
+	virtual int			GetDamageSmallBackStateID() const;	// June 32b4d750 ( vslot 0x470 )
+	virtual int			GetDamageBigFrontStateID() const;	// June 32b4d790 ( vslot 0x474 )
+	virtual int			GetDamageBigBackStateID() const;	// June 32b4d7d0 ( vslot 0x478 )
+	virtual int			GetDamageStandUpFrontStateID() const;	// June 32b4d890 ( vslot 0x47c )
+	virtual int			GetDamageStandUpBackStateID() const;	// June 32b4d8d0 ( vslot 0x480 )
+	virtual int			GetDamageAirSmallStateID() const;	// June 32b4d910 ( vslot 0x484 )
+	virtual int			GetDamageAirDownStateID() const;	// June 32b4d950 ( vslot 0x488 )
+	virtual int			GetDamageAirUpStateID() const;	// June 32b4da50 ( vslot 0x498 )
+
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 #ifdef	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
@@ -655,7 +684,7 @@ protected:
 	void				EraseDamageEffectIndexEntry( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b16810
 	bool				IsInvasionOfDarkEnergyTarget( const CX2GameUnit* pGameUnit_ );	// June 32b16260
 	void				EraseInvasionOfDarkEnergyTarget( const CX2GameUnit* pGameUnit_ );	// June 32b166e0
-	bool				IsInvasionOfDarkEnergyActive() const;	// June 32b4b580: body in CH1k2
+	bool				IsInvasionOfDarkEnergyActive() const;	// June 32b4b580
 	void				ResetPhantomRushReady();	// June 32b34920
 	void				ClearAltarOfEvilEffectSet();	// June 32b35540
 	void				ReleaseTransformedSkinAnim( const int iForm_ );	// char-luciel CH1a4: June 32b13d30
