@@ -2378,6 +2378,41 @@ skill-tree rows, the HUD portrait, and surviving a relog. A defect goes back to 
 
 **Done gate:** the walk passes; 0 unexplained `no_state` rows; no new `KEM_ERROR`.
 
+### CH6 - Done (2026-11-14, Sonnet 5.5): scans PASSED, walk owed
+
+**No code change, no flag.** Save backed up first: `data\db_backup\els_db_20261114_123230_pre_pre_ch6_walk_elesis.sql`. Walk sheet (tables per slot key, nicknames): `june2017_re/char_elesis/ch6_walk.md`.
+
+| Scan | Before (CH0, 2026-11-12) | After (2026-11-14) |
+|---|---|---|
+| `census.py` | - | 26 PASS, 0 FAIL, `to-implement` 0 (regenerated `census.tsv` / matrix / coverage reverted: line numbers only) |
+| `charport_scan.py` | `ELESIS_KNIGHT {'no NUMERICAL_DATA_INDEX': 69, 'no DAMAGE table': 20}`, KEYS empty | identical (diff vs `plan_charport_scan_20261111.txt`: one extra SKIPPED name, `GameEditCommandList`, a peer's file) |
+| `charport_keys.py ELESIS_KNIGHT` | 248 keys: june-only 9 / neither 1 / march-only-site 4 | identical (234 both); left: `BBT_*` / `BFT_*` damage-data (no June reader), `IMMUNITY_EDT_LIST_AT_THIS_STATE` (no reader), `FORCE_DYNAMIC_CAMERA_INDEX` / `RETAIN_CAMERA_STATE` (June `ReservedSkillStart` camera: Stage 9), `HEAD_IK` (neither) |
+| `s3_no_state.py --family X2GUEL.cpp --preprocess` | 261 rows, 254 no_state | 261 rows, **80 no_state (38 ids), 0 unexplained** |
+
+**The 80 `no_state` rows, explained:** 30 rows type-8 / `RNSI_P_*` passives and 106 (no class state in June); 13 `*_UPGRADE` ids (no state of their own); 37 rows / 12 ids
+the generator misses although X2GUEL.cpp has a qualified `case CX2SkillTree::RNSI_*` (28000 `:1726`, 28003 `:2679`, 28201 `:4080`, 28008 `:1796`, 28600 `:3221`, 28222 `:2378`,
+28015 `:1918`, 28223 `:2414`, 28063 `:2405`, 28020 `:2238`, 28024 `:2467`) and 900 (`SI_ETC_WS_COMMON_LOVE`, `:1689`).
+
+**Save set-up** (class names by nickname; unit numbers only here). Learned bank: base ids, except the not-reached ids of the CH3 / CH4 reviews, each pair has its mate at level 0
+(bank-1 rule): 29 `ElesisGM` enhanced Victory / Provoke / Juggernaut / Drastic Charge / Sonic Blade (28046 / 28227 / 28048 / 28228 / 28049) + base hyper 28600; 30 `ElesisBH` enhanced
+Red Lotus / Flame Rose (28231 / 28232) + base hyper 28601; 146 `CAvenger80` enhanced Fate Smash 28605. Three skill pages per transcended unit, two for 29 / 30 / 35 non-transcended
+(`unit_skill_page`), so every active is slotted: 7 in `wewe` (20), 13 in `SaberT` (40) / `eresisu` (21) / `DKnight80` (144), 24 in each of 29 / 30 / 146 (F = hyper, T = a transcended skill, page 1).
+`wewe` level 9 -> 14. New units: 167 `ElTrGM75` / 168 `ElTrBH75` / 169 `ElTrCA75` (120 / 121 / 125, level 75, transcendence 0:
+the transition walk), 170-172 `ElJobDK` / `ElJobSK` / `ElJobPK` (class 8, level 14, exp 81600) and 173 `ElJobCA` (class 35, level 34, exp 1212400): the job-change walk (CHNb's exp).
+Generator: `loadout.py` style, page rows in `unit_skill_page`, `unit_skill_page_info` = (3 or 2, 1).
+**Deviation from the kickoff:** each skill is slotted once (no A-and-B double slotting: 24 skills x 2 does not fit 3 pages). A / B key parity: the shared 7 skills sit on the A row of
+`wewe` and the B row of the other units, the rest in one row each.
+
+**Walk content** (user's request: dev commands first, a table per slot key, nicknames): 11 sections in `ch6_walk.md`: skills (cast 1 / cast 2 at once / cast 3 after the clock / move after),
+Way of the Sword (Z combos one way, X combos the other, both modes, `/stage 2`, drain, village), four summons, blood sucking / Blood Runaway, passives, CH4's three not-reached checks
+(Overflowing Blood past 4 stacks, berserker 2, Dodge and Slash MP refund), one dungeon per job, both job-change dialogs on fresh units, the creation screen, the transition on
+`ElTrGM75` / `ElTrBH75` / `ElTrCA75` (`/tc 1`, `/qdone 42030`, `/additem 288493 1`), leave and return. Console: `/hpf` `/mpf` `/mhp` `/stage` `/monhp` `/invin 1`
+(NOTE `/invin 0` = invincible and free MP), `g_pX2Game:GetMyUnit():SetHyperModeCount( 3 )`.
+**Watch (CH6 reading, not code):** `SetDungeonClearTexture` has no Elesis case (default path through `GetCharacterImageName`, `CIT_DungeonClear`): a blank or wrong end-of-dungeon picture on
+35 / 125 goes back to `JUNE_CHAR_ELESIS_CLASS` (Ara's CH6 defect shape). Not for the walk: Grand Master aura on allies, Crimson Avenger passive icon, Infernal Blade's upgrade (JUNE_BUGS 667).
+
+`DEPLOY OK: X2_offline.exe is 26,600,960 B, dated 2026-11-14 12:17:46, md5 8e5646f370573b533533a5e21a6190cf, equal to X2/US_SERVICE/x2.exe (2026-11-14 12:17:38); built at main e7659b6e.` (a peer's build had just linked it; nothing to relink).
+
 ## Phase Z - Close-out
 
 **Run with:** Sonnet 5.5 medium. `MODS.md` "June character: Elesis" section (flags, files, data, revert order: exe + data036 + motion koms
