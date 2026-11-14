@@ -858,7 +858,7 @@ line (nothing runs before CH1). funcmap rows: `grep "(DU1b3)" june2017_re/funcma
   `GetUserUnitRelativePos` codes (no enum; March's own switch, copied), not NPC ids; a one-line comment says so.
 - **Hygiene.** flagcheck `DUO_BODY --worktree --files` (my six files): 5 PASS (+421, +6, +6, +7, +3), 1 OTHER (Always.h: my guard + a peer's
   uncommitted char-elesis CH3d block, not staged), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS.
-  Commit and range line: below.
+  Commit `04d2cacf`; `--range 04d2cacf^..04d2cacf`: 6 PASS, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GameUnit.cpp`, `X2GUChung.cpp`: 0 errors each. Full build skipped: no
   play-test (DU1d builds and hands off the regression pass).
 - **In game:** nothing to see. Other classes have no second anim and none of the keys: the second-body lines move only a local and the unread
