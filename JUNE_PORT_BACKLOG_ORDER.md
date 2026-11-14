@@ -273,6 +273,10 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   byte `+0x8864` and the unit byte `+0xdac` are set, the unit drifts from its anim matrix by a per-frame velocity `+0x886c..+0x8874` (decays each
   frame; seeded once, `+0x8865`, from a `CX2Game` vfunc 0x94 table `+0x44..+0x4c`), `dirDegree.y = +0x8878`, both bodies are moved by it and the
   normal move / rotation is skipped. Every class. Identify the writer of `+0x8864` first (funcmap row `32063650 @32064f47-320652b7 (DU1b2)`).
+- **`PhysicProcess` landing extras** (char-luciel DU1b3, 2026-11-14). June `32015b30 @32019e84-32019f94`: when the landing reports misplaced
+  and `+0x40a4` was clear, June re-runs `CanDown` on the stored position and sets `+0x40a4` / the clock `+0x40a8` only if that fails too (March's
+  `RESET_INVALID_UNIT_POSITION_TEST` block sets `m_bMisplaced` at once). June's landing helper `32010440 @32011081` also stores a fall record
+  `+0x40ac..+0x40c4` (line index, position, land position) on the misplaced branch; find its reader first. Every class (funcmap rows (DU1b3)).
 
 ### Stage 3: skill system core (skill tree engine + skill slots)
 
@@ -1057,6 +1061,10 @@ half is planned there (C9h-2a/2b/3). Two pieces are not effect work and have no 
   trailing float as the game-unit one and stores it in EffectSetInstance `+0x14c`. CH1o ported the game-unit half
   (`SERV_IRUHADEV_JUNE_EFFECTSET_FORCE_DOWN_RATE`, `m_fJuneForceDownValueRate`); March's `PlayEffectSetByPet` has no parameter. It matters only
   if a pet caller passes a rate other than 1.
+- **Riding-pet anim move in `PhysicProcess`** (char-luciel DU1b3, 2026-11-14). June `32015b30 @32018204`: while riding (`GetRidingOn`) with a
+  riding pet whose byte `+0x5a1` is 1, the unit's anim move comes from the riding pet's future anim (`32071c10` / `32071a30`) instead of the
+  unit's, and the second body gets none; March always reads the unit's anim. Identify the pet key that sets `+0x5a1` first (funcmap row
+  `32015b30 @32018204 (DU1b3)`).
 
 **Depends on:** june-effect C9h-2a and C9h-3 (the code they would exercise), Stage 13 (the items), Stage 14 (byte-exact assets).
 

@@ -13259,6 +13259,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !( defined( SERV_IRUHADEV_JUNE_SKILL_STATE_PTR ) && defined( SERV_IRUHADEV_JUNE_SKILL_TREE_PANELS ) )
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs SKILL_STATE_PTR ( CommonStateStart's state data ) and SKILL_TREE_PANELS ( SetCommandGroup ), char-luciel DU1b
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !( defined( SERV_IRUHADEV_JUNE_NOT_SELECT_UNIT_OFFSET ) && defined( SERV_IRUHADEV_JUNE_APPLY_MOVEMENT_SPEED ) && defined( SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs NOT_SELECT_UNIT_OFFSET ( the offset keys ), APPLY_MOVEMENT_SPEED and LINEMAP_LAND_MONSTER_ROAD ( PhysicProcess ), char-luciel DU1b3
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-14

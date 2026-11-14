@@ -774,6 +774,9 @@ void CX2GameUnit::ReInit( bool bUseTeamPos, int startPosIndex )
 
 	SetRemainHyperModeTime( 0.0f );
 	m_PhysicParam				= m_OrgPhysicParam;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	m_MinorUnitPhysicParam		= m_OrgPhysicParam;	// char-luciel DU1b3: June Init 322a5f90 @322a600a
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef DEEP_WATER_DUNGEON_TEST
 	ResetPhysicParam();
 #endif DEEP_WATER_DUNGEON_TEST
@@ -5082,6 +5085,9 @@ void CX2GameUnit::InitStat()
 /*virtual*/ void CX2GameUnit::ResetPhysicParam( bool bPreserveNowSpeed /*= false */ )
 {
 	m_PhysicParam	= m_OrgPhysicParam;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	m_MinorUnitPhysicParam	= m_OrgPhysicParam;	// char-luciel DU1b3: June 322886a0 @322886c2
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef RIDING_SYSTEM
 	/// 탈것에 탑승했을 때, 물리 설정값 갱신

@@ -1068,6 +1068,10 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_cActiveBodyChangeStateNum			= 0;
 	m_bFirstUnitTransformed				= false;
 	m_bMinorUnitTransformed				= false;
+	m_fApplyAnimMoveMultiply			= 1.f;	// char-luciel DU1b3: June's ctor leaves +0x8f50 to the first state start ( miss 1.0 )
+	m_bUseNotSelectMotionBeforePos		= false;
+	INIT_VECTOR3( m_vNotSelectMotionBeforePos, 0.f, 0.f, 0.f );
+	m_bUsePhysicProcessNotSelectUnit	= false;
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
@@ -17118,6 +17122,14 @@ void CX2GUUser::CommonStateStartFuture()
 	ParseNotSelectUnitOffset( m_FutureStateData.stateID, true );
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 #endif SERV_IRUHADEV_JUNE_NOT_SELECT_UNIT_OFFSET
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June 320506f0 @32056f4a-3205763c
+	LUA_GET_VALUE( m_LuaManager, "USE_NOT_SELECT_MOTION_BEFORE_POS", m_bUseNotSelectMotionBeforePos, false );
+	if ( true == m_bUseNotSelectMotionBeforePos )
+		m_vNotSelectMotionBeforePos = m_FrameDataFuture.syncData.vNotSelectPosition;
+	LUA_GET_VALUE( m_LuaManager, "APPLY_ANIM_MOVE_MULTIPLY", m_fApplyAnimMoveMultiply, 1.f );
+	LUA_GET_VALUE( m_LuaManager, "USE_PHYSICPROCESS_NOT_SELECT_UNIT", m_bUsePhysicProcessNotSelectUnit, false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef LINKED_LINEMAP_JUMP_USER_TEST
 	LUA_GET_VALUE( m_LuaManager, "LINK_JUMP_TIME", m_fLinkJumpTime, 1.f );
@@ -18493,6 +18505,14 @@ void CX2GUUser::CommonStateStart()
 	ParseNotSelectUnitOffset( m_NowStateData.stateID, false );
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 #endif SERV_IRUHADEV_JUNE_NOT_SELECT_UNIT_OFFSET
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June 32057b80 @320611b6-320618a8; the kept position is the Future one here too
+	LUA_GET_VALUE( m_LuaManager, "USE_NOT_SELECT_MOTION_BEFORE_POS", m_bUseNotSelectMotionBeforePos, false );
+	if ( true == m_bUseNotSelectMotionBeforePos )
+		m_vNotSelectMotionBeforePos = m_FrameDataFuture.syncData.vNotSelectPosition;
+	LUA_GET_VALUE( m_LuaManager, "APPLY_ANIM_MOVE_MULTIPLY", m_fApplyAnimMoveMultiply, 1.f );
+	LUA_GET_VALUE( m_LuaManager, "USE_PHYSICPROCESS_NOT_SELECT_UNIT", m_bUsePhysicProcessNotSelectUnit, false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef SERV_EVE_BATTLE_SERAPH
 	LUA_GET_VALUE( m_LuaManager, "IS_NOCHANGE_SPECTRO",		m_FrameDataNow.stateParam.bNoChangSpectro,		false );
@@ -25948,6 +25968,11 @@ void CX2GUUser::PhysicProcess()
 	//현재 정보 받아오기
 	positionOrg = position = m_FrameDataFuture.syncData.position;
 	angleDegree	= m_FrameDataFuture.unitCondition.dirDegree;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June 32015b30 @32015b81, the second body's position runs beside the first
+	D3DXVECTOR3 vNotSelectPosition = m_FrameDataFuture.syncData.vNotSelectPosition;
+	const D3DXVECTOR3 vNotSelectPositionOrg = vNotSelectPosition;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_WORLD_TRIGGER_AUTO_DISABLE
 	/// June 32015b30 @32015bb2-32015c1b: the frame's entry line and land position ( +0x7e54 / +0x7e20, read before any re-land below ), for the auto-disable gate
 	const int			iEntryLineIndex		= m_FrameDataFuture.syncData.lastTouchLineIndex;
@@ -26066,6 +26091,10 @@ void CX2GUUser::PhysicProcess()
 			angleDegree	= m_FrameDataFuture.unitCondition.dirDegree = pLineData->dirDegree;
 			m_PhysicParam.nowSpeed.x = 0.0f;
 			m_PhysicParam.nowSpeed.y = 0.0f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			m_MinorUnitPhysicParam.nowSpeed.x = 0.0f;	// char-luciel DU1b3: June @3201689f
+			m_MinorUnitPhysicParam.nowSpeed.y = 0.0f;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		}
 		else
 		{
@@ -26157,6 +26186,28 @@ void CX2GUUser::PhysicProcess()
 			m_PhysicParam.nowSpeed.x = 0.0f;
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June @32016996-32016a81, the second body's x decay ( its walk speed against the first body's GetWalkSpeed )
+	if( m_MinorUnitPhysicParam.nowSpeed.x >= 0.0f )
+	{
+		if ( true == m_MinorUnitPhysicParam.bApplyMovementSpeed )
+			m_MinorUnitPhysicParam.nowSpeed.x -= m_MinorUnitPhysicParam.fReloadAccel * m_fElapsedTime * ( GetWalkSpeed() / m_MinorUnitPhysicParam.fWalkSpeed );
+		else
+			m_MinorUnitPhysicParam.nowSpeed.x -= m_MinorUnitPhysicParam.fReloadAccel * m_fElapsedTime;
+		if( m_MinorUnitPhysicParam.nowSpeed.x <= 0.0f )
+			m_MinorUnitPhysicParam.nowSpeed.x = 0.0f;
+	}
+	else
+	{
+		if ( true == m_MinorUnitPhysicParam.bApplyMovementSpeed )
+			m_MinorUnitPhysicParam.nowSpeed.x += m_MinorUnitPhysicParam.fReloadAccel * m_fElapsedTime * ( GetWalkSpeed() / m_MinorUnitPhysicParam.fWalkSpeed );
+		else
+			m_MinorUnitPhysicParam.nowSpeed.x += m_MinorUnitPhysicParam.fReloadAccel * m_fElapsedTime;
+		if( m_MinorUnitPhysicParam.nowSpeed.x > 0.0f )
+			m_MinorUnitPhysicParam.nowSpeed.x = 0.0f;
+	}
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef REVERSE_GRAVITY_TEST
 
 	if( 0.f != m_fReverseGravitySpeedDeltaY )
@@ -26183,6 +26234,30 @@ void CX2GUUser::PhysicProcess()
 
 		if( m_PhysicParam.nowSpeed.y > 4000.f )
 			m_PhysicParam.nowSpeed.y = 4000.f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1b3: June @32016b61-32016c12, the second body under reverse gravity
+		if( m_MinorUnitPhysicParam.nowSpeed.y > 300.f )
+		{
+			m_MinorUnitPhysicParam.nowSpeed.y -= m_MinorUnitPhysicParam.fGAccel * m_fElapsedTime;
+			if( m_MinorUnitPhysicParam.nowSpeed.y <= m_MinorUnitPhysicParam.fMaxGSpeed )
+				m_MinorUnitPhysicParam.nowSpeed.y = m_MinorUnitPhysicParam.fMaxGSpeed;
+		}
+		else if( m_MinorUnitPhysicParam.nowSpeed.y < -50.f )
+		{
+			float fMinorUnitScale = m_MinorUnitPhysicParam.nowSpeed.y / -50.f;
+			m_MinorUnitPhysicParam.nowSpeed.y += m_fReverseGravitySpeedDeltaY * fMinorUnitScale;
+		}
+		else
+		{
+			m_MinorUnitPhysicParam.nowSpeed.y += m_fReverseGravitySpeedDeltaY;
+		}
+
+		if( m_MinorUnitPhysicParam.nowSpeed.y < -4000.f )
+			m_MinorUnitPhysicParam.nowSpeed.y = -4000.f;
+
+		if( m_MinorUnitPhysicParam.nowSpeed.y > 4000.f )
+			m_MinorUnitPhysicParam.nowSpeed.y = 4000.f;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 
@@ -26210,6 +26285,9 @@ void CX2GUUser::PhysicProcess()
 		m_PhysicParam.nowSpeed.x = 0.f;
 
 		D3DXVECTOR3 vAnimRotateDegree = m_pXSkinAnimFuture->GetMatrix().GetRotateDegree();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		m_MinorUnitPhysicParam.nowSpeed.x = 0.f;	// char-luciel DU1b3: June @32016cc9
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		vAnimRotateDegree.x += m_vReverseGravityRotateSpeedDelta.x;
 		vAnimRotateDegree.y += m_vReverseGravityRotateSpeedDelta.y;
 		vAnimRotateDegree.z += m_vReverseGravityRotateSpeedDelta.z;
@@ -26218,6 +26296,17 @@ void CX2GUUser::PhysicProcess()
 
 
 		m_pXSkinAnim->GetMatrix().RotateDegree( vAnimRotateDegree );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1b3: June @32016d73-32016e3c, the second body's anims turn from their own degree
+		D3DXVECTOR3 vMinorUnitAnimRotateDegree( 0.f, 0.f, 0.f );
+		if ( NULL != m_pMinorUnitXSkinAnimFuture )
+			vMinorUnitAnimRotateDegree = m_pMinorUnitXSkinAnimFuture->GetMatrix().GetRotateDegree();
+		vMinorUnitAnimRotateDegree += m_vReverseGravityRotateSpeedDelta;
+		if ( NULL != m_pMinorUnitXSkinAnimFuture )
+			m_pMinorUnitXSkinAnimFuture->GetMatrix().RotateDegree( vMinorUnitAnimRotateDegree );
+		if ( NULL != m_pMinorUnitXSkinAnim )
+			m_pMinorUnitXSkinAnim->GetMatrix().RotateDegree( vMinorUnitAnimRotateDegree );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 
@@ -26282,6 +26371,16 @@ void CX2GUUser::PhysicProcess()
 				if( m_PhysicParam.nowSpeed.y <= m_PhysicParam.fMaxGSpeed * fBuoyancy )
 					m_PhysicParam.nowSpeed.y = m_PhysicParam.fMaxGSpeed * fBuoyancy;
 #endif SERV_IRUHADEV_JUNE_LIMIT_MAX_G_SPEED
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				// char-luciel DU1b3: June @3201745a-32017861, the second body falls without the SET_LIMIT_MAX_G_SPEED cap ( JUNE_BUGS 142 )
+				m_MinorUnitPhysicParam.nowSpeed.y -= m_MinorUnitPhysicParam.fGAccel * m_fElapsedTime * fBuoyancy;
+				if( m_MinorUnitPhysicParam.nowSpeed.y <= m_MinorUnitPhysicParam.fMaxGSpeed * fBuoyancy )
+					m_MinorUnitPhysicParam.nowSpeed.y = m_MinorUnitPhysicParam.fMaxGSpeed * fBuoyancy;
+
+				m_MinorUnitPhysicParam.nowSpeed.y -= m_MinorUnitPhysicParam.fDownAccel * m_fElapsedTime;
+				if( m_MinorUnitPhysicParam.nowSpeed.y <= m_MinorUnitPhysicParam.fMaxGSpeed * fBuoyancy )
+					m_MinorUnitPhysicParam.nowSpeed.y = m_MinorUnitPhysicParam.fMaxGSpeed * fBuoyancy;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			}
 		}
 		else
@@ -26293,6 +26392,9 @@ void CX2GUUser::PhysicProcess()
 				if ( m_bRidingMachine == false )
 				{
 					m_PhysicParam.nowSpeed.y = 0.0f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+					m_MinorUnitPhysicParam.nowSpeed.y = 0.0f;	// char-luciel DU1b3: June @32017884
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				}
 			}
 		}
@@ -26340,12 +26442,35 @@ void CX2GUUser::PhysicProcess()
 		else
 			position -= m_FrameDataFuture.unitCondition.dirVector * m_PhysicParam.nowSpeed.x * fSlowFactor * m_fElapsedTime;
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June @32017b2f-32017e3b, the second body ( its speed ) and the kept position move the same way
+	{
+		D3DXVECTOR3 vMinorUnitDirVec = m_FrameDataFuture.unitCondition.dirVector;
+		if( false == IsOnSomethingFuture() )
+			vMinorUnitDirVec.y = 0.0f;
+		const D3DXVECTOR3 vMinorUnitMove = vMinorUnitDirVec * m_MinorUnitPhysicParam.nowSpeed.x * fSlowFactor * m_fElapsedTime;
+		if( m_FrameDataFuture.syncData.bIsRight == true )
+		{
+			vNotSelectPosition += vMinorUnitMove;
+			m_vNotSelectMotionBeforePos += vMinorUnitMove;
+		}
+		else
+		{
+			vNotSelectPosition -= vMinorUnitMove;
+			m_vNotSelectMotionBeforePos -= vMinorUnitMove;
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	//라인 스피드 적용
 	m_FrameDataFuture.unitCondition.dirVector = pLineData->dirVector;
 	if( true == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
 		position += pLineData->dirVector * pLineData->m_fSpeed * m_fElapsedTime;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		vNotSelectPosition += pLineData->dirVector * pLineData->m_fSpeed * m_fElapsedTime;	// char-luciel DU1b3: June @32017f7a
+		m_vNotSelectMotionBeforePos += pLineData->dirVector * pLineData->m_fSpeed * m_fElapsedTime;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 
 
@@ -26398,6 +26523,35 @@ void CX2GUUser::PhysicProcess()
 		)
 	{
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1b3: June @3201815f-320188d1; the riding-pet anim move ( pet +0x5a1, @32018204 ) is Stage 17's
+		D3DXVECTOR3 vTranslationX = GetDirVector() * GetXSkinAnimFuture()->GetMotionOffset().x;
+		D3DXVECTOR3 vTranslationZ = GetZVector() * GetXSkinAnimFuture()->GetMotionOffset().z;
+		D3DXVECTOR3 vNotSelectTranslationX( 0.f, 0.f, 0.f );
+		D3DXVECTOR3 vNotSelectTranslationZ( 0.f, 0.f, 0.f );
+		if ( NULL != GetNotSelectXSkinAnimFuture() )
+		{
+			vNotSelectTranslationX = GetDirVector() * GetNotSelectXSkinAnimFuture()->GetMotionOffset().x;
+			vNotSelectTranslationZ = GetZVector() * GetNotSelectXSkinAnimFuture()->GetMotionOffset().z;
+		}
+		D3DXVECTOR3 vAnimMove = ( vTranslationX + vTranslationZ ) * m_fApplyAnimMoveMultiply;
+		D3DXVECTOR3 vNotSelectAnimMove = ( vNotSelectTranslationX + vNotSelectTranslationZ ) * m_fApplyAnimMoveMultiply;
+		vAnimMove.y = 0.f;
+		vNotSelectAnimMove.y = 0.f;
+
+		if( m_FrameDataFuture.syncData.bIsRight == true )
+		{
+			position += vAnimMove;
+			vNotSelectPosition += vNotSelectAnimMove;
+			m_vNotSelectMotionBeforePos += vNotSelectAnimMove;
+		}
+		else
+		{
+			position -= vAnimMove;
+			vNotSelectPosition -= vNotSelectAnimMove;
+			m_vNotSelectMotionBeforePos -= vNotSelectAnimMove;
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		D3DXVECTOR3 vTranslationX = GetDirVector() * m_pXSkinAnimFuture->GetMotionOffset().x;
 		D3DXVECTOR3 vTranslationZ = GetZVector() * m_pXSkinAnimFuture->GetMotionOffset().z;
 		vTranslationX.y = 0.f;
@@ -26411,6 +26565,7 @@ void CX2GUUser::PhysicProcess()
 		{
 			position -= vTranslationX + vTranslationZ;
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 
 
@@ -26421,6 +26576,18 @@ void CX2GUUser::PhysicProcess()
 //#endif STEP_ON_MONSTER_TEST
 
 	//다른 캐릭터에 의해 밀림 혹은 막힘
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June @32018bee-32018c1c: March's loop below as June's 32010060, again for the second body
+	if( m_FrameDataFuture.stateParam.bCanPassUnit == false )
+	{
+		PhysicProcess_PushByUnits( position, m_PhysicParam.nowSpeed.x, m_FrameDataFuture.syncData.position );
+		if ( true == m_bUsePhysicProcessNotSelectUnit )
+		{
+			D3DXVECTOR3& vNotSelectPhysicPosition = ( true == m_bUseNotSelectMotionBeforePos ) ? m_vNotSelectMotionBeforePos : vNotSelectPosition;
+			PhysicProcess_PushByUnits( vNotSelectPhysicPosition, m_MinorUnitPhysicParam.nowSpeed.x, m_FrameDataFuture.syncData.vNotSelectPosition );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_FrameDataFuture.stateParam.bCanPassUnit == false )
 	{
 #ifdef  X2OPTIMIZE_NPC_NONHOST_SIMULATION
@@ -26564,6 +26731,7 @@ void CX2GUUser::PhysicProcess()
 		}
 	}
 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	//Y이동
 #ifdef RIDING_SYSTEM
 	D3DXVECTOR3 vPos = ( true == GetRidingOn() && NULL != m_ptrRidingPet ) ? m_ptrRidingPet->GetPos() : m_FrameDataFuture.syncData.position;
@@ -26587,6 +26755,22 @@ void CX2GUUser::PhysicProcess()
 			position.y += m_PhysicParam.nowSpeed.y * m_fElapsedTime;
 		}
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June @32019159-320191fb; June tests the first body's y speed here ( JUNE_BUGS )
+	if ( true == m_bUsePhysicProcessNotSelectUnit )
+	{
+		D3DXVECTOR3& vNotSelectPhysicPosition = ( true == m_bUseNotSelectMotionBeforePos ) ? m_vNotSelectMotionBeforePos : vNotSelectPosition;
+		if( m_PhysicParam.nowSpeed.y > 0.f && false == pLineMap->CanPassUp( vNotSelectPhysicPosition ) )
+		{
+			vNotSelectPhysicPosition.y = m_FrameDataFuture.syncData.vNotSelectPosition.y;
+			m_MinorUnitPhysicParam.nowSpeed.y = 0.f;
+		}
+		else if( D3DXVECTOR3(0, 0, 0 ) == m_vDisplaceUnitPosition )
+		{
+			vNotSelectPhysicPosition.y += m_MinorUnitPhysicParam.nowSpeed.y * m_fElapsedTime;
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 	//// 외부요인에 의한 캐릭터 위치변화가 있다면
@@ -26688,6 +26872,22 @@ void CX2GUUser::PhysicProcess()
 
 
 	//지면 계산////////////////////////////////////////////////////////////////////
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June @32019405-320194df: March's landing below as June's 32010440, again for the second body
+	int lastTouchLineIndex		= m_FrameDataFuture.syncData.lastTouchLineIndex;
+	D3DXVECTOR3 landPosition	= m_FrameDataFuture.unitCondition.landPosition;
+	const bool bMisplacedOnLand = PhysicProcess_LandOnLine( pLineMap, position, lastTouchLineIndex, landPosition, positionOrg, false );
+#ifdef RESET_INVALID_UNIT_POSITION_TEST
+	bMisplaced = bMisplacedOnLand;
+#endif RESET_INVALID_UNIT_POSITION_TEST
+	if ( true == m_bUsePhysicProcessNotSelectUnit )
+	{
+		D3DXVECTOR3& vNotSelectPhysicPosition = ( true == m_bUseNotSelectMotionBeforePos ) ? m_vNotSelectMotionBeforePos : vNotSelectPosition;
+		int iNotSelectLineIndex = -1;
+		D3DXVECTOR3 vNotSelectLandPosition = pLineMap->GetLandPosition( vNotSelectPhysicPosition, false, LINE_RADIUS, &iNotSelectLineIndex );
+		PhysicProcess_LandOnLine( pLineMap, vNotSelectPhysicPosition, iNotSelectLineIndex, vNotSelectLandPosition, vNotSelectPositionOrg, true );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	bool bTouch	= false;
 	//m_FrameDataFuture.unitCondition.bFall	= false;
 	int lastTouchLineIndex		= m_FrameDataFuture.syncData.lastTouchLineIndex;
@@ -26856,6 +27056,7 @@ void CX2GUUser::PhysicProcess()
 		}
 	}
 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef RESET_INVALID_UNIT_POSITION_TEST
 
 	if( bMisplaced != m_bMisplaced )
@@ -26961,6 +27162,10 @@ void CX2GUUser::PhysicProcess()
 		}
 		m_PhysicParam.nowSpeed.x = 0.0f;
 		m_PhysicParam.nowSpeed.y = 0.0f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		m_MinorUnitPhysicParam.nowSpeed.x = 0.0f;	// char-luciel DU1b3: June @32019e0b
+		m_MinorUnitPhysicParam.nowSpeed.y = 0.0f;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 
 
@@ -26992,6 +27197,29 @@ void CX2GUUser::PhysicProcess()
 	//위치 업데이트////////////////////////////////////////////////////////////////
 	m_FrameDataFuture.syncData.position			= position;
 	m_FrameDataFuture.unitCondition.dirDegree	= dirDegree;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b3: June @32019e25-3201a1c7: the second body stands at the first ( or the kept position ), then at its offset
+	m_FrameDataFuture.syncData.vNotSelectPosition = ( true == m_bUseNotSelectMotionBeforePos ) ? m_vNotSelectMotionBeforePos : position;
+	if ( NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		const D3DXVECTOR3 vMotionDifference = GetNotSelectXSkinAnimFuture()->GetMotionMoveNow() - GetXSkinAnimFuture()->GetMotionMoveNow();
+		const D3DXVECTOR3 vDirVector = GetDirVector();
+		const float fTurnedDifferenceX = vDirVector.x * vMotionDifference.x + vDirVector.x * vMotionDifference.z;	// June turns by dir.x / dir.z alone ( JUNE_BUGS )
+		const float fTurnedDifferenceZ = vDirVector.z * vMotionDifference.x + vDirVector.z * vMotionDifference.z;
+		D3DXVECTOR3 vNotSelectOffset = vDirVector * m_afNotSelectUnitOffset[0];
+		vNotSelectOffset.y = m_afNotSelectUnitOffset[1];
+		if ( true == m_bUseNotSelectMotionDifference )
+		{
+			vNotSelectOffset.x += fTurnedDifferenceX;
+			vNotSelectOffset.y += vMotionDifference.y;
+			vNotSelectOffset.z += fTurnedDifferenceZ;
+		}
+		if( m_FrameDataFuture.syncData.bIsRight == true )
+			m_FrameDataFuture.syncData.vNotSelectPosition += vNotSelectOffset;
+		else
+			m_FrameDataFuture.syncData.vNotSelectPosition -= vNotSelectOffset;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	const float MAGIC_LINE_TOUCH_BOUND = 1.f;
 	if( fabs(m_FrameDataFuture.syncData.position.y-m_FrameDataFuture.unitCondition.landPosition.y) < MAGIC_LINE_TOUCH_BOUND && 
@@ -27027,6 +27255,199 @@ void CX2GUUser::PhysicProcess()
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1b3: June 32010060, March's PhysicProcess push loop ( live branches ) on a given position, speed and fallback
+void CX2GUUser::PhysicProcess_PushByUnits( D3DXVECTOR3& vPosition_, float& fNowSpeedX_, const D3DXVECTOR3& vSyncPosition_ )
+{
+	D3DXVECTOR2 vMyUnitMinMaxY( m_FrameDataFuture.syncData.position.y, m_FrameDataFuture.syncData.position.y + GetUnitHeight( true ) );
+
+	const vector<CX2GameUnit*>& vecGameUnitList = g_pX2Game->GetUnitList();
+	for( vector<CX2GameUnit*>::const_iterator cvItr = vecGameUnitList.begin();
+		vecGameUnitList.end() != cvItr; ++cvItr )
+	{
+		CX2GameUnit* pGameUnit = *cvItr;
+		if ( NULL != pGameUnit && pGameUnit != this )
+		{
+			if ( ( ( pGameUnit->GetTeam() != GetTeam() && false == pGameUnit->GetStateparam( true ).bCanPassUnit)
+				|| ( pGameUnit->GetTeam() == GetTeam() && pGameUnit->GetGameUnitType() == GUT_NPC
+				&& static_cast<CX2GUNPC*>( pGameUnit )->CanPassAllyUnit() == false )
+#ifdef SERV_IRUHADEV_ELYSION_SCRIPT_A
+				|| ( GUT_NPC == pGameUnit->GetGameUnitType() && true == static_cast<CX2GUNPC*>( pGameUnit )->HasCanNotPassSpecifiedBone() )
+#endif SERV_IRUHADEV_ELYSION_SCRIPT_A
+				) && ( pGameUnit->GetAllyTeam() == CX2Room::TN_NONE || pGameUnit->GetAllyTeam() != static_cast<CX2Room::TEAM_NUM>(GetTeam()) ) &&
+				pGameUnit->GetGameUnitState() != GUSI_DIE &&
+				!( g_pX2Game->GetGameType() == CX2Game::GT_BATTLE_FIELD && false == pGameUnit->DidReceiveFirstSyncPacket() ) )
+			{
+				if ( !( false == m_FrameDataFuture.stateParam.bCanPushUnit &&
+					pGameUnit->GetStateparam( true ).bCanPushUnit ) )
+				{
+					vMyUnitMinMaxY.x = vPosition_.y;
+					vMyUnitMinMaxY.y = vPosition_.y + GetUnitHeight( true );
+					if ( pGameUnit->GetGameUnitType() == GUT_USER )
+					{
+						int  iDirection = 0;
+						PhysicProcess_RetrieveRelativePosInfo( static_cast<CX2GUUser*>(pGameUnit), pGameUnit->GetUnitIndex(), iDirection );
+						if ( ProcessCanPushUnit( pGameUnit, vMyUnitMinMaxY, vPosition_, iDirection ) == false )
+						{
+							vPosition_ = vSyncPosition_;
+							fNowSpeedX_ = 0.0f;
+						}
+					}
+					else
+					{
+						CX2GUNPC* pNPC = static_cast<CX2GUNPC*>(pGameUnit);
+						int  iDirection = 0;
+						// char-luciel DU1b3: relative-position codes 1-4 have no enum ( March's switch, verbatim )
+						switch( pNPC->GetUserUnitRelativePos( GetUnitIndex() ) )
+						{
+						case 1:
+							iDirection = 2;
+							break;
+						case 2:
+							iDirection = 1;
+							break;
+						case 3:
+							iDirection = 4;
+							break;
+						case 4:
+							iDirection = 3;
+							break;
+						}
+#ifdef SERV_IRUHADEV_ELYSION_SCRIPT_A
+						if ( true == pNPC->HasCanNotPassSpecifiedBone() )
+						{
+							const int iNumBone = (int)pNPC->GetNowStateData().m_vecCanNotPassSpecifiedBone.size();
+							for ( int iBone = 0; iBone < iNumBone; ++iBone )
+								ProcessCanPushUnit( pGameUnit, vMyUnitMinMaxY, vPosition_, iDirection, iBone );
+						}
+						else
+#endif SERV_IRUHADEV_ELYSION_SCRIPT_A
+						if ( ProcessCanPushUnit( pGameUnit, vMyUnitMinMaxY, vPosition_, iDirection ) == false )
+						{
+							vPosition_ = vSyncPosition_;
+							fNowSpeedX_ = 0.0f;
+						}
+					}
+					continue;
+				}
+
+				if ( CheckPassUnit( pGameUnit, vPosition_ ) == true )
+				{
+					vPosition_ = vSyncPosition_;
+					fNowSpeedX_ = 0.0f;
+				}
+			}
+		}
+	}
+}
+
+// char-luciel DU1b3: June 32010440, March's PhysicProcess landing on a given position with the first or the second body's physics; returns bMisplaced
+bool CX2GUUser::PhysicProcess_LandOnLine( CKTDGLineMap* pLineMap_, D3DXVECTOR3& vPosition_, int& iLastTouchLineIndex_, D3DXVECTOR3& vLandPosition_, const D3DXVECTOR3& vPositionOrg_, const bool bMinorUnit_ )
+{
+	PhysicParam& physicParam = ( true == bMinorUnit_ ) ? m_MinorUnitPhysicParam : m_PhysicParam;
+	CKTDGXSkinAnim* pXSkinAnimFuture = ( true == bMinorUnit_ ) ? m_pMinorUnitXSkinAnimFuture : m_pXSkinAnimFuture;
+	const float fNowAnimTimeFuture = ( NULL != pXSkinAnimFuture ) ? pXSkinAnimFuture->GetNowAnimationTime() : 0.f;
+	bool bMisplaced = false;
+
+	bool bTouch	= false;
+	if ( CX2Unit::UC_EVE_BATTLE_SERAPH == GetUnitClass() && CX2GUEve::ENSI_EBS_BOOST_DASH == m_itNowStateData->first )
+		bTouch = pLineMap_->IsOnLine( vPosition_, 51.f, &vLandPosition_, &iLastTouchLineIndex_ );
+	else
+		bTouch = pLineMap_->IsOnLine( vPosition_, LINE_RADIUS, &vLandPosition_, &iLastTouchLineIndex_ );
+
+	if( bTouch == true )
+	{
+		if( physicParam.nowSpeed.y > 0.0f )
+		{
+			vPosition_.x = vLandPosition_.x;
+			vPosition_.z = vLandPosition_.z;
+		}
+		else if( 0.f != m_vFutureIgnoreLineTime.y &&
+			fNowAnimTimeFuture >= m_vFutureIgnoreLineTime.x &&
+			fNowAnimTimeFuture < m_vFutureIgnoreLineTime.y )
+		{
+			vPosition_.x = vLandPosition_.x;
+			vPosition_.z = vLandPosition_.z;
+		}
+		else
+		{
+			vPosition_ = vLandPosition_;
+			physicParam.nowSpeed.y = 0.0f;
+			physicParam.fDownAccel = 0.0f;
+		}
+	}
+	else
+	{
+		if( m_FrameDataFuture.stateParam.bLandConnect == true
+			&& pLineMap_->IsOnLineConnect( vPosition_, &iLastTouchLineIndex_, LINE_RADIUS, &vLandPosition_ ) == true )
+		{
+			vPosition_ = vLandPosition_;
+			physicParam.nowSpeed.y = 0.0f;
+			physicParam.fDownAccel = 0.0f;
+		}
+		else
+		{
+			const CKTDGLineMap::LineData* pDwnLineData = pLineMap_->GetLineData( iLastTouchLineIndex_ );
+			bool bMeOnStart = false;
+			bool bMeOnEnd = false;
+
+			if( pDwnLineData != NULL )
+			{
+				if( GetDistance(vLandPosition_,pDwnLineData->startPos) < LINE_RADIUS && pDwnLineData->beforeLine == -2 )
+					bMeOnStart = true;
+				else if( GetDistance(vLandPosition_,pDwnLineData->endPos) < LINE_RADIUS && pDwnLineData->nextLine == -2 )
+					bMeOnEnd = true;
+
+				if( pDwnLineData->lineType == CKTDGLineMap::LT_MONSTER_ROAD || pDwnLineData->lineType == CKTDGLineMap::LT_WALL )
+				{
+					bMeOnStart = bMeOnEnd = false;
+				}
+			}
+
+			if( bMeOnStart == true || bMeOnEnd == true )
+			{
+				if( vPosition_.y < vLandPosition_.y )
+					vPosition_.y = vLandPosition_.y;
+
+				vLandPosition_ = pLineMap_->GetLandPosition( vPosition_, false, LINE_RADIUS, &iLastTouchLineIndex_ );
+				vPosition_.x = vLandPosition_.x;
+				vPosition_.z = vLandPosition_.z;
+			}
+			else
+			{
+				bool bCanDown = pLineMap_->CanDown( vPosition_, LINE_RADIUS, &vLandPosition_, &iLastTouchLineIndex_, false, false, false );
+
+				if( bCanDown == true )
+				{
+					vPosition_.x = vLandPosition_.x;
+					vPosition_.z = vLandPosition_.z;
+
+					if( vPosition_.y < vLandPosition_.y )
+						vPosition_.y = vLandPosition_.y;
+				}
+				else
+				{
+					bMisplaced = true;
+
+					vPosition_.x = vPositionOrg_.x;
+					vPosition_.z = vPositionOrg_.z;
+					if( vPosition_.y < vLandPosition_.y )
+						vPosition_.y = vLandPosition_.y;
+
+					if ( m_FrameDataFuture.unitCondition.bFootOnLine == true
+						&& physicParam.nowSpeed.y < 0.f )
+					{
+						physicParam.nowSpeed.y = 0.0f;
+						physicParam.fDownAccel = 0.0f;
+					}
+				}
+			}
+		}
+	}
+
+	return bMisplaced;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //void CX2GUUser::PhysicProcess_FastUpwardWind( CKTDGLineMap* pLineMap )
 //{
 //#ifdef LINEMAP_FAST_WIND_TEST

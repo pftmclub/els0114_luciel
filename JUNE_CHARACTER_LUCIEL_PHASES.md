@@ -825,6 +825,45 @@ Opus 5.5 high. Part 3 of DU1's six, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no 
 - **In game:** nothing to see. Every other class has no second body (`m_pMinorUnitXSkinAnim(Future)` NULL, form 0): each new line is a NULL
   test or picks the first body.
 
+### DU1b3 - Done (2026-11-14)
+
+Opus 5.5 high. Part 4 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (Always.h: a third `#error` guard, NOT_SELECT_UNIT_OFFSET, APPLY_MOVEMENT_SPEED,
+LINEMAP_LAND_MONSTER_ROAD). Files: `X2GUUser.cpp` (+421), `X2GUUser.h`, `X2GameUnit.h`, `X2GameUnit.cpp`, `KTDGXSkinAnim.h`, `Always.h`. No `_DEBUG`, no log
+line (nothing runs before CH1). funcmap rows: `grep "(DU1b3)" june2017_re/funcmap.tsv` (16).
+- **Split again (kickoff's own rule).** The physics alone filled the session: **DU1b3** = Ciel's physics; **DU1b4** (kickoff written) = the
+  `MINOR_UNIT_SPEED_X/Y` / `MINOR_UNIT_PASSIVE_SPEED_X/Y` parses, the APPLY_MOVEMENT_SPEED minor copy and rescale, the frame-move passive apply
+  (`@320631b0`), `+0x8f6d` and the `+0x8604` twin, and the camera / armor keys. DU1c now depends on DU1b4; `DU1-review.md` covers seven parts.
+- **The second PhysicParam:** `CX2GameUnit::m_MinorUnitPhysicParam` (June unit `+0x36c`, a whole `PhysicParam`), copied from Org in `Init`
+  (`322a5f90 @322a600a`) and `ResetPhysicParam` (`322886a0 @322886c2`); RidingOffEnd copies only the first, as June. Every unit carries it.
+- **`PhysicProcess` (`32015b30`), June's order:** a local second position from Future `vNotSelectPosition`; line fallbacks zero the second
+  speed too; its x decay (own walk speed vs the first body's `GetWalkSpeed`); its fall (cap without SET_LIMIT, JUNE_BUGS 142), land-connect
+  zero and reverse gravity (both second anims turned); the x move, line speed and anim move push **both** the local second position and the kept
+  `m_vNotSelectMotionBeforePos` (`+0x8f60`) for every class (harmless: read only with `+0x8f5d`). The anim move now reads the **active** body
+  (`GetXSkinAnimFuture()`, June `32070cf0`; March read `m_pXSkinAnimFuture`) and multiplies by `APPLY_ANIM_MOVE_MULTIPLY` (it is in these lines,
+  so ported here). With `USE_PHYSICPROCESS_NOT_SELECT_UNIT` the second (kept or local, by `+0x8f5d`) also gets the push loop, the ceiling / y
+  move and the landing. Store: second = kept position or the **first body's** position, then the offset (`m_afNotSelectUnitOffset`,
+  `GetMotionMoveNow` difference = June `320703f0` `+0x2c4`, added getter in `KTDGXSkinAnim.h`).
+- **Two helpers (June's functions, March's inline blocks):** `PhysicProcess_PushByUnits` = `32010060` and `PhysicProcess_LandOnLine` = `32010440`
+  (PhysicParam and anim by `bMinorUnit_`, returns bMisplaced). Under the flag the first body runs through them too; their bodies are March's
+  live branches verbatim (`X2OPTIMIZE_NPC_NONHOST_SIMULATION`, `ADD_CAN_PASS_ALLY_UNIT`, `MONSTER_ROAD` + `FIX_LINE_TYPE_WALL`,
+  `X2OPTIMIZE_WALL_TRAP_BUG_FIX`, `AISHA_SECOND_CLASS_CHANGE` on; `REMOVE_LAND_CONNECT_CONSTRAINTS` off: flag probe), March's inline code in `#else`.
+- **State-start keys** (both starts, after `ParseNotSelectUnitOffset`): `USE_NOT_SELECT_MOTION_BEFORE_POS` (miss 0; true copies the **Future**
+  second position to `+0x8f60` in both starts), `APPLY_ANIM_MOVE_MULTIPLY` (miss 1.0, `fld1`), `USE_PHYSICPROCESS_NOT_SELECT_UNIT` (miss 0).
+  Ctor: `+0x8f5d` / `+0x8f60` / `+0x8f6c` zero as June; `+0x8f50` = 1.0 (June's ctor leaves it to the first state start).
+- **June bugs kept (JUNE_BUGS 659 / 660, row 142 Port column updated):** the second body's ceiling test reads the first body's y speed
+  (`@3201917c`); the offset turns the motion difference as `dir.x * ( dx + dz )` / `dir.z * ( dx + dz )` (`@3201a009-3201a071`).
+- **Routed (scope rule; every class or riding):** Stage 2 bullet: June's misplaced re-test (`@32019e84-32019f94`) and the `+0x40ac` fall
+  record (`32010440 @32011081`); Stage 17 bullet: the riding-pet anim move (`@32018204`, pet `+0x5a1`).
+- **Enum gate:** `enumscan --check` lists 4 class A rows at `PhysicProcess_PushByUnits`'s `case 1..4`: those are
+  `GetUserUnitRelativePos` codes (no enum; March's own switch, copied), not NPC ids; a one-line comment says so.
+- **Hygiene.** flagcheck `DUO_BODY --worktree --files` (my six files): 5 PASS (+421, +6, +6, +7, +3), 1 OTHER (Always.h: my guard + a peer's
+  uncommitted char-elesis CH3d block, not staged), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS.
+  Commit and range line: below.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GameUnit.cpp`, `X2GUChung.cpp`: 0 errors each. Full build skipped: no
+  play-test (DU1d builds and hands off the regression pass).
+- **In game:** nothing to see. Other classes have no second anim and none of the keys: the second-body lines move only a local and the unread
+  `+0x8f60`; the first body runs March's code through the helpers; `APPLY_ANIM_MOVE_MULTIPLY` reads 1.0.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

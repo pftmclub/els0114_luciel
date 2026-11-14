@@ -2149,6 +2149,8 @@ public:
 		void UpdateShowViewListByActiveBody();				/// char-luciel DU1b: June 31fd6260
 		bool IsActiveBodyChangeReached() const;				/// char-luciel DU1b: June 31fc9510
 		void ApplyDuoTypeAtStateStart( const int iDuoType_, const bool bHasAnimName_, const bool bHasMinorUnitAnimName_, bool* pbEventFlagList_ );	/// char-luciel DU1b: June 320506f0 @32050e10 / 32057b80 @32059a1e
+		void PhysicProcess_PushByUnits( D3DXVECTOR3& vPosition_, float& fNowSpeedX_, const D3DXVECTOR3& vSyncPosition_ );	/// char-luciel DU1b3: June 32010060
+		bool PhysicProcess_LandOnLine( CKTDGLineMap* pLineMap_, D3DXVECTOR3& vPosition_, int& iLastTouchLineIndex_, D3DXVECTOR3& vLandPosition_, const D3DXVECTOR3& vPositionOrg_, const bool bMinorUnit_ );	/// char-luciel DU1b3: June 32010440
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		CKTDGXSkinAnimPtr GetXSkinAnimPtr() const { return m_pXSkinAnim; }
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
@@ -4755,6 +4757,10 @@ public:
 		char											m_cActiveBodyChangeStateNum;	/// char-luciel DU1b: June +0x84de, the Future stateChangeNum at the switch
 		bool											m_bFirstUnitTransformed;		/// char-luciel DU1b: June +0x8f6e, CH1a0's pair ( 31fc9d50 / 31fc9d90 ); UpdateDuo skips the equipment while either is set
 		bool											m_bMinorUnitTransformed;		/// char-luciel DU1b: June +0x8f6f
+		float											m_fApplyAnimMoveMultiply;		/// char-luciel DU1b3: June +0x8f50, APPLY_ANIM_MOVE_MULTIPLY
+		bool											m_bUseNotSelectMotionBeforePos;	/// char-luciel DU1b3: June +0x8f5d, USE_NOT_SELECT_MOTION_BEFORE_POS
+		D3DXVECTOR3										m_vNotSelectMotionBeforePos;	/// char-luciel DU1b3: June +0x8f60, the second body's position kept from the state start
+		bool											m_bUsePhysicProcessNotSelectUnit;	/// char-luciel DU1b3: June +0x8f6c, USE_PHYSICPROCESS_NOT_SELECT_UNIT
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		
 

@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel DU1c` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | DU1b |
+| Depends on | DU1b4 |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) |
 | Review | none of its own: `kickoffs/char-luciel/DU1-review.md` covers DU1, DU1b, DU1c, DU1d |
@@ -62,3 +62,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `CommonFrameMoveFuture` `@32063316` (`= ( +0x8e90 == 1 )`, beside the funcmap's `31fe9e40`), and its Now reader is the sync pop after
   `CommonFrameMove` (starts ~`3206cfe0`, `ret 8` `@3206d473`): for others' units of type 10, `@3206d42d-3206d45a` calls `SetActiveBody( word == 1 )`
   when it differs. Both come with the field here (funcmap rows `32061bf0 @32063316 (DU1b2)`, `3206d42d (DU1b2)`).
+
+## Amended by DU1b3 (2026-11-14)
+
+- Order is now DU1b3 -> DU1b4 -> DU1c (DU1b3 split again). `PhysicProcess` now writes `m_FrameDataFuture.syncData.vNotSelectPosition` every
+  frame (the first body's position, or the kept `m_vNotSelectMotionBeforePos`, plus the offset): the wire bits carry that value.

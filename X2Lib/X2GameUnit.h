@@ -2513,6 +2513,10 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 
 		const PhysicParam&			GetPhysicParam() const	{ return m_PhysicParam; }
 		PhysicParam&				AccessPhysicParam()		{ return m_PhysicParam; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		const PhysicParam&			GetMinorUnitPhysicParam() const	{ return m_MinorUnitPhysicParam; }	/// char-luciel DU1b3: June unit +0x36c
+		PhysicParam&				AccessMinorUnitPhysicParam()		{ return m_MinorUnitPhysicParam; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_SKILL
 		float						GetWalkSpeedParam() const	{ return m_PhysicParam.fWalkSpeed; }	/// June 31e4cfd0 ( fld [ecx + 0x324] ), bound to Lua for the Hell Drop UFO
 		float						GetJumpSpeedParam() const	{ return m_PhysicParam.fJumpSpeed; }	/// June 31e4e020 ( fld [ecx + 0x32c] )
@@ -4571,6 +4575,9 @@ protected:
 		PhysicParam										mWorldRateBackupPhysicParam;	/// June unit +0x334 ( C3n ): m_PhysicParam at the first ApplyJuneWorldGravityRate. Never refreshed, never copied back; a plain member, not a PhysicParam field, so the whole-struct copies ( C3h ) leave it alone
 		bool											m_bWorldRateBackupTaken;		/// June unit +0x368: set by the first ApplyJuneWorldGravityRate, cleared only by the ctor ( June @322a5e44 )
 #endif SERV_IRUHADEV_JUNE_WORLD_RATE_APPLY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		PhysicParam										m_MinorUnitPhysicParam;	/// char-luciel DU1b3: June unit +0x36c, the second body's ( Ciel ) physics
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_WORLD_COLOR_WINDOW
 		float											m_fWorldColorStartTime;	/// June unit +0x244 ( C3o ): the now state's CHANGE_WORLD_COLOR_DATA START_TIME; -1 = no window ( ctor @322a2928 )
 		float											m_fWorldColorEndTime;	/// June unit +0x248: its END_TIME ( -1 in the ctor )

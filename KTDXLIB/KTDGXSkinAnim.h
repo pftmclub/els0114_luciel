@@ -220,6 +220,9 @@ class CKTDGXSkinAnim : public CKTDGObject
 
 		bool IsAnimationEnd(){ return m_bAnimEnd; }
 		D3DXVECTOR3 GetMotionOffset(){ return m_MotionOffset; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		D3DXVECTOR3 GetMotionMoveNow() const { return m_MotionMoveNow; }	// char-luciel DU1b3: June 320703f0 ( +0x2c4 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		void SetApplyMotionOffset( bool bApply ){ m_bApplyMotionOffset = bApply; }
 
 

@@ -60,3 +60,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `vslot 0x260` true and `m_bDuoEnabled`, the speed-factor time is the not-selected body's anim time) sits just before March's
   `m_vecSpeedFactor` loop (the `SERV_IRUHADEV_JUNE_SPEED_TIME` block); the `+0x8604` twin (`@320623ed`, same `+0x8f6d` test with
   `vslot 0x260` false, applied to `+0x370..+0x37c`) follows that loop. Both use DU1b2's `fNowAnimTime` (the active body) otherwise.
+
+## Done note
+
+Split again (2026-11-14): this phase ported the physics; the speed keys, frame-move speed readers and camera / armor keys went to
+`DU1b4.md`. See "DU1b3 - Done" in the plan doc.
