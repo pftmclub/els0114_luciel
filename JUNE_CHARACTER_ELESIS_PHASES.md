@@ -2161,6 +2161,7 @@ CH4c stage review covers it ( `CH4b.md` / `CH4c.md` amended ).
   line's BBT number ), not this phase's; 0 in this phase's code.
 - `DEPLOY OK: X2_offline.exe is 26,570,752 B, dated 2026-11-14 08:40:52, md5 4b5aadce6d5a7f8f98ab309849f31196, equal to X2/US_SERVICE/x2.exe (2026-11-14 08:40:45); built at main 194d520b + 12 uncommitted code file(s).`
 - `EXESTR OK: 3 of 3 found in X2_offline.exe, 26570752 B, dated 2026-11-14 08:40:52, md5 4b5aadce6d5a7f8f98ab309849f31196` ( wide: the init and burst-fire lines, `EffectSet_B_EL_Blood_Sucking` ).
+- Commit `ce0bcdf4`. `flagcheck --range ce0bcdf4^..ce0bcdf4`: `files: 7 PASS, 0 PASS~ (blank/marker only), 1 DEFINE, 4 OTHER (other flags), 0 FAIL, 0 ERROR`; the 1 deleted line is CH1j's `//#define`; `RESULT: PASS`.
 - **Save:** backup `db_backup/els_db_20261114_083128_pre_sql.sql`; learned 29 + 28404 / 28416, 30 + 28409 / 28418, 144 + 28411, 146 + 28414 ( level 1 each ).
 
 **How to see it in game:** one `[JUNE_CHAR] ELESIS PASSIVE init ( ... )` line per load with the values above, then `dodge and slash mp refund`, `scalet rose hit counted`,
