@@ -6791,5 +6791,944 @@ void CX2GULuciel::LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove()
 	CommonFrameMove();
 }
 
+// char-luciel CH1i: Demonio script states ( June 32ae9b40 - 32b39e70 ); the macro is June's expansion on the body not selected
+#define ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_NOT_SELECT_( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, bCondition, iStateID ) \
+	else if( true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() && m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && \
+		( (float)(fChangeTiming) < GetNotSelectXSkinAnimFuture()->GetNowAnimationTime() || true == GetNotSelectXSkinAnimFuture()->IsAnimationEnd() ) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() && \
+		GetNotSelectXSkinAnimFuture()->GetNowAnimationTime() < (float)(fInputTiming) && (float)(fInputTimingStart) <= GetNotSelectXSkinAnimFuture()->GetNowAnimationTime() && true == (bCondition) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+
+namespace _CONST_LUCIEL_CH1I_
+{
+	const float		DASH_JUMP_LANDING_SPEED_X_ADD						= 1000.f;	// June 32ae9b40: LandingPrediction( 1000, -1000, pos, 5 )
+	const float		DASH_JUMP_LANDING_MIN_Y_OFFSET						= -1000.f;	// June 32ae9b40
+	const int		DASH_JUMP_LANDING_STEP_COUNT						= 5;		// June 32ae9b40
+	const double	DASH_COMBO_Z_LANDING_FALL_OFFSET					= 45.0;		// June 32b0c220: the jump-down branch drops the unit ( a double; the other states use LINE_RADIUS )
+	const double	BOUNDING_TARGET_UNIT_WIDTH_RATE						= 0.5;		// June 32b341b0 / 32b343b0 / 32b35fd0: half the target's width
+	const float		BOUNDING_TARGET_LAND_RADIUS							= 30.f;		// June 32b341b0 / 32b343b0 / 32b35fd0: GetLandPosition radius
+	const double	BOUNDING_TARGET_Z_START_STAND_DISTANCE_ADD			= 30.0;		// June 32b343b0
+	const double	BOUNDING_TARGET_CIEL_STRIKER_STAND_DISTANCE_ADD		= 20.0;		// June 32b35fd0
+	const float		RIDING_HYPER_MODE_SHOCK_TIME						= 0.1f;		// June 32b39e70
+	const DWORD		HYPER_MODE_WORLD_COLOR								= 0xff222222;	// June 32b37d80: SetWorldColor inlined ( 2 / 15, alpha 1 )
+	const float		HYPER_MODE_CRASH_CAMERA_DISTANCE					= 30.f;		// June 32b37d80
+	const float		HYPER_MODE_CRASH_CAMERA_TIME						= 0.4f;		// June 32b37d80
+
+	// June 32011d20 / 31fd66b0 / 32011f50 ( the awakening effect-set family ); stand-in: not ported ( Stage 12 ), June's empty-name default
+	void AwakeningEffectBegin()			{}
+	bool AwakeningEffectSetPresent()	{ return false; }
+	void AwakeningEffectPlay()			{}
+}
+using namespace _CONST_LUCIEL_CH1I_;
+
+// char-luciel CH1i: June 32ae9b40 ( the landing point is predicted; June does not call CommonStateStartFuture here )
+void CX2GULuciel::LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_StateStartFuture()
+{
+	D3DXVECTOR3 vLandPosition = m_FrameDataFuture.syncData.position;
+	LandingPrediction( DASH_JUMP_LANDING_SPEED_X_ADD, DASH_JUMP_LANDING_MIN_Y_OFFSET, &vLandPosition, DASH_JUMP_LANDING_STEP_COUNT );
+	m_PhysicParam.nowSpeed.x = 0.f;
+	m_FrameDataFuture.syncData.position = vLandPosition;
+}
+
+// char-luciel CH1i: June 32b08230 ( duo and not-selected body, no USEFUL_VALUE gate )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_STRIKER_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_X : LSI_BOUNDING_TARGET_LU_COMMAND_X ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b085b0 ( event 0 needs no key )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_X_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, true, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_X_LU_STRIKER : LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b08940 ( event 0 is timed on the body not selected )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_NOT_SELECT_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XX : LSI_BOUNDING_TARGET_LU_COMMAND_XX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b08d30
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXX : LSI_BOUNDING_TARGET_LU_COMMAND_XXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b090d0
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b09470
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b09810
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b09bb0 ( event 0 is timed on the body not selected )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_NOT_SELECT_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b09fa0 ( Demonio only: event 0 is timed on the body not selected )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	else if( NULL != GetUnit() && CX2Unit::UC_LUCIEL_DEMONIO == GetUnit()->GetClass() )
+	{
+		if( false )
+		{
+		}
+		ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_NOT_SELECT_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_START : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START ) )
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0a380 ( the next state is the other body's )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP : LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_LOOP ) );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0a3e0 ( the next state is the other body's )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP_EventProcess()
+{
+	if( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING : LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_END ) );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0a420
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZ : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0a780
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZ : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0ab20
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0aec0
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	else if( true == m_InputData.oneSit )
+	{
+		CheckBoundingTarget();
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0b190
+void CX2GULuciel::LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	else if( true == m_InputData.oneSit )
+	{
+		CheckBoundingTarget();
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0b460
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_START : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_START ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0b7c0
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_START_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_LOOP : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LOOP ) );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0b820
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LOOP_EventProcess()
+{
+	if( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_LANDING : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LANDING ) );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0b860
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LANDING_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XXZ : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZ ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0bbc0
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZ_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XXZX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0bf60 ( no Sit event )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0c220 ( the jump-down branch drops the unit 45 units )
+void CX2GULuciel::LSI_LDB_F_DASH_COMBO_Z_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+		else
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y = static_cast<float>( m_FrameDataFuture.syncData.position.y - DASH_COMBO_Z_LANDING_FALL_OFFSET );
+		}
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, LSI_LDB_M_DASH_COMBO_ZX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0c580
+void CX2GULuciel::LSI_LDB_F_DASH_COMBO_ZX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_LDB_M_DASH_COMBO_ZXX : LSI_LDB_F_DASH_COMBO_ZXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0c920
+void CX2GULuciel::LSI_LDB_F_DASH_COMBO_ZXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_LDB_M_DASH_COMBO_ZXXX : LSI_LDB_F_DASH_COMBO_ZXXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0ccc0
+void CX2GULuciel::LSI_LDB_F_DASH_COMBO_ZXXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_LDB_M_DASH_COMBO_ZXXXX : LSI_LDB_F_DASH_COMBO_ZXXXX ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0d060
+void CX2GULuciel::LSI_LDB_F_DASH_COMBO_ZXXXX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_LDB_M_DASH_COMBO_ZXXXXZ : LSI_LDB_F_DASH_COMBO_ZXXXXZ ) )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0d400
+void CX2GULuciel::LSI_LDB_F_DASH_COMBO_ZXXXXZ_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	else if( true == m_InputData.oneSit )
+	{
+		CheckBoundingTarget();
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0d6d0
+void CX2GULuciel::LSI_LDB_F_DASH_JUMP_COMBO_XZ_START_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( ( true == IsMinorUnitActive() ? LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING : LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING ) );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0d730
+void CX2GULuciel::LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_ATTACK );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0d770
+void CX2GULuciel::LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_ATTACK_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, LSI_LDB_F_DASH_JUMP_COMBO_XZX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0dac0
+void CX2GULuciel::LSI_LDB_F_DASH_JUMP_COMBO_XZX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	else if( true == m_InputData.oneSit )
+	{
+		CheckBoundingTarget();
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0dd90
+void CX2GULuciel::LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_ATTACK );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0ddd0
+void CX2GULuciel::LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_ATTACK_EventProcess()
+{
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, LSI_LDB_M_DASH_JUMP_COMBO_XZX )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b0e120
+void CX2GULuciel::LSI_LDB_M_DASH_JUMP_COMBO_XZX_EventProcess()
+{
+	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+	if( 0.f < GetUsefulValueNow( 0, 0 ) && true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() )
+	{
+		pFutureAnim = GetNotSelectXSkinAnimFuture();
+	}
+
+	if( true == pFutureAnim->IsAnimationEnd() )
+	{
+		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
+	}
+	else if( true == m_InputData.oneSit )
+	{
+		CheckBoundingTarget();
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH1i: June 32b14c00
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd()
+{
+	CommonStateEnd();
+
+	if( true == m_bBoundingStrikeHit )
+	{
+		UpCombinationPoint( -m_iBoundingStrikeCount );
+		m_bBoundingStrikeHit = false;
+	}
+}
+
+// char-luciel CH1i: June 32b14c30 ( the position is the unit I attacked )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_StateStartFuture()
+{
+	D3DXVECTOR3 vPosition = GetPos( true );
+
+	CX2GameUnit* pAttackedUnit = GetGameUnitAttackedByMe();
+	if( NULL != pAttackedUnit )
+	{
+		vPosition = pAttackedUnit->GetPos( true );
+	}
+	m_FrameDataFuture.syncData.position = vPosition;
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH1i: June 32b1f2b0 ( the hyper mode shock particles at the body bone; the STR_TOKANG text is a major particle here )
+void CX2GULuciel::ShowMinorParticleHyperModeShockOfBody()
+{
+	CKTDGParticleSystem* pMinorParticleSystem = g_pX2Game->GetMinorParticle();
+	if( NULL == pMinorParticleSystem )
+		return;
+
+	wstring wstrBoneName;
+	wstrBoneName += ( true == IsMinorUnitActive() ? L"MAJOR:" : L"MINOR:" );
+	wstrBoneName += L"Bip01";
+	const D3DXVECTOR3 vBonePos = GetBonePos( wstrBoneName.c_str() );
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeqGroundShockWave = pMinorParticleSystem->GetInstanceSequence( GetHandleCommonMinorParticleByEnum( COMMON_MINOR_PII_GROUND_SHOCK_WAVE ) );
+	PlaySequenceByTriggerCount( pSeqGroundShockWave, m_FrameDataNow.unitCondition.landPosition.x, m_FrameDataNow.unitCondition.landPosition.y + 5.0f, m_FrameDataNow.unitCondition.landPosition.z, 5, 10, 3 );
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeqWhiteShockWave = pMinorParticleSystem->GetInstanceSequence( GetHandleCommonMinorParticleByEnum( COMMON_MINOR_PII_WHITE_SHOCK_WAVE ) );
+	PlaySequenceByTriggerCount( pSeqWhiteShockWave, vBonePos, 10, 10, 1 );
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeqImpactTick = pMinorParticleSystem->GetInstanceSequence( GetHandleCommonMinorParticleByEnum( COMMON_MINOR_PII_IMPACT_TICK ) );
+	PlaySequenceByTriggerCount( pSeqImpactTick, vBonePos, 200, 200, 30 );
+
+	if( true == GetShowSmallGageAndName() && NULL != g_pX2Game->GetMajorParticle() )
+	{
+		g_pX2Game->GetMajorParticle()->CreateSequence( this, L"LD_STR_TuKang_M", vBonePos );
+	}
+}
+
+// char-luciel CH1i: June 32b37d80 ( the Lu / Ciel hyper mode change; the state table's FrameMove calls it with its two times )
+void CX2GULuciel::CommonHyperModeFrameMove( const float fChangeTime_, const float fShockTime_, const bool bSound_ )
+{
+	g_pX2Game->GetWorld()->SetWorldColor( HYPER_MODE_WORLD_COLOR );
+
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( fChangeTime_ ) )
+	{
+		ShowMinorParticleHyperModeChange( L"Bip01_Spine1" );
+
+		if( true == bSound_ )
+		{
+			PlaySound( L"Stickslash1.ogg" );
+		}
+	}
+
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( fShockTime_ ) )
+	{
+		AwakeningEffectBegin();
+		if( true == AwakeningEffectSetPresent() )
+		{
+			AwakeningEffectPlay();
+		}
+
+		ShowMinorParticleHyperModeShockOfBody();
+
+		UpDownCrashCamera( HYPER_MODE_CRASH_CAMERA_DISTANCE, HYPER_MODE_CRASH_CAMERA_TIME );
+		g_pKTDXApp->GetDGManager()->ClearScreen();
+
+		if( false == AwakeningEffectSetPresent() )
+		{
+			ShowMinorParticleHyperModeTrace();
+		}
+
+		ApplyHyperModeBuff();
+
+		if( true == bSound_ )
+		{
+			PlaySound( L"Slash.ogg" );
+			PlaySound( L"Break.ogg" );
+			PlaySound( L"Change.ogg" );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1i: June 32b34100
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_STRIKER_StateStartFuture()
+{
+	CX2GameUnit* pBoundingTarget = g_pX2Game->GetUnitByUIDAndType( m_BoundingTarget.m_uidGameUnit, m_BoundingTarget.m_eGameUnitType );
+	if( true == g_pX2Game->IsValidUnit( pBoundingTarget ) && 0.f < pBoundingTarget->GetNowHp() )
+	{
+		m_FrameDataFuture.syncData.vNotSelectPosition = pBoundingTarget->GetPos();
+	}
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH1i: June 32b341b0 ( a stand point beside the bounding target )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_X_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	CX2GameUnit* pBoundingTarget = g_pX2Game->GetUnitByUIDAndType( m_BoundingTarget.m_uidGameUnit, m_BoundingTarget.m_eGameUnitType );
+	if( NULL == pBoundingTarget )
+		return;
+
+	D3DXVECTOR3 vStandPosition = GetPos( true );
+	CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+	const bool bStandRight = ( false == GetIsRight() );
+	const float fStandDistance = static_cast<float>( pBoundingTarget->GetUnitWidth( false ) * BOUNDING_TARGET_UNIT_WIDTH_RATE + GetUsefulValueFuture( 0, 0 ) );
+	pLineMap->GetFixedDistancePositionForWeaponTaker( &pBoundingTarget->GetPos( true ), fStandDistance, bStandRight, vStandPosition );
+
+	int iLandLineIndex = -1;
+	vStandPosition = g_pX2Game->GetWorld()->GetLineMap()->GetLandPosition( vStandPosition, true, BOUNDING_TARGET_LAND_RADIUS, &iLandLineIndex );
+
+	const CKTDGLineMap::LineData* pLandLineData = g_pX2Game->GetWorld()->GetLineMap()->GetLineData( iLandLineIndex );
+	if( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
+	{
+		m_FrameDataFuture.syncData.position = vStandPosition;
+		m_FrameDataFuture.syncData.position.y = pBoundingTarget->GetPos( true ).y;
+	}
+}
+
+// char-luciel CH1i: June 32b343b0 ( a stand point beside the unit I attacked )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_StateStartFuture()
+{
+	D3DXVECTOR3 vPosition = GetPos( true );
+
+	CX2GameUnit* pAttackedUnit = GetGameUnitAttackedByMe();
+	if( NULL != pAttackedUnit )
+	{
+		D3DXVECTOR3 vStandPosition = vPosition;
+		CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+		const bool bStandRight = ( false == GetIsRight() );
+		const float fStandDistance = static_cast<float>( pAttackedUnit->GetUnitWidth( false ) * BOUNDING_TARGET_UNIT_WIDTH_RATE + BOUNDING_TARGET_Z_START_STAND_DISTANCE_ADD );
+		pLineMap->GetFixedDistancePositionForWeaponTaker( &pAttackedUnit->GetPos( false ), fStandDistance, bStandRight, vStandPosition );
+
+		int iLandLineIndex = -1;
+		vStandPosition = g_pX2Game->GetWorld()->GetLineMap()->GetLandPosition( vStandPosition, true, BOUNDING_TARGET_LAND_RADIUS, &iLandLineIndex );
+
+		const CKTDGLineMap::LineData* pLandLineData = g_pX2Game->GetWorld()->GetLineMap()->GetLineData( iLandLineIndex );
+		if( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
+		{
+			vPosition = vStandPosition;
+			vPosition.y = pAttackedUnit->GetPos( true ).y;
+		}
+		else
+		{
+			vPosition = pAttackedUnit->GetPos( true );
+		}
+	}
+	m_FrameDataFuture.syncData.position = vPosition;
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH1i: June 32b35fd0 ( both bodies get a stand point beside the bounding target )
+void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	if( NULL == g_pX2Game->GetWorld() || NULL == g_pX2Game->GetWorld()->GetLineMap() )
+		return;
+
+	CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+	CX2GameUnit* pBoundingTarget = g_pX2Game->GetUnitByUIDAndType( m_BoundingTarget.m_uidGameUnit, m_BoundingTarget.m_eGameUnitType );
+	if( NULL == pBoundingTarget || false == ( 0.f < pBoundingTarget->GetNowHp() ) )
+		return;
+
+	// the two bodies must stand on different line groups
+	const CKTDGLineMap::LineGroupID targetLineGroupID = pLineMap->GetLineGroupIncludesLineData( pBoundingTarget->GetLastTouchLineIndex( true ) );
+	const CKTDGLineMap::LineGroupID myLineGroupID = pLineMap->GetLineGroupIncludesLineData( GetLastTouchLineIndex( true ) );
+	if( false == targetLineGroupID.IsValid() || false == myLineGroupID.IsValid() || false == ( targetLineGroupID != myLineGroupID ) )
+		return;
+
+	D3DXVECTOR3 vStandPosition = GetPos( true );
+	const bool bStandRight = ( false == GetIsRight() );
+	const float fStandDistance = static_cast<float>( pBoundingTarget->GetUnitWidth( false ) * BOUNDING_TARGET_UNIT_WIDTH_RATE + BOUNDING_TARGET_CIEL_STRIKER_STAND_DISTANCE_ADD );
+	pLineMap->GetFixedDistancePositionForWeaponTaker( &pBoundingTarget->GetPos( true ), fStandDistance, bStandRight, vStandPosition );
+
+	int iLandLineIndex = -1;
+	vStandPosition = pLineMap->GetLandPosition( vStandPosition, true, BOUNDING_TARGET_LAND_RADIUS, &iLandLineIndex );
+
+	const CKTDGLineMap::LineData* pLandLineData = pLineMap->GetLineData( iLandLineIndex );
+	if( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
+	{
+		m_FrameDataFuture.syncData.position = vStandPosition;
+		m_FrameDataFuture.syncData.position.y = pBoundingTarget->GetPos( true ).y;
+		m_FrameDataFuture.syncData.vNotSelectPosition = vStandPosition;
+		m_FrameDataFuture.syncData.vNotSelectPosition.y = pBoundingTarget->GetPos( true ).y;
+	}
+}
+
+// char-luciel CH1i: June 32b39e70
+void CX2GULuciel::LSI_RIDING_HYPER_MODE_FrameMove()
+{
+	CommonHyperModeFrameMove( 0.f, RIDING_HYPER_MODE_SHOCK_TIME, true );
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}

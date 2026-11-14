@@ -273,3 +273,8 @@ offset	kind	name	note
 0x9888	field	m_fCombinationPointOverflowCoolTime	CX2GULuciel float; users: 32b14860 ? ( CH1a ), 32b397a0 CommonFrameMove ( CH1l2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
 0x988c	field	m_iDamageEffectIndex	CX2GULuciel int; users: 32b0efc0 StampEffectSetIndex ( CH1k ), 32b0efe0 GetDamageEffectIndex ( CH1k ), 32b0fa20 ? ( CH1l ), 32b18170 ? ( CH1l2 ) ( CH1a ); June's ctor leaves it unset
 0x9890	field	m_vecDamageEffectHitCount	CX2GULuciel std::vector<SDamageEffectHitCount>; users: 32b14db0 FindDamageEffectIndexEntry ( CH1a ), 32b16810 EraseDamageEffectIndexEntry ( CH1k ), 32b16880 ? ( CH1l3 ), 32b18170 ? ( CH1l2 ) ( CH1a )
+0x8eb8	field	m_afUsefulValueNow[0][0]	CX2GUUser: USEFUL_VALUE0 first value of the Now state; CH1i: 0 < it gates the not-selected anim in the bounding-target EventProcess family
+0x8ef4	field	m_afUsefulValueFuture[0][0]	CX2GUUser: USEFUL_VALUE0 first value of the Future state; CH1i: the stand distance add in 32b341b0
+0xd78	field	m_optrGameUnitAttackedByMe	CX2GameUnit observer ( CH1i: 32b14c30, 32b343b0 ); +0xd80 is m_optrGameUnitWhoAttackedMe
+0x41f9	field	m_bShowSmallGageAndName	CX2GameUnit ( CH1i: 32b1f2b0 shows the TOKANG text only with it )
+0x9010	field	m_ahCommonMinorParticleInstance[4..6]	CX2GUUser common minor particle handles from +0x9000: ground shock wave +0x9010, white shock wave +0x9014, impact tick +0x9018 ( CH1i: 32b1f2b0 )

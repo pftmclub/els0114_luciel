@@ -2130,6 +2130,35 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **Commit** `4946d4f1`; `finish.py --range 4946d4f1^..4946d4f1`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1i` ( Sonnet 5.5 high; its Opus review covers CH1g, CH1g2, CH1h, CH1i ).
 
+### CH1i - Done (2026-11-14)
+
+Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.h` / `.cpp`, nothing references it until CH1 ). funcmap `grep "(CH1i)" june2017_re/funcmap.tsv` ( 51 rows ); JUNE_BUGS 704-705;
+no review of its own: the CH1i review ( `kickoffs/char-luciel/CH1i-review.md`, Opus ) covers CH1g, CH1g2, CH1h, CH1i.
+- **45 functions, June addresses** ( every `state-fn` / `helper` row of `ch0_class_map.tsv` col 6 = CH1i; the 42 thunks are CH1m's registration ):
+  StartFuture `32ae9b40` `32b14c30` `32b34100` `32b341b0` `32b343b0` `32b35fd0`; StateEnd `32b14c00`; FrameMove `32b39e70`;
+  EventProcess `32b08230` `32b085b0` `32b08940` `32b08d30` `32b090d0` `32b09470` `32b09810` `32b09bb0` `32b09fa0` `32b0a380` `32b0a3e0` `32b0a420` `32b0a780` `32b0ab20` `32b0aec0` `32b0b190` `32b0b460` `32b0b7c0` `32b0b820` `32b0b860` `32b0bbc0` `32b0bf60` `32b0c220` `32b0c580` `32b0c920` `32b0ccc0` `32b0d060` `32b0d400` `32b0d6d0` `32b0d730` `32b0d770` `32b0dac0` `32b0dd90` `32b0ddd0` `32b0e120`;
+  the two `?` helpers: `32b1f2b0` = `ShowMinorParticleHyperModeShockOfBody` ( March's `ShowMinorParticleHyperModeShock` with the `MAJOR:` / `MINOR:` + `Bip01` bone and the TOKANG text as a major particle ) and `32b37d80` = `CommonHyperModeFrameMove( fChangeTime, fShockTime, bSound )` ( the class pattern of Ara / Arme ).
+- **How it was read:** `charport_adis.py luciel --phase CH1i` listings ( the tool does not stop at a `ret` without padding: `32b0a3e0` ran into `32b0a420`, cut at the next class-map address ); a scratch token diff ( memory offsets, state ids, branch kinds, constants ) of every listing against four templates
+  sorted the 35 EventProcess functions: 15 equal to a template apart from the next state id and the key, 6 equal to each other ( the end states ), 7 tiny ones, `32b085b0` ( no key ), `32b0c220` / `32b0d770` / `32b0ddd0` ( a template with a fixed next state ) and the three not-selected-body ones;
+  those, the StartFutures and both helpers were decoded line by line to the `ret`, x87 compares read with the CH1f rules.
+- **Shapes:** every EventProcess is `anim end -> ( on line ? WAIT : JUMP_DOWN )`, then `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, ..., key, state )`, then the cancel macros ( skill, walk, dash, back walk ) as CH1g. The anim is the active body's, or ( A: `0 < USEFUL_VALUE0` Now value, C: no value test ) the not-selected body's when
+  `IsDuoEnabled()` and `GetNotSelectXSkinAnimFuture()` exist. Next state = `IsMinorUnitActive() ? Ciel id : Lu id` ( ids +20 apart ), `F / M` pairs +5. `32b08940` / `32b09bb0` / `32b09fa0` time event 0 on the not-selected body: the new macro `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_NOT_SELECT_`
+  ( June's expansion ); `32b09fa0` does it for Demonio ( class 129 ) only. The end states ( `32b0aec0` family ) add `oneSit -> CheckBoundingTarget()` ( `32b0bf60` has none ). `32b085b0` takes event 0 with no key ( `true` ). `32b08230` has no value gate.
+- **Callees:** `LandingPrediction` ( CX2GUUser, hoisted by char-ara CH1g: checklist 7ac L777 answered, no second copy ), `GetUnitByUIDAndType`, `IsValidUnit`, `GetNowHp`, `GetLandPosition( pos, true, 30, &idx )` ( 7y L680 ), `GetLineGroupIncludesLineData` ( = June `31c5c240`, +0xf4 / +0xf8 = `m_lineGroupID` ), `LineGroupID::operator!=` ( `31cfd6b0` ),
+  `GetGameUnitAttackedByMe` ( +0xd78 ), `GetUnitWidth( false )` ( vslot 0x188 ), `GetUsefulValueNow / Future( 0, 0 )`, the awakening effect-set family as three inert stand-ins in `_CONST_LUCIEL_CH1I_` ( `stand-in: not ported`, Stage 12, as Ara / Arme ).
+  `CheckBoundingTarget` ( vslot 0x568, `32b34680` ) is declared virtual in the class header, body in CH1l.
+- **Engine finding, routed:** June `31c60890` is the June body of `CKTDGLineMap::GetFixedDistancePositionForWeaponTaker` ( ~30 June callers: Add, Elesis, Raven, Lu/Ciel ) and it is **not** March's: negative distance flips `bIsRight`, the start line comes from a scan of every enabled non-wall line, not from `GetLandPosition`.
+  The three Lu/Ciel StartFutures ( `32b341b0` `32b343b0` `32b35fd0` ) call March's version for now. `tools/data/june_march_divergent.tsv` has the `replace` row, `june_diverge_allow.tsv` four rows ( these three and `CX2GUEL::ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_End` ),
+  and the whole replacement is the new Opus phase **CH1i2** ( `kickoffs/char-luciel/CH1i2.md`; Add / Elesis / Raven take it too ).
+- **June quirks kept ( JUNE_BUGS 704-705 ):** Z start / Z loop pick the other body's next state ( `dec al` ); `32ae9b40` skips `CommonStateStartFuture`. Not bugs, noted: `32b0c220` drops the unit 45 ( a double, not `LINE_RADIUS` ) on its jump-down branch; `32b0c220` goes to `LSI_LDB_M_DASH_COMBO_ZX` whichever the body.
+- **Constants:** namespace `_CONST_LUCIEL_CH1I_` ( landing speed 1000 / -1000 / 5 steps, 45.0, half width 0.5, land radius 30, stand adds 30.0 and 20.0, 0.1 s, world colour 0xff222222, camera 30 / 0.4 ); state ids are enum members, `UC_LUCIEL_DEMONIO` named; event indexes plain ( no Enum ). Hyper mode timers are `EventTimerOneshot` ( CH1f2 review ).
+- **Checklist rows:** 7ac L777 done ( above ); 7ac L778 ( CanDown ), 7 L254 ( `+0x7cc8` ), 7l L471 ( the BOUNDING_UP hook `32b38cb0` ) have no site in these 45.
+- **Not in this phase:** no state is registered ( `stateends` / `skillicons` / `luabind` do not apply ); CH1j is merged in ( the only riding function here is `32b39e70` ); no new branch drifted besides CH1i2.
+- **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge` `RESULT: PASS` ( `--check-all` PASS with the four allow rows ); `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings; `cl /P` holds 314 `LSI_*` definitions ( 271 + 43 ). Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1i review` ( Opus 5.5 high ); `/x2-phase char-luciel CH1i2` ( Opus 5.5 high, independent of the review ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

@@ -917,6 +917,53 @@ protected:
 	void				LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove();	// June 32b29000
 	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_FrameMove();	// June 32b29360
 	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_X_FrameMove();	// June 32b29570
+	// char-luciel CH1i: Demonio script states ( June 32ae9b40 - 32b39e70 )
+	void				LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_StateStartFuture();	// June 32ae9b40
+	void				LSI_BOUNDING_TARGET_LU_STRIKER_EventProcess();	// June 32b08230
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_X_EventProcess();	// June 32b085b0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_EventProcess();	// June 32b08940
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XX_EventProcess();	// June 32b08d30
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXX_EventProcess();	// June 32b090d0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXX_EventProcess();	// June 32b09470
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX_EventProcess();	// June 32b09810
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX_EventProcess();	// June 32b09bb0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_EventProcess();	// June 32b09fa0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_EventProcess();	// June 32b0a380
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP_EventProcess();	// June 32b0a3e0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING_EventProcess();	// June 32b0a420
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ_EventProcess();	// June 32b0a780
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ_EventProcess();	// June 32b0ab20
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX_EventProcess();	// June 32b0aec0
+	void				LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX_EventProcess();	// June 32b0b190
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_EventProcess();	// June 32b0b460
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_START_EventProcess();	// June 32b0b7c0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LOOP_EventProcess();	// June 32b0b820
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LANDING_EventProcess();	// June 32b0b860
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZ_EventProcess();	// June 32b0bbc0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZX_EventProcess();	// June 32b0bf60
+	void				LSI_LDB_F_DASH_COMBO_Z_EventProcess();	// June 32b0c220
+	void				LSI_LDB_F_DASH_COMBO_ZX_EventProcess();	// June 32b0c580
+	void				LSI_LDB_F_DASH_COMBO_ZXX_EventProcess();	// June 32b0c920
+	void				LSI_LDB_F_DASH_COMBO_ZXXX_EventProcess();	// June 32b0ccc0
+	void				LSI_LDB_F_DASH_COMBO_ZXXXX_EventProcess();	// June 32b0d060
+	void				LSI_LDB_F_DASH_COMBO_ZXXXXZ_EventProcess();	// June 32b0d400
+	void				LSI_LDB_F_DASH_JUMP_COMBO_XZ_START_EventProcess();	// June 32b0d6d0
+	void				LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_EventProcess();	// June 32b0d730
+	void				LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_ATTACK_EventProcess();	// June 32b0d770
+	void				LSI_LDB_F_DASH_JUMP_COMBO_XZX_EventProcess();	// June 32b0dac0
+	void				LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_EventProcess();	// June 32b0dd90
+	void				LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_ATTACK_EventProcess();	// June 32b0ddd0
+	void				LSI_LDB_M_DASH_JUMP_COMBO_XZX_EventProcess();	// June 32b0e120
+	void				LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd();	// June 32b14c00
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_StateStartFuture();	// June 32b14c30
+	void				ShowMinorParticleHyperModeShockOfBody();	// June 32b1f2b0
+	void				LSI_BOUNDING_TARGET_LU_STRIKER_StateStartFuture();	// June 32b34100
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_X_StateStartFuture();	// June 32b341b0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_StateStartFuture();	// June 32b343b0
+	void				LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture();	// June 32b35fd0
+	void				LSI_RIDING_HYPER_MODE_FrameMove();	// June 32b39e70
+	void				CommonHyperModeFrameMove( const float fChangeTime_, const float fShockTime_, const bool bSound_ );	// June 32b37d80 ( shared by the Lu / Ciel hyper mode states )
+	virtual void		CheckBoundingTarget();	// June 32b34680 ( vslot 0x568 ): body in CH1l
 
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )

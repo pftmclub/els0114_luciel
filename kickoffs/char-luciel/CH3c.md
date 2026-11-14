@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, high** effort, then type `/x2-phase char-luciel CH3c` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | CH3b review, DU1 review |
+| Depends on | CH3b review, CH1i2 (June's weapon-taker walk, the Demonio bounding strike calls it), DU1 review |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL SKILL` / `NUM`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | none of its own (user, 2026-11-10): the CH3c2 review covers CH3c, CH3c2; do not write `CH3c-review.md` (any debug define stays on until then) |
