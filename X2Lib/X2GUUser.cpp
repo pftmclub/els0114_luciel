@@ -8112,6 +8112,19 @@ HRESULT CX2GUUser::OnFrameMove( double fTime, float fElapsedTime )
 		m_pXSkinAnim->GetMatrix().Scale( m_vTransScale * m_fBasicBoneScale );
 #endif // VERIFY_STAT_BY_BUFF
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	{	// char-luciel DU1d3b: June 3206eaf0 @3206f1bb / @3206f263, the second body's anims the same way
+#ifdef VERIFY_STAT_BY_BUFF
+		const D3DXVECTOR3 vMinorUnitScale = m_vTransScale.GetVector3() * m_fBasicBoneScale;
+#else	// VERIFY_STAT_BY_BUFF
+		const D3DXVECTOR3 vMinorUnitScale = m_vTransScale * m_fBasicBoneScale;
+#endif // VERIFY_STAT_BY_BUFF
+		if ( m_pMinorUnitXSkinAnim != NULL )
+			m_pMinorUnitXSkinAnim->GetMatrix().Scale( vMinorUnitScale );
+		if ( m_pMinorUnitXSkinAnimFuture != NULL )
+			m_pMinorUnitXSkinAnimFuture->GetMatrix().Scale( vMinorUnitScale );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 	if( m_itNowStateData->first == GUSI_DIE )
@@ -19556,7 +19569,11 @@ void CX2GUUser::CommonFrameMoveFuture_TimedEvent()
 	{
 		D3DXVECTOR3 stopTime = m_StopAllList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        if( GetXSkinAnimFuture()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff1ff0 @31ff2043, the active body's anim
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
         if( m_pXSkinAnimFuture->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		if( m_pXSkinAnimFuture->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, true ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -19584,7 +19601,11 @@ void CX2GUUser::CommonFrameMoveFuture_TimedEvent()
 	{
 		D3DXVECTOR3 stopTime = m_Stop2AllList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        if( GetXSkinAnimFuture()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff1ff0 @31ff2376
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
         if( m_pXSkinAnimFuture->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		if( m_pXSkinAnimFuture->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, true ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -19612,7 +19633,11 @@ void CX2GUUser::CommonFrameMoveFuture_TimedEvent()
 	{
 		D3DXVECTOR2 stopTime = m_StopMyList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        if( GetXSkinAnimFuture()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff1ff0 @31ff2634
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
         if( m_pXSkinAnimFuture->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		if( m_pXSkinAnimFuture->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, true ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -19624,7 +19649,11 @@ void CX2GUUser::CommonFrameMoveFuture_TimedEvent()
 	{
 		D3DXVECTOR2 stopTime = m_Stop2MyList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        if( GetXSkinAnimFuture()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff1ff0 @31ff2704
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
         if( m_pXSkinAnimFuture->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		if( m_pXSkinAnimFuture->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, true ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -22789,7 +22818,11 @@ void CX2GUUser::CommonFrameMove_Invincible()
 bool CX2GUUser::SoundEventTimer( float fTime_ )
 {
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	bool bDue = GetXSkinAnimPtr()->EventTimerOneshot( fTime_ );	// char-luciel DU1d3b: June 31ff27c0 @31ff39b1 / 31fea120 @31fea191, the active body's anim
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	bool bDue = m_pXSkinAnim->EventTimerOneshot( fTime_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( NULL != m_ptrRidingPet && true == GetRidingOn() && NULL != m_ptrRidingPet->GetXSkinAnimPtr() )
 		bDue = m_ptrRidingPet->GetXSkinAnimPtr()->EventTimerOneshot( fTime_ );
 	return bDue;
@@ -22958,7 +22991,11 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		D3DXVECTOR2 attackTime = m_AttackTimeList[i];
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		if( GetXSkinAnimPtr()->GetNowAnimationTime() > attackTime.x && GetXSkinAnimPtr()->GetNowAnimationTime() < attackTime.y )	// char-luciel DU1d3b: June 31ff27c0 @31ff2952 / @31ff2984
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( m_pXSkinAnim->GetNowAnimationTime() > attackTime.x && m_pXSkinAnim->GetNowAnimationTime() < attackTime.y )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		{
 #ifdef SERV_IRUHADEV_JUNE_SKILL_MEMO_FX
 			/// S3d, June2017 CommonFrameMove_TimedEvent 31ff27c0 @31ff2a04-31ff2a87: inside the attack window the scale is 1.0, or for an
@@ -23029,7 +23066,11 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 		{
 			D3DXVECTOR3 stopTime = m_StopAllList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+            if( GetXSkinAnimPtr()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff27c0 @31ff2d0a
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
             if( m_pXSkinAnim->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 			if( m_pXSkinAnim->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -23059,7 +23100,11 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 		{
 			D3DXVECTOR3 stopTime = m_Stop2AllList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+            if( GetXSkinAnimPtr()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff27c0 @31ff3088
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
             if( m_pXSkinAnim->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 			if( m_pXSkinAnim->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -23090,7 +23135,11 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 	{
 		D3DXVECTOR2 stopTime = m_StopOtherList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        if( GetXSkinAnimPtr()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff27c0 @31ff3388
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
         if( m_pXSkinAnim->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		if( m_pXSkinAnim->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -23120,7 +23169,11 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 	{
 		D3DXVECTOR2 stopTime = m_Stop2OtherList[i];
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        if( GetXSkinAnimPtr()->EventTimerOneshot( stopTime.x ) == true )	// char-luciel DU1d3b: June 31ff27c0 @31ff36e8
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
         if( m_pXSkinAnim->EventTimerOneshot( stopTime.x ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		if( m_pXSkinAnim->EventTimer( stopTime.x ) == true && EventCheck( stopTime.x, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -23308,7 +23361,11 @@ void CX2GUUser::CommonFrameMove_Particle()
 
 
 	D3DXVECTOR3 MPHoldEffPos( 0, 0, 0);
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	GetFramePos( &MPHoldEffPos, true == m_bMinorUnitActive ? m_pFrame_MinorUnit_Bip01 : m_pFrame_Bip01 );	// char-luciel DU1d3b: June 31ff3ce0 @31ff3df5, the active body's Bip01
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	GetFramePos( &MPHoldEffPos, m_pFrame_Bip01 );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef  X2OPTIMIZE_CONFUSE_DIFFERENT_PARTICLE_SYSTEMS_BUG_FIX
 	CKTDGParticleSystem::CParticleEventSequence* pSeqHoldEffCenter = g_pX2Game->GetMajorParticle()->GetInstanceSequence( m_hHoldEffCenter );
 	CKTDGParticleSystem::CParticleEventSequence* pSeqHoldEffCircle = g_pX2Game->GetMajorParticle()->GetInstanceSequence( m_hHoldEffCircle );
@@ -37569,7 +37626,11 @@ void CX2GUUser::EmotionFrameMove()
 	if(m_ePlayedEmotion == CX2Unit::ET_NONE)
 		return;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( GetXSkinAnimPtr() != NULL && GetXSkinAnimPtr()->IsAnimationEnd() == true )	// char-luciel DU1d3b: June 3204a860 @3204a8b4 / @3204a8ce, the active body's anim
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if(m_pXSkinAnim != NULL && m_pXSkinAnim->IsAnimationEnd() == true)
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		switch(m_ePlayedEmotion)
 		{
@@ -37671,7 +37732,11 @@ bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmoti
 			CKTDXDeviceXSkinMesh *pMixMotion = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( wstrEmotionName );
 			if( pMixMotion != NULL )
 			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				GetXSkinAnimPtr()->MixAnim( pMixMotion );	// char-luciel DU1d3b: June 32043380 @32043e26 ( 32351070 mixes on the active body's anim )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				m_pXSkinAnim->MixAnim( pMixMotion );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				//m_bMixedEmotion = true;
 				switch( eEmotion )
 				{
@@ -37759,6 +37824,15 @@ bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmoti
 		if ( m_ePlayedEmotion == CX2Unit::ET_NONE && iWaitStateId != GetRidingWaitStateID() )
 			return false;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		if( GetXSkinAnimPtr() != NULL )	// char-luciel DU1d3b: June 32043380 @32043594-@32043616, the active body's anim
+		{
+			if(eEmotionId == CX2Unit::ET_SITWAIT)
+				GetXSkinAnimPtr()->Play( CKTDGXSkinAnim::XAP_LOOP );
+			else
+				GetXSkinAnimPtr()->Play( CKTDGXSkinAnim::XAP_ONE_WAIT );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if(m_pXSkinAnim != NULL)
 		{
 			if(eEmotionId == CX2Unit::ET_SITWAIT)
@@ -37766,6 +37840,7 @@ bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmoti
 			else
 				m_pXSkinAnim->Play( CKTDGXSkinAnim::XAP_ONE_WAIT );
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		if ( ( eEmotionId != CX2Unit::ET_SITREADY && eEmotionId != CX2Unit::ET_STANDUP ) && iWaitStateId == GetRidingWaitStateID() )
 			return false;
@@ -37827,7 +37902,11 @@ bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmoti
 		std::wstring wstrEffectSetName;
 		float fStartTime = 0.f;
 		bool bLoop = false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		if( true == g_pData->GetUnitManager()->GetUnitViewerEffectSet( wstrEmotionType, GetUnit()->GetClass(), true == IsMinorUnitActive() ? DUO_TYPE_MINOR_UNIT : DUO_TYPE_FIRST_UNIT,	// char-luciel DU1d3b: June @32043ba1, the active body's row
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( true == g_pData->GetUnitManager()->GetUnitViewerEffectSet( wstrEmotionType, GetUnit()->GetClass(), 0,
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			wstrEffectSetName, fStartTime, bLoop ) )
 		{
 			const CX2EffectSet::Handle hEffectSet = g_pData->GetUIEffectSet()->PlayEffectSet( wstrEffectSetName, this );
@@ -37848,6 +37927,20 @@ bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmoti
 	}
 #endif SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_TABLE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	CKTDGXSkinAnimPtr pEmotionSkinAnim = GetXSkinAnimPtr();	// char-luciel DU1d3b: June 32043380 @32043d02-@32044242, the active body's anim
+	if( pEmotionSkinAnim != NULL )
+	{
+		if( CX2Unit::IsAvatarEmotion( eEmotionId ) )
+			pEmotionSkinAnim->ChangeAnim( wstrEmotionType.c_str(), false );
+		else
+			pEmotionSkinAnim->ChangeAnim( wstrEmotionType.c_str(), true );
+
+		if(eEmotionId == CX2Unit::ET_SITWAIT)
+			pEmotionSkinAnim->Play( CKTDGXSkinAnim::XAP_LOOP );
+		else
+			pEmotionSkinAnim->Play( CKTDGXSkinAnim::XAP_ONE_WAIT );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if(m_pXSkinAnim != NULL)
 	{						
 		if( CX2Unit::IsAvatarEmotion( eEmotionId ) ) 
@@ -37859,6 +37952,7 @@ bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmoti
 			m_pXSkinAnim->Play( CKTDGXSkinAnim::XAP_LOOP );
 		else
 			m_pXSkinAnim->Play( CKTDGXSkinAnim::XAP_ONE_WAIT );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		m_ePlayedEmotion = eEmotionId;
 

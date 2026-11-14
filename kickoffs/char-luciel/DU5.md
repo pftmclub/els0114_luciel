@@ -78,3 +78,8 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
   count `328836c0` @`328837a5` all pass ( my select unit form == 1 ) to `CX2Inventory` `3286a6b0( set id, body )`, which counts the equipped
   parts of a set that body wears (filter `3286a4b0`). All three sit inside the item +0xac "set complete" socket list, which March's
   `ItemData` lacks and nobody has ported (funcmap S7m: "Stage 16"). Whoever ports that list passes the form; the count helper goes here.
+
+## Amended by DU1d3b (2026-11-14)
+
+- `InitSocketData` `3206d770 @3206da0f`: the set-socket count `3286a6b0( set, my unit +0xe40 )` reads the unit form; it is the same count helper
+  as above (funcmap row `3206d770 @3206d8f7 / @3206da0f (DU1d3b)`).

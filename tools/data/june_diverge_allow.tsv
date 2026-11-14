@@ -28,3 +28,5 @@ X2SlideShot.cpp	*	ScenEnd	tsv CX2SlideShot::ScenEnd (325c7140) -> Stage 9; june-
 X2GUEL.cpp	CX2GUEL::SI_A_SCA_SHADOW_EDGE_FrameMove	GT_PVP	June 32b84390 @32b844df: vslot 0x10c, cmp eax, 1 (type 1 only: the mark max-HP share); the search range beside it is 322cc1a0 = GetIsNowPVPCorrectionGame; char-elesis CH3c2
 X2GUEL.cpp	CX2GUEL::GetActualMPConsume	GT_PVP	June 32b7ebe0 @32b7ed7c: vslot 0x10c, cmp eax, 1 (type 1 only: the Vigor MP rate 0.8 / 0.6); char-elesis CH4b
 X2GUEL.cpp	CX2GUEL::GetActualCoolTime	GT_PVP	June 32b7ee10 @32b7eedf: vslot 0x10c, cmp eax, 1 (type 1 only: the Vigor cool-time rate 0.6 / 0.2); char-elesis CH4b
+X2GUUser.cpp	CX2GUUser::CommonFrameMove	CommonFrameMoveFuture_TimedEvent	routed to backlog Stage 2 by char-luciel DU1d3b: June 31ff1ff0's 16 B stop records with the state test; the body reads are ported
+X2GUUser.cpp	CX2GUUser::CommonFrameMove	CommonFrameMove_TimedEvent	routed to backlog Stage 2 by char-luciel DU1d3b: June 31ff27c0's 16 B stop records with the state test; the body reads are ported

@@ -1105,6 +1105,42 @@ funcmap rows: `grep "(DU1d3)" june2017_re/funcmap.tsv` (10).
   (DU1d4 builds and hands off the regression pass).
 - **In game:** nothing to see. March classes have no second anim, so no second after-image; body 3 picks the first after-image as before.
 
+### DU1d3b - Done (2026-11-14)
+
+Opus 5.5 high. Part 10b of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new define, Always.h untouched). File: `X2GUUser.cpp` (+94, insert-only,
+17 hunks, each tagged `// char-luciel DU1d3b`). No `_DEBUG`, no log line. funcmap rows: `grep "(DU1d3b)" june2017_re/funcmap.tsv` (12).
+- **Function starts re-checked** (DU1d3's method). March names: `31ff1ff0` = `CommonFrameMoveFuture_TimedEvent` (same place, after the combo
+  manager), `31ff3ce0` = `CommonFrameMove_Particle`, `3206d770` = `InitSocketData` (slot 484), `3206eaf0` = `OnFrameMove`. None in March:
+  `31fdb800`, `31fdf5d0`, `31fe0bb0` (June's emotion setter), `320200b0`, `31fe2fb0` / `31fe3e30` / `31fe4210`.
+- **Emotion (ported, March's own lines):** `PlayEmotion` runs every anim call on the active body (riding Play @`320435cc` / @`32043616`, avatar
+  `MixAnim` = June's mix on `32071d80` @`32043e26`, ChangeAnim / Play @`32043d02`-@`32044242`) and the unit-viewer table row by body
+  (@`32043ba1`, `DUO_TYPE_MINOR_UNIT` / `_FIRST_UNIT`); `EmotionFrameMove` tests the active anim's end (@`3204a8b4` / @`3204a8ce`).
+- **Emotion (routed, backlog Stage 10 bullet):** June's `PlayEmotion` / `EmotionFrameMove` are the EmotionData rewrite (Stage 10 owns it). Its
+  body reads sit only in June-only branches: the setter `31fe0bb0`, the helpers `31fdb800` / `31fdf5d0`, the `+0xe40` arguments (@`32043d92`,
+  @`320442bb`, @`320446c0`, OnFrameMove @`3206ecb7`), the sit-item body filter (@`3204a9f5` / @`3204aa03`), the sit-item block @`32043938`.
+- **Per frame (ported):** `OnFrameMove` scales the second anim pair like the first (@`3206f1bb` / @`3206f263`). `CommonFrameMoveFuture_TimedEvent`'s
+  four stop lists run on `GetXSkinAnimFuture()` (@`31ff2043` / `2376` / `2634` / `2704`). `CommonFrameMove_TimedEvent`'s attack window
+  (@`31ff2952` / @`31ff2984`) and its four stop lists (@`31ff2d0a` / `3088` / `3388` / `36e8`) run on `GetXSkinAnimPtr()`. `SoundEventTimer`
+  (shared by both sound players: @`31ff39b1` and DU1d4's `31fea120 @31fea191`) does too. `CommonFrameMove_Particle` puts the hold effect on the
+  active body's Bip01 (@`31ff3df5`). Only the live `X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE` lines were touched (probe: on).
+- **Routed:** DU3 = `InitSocketData @3206d8f7` (skip an equip's sockets when its minor-unit field `3286a4b0` is not both / not the active body)
+  and the second body's equip creation `31fe4210` -> `31fe3e30` -> `31fe2fb0`. DU5 = `@3206da0f` (set count by form). Stage 16 = `320200b0`
+  (socket-option particles per body, none in March). Kickoffs DU3 / DU5 / DU1d4 / DU1-review amended.
+- **Not body reads (routed, backlog Stage 2 bullets):** June's stop records are 16 B with a state-index test (divergence row
+  `CommonFrameMoveFuture_TimedEvent / CommonFrameMove_TimedEvent`, replace, body reads ported; two allow rows); the `Init` lead: PvP / type 5
+  `USI_START`, battle field `USI_WAIT`, dungeon / PVE no state change in `Init`, riding on through `3204d120` (row `CX2GUUser::Init` is `out`:
+  the gate matches the bare name `Init` and would trip on every `Init(` call); `OnFrameMove`'s first-body quirk (the `+0x87d0` test scales
+  `+0x87d4` again; March's live `VERIFY_STAT_BY_BUFF` branch scales the Future anim).
+- **For the DU1 review:** DU1b's constants say DUO_TYPE has no June Enum entry; June's `Enum.lua` has `DT_MAJOR` 0 / `DT_MINOR` 1 / `DT_BOTH` 2 /
+  `DT_KEEP` 3, and DU1b's `DUO_TYPE_NONE = 3` ("the duo ends") shares `DT_KEEP`'s value (written into `DU1-review.md`).
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files X2Lib/X2GUUser.cpp`: 1 PASS (+94), 0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII,
+  RESULT: PASS. `junediverge --check X2GUUser.cpp`: RESULT: PASS (open replace rows 8, unchanged). `enumscan --check`: the 4 known DU1b3 rows only.
+  Flag probe: DUO_BODY, X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE, VERIFY_STAT_BY_BUFF, RIDING_SYSTEM, UNIT_EMOTION, JUNE_UNIT_VIEWER_EFFECT_TABLE,
+  JUNE_UNIT_SOUND on. Commit and range flagcheck: below.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GUChung.cpp`, `X2GULire_ElvenRanger.cpp`: 0 errors each. Full build
+  skipped: no play-test (DU1d4 builds and hands off the regression pass, now with DU1d3b's paths).
+- **In game:** nothing to see. March classes have one body, so the active anim is `m_pXSkinAnim` and every path is as before.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

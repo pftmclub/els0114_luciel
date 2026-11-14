@@ -281,6 +281,17 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   (`@3205b934`, a local bool, miss 0) skips `NomalDirectCamera` in March's focus-unit `bResetCamera` block; `FORCE_DYNAMIC_CAMERA_INDEX` (`@3205c0e8`,
   int, miss 0) goes to the state param `+0x801c` between `normalCamera` and `hitCamera`. Every June class script uses both (WIN states `-1`,
   `*_WAIT_STATE_CHANGE` `TRUE`; Rose 19). Find the `+0x801c` reader first, then port both with it (funcmap row `32057b80 @3205b8e1 (DU1b4)`).
+- **Stop-list records with the state index** (char-luciel DU1d3b, 2026-11-14). June's `CommonFrameMoveFuture_TimedEvent` (`31ff1ff0`) and
+  `CommonFrameMove_TimedEvent` (`31ff27c0` @`31ff2ce2`-`31ff36e8`) read 16-byte stop records `{ time, value, ?, state index }` and fire one only
+  while the now state's index ( `(+0x7cbc protected - +0x7cec) / 100` ) equals the stored one; March's are `D3DXVECTOR3` / `D3DXVECTOR2` with no
+  test. Port with the `STOP_*` loaders in `CommonStateStart`; DU1d3b ported only the active-body anim clock (divergence row, allow rows).
+- **User `Init` start state** (char-luciel DU1d3b lead, 2026-11-14). June `3204ea20 @3204ed8f-3204eddf`: PvP and type 5 -> `USI_START`, battle
+  field -> `USI_WAIT`, dungeon and PVE no state change in `Init`; riding on through `3204d120` unless PvP / PVE or the dungeon UI test
+  (`31aadcb0` / `31edf8f0` / `32932230`, else `SetShowSkillSlot` `32150b70` / `32151ab0`). March sends a dungeon unit to `USI_START` or the
+  riding start state. First find where June's dungeon start state is set (StageLoad `327cd1b0` user loop?), then port the switch whole.
+- **`OnFrameMove` first-body Future scale** (char-luciel DU1d3b, 2026-11-14). June `3206eaf0 @3206f10a-3206f1b6`: under the `+0x87d0` test it
+  scales `+0x87d4` a second time (March's `#else` of `VERIFY_STAT_BY_BUFF` does the same; March's live branch scales the Future anim). The
+  second body's pair (`+0x8e88` / `+0x8e84`) is scaled correctly and ported. Decide with Stage 33 whether the Future anim's scale matters.
 
 ### Stage 3: skill system core (skill tree engine + skill slots)
 
@@ -838,6 +849,11 @@ which this stage widens). Lu/Ciel, Rose and Ain rows stay inert until Stage 8, a
   the square the unit's `323ffd20`. `31fdbb70` (called twice each from CommonStateStartFuture / CommonStateStart) swaps that state's anim name
   for `+0x93bc`, and PEPPER_RUN_END_FrameMove (`31fd98b0`) clears it 0.01 s in. CH1n2 left a stand-in line there. Placed here as the nearest
   owner (motion by name in game and square); decode the binder's name first and move it if it belongs elsewhere.
+- **Lu/Ciel reads in June's emotion branches** (char-luciel DU1d3b, 2026-11-14). Port with the rewritten `PlayEmotion` / `EmotionFrameMove`:
+  the emotion setter `31fe0bb0` (emotion-end set on the active anim; equip show by `+0x15d4 == +0x8e90`, DU3's byte), `31fdb800` (EmotionData
+  motion found in the body's motion), `31fdf5d0` (EmotionData voice `31ecc150( class, +0x8e90 )`), the unit form `+0xe40` passed to `32351900`
+  (`@32043d92`), `31fac950` (`@320442bb`, and OnFrameMove `@3206ecb7`), `31ecc150` (`@320446c0`), and `EmotionFrameMove`'s sit-item body filter
+  (`@3204a9f5` / `@3204aa03`: type 10, entry `+0x40` 2 = Lu only, 3 = Ciel only). DU1d3b ported the reads March's own functions have.
 
 ### Stage 11: division item templets (june-effect C9f, 2026-10-07)
 
@@ -1015,6 +1031,10 @@ the record itself and every field March already reads. The rest has no March own
   per-level map on `g_pData +0x258`; `328b1880` returns the current level's int64 limit (-1 on a miss). Eight readers: item/ED code `3216d8c0`, `328461a0`, `32849da0`,
   `3286f7b0`, `3286feb0`, `32dd6020`, `32dec9f0`, and the dungeon result `324d60e0`, which caps the shown ED gain at the limit less the ED saved at dungeon start
   (state `+0x7e8`, writer `324ccc32`; R1 keeps it uncapped, June's no-table path). March has no ED limit at all; offline reach: every ED gain.
+- **Socket-option particles** (char-luciel DU1d3b, 2026-11-14). June `320200b0` (called from `OnFrameMove @3207000f`, none in March) keeps a
+  map `+0x7c9c` of the equipped socket options (equips `32867f80`, sets `32350b80` / `325bb840`) to the particles of the socket templet's
+  `+0x20c` list (`32715320`), and each frame puts them on Bip01 plus a y offset; for Lu/Ciel the first particle sits on Lu's Bip01 (shown
+  when Ciel is not active) and the second on Ciel's (`+0x8e88` @`32020503`). Port whole with the socket templet's particle field.
 
 Routed elsewhere:
 - the division and render-division tables go to Stage 11;

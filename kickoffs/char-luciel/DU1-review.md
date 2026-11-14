@@ -82,3 +82,12 @@ and commit.
   June (`32275a30` / `322720f0` mode pick, InitComponent `@31feec8a`, TimedEvent `@31ff2882`, CommonStateStart `@3205b699`, NotifyShowObjectChanged
   `@31ff1dac` / `@31ff1db7` = JUNE_BUGS 669), that `IsMinorUnitActive` is virtual in `CX2GameUnit` (base false = June `31e4c550`), and that
   every March caller of `EnableAfterImage` / `DisableAfterImage` keeps mode 3 (June's NPC callers pass 3 too).
+
+## Amended by DU1d3b (2026-11-14)
+
+- Check DU1d3b's 17 hunks (`X2GUUser.cpp`, `grep -n "char-luciel DU1d3b"`) against the funcmap rows `(DU1d3b)`: `PlayEmotion` (riding Play, MixAnim,
+  ChangeAnim / Play, unit-viewer duo row), `EmotionFrameMove`, `OnFrameMove` scale pair, `CommonFrameMoveFuture_TimedEvent` (4), `CommonFrameMove_TimedEvent`
+  (attack window + 4 stop lists), `SoundEventTimer`, `CommonFrameMove_Particle`; and the routes (Stage 2 / 10 / 16, DU3, DU5).
+- **Finding for the review:** DU1b's `_CONST_GUUSER_DU1B_` says DUO_TYPE has "no Enum entry in June", but June's `Enum.lua` has `DUO_TYPE`
+  (`DT_MAJOR` 0, `DT_MINOR` 1, `DT_BOTH` 2, `DT_KEEP` 3; `june_src_fixed/data036_kom/Enum.src.lua:17515`). DU1b's `DUO_TYPE_NONE = 3` ("the duo
+  ends") shares `DT_KEEP`'s value: decide whether the constants take June's names (enum rule) and whether value 3 keeps or ends the duo.

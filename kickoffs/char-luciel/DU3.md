@@ -57,3 +57,12 @@ strings), `328825c0`, `32882540`. `31fd48a0`, `31fd63c0`, `32882540` have no Mar
 - The `CommonFrameMove` equip loop's stand-in is `bEquipForMinorUnit` (`X2GUUser.cpp`, `@3206585b`): it picks the body whose render param
   the equip takes. June's loop then runs a block March lacks (`@320659e9-32065ae1`: `+0x8e64` / `+0x8e68` / `+0x8e70`, the active body's anim
   time against `+0x8e68`): identify it with the equip-view rewrite (funcmap row `32063650 @3206584a-320659e4 (DU1b2)`).
+
+## Amended by DU1d3b (2026-11-14)
+
+- **Second body equips:** `31fe4210` (called from `InitEqip` `32024510 @32024551` on the view list) -> `31fe3e30` -> `31fe2fb0` x8 build Lu's
+  equip on `+0x87d4` and, for an item with a minor-unit id (item templet `+0x30`), Ciel's equip on `+0x8e88` (`31fac2a0`). Census rows
+  `31fe2fb0` / `31fe4210`, funcmap row `31fe2fb0 / 31fe3e30 / 31fe4210 (DU1d3b)`.
+- **Socket options by body:** `InitSocketData` `3206d770 @3206d8f7`: per equip, `3286a4b0` (the item's minor-unit field, 2 = both) not both and
+  not the active body (`+0x8e90`) -> that equip's socket options are skipped. Port it with the field (funcmap row `3206d770 @3206d8f7 / @3206da0f (DU1d3b)`).
+- The emotion setter's equip show by `+0x15d4` (`31fe0bb0`) goes with Stage 10's emotion rewrite, not here.

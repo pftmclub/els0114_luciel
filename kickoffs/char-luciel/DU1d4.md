@@ -50,3 +50,9 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Amended by DU1d3b (2026-11-14)
+
+- The sound player `31fea120`'s site (`@31fea191`) is done: March's `PlayStateSoundRecords` and `PlaySoundRecords` share `SoundEventTimer`, which
+  DU1d3b moved to the active body's anim (census row says so). The regression play-test adds DU1d3b's paths on a March class: hit-stop on a
+  skill (`StopAll` / `StopMy` lists), a sit emotion (sit ready -> sit wait loops) and an avatar emotion, and the MP-charge hold effect.
