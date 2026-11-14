@@ -673,6 +673,38 @@ protected:
 	void				LSI_LU_DIE_FRONT_StateStart();	// June 32b3a250
 	void				LSI_LU_DIE_BACK_StateStart();	// June 32b3a270
 
+	// char-luciel CH1d: Ciel's common states ( June 32ae5960 - 32b235c0 )
+	void				LSI_CIEL_JUMP_UP_EventProcess();	// June 32ae5960
+	void				LSI_CIEL_STANDUP_ROLLING_FRONT_FRONT_StateEnd();	// June 32ae5a00
+	void				LSI_CIEL_STANDUP_ROLLING_FRONT_BACK_StateEnd();	// June 32ae5a40
+	void				LSI_CIEL_STANDUP_ROLLING_BACK_FRONT_StateEnd();	// June 32ae5a80
+	void				LSI_CIEL_STANDUP_ROLLING_BACK_BACK_StateEnd();	// June 32ae5ac0
+	void				LSI_CIEL_STANDUP_ATTACK_FRONT_StateEnd();	// June 32ae5b00
+	void				LSI_CIEL_STANDUP_ATTACK_BACK_StateEnd();	// June 32ae5b40
+	void				LSI_CIEL_JUMP_DOWN_EventProcess();	// June 32af1b80
+	void				LSI_CIEL_DAMAGE_DOWN_FRONT_EventProcess();	// June 32af1c30
+	void				LSI_CIEL_DAMAGE_DOWN_BACK_EventProcess();	// June 32af1da0
+	void				LSI_CIEL_STANDUP_ROLLING_FRONT_FRONT_EventProcess();	// June 32af1f20
+	void				LSI_CIEL_STANDUP_ROLLING_FRONT_BACK_EventProcess();	// June 32af1fb0
+	void				LSI_CIEL_STANDUP_ROLLING_BACK_FRONT_EventProcess();	// June 32af2040
+	void				LSI_CIEL_STANDUP_ROLLING_BACK_BACK_EventProcess();	// June 32af20d0
+	void				LSI_CIEL_STANDUP_ATTACK_FRONT_EventProcess();	// June 32af2160
+	void				LSI_CIEL_STANDUP_ATTACK_BACK_EventProcess();	// June 32af21f0
+	void				LSI_CIEL_JUMP_DOWN_NO_ATTACK_EventProcess();	// June 32af5cf0
+	void				LSI_CIEL_JUMP_READY_EventProcess();	// June 32b11720
+	void				LSI_CIEL_DASH_END_FrameMove();	// June 32b11830
+	void				LSI_CIEL_DASH_JUMP_EventProcess();	// June 32b118d0
+	void				LSI_CIEL_DAMAGE_DOWN_FRONT_FrameMove();	// June 32b11ba0
+	void				LSI_CIEL_DAMAGE_DOWN_BACK_FrameMove();	// June 32b11c50
+	void				LSI_CIEL_JUMP_DOWN_NO_ATTACK_FrameMoveFuture();	// June 32b12e20
+	void				LSI_CIEL_WAIT_EventProcess();	// June 32b22710
+	void				LSI_CIEL_WALK_EventProcess();	// June 32b22950
+	void				LSI_CIEL_JUMP_LANDING_EventProcess();	// June 32b22b50
+	void				LSI_CIEL_DASH_EventProcess();	// June 32b22e30
+	void				LSI_CIEL_DASH_END_EventProcess();	// June 32b23050
+	void				LSI_CIEL_DASH_JUMP_LANDING_EventProcess();	// June 32b23380
+	void				LSI_CIEL_DASH_JUMP_POWER_LANDING_EventProcess();	// June 32b235c0
+
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )
 	CKTDGParticleSystem::CParticleEventSequenceHandle	m_ahLucielMajorParticleInstance[LUCIEL_MAJOR_PII_END];	// +0x959c

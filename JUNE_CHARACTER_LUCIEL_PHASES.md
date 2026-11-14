@@ -1952,6 +1952,30 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Commit** `8716f6b7`; `finish.py --range 8716f6b7^..8716f6b7`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 
+### CH1d - Done (2026-11-14)
+
+Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.h` / `.cpp`, nothing references it until CH1 ). funcmap `grep "(CH1d)" june2017_re/funcmap.tsv` ( 30 rows ); JUNE_BUGS 693; no review of its own ( CH1f2 covers it ).
+- **30 functions, June addresses** ( every `state-fn` row of `ch0_class_map.tsv` col 6 = CH1d ): StateEnds `32ae5a00 32ae5a40 32ae5a80 32ae5ac0 32ae5b00 32ae5b40` ( the six stand-ups ); `32ae5960` JUMP_UP, `32af1b80` JUMP_DOWN,
+  `32af5cf0` JUMP_DOWN_NO_ATTACK ( uncarved: read from `charport_adis.py` ), `32b11720` JUMP_READY, `32b118d0` DASH_JUMP, `32b22710` WAIT, `32b22950` WALK, `32b22b50` JUMP_LANDING, `32b22e30` DASH, `32b23050` DASH_END,
+  `32b23380` DASH_JUMP_LANDING, `32b235c0` DASH_JUMP_POWER_LANDING EventProcess; `32af1c30` / `32af1da0` DAMAGE_DOWN FRONT / BACK and the six stand-up rolling / attack EventProcess `32af1f20 32af1fb0 32af2040 32af20d0 32af2160 32af21f0`;
+  FrameMove `32b11830` DASH_END, `32b11ba0` / `32b11c50` DAMAGE_DOWN FRONT / BACK, FrameMoveFuture `32b12e20` JUMP_DOWN_NO_ATTACK. The 32 thunks ( incl. `32af1f10`, the second slot of `32af1c30` ) are CH1m's registration.
+  CH0 gave this group only EventProcess / StateEnd / FrameMove functions: no Ciel `StateStart` is in it ( DIE_FRONT / DIE_BACK use CH1b's `DieFrontStart` / `DieBackStart` ).
+- **How it was read:** every function decompiled in Ghidra and diffed ( names and `FUN_` addresses normalised ) against the Lu function CH1b wrote from its twin. 26 of the 30 are **the same body as Lu's with only state ids changed**
+  ( the diff shows nothing else ); 4 differ in shape ( DAMAGE_DOWN FRONT / BACK, DASH, DASH_END ) and are written from the Ciel decompile.
+- **State ids ( June, and the one thing to watch in CH1's play-test ):** Ciel's code passes **Lu's ids for every common state ( 13-22, 25-42, 73 ) and her own ids only for what Lu's table lacks** ( combos, jump combos, dash combos, switching, stand-up rolls / attacks, 213 ).
+  So `LSI_LU_DASH_JUMP` / `LSI_LU_JUMP_DOWN` / `LSI_LU_WAIT` / `LSI_LU_DAMAGE_AIR_FALL` / `LSI_LU_DAMAGE_STANDUP_FRONT` appear inside `LSI_CIEL_*` functions. June's `StateChange` ( `320348c0` ) does no id remap ( decompiled );
+  whether the shared ids reach Ciel's states is the registration's job ( CH1m, `InitStateCommon` registers Lu ids and Ciel ids both ), so no id was translated here. Ciel's own: `LSI_CIEL_JUMP_COMBO_Z / X` 251 / 252, `_COMBO_Z / X` 238 / 243,
+  `_DASH_COMBO_Z / X` 253 / 254, `_DASH_JUMP_COMBO_Z / X` 255 / 257, `_DASH_JUMP_POWER_LANDING` 230, `_SWITCHING` 237, stand-up rolls 231-234, attacks 235 / 236, `_DAMAGE_STANDUP_BACK` 213.
+- **Where Ciel differs from Lu ( June shapes kept ):** DAMAGE_DOWN FRONT / BACK have **no no-down roll** ( flags [1] and [4] both give the plain stand-up attack; no `GetRandomInt()`, no `m_iNoDownDamageAtStandUpAttackPercent` ), and Ciel's DASH / DASH_END have
+  **no job-line split** ( `IsInJobLine` is not called: Z / X give her own `DASH_COMBO_Z / X`, DASH_END keeps the first-eighth window ). DASH_JUMP_LANDING keeps Lu's missing `else` ( JUNE_BUGS 693 ).
+- **Constants:** no new one: every immediate is CH1b's ( `LINE_RADIUS`, `LINE_RADIUS * 1.5f`, `0.3f`, `0.4f`, `0.19f`, `0.32f`, `0.33f`, `0.125f` ); no `_CONST_LUCIEL_CH1D_` block opened.
+- **Callees:** unchanged from CH1b ( `StateChangeDashIfPossible`, `ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE`, `SpecialAttackEventProcess`, `CanDown`, `GetDashJumpSpeed`, `GetJumpSpeed`, `GetRidingOn` ); nothing new needed.
+- **Names:** `junediverge.py --list` checked; every name is `LSI_CIEL_<STATE>_<Fn>` ( the CH0 map's names ), no `June` / address / phase tag in any identifier; the phase tag is in the comments only.
+- **Not in this phase:** checklist row §7 L254 ( `+0x7cc8` ): no site in these 30; no state registered, so `stateends` / `skillicons` / `luabind` do not apply.
+- **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge` `RESULT: PASS`; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each; `cl /P` holds all 30 `LSI_CIEL_*` definitions. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
