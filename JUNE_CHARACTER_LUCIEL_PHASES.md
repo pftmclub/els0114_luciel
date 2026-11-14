@@ -2102,6 +2102,7 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS` ( 10 deleted lines = the CH1f2 helper's body moved ); `junediverge` `RESULT: PASS`; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each; `cl /P` holds 224 `LSI_*` definitions ( 186 + these 38 ). Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** `2e5864b0`; `finish.py --range 2e5864b0^..2e5864b0`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1h` ( Sonnet 5.5 high ).
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
