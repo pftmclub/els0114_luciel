@@ -244,7 +244,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH1k2 | ready (CH1k done 2026-11-14): overrides band 1 part 2 (state-id getters), `IsInvasionOfDarkEnergyActive` body, transcription under `_CORE` | Sonnet 5.5 / high, Opus review (also covers CH1k) | CH1k | `X2GULuciel.*` | `CH1k2.md` |
+| CH1k2 | code done 2026-11-14 (`3880c02b`, 30 rows under `_CORE`, JUNE_BUGS 708): review pending (covers CH1k); owes the user nothing | Sonnet 5.5 / high done; review Opus 5.5 / high | CH1k | `X2GULuciel.*` | `CH1k2-review.md` |
 | CH1l | blocked (CH1k2 review): overrides band 2 part 1 (DU2 getters), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1l3 review covers it) | CH1k2 review | `X2GULuciel.*` | `CH1l.md` |
 | CH1l2 | blocked (CH1l): overrides band 2 part 2 | Sonnet 5.5 / high, no review of its own (CH1l3 review covers it) | CH1l | `X2GULuciel.*` | `CH1l2.md` |
 | CH1l3 | blocked (CH1l2; CH1l30 review done): overrides band 2 part 3 | Sonnet 5.5 / high, Opus review (also covers CH1l, CH1l2) | CH1l2 | `X2GULuciel.*` | `CH1l3.md` |

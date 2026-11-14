@@ -2267,6 +2267,31 @@ Sonnet 5.5 high. All 31 CH1k rows of the class map written whole under `SERV_IRU
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Next:** `/x2-phase char-luciel CH1k2` ( Sonnet 5.5 high; its review also covers CH1k ).
 
+### CH1k2 - Done (2026-11-14)
+
+Sonnet 5.5 high. All 30 CH1k2 rows of the class map written under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.cpp` +336, `.h` +30 -1; inert, `_LIVE` stays `//#define` ). Code commit `3880c02b`.
+funcmap: `grep "(CH1k2)" june2017_re/funcmap.tsv` ( 11 rows, getters grouped ). `JUNE_BUGS.md` 708. No debug define. Review: `kickoffs/char-luciel/CH1k2-review.md` ( covers CH1k, CH1k2 ).
+- **Written ( June address / vslot ):** `DeleteMinorParticle` `32b1f0a0` ( 0x4c ), `HyperModeBuffEffectStart` `32b1f0b0` ( 0xc4 ), `ReInit` `32b373e0` ( 0x44 ), `CreateGageData` `32b37c70` ( 0xd0 ), `StateChange( int, bool )` `32b4db90` ( 0x5c ) /
+  `StateChange( int, int, bool )` `32b4dbb0` ( 0x434 ), `IsInvasionOfDarkEnergyActive` `32b4b580`, `GetWaitStateID` `32b4d3c0` ( 0x438 ), the movement getters `32b4d3f0` Walk, `32b4d430` Dash, `32b4d470` DashEnd, `32b4d4b0` DashJump,
+  `32b4d4f0` DashJumpLanding, `32b4d530` JumpReady, `32b4d570` JumpUp, `32b4d610` JumpLanding, `32b4d650` DieFront, `32b4d690` DieBack ( 0x43c-0x464 ), the damage getters `32b4d6d0` Groggy, `32b4d710` SmallFront, `32b4d750` SmallBack,
+  `32b4d790` BigFront, `32b4d7d0` BigBack, `32b4d890` StandUpFront, `32b4d8d0` StandUpBack, `32b4d910` AirSmall, `32b4d950` AirDown, `32b4da50` AirUp ( DU2's exact names, `const` ).
+- **No class code, two rows:** `32b4cfb0` = the compiler's `vector<SDamageEffectHitCount>::erase` ( 12-byte entries ); `32b4dd50` = a copy of March's `CX2GameUnit::SetHyperModeCountByBuff` ( `+0x6844` written if different, CH1k's `Init` already calls it ).
+- **Getters, decoded from the listings, not from CH0's hint:** only `GetWaitStateID` calls `GetStateIDByForm`; the other 20 do the arithmetic inline: `IsTransformed( DT_BOTH )` ( `31fc9d90( 2 )` ) then vslot 0x260 ( `IsMinorUnitActive` ):
+  transformed -> `LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_*` ( 0x1a8-based ) / `LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_*` ( + 0x2d ); not transformed -> `LSI_LU_*` / `LSI_CIEL_*` ( + 0xb5 movement, + 0xb4 damage, + 0xb9 die ).
+  Every constant was matched to its `LSI_*` member by script ( no number in the code ). The ten damage getters answer the transformed **WAIT** state while transformed; the die pair answers Lu's id while transformed.
+- **`ReInit`:** June tests `g_pData +0x6c` ( the PvP room ) not the game type, then `+0xd8 == 8` = `PGT_AMUSEMENT_ITEM` ( registered in `X2PVPRoom.h` under `JUNE_ENUM_NAMES`, June `Enum.lua:736` ): other form's MP = its MP / 3.0.
+  Else the kill lead from `CX2Game` `+0x4a4` / `+0x4a8` ( taken as Red / Blue team kill, `GetRedTeamKill` / `GetBlueTeamKill`; the review confirms the order ): above 1 the other form's MP and the Combination Point go to 0,
+  exactly 1 halves the other form's MP and zeroes the Combination Point. The `+0x8f70` window ( `m_pTransformSkillSlotUI` ) is deleted as the destructor does ( stand-in: CH2d20 adds its dialog release ). JUNE_BUGS 708: two gauge reads with no null test.
+- **`IsInvasionOfDarkEnergyActive`:** the listing ( `fcomp` / `test ah, 0x41` / `jp` ) is `0 <= m_fInvasionOfDarkEnergyTime`; CH0's hint said `0 < time`. Written as June has it ( default -1 = off ).
+- **Routed ( CH1o, kickoff amended ):** eleven getters have no virtual base in March ( `GetWaitStateID` .. `GetDieBackStateID`; seven of them do not exist in March at all ): declared `virtual` in `X2GULuciel.h` and marked `+`; CH1o adds the bases.
+  Declaring the two `StateChange` overloads here routes the class's own calls through `GetStateIDByForm`, as June's do ( inert until `_LIVE` ).
+- **Gates:** `finish.py --files X2GULuciel.h/.cpp X2PVPRoom.h`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 1 OTHER, 0 FAIL, 0 ERROR` ( the OTHER is `X2PVPRoom.h`, which belongs to `JUNE_ENUM_NAMES` ), `JUNE_ENUM_NAMES` `1 PASS, 2 OTHER, 0 FAIL`,
+  `junediverge` PASS, `enumscan` exit 0; the one deleted line is the header comment `body in CH1k2` on `IsInvasionOfDarkEnergyActive`. Range gate `--range 3880c02b^..3880c02b`: identical tallies. stateends / skillicons / luabind: nothing registered or staged.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp` ( plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ) and `X2GUUser.cpp` ( includes the changed `X2PVPRoom.h` ): 0 errors each ( one first-run error, a `const CX2PVPRoom*` calling the non-const `GetPVPGameType`, fixed ).
+  Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1k2 review` ( Opus 5.5 high; covers CH1k and CH1k2 ), then `/x2-phase char-luciel CH1l`.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

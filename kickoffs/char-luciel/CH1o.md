@@ -58,3 +58,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `DoProcessWhenDamageDataDestroyed` ( `X2GameUnit.h`, `SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE` guard ) and **0x300** `AdjustDamageDataBeforeDamageReact` ( `X2GUUser.h:1674` and the four user-attacker call
   sites, Raven's `_LIVE` guards ): widen to Lu/Ciel as the CH1k kickoff text says ( Lu/Ciel has summoned NPCs: CH1o decides `CX2GUNPC`'s `32778fe0` by that text ).
 - `CX2GameUnit::GetNowMp / GetMaxMp / SetMaxMp / FlushMp / UpNowMp / SetNowMp` are already virtual ( flag `SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL`, CH1k ): the wiring list needs nothing for them.
+
+## Amended by char-luciel CH1k2 (2026-11-14)
+
+- **Eleven Lu/Ciel getters have no virtual base in March** ( `X2GULuciel.h`, marked `+`; declared `virtual` in the class only ): vslot 0x438 `GetWaitStateID` ( `X2GUUser.h:1759`, non-virtual ), 0x43c `GetWalkStateID`, 0x440 `GetDashStateID`, 0x444 `GetDashEndStateID`
+  ( non-virtual, `X2GUUser.h:1742-1744` ), and 0x448 `GetDashJumpStateID`, 0x44c `GetDashJumpLandingStateID`, 0x450 `GetJumpReadyStateID`, 0x454 `GetJumpUpStateID`, 0x45c `GetJumpLandingStateID`, 0x460 `GetDieFrontStateID`, 0x464 `GetDieBackStateID`
+  ( absent in March; June's bases are `3208ddd0 .. 33069eb0` returning the `USI_*` ids ). Add the bases ( non-const, as Lu/Ciel's ) under `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS`'s sibling guard or a new class-agnostic flag, make the
+  engine and class readers ask them, and widen with `_LIVE`. The damage getters and `GetJumpDownStateID` are DU2's and already virtual.
+- `StateChange( int, bool )` and `( int, int, bool )` are overridden in Lu/Ciel ( CH1k2 ): the March bases are already virtual.
