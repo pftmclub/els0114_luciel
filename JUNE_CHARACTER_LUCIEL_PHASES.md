@@ -1484,6 +1484,34 @@ the worktree run below ).
 - **How to see it in game:** nothing for Lu/Ciel yet ( inert ). Every class: MP regen and detonation now feed the gained / spent MP tallies, and the
   gauge's per-frame `Veryfy` is gone; regen amounts are unchanged.
 
+### CH1a1 - Review (2026-11-14)
+
+Opus 5.5 high, Ghidra read-only (`funcdis.py` + vtable dump from the exe). **Verdict: pass, no code change.**
+- **Slot map:** vt `3349b2a4` vs base `33487acc` and Chung `3349b064`: Lu/Ciel replaces every slot but 12 ( `32a31dc0` ) and 14 ( `32a33b20` ), as the
+  Done note says; slots 1-11 / 21 in Chung = the base bodies. Slot 13 `32a35000` is a bare `call 32a33c40`; slot 16 `32a350c0` is byte-for-byte the base
+  `32a33f90` ( `SetHyperModeRemainTime( 0 )` `31e8c9d0` ): no code needed. 17 / 18 ( `32a32530` / `32a350d0` ) are CH1a2's.
+- **Spot-checks (3, all = commit):** (1) `MpFrameMove` `32a35170`: item timer, form index `31d717e0`, `UpNowMp( ( vslot 0x20( 0 ) + item rate ) x time
+  [x 0 unless +0x18 == 1], 1, form )`, `UpNowMp( +0x12c x time, 1, form == 0 )` (ungated), factors on `+8` / `+0xc` by form, cleared when HP gauge `+0x20`
+  is NULL or <= 0, factor x elapsed time. (2) `SetAddMaxMP` `32a31800`: Ciel -> `+0x10 = +0x14`, then equal -> return, else
+  `SetMaxMp( GetMaxMp( 0 ) - old + new, 0 )` through the vtable, store. (3) `UpdateDamageFlushMP` `32a33d50`: `UpNowMp( +0xfc x -1.0 ( 33436c90 ), 1,
+  31d717e0() )` via vslot 0xc, then the March tail.
+- **`+0x18` gate:** written only by the ctor `322b3a70` @`322b3abb` and copy ctor `322b24f0` @`322b259f` ( `bl` = 1 in both ); `op=` `32a36530` and
+  `Init` `322b37a0` never touch it. The exe's one setter-shaped `[ecx + 0x18]` byte writer, `32e1dba0`, is a UI show toggle ( calls a singleton +
+  `31cd32e0` ). Leaving the gate out is safe.
+- **Base bodies / Lu/Ciel bodies:** re-read against the diff ( base `SetNowMp` keeps March's own negative store, = June's `322b3010` order; `FlushMp`
+  base spends on 0, Lu/Ciel on the index; `UpdateDataFromGameUnit` point before max = JUNE_BUGS 677 ). JUNE_BUGS 675-678 and the two divergence rows
+  match the bodies.
+- **Callers:** every 3-argument `SetNowMp` / `UpNowMp` call is in `X2GageData.cpp` ( 184, 265, 357, 1757, 1775, 1776, 1810 ) or CH1a's
+  `X2GULuciel.cpp:303` ( after this commit ); the `bSkip_` overloads at `X2GageData.h:307` / `:349` are the dead `#else` branch. No `&CX2GageData::`
+  member pointer, no luabind binding of a gauge MP accessor.
+- **Routing:** `CH1a2.md` / `CH1a3.md` exist with STATUS rows; CH1 depends on CH1a2 / CH1a3 / CH1a4 reviews.
+- **Hygiene:** flagcheck `FORM_MP_GAGE --range 88246a05^..88246a05 --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`: `files: 1 PASS, 1 PASS~ (blank/marker
+  only), 1 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR` / `3 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0
+  #else/#endif without the flag token, 0 encoding change(s)` / `RESULT: PASS` ( the 3 deletions = the `m_fRestFormMpRate` rename inside `_CORE`; PASS~ =
+  one blank line ). `git log -S<flag> 88246a05..HEAD` and `git log 88246a05..HEAD -- X2Lib/X2GageData.*`: empty. `junediverge.py --check-all`:
+  `allow-listed: 240` / `RESULT: PASS`. `enumscan.py --check X2GageData.h X2GageData.cpp`: `0 A/B row(s) remain`.
+- No build ( no code change ). CH1a2 and CH1a3 are unblocked; CH1k's CH1a1 dependency is met.
+
 ### CH1a - Done (2026-11-14)
 
 Opus 5.5 high. New `X2Lib/X2GULuciel.h` / `.cpp` ( ASCII, CRLF; in `X2Lib_2010.vcxproj` + `.filters` ) under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`;
