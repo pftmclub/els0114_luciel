@@ -1179,6 +1179,8 @@ Opus 5.5 high. Part 11 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new d
   X2/US_SERVICE/x2.exe (2026-11-14 12:17:38); built at main d3cfe730 + 1 uncommitted code file(s).` (the file is this phase's).
 - **In game:** March classes have one body, so every new line reads `m_pXSkinAnim` as before. The play-test below is the DU1 regression pass
   (DU1b4-DU1d4's every-class lines).
+- **Play-test PASSED 2026-11-14** (user: all checks; run 12:20-12:26 on the deployed exe md5 8e5646f3): ravbe, Iivue, reyaa as handed off.
+  Logs: 0 EXCEPTION, ErrorLog clean, UNHANDLED only the known `E_DISABLE_HB_CHECK_REQ` x4 (outside this phase). DU1d5 ready.
 
 ### DU2 - Done (2026-11-14)
 
