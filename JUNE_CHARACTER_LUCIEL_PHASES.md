@@ -1371,7 +1371,7 @@ and skill-use reads go through the shared `CX2GUUser` helpers (Chung plan, Rules
 Opus 5.5 high. Two new flags ( `Always.h`, no `_DEBUG`, no log tag, inert ): class-agnostic `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK` ( needs
 `_DUO_BODY` and `_SKILL_TREE_UI`, `#error` guard ) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( defined here; CH1a adds only `//#define _LIVE` ).
 Files: `Always.h`, `KTDGUISlot.h`, `X2GUUser.h/.cpp`, `X2Game.h/.cpp`, `X2GageData.h`, `X2UISkillTreeNew2015.h/.cpp`. funcmap:
-`grep "Char Luciel CH1a0" june2017_re/funcmap.tsv` ( 23 rows ). `JUNE_BUGS.md` 674. Commit: see `git log --grep "char-luciel Phase CH1a0"`.
+`grep "Char Luciel CH1a0" june2017_re/funcmap.tsv` ( 23 rows ). `JUNE_BUGS.md` 674. Commit `3964df64`; flagcheck `--range 3964df64^..3964df64`: both flags `RESULT: PASS` ( same tallies as the worktree run below ).
 - **Already ported:** `31fc8900` = Chung CH2b0's `SkillSlotKey::IsKeyPressedOnce` ( Lu/Ciel calls it with `m_InputData` ).
 - **Transform pair** ( `CX2GUUser`, DU1b's members `+0x8f6e` / `+0x8f6f` ): `SetTransformed( int, bool )` `31fc9d50`, `IsTransformed( int )` `31fc9d90`.
   Arguments are `CX2Unit::DT_*`: the getter's 2 ( `DT_BOTH` ) means either body, 3 ( `DT_KEEP` ) both; kept as June has them.
