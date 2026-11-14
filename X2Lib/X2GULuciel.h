@@ -869,6 +869,54 @@ protected:
 	CX2EffectSet::Handle	PlayRatedProjectileEffectSet( const WCHAR* pwszEffectSetName_, const bool bAddMaxCountModifier_ );	// June 32b28020 and its siblings, inline in each
 	void				SetEffectSetLocalRotateZ( const CX2EffectSet::Handle hEffectSet_, const float fRotateDegree_ );	// June +0xe4 of the effect set instance, inline in each
 	void				SetAirWalkSpeedByInput();	// June 32b105d0 and its siblings, inline in each
+	// char-luciel CH1h: Dread Lord and Noblesse combos ( June 32ae5940 - 32b29570 )
+	void				LSI_LLD_COMBO_XX_DOWN_XX_LOOP_StateStartFuture();	// June 32ae5940
+	void				LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture();	// June 32ae5df0
+	void				LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_StateStartFuture();	// June 32ae60d0
+	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture();	// June 32ae60f0
+	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_StateStartFuture();	// June 32ae6110
+	void				LSI_LLD_COMBO_ZZZXZ_EventProcess();	// June 32af1180
+	void				LSI_LLD_COMBO_XX_DOWN_X_EventProcess();	// June 32af13b0
+	void				LSI_LLD_COMBO_XX_DOWN_XX_READY_EventProcess();	// June 32af16a0
+	void				LSI_LLD_COMBO_XX_DOWN_XX_LOOP_EventProcess();	// June 32af16e0
+	void				LSI_LLD_COMBO_XX_DOWN_XX_LOOP_X_EventProcess();	// June 32af1950
+	void				LSI_LCN_DASH_COMBO_ZX_DOWN_X_StateStartFuture();	// June 32af6c50
+	void				LSI_LCN_DASH_COMBO_ZX_DOWN_X_EventProcess();	// June 32af6cc0
+	void				LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_EventProcess();	// June 32af6fc0
+	void				LSI_LCN_DASH_COMBO_ZX_DOWN_XX_END_EventProcess();	// June 32af72d0
+	void				LSI_LCN_SNIPING_COMBO_UP_X_EventProcess();	// June 32af7500
+	void				LSI_LCN_SNIPING_COMBO_DOWN_X_EventProcess();	// June 32af7730
+	void				LSI_LLD_M_COMBO_ZZZXZ_EventProcess();	// June 32afabc0
+	void				LSI_LLD_M_COMBO_XX_DOWN_X_EventProcess();	// June 32afae50
+	void				LSI_LLD_M_COMBO_XX_DOWN_XX_READY_EventProcess();	// June 32afb1c0
+	void				LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_EventProcess();	// June 32afb450
+	void				LSI_LLD_M_COMBO_XX_DOWN_XX_END_EventProcess();	// June 32afb6c0
+	void				LSI_LCN_F_COMBO_ZZZX_UP_X_EventProcess();	// June 32afb950
+	void				LSI_LCN_F_COMBO_ZZZX_DOWN_X_EventProcess();	// June 32afbbe0
+	void				LSI_LCN_F_COMBO_XXXX_UP_X_EventProcess();	// June 32afbe70
+	void				LSI_LCN_F_COMBO_XXXX_DOWN_X_EventProcess();	// June 32afc100
+	void				LSI_LCN_F_DASH_COMBO_ZXX_UP_X_EventProcess();	// June 32afc390
+	void				LSI_LCN_F_DASH_COMBO_ZXX_DOWN_X_EventProcess();	// June 32afc620
+	void				LSI_LCN_F_DASH_COMBO_XXX_UP_X_EventProcess();	// June 32afc8b0
+	void				LSI_LCN_F_DASH_COMBO_XXX_DOWN_X_EventProcess();	// June 32afcb40
+	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_StateStartFuture();	// June 32afcdd0
+	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_EventProcess();	// June 32afce40
+	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_EventProcess();	// June 32afd140
+	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_END_EventProcess();	// June 32afd450
+	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_X_StateStartFuture();	// June 32afd6e0
+	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_X_EventProcess();	// June 32afd750
+	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_EventProcess();	// June 32afda50
+	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_END_EventProcess();	// June 32afdd60
+	void				LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_FrameMove();	// June 32b15b20
+	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_FrameMove();	// June 32b15d40
+	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_FrameMove();	// June 32b15fe0
+	void				LSI_LCN_DASH_COMBO_ZX_DOWN_X_FrameMove();	// June 32b270b0
+	void				LSI_LCN_SNIPING_COMBO_UP_X_FrameMove();	// June 32b272c0
+	void				LSI_LCN_SNIPING_COMBO_DOWN_X_FrameMove();	// June 32b27710
+	void				LSI_LCN_F_COMBO_ZZZX_UP_X_FrameMove();	// June 32b28ca0
+	void				LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove();	// June 32b29000
+	void				LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_FrameMove();	// June 32b29360
+	void				LSI_LCN_F_DASH_COMBO_XX_DOWN_X_FrameMove();	// June 32b29570
 
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )
@@ -907,7 +955,7 @@ protected:
 	float								m_fCommunionRate;					// +0x9640
 	float								m_afFormMpRegenerationRate[2];		// +0x9644: June's ctor leaves them unset
 	float								m_fComboXXDownXXLoopTime;			// +0x964c
-	CX2EffectSet::Handle				m_hDashComboDownXEffectSet;			// +0x9650
+	CX2DamageEffect::CEffectHandle		m_hDashComboDownXDamageEffect;		// +0x9650: a damage effect handle ( 32b270b0 )
 	D3DXVECTOR3							m_vDashComboDownXPosition;			// +0x9654
 	USHORT								m_usDancingBladeLoopCount;			// +0x9660
 	float								m_fSummonedDarknessElapsedTime;		// +0x9664

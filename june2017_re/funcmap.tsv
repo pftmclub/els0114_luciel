@@ -11829,3 +11829,50 @@ du1d_body_reads.tsv (DU1d)	every June user-band function that reads a body acces
 32b3a2b0 (CH1g2)	CX2GULuciel::LSI_LOSE_StateStart	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); EndTransformedForm( 0 ), ( 1 ), then LoseStateStart ( 320007e0 )
 32b3b530 (CH1g2)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_READY_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); events: Z -> Sniping Z, X charge ( X held ), Up + X, Down + X ( reads event 2 times ); MP < 10 shows STR_ID_2549; cancels walk, dash, skill
 32b3bc70 (CH1g2)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZX_WAIT_EventProcess	PORTED	Char Luciel CH1g2: inert ( _CORE, not wired until CH1 ); same as 32b3b530 with the F states
+32ae5940 (CH1h)	CX2GULuciel::LSI_LLD_COMBO_XX_DOWN_XX_LOOP_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); loop time = key input start
+32ae5df0 (CH1h)	CX2GULuciel::LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); loop count + 1
+32ae60d0 (CH1h)	CX2GULuciel::LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); loop time = key input start
+32ae60f0 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); loop count + 1
+32ae6110 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); loop count + 1
+32af1180 (CH1h)	CX2GULuciel::LSI_LLD_COMBO_ZZZXZ_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); foot, anim end; skill / walk / dash cancels (= Lu ZZZZX body)
+32af13b0 (CH1h)	CX2GULuciel::LSI_LLD_COMBO_XX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); as 32af0860, event 0 X -> LSI_LLD_COMBO_XX_DOWN_XX_READY
+32af16a0 (CH1h)	CX2GULuciel::LSI_LLD_COMBO_XX_DOWN_XX_READY_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); anim end -> LSI_LLD_COMBO_XX_DOWN_XX_LOOP
+32af16e0 (CH1h)	CX2GULuciel::LSI_LLD_COMBO_XX_DOWN_XX_LOOP_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); cancel chain, key window repeat after 0.3 s -> LOOP_X, state time -> LOOP_X
+32af1950 (CH1h)	CX2GULuciel::LSI_LLD_COMBO_XX_DOWN_XX_LOOP_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); foot, anim end; skill / walk / dash cancels (= Lu ZZZZX body)
+32af6c50 (CH1h)	CX2GULuciel::LSI_LCN_DASH_COMBO_ZX_DOWN_X_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); resets the make target, effect handle, position, loop count
+32af6cc0 (CH1h)	CX2GULuciel::LSI_LCN_DASH_COMBO_ZX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); foot, event 0 X -> own loop, anim end -> wait; cancels
+32af6fc0 (CH1h)	CX2GULuciel::LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); event 0 X below five loops -> itself, anim end -> END; cancels
+32af72d0 (CH1h)	CX2GULuciel::LSI_LCN_DASH_COMBO_ZX_DOWN_XX_END_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); foot, anim end; skill / walk / dash cancels (= Lu ZZZZX body)
+32af7500 (CH1h)	CX2GULuciel::LSI_LCN_SNIPING_COMBO_UP_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); anim end; skill / walk / dash cancels (= 32af6780)
+32af7730 (CH1h)	CX2GULuciel::LSI_LCN_SNIPING_COMBO_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); anim end; skill / walk / dash cancels (= 32af6780)
+32afabc0 (CH1h)	CX2GULuciel::LSI_LLD_M_COMBO_ZZZXZ_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afae50 (CH1h)	CX2GULuciel::LSI_LLD_M_COMBO_XX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); as 32af7ec0, event 0 X on a Dread Lord unit -> LSI_LLD_M_COMBO_XX_DOWN_XX_READY
+32afb1c0 (CH1h)	CX2GULuciel::LSI_LLD_M_COMBO_XX_DOWN_XX_READY_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0, anim end -> M XX_DOWN_XX_LOOP
+32afb450 (CH1h)	CX2GULuciel::LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); as 32af16e0, both changes -> M XX_DOWN_XX_END
+32afb6c0 (CH1h)	CX2GULuciel::LSI_LLD_M_COMBO_XX_DOWN_XX_END_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afb950 (CH1h)	CX2GULuciel::LSI_LCN_F_COMBO_ZZZX_UP_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afbbe0 (CH1h)	CX2GULuciel::LSI_LCN_F_COMBO_ZZZX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afbe70 (CH1h)	CX2GULuciel::LSI_LCN_F_COMBO_XXXX_UP_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afc100 (CH1h)	CX2GULuciel::LSI_LCN_F_COMBO_XXXX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afc390 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZXX_UP_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afc620 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZXX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afc8b0 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XXX_UP_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afcb40 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XXX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afcdd0 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); resets the make target, effect handle, position, loop count
+32afce40 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); foot, event 0 X -> own loop, anim end -> wait; cancels
+32afd140 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); event 0 X below five loops -> itself, anim end -> END; cancels
+32afd450 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_END_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32afd6e0 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XX_DOWN_X_StateStartFuture	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); resets the make target, effect handle, position, loop count
+32afd750 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XX_DOWN_X_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); foot, event 0 X -> own loop, anim end -> wait; cancels
+32afda50 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); event 0 X below five loops -> itself, anim end -> END; cancels
+32afdd60 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_END_EventProcess	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); same as 32af98c0
+32b15b20 (CH1h)	CX2GULuciel::LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); 0.01 s: make target within hp > 0 sets position; plays the loop effect set at it
+32b15d40 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); as 32b15b20; the target must be within 700 units
+32b15fe0 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); as 32b15b20
+32b270b0 (CH1h)	CX2GULuciel::LSI_LCN_DASH_COMBO_ZX_DOWN_X_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); 0.01 s: creates the projectile damage effect; every frame reads its main effect position
+32b272c0 (CH1h)	CX2GULuciel::LSI_LCN_SNIPING_COMBO_UP_X_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); 0.01 s: effect set + rated projectile set ( 10 MP )
+32b27710 (CH1h)	CX2GULuciel::LSI_LCN_SNIPING_COMBO_DOWN_X_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); as 32b272c0 with the Down sets
+32b28ca0 (CH1h)	CX2GULuciel::LSI_LCN_F_COMBO_ZZZX_UP_X_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); 0.01 s: rated projectile set ( 10 MP ); behind four states
+32b29000 (CH1h)	CX2GULuciel::LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); 0.01 s: rated projectile set ( 10 MP ); behind four states
+32b29360 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); 0.01 s: creates the projectile damage effect; every frame reads its main effect position
+32b29570 (CH1h)	CX2GULuciel::LSI_LCN_F_DASH_COMBO_XX_DOWN_X_FrameMove	PORTED	Char Luciel CH1h: inert ( _CORE, not wired until CH1 ); 0.01 s: creates the projectile damage effect; every frame reads its main effect position

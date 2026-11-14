@@ -2105,6 +2105,30 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **Commit** `2e5864b0`; `finish.py --range 2e5864b0^..2e5864b0`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1h` ( Sonnet 5.5 high ).
 
+### CH1h - Done (2026-11-14)
+
+Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.h` / `.cpp`, nothing references it until CH1 ). funcmap `grep "(CH1h)" june2017_re/funcmap.tsv` ( 47 rows ); JUNE_BUGS 703; no review of its own ( the CH1i review covers CH1g, CH1g2, CH1h, CH1i ).
+- **47 functions, June addresses** ( every `state-fn` row of `ch0_class_map.tsv` col 6 = CH1h ): StartFuture `32ae5940` `32ae5df0` `32ae60d0` `32ae60f0` `32ae6110` `32af6c50` `32afcdd0` `32afd6e0`;
+  EventProcess `32af1180` `32af13b0` `32af16a0` `32af16e0` `32af1950` `32af6cc0` `32af6fc0` `32af72d0` `32af7500` `32af7730` `32afabc0` `32afae50` `32afb1c0` `32afb450` `32afb6c0` `32afb950` `32afbbe0` `32afbe70` `32afc100` `32afc390` `32afc620` `32afc8b0` `32afcb40` `32afce40` `32afd140` `32afd450` `32afd750` `32afda50` `32afdd60`;
+  FrameMove `32b15b20` `32b15d40` `32b15fe0` `32b270b0` `32b272c0` `32b27710` `32b28ca0` `32b29000` `32b29360` `32b29570`. The 47 thunks are CH1m's registration ( 4 of the FrameMoves serve four states each: `32b28ca0` / `32b29000` ).
+- **How it was read:** `charport_adis.py luciel --phase CH1h` listings, cut at each function's end; a scratch matcher ( normalised listing against every CH1b-CH1g2 listing, state ids, strings and constants kept ) found 38 of the 47 equal to a written sibling or to each other apart from a state id, a key or a string;
+  the rest ( the loop EventProcess `32af16e0`, the X2 loop `32af6fc0` family, the three StartFuture resets, the six FrameMoves with a make target or a damage effect ) were decoded line by line to the `ret`, x87 compares read with the CH1f rules.
+- **Shapes ( = CH1f / CH1g2 ):** `32af1180` / `32af1950` / `32af72d0` = Lu's ZZZZX body ( jump down, wait, skill / walk / dash ); `32af7500` / `32af7730` = `32af6780`; twelve F / M ends = `32af98c0` ( skill, walk, back walk, dash ), `32afb1c0` the same with its anim end going to the M loop;
+  `32af13b0` = `32af0860` with its event 0 X to the ready state, `32afae50` = `32af7ec0` with X in place of Z ( Dread Lord unit test kept ); `32af6cc0` / `32afce40` / `32afd750` put the X event before the anim end ( Lu's `32aed320` order ), `32af6fc0` / `32afd140` / `32afda50` add `m_usStateLoopCount < 5` and end in their END state.
+- **Loop EventProcess ( `32af16e0` / `32afb450` ):** the cancel chain opens the function ( no `if` before it: written `if( false ) {}` then the three macros ); then an else-if on the key window of the state time ( key start <= state time <= key end ): X + 0.3 s ( a double ) after the last X changes state, X held stamps the time;
+  last, outside the chain, the state change time ends the state ( the Dread Lord loop goes to LOOP_X, the Chiliarch M loop to its END ).
+- **Make target and effect handle:** the three down-X StartFuture functions reset `m_uidMakeTarget` / type ( `SetMakeTarget( -1, GUT_USER )`, +0x6898 .. +0x68a0, the MAKE_TARGET store of June's damage effect ), the damage effect handle, the position and the loop count.
+  `m_hDashComboDownXEffectSet` ( CH1a, provisional ) is a **damage effect** handle in June ( `32b270b0` stores `CreateInstanceHandle`'s result and reads `GetInstance` every frame ): renamed `m_hDashComboDownXDamageEffect`, type `CX2DamageEffect::CEffectHandle`, ctor `INVALID_DAMAGE_EFFECT_HANDLE` ( same 4 bytes, same -1 ); `ch1_offsets.tsv` row updated.
+  The XX loop FrameMoves find the target with `CX2Game::GetUnitByUIDAndType` ( June `32294460`, same list and compare ), test `GetNowHp() > 0` ( no gauge data reads 1 ), `32b15d40` also needs it within 700 units, then play the loop set at `m_vDashComboDownXPosition` ( custom position ).
+- **June quirks kept ( JUNE_BUGS 703 ):** the XX loops and the non-F ZX states play / create the F ZX effect names. Not bugs, noted: `32b270b0` reads the damage effect position every frame, outside the timer; the first set of `32b272c0` / `32b27710` keeps no handle.
+- **Constants:** namespace `_CONST_LUCIEL_CH1H_` ( 0.3 s double, loop count 5 as a USHORT, 0.01 s, 700, 10 MP ); state ids are enum members, `GUT_USER` / `UC_LUCIEL_DREAD_LORD` named; the event indexes are plain ( no Enum ). The timers are `EventTimerOneshot` ( CH1f2 review ).
+- **Callees:** nothing new to write beyond the member rename: `PlayComboProjectileEffectSet`, `PlayRatedProjectileEffectSet`, `SetMakeTarget`, the cancel macros of CH1f / CH1g.
+- **Not in this phase:** no state is registered ( `stateends` / `skillicons` / `luabind` do not apply ); checklist §7 L254 ( `+0x7cc8` ) and §7ac L778 ( CanDown ) have no site in these 47; no new branch drifted.
+- **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS` ( 2 deleted lines = CH1a's ctor initialiser and member declaration, renamed and retyped ); `junediverge` `RESULT: PASS`; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings in the new lines; `cl /P` holds 271 `LSI_*` definitions ( 224 + these 47 ). Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1i` ( Sonnet 5.5 high; its Opus review covers CH1g, CH1g2, CH1h, CH1i ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
