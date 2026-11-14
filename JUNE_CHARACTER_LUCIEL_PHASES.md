@@ -1019,6 +1019,7 @@ Opus 5.5 high. Part 8 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new de
   0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check` (2 files): RESULT: PASS. `enumscan --check X2GUUser.cpp`: the 4 known DU1b3
   rows only. No `JUNE_BUGS` row, no divergent function (each June body differs from March's only by the accessor). Flag probe: DUO_BODY,
   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE, SKILL_CANCEL_BY_HYPER_MODE, JUNE_BUFF_AWAKE_LOCK, CHAR_ARME_CORE, USER_BASE_STATE_BODIES all on.
+  Commit `a9621883`; `--range a9621883^..a9621883`: 1 PASS, 1 PASS~, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GUChung.cpp`, `X2GUElsword_SwordMan.cpp`, `X2GUAdd.cpp`, `X2GuEve.cpp`:
   0 errors each. Full build skipped: no play-test (DU1d2 builds and hands off the regression pass).
 - **In game:** nothing to see. Every other class has form 0: `GetXSkinAnimFuture()` / `GetXSkinAnimPtr()` return March's members.
