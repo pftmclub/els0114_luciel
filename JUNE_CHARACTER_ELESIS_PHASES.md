@@ -2413,6 +2413,11 @@ Way of the Sword (Z combos one way, X combos the other, both modes, `/stage 2`, 
 
 `DEPLOY OK: X2_offline.exe is 26,600,960 B, dated 2026-11-14 12:17:46, md5 8e5646f370573b533533a5e21a6190cf, equal to X2/US_SERVICE/x2.exe (2026-11-14 12:17:38); built at main e7659b6e.` (a peer's build had just linked it; nothing to relink).
 
+**Walk result (user, 2026-11-14, run 13:13-13:39 on exe md5 `0475c657`, a peer's build of main `7f4afddf`; logs read): all passed.** `ELESIS UI cut-in` x90 (set 0 x41, 1 x18, 2 x19, 3 x12 = 8 / 29 / 30 / 35, 120, 121, 125); hyper cut-in
+class 120 x2 (`HQ_Cutin_EGM_Transcendence`), 121 (`_EBH_`), 125 (`_ECA_`). Job changes: `ElJobDK` 8 -> 35, `ElJobSK` 8 -> 29, `ElJobPK` 8 -> 30 (`CLASS GUIDE 1st` x3, quests 35569-35572 / 35320-35323 / 35330-35333, NetError 0),
+`ElJobCA` 35 -> 125 (`CLASS GUIDE 2nd: class 35 line 3 -> next class 125`, 35573-35577); save after: 35 / 29 / 30 / 125. Transition: `ElTrGM75` / `ElTrBH75` / `ElTrCA75` each `/tc 1`, `/additem 288493`, quests 41990-42030 (NetError 0), saved transcendence 1.
+`KEM_ERROR` 0, `Motion Error` 0, `EXCEPTION` 0, `lua: 0 unbound`, ErrorLog `lua error` 1 = the pre-existing TutorSystem; `UNHANDLED` x15 all `E_DISABLE_HB_CHECK_REQ`. No defect found, no code. Z is next.
+
 ## Phase Z - Close-out
 
 **Run with:** Sonnet 5.5 medium. `MODS.md` "June character: Elesis" section (flags, files, data, revert order: exe + data036 + motion koms
