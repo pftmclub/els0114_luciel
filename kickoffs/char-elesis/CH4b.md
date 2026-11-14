@@ -59,3 +59,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   `m_fBlazingHeartTranscendenceRate` / `m_fBlazingHeartTranscendenceDamageRate` ( +0x979a / +0x979c / +0x97a0: the 28417 part of `SetDamageExceptionProcess` ). Dignity's level is
   `m_usDignityOfGrandMasterLevel` ( 28416 part ). Never write them again in an override.
 - Carried from CH4a's play-test if it did not show: the Advanced Knight Mastery quick stand on unit 29 ( both flags are now set by 28404 alone, no Get Chance test ).
+- **Carried from CH4a's play-test ( 2026-11-14 ):** `[JUNE_CHAR] ELESIS PASSIVE burst fire` was never seen. Big Burst ( 28220, unit 21 bank B slot 1 ) hit twice, but its follow-up
+  `DAMAGE_EFFECT_Elesis_Big_Burst`, which carries `DTT_BURST_FIRE`, hit nothing. In your hand-off, cast Big Burst into a group of monsters that are still alive, ideally burning
+  ( e.g. after Sword Fire ). If the line still does not show while the explosion hits ( `GFD att=21` lines after the effect is made ), the trigger parse is the suspect.
+  Also carried: `blood runaway cleanse` on unit 146 ( a debuff on her, e.g. a monster's slow or poison ). The Crimson Avenger buff icon is absent by June's data ( no icon key on BTI 666 ):
+  not a defect.

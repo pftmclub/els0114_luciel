@@ -2168,6 +2168,17 @@ CH4c stage review covers it ( `CH4b.md` / `CH4c.md` amended ).
 `burst fire`, `burning phantom blood sucking`, `stigma of fire` / `stigma of fire judgement`, `flame sword debuff`, `blood runaway tick` / `blood runaway cleanse`,
 `grand master transcendence moving buff` / `one on one`, `dignity of grand master buff` as each fires.
 
+**Logs ( 2026-11-14, run 09:36-09:42, md5 4b5aadce; 0 EXCEPTION / Motion Error / KEM_ERROR; known `E_DISABLE_HB_CHECK_REQ` x6 ).** `init` x2 per load on units 29 / 30 / 146 / 21 / 144:
+29 dodge reuse 1, chivalry 3 ( 221 / 222 ), quick stand 1 / 1, knight mastery damaged 0.850 rate 0.150, rushing loop 1, waltz dodge 3, walk / dash x1.090, anim 0.040, GM 1, dignity 1;
+30 fire ball 1.450, flame sword 1, wall 6.00, blossoms 3 ( 20.00 ), magic critical 0.075 / 0.150, stigma 3 ( 3.800 ), unextinguishable 1, BH 1 ( 0.150 / 3.000 ), blaze absolu 1;
+146 CA 1, judgment 3 ( 0.500 ), revenge 3 ( 0.150 / 0.150 ), punish 0.750, blood runaway 1 ( 40 / 40 / 40, cool 1.0 ). Seen: `dignity of grand master buff`, `one on one` x16
+( one enemy within 600 ), `moving buff` x16, `stigma of fire` x17, `stigma of fire judgement` x3 ( 5 stacks, x3.800 ), `flame sword debuff` x11, `scalet rose hit counted` x6
+( back speed x -1500, so the `< -500` reading holds ) and the summon's `req npc ... scalet rose N of M` x6, `burning phantom blood sucking` x3 ( 28055, hp 515.5 ), `blood runaway
+tick` x71 ( `passive buff 1` from hp rate 0.463 down, 0 above half ). **User: everything worked except the Crimson Avenger buff icon** = June's data: `BattleFieldBuffTemplet` gives
+BTI 666 `BTI_BUFF_BLOOD_RUNAWAY_PASSIVE` no `BUFF_ICON_TEXTURE_KEY` ( its neighbours have one ), so June shows no icon either; the buff is on ( `passive buff 1` ). Not seen: `burst fire`
+( Big Burst 28207 hit twice, its follow-up `DAMAGE_EFFECT_Elesis_Big_Burst` that carries `DTT_BURST_FIRE` was made at 09:41:33 and hit nothing ), `blood runaway cleanse` ( no
+debuff on her ), the Dodge and Slash refund ( base id only ): carried to CH4b's play-test ( kickoff amended ). User owes nothing more for CH4a.
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended
