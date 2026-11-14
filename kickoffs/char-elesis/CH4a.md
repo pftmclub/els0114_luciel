@@ -72,3 +72,10 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   (+0x9788). `InitPassiveSkillState` writes the level / intervals, `BloodRunawayProc_FrameMove` (`32b734d0`) runs the timer and uses `IsBloodRunawayCleanseReady()`
   (`32b6fb10`, written) and the saved debuff, the delegate `32b524b0` counts Scalet Rose hits (28211 / 28232, DD+0x3dc > -500). Widen `_SUMMON`'s members, never copy them.
 - Vslot 0x24c's Fire Blossoms tail reads March's `m_uiFireBlossomsSkillLevel` / `m_bIsFireBlossoms` (+0x95f4 / +0x95f0): June's writers are this phase's.
+
+## Amended by the CH3d review (2026-11-14)
+
+- `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG` is retired (`//#define`); turn it back on for your play-test if you need the `ELESIS SKILL equip` lines, and the CH4c review retires it again.
+- `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG` stays on: once your hit-count delegate `32b524b0` counts Scalet Rose hits, the play-test hand-off lists its lines
+  `[JUNE_CHAR] ELESIS SUMMON req npc ... scalet rose %d of %d` and `... fire blossoms end mine` (never seen yet: the count was 0 until now), and Dignity's War Prelude air state
+  ( CH3a ) is cast once.

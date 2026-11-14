@@ -59,3 +59,9 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - Shadow Edge's mark is done under `_SKILL`, not `_BLOOD`: the `ShadowEdgeRecord` struct ( `+0x9700`, Add's `ReverseReactorTargetInfo` layout ), `m_vecShadowEdgeRecord`, `GetTargetUnit` `32b81220`, `ResetShadowEdgeRecord` `32b81300`, `ClearShadowEdgeRecords` and the upkeep `ShadowEdgeRecordFrameMove` `32b813d0`. The CH1h / CH1j `_BLOOD` declarations and the two `_BLOOD` call sites now sit in the `#else` of a `_SKILL` block: when CH4c turns `_BLOOD` on, delete nothing; those `#else` lines stay dead.
 - Still CH4c's: the 0x730 walk `32b816a0` ( it calls `ShadowEdgeRecord::GetTargetUnit` and uses nothing else ).
+
+## Amended by the CH3d review (2026-11-14)
+
+- The CH4 stage review also retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG` (CH3b0; its Scalet Rose / Fire Blossoms lines are CH4a's to show) and
+  `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (the `SBUF` lines: `parse` and `frame` seen in CH2a-CH3d; `at once` and `state end` never seen, the user was asked once in the CH3d review
+  hand-off; retire it whether or not they show), plus `_SKILL_DEBUG` if CH4a turned it back on.

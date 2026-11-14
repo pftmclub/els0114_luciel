@@ -47,3 +47,11 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH5 (2026-11-13)
 
 - Skills were not castable at CH5, so its cut-in checks are owed here: every skill cast shows `[JUNE_CHAR] ELESIS UI cut-in set <n> name <gfx>` (8 / 29 / 30 -> set 0 `HQ_CutIn_Elesis_01`, 120 -> 1 `_GM_01`, 121 -> 2 `_BH_01`, 125 -> 3 `_CA_01`, 35 -> 0), each matched by a `[JUNE_GFX] CUTIN play`; the hyper on 120 / 121 / 125 shows `ELESIS UI hyper cut-in class <c> name HQ_Cutin_EGM / EBH / ECA_Transcendence`.
+
+## Amended by the CH3d review (2026-11-14)
+
+- Not reached in CH3 (each from its Done note): the enhanced ids 28046 / 28048 / 28049 ( CH3a ), the CH3a2 / CH3b / CH3b2 upgrade ids ( 28227 / 28228, CH3b's, 28231 / 28232 ),
+  War Prelude's air state ( needs CH4a's Dignity ), Shade 28044's equip line ( CH3c; slotted in CH3d, seen ), Shadow Edge's time-out end, the base hyper actives 28600 / 28601 and
+  the enhanced Fate Smasher 28605, the gray / party transcended pictures of 120 / 121 / 125, and the level-70 guide popup ( the transition walk ).
+- Units 29 / 30 / 146 are transcended since CH3d: use un-transcended 120 / 121 / 125 units for the transition walk ( create them, or reset one with `elsdb.py settranscend <unit> 0` and empty slots 4 / 9 ).
+- The Blood Cutter's `NPC Motion Error` in State.log is June's data ( JUNE_BUGS 661 ), not a walk failure.

@@ -12930,7 +12930,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-13
 // Description: June character port ( Elesis ) Phase CH2a - temporary [JUNE_CHAR] ELESIS SKILL equip lines ( one per equipped skill ) for the play-test; the CH2d review retires it.
 //              Revert: comment out the #define ( JUNE_CHAR_ELESIS_SKILL_DEBUG ).
-#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL_DEBUG
