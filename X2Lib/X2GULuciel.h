@@ -699,7 +699,38 @@ public:
 	virtual int			GetDamageRevengeStateID() const;	// June 32b4db10 ( vslot 0x4a4 )
 	virtual int			GetDanceWaitStateID();	// + June 32b4db50 ( vslot 0x5c4 ), base 3208e140 returns the dance wait state
 	virtual bool		IsHyperModeState() const;	// June 32b4dbe0 ( vslot 0x51c )
-	virtual void		SetSDOnePieceAvatar( const int iForm_, const bool bSDOnePieceAvatar_ );	// + June 32b172b0 ( vslot 0x87c ): body in CH1l2, base 3208e280 stores m_bSDOnePieceAvatar
+	virtual void		SetSDOnePieceAvatar( const int iForm_, const bool bSDOnePieceAvatar_ );	// + June 32b172b0 ( vslot 0x87c ), base 3208e280 stores m_bSDOnePieceAvatar
+
+	// char-luciel CH1l2: overrides band 2 part 2 ( June 32ae40c0 - 32b3a310 ); ( + ) = the base is not declared virtual in March, CH1o declares it virtual
+	virtual void		SetEquippedSkillLevel( const CX2SkillTree::SKILL_ID eSkillID_, const bool bChangeAll_ );	// June 32ae40c0 ( vslot 0x7b8 )
+	virtual void		CommonStateStartFuture();	// June 32ae4f60 ( vslot 0x7c0 ): a jump to the base
+	virtual void		CommonStateEndFuture();	// June 32ae4f70 ( vslot 0x7d8 ): a jump to the base
+	virtual void		CommonStateEnd();	// June 32ae4f80 ( vslot 0x7dc ): a jump to the base
+	virtual RENDER_HINT	CommonRender_Prepare();	// June 32ae4f90 ( vslot 0x7e8 ): the base
+	virtual bool		SpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ = CX2SkillTree::ASUT_GROUND );	// June 32ae4fb0 ( vslot 0x7f4 )
+	virtual void		StateChangeDashIfPossible();	// + June 32ae5400 ( vslot 0x668 ), base 31fc85b0
+	virtual bool		IsSkillChainReady( const int iSkillID_, const int iUnused_ );	// + June 32ae9bd0 ( vslot 0x658 ), base 330fb7d0 is a stub: the Phantom Rush chain is ready
+	virtual float		ShownSkillCoolTime( const float fCoolTime_, const int iSkillID_ );	// June 32aea8c0 ( vslot 0x6a8 )
+	virtual void		StoreGageSnapshot();	// + June 32aeb410 ( vslot 0x740 ), base 32009780
+	virtual void		RestoreGageSnapshot();	// + June 32aeb430 ( vslot 0x744 ), base 3204da60
+	virtual void		UpdateAfterImageEquip( const AFTER_IMAGE_BODY eBody_ = AIB_FIRST_UNIT );	// June 32b0e440 ( vslot 0x6b0 )
+	virtual void		SumSocketOptionAfterSlots( CX2SocketItem::SocketData& kAggregate_, const CX2SocketItem::SocketData& kSocketData_ );	// June 32b0e670 ( vslot 0x794 )
+	virtual void		SpecialAttackUse( const int iSkillID_, const bool bUnused_ );	// + June 32b0f940 ( vslot 0x7fc )
+	virtual void		ResetMaxMP();	// + June 32b0fa90 ( vslot 0x664 ), base 31fd2810
+	virtual float		GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const;	// June 32b14640 ( vslot 0x6a0 )
+	virtual float		GetActualCoolTime( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_, IN int iSkillLevel_ ) const;	// June 32b15050 ( vslot 0x6a4 )
+	virtual bool		IsNotCommonMoveState();	// June 32b15220 ( vslot 0x828 )
+	virtual void		AfterImageFrameMove();	// June 32b15430 ( vslot 0x850 )
+	virtual void		ShowActiveSkillCutInAndLightByScript( float fTimeToShow_, bool bOnlyLight_ );	// June 32b16c80 ( vslot 0x834 )
+	virtual void		ScaleHead( float fHeadScale_, float fFaceScale_ );	// June 32b171c0 ( vslot 0x66c )
+	virtual void		RegisterDamageEffectHitCountEntry();	// + June 32b18170 ( vslot 0x848 ), base 31f3f070 is empty
+	virtual bool		SpecialAttackNoStageChange( const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	// June 32b1c880 ( vslot 0x810 )
+	virtual void		CommonFrameMoveFuture();	// June 32b1edd0 ( vslot 0x7c8 )
+	virtual void		SpecialAttackCooldown( const int iSkillID_, const float fMpConsume_ );	// + June 32b1eef0 ( vslot 0x800 )
+	virtual void		CommonStateStart();	// June 32b37910 ( vslot 0x7c4 )
+	virtual void		NoStateChangeActionFrameMove();	// June 32b37c40 ( vslot 0x80c )
+	virtual void		CommonFrameMove();	// June 32b397a0 ( vslot 0x7cc )
+	virtual bool		CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ = CX2SkillTree::ASUT_GROUND );	// + June 32b3a310 ( vslot 0x7f8 )
 
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,
@@ -738,7 +769,26 @@ protected:
 	void				ReleaseTransformedSkinAnim( const int iForm_ );	// char-luciel CH1a4: June 32b13d30
 	void				SetFormSkinAnim( const int iForm_, STransformedSkin& transformedSkin_ );	// char-luciel CH1a4: June 32b13e20
 	void				EndTransformedForm( const int iForm_, const bool bByDie_ );	// char-luciel CH1a4: June 32b38f30
-	bool				IsInJobLine( int iJobLine_ );	// June 32aeb380 ( vslot 0x670 ): body in CH1l2
+	bool				IsInJobLine( int iJobLine_ );	// June 32aeb380 ( vslot 0x670 )
+	// char-luciel CH1l2: CX2GUUser's skill state helpers, as Eve and Ara carry them
+	void				SetSkillLevelStateData( const CX2SkillTree::SkillTemplet* pSkillTemplet_, UserUnitStateData& stateData_ );	// June 3201f850
+	void				SetSkillLevelStateDataByID( const CX2SkillTree::SkillTemplet* pSkillTemplet_, const int iStateID_ );	// June 32028190 ( vslot 0x7a8 )
+	// char-luciel CH1l2: class helpers the band 2 overrides call, bodies in CH1l3
+	void				UpGageNowMp( const float fChangeOfNowMp_, const int iMpForm_ );	// June 32aeb1a0
+	void				ShowActiveSkillCutInAndLight( const float fTimeToShow_, const int iSkillCutInSetSubIndex_, const bool bOnlyLight_ );	// June 32b16940
+	void				CancelSummonDarkness();	// June 32b204d0
+	bool				IsOpenMindConditionMet() const;	// June 32b4c7f0
+	int					GetOpenMindSkillID() const;	// June 32b0ef80
+	void				UpdateOpenMindBuff();	// June 32b14d10
+	void				UpdateStableDarkEnergyBuff();	// June 32b0eed0
+	void				FrameMoveChaserOfDarknessEffect();	// June 32b1f650
+	void				FrameMoveShadowBoltSpear();	// June 32b20780
+	void				FrameMoveTwilightJudgementMp();	// June 32aebb60
+	void				FrameMoveAuraOfFear();	// June 32b15780
+	void				FrameMoveDeathTouchEffect();	// June 32b34a90
+	void				UpdateInvasionOfDarkEnergyTargetTime();	// June 32b16760
+	void				FrameMoveAltarOfEvilEnd();	// June 32b35c60
+	void				FrameMoveBoundingKeyDialog();	// June 32b0e550
 	void				DieFrontStart();	// char-luciel CH1b: June 31fd2d60 ( CX2GUUser's shared body )
 	void				DieBackStart();	// char-luciel CH1b: June 31fd2e30 ( CX2GUUser's shared body )
 
@@ -1120,7 +1170,7 @@ protected:
 	float								m_fLeftHandRotateDegree;			// +0x9630
 	float								m_fDeathCrisisOfMarbasMinChargeTime;	// +0x9634
 	float								m_fDeathCrisisOfMarbasMaxChargeTime;	// +0x9638
-	CX2EffectSet::Handle				m_hSoulShockEffectSet;				// +0x963c
+	CX2DamageEffect::CEffectHandle		m_hSoulShockDamageEffect;			// +0x963c: a damage effect handle ( June 32b397a0 moves it with the unit )
 	float								m_fCommunionRate;					// +0x9640
 	float								m_afFormMpRegenerationRate[2];		// +0x9644: June's ctor leaves them unset
 	float								m_fComboXXDownXXLoopTime;			// +0x964c
@@ -1148,7 +1198,7 @@ protected:
 	CX2EffectSet::Handle				m_hDarkCrescentEffectSet;			// +0x96ac
 	int									m_iEvilClawHitCount;				// +0x96b0
 	float								m_fSwitchingCoolTime;				// +0x96b4
-	int									m_iSpecialAttackCombinationPointCost;	// +0x96b8
+	int									m_iSkillUseMpForm;					// +0x96b8: the form that pays a skill's MP ( SpecialAttackUse stores 0 for Lu, 1 for Ciel )
 	int									m_iLastUsedSkillID;					// +0x96bc
 	float								m_fSoulStrikeMoveSpeed;				// +0x96c0
 	float								m_fSoulStrikeSpeedRate;				// +0x96c4
@@ -1212,6 +1262,8 @@ protected:
 	float								m_fCombinationPointOverflowCoolTime;	// +0x9888
 	int									m_iDamageEffectIndex;				// +0x988c: June's ctor leaves it unset
 	std::vector<SDamageEffectHitCount>	m_vecDamageEffectHitCount;			// +0x9890
+	bool								m_bSkillCameraOverride;				// +0x8d90 ( CX2GUUser's camera group ): stand-in, the reader is Stage 9's camera pair; CommonStateStart clears it
+	float								m_fSkillCameraOverrideValue;		// +0x8da4 ( CX2GUUser's camera group ): stand-in, as above
 };
 
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE

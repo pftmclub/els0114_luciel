@@ -687,6 +687,11 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_TRANSCENDENCE                         = 764,	// June's Enum.lua; Ciel's transformed form ( EndTransformedForm erases it )
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-15 // char-luciel CH1l2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_DEAD_HANDS                            = 463,	// June's Enum.lua; Lu/Ciel's CommonFrameMove releases the Dead Hands sound when it ends
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID

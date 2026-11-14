@@ -67,7 +67,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fLeftHandRotateDegree( 0.f )
 , m_fDeathCrisisOfMarbasMinChargeTime( 1.f )
 , m_fDeathCrisisOfMarbasMaxChargeTime( 1.f )
-, m_hSoulShockEffectSet( INVALID_EFFECTSET_HANDLE )
+, m_hSoulShockDamageEffect( INVALID_DAMAGE_EFFECT_HANDLE )
 , m_fCommunionRate( 1.f )
 , m_fComboXXDownXXLoopTime( 0.f )
 , m_hDashComboDownXDamageEffect( INVALID_DAMAGE_EFFECT_HANDLE )
@@ -94,7 +94,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_hDarkCrescentEffectSet( INVALID_EFFECTSET_HANDLE )
 , m_iEvilClawHitCount( 0 )
 , m_fSwitchingCoolTime( 0.f )
-, m_iSpecialAttackCombinationPointCost( 3 )
+, m_iSkillUseMpForm( 3 )
 , m_iLastUsedSkillID( 0 )
 , m_fSoulStrikeMoveSpeed( 1.f )
 , m_fSoulStrikeSpeedRate( 1.f )
@@ -137,6 +137,8 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_vAbyssSnipingAimPosition( 0.f, 0.f, 0.f )
 , m_vAbyssSnipingAimRange( 35.f, 35.f )
 , m_fCombinationPointOverflowCoolTime( 0.f )
+, m_bSkillCameraOverride( false )
+, m_fSkillCameraOverrideValue( 0.f )
 {
 	m_afSeizedByFearValue[0] = m_afSeizedByFearValue[1] = 1.f;
 
@@ -9732,6 +9734,1302 @@ using namespace _CONST_LUCIEL_CH1L_;
 		if ( CX2Unit::EP_AC_TEMP4 == pViewEquip->GetEqipPos() )	// June EP_AC_RING2
 			pViewEquip->SetShowObject( false );
 	}
+}
+
+// char-luciel CH1l2: constants and helpers of the band 2 overrides ( part 2 )
+namespace _CONST_LUCIEL_CH1L2_
+{
+	const int		STR_ID_SKILL_REPLACED_BY_UPGRADE		= 35758;	// June's string 0x8bae; March's StringID enum has no entry for it
+	const int		EVENT_FLAG_DUO_TO_MINOR_UNIT			= 8;		// June +0x7d8d: DUO_TYPE 1 began while Lu was active ( CX2GUUser's DU1b constant is file-local there )
+	const int		EVENT_FLAG_DUO_TO_FIRST_UNIT			= 9;		// June +0x7d8e: DUO_TYPE 0 began while Ciel was active
+	const float		BODY_SWITCH_EFFECT_EVENT_TIME			= 0.01f;	// June 32b397a0 ( 33437810 ): the animation time of the body switch effect sets
+	const int		UAI_CANCEL_SUMMON_DARKNESS				= 42;		// June 32b1c880 / 32b37c40 compare the user action with 0x2a; Enum.lua has no name for it
+	const float		DANCING_BLADE_LOOP_MP_COST				= 30.f;		// June 32b14640 ( 33439c68 ): the MP cost one Dancing Blade loop takes off
+	const float		ALTAR_OFFSET_FAR						= 140.f;	// June 32ae9d00 ( 334bac38 )
+	const float		ALTAR_OFFSET_MID						= 120.f;	// June 32ae9d00 ( 33439d10 )
+	const float		ALTAR_OFFSET_NEAR						= 80.f;		// June 32ae9d00 ( 33438090 )
+
+	// June 32ae9d00 ( sole caller 32b35600, CH1l3 ): the eight places around the Altar of Evil, a ring in the x-y plane
+	void GetEffectOffsetByIndex( D3DXVECTOR3* pvOffset_, const int iIndex_ )
+	{
+		*pvOffset_ = D3DXVECTOR3( 0.f, 0.f, 0.f );
+
+		switch ( iIndex_ )
+		{
+		case 0:
+			pvOffset_->y = ALTAR_OFFSET_FAR;
+			break;
+
+		case 1:
+			pvOffset_->x = ALTAR_OFFSET_NEAR;
+			pvOffset_->y = ALTAR_OFFSET_NEAR;
+			break;
+
+		case 2:
+			pvOffset_->x = ALTAR_OFFSET_MID;
+			break;
+
+		case 3:
+			pvOffset_->x = ALTAR_OFFSET_NEAR;
+			pvOffset_->y = -ALTAR_OFFSET_NEAR;
+			break;
+
+		case 4:
+			pvOffset_->y = -ALTAR_OFFSET_FAR;
+			break;
+
+		case 5:
+			pvOffset_->x = -ALTAR_OFFSET_NEAR;
+			pvOffset_->y = -ALTAR_OFFSET_NEAR;
+			break;
+
+		case 6:
+			pvOffset_->x = -ALTAR_OFFSET_MID;
+			break;
+
+		case 7:
+			pvOffset_->x = -ALTAR_OFFSET_NEAR;
+			pvOffset_->y = ALTAR_OFFSET_NEAR;
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+using namespace _CONST_LUCIEL_CH1L2_;
+
+// char-luciel CH1l2: June 3201f850 ( CX2GUUser's, carried per class as Eve and Ara do ): the state's skill level, power rate ( times the additional power rate + 1 ) and skill id
+void CX2GULuciel::SetSkillLevelStateData( const CX2SkillTree::SkillTemplet* pSkillTemplet_, UserUnitStateData& stateData_ )
+{
+	if ( NULL == pSkillTemplet_ || NULL == GetUnit() )
+		return;
+
+	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
+	const int iSkillTempletLevel = max( 1, userSkillTree.GetSkillLevel( pSkillTemplet_->m_eID, false, 0, true ) );
+
+	stateData_.m_SPLevel	= static_cast<char>( iSkillTempletLevel );
+	stateData_.m_fPowerRate	= pSkillTemplet_->GetSkillPowerRateValue( iSkillTempletLevel );
+	stateData_.m_eSkillID	= pSkillTemplet_->m_eID;
+	stateData_.m_fPowerRate	= ( GetSkillAdditionalPowerRate( static_cast<int>( pSkillTemplet_->m_eID ) ) + 1.f ) * stateData_.m_fPowerRate;
+}
+
+// char-luciel CH1l2: June 32028190 ( vslot 0x7a8 ); the same for the state with this id, none when that state is not registered
+void CX2GULuciel::SetSkillLevelStateDataByID( const CX2SkillTree::SkillTemplet* pSkillTemplet_, const int iStateID_ )
+{
+	if ( NULL == pSkillTemplet_ || NULL == GetUnit() )
+		return;
+
+	UserUnitStateDataMap::iterator itState = GetStateDataIterator( iStateID_ );
+	if ( itState != m_StateList.end() )
+		SetSkillLevelStateData( pSkillTemplet_, itState->second );
+}
+
+// char-luciel CH1l2: June 32ae40c0 ( vslot 0x7b8 ); 47 blocks in June's order, each keyed by its skill id, the upgrade swapped templet, a state that is not registered is skipped
+/*virtual*/ void CX2GULuciel::SetEquippedSkillLevel( const CX2SkillTree::SKILL_ID eSkillID_, const bool bChangeAll_ )
+{
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LUCIEL_STOMP == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LUCIEL_STOMP, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LD_STOMP_LANDING );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LD_M_HEAVY_HIT );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LUCIEL_HAUNTING_BEAT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LUCIEL_HAUNTING_BEAT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LD_M_HAUNTING_BEAT );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::SI_A_LD_CHASER_OF_DARKNESS == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::SI_A_LD_CHASER_OF_DARKNESS, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, 268 );	// June's id; no state is registered there
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LLC_DARK_CRESCENT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LLC_DARK_CRESCENT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LLC_DARK_CRESCENT );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LLC_RUINOUS_IMPACT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LLC_RUINOUS_IMPACT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LLC_RUINOUS_IMPACT );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCG_DEMONIC_BREATH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCG_DEMONIC_BREATH, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_DEMONIC_BREATH_CHARGING );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_DEMONIC_BREATH_FIRE );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCG_FANTASIE_IMPROMPTU_1ST_MOVEMENT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCG_FANTASIE_IMPROMPTU_1ST_MOVEMENT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCG_DEATH_CRISIS_OF_MARBAS == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCG_DEATH_CRISIS_OF_MARBAS, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCG_ESCHATON == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCG_ESCHATON, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_ESCHATON );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCN_FANTASIE_IMPROMPTU_2ND_MOVEMENT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCN_FANTASIE_IMPROMPTU_2ND_MOVEMENT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LLC_BLASTING_FEAR == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LLC_BLASTING_FEAR, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LLC_M_BLASTING_FEAR );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LLC_BACKSTAB == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LLC_BACKSTAB, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LLC_M_BACKSTAB );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::SI_A_LCG_SOUL_SHOCK == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::SI_A_LCG_SOUL_SHOCK, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCG_M_SOUL_SHOCK );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LCG_SOUL_STRIKE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LCG_SOUL_STRIKE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCG_F_SOUL_STRIKE_LOOP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCG_F_SOUL_STRIKE_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCG_M_SOUL_STRIKE_READY );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCG_M_SOUL_STRIKE_LOOP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCG_M_SOUL_STRIKE_END );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::SI_SA_LLD_DANCING_BLADE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::SI_SA_LLD_DANCING_BLADE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LLD_DANCING_BLADE_LOOP );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LLD_PHANTOM_BLADE_ATTACK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LLD_PHANTOM_BLADE_FAIL );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LLD_DANCING_BLADE_LOOP );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LCN_SWIFT_SMASH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LCN_SWIFT_SMASH, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCN_M_SWIFT_SMASH );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT, true );
+		for ( int iStateID = LSI_SA_LCN_SHADOW_BOLT_CONTROL; iStateID <= LSI_SA_LCN_SHADOW_BOLT_END; ++iStateID )	// June lists 405-414 one by one; 406-413 have no state name
+			SetSkillLevelStateDataByID( pSkillTemplet, iStateID );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCN_M_TWILIGHT_JUDGEMENT_REATTACK );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LLD_M_FEAR_ABSORPTION );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LLD_CHAINS_OF_BONDAGE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LLD_CHAINS_OF_BONDAGE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LLD_F_CHAINS_OF_BONDAGE_DASH_ATTACK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LLD_M_CHAINS_OF_BONDAGE );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LLD_M_CHAINS_OF_BONDAGE_DASH_ATTACK );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LCN_SUMMON_FAMILIAR == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LCN_SUMMON_FAMILIAR, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCN_M_SUMMON_FAMILIAR );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LCG_SHADOW == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LCG_SHADOW, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCN_M_SHADOW );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDB_LAND_CRASHER == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDB_LAND_CRASHER, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_LAND_CRASHER_LANDING );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_LAND_CRASHER_CHAIN );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDB_NIGHTMARE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDB_NIGHTMARE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_NIGHTMARE_TARGET );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDB_F_PHANTOM_RUSH_TARGET );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDB_M_PHANTOM_RUSH );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDB_M_PHANTOM_RUSH_TARGET );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LDB_ABYSS_STRIKE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LDB_ABYSS_STRIKE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDB_M_ABYSS_STRIKE );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_DESPERADO == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_DESPERADO, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_DESPERADO_ATTACK_READY );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_DESPERADO_ATTACK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_DESPERADO_ATTACK_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_DESPERADO_ATTACK_UP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_DESPERADO_ATTACK_DOWN );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_BUFF_PHANTOM_CIRCLE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_BUFF_PHANTOM_CIRCLE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_M_COMMON_BUFF_PHANTOM_CIRCLE );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LDN_RAPID_IMPACT == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LDN_RAPID_IMPACT, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDN_M_RAPID_IMPACT );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LDN_PUNISHER == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LDN_PUNISHER, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDN_M_PUNISHER );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDB_ALTAR_OF_EVIL == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDB_ALTAR_OF_EVIL, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_END );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDB_DEATH_TOUCH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDB_DEATH_TOUCH, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDB_MORTAL_FEAR == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDB_MORTAL_FEAR, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDB_DARK_PLASMA == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDB_DARK_PLASMA, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_TRANSCENDENCE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_TRANSCENDENCE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_END );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_SHADOW_FURY == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_SHADOW_FURY, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_SHREWD_CUTTER == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_SHREWD_CUTTER, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, 499 );	// June's id; no state is registered there
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_SILENT_RAGE == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_SILENT_RAGE, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LLD_BLUFF == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LLD_BLUFF, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LLD_BLUFF_CIEL );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LCN_SOUL_SPREAD == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LCN_SOUL_SPREAD, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCN_SOUL_SPREAD_LU_LOOP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCN_SOUL_SPREAD_LU_END );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCN_SOUL_SPREAD_CIEL_READY );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LCN_SOUL_SPREAD_CIEL_END );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_A_LDN_RAPID_FURY == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LDN_RAPID_FURY, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_A_LDN_RAPID_FURY_CIEL );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_ABYSS_SNIPING == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_ABYSS_SNIPING, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_ABYSS_SNIPING_UP );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_ABYSS_SNIPING_ATTACK );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_ABYSS_SNIPING_DOWN );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_ABYSS_SNIPING_END );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_DEMONIC_RUSH == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_DEMONIC_RUSH, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_DEMONIC_RUSH_LAST );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_DEMONIC_RUSH_LANDING );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LDN_SINISTER_MIND == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LDN_SINISTER_MIND, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LDN_SINISTER_MIND_FLY );
+	}
+
+	if ( true == bChangeAll_ || CX2SkillTree::RNSI_SA_LCN_MAGDONIC_CANNON == eSkillID_ )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LCN_MAGDONIC_CANNON, true );
+		SetSkillLevelStateDataByID( pSkillTemplet, LSI_SA_LCN_MAGDONIC_CANNON_FLY );
+	}
+}
+
+// char-luciel CH1l2: June 32ae4f60 ( vslot 0x7c0 ); June's body is a jump to the base
+/*virtual*/ void CX2GULuciel::CommonStateStartFuture()
+{
+	CX2GUUser::CommonStateStartFuture();
+}
+
+// char-luciel CH1l2: June 32ae4f70 ( vslot 0x7d8 ); June's body is a jump to the base
+/*virtual*/ void CX2GULuciel::CommonStateEndFuture()
+{
+	CX2GUUser::CommonStateEndFuture();
+}
+
+// char-luciel CH1l2: June 32ae4f80 ( vslot 0x7dc ); June's body is a jump to the base
+/*virtual*/ void CX2GULuciel::CommonStateEnd()
+{
+	CX2GUUser::CommonStateEnd();
+}
+
+// char-luciel CH1l2: June 32ae4f90 ( vslot 0x7e8 )
+/*virtual*/ RENDER_HINT CX2GULuciel::CommonRender_Prepare()
+{
+	return CX2GUUser::CommonRender_Prepare();
+}
+
+// char-luciel CH1l2: June 32ae4fb0 ( vslot 0x7f4 ); the lookup, then the use; a skill of use condition 3 / 5 gives the chosen values back
+/*virtual*/ bool CX2GULuciel::SpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ )
+{
+	const float fSavedReservedMp = m_fReservedSkillMp;
+	const int iSavedSlotIndex = m_iChosenSkillSlotIndex;
+	const int iSavedSkillID = m_iChosenSkillID;
+
+	bool bUsed = false;
+	if ( true == CanUseSpecialAttack( eActiveSkillUseCondition_ ) && 0 != m_iChosenSkillID )
+	{
+		bUsed = true;
+		SpecialAttackUse( m_iChosenSkillID, true );
+		Send_SKILL_USE_REQ( static_cast<CX2SkillTree::SKILL_ID>( m_iChosenSkillID ) );
+	}
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( m_iChosenSkillID ), true );
+	if ( NULL != pSkillTemplet && ( CX2SkillTree::ASUT_ANYTIME == pSkillTemplet->m_eActiveSkillUseCondtion || CX2SkillTree::ASUT_ANYTIME_EXCEPT_AIR == pSkillTemplet->m_eActiveSkillUseCondtion ) )
+	{
+		m_iChosenSkillID = iSavedSkillID;
+		m_fReservedSkillMp = fSavedReservedMp;
+		m_iChosenSkillSlotIndex = iSavedSlotIndex;
+	}
+
+	if ( true == bUsed )
+	{
+		m_iNowSpecialAttack = m_iChosenSkillSlotIndex + 1;
+		return true;
+	}
+
+	m_iChosenSkillID = iSavedSkillID;
+	return false;
+}
+
+// char-luciel CH1l2: June 32ae5400 ( vslot 0x668 ); the base first, then the dash, riding dash or walk state by the body in play ( the state change maps Lu's id to Ciel's by form )
+/*virtual*/ void CX2GULuciel::StateChangeDashIfPossible()
+{
+	CX2GUUser::StateChangeDashIfPossible();
+
+	if ( false == GetEnableDash( EDS_END ) )
+	{
+		StateChange( LSI_LU_WALK, false );
+		return;
+	}
+
+	if ( true == GetRidingOn() )
+		StateChange( LSI_RIDING_DASH, false );
+	else if ( true == IsMinorUnitActive() )
+		StateChange( LSI_CIEL_DASH, false );
+	else
+		StateChange( LSI_LU_DASH, false );
+}
+
+// char-luciel CH1l2: June 32ae9bd0 ( vslot 0x658 ); only the two Phantom Rush skills answer, with their chain being ready
+/*virtual*/ bool CX2GULuciel::IsSkillChainReady( const int iSkillID_, const int iUnused_ )
+{
+	UNREFERENCED_PARAMETER( iUnused_ );
+
+	switch ( iSkillID_ )
+	{
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH:
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH_UPGRADE:
+		return m_bPhantomRushReady;
+
+	default:
+		return false;
+	}
+}
+
+// char-luciel CH1l2: June 32aea8c0 ( vslot 0x6a8 ); Summon Darkness, Twilight Judgement and Phantom Rush show no cool time while their effect or chain is up
+/*virtual*/ float CX2GULuciel::ShownSkillCoolTime( const float fCoolTime_, const int iSkillID_ )
+{
+	switch ( g_pData->GetSkillTree()->GetUpgradeBaseSkillID( static_cast<CX2SkillTree::SKILL_ID>( iSkillID_ ) ) )
+	{
+	case CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS:
+		if ( true == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+			return 0.f;
+		break;
+
+	case CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT:
+		if ( 0 != GetBuffAccumulationCountNowInFactor( BTI_BUFF_TWILIGHT_JUDGEMENT ) )
+			return 0.f;
+		break;
+
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH:
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH_UPGRADE:
+		if ( true == m_bPhantomRushReady )
+			return 0.f;
+		break;
+
+	default:
+		break;
+	}
+
+	return fCoolTime_;
+}
+
+// char-luciel CH1l2: June 32aeb380 ( vslot 0x670 ); job line 1 is Chiliarch / Dread Lord, 2 Royal Guard / Noblesse, 3 Diablura / Demonio
+bool CX2GULuciel::IsInJobLine( int iJobLine_ )
+{
+	const int iUnitClass = ( NULL != GetUnit() ) ? static_cast<int>( GetUnit()->GetClass() ) : 0;
+
+	switch ( iJobLine_ )
+	{
+	case 1:
+		return CX2Unit::UC_LUCIEL_CHILIARCH == iUnitClass || CX2Unit::UC_LUCIEL_DREAD_LORD == iUnitClass;
+
+	case 2:
+		return CX2Unit::UC_LUCIEL_ROYAL_GUARD == iUnitClass || CX2Unit::UC_LUCIEL_NOBLESSE == iUnitClass;
+
+	case 3:
+		return CX2Unit::UC_LUCIEL_DIABLURA == iUnitClass || CX2Unit::UC_LUCIEL_DEMONIO == iUnitClass;
+
+	default:
+		return false;
+	}
+}
+
+// char-luciel CH1l2: June 32aeb410 ( vslot 0x740 ); the own unit runs the base, stand-in: the base 32009780 Crest of Time snapshot is not ported
+/*virtual*/ void CX2GULuciel::StoreGageSnapshot()
+{
+	if ( false == IsMyUnit() )
+		return;
+}
+
+// char-luciel CH1l2: June 32aeb430 ( vslot 0x744 ); the own unit runs the base, stand-in: the base 3204da60 Crest of Time restore is not ported
+/*virtual*/ void CX2GULuciel::RestoreGageSnapshot()
+{
+	if ( false == IsMyUnit() )
+		return;
+}
+
+// char-luciel CH1l2: June 32b0e440 ( vslot 0x6b0 ); a transformed body takes its own animation and after-image, any body other than the first reads the second
+/*virtual*/ void CX2GULuciel::UpdateAfterImageEquip( const AFTER_IMAGE_BODY eBody_ )
+{
+	if ( AIB_FIRST_UNIT == eBody_ )
+	{
+		const bool bTransformed = IsTransformed( CX2Unit::DT_MAJOR );
+		CKTDGXSkinAnimPtr pXSkinAnim = ( true == bTransformed ) ? m_aTransformedSkin[0].m_pXSkinAnim : m_pXSkinAnim;
+		CKTDGXSkinAfterImage* pAfterImage = ( true == bTransformed ) ? m_aTransformedSkin[0].m_pAfterImage : m_pAfterImage;
+
+		if ( NULL != pAfterImage && NULL != pXSkinAnim )
+			pAfterImage->UpdateEquipView( pXSkinAnim.get() );
+	}
+	else
+	{
+		const bool bTransformed = IsTransformed( CX2Unit::DT_MINOR );
+		CKTDGXSkinAnimPtr pXSkinAnim = ( true == bTransformed ) ? m_aTransformedSkin[1].m_pXSkinAnim : m_pMinorUnitXSkinAnim;
+		CKTDGXSkinAfterImage* pAfterImage = ( true == bTransformed ) ? m_aTransformedSkin[1].m_pAfterImage : m_pMinorUnitAfterImage;
+
+		if ( NULL != pAfterImage && NULL != pXSkinAnim )
+			pAfterImage->UpdateEquipView( pXSkinAnim.get() );
+	}
+}
+
+// char-luciel CH1l2: June 32b0e670 ( vslot 0x794 ); the three Demonio skills of the body in play take the skill-group power sockets
+/*virtual*/ void CX2GULuciel::SumSocketOptionAfterSlots( CX2SocketItem::SocketData& kAggregate_, const CX2SocketItem::SocketData& kSocketData_ )
+{
+	UNREFERENCED_PARAMETER( kAggregate_ );	// AddSkillAdditionalPowerRateBySlot writes m_SocketData, the aggregate SumSocketOption passes
+
+	if ( NULL == GetUnit() )
+		return;
+
+	const CX2SkillTree::SKILL_ID aeLuSkillID[3] = { CX2SkillTree::RNSI_SA_LDB_DEATH_TOUCH, CX2SkillTree::RNSI_SA_LDB_MORTAL_FEAR, CX2SkillTree::RNSI_SA_LDB_DARK_PLASMA };
+	const CX2SkillTree::SKILL_ID aeCielSkillID[3] = { CX2SkillTree::RNSI_SA_LDN_SHADOW_FURY, CX2SkillTree::RNSI_SA_LDN_SHREWD_CUTTER, CX2SkillTree::RNSI_SA_LDN_SILENT_RAGE };
+
+	for ( int i = 0; i < 3; ++i )
+		AddSkillAdditionalPowerRateBySlot( kSocketData_, ( true == IsMinorUnitActive() ) ? aeCielSkillID[i] : aeLuSkillID[i] );
+}
+
+// char-luciel CH1l2: June 32b0f940 ( vslot 0x7fc ); the use of the skill the lookup chose, a skill with no state change pays at once
+/*virtual*/ void CX2GULuciel::SpecialAttackUse( const int iSkillID_, const bool bUnused_ )
+{
+	UNREFERENCED_PARAMETER( bUnused_ );
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( iSkillID_ ), true );
+
+	if ( true == SpecialAttackNoStageChange( pSkillTemplet ) )
+	{
+		SpecialAttackCooldown( pSkillTemplet->m_eID, m_fChosenSkillMp );
+		SkillMemoMpRefund( iSkillID_, true, m_fChosenSkillMp );
+		m_fChosenSkillMp = 0.f;
+		m_bSpecialAttackEventProcessedAtThisFrame = true;
+		return;
+	}
+
+	ReserveSkillUse( pSkillTemplet->m_eID );
+	m_iSkillUseMpForm = ( true == IsMinorUnitActive() ) ? 1 : 0;
+
+	if ( false == StateChangeBySkillID( pSkillTemplet->m_eID ) )
+		StateChangeBySkillSlot( m_iChosenSkillSlotIndex );
+
+	m_bSpecialAttackEventProcessedAtThisFrame = true;
+}
+
+// char-luciel CH1l2: June 32b0fa90 ( vslot 0x664 ); the base's max MP once per form, each form's gauge gets its own max
+/*virtual*/ void CX2GULuciel::ResetMaxMP()
+{
+	const float fBaseMaxMp = ONE_CHARGE * 3.0f;
+
+	m_AdditionalMaxMp.SetBasicStatValue( fBaseMaxMp );
+
+	for ( int iForm = 0; iForm < 2; ++iForm )
+	{
+		const float fResultMaxMp = GetUnit()->ResetMaxMp( fBaseMaxMp, iForm );
+		const float fAbilityRate = 0.f;	// June 32358970( 5 ) x 0.01: June's per-unit ability map, 0 in March ( the base's stand-in )
+		const float fRate = fAbilityRate + m_SocketData.m_Stat.m_ExtraStat.m_fIncreaseMPRate;
+		const float fMaxMpWithSocket = fResultMaxMp + ( fResultMaxMp * fRate + m_SocketData.m_iAddMPValue );
+
+		m_AdditionalMaxMp.SetOptionValue( fMaxMpWithSocket - fBaseMaxMp );
+		m_AdditionalMaxMp.CheckAndUpdateResultValue();
+
+		GetGageData()->SetMaxMp( m_AdditionalMaxMp.GetResultValue(), iForm );
+	}
+}
+
+// char-luciel CH1l2: June 32b14640 ( vslot 0x6a0 ); no MP in the effect of Twilight Judgement, Summon Darkness or a ready Phantom Rush chain, Dancing Blade loops lower it, Open Mind scales the rest
+/*virtual*/ float CX2GULuciel::GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const
+{
+	float fMpConsumption = CX2GUUser::GetActualMPConsume( eSkillID_, iSkillLevel_ );
+
+	CX2GULuciel* pThis = const_cast<CX2GULuciel*>( this );	// HaveThisBuff is not const in March
+	const CX2SkillTree::SKILL_ID eBaseSkillID = g_pData->GetSkillTree()->GetUpgradeBaseSkillID( eSkillID_ );
+
+	switch ( eBaseSkillID )
+	{
+	case CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT:
+		if ( true == pThis->HaveThisBuff( BTI_BUFF_TWILIGHT_JUDGEMENT ) )
+			fMpConsumption = 0.f;
+		break;
+
+	case CX2SkillTree::SI_SA_LLD_DANCING_BLADE:
+		fMpConsumption = max( 0.f, fMpConsumption - m_usDancingBladeLoopCount * DANCING_BLADE_LOOP_MP_COST );
+		break;
+
+	case CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS:
+		if ( true == pThis->HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+			fMpConsumption = 0.f;
+		break;
+
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH:
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH_UPGRADE:
+		if ( true == m_bPhantomRushReady )
+			fMpConsumption = 0.f;
+		break;
+
+	default:
+		break;
+	}
+
+	// Open Mind: the skills of Lu's body ( first list ), of Ciel's ( second list ) and of both ( third list ) cost the passive's MP rate while its combination points are reached
+	bool bOpenMindApplies = false;
+	switch ( eBaseSkillID )
+	{
+	case CX2SkillTree::RNSI_SA_LUCIEL_TRIPLE_SHOT:
+	case CX2SkillTree::RNSI_SA_LUCIEL_FLICK_SHOT:
+	case CX2SkillTree::RNSI_SA_LLC_DARK_CRESCENT:
+	case CX2SkillTree::RNSI_SA_LLD_SUPREME_PUNISHMENT:
+	case CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE:
+	case CX2SkillTree::RNSI_SA_LCG_DEATH_CRISIS_OF_MARBAS:
+	case CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION:
+	case CX2SkillTree::RNSI_SA_LCG_FANTASIE_IMPROMPTU_1ST_MOVEMENT:
+	case CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT:
+	case CX2SkillTree::RNSI_SA_LUCIEL_TRIPLE_SHOT_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LUCIEL_FLICK_SHOT_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LDN_DESPERADO:
+	case CX2SkillTree::RNSI_SA_LDN_SINISTER_MIND:
+	case CX2SkillTree::RNSI_SA_LDN_GARDEN_OF_HAURES:
+	case CX2SkillTree::RNSI_SA_LLD_FEAR_TOMORROW:
+	case CX2SkillTree::RNSI_SA_LCN_MAGDONIC_CANNON:
+	case CX2SkillTree::RNSI_SA_LDN_ABYSS_SNIPING:
+		bOpenMindApplies = ( true == IsOpenMindConditionMet() && false == IsMinorUnitActive() );
+		break;
+
+	case CX2SkillTree::RNSI_SA_LUCIEL_STOMP:
+	case CX2SkillTree::RNSI_SA_LUCIEL_EVIL_CLAW:
+	case CX2SkillTree::RNSI_SA_LLC_RUINOUS_IMPACT:
+	case CX2SkillTree::RNSI_SA_LLC_DEAD_HANDS:
+	case CX2SkillTree::RNSI_SA_LLC_POWER_OF_ORIAX:
+	case CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS:
+	case CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT:
+	case CX2SkillTree::RNSI_SA_LCG_DEMONIC_BREATH:
+	case CX2SkillTree::RNSI_SA_LCN_SPECTRAL_SPEAR:
+	case CX2SkillTree::RNSI_SA_LUCIEL_STOMP_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LUCIEL_EVIL_CLAW_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LLC_RUINOUS_IMPACT_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LLC_DEAD_HANDS_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LDB_LAND_CRASHER:
+	case CX2SkillTree::RNSI_SA_LDB_BLOODLUST:
+	case CX2SkillTree::RNSI_SA_LDB_NIGHTMARE:
+	case CX2SkillTree::RNSI_SA_LDB_LAND_CRASHER_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LLD_DEAD_CROSS:
+	case CX2SkillTree::RNSI_SA_LCN_SOUL_LOCK:
+	case CX2SkillTree::RNSI_SA_LDN_DEMONIC_RUSH:
+	case CX2SkillTree::RNSI_A_LCN_SWIFT_SMASH:
+		bOpenMindApplies = ( true == IsOpenMindConditionMet() && true == IsMinorUnitActive() );
+		break;
+
+	case CX2SkillTree::RNSI_A_LLC_BLASTING_FEAR:
+	case CX2SkillTree::RNSI_A_LLC_BLASTING_FEAR_UPGRADE:
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH:
+	case CX2SkillTree::RNSI_A_LDN_RAPID_IMPACT:
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH_UPGRADE:
+		bOpenMindApplies = IsOpenMindConditionMet();
+		break;
+
+	default:
+		break;
+	}
+
+	if ( true == bOpenMindApplies )
+		fMpConsumption = GetLearnedSkillAbilityValue( CX2SkillTree::SA_MP_CONSUME_REL, GetOpenMindSkillID() ) * fMpConsumption;
+
+	return fMpConsumption;
+}
+
+// char-luciel CH1l2: June 32b15050 ( vslot 0x6a4 ); -1 ( no cool time is stored ) for Summon Darkness and Twilight Judgement while their effect lives and for the Phantom Rush target states, never below 0
+/*virtual*/ float CX2GULuciel::GetActualCoolTime( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_, IN int iSkillLevel_ ) const
+{
+	if ( NULL == pSkillTemplet_ )
+		return 0.f;
+
+	// June's base takes a third argument ( 0 ) March does not have; the two skill memo cases ( 10003, 30207 ) read June's GetEqippedSkillMemo stub, which answers 0: never applied, not written
+	float fCoolTime = CX2GUUser::GetActualCoolTime( pSkillTemplet_, iSkillLevel_ );
+
+	CX2GULuciel* pThis = const_cast<CX2GULuciel*>( this );	// HaveThisBuff is not const in March
+
+	switch ( g_pData->GetSkillTree()->GetUpgradeBaseSkillID( pSkillTemplet_->m_eID ) )
+	{
+	case CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS:
+		if ( true == pThis->HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+			return -1.f;
+		break;
+
+	case CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT:
+		if ( 0 != GetBuffAccumulationCountNowInFactor( BTI_BUFF_TWILIGHT_JUDGEMENT ) )
+			return -1.f;
+		break;
+
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH:
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH_UPGRADE:
+		if ( LSI_A_LDB_F_PHANTOM_RUSH_TARGET == GetNowStateID() || LSI_A_LDB_M_PHANTOM_RUSH_TARGET == GetNowStateID() )
+			return -1.f;
+		break;
+
+	default:
+		break;
+	}
+
+	return max( 0.f, fCoolTime );
+}
+
+// char-luciel CH1l2: June 32b15220 ( vslot 0x828 ); the base's test less the two power landing states
+/*virtual*/ bool CX2GULuciel::IsNotCommonMoveState()
+{
+	if ( false == CX2GUUser::IsNotCommonMoveState() )
+		return false;
+
+	return LSI_LU_DASH_JUMP_POWER_LANDING != GetNowStateID() && LSI_CIEL_DASH_JUMP_POWER_LANDING != GetNowStateID();
+}
+
+// char-luciel CH1l2: June 32b15430 ( vslot 0x850 ); both after-images follow, they draw nothing in either body's wait state
+/*virtual*/ void CX2GULuciel::AfterImageFrameMove()
+{
+	const int iNowStateID = GetNowStateID();
+	const bool bEnable = ( LSI_LU_WAIT != iNowStateID && LSI_CIEL_WAIT != iNowStateID );
+
+	if ( NULL != m_pAfterImage )
+	{
+		if ( true == bEnable )
+			m_pAfterImage->Enable();
+		else
+			m_pAfterImage->Disable();
+	}
+
+	if ( NULL != m_pMinorUnitAfterImage )
+	{
+		if ( true == bEnable )
+			m_pMinorUnitAfterImage->Enable();
+		else
+			m_pMinorUnitAfterImage->Disable();
+	}
+
+	if ( NULL != m_pAfterImage )
+		m_pAfterImage->OnFrameMove( m_fTime, m_fElapsedTime );
+
+	if ( NULL != m_pMinorUnitAfterImage )
+		m_pMinorUnitAfterImage->OnFrameMove( m_fTime, m_fElapsedTime );
+}
+
+// char-luciel CH1l2: June 32b16c80 ( vslot 0x834 ); the cut-in by the unit's cut-in set sub index
+/*virtual*/ void CX2GULuciel::ShowActiveSkillCutInAndLightByScript( float fTimeToShow_, bool bOnlyLight_ )
+{
+	ShowActiveSkillCutInAndLight( fTimeToShow_, m_iSkillCutInSetSubIndex, bOnlyLight_ );
+}
+
+// char-luciel CH1l2: June 32b171c0 ( vslot 0x66c ); each body scales its head bone, or its spine bone while it wears the one-piece avatar
+/*virtual*/ void CX2GULuciel::ScaleHead( float fHeadScale_, float fFaceScale_ )
+{
+	for ( int iForm = 0; iForm < 2; ++iForm )
+		ScaleHeadBone( ( true == m_mapScaleHeadByForm[iForm] ) ? L"Bip01_Spine1" : L"Bip01_Head", fHeadScale_, fFaceScale_, iForm );
+}
+
+// char-luciel CH1l2: June 32b172b0 ( vslot 0x87c )
+/*virtual*/ void CX2GULuciel::SetSDOnePieceAvatar( const int iForm_, const bool bSDOnePieceAvatar_ )
+{
+	m_mapScaleHeadByForm[iForm_] = bSDOnePieceAvatar_;
+}
+
+// char-luciel CH1l2: June 32b18170 ( vslot 0x848 ); a skill state that gains combination points adds the skill's hit counter entry of this damage effect index once
+/*virtual*/ void CX2GULuciel::RegisterDamageEffectHitCountEntry()
+{
+	if ( false == IsMyUnit() )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( GetNowStateSkillID() );
+	if ( NULL == pSkillTemplet || 0 >= pSkillTemplet->m_usFPGainCount )
+		return;
+
+	SDamageEffectHitCount hitCountEntry;
+	hitCountEntry.m_iSkillID = g_pData->GetSkillTree()->GetUpgradeBaseSkillID( pSkillTemplet->m_eID );
+	hitCountEntry.m_iDamageEffectIndex = m_iDamageEffectIndex;
+	hitCountEntry.m_iHitCount = 0;
+
+	// June 32b4cb40: std::find over the 12-byte entries, the same skill and damage effect index
+	std::vector<SDamageEffectHitCount>::iterator vit = m_vecDamageEffectHitCount.begin();
+	for ( ; vit != m_vecDamageEffectHitCount.end(); ++vit )
+	{
+		if ( vit->m_iDamageEffectIndex == hitCountEntry.m_iDamageEffectIndex && vit->m_iSkillID == hitCountEntry.m_iSkillID )
+			break;
+	}
+
+	if ( vit == m_vecDamageEffectHitCount.end() )
+		m_vecDamageEffectHitCount.push_back( hitCountEntry );
+}
+
+// char-luciel CH1l2: June 32b1c880 ( vslot 0x810 ); Summon Darkness used while its effect lives ends it by a user action instead of a state change
+/*virtual*/ bool CX2GULuciel::SpecialAttackNoStageChange( const CX2SkillTree::SkillTemplet* pSkillTemplet_ )
+{
+	if ( NULL == pSkillTemplet_ )
+		return false;
+
+	if ( CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS != g_pData->GetSkillTree()->GetUpgradeBaseSkillID( pSkillTemplet_->m_eID ) )
+		return false;
+
+	if ( true == GetRidingOn() )
+		return false;
+
+	if ( false == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+		return false;
+
+	if ( UAI_CANCEL_SUMMON_DARKNESS != m_FrameDataFuture.syncData.nowAction )
+		m_FrameDataFuture.syncData.nowAction = UAI_CANCEL_SUMMON_DARKNESS;
+
+	return true;
+}
+
+// char-luciel CH1l2: June 32b1edd0 ( vslot 0x7c8 ); the combination point follows into the synced int, the switching cool time runs down, the switching guide shows it
+/*virtual*/ void CX2GULuciel::CommonFrameMoveFuture()
+{
+	CX2GUUser::CommonFrameMoveFuture();
+
+	const int iNowCombinationPoint = GetNowCombinationPoint();	// June reads the gauge's value cell, 0 without a gauge
+	if ( m_FrameDataFuture.syncData.iClassSyncInt != iNowCombinationPoint )
+		m_FrameDataFuture.syncData.iClassSyncInt = iNowCombinationPoint;
+
+	if ( 0.f < m_fSwitchingCoolTime )
+	{
+		m_fSwitchingCoolTime -= m_fElapsedTime;
+		if ( m_fSwitchingCoolTime < 0.f )
+			m_fSwitchingCoolTime = 0.f;
+	}
+
+	bool bShowSwitchingGuide = true;
+	g_pX2Game->UpdateLucielSwitchingGuideUI( &bShowSwitchingGuide, m_fSwitchingCoolTime );
+}
+
+// char-luciel CH1l2: June 32b1eef0 ( vslot 0x800 ); the own unit pays the stored combination points, the MP, the combination points of the skill, the finality stone and the cool time
+/*virtual*/ void CX2GULuciel::SpecialAttackCooldown( const int iSkillID_, const float fMpConsume_ )
+{
+	if ( false == IsMyUnit() )
+		return;
+
+	UpCombinationPoint( m_iLastUsedSkillID );	// June passes the stored value as a point count ( the member's name is CH1a's )
+	m_iLastUsedSkillID = 0;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( iSkillID_ ), true );
+	if ( NULL == GetUnit() || NULL == pSkillTemplet )
+		return;
+
+	MarkSkillSlotUsed( m_iChosenSkillSlotIndex, false );
+	UpGageNowMp( -fMpConsume_, m_iSkillUseMpForm );
+
+	if ( CX2SkillTree::ST_HYPER_ACTIVE_SKILL == pSkillTemplet->m_eType && false == IsTrainingOrPhotozone() )
+	{
+		CX2Item* pItem = g_pData->GetMyUser()->GetSelectUnit()->GetInventory().GetItemByTID( CX2EnchantItem::ATI_HYPER_SKILL_STONE );
+		if ( NULL != pItem )
+			g_pX2Game->Handler_EGS_USE_FINALITY_SKILL_REQ( pItem->GetItemData().m_ItemUID );
+	}
+
+	const int iSkillLevel = max( 1, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true ) );
+
+	UpCombinationPoint( -GetSkillCombinationPointCost( static_cast<CX2SkillTree::SKILL_ID>( iSkillID_ ), iSkillLevel ) );
+
+	const float fCoolTime = GetActualCoolTime( pSkillTemplet, iSkillLevel );
+	if ( false == ( fabs( -1.f - fCoolTime ) <= FLT_EPSILON ) )	// June 31c7b640: a cool time of -1 is not stored
+	{
+		GetUnit()->AccessUnitData().m_UserSkillTree.SetSkillCoolTimeLeft( pSkillTemplet->m_eID, fCoolTime, true );
+		GetUnit()->ApplySkillCoolTimeRateByBuff( pSkillTemplet->m_eID );
+	}
+
+	CX2RandomMissionManager::GetInstance()->OnSkillUse( pSkillTemplet->m_eID );
+}
+
+// char-luciel CH1l2: June 32b37910 ( vslot 0x7c4 ); skills with a combination point cost take the specialization B rate, the Communion skills their rate, the camera override clears, the Altar of Evil effect sets stop
+/*virtual*/ void CX2GULuciel::CommonStateStart()
+{
+	CX2GUUser::CommonStateStart();
+
+	const CX2SkillTree::SkillTemplet* pNowStateSkillTemplet = GetEquippedActiveSkillTemplet( GetNowStateSkillID(), true );
+	if ( NULL != pNowStateSkillTemplet && 0 < pNowStateSkillTemplet->m_usFPConsumtion )
+		m_fNowStatePowerRate = m_fNowStatePowerRate * static_cast<float>( GetCharacterSpecializationB() + 1.0 );
+
+	switch ( g_pData->GetSkillTree()->GetUpgradeBaseSkillID( GetNowStateSkillID() ) )
+	{
+	case CX2SkillTree::RNSI_SA_LUCIEL_NETHER_SHREDDER:
+	case CX2SkillTree::RNSI_SA_LUCIEL_SOUL_INFEST:
+	case CX2SkillTree::RNSI_SA_LLC_APOLLYON:
+	case CX2SkillTree::RNSI_SA_LLD_OBLIVION:
+	case CX2SkillTree::RNSI_SA_LCG_ESCHATON:
+	case CX2SkillTree::RNSI_SA_LCN_FANTASIE_IMPROMPTU_2ND_MOVEMENT:
+	case CX2SkillTree::RNSI_SA_LUCIEL_NETHER_SHREDDER_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LUCIEL_SOUL_INFEST_UPGRADE:
+	case CX2SkillTree::RNSI_SA_LLD_DEMONIC_CANNON:
+	case CX2SkillTree::RNSI_SA_LCN_RAIN_OF_CHAOS:
+		m_fNowStatePowerRate = m_fNowStatePowerRate * m_fCommunionRate;
+		break;
+
+	default:
+		break;
+	}
+
+	if ( true == IsMyUnit() && false == CX2UISkillTreeNew::IsSameOrUpgradeSkill( GetNowStateSkillID(), CX2SkillTree::RNSI_SA_LCG_DEATH_CRISIS_OF_MARBAS )
+		&& LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT != GetNowStateID() && LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE != GetNowStateID()
+		&& LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE != GetNowStateID() && LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE != GetNowStateID()
+		&& LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END != GetNowStateID() )
+	{
+		m_bSkillCameraOverride = false;
+		m_fSkillCameraOverrideValue = 0.f;
+	}
+
+	switch ( GetNowStateID() )
+	{
+	case LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH:
+	case LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR:
+	case LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA:
+	case LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END:
+	case LSI_SA_LDB_ALTAR_OF_EVIL_END:
+		ClearAltarOfEvilEffectSet();
+		break;
+
+	default:
+		break;
+	}
+}
+
+// char-luciel CH1l2: June 32b37c40 ( vslot 0x80c ); the base's user actions, then the Summon Darkness cancel action
+/*virtual*/ void CX2GULuciel::NoStateChangeActionFrameMove()
+{
+	UserNoStateChangeActionFrameMove();
+
+	if ( UAI_CANCEL_SUMMON_DARKNESS == m_FrameDataNow.syncData.nowAction )
+		CancelSummonDarkness();
+}
+
+// char-luciel CH1l2: June 32b397a0 ( vslot 0x7cc ); the base, the per-form timers and effects of Lu's skills, the remote unit's combination point, the transformed-state helpers of CH1l3
+/*virtual*/ void CX2GULuciel::CommonFrameMove()
+{
+	CX2GUUser::CommonFrameMove();
+
+	FrameMoveChaserOfDarknessEffect();
+
+	if ( false == IsMyUnit() )
+	{
+		CX2LucielGageData* pLucielGageData = static_cast<CX2LucielGageData*>( GetGageData() );
+		if ( NULL != pLucielGageData )
+		{
+			pLucielGageData->SetCombinationPointChanged( true );
+			pLucielGageData->SetNowCombinationPoint( m_FrameDataNow.syncData.iClassSyncInt );
+		}
+	}
+
+	if ( true == m_bNeedToUpdateWeaponEffect )
+	{
+		UpdateWeaponEnchantEffectAndExtraDamageType();
+		m_bNeedToUpdateWeaponEffect = false;
+	}
+
+	// the first animation event of Lu's four basic skills plays the body switch effect sets June's start flags asked for ( June reads the Future list )
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( BODY_SWITCH_EFFECT_EVENT_TIME ) )
+	{
+		switch ( GetNowStateSkillID() )
+		{
+		case CX2SkillTree::RNSI_SA_LUCIEL_TRIPLE_SHOT:
+		case CX2SkillTree::RNSI_SA_LUCIEL_STOMP:
+		case CX2SkillTree::RNSI_SA_LUCIEL_FLICK_SHOT:
+		case CX2SkillTree::RNSI_SA_LUCIEL_EVIL_CLAW:
+		case CX2SkillTree::RNSI_SA_LUCIEL_TRIPLE_SHOT_UPGRADE:
+		case CX2SkillTree::RNSI_SA_LUCIEL_STOMP_UPGRADE:
+		case CX2SkillTree::RNSI_SA_LUCIEL_FLICK_SHOT_UPGRADE:
+		case CX2SkillTree::RNSI_SA_LUCIEL_EVIL_CLAW_UPGRADE:
+			if ( true == m_FrameDataFuture.stateParam.bEventFlagList[EVENT_FLAG_DUO_TO_MINOR_UNIT] )
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LD_F_SW_Out", this );
+
+			if ( true == m_FrameDataFuture.stateParam.bEventFlagList[EVENT_FLAG_DUO_TO_FIRST_UNIT] )
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LD_M_SW_Out", this );
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	if ( 0.f < m_fSeizedByFearTimer )
+	{
+		m_fSeizedByFearTimer -= m_fElapsedTime;
+		if ( m_fSeizedByFearTimer < 0.f )
+			m_fSeizedByFearTimer = 0.f;
+	}
+
+	if ( 0.f < m_fPowerOfOriaxTime )
+	{
+		m_fPowerOfOriaxTime -= m_fElapsedTime;
+		if ( m_fPowerOfOriaxTime < 0.f )
+			m_fPowerOfOriaxTime = 0.f;
+	}
+
+	CX2DamageEffect::CEffect* pSoulShockDamageEffect = g_pX2Game->GetDamageEffect()->GetInstance( m_hSoulShockDamageEffect, true );
+	if ( NULL != pSoulShockDamageEffect )
+		pSoulShockDamageEffect->SetPos( GetPos( false ) );
+
+	const bool bDeadHandsBuff = HaveThisBuff( BTI_BUFF_DEAD_HANDS );
+	if ( false == bDeadHandsBuff && true == m_bDeadHandsActive )
+		PlaySound( L"Lu_SP_DeadHands02_Release.ogg", true, false );
+
+	m_bDeadHandsActive = bDeadHandsBuff;
+
+	// the body out of play waits in its pose while the two bodies are not both shown
+	if ( false == m_bDuoEnabled )
+	{
+		if ( false == IsMinorUnitActive() )
+		{
+			m_pMinorUnitXSkinAnim->ChangeAnim( L"Wait", false );
+			m_pMinorUnitXSkinAnim->Play( CKTDGXSkinAnim::XAP_LOOP );
+		}
+		else
+		{
+			m_pXSkinAnim->ChangeAnim( L"Wait3", false );
+			m_pXSkinAnim->Play( CKTDGXSkinAnim::XAP_LOOP );
+		}
+	}
+
+	if ( false == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+	{
+		KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS );
+		KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP );
+	}
+
+	if ( 0.f < m_fSoulStrikeCoolTime )
+	{
+		m_fSoulStrikeCoolTime -= m_fElapsedTime;
+		if ( m_fSoulStrikeCoolTime < 0.f )
+			m_fSoulStrikeCoolTime = 0.f;
+	}
+
+	if ( 0.f < m_fFearDamageEffectCoolTime )
+	{
+		m_fFearDamageEffectCoolTime -= m_fElapsedTime;
+		if ( m_fFearDamageEffectCoolTime < 0.f )
+			m_fFearDamageEffectCoolTime = 0.f;
+	}
+
+	if ( true == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+		m_fSummonedDarknessElapsedTime += m_fElapsedTime;
+
+	FrameMoveShadowBoltSpear();
+	FrameMoveTwilightJudgementMp();
+	FrameMoveAuraOfFear();
+
+	if ( 0.f < m_fCombinationPointOnHitCoolTime )
+	{
+		m_fCombinationPointOnHitCoolTime -= m_fElapsedTime;
+		if ( m_fCombinationPointOnHitCoolTime < 0.f )
+			m_fCombinationPointOnHitCoolTime = 0.f;
+	}
+
+	if ( 0.f <= m_fPhantomRushReadyTime )
+	{
+		m_fPhantomRushReadyTime -= m_fElapsedTime;
+		if ( m_fPhantomRushReadyTime < 0.f )
+			ResetPhantomRushReady();
+	}
+
+	FrameMoveDeathTouchEffect();
+	UpdateInvasionOfDarkEnergyTargetTime();
+	FrameMoveAltarOfEvilEnd();
+	FrameMoveBoundingKeyDialog();
+
+	if ( NULL != GetUnit() && 0 != GetUnit()->GetUnitData().m_iUnitClassTran )
+	{
+		UpdateOpenMindBuff();
+		UpdateStableDarkEnergyBuff();
+	}
+
+	if ( LSI_A_LDN_M_PUNISHER != GetNowStateID() && INVALID_EFFECTSET_HANDLE != m_hPunisherEffectSet )
+		g_pX2Game->GetEffectSet()->StopEffectSet( m_hPunisherEffectSet );
+
+	if ( 0.f < m_fCombinationPointOverflowCoolTime )
+	{
+		m_fCombinationPointOverflowCoolTime -= m_fElapsedTime;
+		if ( m_fCombinationPointOverflowCoolTime < 0.f )
+			m_fCombinationPointOverflowCoolTime = 0.f;
+	}
+}
+
+// char-luciel CH1l2: June 32b3a310 ( vslot 0x7f8 ); chooses the skill of the pressed slot and checks that it can be used now: use condition, bans, cool time, MP, combination points, finality stone
+/*virtual*/ bool CX2GULuciel::CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ )
+{
+	if ( true == IsQuickSlotSpecialItemWaiting() )
+		return false;
+
+	CX2UserSkillTree& accessUserSkillTree = GetUnit()->AccessUnitData().m_UserSkillTree;
+	const CX2UserSkillTree::SkillSlotData* pSkillSlotData = NULL;
+	int iPressedSkillSlotIndex = -1;
+
+	if ( false == CommonSpecialAttackEventProcess( accessUserSkillTree, pSkillSlotData, iPressedSkillSlotIndex ) )
+		return false;
+
+	if ( NULL == pSkillSlotData )
+		return false;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( pSkillSlotData->m_eID, true );
+	if ( NULL == pSkillTemplet )
+		return false;
+
+	if ( pSkillTemplet->m_eID != pSkillSlotData->m_eID )
+	{
+		const int iStringID = STR_ID_SKILL_REPLACED_BY_UPGRADE;
+		PushInfoText( GET_STRING( iStringID ) );
+		return false;
+	}
+
+	m_iChosenSkillID = pSkillTemplet->m_eID;
+
+	// with Stable Dark Energy learned: a locked Phantom Rush is usable anywhere but in the air, Sinister Mind's air keys count as the ground key
+	CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eKeyCondition = eActiveSkillUseCondition_;
+	CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eSkillCondition = pSkillTemplet->m_eActiveSkillUseCondtion;
+	if ( 0 < accessUserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true ) )
+	{
+		if ( CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH == pSkillTemplet->m_eID || CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH_UPGRADE == pSkillTemplet->m_eID )
+		{
+			if ( true == m_bStableDarkEnergyLocked && CX2SkillTree::ASUT_AIR != eKeyCondition && CX2SkillTree::ASUT_AIR_ONLY != eKeyCondition )
+				eSkillCondition = CX2SkillTree::ASUT_ANYTIME_EXCEPT_AIR;
+		}
+		else if ( CX2SkillTree::RNSI_SA_LDN_SINISTER_MIND == g_pData->GetSkillTree()->GetUpgradeBaseSkillID( pSkillTemplet->m_eID ) )
+		{
+			if ( CX2SkillTree::ASUT_AIR == eKeyCondition || CX2SkillTree::ASUT_AIR_ONLY == eKeyCondition )
+				eKeyCondition = CX2SkillTree::ASUT_GROUND;
+		}
+	}
+
+	if ( false == CheckSkillUseCondition( eKeyCondition, eSkillCondition ) )
+		return false;
+
+	if ( false == CheckSummonSpecialAttack( pSkillTemplet->m_eID ) )
+		return false;
+
+	if ( false == CheckSkillUsePVPOfficial( pSkillTemplet->m_eID ) )
+		return false;
+
+	if ( false == CheckSkillUseNotPve( pSkillTemplet->m_eID ) )
+		return false;
+
+	if ( false == CheckSkillUseNotDungeon( pSkillTemplet->m_eID ) )
+		return false;
+
+	if ( true == IsRidingKeySkillWaiting() )
+		return false;
+
+	const int iSkillTempletLevel = max( 1, accessUserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true ) );
+
+	m_fChosenSkillMp = GetActualMPConsume( pSkillTemplet->m_eID, iSkillTempletLevel );
+	const int iCombinationPointCost = GetSkillCombinationPointCost( pSkillTemplet->m_eID, iSkillTempletLevel );
+
+	if ( false == IsDevUnlimitedSkillUse() )
+	{
+		const float fCoolTimeLeft = ShownSkillCoolTime( pSkillSlotData->m_fCoolTimeLeft, pSkillTemplet->m_eID );
+		if ( 0.f < fCoolTimeLeft )
+		{
+			PushInfoText( GET_STRING( STR_ID_226 ) );
+			return false;
+		}
+
+		if ( m_fReservedSkillMp + m_fChosenSkillMp > GetNowMp() )
+		{
+			PushInfoText( GET_STRING( STR_ID_2549 ) );
+			return false;
+		}
+
+		if ( GetNowCombinationPoint() < iCombinationPointCost )
+		{
+			const int iStringID = STR_ID_NOT_ENOUGH_COMBINATION_POINT;
+			PushInfoText( GET_STRING( iStringID ) );
+			return false;
+		}
+
+		if ( CX2SkillTree::ST_HYPER_ACTIVE_SKILL == pSkillTemplet->m_eType && false == IsTrainingOrPhotozone()
+			&& g_pData->GetMyUser()->GetSelectUnit()->GetInventory().GetNumItemByTID( CX2EnchantItem::ATI_HYPER_SKILL_STONE ) <= 0 )
+		{
+			PushInfoText( GET_STRING( STR_ID_26119 ) );
+			return false;
+		}
+	}
+
+	m_iChosenSkillID = pSkillTemplet->m_eID;
+	m_iChosenSkillSlotIndex = iPressedSkillSlotIndex;
+	return true;
 }
 
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
