@@ -76,3 +76,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - The berserker tick's enemy-count member ( u16 +0x97a8 ) is yours to declare; June's InitPassiveSkillState zeroes it with Madness's level ( one dword store ): add its reset beside
   `m_usMadnessLevel = 0;` in `InitPassiveSkillState`'s `_BLOOD` lines.
 - The stage review also retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG` ( CH4a ).
+
+## Amended by CH4b (2026-11-14)
+
+- Carried twice ( CH4a, CH4b ): `[JUNE_CHAR] ELESIS PASSIVE blood runaway cleanse` was never seen ( no debuff reached unit 146 ). Your play-test runs on unit 146
+  `CAvenger80`: name a monster that slows or poisons her, and check the line ( JUNE_BUGS 666: the port walks a copy of the buff list ).

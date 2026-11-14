@@ -2227,6 +2227,14 @@ Charge 28206 and Sonic Blade 28011 out. Units 30 / 21 / 146 unchanged (Infernal 
 **In game:** `[JUNE_CHAR] ELESIS PASSIVE mp: skill ...`, `cool time: skill ...`, `dignity: ignore state defence`, `blazing heart transcendence: ignore defence` /
 `magic damage x`, `infernal blade defence rate` (each at most once a second).
 
+**Play-test PASS (user, 2026-11-14; run 10:25-10:30 on md5 `c01fa8ce`; 0 EXCEPTION, 0 ErrorLog lines of this phase; known `E_DISABLE_HB_CHECK_REQ` UNHANDLED x5).** `init` on
+units 29 / 30 / 21 / 146. `mp:` 81 lines: Rushing Sword 28202 25.00 -> 22.00 ( loop 0, waltz 3 ) x30, -> 19.50 ( loop 1 ), -> 17.00 ( loop 2 ), -> 13.20 ( loop 0 in Vigor );
+Vigor x 0.6 on 28039 100 -> 60 and 28043 80 -> 48. `cool time:` 28217 Dodge and Slash 5.00 -> 0.40 x8 ( Vigor 0.2 x Victorious Sword ), 28023 15.00 -> 3.00, 28224 5.00 -> 1.00.
+`dignity: ignore state defence` x11. `blazing heart transcendence: ignore defence` x13 ( rolls 0.133-0.137 < 0.150 ), `magic damage x 1.044 ( blaze resist 220.0 )` x29.
+CH4a's carried `burst fire` x9 ( Big Burst into a burning group ): closed. Not seen: `infernal blade defence rate` ( unit 21 has the upgrade 28050 slotted; a state's skill id is
+the slotted id in June too, `32024b00` @`32024d2c`, and June names only 28014: **JUNE_BUGS 667**, verbatim; the base-skill check goes to CH4b2's play-test on unit 30, which has
+28014 ) and CH4a's `blood runaway cleanse` ( no debuff reached unit 146 ): carried to CH4c, the Crimson Avenger phase. User owes nothing more for CH4b.
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended

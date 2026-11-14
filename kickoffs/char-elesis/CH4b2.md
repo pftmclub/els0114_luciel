@@ -39,6 +39,8 @@ Port Advanced Knight Mastery's guard (28404, Grand Master 29 / 120), whole, as J
 - Run `stateends.py check` ( the two states are entered here ) and the usual gates. Play-test on unit 29 `ElesisGM` ( 28404 learned since CH4a, rate 0.150 ):
   get hit by small monsters about 20 times; expect a few guard motions and `[JUNE_CHAR] ELESIS PASSIVE advanced knight mastery guard ( ... )` lines, and the
   damage on those hits x 0.85. After every guard she must be able to move.
+- **Carried from CH4b's play-test (2026-11-14):** `[JUNE_CHAR] ELESIS PASSIVE infernal blade defence rate` was never seen: unit 21 slots the upgrade 28050, and June's
+  0x428 names only the base 28014 ( JUNE_BUGS 667 ). In your hand-off, slot `RNSI_SA_SPK_INFERNAL_BLADE` 28014 on unit 30 `ElesisBH` ( learned, level 1 ) and cast it on monsters.
 
 You are on Opus: delegate the reads, probes and builds. Rules as CH4b's kickoff ( no enum literals, no `June` in names, one-line phase-tagged comments,
 `junediverge.py --list` first ).
