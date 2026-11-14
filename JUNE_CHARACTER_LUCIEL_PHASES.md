@@ -2157,6 +2157,7 @@ no review of its own: the CH1i review ( `kickoffs/char-luciel/CH1i-review.md`, O
 - **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge` `RESULT: PASS` ( `--check-all` PASS with the four allow rows ); `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings; `cl /P` holds 314 `LSI_*` definitions ( 271 + 43 ). Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** `a20ce8f2`; `finish.py --range a20ce8f2^..a20ce8f2`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1i review` ( Opus 5.5 high ); `/x2-phase char-luciel CH1i2` ( Opus 5.5 high, independent of the review ).
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
