@@ -76,3 +76,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   0x62c `SetHandEquipShow( bool )` ( `3208ddc0` empty; `StateChange` @`320349cb` with 0, `PlayEmotion` @`320447e9` with 1 ), 0x504 `GetSkillIconTexture( CKTDGUISlot*, const SkillTemplet* )` ( `31fdb990` = `SetItemTex( icon, piece )` ), 0x64c `SyncFutureMpFromGage` ( `31fe9da0` ),
   0x568 `CheckBoundingTarget() -> bool` ( `31e4c550` false; callers are the CH1h / CH1i states ), 0x87c `SetSDOnePieceAvatar( int, bool )` ( `3208e280` stores `m_bSDOnePieceAvatar` ), 0x5c4 `GetDanceWaitStateID` ( `3208e140` = the dance wait state ).
 - `IsHyperModeState` ( 0x51c ) is declared only under `SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME` in `X2GUUser.h`; widen its guard so `_LIVE` alone compiles Lu's override as an override.
+
+## Amended by char-luciel CH1l2 (2026-11-15)
+
+- Nine more Lu/Ciel overrides were written with no March virtual base ( `X2GULuciel.h`, marked `+` ): add each base as a virtual and widen with `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`:
+  0x668 `StateChangeDashIfPossible` ( `31fc85b0`; March's is a plain member at `X2GUUser.h:3097` ), 0x658 `IsSkillChainReady( int, int )` ( `330fb7d0` stub, answers false ), 0x740 `StoreGageSnapshot` ( `32009780` ) and 0x744 `RestoreGageSnapshot` ( `3204da60` ) ( both Crest of Time, not ported: empty bases ),
+  0x7fc `SpecialAttackUse( int, bool )`, 0x800 `SpecialAttackCooldown( int, float )` and 0x7f8 `CanUseSpecialAttack( ACTIVE_SKILL_USE_CONDITION )` ( bases `31aa1d30`, pure stubs; the other classes carry them as plain members ), 0x664 `ResetMaxMP` ( `31fd2810` = March's `CX2GUUser::ResetMaxMP` ), 0x848 `RegisterDamageEffectHitCountEntry` ( `31f3f070`, empty ).
