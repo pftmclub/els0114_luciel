@@ -940,7 +940,8 @@ the new divergence flag `SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE`. Files: `X2U
   `X2GUUser.cpp` +54, `X2UDPPacket.h` +28, `X2GUUser.h` +18, `X2DamageEffect.cpp` +8, `X2Unit.h` +4, `X2UICharInfo.h` +3), 2 OTHER (`Always.h`
   and `X2Game.cpp`: a peer's uncommitted char-elesis CH4a blocks beside mine, not staged), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS.
   `junediverge --check` (8 files): RESULT: PASS. `enumscan --check`: the 4 known DU1b3 rows only. Flag probe: both flags, BUFF_NEW_FINALIZER
-  and CHARINFO_SHOW on, no `#error`.
+  and CHARINFO_SHOW on, no `#error`. Commit `d353b1ff` (shared `Always.h` / `X2Game.cpp` staged without the peer's hunks); `--range
+  d353b1ff^..d353b1ff` (both flags): 8 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2Packet.cpp` (includes `X2UDPPacket.cpp`), `X2Game.cpp`,
   `X2DamageEffect.cpp`, `X2Unit.cpp`, `X2UICharInfo.cpp`, `X2GUChung.cpp`: no error in DU1c's code; each TU's only errors are the peer's
   uncommitted `X2BuffBehaviorTemplet.h(146)` (C2027 `CX2GameUnit`, char-elesis CH4a in progress). Full build skipped: no play-test.
