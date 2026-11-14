@@ -1136,7 +1136,7 @@ Opus 5.5 high. Part 10b of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new 
 - **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files X2Lib/X2GUUser.cpp`: 1 PASS (+94), 0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII,
   RESULT: PASS. `junediverge --check X2GUUser.cpp`: RESULT: PASS (open replace rows 8, unchanged). `enumscan --check`: the 4 known DU1b3 rows only.
   Flag probe: DUO_BODY, X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE, VERIFY_STAT_BY_BUFF, RIDING_SYSTEM, UNIT_EMOTION, JUNE_UNIT_VIEWER_EFFECT_TABLE,
-  JUNE_UNIT_SOUND on. Commit and range flagcheck: below.
+  JUNE_UNIT_SOUND on. Commit `217f55da`; `--range 217f55da^..217f55da`: 1 PASS (+94), 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GUChung.cpp`, `X2GULire_ElvenRanger.cpp`: 0 errors each. Full build
   skipped: no play-test (DU1d4 builds and hands off the regression pass, now with DU1d3b's paths).
 - **In game:** nothing to see. March classes have one body, so the active anim is `m_pXSkinAnim` and every path is as before.
