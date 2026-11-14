@@ -51,3 +51,9 @@ strings), `328825c0`, `32882540`. `31fd48a0`, `31fd63c0`, `32882540` have no Mar
 - **The equip's minor-unit byte** (`CX2Eqip +0x15d4`, set when the equip is Ciel's): `CX2GUUser::UpdateShowViewListByActiveBody` (`31fd6260`,
   DU1b) reads it as a stand-in `false` (every equip Lu's). Replace the stand-in with the member when it lands here; DU1b2's equip loop in
   `CommonFrameMove` (`@3206585b`) has the same stand-in.
+
+## Amended by char-luciel DU1b2 (2026-11-14)
+
+- The `CommonFrameMove` equip loop's stand-in is `bEquipForMinorUnit` (`X2GUUser.cpp`, `@3206585b`): it picks the body whose render param
+  the equip takes. June's loop then runs a block March lacks (`@320659e9-32065ae1`: `+0x8e64` / `+0x8e68` / `+0x8e70`, the active body's anim
+  time against `+0x8e68`): identify it with the equip-view rewrite (funcmap row `32063650 @3206584a-320659e4 (DU1b2)`).

@@ -53,3 +53,12 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **`InitStat` per form:** June's `CX2GUUser::InitStat` (user vslot 0x330, `31fe5480`, uncarved) takes the game stat from the unit by the
   active body (`3234af90( +0x8e90 == 1 )` on unit `+0x28`), March's from `m_GameStat`. `UpdateDuo` already calls `InitStat()` with a stand-in
   comment: replace March's body with June's here (a `june_march_divergent.tsv` row in the same commit) together with the other unit form readers.
+
+## Amended by DU1b2 (2026-11-14)
+
+- `SyncData::vNotSelectPosition` exists (Future +0x7e48 / Now +0x80e8, zeroed in `Init`, copied with the struct): wire it in `Serialize` /
+  `Deserialize` / `SetData` / `SendFrameData` (bits 0x20000-0x80000).
+- **The synced active-body word** (bit 0x1000000, Future +0x7f5c / Now +0x81fc, protected short): its Future writer is also in
+  `CommonFrameMoveFuture` `@32063316` (`= ( +0x8e90 == 1 )`, beside the funcmap's `31fe9e40`), and its Now reader is the sync pop after
+  `CommonFrameMove` (starts ~`3206cfe0`, `ret 8` `@3206d473`): for others' units of type 10, `@3206d42d-3206d45a` calls `SetActiveBody( word == 1 )`
+  when it differs. Both come with the field here (funcmap rows `32061bf0 @32063316 (DU1b2)`, `3206d42d (DU1b2)`).

@@ -18661,7 +18661,11 @@ void CX2GUUser::CommonFrameMoveFuture()
 	}
 #endif TEST_GROUP_GRAP
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	float fNowAnimTime = GetXSkinAnimFuture()->GetNowAnimationTime();	// char-luciel DU1b2: June @32061de1, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	float fNowAnimTime = m_pXSkinAnimFuture->GetNowAnimationTime();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef RIDING_SYSTEM
 	if ( true == GetRidingOn() && NULL != m_ptrRidingPet && NULL != m_ptrRidingPet->GetXSkinAnimFuturePtr() )
@@ -18797,8 +18801,13 @@ void CX2GUUser::CommonFrameMoveFuture()
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( GetXSkinAnimFuture()->GetNowAnimationTime() >= m_vDisableGravityInScriptTime.x &&
+		GetXSkinAnimFuture()->GetNowAnimationTime() < m_vDisableGravityInScriptTime.y )	// char-luciel DU1b2: June @32062601, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnimFuture->GetNowAnimationTime() >= m_vDisableGravityInScriptTime.x &&
 		m_pXSkinAnimFuture->GetNowAnimationTime() < m_vDisableGravityInScriptTime.y )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		m_bDisableGravityInScript = true;
 	}
@@ -18872,6 +18881,27 @@ void CX2GUUser::CommonFrameMoveFuture()
 #endif TEST_GROUP_GRAP
 
 #ifdef RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b2: June @320628d1-32062a93, riding moves both bodies to the saddle, else the active body and the not-selected one
+	if ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE )
+	{
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
+		const D3DXVECTOR3 vSaddlePos = GetPos( true ) + GetSaddlePos();
+#else SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
+		const D3DXVECTOR3 vSaddlePos = GetSaddlePos();
+#endif SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
+		m_pXSkinAnimFuture->GetMatrix().Move( vSaddlePos );
+		if( NULL != m_pMinorUnitXSkinAnimFuture )
+			m_pMinorUnitXSkinAnimFuture->GetMatrix().Move( vSaddlePos );
+	}
+	else
+	{
+		GetXSkinAnimFuture()->GetMatrix().Move( m_FrameDataFuture.syncData.position );
+		CKTDGXSkinAnim* pNotSelectXSkinAnimFuture = GetNotSelectXSkinAnimFuture();
+		if( NULL != pNotSelectXSkinAnimFuture )
+			pNotSelectXSkinAnimFuture->GetMatrix().Move( m_FrameDataFuture.syncData.vNotSelectPosition );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE )
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
 		m_pXSkinAnimFuture->GetMatrix().Move( GetPos( true ) + GetSaddlePos() );	// June 32062903: the saddle is relative to the rider
@@ -18880,6 +18910,7 @@ void CX2GUUser::CommonFrameMoveFuture()
 #endif SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
 	else
 		m_pXSkinAnimFuture->GetMatrix().Move( m_FrameDataFuture.syncData.position );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else //RIDING_SYSTEM
 	m_pXSkinAnimFuture->GetMatrix().Move( m_FrameDataFuture.syncData.position );
 #endif //RIDING_SYSTEM 탈 것 위치 적용
@@ -18898,10 +18929,17 @@ void CX2GUUser::CommonFrameMoveFuture()
 		if(m_fReverseGravitySpeedDeltaY == 0.f)
 #ifdef RIDING_SYSTEM
 		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			if ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE )	// char-luciel DU1b2: June @32062aef / @32062b75, the active body turns
+				GetXSkinAnimFuture()->GetMatrix().RotateDegree( GetSaddleDegree() );
+			else
+				GetXSkinAnimFuture()->GetMatrix().RotateDegree( m_FrameDataNow.unitCondition.dirDegree );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			if ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE )
 				m_pXSkinAnimFuture->GetMatrix().RotateDegree( GetSaddleDegree() );
 			else
 				m_pXSkinAnimFuture->GetMatrix().RotateDegree( m_FrameDataNow.unitCondition.dirDegree );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		}
 #else //RIDING_SYSTEM
 			m_pXSkinAnimFuture->GetMatrix().RotateDegree( m_FrameDataNow.unitCondition.dirDegree );
@@ -18921,6 +18959,10 @@ void CX2GUUser::CommonFrameMoveFuture()
 		if( m_StopAdvanceTimeFuture == false )
 		{
 			m_pXSkinAnimFuture->OnFrameMove( m_fTime, m_fElapsedTime );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			if( NULL != m_pMinorUnitXSkinAnimFuture )	// char-luciel DU1b2: June @32062c47, the second body's clock
+				m_pMinorUnitXSkinAnimFuture->OnFrameMove( m_fTime, m_fElapsedTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
             bXSkinAnimFutureOnFrameMoveCalled = true;
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -18946,8 +18988,17 @@ void CX2GUUser::CommonFrameMoveFuture()
 	}
 
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+    if ( bXSkinAnimFutureOnFrameMoveCalled == false )
+    {
+        m_pXSkinAnimFuture->UpdateBeforeAnimationTime();
+        if( NULL != m_pMinorUnitXSkinAnimFuture )	// char-luciel DU1b2: June @32062da8
+            m_pMinorUnitXSkinAnimFuture->UpdateBeforeAnimationTime();
+    }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if ( bXSkinAnimFutureOnFrameMoveCalled == false )
         m_pXSkinAnimFuture->UpdateBeforeAnimationTime();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if ( bRidingPetXSkinAnimFutureOnFrameMoveCalled == false && NULL != m_ptrRidingPet && NULL != m_ptrRidingPet->GetXSkinAnimFuturePtr() )
         m_ptrRidingPet->GetXSkinAnimFuturePtr()->UpdateBeforeAnimationTime();
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -19542,7 +19593,11 @@ void CX2GUUser::CommonFrameMove()
 		if ( true == GetRidingOn() && NULL != m_ptrRidingPet && NULL != m_ptrRidingPet->GetXSkinAnimPtr() )
 			CommonFrameMove_EffectSet( m_ptrRidingPet->GetXSkinAnimPtr()->GetNowAnimationTime() );
 		else
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			CommonFrameMove_EffectSet( GetXSkinAnimPtr()->GetNowAnimationTime() );	// char-luciel DU1b2: June @320647ad, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			CommonFrameMove_EffectSet( m_pXSkinAnim->GetNowAnimationTime() );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else //RIDING_SYSTEM
 		CommonFrameMove_EffectSet( m_pXSkinAnim->GetNowAnimationTime() );
 #endif //RIDING_SYSTEM 이펙트 시간 탈 것으로 적용하기
@@ -19605,8 +19660,13 @@ void CX2GUUser::CommonFrameMove()
 
 #ifdef SUPER_ARMOR_TIME
 	float fAnimTime = -1.f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( NULL != GetXSkinAnimPtr() )	// char-luciel DU1b2: June @32064a91, the active body
+		fAnimTime = GetXSkinAnimPtr()->GetNowAnimationTime();
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnim != NULL )
 		fAnimTime = m_pXSkinAnim->GetNowAnimationTime();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
     const std::vector<D3DXVECTOR2>& vecSuperArmorTime = m_vecNowSuperArmorTime;
@@ -19740,6 +19800,27 @@ void CX2GUUser::CommonFrameMove()
 #endif TEST_GROUP_GRAP
 
 #ifdef RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b2: June @320652f5-32065532, riding moves both bodies to the saddle, else the active body and the not-selected one
+	if ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE )
+	{
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
+		const D3DXVECTOR3 vSaddlePos = GetPos( false ) + GetSaddlePos();
+#else SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
+		const D3DXVECTOR3 vSaddlePos = GetSaddlePos();
+#endif SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
+		m_pXSkinAnim->GetMatrix().Move( vSaddlePos );
+		if( NULL != m_pMinorUnitXSkinAnim )
+			m_pMinorUnitXSkinAnim->GetMatrix().Move( vSaddlePos );
+	}
+	else
+	{
+		GetXSkinAnimPtr()->GetMatrix().Move( m_FrameDataNow.syncData.position );
+		CKTDGXSkinAnimPtr pNotSelectXSkinAnim = GetNotSelectXSkinAnimPtr();
+		if( NULL != pNotSelectXSkinAnim )
+			pNotSelectXSkinAnim->GetMatrix().Move( m_FrameDataNow.syncData.vNotSelectPosition );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE )
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
 		m_pXSkinAnim->GetMatrix().Move( GetPos( false ) + GetSaddlePos() );	// June 3206532c: the saddle is relative to the rider
@@ -19748,6 +19829,7 @@ void CX2GUUser::CommonFrameMove()
 #endif SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS
 	else
 		m_pXSkinAnim->GetMatrix().Move( m_FrameDataNow.syncData.position );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else //RIDING_SYSTEM
 	m_pXSkinAnim->GetMatrix().Move( m_FrameDataNow.syncData.position );
 #endif //RIDING_SYSTEM 탈 것 위치 적용하기
@@ -19764,12 +19846,26 @@ void CX2GUUser::CommonFrameMove()
 	{
 #ifdef REVERSE_GRAVITY_TEST  // oasis907 : 김상윤 [2011.6.29] 
 		if(m_fReverseGravitySpeedDeltaY == 0.f)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		{
+			// char-luciel DU1b2: June @32065547-320656cf, the first body and the second turn alike
+#ifdef RIDING_SYSTEM
+			const D3DXVECTOR3 vRotateDegree = ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE ) ? GetSaddleDegree() : m_FrameDataNow.unitCondition.dirDegree;
+#else RIDING_SYSTEM
+			const D3DXVECTOR3 vRotateDegree = m_FrameDataNow.unitCondition.dirDegree;
+#endif RIDING_SYSTEM
+			m_pXSkinAnim->GetMatrix().RotateDegree( vRotateDegree );
+			if( NULL != m_pMinorUnitXSkinAnim )
+				m_pMinorUnitXSkinAnim->GetMatrix().RotateDegree( vRotateDegree );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef RIDING_SYSTEM
 			if ( true == GetRidingOn() && GetNowStateID() != USI_RIDING_DIE )
 				m_pXSkinAnim->GetMatrix().RotateDegree( GetSaddleDegree() );
 			else
 #endif //RIDING_SYSTEM 탈 것 회전값 적용하기
 				m_pXSkinAnim->GetMatrix().RotateDegree( m_FrameDataNow.unitCondition.dirDegree );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else
 		m_pXSkinAnim->GetMatrix().RotateDegree( m_FrameDataNow.unitCondition.dirDegree );
 #endif REVERSE_GRAVITY_TEST
@@ -19787,6 +19883,14 @@ void CX2GUUser::CommonFrameMove()
                 * m_AdvanceTimeCount 
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
                 );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			if( NULL != m_pMinorUnitXSkinAnim )	// char-luciel DU1b2: June @32065712, the second body's clock
+				m_pMinorUnitXSkinAnim->OnFrameMove( m_fTime, m_fElapsedTime
+#ifndef X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+					* m_AdvanceTimeCount
+#endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+					);
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
             bXSkinAnimOnFrameMoveCalled = true;
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -19814,6 +19918,10 @@ void CX2GUUser::CommonFrameMove()
 			{
 				CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = m_pXSkinAnim->GetCloneFrame( L"Bip01_Spine1" );
 				RotateBone( pFrame, D3DXVECTOR3( 0, 0, -1 ), m_fRotateBoneDegree );				
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				if( NULL != m_pMinorUnitXSkinAnim )	// char-luciel DU1b2: June @32065792, the second body's spine
+					RotateBone( m_pMinorUnitXSkinAnim->GetCloneFrame( L"Bip01_Spine1" ), D3DXVECTOR3( 0, 0, -1 ), m_fRotateBoneDegree );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			}
 
 
@@ -19825,11 +19933,24 @@ void CX2GUUser::CommonFrameMove()
 				CX2EqipPtr pCX2Eqip = m_ViewEqipList[i];
 				if ( pCX2Eqip == NULL )
 					continue;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				const bool bEquipForMinorUnit = false;	// char-luciel DU1b2: June @3206585b; stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+				CKTDGXSkinAnimPtr pEquipXSkinAnim = ( true == bEquipForMinorUnit ) ? m_pMinorUnitXSkinAnim : m_pXSkinAnim;
+				if( NULL == pEquipXSkinAnim )
+				{
+					StateLog( L"CX2GUUser.CommonFrameMove NULL == pXSkinAnim !!!" );
+					continue;
+				}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 				//{{ robobeg : 2008-10-17
 				//pCX2Eqip->OnFrameMove( m_fTime, m_fElapsedTime * m_AdvanceTimeCount, m_pXSkinAnim->GetRenderParam() );
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				pCX2Eqip->SetRenderParam( m_fTime, m_fElapsedTime , pEquipXSkinAnim->GetRenderParam() );	// char-luciel DU1b2: the equip's body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				pCX2Eqip->SetRenderParam( m_fTime, m_fElapsedTime , m_pXSkinAnim->GetRenderParam() );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET
 				// June2017 CommonFrameMove 32063650 @32065d57-32066052: the per-equip CEPE play, after SetRenderParam (32963c80) and
 				// June's DITT_LOOP_ANIM_ITEM_ID (72) block 3295c960 (backlog Stage 11), before OnFrameMove (@32066083). This is the live
@@ -19988,6 +20109,10 @@ void CX2GUUser::CommonFrameMove()
     if ( bXSkinAnimOnFrameMoveCalled == false )
     {
         m_pXSkinAnim->UpdateBeforeAnimationTime();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        if( NULL != m_pMinorUnitXSkinAnim )	// char-luciel DU1b2: June @320661af
+            m_pMinorUnitXSkinAnim->UpdateBeforeAnimationTime();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     }
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 
@@ -20286,9 +20411,17 @@ void CX2GUUser::CommonFrameMove()
 		pSeq_Pepper2->SetPosition( fireBodyEffPos2 );
 
 	D3DXVECTOR3 lFoot;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	GetFramePos( &lFoot, true == m_bMinorUnitActive ? m_pFrame_MinorUnit_Bip01_L_Foot : m_pFrame_Bip01_L_Foot );	// char-luciel DU1b2: June @3206722c, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	GetFramePos( &lFoot, m_pFrame_Bip01_L_Foot );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	D3DXVECTOR3 rFoot;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	GetFramePos( &rFoot, true == m_bMinorUnitActive ? m_pFrame_MinorUnit_Bip01_R_Foot : m_pFrame_Bip01_R_Foot );	// char-luciel DU1b2: June @32067289, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	GetFramePos( &rFoot, m_pFrame_Bip01_R_Foot );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	if( pSeq_SlowRight != NULL )
 	{
@@ -20460,7 +20593,11 @@ void CX2GUUser::CommonFrameMove()
 	#endif //FIX_NOT_ACTIVE_SKILL_AT_ENCHANT_DAMAGE
 
 			D3DXVECTOR3 numPos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			GetFramePos( &numPos, true == m_bMinorUnitActive ? m_pFrame_MinorUnit_Bip01_Head : m_pFrame_Bip01_Head );	// char-luciel DU1b2: June @32067900, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			GetFramePos( &numPos, m_pFrame_Bip01_Head );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			numPos.y += 70.0f;
 			if( NULL != g_pData->GetPicChar() )
 			{
@@ -20833,7 +20970,11 @@ void CX2GUUser::CommonFrameMove()
 #endif SERV_IRUHADEV_JUNE_ENCHANT_PARITY
 
 			D3DXVECTOR3 numPos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			GetFramePos( &numPos, true == m_bMinorUnitActive ? m_pFrame_MinorUnit_Bip01_Head : m_pFrame_Bip01_Head );	// char-luciel DU1b2: June @320691ff, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			GetFramePos( &numPos, m_pFrame_Bip01_Head );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			numPos.y += 70.0f;
 			if( NULL != g_pData->GetPicChar() )
 			{
@@ -21774,7 +21915,11 @@ void CX2GUUser::CommonFrameMove()
 	}
 
 	D3DXVECTOR3 markerPos, vHeadPos, vTempPos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	GetFramePos( &vHeadPos, true == m_bMinorUnitActive ? m_pFrame_MinorUnit_Bip01_Head : m_pFrame_Bip01_Head );	// char-luciel DU1b2: June @3206c239, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	GetFramePos( &vHeadPos, m_pFrame_Bip01_Head );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	markerPos = GetPos();
 	markerPos.y = vHeadPos.y;
 

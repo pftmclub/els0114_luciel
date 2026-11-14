@@ -265,6 +265,14 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   `LT_CLIFF` 10, `KTDGLineMap.h:61` notes the gap) has a handler `31fd7350` called from `PhysicProcess` `32015b30 @3201a246`: on such a line, unless
   the unit is in a down / air-fall / air-down-landing state (getters `0x114` / `0x118` / `0x494` / `0x490`), `CanDown` drops it through the line.
   First find which June line maps carry type 11, then register the member and port the handler (funcmap row `31fd7350`).
+- **Rotation offset in the Now frame move** (char-luciel DU1b2, 2026-11-14). June `CommonFrameMove` `32063650 @320655e1-32065663` turns both
+  bodies by Now `dirDegree` plus a user vector `+0x9420..+0x9428`, and adds 180 to y when the word `+0x9540` is 1 (ctor `@32042004` writes it);
+  March turns by `dirDegree` alone (`X2GUUser.cpp`, DU1b2's `vRotateDegree`). Every class. Find the writers of `+0x9420` / `+0x9540` first, then
+  port the sum into `vRotateDegree` (funcmap row `32063650 @32065547-320656cf (DU1b2)`).
+- **`+0x8864` drift block in `CommonFrameMove`** (char-luciel DU1b2, 2026-11-14). June `32063650 @32064f47-320652b7`, none in March: while the
+  byte `+0x8864` and the unit byte `+0xdac` are set, the unit drifts from its anim matrix by a per-frame velocity `+0x886c..+0x8874` (decays each
+  frame; seeded once, `+0x8865`, from a `CX2Game` vfunc 0x94 table `+0x44..+0x4c`), `dirDegree.y = +0x8878`, both bodies are moved by it and the
+  normal move / rotation is skipped. Every class. Identify the writer of `+0x8864` first (funcmap row `32063650 @32064f47-320652b7 (DU1b2)`).
 
 ### Stage 3: skill system core (skill tree engine + skill slots)
 

@@ -788,6 +788,42 @@ Files: `X2GUUser.h`, `X2GUUser.cpp`, `X2Unit.h`, `X2Unit.cpp`, `Always.h`. No `_
   every dependency on. Full build skipped: no play-test (DU1d builds and hands off the regression pass).
 - **In game:** nothing to see. Every other class has no `DUO_TYPE` (miss 3 -> `UpdateDuo` returns at the unit-type test) and form 0.
 
+### DU1b2 - Done (2026-11-14)
+
+Opus 5.5 high. Part 3 of DU1's six, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new define, Always.h untouched). Files: `X2GUUser.h`, `X2GUUser.cpp`
+(+151 lines, insert-only). No `_DEBUG`, no log line (nothing runs before CH1). funcmap rows: `grep "(DU1b2)" june2017_re/funcmap.tsv` (14).
+- **SyncData second position:** `vNotSelectPosition` after `position` (June syncData +0x14: Future +0x7e48, Now +0x80e8), zeroed in `Init`
+  (June ctor `320774e0`), copied with the struct (compiler `operator=`; no `sizeof` / `memcpy` user). DU1b3 writes it, DU1c puts it on the wire.
+- **Future (`32061bf0`, decompiled):** `fNowAnimTime` (`@32061de1`) and the `DISABLE_GRAVITY` window (`@32062601`) read the active body;
+  riding moves both bodies to the saddle, otherwise the active body goes to the position and, with the duo on, the not-selected body to
+  `vNotSelectPosition` (`@320628d1-32062a93`); only the active body turns (`@32062aef` / `@32062b75`); the second body's clock (`@32062c47`)
+  and its before-time update (`@32062da8`). The push / pass vectors keep March's `m_pXSkinAnimFuture != NULL` tests (June tests `+0x87d0` too).
+- **Now (`32063650`, capstone; Ghidra times out):** `CommonFrameMove_EffectSet` (`@320647ad`) and the `SUPER_ARMOR_TIME` time (`@32064a91`) read
+  `GetXSkinAnimPtr()`; the moves (`@320652f5-32065532`) as in the Future but through `GetXSkinAnimPtr()` / `GetNotSelectXSkinAnimPtr()`; **both**
+  bodies turn by the same vector (`@32065547-320656cf`: June turns `+0x87d4` and `+0x8e88`, not the active one); the second clock (`@32065712`),
+  its `Bip01_Spine1` `RotateBone` (`@32065792`), its before-time update (`@320661af`); the equip loop picks the equip's body
+  (`@3206584a-320659e4`, stand-in `bEquipForMinorUnit = false` until DU3) and logs June's `StateLog( L"CX2GUUser.CommonFrameMove NULL ==
+  pXSkinAnim !!!" )` and skips when that body is missing; the five bone-frame reads by the active body (feet `@3206722c` / `@32067289`, poison
+  and blaze numbers `@32067900` / `@320691ff`, the marker head `@3206c239`).
+- **Not in `CommonFrameMove`:** the kickoff's `@3206d44b` is in the Now sync pop after it (`CommonFrameMove` returns at `3206cf24`; the pop
+  starts about `3206cfe0`, `ret 8` at `@3206d473`): others' Lu/Ciel units apply the synced active-body word with `SetActiveBody`. With the
+  Future write of that word (`@32063316`) it goes to **DU1c** (kickoff amended).
+- **Left to DU1b3 (kickoff amended with the March lines):** the `+0x8f6d` speed-time reader (`@3206211d`, before March's `m_vecSpeedFactor`
+  loop) and the `+0x8604` twin (`@320623ed` / `@32062419`, after it). The kickoff listed `@32062419` with the moves; it is the twin's.
+- **Routed (scope rule; every class, not Lu/Ciel's subject):** two Stage 2 bullets in `JUNE_PORT_BACKLOG_ORDER.md`: the Now rotation offset
+  (`+0x9420` vector and the `+0x9540` y flip June adds to `dirDegree`, `@320655e1-32065663`), and the `+0x8864` drift block
+  (`@32064f47-320652b7`, moves both bodies itself and skips the normal move / rotation). DU3 (kickoff amended): the equip loop's
+  `+0x8e64` / `+0x8e70` block after the body pick (`@320659e9`).
+- **Live branches only:** `GRAPPLING_TEST`, `RENA_SIEGE_MODE_ANGLE_TEST` and the non-adaptive / non-riding `#else` paths are off in
+  `US_SERVICE` (flag probe) and get no twins; the riding blocks keep `SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS`'s choice.
+- **Hygiene.** flagcheck `DUO_BODY --worktree --files X2GUUser.cpp X2GUUser.h`: 2 PASS (+145, +6), 0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII,
+  RESULT: PASS. `junediverge --check`: RESULT: PASS. enumscan `--check X2GUUser.cpp --reuse`: 0 A/B rows (a fresh `cl /P` of its `X2GuEve.cpp`
+  TU exited 2 with no output; the `/Zs` probes below compile the real files).
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp` and `X2GUChung.cpp`: 0 errors each. Full build skipped: no play-test
+  (DU1d builds and hands off the regression pass).
+- **In game:** nothing to see. Every other class has no second body (`m_pMinorUnitXSkinAnim(Future)` NULL, form 0): each new line is a NULL
+  test or picks the first body.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

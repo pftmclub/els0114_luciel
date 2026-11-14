@@ -51,3 +51,12 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Amended by DU1b2 (2026-11-14)
+
+- `SyncData::vNotSelectPosition` exists (Future +0x7e48): `PhysicProcess` writes it here. `CommonFrameMove(Future)` already move the
+  not-selected body to it.
+- **Where the frame-move readers go in March's `CommonFrameMoveFuture`:** the `+0x8f6d` speed-time reader (`@3206211d`: when set,
+  `vslot 0x260` true and `m_bDuoEnabled`, the speed-factor time is the not-selected body's anim time) sits just before March's
+  `m_vecSpeedFactor` loop (the `SERV_IRUHADEV_JUNE_SPEED_TIME` block); the `+0x8604` twin (`@320623ed`, same `+0x8f6d` test with
+  `vslot 0x260` false, applied to `+0x370..+0x37c`) follows that loop. Both use DU1b2's `fNowAnimTime` (the active body) otherwise.

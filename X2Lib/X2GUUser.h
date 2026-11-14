@@ -863,6 +863,9 @@ public:
 #endif SERV_IRUHADEV_JUNE_HIT_STOP_LISTS
 
 			D3DXVECTOR3				position;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			D3DXVECTOR3				vNotSelectPosition;	// char-luciel DU1b2: June syncData +0x14 ( Future +0x7e48 / Now +0x80e8 ), the not-selected body
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_LINE_INDEX16
 			USHORT					lastTouchLineIndex;		// June 3201f5f0 syncData +0x20: 16-bit ( short )
 #else SERV_IRUHADEV_JUNE_LINE_INDEX16
@@ -930,6 +933,9 @@ public:
 #endif SERV_IRUHADEV_JUNE_HIT_STOP_LISTS
 
 				INIT_VECTOR3( position,	0,0,0 );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				INIT_VECTOR3( vNotSelectPosition, 0,0,0 );	// char-luciel DU1b2: June 320774e0 zeroes it
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				lastTouchLineIndex		= 0;
 
 				bIsRight				= true;
