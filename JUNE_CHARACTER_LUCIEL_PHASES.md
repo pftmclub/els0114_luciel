@@ -1062,6 +1062,8 @@ No `_DEBUG`, no log line (nothing reads a second body before CH1). funcmap rows:
   0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check` (3 files): RESULT: PASS. `enumscan --check X2GUUser.cpp`: the 4 known DU1b3
   rows only. Flag probe: DUO_BODY, DIVERGE_PLAY_SOUND_REVIVE, DIVERGE_SCALE_HEAD / RESTORE_HEAD / UNIT_REFORM / ROTATE_BONE / BONE_NAME_PREFIX,
   USER_LEFT_HAND_SCALE, SERV_NEW_DEFENCE_DUNGEON, MODIFY_GET_BONE_POS, ADD_PLAY_SOUND, DUNGEON_ITEM, ELSWORD_SECOND_CLASS_CHANGE all on.
+  Commit `57f8cf79` (shared files staged as HEAD + this phase's hunks); `--range 57f8cf79^..57f8cf79`, each flag `--with` the other: DUO_BODY
+  2 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS; DIVERGE_PLAY_SOUND_REVIVE 1 PASS, 1 DEFINE, 1 OTHER (`X2GUUser.h`: DUO_BODY's), RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GUChung.cpp`: 0 errors each. Full build skipped: no play-test (DU1d4
   builds and hands off the regression pass).
 - **In game:** nothing to see for March classes except the revive voice (Rena's file name). Form 0 and no second anim leave every other path as before.
