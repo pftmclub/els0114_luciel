@@ -42,3 +42,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   Still `?` (name it by the class pattern from the hint in col 7): `32b20670` `32b3db80`.
 - **States:** the ones whose callbacks are listed above (the state table's col 8 keeps the unsplit `CH2c`).
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7ai L835-841 pass June skip / adjust / level / creator at every ported BFI call.
+
+## Amended by char-luciel CH1k0 (2026-11-14)
+
+- `322a7000` is `CX2GameUnit::AddAllBuffTimeFinalizerDuration( float )` (flag `SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS`): every non-debuff buff's Time
+  finalizers gain the value, and the awakening clock follows for BTI 5 / 822. Call it by name.

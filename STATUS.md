@@ -252,7 +252,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH1g2 | blocked (CH1g): Chiliarch + Royal Guard states part 2 (split by CH0) | Sonnet 5.5 / high, no review of its own (CH1i review covers it) | CH1g | `X2GULuciel.*` | `CH1g2.md` |
 | CH1h | blocked (CH1g2): Dread Lord + Noblesse states, transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1i review covers it) | CH1g2 | `X2GULuciel.*` | `CH1h.md` |
 | CH1i | blocked (CH1h): Demonio script states + riding (CH1j merged in by CH0), transcription under `_CORE` | Sonnet 5.5 / high, Opus review (also covers CH1g, CH1g2, CH1h) | CH1h | `X2GULuciel.*` | `CH1i.md` |
-| CH1k0 | ready (CH1a0 review done): Opus helpers: buff Time-finalizer passes `322a74a0` / `322a7000` / `3227bcb0` | Opus 5.5 / high, Opus review | CH1a0 review | `X2GameUnit.*`, `X2Buff*`, Always.h | `CH1k0.md` |
+| CH1k0 | done 2026-11-14 (`88c14ed5`, flag `_BUFF_TIME_PASS`; 3 passes on `CX2GameUnit`, gates PASS, no build: inert); review ready | Opus 5.5 / high, Opus review | CH1a0 review | `X2GameUnit.*`, Always.h | `CH1k0.md`, `CH1k0-review.md` |
 | CH1k | blocked (CH1i, CH1k0 reviews; CH1a1 review done): overrides band 1 part 1, transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1k2 review covers it) | CH1i review, CH1k0 review, CH1a1 review | `X2GULuciel.*` | `CH1k.md` |
 | CH1k2 | blocked (CH1k): overrides band 1 part 2 (state-id getters), transcription under `_CORE` | Sonnet 5.5 / high, Opus review (also covers CH1k) | CH1k | `X2GULuciel.*` | `CH1k2.md` |
 | CH1l | blocked (CH1k2 review): overrides band 2 part 1 (DU2 getters), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1l3 review covers it) | CH1k2 review | `X2GULuciel.*` | `CH1l.md` |

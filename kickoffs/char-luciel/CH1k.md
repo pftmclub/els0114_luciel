@@ -64,3 +64,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by CH1a4 (2026-11-14)
 
 - `32b162e0` ( LoadTransformedSkinAnim ) fills user `+0x8f74` / `+0x8f8c`: that is `CX2GUUser::m_aTransformedSkin[0 / 1]` ( `STransformedSkin`, CH1a4 ); it starts with `ReleaseTransformedSkinAnim` ( ported ).
+
+## Amended by char-luciel CH1k0 (2026-11-14)
+
+- `322a74a0` is `CX2GameUnit::MultiplyAllDebuffTimeFinalizerDuration( float fRate_ )` (flag `SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS`): it scales the
+  **debuffs'** Time finalizers (CH0's "non-debuff" was backwards). Lu/Ciel's vslot 0x318 `32b0e3f0` calls it by that name.

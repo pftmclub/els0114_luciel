@@ -1821,6 +1821,34 @@ Opus 5.5 high, read-only ( `charport_adis.py` on all six June bodies, Ghidra `de
   No later commit touches the six files.
 - **Build:** none ( no code change ). CH1's CH1a4 dependency is met.
 
+### CH1k0 - Done (2026-11-14)
+
+Opus 5.5 high. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS` ( `Always.h`, no `_DEBUG`, no log tag, inert until CH1k / CH1m call it ),
+with an `#error` guard in `X2GameUnit.cpp` on `SERV_IRUHADEV_JUNE_BUFF_BINDING` ( `SetDurationTime` ), `SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE`
+( `GetDurationTime` ) and `FIX_BUFF_FINALIZE_DURATION_TIME_CONTROL_BUG`. Files: `Always.h`, `X2GameUnit.h` / `.cpp` ( insert-only, 89 lines ). Code commit
+`88c14ed5`. funcmap: `grep "(CH1k0)" june2017_re/funcmap.tsv` ( 3 rows; the CH0 candidate rows stay, superseded ). `JUNE_BUGS.md` 690, 691.
+- **Already ported?** None of the three: Eve CH4b2 holds only the Get / Set siblings ( `3227bfa0` / `3227c110` ); `3227b920` / `3227ba10` are March's
+  `GetBuffFinalizerTempletPtrList` / `ChangeBuffFinalizerTempletPtrList` ( D0c-1: same as March ), `3229fd80` is March's `GetBuffFactor`.
+- **`3227bcb0` -> `CX2GameUnit::AddBuffTimeFinalizerDuration( BUFF_TEMPLET_ID, float )`:** each Time finalizer of the BTI's first buff gets
+  `Set( Get + add )`, then the list goes back even when no buff matched ( as Eve's setter ). Caller `32b3d380` ( CH1m ).
+- **`322a7000` -> `AddAllBuffTimeFinalizerDuration( float )`:** per `GetBuffFactor` entry, skipped when the templet exists and is a debuff
+  ( templet `+0x64` = `IS_DEBUFF`, `jz @322a70b8` ); every Time finalizer `Set( Get + add )`; for BTI 5 / 822 ( `BTI_HYPER_MODE` /
+  `BTI_TRANSCENDENTAL_HYPER_MODE`, both in March's enum ) the gauge ( unit `+0xc04` = `GetGageData()` ) hyper-mode remain time ( protected `+0xe8` )
+  gains the value too when it is > 0 ( `test ah,5 / jp` ), via `SetHyperModeRemainTime` `31e8c9d0`. Callers `32b3db80` / `32b3dea0` ( CH1m, CH2c2 ).
+- **`322a74a0` -> `MultiplyAllDebuffTimeFinalizerDuration( float )`:** returns when rate < 0 ( `fldz / fcomp`, `test ah,0x41`; NaN passes, kept ); per
+  factor, skipped when the templet exists and is **not** a debuff ( `jnz @322a7538` ): **CH0 had this backwards** ( "non-debuff" ); the funcmap and
+  `ch0_unmapped_identified.tsv` rows and the CH1k kickoff are corrected. `Set( Get * rate )`. Caller Lu/Ciel vslot 0x318 `32b0e3f0` ( CH1k ).
+- **Quirks kept:** a factor's edit lands on the first buff of its BTI, so N buffs of one BTI give the first N edits ( row 690; a missing templet passes
+  both filters ); the awakening clock moves once per Time finalizer ( row 691 ).
+- **Kickoffs amended:** CH1k ( `322a74a0` name, debuff ), CH1m ( `3227bcb0`, `322a7000` ), CH2c2 ( `322a7000` ).
+- **Hygiene:** `finish.py --files` ( worktree ) and `--range 88c14ed5^..88c14ed5`, both: `flagcheck JUNE_CHAR_BUFF_TIME_PASS PASS` ( `2 PASS, 0 PASS~,
+  1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` ), `junediverge RESULT: PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`. `JUNE_BUFF_BINDING` /
+  `JUNE_CHAR_EVE_PASSIVE` SKIPPED: targets of the `#error` guard, not this phase's. stateends / skillicons / luabind: n/a.
+- **Compile:** `/Zs` probe of `X2GameUnit.cpp` ( census `cl_cmd`, no PCH ): 0 errors; a `cl /P` of it holds all three definitions ( flag on, guard
+  passes ). Full build skipped: no play-test.
+- **Peer:** char-luciel CH1l30 ran at the same time in `X2Game.*` / `X2DamageEffect.h` / `funcmap.tsv`; this phase committed only its own hunks.
+- **How to see it in game:** nothing yet ( inert ); CH1k / CH1m's callers reach it when `_LIVE` lands.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

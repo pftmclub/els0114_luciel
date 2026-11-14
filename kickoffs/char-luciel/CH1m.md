@@ -50,3 +50,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - `CX2GULuciel::SetSkillCutInSetIndexByUnitClass()` is InitState's `+0x8ac8` switch ( `@32b43d52`-`@32b43d9f` ): call it where June's switch sits.
 - `LUCIEL_STATE_ID` ( `X2GULuciel.h`, under `SERV_IRUHADEV_JUNE_ENUM_NAMES` ) holds 531 June names with June's ids. Re-registered ids have no name of their own and stay numbers with a one-line comment: 124 / 125 ( the `LSI_LU_AMUSEMENT_ITEM_PHOENIX_RUN` table again; June `USI_AMUSEMENT_ITEM_PHOENIX_JUMP_UP` / `_DOWN` ), 572 / 573 ( Ciel's copy ), 338 ( `LSI_LU_JUMP_COMBO_Z` again ), 263 ( `LSI_CIEL_THROW_ITEM` again, skill setter ), 406-413 ( `LSI_SA_LCN_SHADOW_BOLT_CONTROL` x8 ), 444 / 445 ( the Altar of Evil XXX READY / END again ), 499 ( `..._SHREWD_CUTTER_END` again ); 327 is registered twice ( `ZXXZ_END` then `XXXZ_END`, the later wins in June: keep the order ); the enum names `LSI_LCG_F_DASH_COMBO_XXXZ_END` = 333.
 - The five `USI_EVENT_SNIPER_*` / `USI_EVENT_PROTON_BOMB_*` rows register June's USI ids ( 111-116 ), not March's `USI_` values: name them by June's value.
+
+## Amended by char-luciel CH1k0 (2026-11-14)
+
+- `3227bcb0` is `CX2GameUnit::AddBuffTimeFinalizerDuration( BUFF_TEMPLET_ID, float )` (caller `32b3d380`); `322a7000` is
+  `CX2GameUnit::AddAllBuffTimeFinalizerDuration( float )` (callers `32b3db80` / `32b3dea0`). Both under `SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS`: call them by name.
