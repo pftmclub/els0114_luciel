@@ -864,6 +864,43 @@ line (nothing runs before CH1). funcmap rows: `grep "(DU1b3)" june2017_re/funcma
 - **In game:** nothing to see. Other classes have no second anim and none of the keys: the second-body lines move only a local and the unread
   `+0x8f60`; the first body runs March's code through the helpers; `APPLY_ANIM_MOVE_MULTIPLY` reads 1.0.
 
+### DU1b4 - Done (2026-11-14)
+
+Opus 5.5 high. Part 5 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (Always.h: a fourth `#error` guard, `SERV_IRUHADEV_JUNE_SPEED_TIME`), plus
+the new divergence flag `SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE`. Files: `X2GUUser.cpp` (+168), `X2GUUser.h` (+3), `Always.h` (+14).
+No `_DEBUG`, no log line (nothing runs before CH1). funcmap rows: `grep "(DU1b4)" june2017_re/funcmap.tsv` (10).
+- **Speed keys by active body (`320506f0 @3205283a`).** June has two parse branches on `+0x8e90`: the active body takes `SPEED_X/Y` and
+  `PASSIVE_SPEED_X/Y`, the other body the `MINOR_UNIT_` keys (Ciel active: `SPEED_X` -> `+0x370`, `MINOR_UNIT_SPEED_X` -> `+0x304`). That is why
+  the kickoff saw two sites per key. Ported with `activeBodyPhysicParam` / `otherBodyPhysicParam` (speeds: no store on a miss; passives: -1).
+- **SPEED_TIME lists (`31fe3a60`).** The same swap: `SPEED_TIME(_ULTIMATE)` fills the active body's list, `MINOR_UNIT_SPEED_TIME(_ULTIMATE)` the
+  other's (`m_vecMinorUnitSpeedFactor`, June `+0x8604`); each `_ULTIMATE` falls back to its plain list on its own. C3l's gate is reused.
+- **APPLY_MOVEMENT_SPEED (`@3205418e-320542b9`).** The minor PhysicParam gets the bool every state start; when set, its `nowSpeed.x`, its
+  `passiveSpeed.x` (test `|x - (-1.0)| > FLT_EPSILON`, June's own, not `IsSamef`) and its list's `vSpeed.x` scale by the main rate.
+- **`USE_NOT_SELECT_UNIT_ANIM_TIME_IN_SPEED`** (`+0x8f6d`, Future only, after `USE_PHYSICPROCESS_NOT_SELECT_UNIT`, miss 0).
+- **Frame move (`32061bf0`).** Main pass: with the key, while Ciel acts and the duo is on, the time is the not-selected (Lu's) anim time
+  (`@3206211c`). New minor pass (`@320623c9-320625f5`): no anim test; with the key, while **Lu** acts, Ciel's anim time; flags 1 / 2 / 3 on the
+  minor PhysicParam, no 11-13; same 5th-column turn. Minor passive apply after March's (`@320631b0-320631e2`).
+- **June bug kept (JUNE_BUGS 662):** the main pass's time override is not undone, so with Ciel active the minor pass runs Ciel's list on Lu's
+  anim time (`LSI_BOUNDING_TARGET_CIEL_COMMAND_XXX` has the key and both lists).
+- **Divergence found and replaced in this commit:** June's `CommonStateEndFuture` (`31fdd8e0`) runs, before March's body, the SPEED_TIME entries
+  with no anim time (3rd column < 0, flag 1 / 2 only, 5th-column turn) and erases them (main list when `+0x87d0`, then the minor list), and
+  moves the active Future anim (and, in a duo, the not-selected one) to the Future position. March has none of it. Ported as a prefix under
+  `SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE` (helper `ApplyUntimedSpeedTime` in `_CONST_GUUSER_DU1B4_`), the minor parts nested under
+  `DUO_BODY`; `LINKED_LINEMAP_JUMP_USER_TEST` is off (probe), so the rest is March's live body. `june_march_divergent.tsv` row added. **This one
+  reaches every class** (any untimed SPEED_TIME entry); DU1d's regression play-test covers it.
+- **`SUPER_ARMOR_CUSTOM_COLOR`** (`32057b80 @3205958e`): every `CommonStateStart`, before the event-flag zero, into `m_coSuperArmorCustomColor`
+  (June `+0x8a2c`), miss red (1, 0, 0, 1). The reader is CH3c's (kickoff amended).
+- **Routed (scope rule):** `RETAIN_CAMERA_STATE` / `FORCE_DYNAMIC_CAMERA_INDEX` are not Lu/Ciel keys: every June class script has them (WIN
+  states, `WAIT_STATE_CHANGE`), and `FORCE`'s reader (`+0x801c`) is unmapped. Stage 2 bullet; funcmap row `routed`.
+- **Kickoffs amended:** CH3c (the color's reader), DU1d (minor passive resets beside March's `passiveSpeed = (-1, -1)` sites), DU1-review (the
+  divergence flag).
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --with JUNE_DIVERGE_COMMON_STATE_END_FUTURE --worktree --files` (3 files): 2 PASS (+168, +3), 1 DEFINE,
+  0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check`: RESULT: PASS. `enumscan --check X2GUUser.cpp`: the 4 known
+  DU1b3 rows only (`GetUserUnitRelativePos` codes). Flag probe (`cl /P`): both flags and `SPEED_TIME` on, no `#error`.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp` and `X2GUChung.cpp`: 0 errors each. Full build skipped: no play-test.
+- **In game:** nothing new for Lu/Ciel yet. Other classes: form 0, none of the duo keys, the minor list stays empty; the only live change is
+  the untimed SPEED_TIME entries applying at state end and the Future anim placed at the Future position there (June's behaviour).
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

@@ -41,3 +41,9 @@ and commit.
   `PhysicProcess_PushByUnits` = June `32010060` and `PhysicProcess_LandOnLine` = June `32010440`, the not-selected offset); DU1b4 = the
   speed keys, the frame-move speed readers and the camera / armor keys. Check that both helpers are March's inline blocks verbatim (live
   branches) on the main body, and the two JUNE_BUGS rows 659 / 660 against `@3201917c` / `@3201a009`.
+
+## Amended by DU1b4 (2026-11-14)
+
+- DU1b4 added a second flag, `SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE` (June's `CommonStateEndFuture` prefix, every class; its
+  `june_march_divergent.tsv` row). Review it with the DU1 series: `flagcheck JUNE_CHAR_DUO_BODY --with JUNE_DIVERGE_COMMON_STATE_END_FUTURE`
+  over the range, and read `31fdd8e0` against the prefix. The camera keys DU1b4 routed to Stage 2 are not this review's.

@@ -277,6 +277,10 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   and `+0x40a4` was clear, June re-runs `CanDown` on the stored position and sets `+0x40a4` / the clock `+0x40a8` only if that fails too (March's
   `RESET_INVALID_UNIT_POSITION_TEST` block sets `m_bMisplaced` at once). June's landing helper `32010440 @32011081` also stores a fall record
   `+0x40ac..+0x40c4` (line index, position, land position) on the misplaced branch; find its reader first. Every class (funcmap rows (DU1b3)).
+- **State-start camera keys `RETAIN_CAMERA_STATE` / `FORCE_DYNAMIC_CAMERA_INDEX`** (char-luciel DU1b4, 2026-11-14). June `32057b80`: `RETAIN_CAMERA_STATE`
+  (`@3205b934`, a local bool, miss 0) skips `NomalDirectCamera` in March's focus-unit `bResetCamera` block; `FORCE_DYNAMIC_CAMERA_INDEX` (`@3205c0e8`,
+  int, miss 0) goes to the state param `+0x801c` between `normalCamera` and `hitCamera`. Every June class script uses both (WIN states `-1`,
+  `*_WAIT_STATE_CHANGE` `TRUE`; Rose 19). Find the `+0x801c` reader first, then port both with it (funcmap row `32057b80 @3205b8e1 (DU1b4)`).
 
 ### Stage 3: skill system core (skill tree engine + skill slots)
 

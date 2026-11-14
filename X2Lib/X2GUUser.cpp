@@ -1072,6 +1072,8 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_bUseNotSelectMotionBeforePos		= false;
 	INIT_VECTOR3( m_vNotSelectMotionBeforePos, 0.f, 0.f, 0.f );
 	m_bUsePhysicProcessNotSelectUnit	= false;
+	m_bUseNotSelectUnitAnimTimeInSpeed	= false;	// char-luciel DU1b4: June's ctor leaves +0x8f6d to the first state start ( miss 0 )
+	m_coSuperArmorCustomColor			= D3DXCOLOR( 1.f, 0.f, 0.f, 1.f );	// char-luciel DU1b4: June's ctor leaves +0x8a2c to the first state start ( miss red )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
@@ -16821,10 +16823,24 @@ void CX2GUUser::CommonStateStartFuture()
 
 
 	D3DXVECTOR3 speed;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b4: June 320506f0 @3205283a, the active body takes SPEED_* / PASSIVE_SPEED_*, the other body the MINOR_UNIT_ keys
+	PhysicParam& activeBodyPhysicParam	= ( true == m_bMinorUnitActive ) ? m_MinorUnitPhysicParam : m_PhysicParam;
+	PhysicParam& otherBodyPhysicParam	= ( true == m_bMinorUnitActive ) ? m_PhysicParam : m_MinorUnitPhysicParam;
+	if( m_LuaManager.GetValue( "SPEED_X", speed.x ) == true )
+		activeBodyPhysicParam.nowSpeed.x = speed.x;
+	if( m_LuaManager.GetValue( "SPEED_Y", speed.y ) == true )
+		activeBodyPhysicParam.nowSpeed.y = speed.y;
+	if( m_LuaManager.GetValue( "MINOR_UNIT_SPEED_X", speed.x ) == true )
+		otherBodyPhysicParam.nowSpeed.x = speed.x;
+	if( m_LuaManager.GetValue( "MINOR_UNIT_SPEED_Y", speed.y ) == true )
+		otherBodyPhysicParam.nowSpeed.y = speed.y;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_LuaManager.GetValue( "SPEED_X", speed.x ) == true )
 		m_PhysicParam.nowSpeed.x = speed.x;
 	if( m_LuaManager.GetValue( "SPEED_Y", speed.y ) == true )
 		m_PhysicParam.nowSpeed.y = speed.y;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	
 #ifdef SERV_IRUHADEV_JUNE_SPEED_TIME
 	/// June 31fe3a60 ( called @32053fd4, C3l ). Main list +0x85f4 ( +0x8604 while the second body +0x8e90 is active: Lu/Ciel, checklist 7o ).
@@ -16840,8 +16856,25 @@ void CX2GUUser::CommonStateStartFuture()
 #else SERV_IRUHADEV_JUNE_SKILL_TEMPLET
 	const bool bSpeedTimeUltimate = false;	/// = templet && templet->m_DeleteSkillIDByUpgrade != 0 ( field absent in March )
 #endif SERV_IRUHADEV_JUNE_SKILL_TEMPLET
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b4: June 31fe3a60, SPEED_TIME fills the active body's list and MINOR_UNIT_SPEED_TIME the other's ( bSwap = +0x8e90 ), each _ULTIMATE falls back alone
+	std::vector<TIME_SPEED>& vecActiveBodySpeedTime	= ( true == m_bMinorUnitActive ) ? m_vecMinorUnitSpeedFactor : m_vecSpeedFactor;
+	std::vector<TIME_SPEED>& vecOtherBodySpeedTime	= ( true == m_bMinorUnitActive ) ? m_vecSpeedFactor : m_vecMinorUnitSpeedFactor;
+	bool bSpeedTimeUltimateRead				= false;
+	bool bMinorUnitSpeedTimeUltimateRead	= false;
+	if ( true == bSpeedTimeUltimate )
+	{
+		bSpeedTimeUltimateRead			= ParseSpeedTimeList( m_LuaManager, "SPEED_TIME_ULTIMATE", vecActiveBodySpeedTime );
+		bMinorUnitSpeedTimeUltimateRead	= ParseSpeedTimeList( m_LuaManager, "MINOR_UNIT_SPEED_TIME_ULTIMATE", vecOtherBodySpeedTime );
+	}
+	if ( false == bSpeedTimeUltimateRead )
+		ParseSpeedTimeList( m_LuaManager, "SPEED_TIME", vecActiveBodySpeedTime );
+	if ( false == bMinorUnitSpeedTimeUltimateRead )
+		ParseSpeedTimeList( m_LuaManager, "MINOR_UNIT_SPEED_TIME", vecOtherBodySpeedTime );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( false == bSpeedTimeUltimate || false == ParseSpeedTimeList( m_LuaManager, "SPEED_TIME_ULTIMATE", m_vecSpeedFactor ) )
 		ParseSpeedTimeList( m_LuaManager, "SPEED_TIME", m_vecSpeedFactor );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else SERV_IRUHADEV_JUNE_SPEED_TIME
 	index = 0;
 	m_vecSpeedFactor.clear();
@@ -16861,8 +16894,15 @@ void CX2GUUser::CommonStateStartFuture()
 #endif SERV_IRUHADEV_JUNE_SPEED_TIME
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	LUA_GET_VALUE( m_LuaManager, "PASSIVE_SPEED_X", activeBodyPhysicParam.passiveSpeed.x, -1.0f );	// char-luciel DU1b4: June @32052d2e-320533f9 / @320538f7-32053fc7
+	LUA_GET_VALUE( m_LuaManager, "PASSIVE_SPEED_Y", activeBodyPhysicParam.passiveSpeed.y, -1.0f );
+	LUA_GET_VALUE( m_LuaManager, "MINOR_UNIT_PASSIVE_SPEED_X", otherBodyPhysicParam.passiveSpeed.x, -1.0f );
+	LUA_GET_VALUE( m_LuaManager, "MINOR_UNIT_PASSIVE_SPEED_Y", otherBodyPhysicParam.passiveSpeed.y, -1.0f );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	LUA_GET_VALUE( m_LuaManager, "PASSIVE_SPEED_X", m_PhysicParam.passiveSpeed.x, -1.0f );
 	LUA_GET_VALUE( m_LuaManager, "PASSIVE_SPEED_Y", m_PhysicParam.passiveSpeed.y, -1.0f );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_APPLY_MOVEMENT_SPEED
 	/// June CommonStateStartFuture 320506f0 @32054181-320542b9 ( C3h ): after SPEED_X/Y, PASSIVE_SPEED_X/Y and the SPEED_TIME lists
 	/// ( 31fe3a60 ), in every state start ( miss = false ). When set, rate = GetWalkSpeed() ( 31e4f990 ) / fWalkSpeed, stored as a float,
@@ -16870,6 +16910,9 @@ void CX2GUUser::CommonStateStartFuture()
 	/// every SPEED_TIME entry whatever its flag. June then copies the byte to the minor unit ( +0x36c ) and scales its nowSpeed.x,
 	/// passiveSpeed.x ( |x - (-1)| > FLT_EPSILON ) and MINOR_UNIT_SPEED_TIME list ( +0x8604 ): Lu/Ciel's, checklist 7o, not ported.
 	LUA_GET_VALUE( m_LuaManager, "APPLY_MOVEMENT_SPEED", m_PhysicParam.bApplyMovementSpeed, false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	m_MinorUnitPhysicParam.bApplyMovementSpeed = m_PhysicParam.bApplyMovementSpeed;	// char-luciel DU1b4: June @3205418e, set or not
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( true == m_PhysicParam.bApplyMovementSpeed )
 	{
 		const float fMoveRate = GetWalkSpeed() / m_PhysicParam.fWalkSpeed;
@@ -16878,6 +16921,14 @@ void CX2GUUser::CommonStateStartFuture()
 			m_PhysicParam.passiveSpeed.x *= fMoveRate;
 		for ( UINT ui = 0; ui < m_vecSpeedFactor.size(); ++ui )
 			m_vecSpeedFactor[ui].vSpeed.x *= fMoveRate;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1b4: June @32054244-320542b9, the minor unit by the same rate; its passive test is |x - (-1)| > FLT_EPSILON
+		m_MinorUnitPhysicParam.nowSpeed.x *= fMoveRate;
+		if ( FLT_EPSILON < static_cast<float>( fabs( m_MinorUnitPhysicParam.passiveSpeed.x - (-1.0) ) ) )
+			m_MinorUnitPhysicParam.passiveSpeed.x *= fMoveRate;
+		for ( UINT uiMinorUnit = 0; uiMinorUnit < m_vecMinorUnitSpeedFactor.size(); ++uiMinorUnit )
+			m_vecMinorUnitSpeedFactor[uiMinorUnit].vSpeed.x *= fMoveRate;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		static int s_iStateStartFutureLogLines = 0;
 		if ( s_iStateStartFutureLogLines < 32 )
@@ -17129,6 +17180,7 @@ void CX2GUUser::CommonStateStartFuture()
 		m_vNotSelectMotionBeforePos = m_FrameDataFuture.syncData.vNotSelectPosition;
 	LUA_GET_VALUE( m_LuaManager, "APPLY_ANIM_MOVE_MULTIPLY", m_fApplyAnimMoveMultiply, 1.f );
 	LUA_GET_VALUE( m_LuaManager, "USE_PHYSICPROCESS_NOT_SELECT_UNIT", m_bUsePhysicProcessNotSelectUnit, false );
+	LUA_GET_VALUE( m_LuaManager, "USE_NOT_SELECT_UNIT_ANIM_TIME_IN_SPEED", m_bUseNotSelectUnitAnimTimeInSpeed, false );	// char-luciel DU1b4: June @3205790b, Future only
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef LINKED_LINEMAP_JUMP_USER_TEST
@@ -17454,6 +17506,11 @@ void CX2GUUser::CommonStateStart()
 		}
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b4: June 32057b80 @3205958e-320595f0, every state start; a miss is red
+	if ( false == m_LuaManager.GetUserDefinedTypeValue( "SUPER_ARMOR_CUSTOM_COLOR", m_coSuperArmorCustomColor ) )
+		m_coSuperArmorCustomColor = D3DXCOLOR( 1.f, 0.f, 0.f, 1.f );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	ZeroMemory( m_FrameDataNow.stateParam.bEventFlagList, sizeof(bool) * EVENT_FLAG_LIST_NUM );
 
 	m_FrameDataNow.unitCondition.bHit				= false;
@@ -18727,6 +18784,11 @@ void CX2GUUser::CommonFrameMoveFuture()
 	// 스크립트 상에서 특정 시간에 특정스피드를 지정해 줄수 있도록한다.
 	if( m_pXSkinAnimFuture != NULL && m_vecSpeedFactor.size() > 0)
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1b4: June @3206211c-32062172, while Ciel acts the first body's list runs on that body's own anim time
+		if ( true == m_bUseNotSelectUnitAnimTimeInSpeed && true == IsMinorUnitActive() && true == m_bDuoEnabled && NULL != GetNotSelectXSkinAnimFuture() )
+			fNowAnimTime = GetNotSelectXSkinAnimFuture()->GetNowAnimationTime();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		for(UINT i=0; i<m_vecSpeedFactor.size(); ++i)
 		{
 			TIME_SPEED timeSpeed = m_vecSpeedFactor[i];
@@ -18808,6 +18870,48 @@ void CX2GUUser::CommonFrameMoveFuture()
 			}
 		}
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1b4: June @320623c9-320625f5, the minor unit's list: no anim test, flags 1-3, the time above carries over ( JUNE_BUGS 662 )
+	if ( false == m_vecMinorUnitSpeedFactor.empty() )
+	{
+		if ( true == m_bUseNotSelectUnitAnimTimeInSpeed && false == IsMinorUnitActive() && true == m_bDuoEnabled && NULL != GetNotSelectXSkinAnimFuture() )
+			fNowAnimTime = GetNotSelectXSkinAnimFuture()->GetNowAnimationTime();
+		for ( UINT i = 0; i < m_vecMinorUnitSpeedFactor.size(); ++i )
+		{
+			TIME_SPEED timeSpeed = m_vecMinorUnitSpeedFactor[i];
+			if ( timeSpeed.iFlag > 0 && timeSpeed.vSpeed.z >= 0.f && timeSpeed.vSpeed.z <= fNowAnimTime )
+			{
+				if ( true == timeSpeed.bRotateByDirZ )
+				{
+					const float fRad = static_cast<float>( m_FrameDataFuture.unitCondition.dirDegree.z * static_cast<double>( D3DX_PI ) / 180.0 );
+					const float fCos = static_cast<float>( cos( static_cast<double>( fRad ) ) );
+					timeSpeed.vSpeed.x = fCos * timeSpeed.vSpeed.x;
+					const float fSin = static_cast<float>( sin( static_cast<double>( fRad ) ) );
+					timeSpeed.vSpeed.y = fSin * timeSpeed.vSpeed.x;
+				}
+				switch ( timeSpeed.iFlag )
+				{
+				case 1:
+					m_MinorUnitPhysicParam.nowSpeed.x += timeSpeed.vSpeed.x;
+					m_MinorUnitPhysicParam.nowSpeed.y += timeSpeed.vSpeed.y;
+					break;
+				case 2:
+					m_MinorUnitPhysicParam.nowSpeed.x = timeSpeed.vSpeed.x;
+					m_MinorUnitPhysicParam.nowSpeed.y = timeSpeed.vSpeed.y;
+					break;
+				case 3:
+					m_MinorUnitPhysicParam.passiveSpeed.x = timeSpeed.vSpeed.x;
+					m_MinorUnitPhysicParam.passiveSpeed.y = timeSpeed.vSpeed.y;
+					break;
+				default:
+					break;
+				}
+				m_vecMinorUnitSpeedFactor.erase( m_vecMinorUnitSpeedFactor.begin() + i );
+				--i;
+			}
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifndef X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	map<float,bool>::iterator iter;
@@ -19121,6 +19225,13 @@ void CX2GUUser::CommonFrameMoveFuture()
 			m_PhysicParam.nowSpeed.x = m_PhysicParam.passiveSpeed.x;
 		if( m_PhysicParam.passiveSpeed.y != -1.0f )
 			m_PhysicParam.nowSpeed.y = m_PhysicParam.passiveSpeed.y;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1b4: June @320631b0-320631e2, the minor unit's passive speed the same way
+		if( m_MinorUnitPhysicParam.passiveSpeed.x != -1.0f )
+			m_MinorUnitPhysicParam.nowSpeed.x = m_MinorUnitPhysicParam.passiveSpeed.x;
+		if( m_MinorUnitPhysicParam.passiveSpeed.y != -1.0f )
+			m_MinorUnitPhysicParam.nowSpeed.y = m_MinorUnitPhysicParam.passiveSpeed.y;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		if( NULL != m_pComboManager )
 		{
@@ -25595,8 +25706,65 @@ void CX2GUUser::CommonEventProcess()
 #endif // RIDING_SYSTEM
 }
 
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
+namespace _CONST_GUUSER_DU1B4_	// char-luciel DU1b4
+{
+	// June 31fdd8e0 loop: an entry with flag > 0 and no anim time ( z < 0 ) applies at state end and is erased; flags 1 / 2 only
+	void ApplyUntimedSpeedTime( std::vector<CX2GameUnit::TIME_SPEED>& vecSpeedTime_, CX2GameUnit::PhysicParam& physicParam_, const float fDirDegreeZ_ )
+	{
+		for ( UINT i = 0; i < vecSpeedTime_.size(); ++i )
+		{
+			CX2GameUnit::TIME_SPEED timeSpeed = vecSpeedTime_[i];
+			if ( timeSpeed.iFlag > 0 && timeSpeed.vSpeed.z < 0.f )
+			{
+				if ( true == timeSpeed.bRotateByDirZ )
+				{
+					const float fRad = static_cast<float>( fDirDegreeZ_ * static_cast<double>( D3DX_PI ) / 180.0 );
+					const float fCos = static_cast<float>( cos( static_cast<double>( fRad ) ) );
+					timeSpeed.vSpeed.x = fCos * timeSpeed.vSpeed.x;
+					const float fSin = static_cast<float>( sin( static_cast<double>( fRad ) ) );
+					timeSpeed.vSpeed.y = fSin * timeSpeed.vSpeed.x;
+				}
+				switch ( timeSpeed.iFlag )
+				{
+				case 1:
+					physicParam_.nowSpeed.x += timeSpeed.vSpeed.x;
+					physicParam_.nowSpeed.y += timeSpeed.vSpeed.y;
+					break;
+				case 2:
+					physicParam_.nowSpeed.x = timeSpeed.vSpeed.x;
+					physicParam_.nowSpeed.y = timeSpeed.vSpeed.y;
+					break;
+				default:
+					break;
+				}
+				vecSpeedTime_.erase( vecSpeedTime_.begin() + i );
+				--i;
+			}
+		}
+	}
+}
+using namespace _CONST_GUUSER_DU1B4_;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
 void CX2GUUser::CommonStateEndFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
+	// char-luciel DU1b4: June 31fdd8e0 @31fdd8f3-31fddcae, then March's body ( LINKED_LINEMAP_JUMP_USER_TEST is off in both )
+	if ( NULL != m_pXSkinAnimFuture )
+		ApplyUntimedSpeedTime( m_vecSpeedFactor, m_PhysicParam, m_FrameDataFuture.unitCondition.dirDegree.z );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	ApplyUntimedSpeedTime( m_vecMinorUnitSpeedFactor, m_MinorUnitPhysicParam, m_FrameDataFuture.unitCondition.dirDegree.z );
+	CKTDGXSkinAnim* pStateEndXSkinAnimFuture = GetXSkinAnimFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	CKTDGXSkinAnim* pStateEndXSkinAnimFuture = m_pXSkinAnimFuture;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if ( NULL != pStateEndXSkinAnimFuture )
+		pStateEndXSkinAnimFuture->GetMatrix().Move( m_FrameDataFuture.syncData.position );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if ( NULL != GetNotSelectXSkinAnimFuture() )
+		GetNotSelectXSkinAnimFuture()->GetMatrix().Move( m_FrameDataFuture.syncData.position );	// June @31fddc44: the first body's position too
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#endif SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
 	LUA_GET_VALUE( m_LuaManager, "TRANSITION", m_FrameDataFuture.unitCondition.bTransitionChange, true );
 
 	bool bFlipDir = false;

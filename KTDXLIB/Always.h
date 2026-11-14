@@ -13262,6 +13262,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !( defined( SERV_IRUHADEV_JUNE_NOT_SELECT_UNIT_OFFSET ) && defined( SERV_IRUHADEV_JUNE_APPLY_MOVEMENT_SPEED ) && defined( SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD ) )
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs NOT_SELECT_UNIT_OFFSET ( the offset keys ), APPLY_MOVEMENT_SPEED and LINEMAP_LAND_MONSTER_ROAD ( PhysicProcess ), char-luciel DU1b3
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !defined( SERV_IRUHADEV_JUNE_SPEED_TIME )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs SERV_IRUHADEV_JUNE_SPEED_TIME ( the MINOR_UNIT_SPEED_TIME lists ), char-luciel DU1b4
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-14
@@ -13280,4 +13283,15 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ARA_TRANSCEND ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE and SERV_IRUHADEV_JUNE_CHAR_ARA_TRANSCEND ( the allow-list chain and the picture rows it extends )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel DU1b4 - CX2GUUser::CommonStateEndFuture as June's ( 31fdd8e0 ): before March's body, SPEED_TIME entries with no
+//              anim time ( 3rd column < 0, flags 1 / 2 ) apply at state end and are erased, and the Future anim is moved to the Future
+//              position ( the minor unit's list and Ciel's anim under SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ). Every class. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
+#if defined( SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE ) && !defined( SERV_IRUHADEV_JUNE_SPEED_TIME )
+#error SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE needs SERV_IRUHADEV_JUNE_SPEED_TIME ( TIME_SPEED::bRotateByDirZ )
+#endif SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
 //////////////////////////////////////////////////////////////////////////

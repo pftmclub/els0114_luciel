@@ -55,3 +55,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `EnableAfterImage( mode )` / `DisableAfterImage( bForce, mode )` take (`32275a30` / `322720f0`: 0 first, 1 second, 3 = unit vslot 152 =
   the active body). `SetActiveBody` (DU1b) tests and toggles only `m_pAfterImage` with a stand-in comment: widen it here. `MINOR_UNIT_AFTER_IMAGE`
   (`@3205b69b`, table `+0x852c`) comes with it.
+
+## Amended by DU1b4 (2026-11-14)
+
+- The minor PhysicParam's speeds are now fed (SPEED / PASSIVE_SPEED keys by active body, `m_vecMinorUnitSpeedFactor`, the frame-move minor pass).
+  Among the base-function readers, check June's twins of March's `m_PhysicParam.passiveSpeed = D3DXVECTOR2( -1, -1 )` sites in `X2GUUser.cpp`
+  (`grep -n "passiveSpeed\s*= D3DXVECTOR2\|INIT_VECTOR2( m_PhysicParam.passiveSpeed" X2Lib/X2GUUser.cpp`) for a `+0x378 / +0x37c` reset.
+- The regression play-test now also covers `SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE` (every class: untimed SPEED_TIME entries
+  apply at state end): walk, dash, jump and a few skills on one March class, then "check logs" for nothing new.

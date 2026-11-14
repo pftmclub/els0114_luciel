@@ -4761,6 +4761,9 @@ public:
 		bool											m_bUseNotSelectMotionBeforePos;	/// char-luciel DU1b3: June +0x8f5d, USE_NOT_SELECT_MOTION_BEFORE_POS
 		D3DXVECTOR3										m_vNotSelectMotionBeforePos;	/// char-luciel DU1b3: June +0x8f60, the second body's position kept from the state start
 		bool											m_bUsePhysicProcessNotSelectUnit;	/// char-luciel DU1b3: June +0x8f6c, USE_PHYSICPROCESS_NOT_SELECT_UNIT
+		std::vector<TIME_SPEED>							m_vecMinorUnitSpeedFactor;		/// char-luciel DU1b4: June +0x8604, the minor unit's SPEED_TIME list
+		bool											m_bUseNotSelectUnitAnimTimeInSpeed;	/// char-luciel DU1b4: June +0x8f6d, USE_NOT_SELECT_UNIT_ANIM_TIME_IN_SPEED
+		D3DXCOLOR										m_coSuperArmorCustomColor;		/// char-luciel DU1b4: June +0x8a2c, SUPER_ARMOR_CUSTOM_COLOR
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		
 

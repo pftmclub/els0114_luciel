@@ -44,3 +44,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - Tree rows: 16 (part 3, col 10).
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §1 L58 numerical-only DAMAGE_DATA table LSI_A_LDN_F_RAPID_IMPACT (Luciel_Demonio.lua L4; §1 L58 numerical-only DAMAGE_DATA table LSI_A_LDN_F_PUNISHER (Luciel_Demonio.lua L6651); §1 L37-105 blocks that index past their skill data need a JUNE_BUGS row; §2 L116 APPLIED_SKILL_ID (parsed since 8c); §2 L117 NUMERICAL_DATA_INDEX; §4 L178-181 June-only SKILL_ID members fail silently (52 SI_ 10000-10699 + 143 RNSI_ 30001-3; §5 L184-188 key SUPER_ARMOR_CUSTOM_COLOR x49 (Demonio); §7i L436-437 class code multiplies m_fNowStatePowerRate, never the entry; §7w L656-662 CUSTOM_RENDER_STATE class users: Luciel_Demonio (CRS_INVISIBLE); §7ae L713-720 June skill-tree ids with no March class state (reform ids 21000+, RNSI_*); §7ae L729-733 June skill types 14-16 / 17 / 18 named in the class switch; ResetLeftSkillCoolTi.
 - Prefix `LDN` = 129. `CUSTOM_RENDER_STATE` (3 Demonio states) is this phase's (`ch0_keys.tsv`; parser `31fce500`, called from `32057b80` @32060740). Split with CH3c2.
+
+## Amended by DU1b4 (2026-11-14)
+
+- `SUPER_ARMOR_CUSTOM_COLOR` (49 Demonio states) is already parsed: `CX2GUUser::CommonStateStart` reads it every state start into
+  `CX2GUUser::m_coSuperArmorCustomColor` (June `+0x8a2c`, miss red 1, 0, 0, 1; `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY`). This phase ports its reader:
+  find June's readers of `+0x8a2c` first (likely the super-armor outline render), then add the accessor it needs.
