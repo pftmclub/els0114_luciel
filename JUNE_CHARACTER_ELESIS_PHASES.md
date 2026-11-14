@@ -2272,6 +2272,13 @@ pre-existing (`X2GUUser.cpp:27704-27710` NUI_BEE*, char-luciel `04d2cacf`), 0 in
 **In game:** `[JUNE_CHAR] ELESIS PASSIVE advanced knight mastery guard ( roll ... <= rate 0.150, damage x ... )` and `... guard damage A -> B` (each at most once a second);
 CH4b's carried `infernal blade defence rate` on unit 30.
 
+**Play-test PASS (user, 2026-11-14; run 11:02-11:04 on md5 `30b80d10`; 0 EXCEPTION; known `E_DISABLE_HB_CHECK_REQ` UNHANDLED x3; State.log clean).** `init` unit 29:
+knight mastery `damaged 0.850 rate 0.150`. `advanced knight mastery guard` x4 ( rolls 0.008 / 0.058 / 0.060 / 0.061 <= 0.150, damage x 0.850 ), each with its `guard damage`
+line: 4995.8 -> 4246.4, 9991.5 -> 8492.8, 10044.3 -> 8537.7 x2 ( = x 0.85 ); the user moved after every guard. Unit 30 ( rate -1.000, no guard ): `infernal blade defence
+rate 0.560 ( blaze resist 220.0 )` x3 = 1 - 0.002 x 220, closing CH4b's carried check ( base 28014 slotted; JUNE_BUGS 667 stands for the upgrade ). ErrorLog: `OpenXET`
+misses for `SA_SPK_INFERNAL_BLADE_WEAPON_DUMMY.XET` / `SPK_INFERNALBLADE_WEAPONM01.XET`: in no June kom and no March kom ( the engine's optional texture-change probe
+beside the mesh ), not this phase's. User owes nothing more for CH4b2.
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended
