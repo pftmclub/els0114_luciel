@@ -1213,7 +1213,8 @@ No `_DEBUG`, no log line. funcmap rows: `grep "(DU1d5)" june2017_re/funcmap.tsv`
   (with `--with` the DU1d2 compound guard at Always.h:13355 is an ERROR the tool cannot evaluate). `junediverge --check` (3 files): RESULT: PASS
   (allow-listed 8). `enumscan --check`: the 6 known rows only. Flag probe (`/P` via stdafx): DIVERGE_USER_RENDER, DUO_BODY, CAMERA_MESH_HIDDEN,
   ENUM_NAMES, RENDER_WORLD_CARTOON, CASH_SKILL_FOR_CHUNG_2011_04, GUILD_SKILL_PART_2, SERV_ELESIS_SECOND_CLASS_CHANGE, FACE_OFF_MONSTER_HEAD_TEST on.
-  `/Zs` probes: `X2GUUser.cpp`, `X2GUChung.cpp`, `X2GURaven.cpp` 0 errors.
+  `/Zs` probes: `X2GUUser.cpp`, `X2GUChung.cpp`, `X2GURaven.cpp` 0 errors. Commit `9223c6c7`; `--range 9223c6c7^..9223c6c7`: DUO_BODY (with
+  DIVERGE) 1 PASS, 1 PASS~, 0 FAIL, 0 deleted, RESULT: PASS; DIVERGE_USER_RENDER on `Always.h` 1 DEFINE, RESULT: PASS.
 - **Build:** `DEPLOY OK: X2_offline.exe is 26,601,984 B, dated 2026-11-14 12:54:14, md5 0475c657fa982b7f260892bdf4af33f7, equal to
   X2/US_SERVICE/x2.exe (2026-11-14 12:54:07); built at main 7f4afddf + 3 uncommitted code file(s).` (the three are this phase's).
 - **In game:** March classes have one body, so the second call and the second draw never run. What changes for every class: the body is
