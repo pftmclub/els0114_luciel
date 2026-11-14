@@ -804,6 +804,10 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
 - **Play-guide frame move (june-dungeons C3y-2, routed by the C3y-2 review 2026-11-14).** June's whole `CX2PlayGuide::OnFrameMove` `3289e490`:
   skips main states 7-8, runs the tutorial frame-move and the jump-guide frame-move `3289e370`, then a per-guide picture layout, and has no
   `FirstEpicGuide` call. C3y-2 inserted only the `3289e370` call at June's place; divergence row + allow row (`X2PlayGuide.cpp`) until the port.
+- **PvP member gauges (char-luciel CH1a3, 2026-11-14).** June's two user PvP-member inserts `32491200` ( = March's `InsertPvpMemberUI( SlotData,
+  CX2GUUser* )` ) and `32491480` ( not mapped ) take their gauge data from `CreateGageDataByUnitClass` `3248ec80`; CH1a3 ported only that call
+  ( under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ). The rest of both bodies ( the room-slot observer byte `+0x93`, the game vslot `0x98` team test )
+  was not diffed against March. PvP only, unreachable offline; diff and port whole when PvP is emulated.
 
 **Why UI is last and not first:** UI is not one system. Each stage above brings its own June dialogs: the region maps (1), slots and skill tree (3), quests (4), and the transcendence guides (6). A UI-first pass would port buttons with no system behind them, and then collide with every feature stage that touches the same dialog. The only UI work that must come early is the framework itself, and that is measured in Stage 2.
 
@@ -1084,7 +1088,9 @@ half is planned there (C9h-2a/2b/3). Two pieces are not effect work and have no 
   - C9h-3b parses the keys; the consumers land here, with the pets.
 - **C9h-2b's pet-info riding block** (`328fce40 @328fd0d8`). It is gated on `IsEnableCode( 2155 )`, which the offline emulator never sends. Its byte is
   `+0xd1` of the unnamed June singleton `324943c0` (no vtable, 0xd4 bytes; not `CX2RidingPetManager`), and no writer has been found. Name both
-  if the code event is ever emulated.
+  if the code event is ever emulated. *(char-luciel CH1a3, 2026-11-14: the singleton is `CX2GageManager` (Skill S7g); writers `3245c5bd` (the
+  `CX2StateMenu` toggle `3245c560`), `32465b8d`, `32478137`, `32478188`, `32edbe4d`, `32edbe5d`, each behind code 2155; Lu/Ciel's full-points effect
+  `32e6e2c0 @32e6e39e` also reads it and was ported without that test.)*
 - **The roster is 42 riding pets, not 7.** June has 57 riding-pet scripts; March's 15 are all among them. The 7 named above carry the viewer and
   reserved keys; DarkChaser and Rakshasa carry the target-search keys (C9h-4).
 - **The pet `PlayEffectSet` force-down float** (char-eve CH1o, 2026-10-27). June's pet overload `321e2340` (called by `321e2510`) takes the same

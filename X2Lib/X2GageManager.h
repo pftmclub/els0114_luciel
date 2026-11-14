@@ -165,6 +165,9 @@ public:
 
 	void SetShow( const bool bShow_ );
 	void CreateMyGageUI( const CX2Unit::UNIT_CLASS eGameUnitClass_, const UidType uid_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+	static CX2GageData* CreateGageDataByUnitClass( const CX2Unit::UNIT_CLASS eUnitClass_ );	// char-luciel CH1a3: June 3248ec80
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 	void InitMyGageWhenGameIsOver();
 	
 	void InsertPartyMemberUI( const KPartyUserInfo& kPartyUserInfo_, CX2GameUnit* pGameUnitPartyMember_ );

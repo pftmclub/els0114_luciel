@@ -890,6 +890,34 @@ public:
 };
 #endif //ADD_RENA_SYSTEM
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+// char-luciel CH1a3: June vt 3353375c ( second base 33533744 ), 0x64 bytes
+class CX2LucielMyGageUI : public CX2MyGageUI
+{
+public:
+	CX2LucielMyGageUI( CX2GageData* pGageData_, const CX2Unit::UNIT_CLASS eOwnerUnitClass_ );	/// June 32e647d0
+	virtual ~CX2LucielMyGageUI();									/// June 32e72770 ( body 32e6ad10 )
+
+	virtual void			InitUI();								/// June 32e6e230
+	virtual void			OnFrameMove( float fElapsedTime_ );		/// June 32e719b0
+	virtual void			SetShow( const bool bShow_ );			/// June 32e5ed90
+	virtual void			SetCharacterImage( const CX2Unit::UNIT_CLASS eGameUnitClass_ );	/// June 32e62d50
+
+protected:
+	virtual void			UpdateMpAndHyperAndDetonationGage();	/// June 32e63070
+
+private:
+	void					UpdateCharacterImageByForm();			/// June 32e62ef0
+	void					UpdateFormMpGage( CKTDGUIStatic* pStaticStateBar_, CKTDGUIStatic* pStaticUnSelected_ );	/// June 32e62410
+	void					UpdateCombinationPointUI();				/// June 32e6e2c0
+	void					UpdateCombinationPointFullEffect( const bool bShow_ );	/// June 32e6ae10
+	static void				GetMinorUnitFormCharacterImageName( OUT wstring& wstrFileName_, OUT wstring& wstrPieceName_, const CX2Unit::UNIT_CLASS eUnitClass_ );	/// June 32e62190
+
+	bool					m_bMinorUnitFormCharacterImage;			/// June +0x5c
+	CKTDGParticleSystem::CParticleEventSequenceHandle	m_hSeqCombinationPointFull;	/// June +0x60
+};
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+
 
 #ifdef ADD_EVE_SYSTEM_2014		// 김종훈, 2014 - 이브 추가 시스템, 나소드 코어
 class CX2EveMyGageUI : public CX2MyGageUI

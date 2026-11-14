@@ -5342,6 +5342,314 @@ void CX2RenaMyGageUI::UpdateNaturalForceUI()
 }
 #endif //ADD_RENA_SYSTEM
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+namespace _CONST_GAGEUI_CH1A3_
+{
+	const int	COMBINATION_POINT_PICTURE_NUM			= 10;	// char-luciel CH1a3: June 32e6e2c0, pictures 0-9 one per point, picture 10 the full mark
+	const float	COMBINATION_POINT_FULL_EFFECT_OFFSET_X	= 42.f;	// June 32e6ae10 ( 334bac68 )
+	const float	COMBINATION_POINT_FULL_EFFECT_OFFSET_Y	= 38.f;	// June 32e6ae10 ( 334c4968 )
+}
+using namespace _CONST_GAGEUI_CH1A3_;
+
+// char-luciel CH1a3: June 32e647d0
+CX2LucielMyGageUI::CX2LucielMyGageUI( CX2GageData* pGageData_, const CX2Unit::UNIT_CLASS eOwnerUnitClass_ )
+	: CX2MyGageUI( pGageData_, eOwnerUnitClass_ )
+	, m_bMinorUnitFormCharacterImage( false )
+	, m_hSeqCombinationPointFull( INVALID_PARTICLE_SEQUENCE_HANDLE )
+{}
+
+// char-luciel CH1a3: June 32e72770 / 32e6ad10, the handle is destroyed only when no game particle system answers ( JUNE_BUGS 682 )
+/*virtual*/ CX2LucielMyGageUI::~CX2LucielMyGageUI()
+{
+	if( ( NULL == g_pX2Game || NULL == g_pX2Game->GetMajorParticle() ) && INVALID_PARTICLE_SEQUENCE_HANDLE != m_hSeqCombinationPointFull )
+		g_pData->GetGameMajorParticle()->DestroyInstanceHandle( m_hSeqCombinationPointFull );
+}
+
+// char-luciel CH1a3: June 32e6e230, Rena's order ( 32e6e190 ) plus the unselected-form info and the point background
+/*virtual*/ void CX2LucielMyGageUI::InitUI()
+{
+	InitStatusUI();
+	InitWakeOrb();
+
+	m_pDLGMyUnit->OpenScriptFile( L"DLG_Luciel_CombinationPoint.lua" );
+
+	if( NULL != m_pDLGMyUnit )
+	{
+		CKTDGUIStatic* pStaticUnSelected = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"StaticPVPGameInfo_UnSelected" ) );
+		if( NULL != pStaticUnSelected )
+			pStaticUnSelected->SetShow( true );
+	}
+
+	CKTDGUIStatic* pStaticCombinationPointBG = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"Luciel_Combination_Point_BG" ) );
+	if( NULL != pStaticCombinationPointBG )
+		pStaticCombinationPointBG->SetShow( true );
+}
+
+// char-luciel CH1a3: June 32e719b0
+/*virtual*/ void CX2LucielMyGageUI::OnFrameMove( float fElapsedTime_ )
+{
+	CX2MyGageUI::OnFrameMove( fElapsedTime_ );
+	UpdateCharacterImageByForm();
+	UpdateCombinationPointUI();
+}
+
+// char-luciel CH1a3: June 32e5ed90 = Eve's 32e5eca0 on +0x60
+/*virtual*/ void CX2LucielMyGageUI::SetShow( const bool bShow_ )
+{
+	CX2MyGageUI::SetShow( bShow_ );
+
+	if( NULL != g_pData && NULL != g_pData->GetGameMajorParticle() )
+	{
+		CKTDGParticleSystem::CParticleEventSequence* pSeq = g_pData->GetGameMajorParticle()->GetInstanceSequence( m_hSeqCombinationPointFull );
+		if( NULL != pSeq )
+			pSeq->SetShowObject( bShow_ );
+	}
+}
+
+// char-luciel CH1a3: June 32e62d50, Ciel's face while the minor unit is out; the texture is set even when no name was found ( JUNE_BUGS 683 )
+/*virtual*/ void CX2LucielMyGageUI::SetCharacterImage( const CX2Unit::UNIT_CLASS eGameUnitClass_ )
+{
+	SetOwnerUnitClass( eGameUnitClass_ );
+
+	CKTDGUIStatic* pStaticCharPictures = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"StaticPVPGameMyChar" ) );
+	if( NULL == pStaticCharPictures || NULL == pStaticCharPictures->GetPicture( 0 ) )
+		return;
+
+	wstring wstrFileName;
+	wstring wstrPieceName;
+	if( NULL == g_pData->GetMyUser() || NULL == g_pData->GetMyUser()->GetSelectUnit() || false == g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() )
+	{
+		CX2Data::GetCharacterImageName( wstrFileName, wstrPieceName, GetOwnerUnitClass(), CX2Data::CIT_MyGage, IsMyGageTranscended() );
+		m_bMinorUnitFormCharacterImage = false;
+	}
+	else
+	{
+		GetMinorUnitFormCharacterImageName( wstrFileName, wstrPieceName, GetOwnerUnitClass() );
+		m_bMinorUnitFormCharacterImage = true;
+	}
+
+	pStaticCharPictures->GetPicture( 0 )->SetTex( wstrFileName.c_str(), wstrPieceName.c_str() );
+	pStaticCharPictures->GetPicture( 0 )->SetSizeAsTextureSize();
+}
+
+// char-luciel CH1a3: June 32e63070, the hyper gauge before the MP bar ( base 32e62d10 runs MP first ), then the resting form's MP
+/*virtual*/ void CX2LucielMyGageUI::UpdateMpAndHyperAndDetonationGage()
+{
+	CKTDGUIStatic* pStaticStateBar = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"StaticPVPGameStateBar" ) );
+	if( NULL != pStaticStateBar )
+	{
+		UpdateHyperGage( pStaticStateBar );
+		UpdateMpGageAndString( pStaticStateBar );
+		UpdateDetonationGage( pStaticStateBar );
+	}
+
+	CKTDGUIStatic* pStaticUnSelected = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"StaticPVPGameInfo_UnSelected" ) );
+	if( NULL != pStaticUnSelected )
+		UpdateFormMpGage( pStaticStateBar, pStaticUnSelected );
+}
+
+// char-luciel CH1a3: June 32e62ef0, the portrait follows a form change; the static is not NULL-tested ( JUNE_BUGS 684 )
+void CX2LucielMyGageUI::UpdateCharacterImageByForm()
+{
+	CKTDGUIStatic* pStaticCharPictures = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"StaticPVPGameMyChar" ) );
+	if( NULL == pStaticCharPictures->GetPicture( 0 ) )
+		return;
+
+	if( NULL == g_pData->GetMyUser() || NULL == g_pData->GetMyUser()->GetSelectUnit() )
+		return;
+
+	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
+	if( pMyUnit->IsMinorUnitForm() == m_bMinorUnitFormCharacterImage )
+		return;
+
+	wstring wstrFileName;
+	wstring wstrPieceName;
+	if( false == pMyUnit->IsMinorUnitForm() )
+	{
+		CX2Data::GetCharacterImageName( wstrFileName, wstrPieceName, GetOwnerUnitClass(), CX2Data::CIT_MyGage, IsMyGageTranscended() );
+		m_bMinorUnitFormCharacterImage = false;
+	}
+	else
+	{
+		GetMinorUnitFormCharacterImageName( wstrFileName, wstrPieceName, GetOwnerUnitClass() );
+		m_bMinorUnitFormCharacterImage = true;
+	}
+
+	pStaticCharPictures->GetPicture( 0 )->SetTex( wstrFileName.c_str(), wstrPieceName.c_str() );
+	pStaticCharPictures->GetPicture( 0 )->SetSizeAsTextureSize();
+}
+
+// char-luciel CH1a3: June 32e62410, the bar shows the form in play's MP, the unselected info the other form's
+void CX2LucielMyGageUI::UpdateFormMpGage( CKTDGUIStatic* pStaticStateBar_, CKTDGUIStatic* pStaticUnSelected_ )
+{
+	if( NULL == m_pGageData || NULL == pStaticStateBar_ || NULL == pStaticUnSelected_ ||
+		NULL == g_pData || NULL == g_pData->GetMyUser() || NULL == g_pData->GetMyUser()->GetSelectUnit() )
+		return;
+
+	const int iMpGageIndexInPlay = ( true == g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() ) ? 1 : 0;
+	const float fNowMp = m_pGageData->GetNowMp( iMpGageIndexInPlay );
+	const float fMaxMp = m_pGageData->GetMaxMp( iMpGageIndexInPlay );
+	UpdateGageForUV( pStaticStateBar_, PGUB_MY_MP, L"MP", fNowMp / fMaxMp, true );
+
+	CKTDGUIStatic* pStaticMp = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"g_pStatic_MP" ) );
+	if( NULL != pStaticMp )
+	{
+		const UINT uiStrSize = 32;
+		WCHAR buf[uiStrSize];
+		ZeroMemory( buf, sizeof(WCHAR) * uiStrSize );
+
+		StringCchPrintf( buf, uiStrSize, L"%ld/%ld",
+			static_cast<UINT>( floor( fNowMp + 0.5f ) ), static_cast<UINT>( floor( fMaxMp + 0.5f ) ) );
+		pStaticMp->GetString( 0 )->msg = buf;
+	}
+	UpdateMpGuidePoint();
+
+	const int iMpGageIndexResting = ( 0 == iMpGageIndexInPlay ) ? 1 : 0;
+	const float fRestFormMpRate = m_pGageData->GetNowMp( iMpGageIndexResting ) / m_pGageData->GetMaxMp( iMpGageIndexResting );
+	CKTDGUIControl::CPictureData* pPictureRestFormMp = pStaticUnSelected_->GetPicture( 1 );
+	if( NULL != pPictureRestFormMp && 0.f <= fRestFormMpRate && 1.f >= fRestFormMpRate )	// June 31c966d0 = UpdateGageForUV on the picture, a rate outside 0..1 leaves it
+		UpdateGageForUV( pStaticUnSelected_, 1, L"BG_LUCIEL_MANA", fRestFormMpRate, true );
+
+	if( NULL != pStaticUnSelected_->GetString( 0 ) )
+		pStaticUnSelected_->GetString( 0 )->msg = L"";
+}
+
+// char-luciel CH1a3: June 32e6e2c0
+void CX2LucielMyGageUI::UpdateCombinationPointUI()
+{
+	if( NULL == m_pGageData )
+		return;
+
+	CX2LucielGageData* pLucielGageData = static_cast<CX2LucielGageData*>( m_pGageData );
+	const int iNowCombinationPoint = pLucielGageData->GetNowCombinationPoint();
+	const bool bShowFullEffect = ( COMBINATION_POINT_PICTURE_NUM <= iNowCombinationPoint );
+
+	if( true == pLucielGageData->GetCombinationPointChanged() )
+	{
+		pLucielGageData->SetCombinationPointChanged( false );
+
+		CKTDGUIStatic* pStaticCombinationPoint = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"Luciel_Combination_Point" ) );
+		if( NULL != pStaticCombinationPoint )
+		{
+			for( int iPictureIndex = 0; iPictureIndex < COMBINATION_POINT_PICTURE_NUM; ++iPictureIndex )
+			{
+				CKTDGUIControl::CPictureData* pPicture = pStaticCombinationPoint->GetPicture( iPictureIndex );
+				if( NULL != pPicture )
+					pPicture->SetShow( iPictureIndex < iNowCombinationPoint );
+			}
+
+			CKTDGUIControl::CPictureData* pPictureFull = pStaticCombinationPoint->GetPicture( COMBINATION_POINT_PICTURE_NUM );
+			if( NULL != pPictureFull )
+				pPictureFull->SetShow( bShowFullEffect );
+		}
+	}
+
+	if( NULL == g_pX2Game )
+		m_hSeqCombinationPointFull = INVALID_PARTICLE_SEQUENCE_HANDLE;	// June forgets the handle without destroying it
+
+	// June also hides the effect while CX2GageManager +0xd1 is set; only enable code 2155 writes it ( never offline, backlog Stage 17 )
+	if( true == GetShow() )
+		UpdateCombinationPointFullEffect( bShowFullEffect );
+}
+
+// char-luciel CH1a3: June 32e6ae10, LD_Arousal_UI_01 over the point background while the points are full
+void CX2LucielMyGageUI::UpdateCombinationPointFullEffect( const bool bShow_ )
+{
+	if( NULL == g_pX2Game || NULL == g_pX2Game->GetMajorParticle() || NULL == m_pDLGMyUnit )
+		return;
+
+	CKTDGParticleSystem* pParticle = g_pX2Game->GetMajorParticle();
+	if( false == bShow_ )
+	{
+		if( INVALID_PARTICLE_SEQUENCE_HANDLE != m_hSeqCombinationPointFull )
+			pParticle->DestroyInstanceHandle( m_hSeqCombinationPointFull );
+		return;
+	}
+
+	if( INVALID_PARTICLE_SEQUENCE_HANDLE == m_hSeqCombinationPointFull )
+	{
+		CKTDGUIStatic* pStaticCombinationPointBG = static_cast<CKTDGUIStatic*>( m_pDLGMyUnit->GetControl( L"Luciel_Combination_Point_BG" ) );
+		if( NULL == pStaticCombinationPointBG || NULL == pStaticCombinationPointBG->GetPicture( 0 ) )
+			return;
+
+		const D3DXVECTOR2 vBGPos = pStaticCombinationPointBG->GetPicture( 0 )->GetPos();
+		m_hSeqCombinationPointFull = pParticle->CreateSequenceHandle( NULL, L"LD_Arousal_UI_01",
+			vBGPos.x + COMBINATION_POINT_FULL_EFFECT_OFFSET_X, vBGPos.y + COMBINATION_POINT_FULL_EFFECT_OFFSET_Y, 0.f );
+	}
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeq = pParticle->GetInstanceSequence( m_hSeqCombinationPointFull );
+	if( NULL == pSeq )
+		return;
+
+	pSeq->SetOverUI( true );
+	pSeq->SetResolutionConvert( true );
+	pSeq->SetShowObject( true );
+	if( NULL != g_pKTDXApp && NULL != g_pKTDXApp->GetDGManager() && NULL != g_pKTDXApp->GetDGManager()->GetDialogManager() )
+		pSeq->SetShowObject( false == g_pKTDXApp->GetDGManager()->GetDialogManager()->GetHideDialog() );
+}
+
+// char-luciel CH1a3: June 32e62190, the job's Ciel face ( the transcended rows for the second jobs )
+/*static*/ void CX2LucielMyGageUI::GetMinorUnitFormCharacterImageName( OUT wstring& wstrFileName_, OUT wstring& wstrPieceName_, const CX2Unit::UNIT_CLASS eUnitClass_ )
+{
+	const bool bTranscended = IsMyGageTranscended();
+	switch( eUnitClass_ )
+	{
+	case CX2Unit::UC_LUCIEL_CHILIARCH:
+		wstrFileName_ = L"DLG_UI_Common_Texture89_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_CHILIARCH_FACE_CHANGE";
+		break;
+
+	case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+		wstrFileName_ = L"DLG_UI_Common_Texture89_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_ROYAL_GUARD_FACE_CHANGE";
+		break;
+
+	case CX2Unit::UC_LUCIEL_DIABLURA:
+		wstrFileName_ = L"DLG_UI_Common_Texture96_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_LDB_FACE_CHANGE";
+		break;
+
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+		wstrFileName_ = L"DLG_UI_Common_Texture89_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_DREADLORD_FACE_CHANGE";
+		if( true == bTranscended )
+		{
+			wstrFileName_ = L"DLG_UI_Common_Texture102_NEW.tga";
+			wstrPieceName_ = L"TR_D_LORD_2";
+		}
+		break;
+
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+		wstrFileName_ = L"DLG_UI_Common_Texture89_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_NOBLESSE_FACE_CHANGE";
+		if( true == bTranscended )
+		{
+			wstrFileName_ = L"DLG_UI_Common_Texture102_NEW.tga";
+			wstrPieceName_ = L"TR_N_OBLESSE_2";
+		}
+		break;
+
+	case CX2Unit::UC_LUCIEL_DEMONIO:
+		wstrFileName_ = L"DLG_UI_Common_Texture96_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_LDN_FACE_CHANGE";
+		if( true == bTranscended )
+		{
+			wstrFileName_ = L"DLG_UI_Common_Texture102_NEW.tga";
+			wstrPieceName_ = L"TR_D_EMONIO_2";
+		}
+		break;
+
+	case CX2Unit::UC_LUCIEL_DUO:
+		wstrFileName_ = L"DLG_UI_Common_Texture88_NEW.tga";
+		wstrPieceName_ = L"CIEL_FACE";
+		break;
+
+	default:
+		break;
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+
 
 #ifdef ADD_EVE_SYSTEM_2014		// 김종훈, 2014 - 이브 추가 시스템, 나소드 코어
 

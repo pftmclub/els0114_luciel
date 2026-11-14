@@ -1608,6 +1608,44 @@ Elesis's base rows ); `ch0_class_map.tsv` names / phases updated.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Commit** `ab709d9f`; flagcheck `--range ab709d9f^..ab709d9f`: `LUCIEL_CORE` ( the two class files ) `0 PASS, 1 PASS~, 1 FAIL` ( the precedented new `.cpp` ), `JUNE_ENUM_NAMES` ( 4 files ) `1 PASS, 2 PASS~, 1 OTHER, 0 FAIL` / `RESULT: PASS`, same tallies as the worktree run ( the `eol!` on `X2UnitManager.h` is the tool's mixed-EOL file note: the inserted line is CRLF like its neighbours ).
 
+### CH1a3 - Done (2026-11-14)
+
+Opus 5.5 high, Ghidra read-only. Files: `X2GageUI.h` / `.cpp`, `X2GageManager.h` / `.cpp` ( CP949, `bytepatch.py`; 382 insertions, 0 deletions ).
+funcmap `grep "Char Luciel CH1a3" june2017_re/funcmap.tsv` ( 19 rows ); `JUNE_BUGS.md` 682-684. Commit: see the follow-up line below.
+- **`CX2LucielMyGageUI` ( `_CORE` ):** RTTI vt `3353375c`, 29 slots vs base `3353336c`, 0x64 bytes ( base 0x5c + `m_bMinorUnitFormCharacterImage`
+  +0x5c + `m_hSeqCombinationPointFull` +0x60; ctor `32e647d0`, made only by `CreateMyGageUI` ). Ported: 0 dtor `32e72770` / `32e6ad10`, 1 `InitUI`
+  `32e6e230` ( Rena's order, opens `DLG_Luciel_CombinationPoint.lua`, shows `StaticPVPGameInfo_UnSelected` and `Luciel_Combination_Point_BG` ),
+  2 `OnFrameMove` `32e719b0`, 8 `SetShow` `32e5ed90` ( = Eve's on +0x60 ), 19 `SetCharacterImage` `32e62d50`, 24 `UpdateMpAndHyperAndDetonationGage`
+  `32e63070` ( March's virtual at that slot: base `32e62d10`, called by the base frame move `32e71620` after the HP gauge; Lu/Ciel runs hyper
+  ( vslot 0x6c ) before MP, then detonation ( 0x64 ), then the resting form ). Helpers: `UpdateCharacterImageByForm` `32e62ef0`, `UpdateFormMpGage`
+  `32e62410`, `UpdateCombinationPointUI` `32e6e2c0`, `UpdateCombinationPointFullEffect` `32e6ae10`, static `GetMinorUnitFormCharacterImageName` `32e62190`.
+- **Slots not overridden ( = the base's pointer ):** 3 `OnFrameRender`, 4 `CrashMyStateGageUI`, 5 / 6 HP / MP texture, 7 `GetShow`, 9 / 10 alpha,
+  11-18 the buff virtuals and `SetDurationTime`, 20 `SetBuffIconStatic`, 21 `InitWakeOrb` ( `32e5b310`, Rena's too ), 22 `ResetGageUIEtc`, 23
+  `RefreshWayOfSwordUI`, 25 `UpdateDetonationGage`, 26 ( June-only `0x68` ), 27 `UpdateHyperGage`, 28 ( `0x70` ). Secondary vt `33533744`: slot 0
+  `32e72670` = compiler adjustor thunk ( `sub ecx, 0x44; jmp 32e72770` ), 1-3 the base's.
+- **What it reads:** `CX2LucielGageData` ( CH1a1 names ): `GetNowCombinationPoint`, `Get/SetCombinationPointChanged`, `GetNowMp` / `GetMaxMp` with
+  the gauge index ( in play = `IsMinorUnitForm()`, June `31d717e0`; the other index for the unselected bar ); `CX2Unit::IsMinorUnitForm` ( +0xe40 ).
+- **Stand-ins / left out ( recorded at the site ):** `31c966d0` ( June-only `CPictureData` UV fill ) = `UpdateGageForUV` on picture 1 behind June's
+  0..1 rate gate. `32e6e2c0`'s `CX2GageManager +0xd1` test ( hide the full effect ): the byte's six writers all sit behind enable code 2155, never
+  sent offline; noted in backlog Stage 17's existing bullet ( which said "no writer found" ). `SetCharacterImage`'s transcend argument uses
+  `IsMyGageTranscended()` ( null-safe ) where June reads unit +0x3c through an unchecked user, as March's base port does.
+- **Particle flag:** sequence `+0x2f4` = `SetResolutionConvert` ( June's Elsword `PlayUIEffectDestruction` `32e67770` writes the same `+0x170` /
+  `+0x2f4` pair March ports as `SetOverUI` / `SetResolutionConvert` ).
+- **Manager:** `CreateGageDataByUnitClass` `3248ec80` ( static, `_CORE`; 31eca1d0 == `UT_LUCIEL` -> `CX2LucielGageData`, else `CX2GageData` ). Under
+  `_LIVE` ( commented out ): `CreateMyGageUI`'s seven Lu/Ciel classes ( `3248e290 @3248e618` ), `InsertPartyMemberUI` ( `324910c0`: = March but the
+  factory ) and `InsertPvpMemberUI( SlotData, CX2GUUser* )` ( `32491200` ) take the factory. `CX2GULuciel::CreateGageData` `32b37c70` stays CH1k2's.
+- **Routed:** the rest of June's two PvP member inserts ( `32491200`, unmapped `32491480`: observer byte, team test ) -> backlog Stage 9 bullet
+  ( PvP only, unreachable offline ). `DLG_Luciel_CombinationPoint.lua` ( data034, CH5's asset, missing ) -> CH1 kickoff amended ( adopt it with the
+  scripts or the point row stays empty ).
+- **Hygiene:** flagcheck `JUNE_CHAR_LUCIEL_CORE --worktree --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE --files` ( 4 files ): `files: 1 PASS, 3 PASS~
+  (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR` / `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched
+  inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)` / `RESULT: PASS` ( PASS~ = one blank line before each new block ).
+  `junediverge.py --check` ( 4 files ): `allow-listed: 7` / `RESULT: PASS`. `enumscan.py --check` ( 4 files ): `0 A/B row(s) remain`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GageUI.cpp` and `X2GageManager.cpp`: 0 errors each, plain and with
+  `/D SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ( the `_LIVE` probe builds `new CX2LucielMyGageUI`, so the class compiled ). Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert ). From CH1 final: the HUD's Combination Point row, the full mark + `LD_Arousal_UI_01` at 10, Ciel's
+  portrait on a body swap, the resting body's MP on the unselected bar.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

@@ -60,3 +60,11 @@ Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_
 
 - `CX2GULuciel::CreateGULuciel` ( Chung's `CreateGUChung` pattern ) was left out of CH1a: the class stays abstract until CH1o wires the pure virtuals. Add it with the factory cases.
 - Depends on CH1a4's review as well ( the dtor calls `EndTransformedForm` / `ReleaseTransformedSkinAnim`, whose bodies are CH1a4's ).
+
+## Amended by char-luciel CH1a3 (2026-11-14)
+
+- `_LIVE` turns on Lu/Ciel's own gauge ( `CreateMyGageUI` case, `CreateGageDataByUnitClass` in the party / PvP member inserts ). Its `InitUI` opens
+  `DLG_Luciel_CombinationPoint.lua` ( data034, `ch0_assets.tsv` row 750: missing, owner CH5, `adopt-june` ). Adopt it here with the scripts
+  ( `luabind.py check` ) or the HUD shows no Combination Point row until CH5; also confirm the particle `LD_Arousal_UI_01` ( full points ) loads.
+  The play-test then checks: the point row fills one picture per point, the full mark and effect at 10, the portrait swaps to Ciel's face on a body
+  swap, and the resting body's MP shows on the unselected info bar.

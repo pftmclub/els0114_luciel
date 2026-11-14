@@ -270,6 +270,20 @@ void CX2GageManager::CreateMyGageUI( const CX2Unit::UNIT_CLASS eGameUnitClass_, 
 			pGageUI = new CX2EveMyGageUI( pGageData, eGameUnitClass_ );
 		} break;
 #endif // ADD_EVE_SYSTEM_2014	// 김종훈, 2014 - 이브 추가 시스템, 나소드 코어
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	// char-luciel CH1a3: June 3248e290 @3248e618, the seven Lu/Ciel classes
+	case CX2Unit::UC_LUCIEL_CHILIARCH:
+	case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+	case CX2Unit::UC_LUCIEL_DIABLURA:
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+	case CX2Unit::UC_LUCIEL_DEMONIO:
+	case CX2Unit::UC_LUCIEL_DUO:
+		{
+			pGageData = new CX2LucielGageData();
+			pGageUI = new CX2LucielMyGageUI( pGageData, eGameUnitClass_ );
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 	default:
 		{
 			pGageData = new CX2GageData();
@@ -283,6 +297,27 @@ void CX2GageManager::CreateMyGageUI( const CX2Unit::UNIT_CLASS eGameUnitClass_, 
 		pGageUI->InitUI();
 	}
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+// char-luciel CH1a3: June 3248ec80, Lu/Ciel's type ( 31eca1d0 gives UT_LUCIEL ) gets the Combination Point gauge, every other class the base one
+/*static*/ CX2GageData* CX2GageManager::CreateGageDataByUnitClass( const CX2Unit::UNIT_CLASS eUnitClass_ )
+{
+	switch( eUnitClass_ )
+	{
+	case CX2Unit::UC_LUCIEL_CHILIARCH:
+	case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+	case CX2Unit::UC_LUCIEL_DIABLURA:
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+	case CX2Unit::UC_LUCIEL_DEMONIO:
+	case CX2Unit::UC_LUCIEL_DUO:
+		return new CX2LucielGageData();
+
+	default:
+		return new CX2GageData();
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 
 #ifdef SERV_DUNGEON_FORCED_EXIT_SYSTEM
 
@@ -517,7 +552,11 @@ void CX2GageManager::SetPartyMemberGameUnit( CX2GameUnit* pParyMemberGameUnit_ )
 
 void CX2GageManager::InsertPartyMemberUI( const KPartyUserInfo& kPartyUserInfo_, CX2GameUnit* pGameUnitPartyMember_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	CX2GageData* pGageData = CreateGageDataByUnitClass( static_cast<CX2Unit::UNIT_CLASS>( kPartyUserInfo_.m_cUnitClass ) );	// char-luciel CH1a3: June 324910c0 -> 3248ec80
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 	CX2GageData* pGageData = new CX2GageData();
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 
 	CX2GageUI* pGageUI = 
 		( NULL != pGageData ? new CX2PartyMemberGageUI( kPartyUserInfo_, pGageData, m_vecGageSetPartyMember.size() ) : NULL );
@@ -3637,7 +3676,11 @@ void CX2GageManager::InsertPvpMemberUI( const CX2Room::SlotData& slotData_, CX2G
 {
 	if( NULL != pGameUnitPvpMember_ )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+		CX2GageData* pGageData = CreateGageDataByUnitClass( pGameUnitPvpMember_->GetUnitClass() );	// char-luciel CH1a3: June 32491200 -> 3248ec80
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 		CX2GageData* pGageData = new CX2GageData();
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 		CX2GageUI* pGageUI = NULL;
 		if ( NULL != pGageData )
 		{
