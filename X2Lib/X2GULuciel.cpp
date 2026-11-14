@@ -11461,9 +11461,9 @@ void CX2GULuciel::CreateChaserOfDarknessDamageEffect( const CX2DamageManager::Da
 	const WCHAR* pwszProjectileName = ( true == bMaleReadyEffect ) ? L"DamageEffect_LD_M_CHASER_OF_DARKNESS_Projectile" : L"DamageEffect_LD_F_CHASER_OF_DARKNESS_Projectile";
 	const float fPowerRate = GetPowerRate() * m_fChaserOfDarknessPowerRate;
 
-	// June passes 1.0 as the reserve time ( the reserve flag is off )
+	// char-luciel CH1l3 review: June @32b1fa67 passes -1.0 as the reserve time ( was 1.0 )
 	CX2DamageEffect::CEffect* pProjectile = g_pX2Game->GetDamageEffect()->CreateInstance( this, pwszProjectileName, fPowerRate, vBonePos, GetRotateDegree(), GetRotateDegree(),
-		m_FrameDataNow.unitCondition.landPosition.y, false, 1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+		m_FrameDataNow.unitCondition.landPosition.y, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
 	if ( NULL != pProjectile )
 	{
 		CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();

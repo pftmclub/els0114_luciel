@@ -2405,6 +2405,30 @@ funcmap: `grep "(CH1l3)" june2017_re/funcmap.tsv` ( 15 rows, grouped ). `JUNE_BU
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Next:** `/x2-phase char-luciel CH1l3 review` ( Opus 5.5 high ).
 
+### CH1l3 - Review (2026-11-15)
+
+Opus 5.5 high. Covers CH1l ( `f82df8f5` ), CH1l2 ( `12df5212` ), CH1l3 ( `bc8eefb8` ). **Verdict: pass after one fix.** Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `_LIVE` stays `//#define` ).
+- **Fix ( `X2GULuciel.cpp`, `CreateChaserOfDarknessDamageEffect` ):** June @`32b1fa67` loads `-1.0` ( `334380f0` ) into the reserve-time slot; CH1l3 wrote `1.0`. Now `-1.f` ( March's default; `bReserve` is false, so no behaviour change ). The CH1l3 note's "passes 1.0" is wrong; funcmap row corrected.
+- **Routed, not fixed here ( CH1o amendment ):** March's `CX2EffectSet::ApplyDamageEffectModifiers` has no case 4, 10 or 11 ( the default logs `[JUNE_FX] ... tag N is not ported` ). Lu/Ciel push all three: tag 4 ( CH1f2 Power of Oriax ), 10 / 11 ( CH1l3 Punisher ); tag 9 exists, under Elsword's `_SKILL`.
+- **Ghidra spot-checks ( all = June ):**
+  - `UpdateNotRenderingOtherEquipList` `32b18220`: the 18 case lists ( 12 groups + 6 face-accessory passes ) equal the `_CONST_LUCIEL_CH1L_` arrays; the two if-chain groups ( 0x22 one-piece 6 / 8-11, 0x27 8-11 ), 0x62 ( 8-11 + 17 ) and 0x3ea ( 8-11, + 18 / 27 when the equip is a not-rendering-hair item ) match; the hair flags per group ( keep mesh + mark: 0x5f / 0x5e / 0x23-0x25 / 0x40 / 0x6a; keep only: 0x26 / 0x28 / 0x29 ) match.
+  - `GetFormEquipItemList` `32b176a0`: list `+0x8834`, position `+0x1b0`, `{ +0x15d4, +0x1a0 }`, stops at two.
+  - `CommonStateStart` `32b37910`: base, FP-cost x ( spec B + 1.0 ), the 10 Communion ids x `+0x9640`, camera clear on my unit outside 358-362, altar stop on 446-448 / 452 / 453; order kept.
+  - `CommonFrameMove` `32b397a0`: block order, timers `+0x95fc` / `+0x960c` / `+0x96a4` / `+0x9674` / `+0x96a8` / `+0x9714` / `+0x9888`, the eight CH1l3 callees in June's order, Wait / Wait3 on the right skin ( `+0x8e88` / `+0x87d4` ), NPC 1906 / 1937, Punisher state 467.
+  - `CanUseSpecialAttack` `32b3a310`: the Stable Dark Energy rewrites ( 30216 / 30220 -> condition 5 off the air keys; Sinister Mind 30048 air key -> 1 ), check order, vslot `0x82c` = `IsDevUnlimitedSkillUse` as Ara / EL, strings 0xe2 / 0x9f5 / 0x8103 / 0x6607 / 0x8bae.
+  - DamageData map: `+0xa4` = `m_ExtraDamage.m_Damage` is proved by an independent reader ( funcmap `32c5ce40`, Raven Megadrill: March source writes `m_Damage`, June writes `+0xa4`; row 1348's ExtraDamageData layout ); a protected float ( `FLD` ), x 0.5.
+  - Punisher `32b34c70`: tags 9 / 10 / 11 write CEffect `+0x5f0` / `+0x2a4` / `+0x7a8` = DamageData ( at CEffect `+0x200` ) `+0x3f0` fForceDownValue / `+0xa4` m_Damage / `+0x5a8` relate skill index; values rate / rate / index + 1 ( add only on 11 ); boss = vslot `0x3c8` GetIsBosRaidNPC; 500 / 5 / 0.5 / 0.25.
+  - Chaser `32b1f800`: 23 arguments ( owner, name, rate x `+0x95d4`, Dummy02, two `GetRotateDegree`, `+0x80c4`, false, -1, 1, 1, -1, -1, 0, -1, 0, 0 ), lock-on `+0x938` ( 8 bytes ) / `+0x940`, destroy silently + erase the first, timer 0.3, BFI 603 `( id, NULL, 1, 0, false )`.
+  - Cut-in `32b16940`: 12 + 3 + 6 names = the three initializers, size 512 x 512 / position ( 256, 512 ), index `+0x8ac8 * 3 + +0x8acc`, `IsTransformed( DT_MAJOR / DT_MINOR )`, hyper third entry only without a customize cut-in, event 0x8b3 even roll = CASH_21.
+  - Open Mind `32b0ef80` / `32b4c7f0`: 127 -> 30416, 128 -> 30418, 129 -> 30420; ability 2 ( 5 without a templet ), `points <= threshold`.
+  - Death Touch `32b34a90` / `32b349f0`: `+0x97b8` / `+0x97bc` damage effect handles, +25 / +25 / +100, `SetLinkMainEffectByPos( mine, target, 99999 )` ( the default ), clear writes -1 / -1 / GUT 0 and erases BTI 760.
+  - Altar `32b35600` / `32b35c60`: `+0x9748` MP per altar through `FlushMp`, 8 at most, offset into instance `+0x1a4`, low effect option = `3241d2a0( 2 )` on `g_pMain +0x180` ( the kickoff's "`+0x1ac == 2`" is the instance offset's z ), state 444, timer helper `3322a380` adds to `+0x9754`.
+  - Renamed members: byte reads of `+0x9678` / `+0x969c`, dword UID `+0x9690`, float timer `+0x97c4`.
+- **Gates:** `finish.py --review --commits f82df8f5 12df5212 bc8eefb8 -v`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `7 PASS, 0 OTHER-fail, 0 FAIL` ( 2 OTHER = the `X2BuffFactor.h` name blocks, flag `JUNE_ENUM_NAMES`, itself `RESULT: PASS` ), 19 deleted lines = the CH1a member / enum / declaration lines the three notes list; `junediverge` and `junediverge --check-all` PASS;
+  `enumscan` FAIL only on the 22 enum definitions of `X2BuffFactor.h` and two untouched `X2GUUser.h` lines ( 2915-2916 ), no row in the class files. Fix: `finish.py --files X2Lib/X2GULuciel.cpp` PASS ( flagcheck 1 PASS, 2 deleted = the replaced call + comment ).
+- **Compile:** `/Zs` probes of `X2GULuciel.cpp` plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors. Full build skipped: no play-test. No debug define to retire.
+- **Next:** `/x2-phase char-luciel CH1m` ( Opus 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
