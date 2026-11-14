@@ -121,10 +121,24 @@ step needs the answer, otherwise let it run). The user has authorised this for O
 
 ## Finish (same session)
 
+0. **Run the gates with one command (user, 2026-11-14):** `python tools/finish.py --files <the code files you changed>`, adding
+   `--state <class file> <June script>`, `--icons <id range>` and `--lua <NAME ...>` when the phase registers skill states, adds skills or
+   stages a June script. It runs the gates described below (flagcheck per flag, junediverge, enumscan, stateends, skillicons, luabind) and
+   prints one block: paste it into the Done note. After committing, run `python tools/finish.py --range <c>^..<c>` for each of your commits
+   (or `--commits c1 c2`), never `^..HEAD` (it runs past 580 s on a busy branch) and paste that block too. **A review** runs
+   `python tools/finish.py --review --commits <the reviewed phases' commits>` (a `--range` takes in every peer commit between them, with
+   their flags; `--review` adds `junediverge --check-all` on top of the per-file check). It runs flagcheck for the flags on changed directive
+   lines and the innermost enclosing block; outer enclosing flags are listed on one `INFO` line (`--flag NAME` runs one). A flag it finds that
+   the phase does not own (the target of an `#error X needs Y` guard) is `--skip-flag NAME "reason"`; when no flag applies, `--no-flag
+   "reason"` (quote a multi-word reason). A commented-out `//#define` (a debug retire) is listed as `retired` and checks nothing. A client edit
+   with no flag left to check is a FAIL, never a silent pass. `INERT` (a `_LIVE` flag not yet defined) is not a fail; every `SKIPPED` is a
+   decision you state in the note. A passing flag prints one `files:` line; `-v` lists its `OTHER` rows. The numbered gate text below is what each
+   gate means and how to fix it; do not run them by hand unless `finish.py` is broken. Two things stay yours: explaining every `OTHER` row and
+   deleted line (`-v`), and the build / `exestr` lines.
 1. `flagcheck.py <FLAG> --worktree --files <the code files you changed>` before committing
    (`--files` keeps peers' uncommitted edits out of your verdict): RESULT must be PASS, every
    FAIL fixed, every OTHER row and deleted line explained. After committing, run it once more
-   with `--range <your first commit>^..HEAD` and paste those summary lines.
+   with `--range <c>^..<c>` per commit (never `^..HEAD`) and paste those summary lines.
    **Lua binder gate (user, 2026-10-27):** for every June `.lua` the phase stages or depends on (an NPC / summon / dungeon script,
    a class script), run `python tools/luabind.py check <NAME ...>`: every method it calls must be bound in March. An unbound
    name is bound whole from June's function (address in the funcmap) or added to `tools/data/lua_unbound_known.tsv` with the
@@ -183,11 +197,20 @@ step needs the answer, otherwise let it run). The user has authorised this for O
    is amended: `CH3d-review.md` covers CH3a-CH3d; char-luciel's are re-amended when that plan resumes). After a review, write or check the
    next phase's kickoff the same way. The user should never have to ask "what's the kickoff".
 6. **Commit with explicit pathspecs** (`git add <your files>`; never `-A` or `.`), message
-   `<Plan> Phase <n>: <what>`. The plan doc, STATUS.md and kickoffs go in the same commit as the
-   code's Done note or right after it.
+   `<plan-key> Phase <id>: <what>` (a review: `<plan-key> Phase <id> review: <what>`; the exact plan key, as `runphases.py` matches it).
+   **Short (user, 2026-11-14):** the subject is one line of
+   about 100 characters or fewer, the body is zero to three lines, and evidence (addresses, gate results, counts) lives in the Done note
+   only. The plan doc, STATUS.md and kickoffs go in the same commit as the code's Done note or right after it.
 7. **Hand-off to the user** (the plan's "Play-test hand-off" section): dev console first,
    copy-ready one-line commands with real values, per check: where / paste / what it does /
    look for / if not. End with the log tag you will read. Never launch the game.
+   **Batched play-test (user, 2026-11-14; opt-in per plan):** when the phase's kickoff `Hand-off` row (see `kickoffs/TEMPLATE.md`) says
+   `batch at <phase>`, do not hand off now. Write this phase's section in `kickoffs/<plan-key>/playtest.md` (template
+   `kickoffs/TEMPLATE-playtest.md`; all six parts, full detail, written now while you know what changed); `python tools/playtest.py check
+   <plan-key> <id>` must print PASS. The Done note says `play-test deferred: section <id> in playtest.md, batch at <phase>` and the build is
+   the probe build ("full build skipped: no play-test yet"). The seam phase (the one the `Hand-off` rows name, listed in the plan's STATUS
+   block header as `Seam: <phase>`) runs `build.py --deploy`, then hands off the output of `python tools/playtest.py assemble <plan-key>
+   <ids of the batch>` in full, never shortened or re-summarised. A kickoff with `Hand-off: now`, or no row, hands off at once.
 8. Last line to the user: what they do next in plain words ("play-test the 3 checks above, then
    say 'check logs'"; or "next: `/x2-phase june-buff 6b review` on Opus 5.5 high").
 
@@ -199,7 +222,8 @@ A new phased plan follows this shape so it works with the loop above:
   Short Done notes; long evidence goes to `<NAME>_ARCHIVE.md` or `.tsv` files.
 - `kickoffs/<plan-key>/<phase>.md` for each phase, from `kickoffs/TEMPLATE.md`. Kickoffs name
   sections to read; they never say "read in full" and never repeat build/deploy instructions.
-- A block in `STATUS.md` with one row per phase (State, Model/effort, Depends, Touches, Kickoff).
+- A block in `STATUS.md` with one row per phase (State, Model/effort, Depends, Touches, Kickoff). A plan that batches play-tests names
+  the seam in the block header (`Seam: <phase>`) and gives each kickoff a `Hand-off` row (`batch at <phase>` / `now`).
 - One log tag and one flag family, named in the STATUS block.
 - **Every plan runs through `/x2-phase` (user, 2026-10-16).** A phase of an existing plan starts with
   `/x2-phase <plan-key> <phase>`; a planning session (a plan that has no phases yet) starts with

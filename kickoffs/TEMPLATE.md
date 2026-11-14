@@ -8,6 +8,7 @@
 | Flag | `SERV_IRUHADEV_<NAME>` (+ `<NAME>_DEBUG` if the phase logs) |
 | Log tag | `[<TAG>]` (`python tools/logs.py --tag <TAG>`) |
 | Review | `kickoffs/<plan-key>/<N>-review.md` (the phase writes it when done) / none |
+| Hand-off | now / batch at <phase> (a batch writes its section in `kickoffs/<plan-key>/playtest.md`; x2-phase "Finish" step 7) |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 

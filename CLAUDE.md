@@ -134,6 +134,19 @@ unifdef script, or read a plan doc "in full".
   <changed files>` prints `RESULT: PASS`; `build.py --deploy` with `DEPLOY OK` (play-test phases only, see the shared-builds rule)
   in the Done note; a Done note of at most ~60 lines; the `STATUS.md` row updated in the same commit (one line, evidence in the note); the
   next kickoff written if missing; a commit with explicit pathspecs; a copy-ready play-test hand-off. Never launch the game yourself.
+- **One gate command (user, 2026-11-14):** `python tools/finish.py --files <changed files>` runs `flagcheck`, `junediverge --check` and
+  `enumscan --check`, and `stateends` / `skillicons` / `luabind` when given their arguments, then prints one block for the Done note. After
+  committing use `--range <c>^..<c>` (or `--commits c1 c2`), never `^..HEAD` (slow); a review uses `--review --commits <the phases' commits>`
+  (adds `junediverge --check-all`). A flag it finds that is not the phase's (a guard's target) is `--skip-flag NAME "reason"`; no flag applies
+  is `--no-flag "reason"` (quote it). Do not run those gates one by one. `INERT` (an undefined `_LIVE` flag) is not a fail; `retired` (a
+  commented-out define) checks nothing; `SKIPPED` names what you must decide; no flag left to check is a FAIL.
+- **Commit message is short (user, 2026-11-14):** one subject line `<plan-key> Phase <id>[ review]: <what>` of about 100 characters or fewer
+  (the exact plan key plus `Phase <id>` is what `runphases.py` matches), and a body of zero to three lines. No evidence, addresses or gate
+  output in it: that goes in the Done note. Older long messages stay as they are.
+- **Batched play-tests (user, 2026-11-14; opt-in per plan, x2-phase step 7):** a kickoff whose `Hand-off` row says `batch at <phase>` (the
+  default is `now`) writes a full, detailed section into `kickoffs/<plan-key>/playtest.md` (linted by `tools/playtest.py check`) and builds
+  probe-only; the seam phase builds once and hands off `playtest.py assemble <plan-key> <ids>` output unshortened. Detail is never traded
+  for fewer hand-offs.
 - **New plans** follow x2-phase's `new-plan` shape: kickoffs that name sections, plus `STATUS.md` rows.
 - **Encoding guard:** `.claude/hooks/encoding_guard.py` blocks Edit/Write on non-UTF-8 files. CP949 files are edited with `bytepatch.py` only.
 

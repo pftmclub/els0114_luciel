@@ -35,12 +35,14 @@ verdict / evidence are hand-written (N1) and carried over a rewrite by (file, li
 import argparse
 import bisect
 import collections
+import glob
 import json
 import os
 import random
 import re
 import subprocess
 import sys
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TRUNK = os.path.normpath(os.path.join(HERE, '..'))
@@ -99,9 +101,22 @@ TOK_PP = re.compile(r'''
 def run_cl_p(out):
     import census as C
     os.makedirs(os.path.dirname(out), exist_ok=True)
+    for old in glob.glob(out[:-2] + '.*.i'):    # per-process leftovers of the fallback below; best effort, a held one stays
+        try:
+            if time.time() - os.path.getmtime(old) > 600:      # never a live peer's file
+                os.remove(old)
+        except OSError:
+            pass
     r = subprocess.run(C.cl_cmd(PP_TU, out), cwd=os.path.join(TRUNK, 'X2Lib'), env=C.cl_env(), capture_output=True)
+    text = (r.stdout + r.stderr).decode('latin1', 'replace')
+    if r.returncode != 0 and 'C1083' in text and 'Permission denied' in text:
+        # the previous .i is still held (Defender / indexer) for a minute or two after a run: write a per-process name instead
+        out = out[:-2] + '.%d.i' % os.getpid()
+        r = subprocess.run(C.cl_cmd(PP_TU, out), cwd=os.path.join(TRUNK, 'X2Lib'), env=C.cl_env(), capture_output=True)
+        text = (r.stdout + r.stderr).decode('latin1', 'replace')
     if r.returncode != 0 or not os.path.exists(out):
-        sys.exit('cl /P failed (exit %s):\n%s' % (r.returncode, r.stdout.decode('latin1', 'replace')[-3000:]))
+        sys.exit('cl /P failed (exit %s):\n%s' % (r.returncode, text[-3000:]))
+    return out
 
 
 class Evaluator(object):
@@ -298,7 +313,7 @@ def load_cpp(reuse):
         enums = json.load(open(jpath))
     else:
         if not (reuse and os.path.exists(ipath)):
-            run_cl_p(ipath)
+            ipath = run_cl_p(ipath)
         enums = parse_cpp_enums(ipath)
         json.dump(enums, open(jpath, 'w'))
     fam = collections.defaultdict(lambda: collections.defaultdict(list))

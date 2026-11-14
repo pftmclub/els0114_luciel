@@ -6,6 +6,12 @@
     python tools/junebinary.py --sample 50  # print 50 random june_guarded rows (seed 7) for the hand check
     python tools/junebinary.py --summary    # print the summary from the written coverage.tsv
     python tools/junebinary.py --holdout    # precision of the `block` rule: hide each evidenced function, predict it from its neighbours
+    python tools/junebinary.py --class CX2GUAdd [--top 25]   # what is left of one class: no funcmap row, largest first
+    python tools/junebinary.py --owner S9 [--top N]          # one owner token (S9, char-luciel, JUNE_UI_PARITY_PHASES; exact, S3 != S30): not mapped yet
+    python tools/junebinary.py --progress   # measured pace since the june-census V2 baseline (funcmap rows, unowned count, weeks)
+    (the three queries above read the tracked coverage.tsv and never rewrite it unless it is missing or you add --refresh (--check, --summary,
+     --sample and --holdout ignore --refresh: they build it only when missing; run with no mode to rebuild); a warning says when it is
+     older than funcmap.tsv. Regenerating is a deliberate step: build, then commit at a milestone.)
 
 (Not `junecensus.py`: that name is the D0a identifier census of the june-march-divergence plan.)
 Inputs: june2017_re/census/functions.tsv (V0), june2017_re/funcmap.tsv, X2Lib / KTDXLIB / X2 sources, JUNE_PORT_BACKLOG_ORDER.md,
@@ -322,13 +328,15 @@ COLS = ['june_va', 'size', 'bucket', 'basis', 'group', 'status', 'fm_status', 'm
 
 
 def write(funcs):
-    with open(OUT, 'w', encoding='utf-8', newline='') as f:
+    tmp = OUT + '.%d.tmp' % os.getpid()      # written aside and swapped in, so a session reading meanwhile never sees a half file
+    with open(tmp, 'w', encoding='utf-8', newline='') as f:
         f.write('# June 2017 coverage census (junebinary.py, plan june-census V1); one row per function of functions.tsv\n')
         f.write('\t'.join(COLS) + '\n')
         for r in funcs:
             f.write('\t'.join([
                 '0x' + r['va'], str(r['size']), r['bucket'], r['basis'], r['group'], r['status'], r['fm_status'].replace('\t', ' '),
                 r['march_has'], r['guarded'], r['owner'], r['owner_basis'], r['march_file'], r['name'], r['fm_sym'][:120].replace('\t', ' ')]) + '\n')
+    os.replace(tmp, OUT)
     groups = collections.defaultdict(list)
     for r in funcs:
         if r['bucket'] == 'studio':
@@ -344,12 +352,14 @@ def write(funcs):
                      (lst[0]['march_file'] or ''),
                      ' '.join('%s(%d)' % (r['va'], r['size']) for r in top)])
     rows.sort(key=lambda x: (-x[5], -x[6]))
-    with open(OUT_FILE, 'w', encoding='utf-8', newline='') as f:
+    tmp_file = OUT_FILE + '.%d.tmp' % os.getpid()
+    with open(tmp_file, 'w', encoding='utf-8', newline='') as f:
         f.write('# per class / file, studio functions only, sorted by unowned functions (junebinary.py, V1)\n')
         f.write('\t'.join(['group', 'functions', 'mapped', 'march_has', 'june_guarded', 'unowned', 'unowned_bytes', 'owner_stages',
                            'march_file', 'top5_unowned_va(size)']) + '\n')
         for x in rows:
             f.write('\t'.join(str(v) for v in x) + '\n')
+    os.replace(tmp_file, OUT_FILE)
     return rows
 
 
@@ -445,7 +455,126 @@ def holdout():
     return 0
 
 
+BASE_COMMIT = '90721ebd'      # june-census V2: SUMMARY.md baseline (2026-11-09)
+BASE_UNOWNED = 19577          # unowned studio functions at that commit (SUMMARY.md)
+WORK_SHARE = 0.51             # mid work share of an unowned function count (SUMMARY.md, 300-function sample)
+
+
+def fresh_rows(force=False):
+    """coverage.tsv rows. The file is tracked, so a query never rewrites it on its own: it is rebuilt only when missing or with
+    --refresh, and a warning says when it is older than funcmap.tsv."""
+    if force or not os.path.exists(OUT):
+        print('(rebuilding coverage.tsv, about 10 s)', file=sys.stderr)
+        write(build())
+    elif os.path.getmtime(OUT) < os.path.getmtime(FMAP):
+        print('(coverage.tsv is older than funcmap.tsv: add --refresh to rebuild it)', file=sys.stderr)
+    return read_cov()
+
+
+def opt(a, name, default):
+    """Value after a flag; a missing value, or another flag in its place, is a usage error."""
+    if name not in a:
+        return default
+    i = a.index(name) + 1
+    if i >= len(a) or a[i].startswith('--'):
+        sys.exit('junebinary.py: %s needs a value' % name)
+    return a[i]
+
+
+def owner_match(owner, text):
+    """Exact token of the comma-separated owner column: S3 never matches S30; char-luciel matches K:char-luciel, X matches P:X."""
+    q = text.strip().lower()
+    toks = [t.strip().lower() for t in owner.split(',')]
+    return q in toks or ('k:' + q) in toks or ('p:' + q) in toks
+
+
+def listing(rows, top):
+    rows = sorted(rows, key=lambda r: -int(r['size']))
+    print('%-12s %6s %-8s %-8s %s' % ('june_va', 'size', 'basis', 'status', 'name / march_file'))
+    for r in rows[:top]:
+        print('%-12s %6s %-8s %-8s %s  %s' % (r['june_va'], r['size'], r['basis'], r['status'], r['fm_symbol'] or r['name'], r['march_file']))
+    if len(rows) > top:
+        print('... %d more (--top N)' % (len(rows) - top))
+
+
+def query_class(name, top, force):
+    """What is left of one class: its studio functions with no funcmap row, largest first."""
+    st = [r for r in fresh_rows(force) if r['bucket'] == 'studio' and r['group'] == name]
+    if not st:
+        print('no studio group named %s (names are in coverage_by_file.tsv, column group)' % name)
+        return 1
+    left = [r for r in st if r['status'] != 'mapped']
+    print('%s: %d functions, %d mapped, %d march_has, %d june_guarded, %d with no funcmap row (%d bytes)' % (
+        name, len(st), len(st) - len(left), sum(r['march_has'] == 'yes' for r in st), sum(r['june_guarded'] == 'yes' for r in st),
+        len(left), sum(int(r['size']) for r in left)))
+    listing(left, top)
+    return 0
+
+
+def query_owner(text, top, force):
+    """What a stage / plan is named for and has not mapped yet: one owner token equals TEXT; not mapped = status none or march_has."""
+    rows = [r for r in fresh_rows(force) if r['bucket'] == 'studio' and owner_match(r['owner'], text)]
+    if not rows:
+        print('no studio function with owner %r (exact token, e.g. S7, char-luciel, JUNE_UI_PARITY_PHASES; S3 does not match S30)' % text)
+        return 1
+    left = [r for r in rows if r['status'] != 'mapped']
+    print('owner %r: %d functions, %d mapped, %d not mapped yet (%d bytes)' % (
+        text, len(rows), len(rows) - len(left), len(left), sum(int(r['size']) for r in left)))
+    listing(left, top)
+    return 0
+
+
+def git_out(args):
+    import subprocess
+    p = subprocess.run(['git'] + args, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    return p.stdout.decode('utf-8', 'replace')
+
+
+def progress(force):
+    """Measured pace since the june-census V2 baseline, in place of the hand estimate in SUMMARY.md."""
+    import datetime
+    rows = fresh_rows(force)
+    st = [r for r in rows if r['bucket'] == 'studio']
+    un = sum(1 for r in st if not r['owner'])
+    unmapped = sum(1 for r in st if r['status'] != 'mapped')
+    base_date = git_out(['show', '-s', '--format=%cI', BASE_COMMIT]).strip()
+    if not base_date:
+        print('baseline commit %s not found' % BASE_COMMIT)
+        return 1
+    d0 = datetime.datetime.fromisoformat(base_date)
+    days = max((datetime.datetime.now(d0.tzinfo) - d0).total_seconds() / 86400.0, 0.01)
+    fm0 = git_out(['show', '%s:june2017_re/funcmap.tsv' % BASE_COMMIT]).count('\n')
+    with open(FMAP, 'rb') as f:
+        fm1 = f.read().count(b'\n')
+    ids = re.findall(r'^(.+?) Phase (\S+?)(?::| |$)', git_out(['log', '%s..HEAD' % BASE_COMMIT, '--pretty=%s']), re.M)
+    phases = len({(p.strip().lower(), i) for p, i in ids})
+    print('baseline %s (%s), %.1f days ago' % (BASE_COMMIT, d0.date(), days))
+    print('funcmap rows        %6d -> %6d   +%d  (%.0f / week)' % (fm0, fm1, fm1 - fm0, (fm1 - fm0) / days * 7))
+    print('unowned studio fns  %6d -> %6d   %+d  (%.0f / week; some of the drop is better attribution, not ports)' % (
+        BASE_UNOWNED, un, un - BASE_UNOWNED, (un - BASE_UNOWNED) / days * 7))
+    print('studio with no funcmap row now: %d of %d' % (unmapped, len(st)))
+    print('phase / review commits since baseline: %d distinct ids (%.0f / week)' % (phases, phases / days * 7))
+    pace = (BASE_UNOWNED - un) / days * 7
+    if pace > 0:
+        print('rough: %d unowned left, %.0f cleared / week -> ~%.0f weeks to zero at this rate (SUMMARY.md counts %.0f%% of unowned as real work, ~%d '
+              'functions; a short window, a range and not a date)' % (un, pace, un / pace, WORK_SHARE * 100, un * WORK_SHARE))
+    return 0
+
+
 def main(a):
+    force = '--refresh' in a
+    try:
+        top = int(opt(a, '--top', 25))
+    except ValueError:
+        sys.exit('junebinary.py: --top needs a number')
+    if any(x in a for x in ('--holdout', '--check', '--summary', '--sample')) and not os.path.exists(OUT):
+        write(build())      # the old modes stay pure reads of the tracked file; only a missing file is built
+    if '--class' in a:
+        return query_class(opt(a, '--class', ''), top, force)
+    if '--owner' in a:
+        return query_owner(opt(a, '--owner', ''), top, force)
+    if '--progress' in a:
+        return progress(force)
     if '--holdout' in a:
         return holdout()
     if '--check' in a:

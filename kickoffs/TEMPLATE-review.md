@@ -20,9 +20,9 @@ Review Phase <N>'s commit(s) against <the map / RE section>: <the specific thing
 could get wrong: enum values, float/key order, store members, read sites, the #else path>.
 
 Hygiene is one command, not a fresh script:
-`python tools/flagcheck.py <FLAG> --range <first phase commit>^..HEAD --with <FLAG>_DEBUG`.
-Paste its `files:` / `in this flag's files:` / `RESULT:` lines into the review. Explain every
-OTHER row and every deleted line; a FAIL or ERROR is a finding.
+`python tools/finish.py --review --commits <the reviewed phases' commits>` (flagcheck per flag with the `_DEBUG` flags attached,
+junediverge `--check` plus `--check-all`, enumscan; a `--range` would also pull in peers' commits). Paste its block into the review.
+Run it with `-v` and explain every OTHER row and every deleted line; a FAIL or ERROR is a finding.
 
 Spot-check 2-3 items directly in Ghidra (read-only); if one fails, re-check the whole phase.
 Fix clear transcription errors under the same flag (then `tools/build.py --deploy`); hand
