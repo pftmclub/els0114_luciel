@@ -818,7 +818,8 @@ Opus 5.5 high. Part 3 of DU1's six, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no 
   `US_SERVICE` (flag probe) and get no twins; the riding blocks keep `SERV_IRUHADEV_JUNE_DIVERGE_SADDLE_POS`'s choice.
 - **Hygiene.** flagcheck `DUO_BODY --worktree --files X2GUUser.cpp X2GUUser.h`: 2 PASS (+145, +6), 0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII,
   RESULT: PASS. `junediverge --check`: RESULT: PASS. enumscan `--check X2GUUser.cpp --reuse`: 0 A/B rows (a fresh `cl /P` of its `X2GuEve.cpp`
-  TU exited 2 with no output; the `/Zs` probes below compile the real files).
+  TU exited 2 with no output; the `/Zs` probes below compile the real files). Commit `0921dee6`; `--range 0921dee6^..0921dee6`: 2 PASS,
+  0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp` and `X2GUChung.cpp`: 0 errors each. Full build skipped: no play-test
   (DU1d builds and hands off the regression pass).
 - **In game:** nothing to see. Every other class has no second body (`m_pMinorUnitXSkinAnim(Future)` NULL, form 0): each new line is a NULL
