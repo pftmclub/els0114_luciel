@@ -238,6 +238,18 @@ void    KDYNAMIC_UNIT_USER_SYNC::Serialize( BYTE*& pbyBuffer, const KDYNAMIC_UNI
 	if( pPrevSync == NULL || pPrevSync->m_dwRelativePos != m_dwRelativePos )
 		m_usDataFieldFlag |= eUnitUserSync_DataField_RelativePos;
 //#endif  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( pPrevSync == NULL || pPrevSync->m_fMinorUnitNowMp != m_fMinorUnitNowMp )	// char-luciel DU1c: June 32d5c2e0 @32d5c442
+		m_usDataFieldFlag |= eUnitUserSync_DataField_MinorUnitNowMp;
+	if( pPrevSync == NULL || pPrevSync->m_usNotSelectPosX != m_usNotSelectPosX )
+		m_usDataFieldFlag |= eUnitUserSync_DataField_NotSelectPosX;
+	if( pPrevSync == NULL || pPrevSync->m_fNotSelectPosY != m_fNotSelectPosY )
+		m_usDataFieldFlag |= eUnitUserSync_DataField_NotSelectPosY;
+	if( pPrevSync == NULL || pPrevSync->m_usNotSelectPosZ != m_usNotSelectPosZ )
+		m_usDataFieldFlag |= eUnitUserSync_DataField_NotSelectPosZ;
+	if( pPrevSync == NULL || pPrevSync->m_sClassSyncShort != m_sClassSyncShort )
+		m_usDataFieldFlag |= eUnitUserSync_DataField_ClassSyncShort;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 	if( pPrevSync == NULL || pPrevSync->m_fClassSkillFloat != m_fClassSkillFloat )
 		m_usDataFieldFlag |= eUnitUserSync_DataField_ClassSkillFloat;
@@ -246,6 +258,10 @@ void    KDYNAMIC_UNIT_USER_SYNC::Serialize( BYTE*& pbyBuffer, const KDYNAMIC_UNI
 	if( pPrevSync == NULL || pPrevSync->m_dwBuffSyncCount != m_dwBuffSyncCount )
 		m_usDataFieldFlag |= eUnitUserSync_DataField_BuffSyncCount;
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( pPrevSync == NULL || pPrevSync->m_usMinorUnitActive != m_usMinorUnitActive )	// char-luciel DU1c: June @32d5c4d6
+		m_usDataFieldFlag |= eUnitUserSync_DataField_MinorUnitActive;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_COMMON_RANDOM_STATE
 	if( pPrevSync == NULL || pPrevSync->m_ucCommonRandomIndex != m_ucCommonRandomIndex )
 		m_usDataFieldFlag |= eUnitUserSync_DataField_CommonRandomIndex;
@@ -300,6 +316,18 @@ void    KDYNAMIC_UNIT_USER_SYNC::Serialize( BYTE*& pbyBuffer, const KDYNAMIC_UNI
 	if( m_usDataFieldFlag & eUnitUserSync_DataField_RelativePos )
         _Serialize( pbyBuffer, m_dwRelativePos );
 //#endif  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( m_usDataFieldFlag & eUnitUserSync_DataField_MinorUnitNowMp )	// char-luciel DU1c: June's wire order 0x10000 .. 0x100000 before 0x200000
+		_Serialize( pbyBuffer, m_fMinorUnitNowMp );
+	if( m_usDataFieldFlag & eUnitUserSync_DataField_NotSelectPosX )
+		_Serialize( pbyBuffer, m_usNotSelectPosX );
+	if( m_usDataFieldFlag & eUnitUserSync_DataField_NotSelectPosY )
+		_Serialize( pbyBuffer, m_fNotSelectPosY );
+	if( m_usDataFieldFlag & eUnitUserSync_DataField_NotSelectPosZ )
+		_Serialize( pbyBuffer, m_usNotSelectPosZ );
+	if( m_usDataFieldFlag & eUnitUserSync_DataField_ClassSyncShort )
+		_Serialize( pbyBuffer, m_sClassSyncShort );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 	if( m_usDataFieldFlag & eUnitUserSync_DataField_ClassSkillFloat )
 		_Serialize( pbyBuffer, m_fClassSkillFloat );
@@ -308,6 +336,10 @@ void    KDYNAMIC_UNIT_USER_SYNC::Serialize( BYTE*& pbyBuffer, const KDYNAMIC_UNI
 	if( m_usDataFieldFlag & eUnitUserSync_DataField_BuffSyncCount )
 		_Serialize( pbyBuffer, m_dwBuffSyncCount );
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( m_usDataFieldFlag & eUnitUserSync_DataField_MinorUnitActive )	// char-luciel DU1c: June's wire order, after 0x800000
+		_Serialize( pbyBuffer, m_usMinorUnitActive );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_COMMON_RANDOM_STATE
 	if( m_usDataFieldFlag & eUnitUserSync_DataField_CommonRandomIndex )
 		_Serialize( pbyBuffer, m_ucCommonRandomIndex );
@@ -427,6 +459,33 @@ bool    KDYNAMIC_UNIT_USER_SYNC::Deserialize( const BYTE*& pbyBuffer, const BYTE
             return false;
     }
 //#endif  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if ( usDataFieldFlag & eUnitUserSync_DataField_MinorUnitNowMp )	// char-luciel DU1c: June 32d5be30 @32d5c044 .. @32d5c0bc
+	{
+		if ( false == _Deserialize( pbyBuffer, pbyEnd, m_fMinorUnitNowMp ) )
+			return false;
+	}
+	if ( usDataFieldFlag & eUnitUserSync_DataField_NotSelectPosX )
+	{
+		if ( false == _Deserialize( pbyBuffer, pbyEnd, m_usNotSelectPosX ) )
+			return false;
+	}
+	if ( usDataFieldFlag & eUnitUserSync_DataField_NotSelectPosY )
+	{
+		if ( false == _Deserialize( pbyBuffer, pbyEnd, m_fNotSelectPosY ) )
+			return false;
+	}
+	if ( usDataFieldFlag & eUnitUserSync_DataField_NotSelectPosZ )
+	{
+		if ( false == _Deserialize( pbyBuffer, pbyEnd, m_usNotSelectPosZ ) )
+			return false;
+	}
+	if ( usDataFieldFlag & eUnitUserSync_DataField_ClassSyncShort )
+	{
+		if ( false == _Deserialize( pbyBuffer, pbyEnd, m_sClassSyncShort ) )
+			return false;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 	if ( usDataFieldFlag & eUnitUserSync_DataField_ClassSkillFloat )
 	{
@@ -441,6 +500,13 @@ bool    KDYNAMIC_UNIT_USER_SYNC::Deserialize( const BYTE*& pbyBuffer, const BYTE
 			return false;
 	}
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if ( usDataFieldFlag & eUnitUserSync_DataField_MinorUnitActive )	// char-luciel DU1c: June @32d5c116
+	{
+		if ( false == _Deserialize( pbyBuffer, pbyEnd, m_usMinorUnitActive ) )
+			return false;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_COMMON_RANDOM_STATE
 	if ( usDataFieldFlag & eUnitUserSync_DataField_CommonRandomIndex )
 	{

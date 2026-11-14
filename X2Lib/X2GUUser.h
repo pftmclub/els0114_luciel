@@ -900,6 +900,11 @@ public:
 			UCHAR				ucNumOfDeBuff;		/// 디버프개수
 //#ifdef  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
             DWORD                   m_dwRelativePos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			KProtectedType<float>	fMinorUnitNowMP;	// char-luciel DU1c: June E, syncData +0x48 ( protected Future +0x7ea8 / Now +0x8148 ), Lu/Ciel's second MP
+			KProtectedType<short>	sClassSyncShort;	// char-luciel DU1c: June F, syncData +0x54 ( Future +0x7ecc / Now +0x816c ), a class's synced short
+			KProtectedType<USHORT>	usMinorUnitActive;	// char-luciel DU1c: June I, syncData +0x84 ( Future +0x7f5c / Now +0x81fc ), 1 = the minor unit is active
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 			KProtectedType<float>	fClassSkillFloat;	/// C3e-1: June's class-skill float ( syncData +0x58; protected slot Future +0x7ed8 / Now +0x8178 ), default 0
 #endif SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
@@ -966,6 +971,11 @@ public:
 				ucNumOfDeBuff			= 0;		/// 디버프개수
 //#ifdef  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
                 m_dwRelativePos         = 0;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				fMinorUnitNowMP			= 0.0f;	// char-luciel DU1c: June 320774e0 zeroes E / F / I
+				sClassSyncShort			= 0;
+				usMinorUnitActive		= 0;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 				fClassSkillFloat		= 0.0f;
 #endif SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
@@ -1179,11 +1189,19 @@ public:
 		{
 			bool		m_bShowOppnentMP;
 			float		m_fUpMPAtAttackOrDamage;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			float		m_fUpMPAtAttackOrDamageMinorUnit;	// char-luciel DU1c: June +0x88d4, the minor unit's copy ( +0x88c8 is the first body's )
+			float		GetUpMPAtAttackOrDamage( const bool bMinorUnit_ ) const { return bMinorUnit_ ? m_fUpMPAtAttackOrDamageMinorUnit : m_fUpMPAtAttackOrDamage; }
+			void		SetUpMPAtAttackOrDamage( const bool bMinorUnit_, const float fValue_ ) { ( bMinorUnit_ ? m_fUpMPAtAttackOrDamageMinorUnit : m_fUpMPAtAttackOrDamage ) = fValue_; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 			CashItemAbility()
 			{
 				m_bShowOppnentMP		= false;
 				m_fUpMPAtAttackOrDamage = 0.f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				m_fUpMPAtAttackOrDamageMinorUnit = 0.f;	// char-luciel DU1c
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			};
 		};
 		//}} dmlee 2008.04.11 - 캐시아이템 관련

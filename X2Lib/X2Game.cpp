@@ -11844,7 +11844,15 @@ void CX2Game::UseItemSpecialAbility( const CX2Item::ItemTemplet* pItemTemplet, C
 
 		case CX2Item::SAT_UP_MP_AT_ATTACK_OR_DAMAGE:
 			{
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE
+				if( 200680 == pItemTemplet->GetItemID() && GT_PVE == GetGameType() )	// June @322fd2fe: the Magic Necklace (200680) gives no MP on hit in a PvE game
+					break;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				pCX2GUUser->AccessCashItemAbility().SetUpMPAtAttackOrDamage( pCX2GUUser->IsMinorUnitActive(), (float) pSa->m_Value1 );	// char-luciel DU1c: June @322fd320, the active body's copy
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				pCX2GUUser->AccessCashItemAbility().m_fUpMPAtAttackOrDamage = (float) pSa->m_Value1;	// 증가량, // fix!! 중첩이 안되는 문제가 있음. 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			} 
 			break;
 
@@ -12812,6 +12820,17 @@ void CX2Game::UseItemPetAbility( const CX2Item::ItemTemplet* pItemTemplet, CX2GU
 //{{ kimhc // 실시간 엘소드 중 실시간 장비 및 아바타 교체
 #ifdef REAL_TIME_ELSWORD
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+namespace _CONST_GAME_DU1C_	// char-luciel DU1c
+{
+	bool IsCharInfoSwitchingView()	// June 322e84e0 / 322e8690: ( g_pData +0x2cc ) +8 = the char window, +0x25a; June tests no NULL, March creates the window on first open
+	{
+		return NULL != g_pData && NULL != g_pData->GetUIManager() && NULL != g_pData->GetUIManager()->GetUICharInfo()
+			&& g_pData->GetUIManager()->GetUICharInfo()->GetSwitchingView();
+	}
+}
+using namespace _CONST_GAME_DU1C_;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 bool CX2Game::RemoveSpecialAbilityInEquip( const CX2Item::ItemTemplet* const pItemTemplet, CX2GUUser* const pCXGUUser )
 {
 
@@ -12837,7 +12856,11 @@ bool CX2Game::RemoveSpecialAbilityInEquip( const CX2Item::ItemTemplet* const pIt
 
 		case CX2Item::SAT_UP_MP_AT_ATTACK_OR_DAMAGE:
 			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				pCXGUUser->AccessCashItemAbility().SetUpMPAtAttackOrDamage( IsCharInfoSwitchingView(), 0.0f );	// char-luciel DU1c: June 322e84e0, the body the char window shows
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				pCXGUUser->AccessCashItemAbility().m_fUpMPAtAttackOrDamage = 0.0f;	// 증가량
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			} 
 			break;
 		}
@@ -12870,7 +12893,15 @@ bool CX2Game::SetSpecialAbilityInEquip( const CX2Item::ItemTemplet* const pItemT
 
 		case CX2Item::SAT_UP_MP_AT_ATTACK_OR_DAMAGE:
 			{
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE
+				if( 200680 == pItemTemplet->GetItemID() && GT_PVE == GetGameType() )	// June 322e8690: the Magic Necklace (200680) gives no MP on hit in a PvE game
+					break;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				pCXGUUser->AccessCashItemAbility().SetUpMPAtAttackOrDamage( IsCharInfoSwitchingView(), static_cast< float >( pSa->m_Value1 ) );	// char-luciel DU1c: June 322e8690, the body the char window shows
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				pCXGUUser->AccessCashItemAbility().m_fUpMPAtAttackOrDamage = static_cast< float >( pSa->m_Value1 );	// 증가량
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			} 
 			break;
 		}

@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel DU1d` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | DU1c |
+| Depends on | DU1c2 |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) |
 | Review | `kickoffs/char-luciel/DU1-review.md` (covers DU1, DU1b, DU1c, DU1d) |
@@ -63,3 +63,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   (`grep -n "passiveSpeed\s*= D3DXVECTOR2\|INIT_VECTOR2( m_PhysicParam.passiveSpeed" X2Lib/X2GUUser.cpp`) for a `+0x378 / +0x37c` reset.
 - The regression play-test now also covers `SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE` (every class: untimed SPEED_TIME entries
   apply at state end): walk, dash, jump and a few skills on one March class, then "check logs" for nothing new.
+
+## Amended by DU1c (2026-11-14)
+
+- DU1c split again: **DU1c2** (the readers outside `CX2GUUser`: weapon-effect type-10 cases, `GetStat`, the socket form readers) now sits
+  between DU1c and DU1d. DU1d depends on DU1c2.
+- The regression play-test also covers DU1c's every-class lines: the MP-on-hit cash ability (a SAT 12 item such as the Magic Necklace 200680
+  still gives MP on hit and on damage), equip / unequip of that item in the village, and `InitStat` (HP / MP / attack unchanged at dungeon start).

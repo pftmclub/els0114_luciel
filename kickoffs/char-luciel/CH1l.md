@@ -53,3 +53,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `GetDamageAirSmallStateID`, 0x488 `GetDamageAirDownStateID`, 0x48c `GetDamageAirDownInvincibleStateID`, 0x490 `GetDamageAirDownLanding`, 0x494
   `GetDamageAirFallStateID`, 0x498 `GetDamageAirUpStateID`, 0x49c `GetDamageAirFlyFrontStateID`, 0x4a0 `GetDamageAirFlyBackStateID`, 0x4a4
   `GetDamageRevengeStateID`; and `virtual int GetJumpDownStateID()` (0x458, not const). The engine readers already ask them (DU2 Done note).
+
+## Amended by char-luciel DU1c (2026-11-14)
+
+- Vslot 0x64c (`32b1c960`) writes gauge MP slot 0 to Future `fNowMP` and slot 1 to Future `syncData.fMinorUnitNowMP` (June E, +0x7ea8, synced on
+  bit 0x10000 since DU1c); vslot 0x650 (`32aeb2c0`) reads Now `fMinorUnitNowMP` back into the gauge's second form. Use DU1c's member names.

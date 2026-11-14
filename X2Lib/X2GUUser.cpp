@@ -3229,6 +3229,17 @@ void CX2GUUser::InitStat()
 
 	AccessStat().InitStat();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1c: June 31fe5480 @31fe55a5, the active body's game stat ( 3234af90( +0x8e90 == 1 ) on the unit data )
+	if( GetUnit()->GetUnitData().GetGameStatOfBody( IsMinorUnitActive() ).m_fBaseHP > 0 )
+	{
+		SetGameStat( GetUnit()->GetUnitData().GetGameStatOfBody( IsMinorUnitActive() ) );
+	}
+	else
+	{
+		SetGameStat( GetUnit()->GetUnitData().m_Stat );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( GetUnit()->GetUnitData().m_GameStat.m_fBaseHP > 0 )
 	{
 		//AccessStat().AddStat( GetUnit()->GetUnitData().m_GameStat );
@@ -3238,6 +3249,7 @@ void CX2GUUser::InitStat()
 	{
 		SetGameStat( GetUnit()->GetUnitData().m_Stat );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 }
 
@@ -12002,10 +12014,18 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 				}
 
 				//{{ dmlee 2008.04.11 캐시 아이템 착용시
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				// char-luciel DU1c: June DamageReact @32049e76, the active body's copy ( +0x88c8 / +0x88d4 )
+				if( 0.f != m_CashItemAbility.GetUpMPAtAttackOrDamage( IsMinorUnitActive() ) )
+				{
+					UpNowMp( m_CashItemAbility.GetUpMPAtAttackOrDamage( IsMinorUnitActive() ) );
+				}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				if( 0.f != m_CashItemAbility.m_fUpMPAtAttackOrDamage )
 				{
 					UpNowMp( m_CashItemAbility.m_fUpMPAtAttackOrDamage );
 				}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				//}} dmlee 2008.04.11 캐시 아이템 착용시
 
 				//{{ 박진웅 : 대전 블루팀 마나 회복률 보너스 없던 문제 수정
@@ -15201,10 +15221,18 @@ void CX2GUUser::AttackResult()
 
 
 			//{{ dmlee 2008.04.11 캐시 아이템 착용시
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			// char-luciel DU1c: June AttackResult 32012b50 @320132fb, the active body's copy ( +0x88c8 / +0x88d4 )
+			if( 0.f != m_CashItemAbility.GetUpMPAtAttackOrDamage( IsMinorUnitActive() ) )
+			{
+				UpNowMp( m_CashItemAbility.GetUpMPAtAttackOrDamage( IsMinorUnitActive() ) );
+			}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			if( 0.f != m_CashItemAbility.m_fUpMPAtAttackOrDamage )
 			{
 				UpNowMp( m_CashItemAbility.m_fUpMPAtAttackOrDamage );
 			}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			//}} dmlee 2008.04.11 캐시 아이템 착용시
 			
 			ProcessAttackResult();
@@ -19278,6 +19306,9 @@ void CX2GUUser::CommonFrameMoveFuture()
 	m_bSpecialAttackEventProcessedAtThisFrame = false;
 #endif NEW_SKILL_TREE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	m_FrameDataFuture.syncData.usMinorUnitActive = ( true == m_bMinorUnitActive ) ? 1 : 0;	// char-luciel DU1c: June @32063316 ( = 31fe9e40 ), every class
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	m_FrameDataFuture.syncData.nowAction = UAI_NONE;
 }
 
@@ -30331,6 +30362,15 @@ bool CX2GUUser::PopFrameData( bool bPopOnce )
 		m_fFrameSkipTime = 0.0f;
 		*/
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1c: June @3206d404-3206d45a, another player's Lu/Ciel takes the synced active body
+	if( false == IsMyUnit() && NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
+	{
+		const bool bSyncedMinorUnitActive = ( 1 == static_cast<USHORT>( m_FrameDataNow.syncData.usMinorUnitActive ) );
+		if( m_bMinorUnitActive != bSyncedMinorUnitActive )
+			SetActiveBody( bSyncedMinorUnitActive );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //#ifdef  SERV_OPTIMIZE_ROBUST_USER_NPC_PACKET_SEND
     return  bPopAgain;
 //#endif  SERV_OPTIMIZE_ROBUST_USER_NPC_PACKET_SEND
@@ -30423,6 +30463,13 @@ void CX2GUUser::SendFrameData()
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
 //#ifdef  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
                 kXPT_UNIT_USER_SYNC.m_dwRelativePos = pSyncData->m_dwRelativePos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+                kXPT_UNIT_USER_SYNC.m_fMinorUnitNowMp = pSyncData->fMinorUnitNowMP;	// char-luciel DU1c: June 3203d4d0 fills E, B, F, I
+                _EncodeUserSyncPos( kXPT_UNIT_USER_SYNC.m_usNotSelectPosX, kXPT_UNIT_USER_SYNC.m_usNotSelectPosZ, pSyncData->vNotSelectPosition, static_cast<unsigned char>( pSyncData->lastTouchLineIndex ) );	// June 32006d80 @3203d6e4 / @3203d709
+                kXPT_UNIT_USER_SYNC.m_fNotSelectPosY = pSyncData->vNotSelectPosition.y;
+                kXPT_UNIT_USER_SYNC.m_sClassSyncShort = pSyncData->sClassSyncShort;
+                kXPT_UNIT_USER_SYNC.m_usMinorUnitActive = pSyncData->usMinorUnitActive;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
                 kXPT_UNIT_USER_SYNC.m_fClassSkillFloat = pSyncData->fClassSkillFloat;
 #endif SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
@@ -45140,6 +45187,13 @@ void CX2GUUser::SyncData::SetData( const KDYNAMIC_UNIT_USER_SYNC& SyncPacket, DW
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER
 //#ifdef  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
     m_dwRelativePos         = SyncPacket.m_dwRelativePos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	fMinorUnitNowMP			= SyncPacket.m_fMinorUnitNowMp;	// char-luciel DU1c: June 3201f5f0: E +0x48, B +0x14 ( 32000f70, y raw ), F +0x54, I +0x84
+	_DecodeUserSyncPos( vNotSelectPosition, SyncPacket.m_usNotSelectPosX, SyncPacket.m_usNotSelectPosZ, static_cast<unsigned char>( SyncPacket.m_ucLastTouchLineIndex ) );
+	vNotSelectPosition.y	= SyncPacket.m_fNotSelectPosY;
+	sClassSyncShort			= SyncPacket.m_sClassSyncShort;
+	usMinorUnitActive		= SyncPacket.m_usMinorUnitActive;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 	fClassSkillFloat		= SyncPacket.m_fClassSkillFloat;	/// June 3201f5f0: syncData +0x58 from packet +0x2a
 #endif SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT

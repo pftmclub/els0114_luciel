@@ -5655,10 +5655,18 @@ void CX2DamageEffect::CEffect::AttackResult()
 				case CX2GameUnit::GUT_USER:
 					{
 						CX2GUUser* pGUUser = static_cast<CX2GUUser*>( pOwnerGameUnit );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+						// char-luciel DU1c: June 31f85910 @31f8716d, the active body's copy, tested != 0 as June ( March > 0 )
+						if( 0.f != pGUUser->GetCashItemAbility().GetUpMPAtAttackOrDamage( pGUUser->IsMinorUnitActive() ) )
+						{
+							pGUUser->UpNowMp( pGUUser->GetCashItemAbility().GetUpMPAtAttackOrDamage( pGUUser->IsMinorUnitActive() ) );
+						}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 						if( pGUUser->GetCashItemAbility().m_fUpMPAtAttackOrDamage > 0.f )
 						{
 							pGUUser->UpNowMp( pGUUser->GetCashItemAbility().m_fUpMPAtAttackOrDamage );
 						}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 					} break;
 				}
 				//}} dmlee 2008.04.11 캐시 아이템 착용시

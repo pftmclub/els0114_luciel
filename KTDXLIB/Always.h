@@ -13265,6 +13265,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !defined( SERV_IRUHADEV_JUNE_SPEED_TIME )
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs SERV_IRUHADEV_JUNE_SPEED_TIME ( the MINOR_UNIT_SPEED_TIME lists ), char-luciel DU1b4
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !( defined( SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER ) && defined( SERV_IRUHADEV_JUNE_CHARINFO_SHOW ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs BUFF_NEW_FINALIZER ( the 32-bit sync field flag ) and CHARINFO_SHOW ( the char window's switching view ), char-luciel DU1c
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-14
@@ -13294,4 +13297,15 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE ) && !defined( SERV_IRUHADEV_JUNE_SPEED_TIME )
 #error SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE needs SERV_IRUHADEV_JUNE_SPEED_TIME ( TIME_SPEED::bRotateByDirZ )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel DU1c - CX2Game::SetSpecialAbilityInEquip ( June 322e8690 ) and UseItemSpecialAbility's SAT_UP_MP_AT_ATTACK_OR_DAMAGE
+//              case ( June @322fd2fe ) as June's: the Magic Necklace ( item 200680 ) gives no MP on hit in a PvE game ( GT_PVE, unreachable
+//              offline ). Every class. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE
+#if defined( SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE ) && !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES )
+#error SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( GT_PVE )
+#endif SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE
 //////////////////////////////////////////////////////////////////////////

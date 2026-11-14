@@ -495,6 +495,10 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 
 			CX2Stat::Stat 			m_Stat;
 			CX2Stat::Stat 			m_GameStat;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			CX2Stat::Stat 			m_MinorUnitGameStat;	// char-luciel DU1c: June unit data +0x1a0; stand-in: zero until its writer 323571c0 lands ( DU5 )
+			const CX2Stat::Stat&	GetGameStatOfBody( const bool bMinorUnit_ ) const { return bMinorUnit_ ? m_MinorUnitGameStat : m_GameStat; }	// June 3234af90
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			KProtectedType<int>		m_iSPoint;				// 가지고 있는 스킬 포인트
 #ifdef NEW_SKILL_TREE
 			KProtectedType<int>		m_iCSPoint;				// 가지고 있는 캐시 스킬 포인트

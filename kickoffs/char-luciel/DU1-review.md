@@ -1,10 +1,10 @@
-# June character Lu/Ciel (Stage 8) - Phase DU1 review (covers DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1d)
+# June character Lu/Ciel (Stage 8) - Phase DU1 review (covers DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d)
 
 | | |
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel DU1 review` (after DU1d is done) |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1d done (their Done notes and commits) |
+| Depends on | DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d done (their Done notes and commits) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (+ `SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE`, DU1) |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) |
 
@@ -47,3 +47,10 @@ and commit.
 - DU1b4 added a second flag, `SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE` (June's `CommonStateEndFuture` prefix, every class; its
   `june_march_divergent.tsv` row). Review it with the DU1 series: `flagcheck JUNE_CHAR_DUO_BODY --with JUNE_DIVERGE_COMMON_STATE_END_FUTURE`
   over the range, and read `31fdd8e0` against the prefix. The camera keys DU1b4 routed to Stage 2 are not this review's.
+
+## Amended by DU1c (2026-11-14)
+
+- The review also covers **DU1c2** (read its Done note; add `"DU1c2 - Done"` to the docsection line) and DU1c's divergence flag
+  `SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE` (add it to the flagcheck `--with` list): June `322e8690` and @`322fd2fe` skip item 200680 in
+  `GT_PVE`. Check DU1c's sync bit order against `32d5be30` (E, B x / y / z, F before 0x200000; I after 0x800000) and the `+0x88c8` / `+0x88d4`
+  identification (`CashItemAbility`, three readers, three writers).

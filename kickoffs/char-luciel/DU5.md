@@ -57,3 +57,11 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
 ## Amended by CH0 (2026-11-02)
 
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §3 L153 CharCustomData (22 Lu/Ciel rows in June); customize reader reads DUO_TYPE; §3 L153 UnitViewerEffectSetTable (Lu/Ciel duo rows); §7e L368 duo minor model in the unit viewer: +0xd7c skin anim, +0xd80-0xd82 duo type / sh; §7v L649-653 IS_FOR_MINOR_UNIT slot key (X2SlotItem.cpp:53-65 LuaGetValue, June 32e284b0 @32e; §7aj L870-872 unit form change 3234d930 (my unit +0x28 / +0x2c match, 3214f050, 328e8cd0( form; §7as L1001-1012 unit viewer glow: 31f92910, 31f9a900, 31f961a0, frame move 31f93050 (+0xd80), vi.
+
+## Amended by char-luciel DU1c (2026-11-14)
+
+- **The second game stat's writer.** DU1c added `CX2Unit::UnitData::m_MinorUnitGameStat` (June unit data +0x1a0) and `InitStat` reads it while
+  Ciel is active, but nothing fills it yet (Ciel falls back to `m_Stat`). June's writer is `UnitData::SetGameStats( KStat first, KStat second )`
+  `323571c0` (ret 0x38), called from seven packet sites (`31ed46e0`, `32360090`, `31ed57d0`, `31ed4c80`, `31f1ed70`, `32461e80`, `32473f70`): the
+  June packets carry a second `KStat` beside `m_kGameStat`. Port the writer, the packet fields (the `CommonPacket.h` rule applies), and the
+  emulator's per-body numbers (the minor unit's equipment, after DU3 / DU4) here.

@@ -902,6 +902,51 @@ No `_DEBUG`, no log line (nothing runs before CH1). funcmap rows: `grep "(DU1b4)
 - **In game:** nothing new for Lu/Ciel yet. Other classes: form 0, none of the duo keys, the minor list stays empty; the only live change is
   the untimed SPEED_TIME entries applying at state end and the Future anim placed at the Future position there (June's behaviour).
 
+### DU1c - Done (2026-11-14)
+
+Opus 5.5 high. Part 6 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (Always.h: a fifth `#error` guard, BUFF_NEW_FINALIZER and CHARINFO_SHOW) plus
+the new divergence flag `SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE`. Files: `X2UDPPacket.h` / `.cpp`, `X2GUUser.h` / `.cpp`, `X2Game.cpp`,
+`X2DamageEffect.cpp`, `X2UICharInfo.h`, `X2Unit.h`, `Always.h`. No `_DEBUG`, no log line (nothing runs before CH1). funcmap rows:
+`grep "(DU1c)" june2017_re/funcmap.tsv` (11).
+- **Split again (kickoff's own rule).** The readers outside `CX2GUUser` (the weapon-effect type-10 cases `3228c540` / `32292610`, `GetStat`
+  `328842f0`, the socket readers `32365d30` / `328836c0`, `3235a160`, `31ed3340`) go to **DU1c2** (kickoff written); DU1d now depends on it.
+- **Sync packet (not `CommonPacket.h`: `KDYNAMIC_UNIT_USER_SYNC` lives in `X2UDPPacket.h`, client-local; no `ServerDefine.h` twin).** Bits
+  0x10000 E float, 0x20000 / 0x40000 / 0x80000 B (second position x half / y float / z half), 0x100000 F short, 0x1000000 I word, in June's
+  wire order (after RelativePos and before C3e-1's 0x200000; I after BuffSyncCount). H (0x20000000) stays char-ain's. SendFrameData encodes B
+  with `_EncodeUserSyncPos` against the line index (`@3203d6e4` / `@3203d709`), SetData decodes it the same way, y raw (`3201f5f0`).
+- **SyncData:** `fMinorUnitNowMP` (E, June +0x48), `sClassSyncShort` (F, +0x54), `usMinorUnitActive` (I, +0x84), protected as June's slots,
+  zeroed in `Init`. **E is Ciel's own MP:** Lu/Ciel's vslot 0x64c override `32b1c960` writes gauge MP (0) to Future `fNowMP` and gauge MP (1)
+  to E (reader `32aeb2c0`, CH1l; kickoff amended). F's drivers are class code (Ain, Rose, Lu/Ciel). June's converters `32071ea0` / `320829b0`
+  need no code: March keeps one SyncData shape copied whole (send list -> receive list -> Now).
+- **Active body sync:** Future I = ( `m_bMinorUnitActive` ) every frame for every class (`@32063316`, = `31fe9e40`), before nowAction is cleared;
+  `PopFrameData`'s tail (`@3206d404-3206d45a`): another player's `UT_LUCIEL` unit calls `SetActiveBody( I == 1 )` when it differs.
+- **MP-on-hit cash ability per body.** June's `+0x88c8` / `+0x88d4` are `m_fUpMPAtAttackOrDamage` and a minor-unit copy (`+0x88c4` =
+  `m_bShowOppnentMP`), so the pair is `CashItemAbility` with `GetUpMPAtAttackOrDamage( bMinorUnit )` / `SetUpMPAtAttackOrDamage`. Readers by
+  the active body: `AttackResult` (`@320132fb`), `DamageReact` (`@32049e76`; NU0 filed it under `32045dc0` CanApplyBuffToGameUnit, no int3
+  between them), `CX2DamageEffect::CEffect::AttackResult` (`@31f8716d`, June tests `!= 0` where March tested `> 0`). Writers:
+  `UseItemSpecialAbility`'s SAT 12 case (`@322fd320`, active body; the kickoff's "ProcessExpListByNpcUnitDie `322f8920`" is this uncarved code
+  after it), `Set/RemoveSpecialAbilityInEquip` (`322e8690` / `322e84e0`) by the **char window's switching view** (`g_pData` +0x2cc UI manager,
+  +8 char window, +0x25a; new `CX2UICharInfo::GetSwitchingView`). June reads the window with no NULL test; March creates it on first open, so
+  `IsCharInfoSwitchingView` (`_CONST_GAME_DU1C_`) tests NULL and reads false. JUNE_BUGS 663: the body is picked by context, not by who wears it.
+- **Divergence found and replaced (this commit):** June's `SetSpecialAbilityInEquip` and the same SAT 12 case skip the Magic Necklace (200680)
+  in `GT_PVE` (unreachable offline) under `SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE`. `june_march_divergent.tsv` rows: `InitStat`,
+  `SetSpecialAbilityInEquip`, `RemoveSpecialAbilityInEquip`, `UseItemSpecialAbility` (SAT 12 case only; other cases not compared),
+  `PopFrameData`.
+- **InitStat per body (kickoff amendment, `31fe5480` @`31fe55a5`):** the game stat is `UnitData::GetGameStatOfBody( IsMinorUnitActive() )`
+  (June `3234af90`: unit data +0x164 `m_GameStat` or +0x1a0, new `m_MinorUnitGameStat`), `m_fBaseHP > 0` else `m_Stat`. **Stand-in:** the
+  second stat's writer is June's `UnitData::SetGameStats( KStat, KStat )` `323571c0` (seven packet sites); it and the emulator's per-body numbers
+  go to **DU5** (kickoff amended). Until then Ciel active reads `m_Stat` (June's absent-value path); CH1's play-test will show it.
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --with JUNE_DIVERGE_UP_MP_ITEM_PVE --worktree --files` (9 files): 7 PASS (`X2UDPPacket.cpp` +66,
+  `X2GUUser.cpp` +54, `X2UDPPacket.h` +28, `X2GUUser.h` +18, `X2DamageEffect.cpp` +8, `X2Unit.h` +4, `X2UICharInfo.h` +3), 2 OTHER (`Always.h`
+  and `X2Game.cpp`: a peer's uncommitted char-elesis CH4a blocks beside mine, not staged), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS.
+  `junediverge --check` (8 files): RESULT: PASS. `enumscan --check`: the 4 known DU1b3 rows only. Flag probe: both flags, BUFF_NEW_FINALIZER
+  and CHARINFO_SHOW on, no `#error`.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2Packet.cpp` (includes `X2UDPPacket.cpp`), `X2Game.cpp`,
+  `X2DamageEffect.cpp`, `X2Unit.cpp`, `X2UICharInfo.cpp`, `X2GUChung.cpp`: no error in DU1c's code; each TU's only errors are the peer's
+  uncommitted `X2BuffBehaviorTemplet.h(146)` (C2027 `CX2GameUnit`, char-elesis CH4a in progress). Full build skipped: no play-test.
+- **In game:** nothing new. Other classes: I is always 0 and only Lu/Ciel reads it; E / B / F are 0; the MP-on-hit copy read is the first
+  body's (form 0, window not switched); InitStat reads `m_GameStat`. The Magic Necklace gate is PvE-only.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

@@ -71,6 +71,9 @@ public:
 	bool GetShow(){ return m_bShow; }
 #ifdef SERV_IRUHADEV_JUNE_CHARINFO_SHOW
 	void SetSwitchingView( bool bSwitchingView_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	bool GetSwitchingView() const { return m_bSwitchingView; }	// char-luciel DU1c: June +0x25a, read by CX2Game's equip ability writers
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif SERV_IRUHADEV_JUNE_CHARINFO_SHOW
 #ifdef SERV_IRUHADEV_JUNE_CHARINFO_VIEW
 	void SetLight( const bool bDarkBackground_ );

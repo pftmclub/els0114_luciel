@@ -262,6 +262,14 @@ struct KDYNAMIC_UNIT_USER_SYNC
 		eUnitUserSync_DataField_NumOfDeBuff = ( 1 << 14 ),
 //#ifdef  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
         eUnitUserSync_DataField_RelativePos = ( 1 << 15 ),
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		eUnitUserSync_DataField_MinorUnitNowMp = ( 1 << 16 ),	// char-luciel DU1c: June E, bit 0x10000 (32d5be30), the minor unit's MP float, packet +0x1c
+		eUnitUserSync_DataField_NotSelectPosX = ( 1 << 17 ),	// char-luciel DU1c: June B x, bit 0x20000, half against the line index, packet +0x20
+		eUnitUserSync_DataField_NotSelectPosY = ( 1 << 18 ),	// char-luciel DU1c: June B y, bit 0x40000, float, packet +0x22
+		eUnitUserSync_DataField_NotSelectPosZ = ( 1 << 19 ),	// char-luciel DU1c: June B z, bit 0x80000, half against the line index, packet +0x26
+		eUnitUserSync_DataField_ClassSyncShort = ( 1 << 20 ),	// char-luciel DU1c: June F, bit 0x100000, a class's synced short (Ain / Rose / Lu/Ciel), packet +0x28
+		eUnitUserSync_DataField_MinorUnitActive = ( 1 << 24 ),	// char-luciel DU1c: June I, bit 0x1000000, the active body word, packet +0x41
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 		eUnitUserSync_DataField_ClassSkillFloat = ( 1 << 21 ),	/// C3e-1: June's bit 0x200000 (32d5be30), wire position after 0x8000 and before 0x800000
 #endif SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
@@ -298,6 +306,10 @@ struct KDYNAMIC_UNIT_USER_SYNC
 													eUnitUserSync_DataField_NumOfDeBuff
 //#ifdef  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
                                                     | eUnitUserSync_DataField_RelativePos
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+                                                    | eUnitUserSync_DataField_MinorUnitNowMp | eUnitUserSync_DataField_NotSelectPosX | eUnitUserSync_DataField_NotSelectPosY
+                                                    | eUnitUserSync_DataField_NotSelectPosZ | eUnitUserSync_DataField_ClassSyncShort | eUnitUserSync_DataField_MinorUnitActive
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //#endif  X2OPTIMIZE_USER_USER_PUSH_PASS_SYNC
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
                                                     | eUnitUserSync_DataField_ClassSkillFloat
@@ -366,6 +378,14 @@ struct KDYNAMIC_UNIT_USER_SYNC
 	UCHAR				m_ucHittedCount;		/// 피격횟수
 	UCHAR				m_ucNumOfDeBuff;		/// 디버프개수
     DWORD               m_dwRelativePos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	float				m_fMinorUnitNowMp;		// char-luciel DU1c: June E ( syncData +0x48 )
+	USHORT				m_usNotSelectPosX;		// char-luciel DU1c: June B ( syncData +0x14, the not-selected body ), x as a half
+	float				m_fNotSelectPosY;
+	USHORT				m_usNotSelectPosZ;
+	short				m_sClassSyncShort;		// char-luciel DU1c: June F ( syncData +0x54 )
+	USHORT				m_usMinorUnitActive;	// char-luciel DU1c: June I ( syncData +0x84 ), 1 = the minor unit is the active body
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
 	float				m_fClassSkillFloat;		/// C3e-1: June's class-skill float, bit 0x200000, packet +0x2a
 #endif SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
@@ -403,6 +423,14 @@ struct KDYNAMIC_UNIT_USER_SYNC
         m_ucHittedCount = 0;
         m_ucNumOfDeBuff = 0;
         m_dwRelativePos = 0;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+        m_fMinorUnitNowMp = 0.f;	// char-luciel DU1c
+        m_usNotSelectPosX = 0;
+        m_fNotSelectPosY = 0.f;
+        m_usNotSelectPosZ = 0;
+        m_sClassSyncShort = 0;
+        m_usMinorUnitActive = 0;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
         m_fClassSkillFloat = 0.f;
 #endif SERV_IRUHADEV_JUNE_SYNC_CLASS_FLOAT
