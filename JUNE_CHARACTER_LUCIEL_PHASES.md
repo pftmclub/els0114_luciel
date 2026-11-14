@@ -1224,6 +1224,59 @@ No `_DEBUG`, no log line. funcmap rows: `grep "(DU1d5)" june2017_re/funcmap.tsv`
   Logs: 0 EXCEPTION, ErrorLog has no render line, UNHANDLED only the known `E_DISABLE_HB_CHECK_REQ` x3. Side note (not this phase, since the
   import): `/invin` fails, its `Slash_invin` calls the unbound `SetInvincibleAndNoMpConsume_Cheat` (ErrorLog 13:06:14). DU1 review ready.
 
+### DU1 - Review (2026-11-14)
+
+Opus 5.5 high. **Verdict: pass after one fix** (enum names, no behaviour change). Covers DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d,
+DU1d2, DU1d3, DU1d3b, DU1d4, DU1d5 (13 code commits `c90b0000` .. `9223c6c7`). All 13 Done notes read; Ghidra read-only.
+- **Fix: `DUO_TYPE` takes June's names.** DU1b's `_CONST_GUUSER_DU1B_` said DUO_TYPE had no June Enum entry; June's `Enum.lua` has `DT_MAJOR` 0 /
+  `DT_MINOR` 1 / `DT_BOTH` 2 / `DT_KEEP` 3 (`Enum.src.lua:17515`). New `CX2Unit::DUO_TYPE` (`X2Unit.h`, under `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY`,
+  tag `char-luciel DU1 review`); the four `DUO_TYPE_*` constants are removed and their 11 uses in `X2GUUser.cpp` (both state starts, both
+  anim plays per body, `ApplyDuoTypeAtStateStart`, the unit-viewer row in `PlayEmotion`) read the members. **Value 3 keeps, not a new
+  decision:** June `320506f0 @32050e10` on 3 (and on a miss, `@32050dfe`) stores word 0 at `+0x8e91` (duo off, end-at-anim-end off), calls
+  `UpdateDuo( 1 )` and never `SetActiveBody`: the active body stays and the duo ends. DU1b's code did exactly that; only the name was wrong.
+- **Spot-checks against June (all equal):**
+  - `ApplyDuoTypeAtStateStart` = `@32050e10-32050f56`: hand-over tests `ESP+0xcc` / `+0xe8` = the size words of the `MINOR_UNIT_ANIM_NAME`
+    (21-byte key at `ESP+0x368`) / `ANIM_NAME` strings, vslot `0x260` = `IsMinorUnitActive`, flags `+0x7d8e` (9) / `+0x7d8d` (8), latch
+    `+0x8e93` (word `0x100` at `+0x8e92`), `+0x8acc` = type; type 2 = `SetDuoEnabled( 1 )` only.
+  - `GetX2UnitClassGrade` = `31fe5860 @31fe5c45-31fe5c6b`: `class - 10 <= 0xbd` (unsigned) -> `1 + ( class >= 100 )`, else 0. March's `/10`
+    form gives the same for every class id >= 0.
+  - Ctor `3203e850`: `+0x8e90` = unit `+0xe40` (`@32042467`, 0 without a unit), `+0x8e91` word 0 (`@32042479`), `+0x8e93` 0, `+0x84dc` word /
+    `+0x84de` 0 (`@3203f385`), `+0x8f6e` word, `+0x8f5c` word, `+0x8f60..68`, `+0x8f6c` 0 (`@320431f6-3204321c`), `+0x8fa4` / `+0x8fa8` /
+    `+0x8fb4` 0 (`@32040ed8-32040ef0`). DU1b3's `+0x8f50 = 1.0` and DU1b4's `+0x8f6d = 0` (June leaves both to the first state start) are safe
+    defaults, noted in their comments.
+  - `CommonRender_PrepareBody` = `31ff03d0`: body pick `32071d80` / `32071db0`; override `+0x8fa4 == 1 && +0x8fb4 == 1`, `+0x8fa8` 0 ->
+    `32071d40`, 1 -> vslot `0x58`; world cartoon / rim before the pain test (`@31ff05c2`); Z word `0x101` (`@31ff060f`); super-armor
+    colour-edge red (`@31ff06fa`); `HaveThisBuff( 0x3b1 )` black edge / petrified at `@31ff0c5b`, skipped by the pain != 0 jump
+    (`@31ff096c` -> `31ff0caa`), so inside the pain == 0 block; instant-show `+0x173 = 1` unconditional (`@31ff0d40`); `+0x160` from the
+    camera after the equip loop (`@31ff0e3a`). `CommonRender_Prepare` / `OnFrameRender_Draw` match DU1d5's note.
+  - `GetCloneFrameByBodyPrefix`: strings `33473188` "MAJOR:" / `33473178` "MINOR:" (Ghidra string list); `31fda280` compares 6 characters.
+- **Mechanical checks (subagent, spot-read):** the 22 cancel-macro twins in `X2GUUser.h` equal their `#else` with `m_pXSkinAnimFuture` ->
+  `GetXSkinAnimFuture()` and nothing else (at `a9621883` and at HEAD). Every `char-luciel DU1d3b` (17) / `DU1d4` (21) / `DU1d5` (4) hunk sits in
+  a funcmap row's function or a census row (one extra address is the `32351070` MixAnim callee). `du1d_body_reads.tsv` (104 rows): no owner
+  left as a bare `DU1d2` / `DU1d3` / `DU1d4`; 4 rows `CH1` (Lu/Ciel-only base helpers), 18 routed, 8 none, 2 dead. `nu0_duo_engine.tsv`: all 440
+  `DU1` rows are cited by address in a Done note, funcmap, the census or a routed kickoff; the 2,248 `DU1-accessor` rows are inline expansions of
+  the accessor (`DU1.md`: one header change, not per site), covered by DU1's accessors and the macro twins.
+- **No change for other classes:** each DU1 commit's flag-off strip equals its parent byte for byte (below); every new branch needs a second
+  anim, form 1, `UT_LUCIEL` or a duo key, which March classes never have. What does reach every class is the four DIVERGE flags (June's own
+  behaviour, divergent rows): untimed SPEED_TIME at state end, the Magic Necklace PvE gate, the revive voice file, the render lines. The DU1d4
+  regression and DU1d5 render play-tests passed on them.
+- **Hygiene, DU1 commits** (`--range c^..c` each, code files, `--with CLASS_GRADE DIVERGE_COMMON_STATE_END_FUTURE DIVERGE_UP_MP_ITEM_PVE
+  DIVERGE_PLAY_SOUND_REVIVE DIVERGE_USER_RENDER`): 13 of 13 `RESULT: PASS`, together 36 PASS, 4 PASS~, 0 OTHER, 0 FAIL, 0 ERROR; 1 deleted line
+  (`442529eb`: DU1b's own stand-in line inside the flag, replaced by DU1d3). The single `--range c90b0000^..HEAD` run reads `RESULT: FAIL` only
+  for peer commits in the range: `abe3a805` (char-elesis CH4b2) and `dbc7c77a` (CH4c) edit `X2GUUser.cpp` under `_ELESIS_PASSIVE` / `_BLOOD`, flags
+  outside the `--with` list (2 FAIL, 5 OTHER, none in DU1 text). `Always.h` per flag without `--with`: DIVERGE_USER_RENDER `RESULT: PASS`; the
+  others FAIL / ERROR only on the `#if defined( A ) && !defined( B )` dependency guards (DU1's own and peers') the tool cannot strip; each phase's
+  own range run showed its define as DEFINE.
+- **This review's edit:** flagcheck `DUO_BODY --worktree --files X2Lib/X2GUUser.cpp X2Lib/X2Unit.h`: `files: 2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER,
+  0 FAIL, 0 ERROR`, 17 deleted lines (the removed constants and DU1b's lines rewritten, all inside the flag; flag-off unchanged), `RESULT: PASS`.
+  junediverge `--check-all`: `RESULT: PASS` (239 allow-listed); `--check` of the two files: `RESULT: PASS`. enumscan `--check X2GUUser.cpp`: the 4
+  known DU1b3 rows only. `/Zs` probes (census `cl_cmd`) of `X2GUUser.cpp`, `X2Unit.cpp`, `X2GUChung.cpp`: 0 errors each. Full build skipped: no
+  play-test (a rename; the next play-test phase builds it).
+- **Routed:** `X2UnitManager.cpp:297` (`JUNE_UNIT_VIEWER_EFFECT_TABLE`, not DU1's) tests the literal `2` = `DT_BOTH`: CH1p kickoff amended, with
+  the new members and the live `Enum.lua` gap (`DT_BOTH` / `DT_KEEP` missing). Side note from DU1d5 (`/invin`'s unbound
+  `SetInvincibleAndNoMpConsume_Cheat`) is not DU1's.
+- CH1a0 is ready; CH1p and CH3c no longer wait on this review.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

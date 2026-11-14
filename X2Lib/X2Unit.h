@@ -46,6 +46,15 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 #endif SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE
 		};
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		enum DUO_TYPE	// char-luciel DU1 review: June Enum.lua DUO_TYPE, a state's DUO_TYPE key
+		{
+			DT_MAJOR	= 0,	// Lu acts
+			DT_MINOR	= 1,	// Ciel acts
+			DT_BOTH		= 2,	// both bodies shown
+			DT_KEEP		= 3,	// the active body stays and the duo ends ( June's miss value )
+		};
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		enum UNIT_CLASS
 		{
