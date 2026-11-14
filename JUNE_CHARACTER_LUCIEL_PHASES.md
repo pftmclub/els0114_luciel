@@ -2211,6 +2211,27 @@ funcmap row `31c60890 (CH1i2)`; JUNE_BUGS 706; the CH1i2 review ( `kickoffs/char
 - **Commit** `5d7b09ce`; `finish.py --range 5d7b09ce^..5d7b09ce --skip-flag SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD`: `flagcheck JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER` `1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0, `FINISH RESULT: PASS`.
 - **Next:** `/x2-phase char-luciel CH1i2 review` ( Opus 5.5 high ); the CH1i review is independent.
 
+### CH1i2 - Review (2026-11-14)
+
+Opus 5.5 high. **Verdict: pass, no code change.** Reviewed commit `5d7b09ce` against June `31c60890` ( decompile + raw listing `31c60890`-`31c620d5` ).
+- **Flip:** `FCOM` dist vs 0, `TEST AH,5 / JP` ( `@31c608a3`-`31c608ba` ): flips only on C0 alone = `dist < 0` strict; NaN ( C0|C2 ) and 0 do not flip. Port `fDist < 0.f` = June.
+- **Start line:** the scan skips `bEnable == 0` and `lineType == 1` ( `LT_WALL`, `CMP [ESI+4],1` `@31c60990`; `LT_WALL` = 1 in `KTDGLineMap.h:44`, `FIX_LINE_TYPE_WALL` defined `Always.h:3305` ); no `cmp 7` anywhere in the function ( monster roads count = `bMonster` true ).
+  y prefilter `start.y <= pos.y + 30 || end.y <= pos.y + 30`, span test x / y / z inside = March's skip negated; inlined LineToLine from `( pos.x, 0, pos.z )` with 30 / 900; hit = Manhattan < 30 and `pointL2.y > retVal.y` from -1.0.
+  No hit: no index fallback ( index starts -1 ) and the 999999 nearest-end pass over enabled lines, start then end, strict `<` ( `@31c61bb3` ); still -1 ( no lines ) returns 0.
+  This tree's `GetLandPosition( pos, bool, float, int* )` ( `KTDGLineMap.cpp:1075`, W1c ) does the same with `true` and `iLineIndex = -1` ( its index fallback reads `GetLineData( -1 )` = NULL, a no-op ). Its returned position is unused in June too.
+- **Walk:** first stretch left from `( pos.x, start.y, pos.z )` to `startPos` ( `@31c61d6f` ), right from `( pos.x, end.y, pos.z )` to `endPos` ( `@31c61f51` ) = port. Loop tests `beforeLine` / `nextLine >= 0` first, then `FCOM` dist vs walk,
+  `TEST AH,41 / JNZ` exits on `dist <= walk` or NaN ( `@31c61d9d`, `@31c61f7b` ) = `walk < dist`. Adds `GetDistance( start, end )` per line = port.
+- **End test:** `FCOMP` ( 15 + dist ) vs walk ( `@31c61e3a`, `@31c61fd3` ): `<=` or NaN jumps to the long branch ( `@31c61ef8` / `@31c6202b`, `AL = 1` ), so `walk < dist + 15` takes the 15-in branch and a NaN takes the long one = the port's `if`. ( Ghidra's decompile renders it as `15 + dist <= walk`. )
+  15-in: `lerp = 15 / length` ( `FDIVR` qword `33449130` ); left `( 1 - lerp ) * start + lerp * end`, right `lerp * start + ( 1 - lerp ) * end`, `XOR AL,AL` = port. Long: `( walk - dist ) / length`, March's two lerps, `true` = port.
+- **`#else`:** March's body unchanged ( flagcheck: 0 deleted lines ).
+- **Add caller finding:** confirmed ( `329edde0`: `GetBoneLinePos` of the target toward Add `@329ee077`, `GetDistance` vs 500 `@329ee0af`, call `@329ee138` with 100 / `!GetIsRight()` ). Two corrections to the `kickoffs/char-add/CH1d.md` note:
+  the 500 test is `<=` ( equal swaps to `GetPos()`, NaN keeps the bone position ), and June's `FIX_AISHA_TELEPORT_POSITON` y test also reads the bone position ( `@329ee07c`-`329ee08d` ). Note amended; still char-add CH1d's to port. `329ef130` has the bone / 500 / call pattern ( `@329ef322`, `@329ef3c8` ).
+- **Divergence table:** row `GetFixedDistancePositionForWeaponTaker` `source` names the flag; `june_diverge_allow.tsv` has no row for it.
+- **Gates** ( `finish.py --review --commits 5d7b09ce --skip-flag SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD "guard target" -v` ): `flagcheck JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER` `1 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`, 0 deleted lines, 0 encoding changes / `RESULT: PASS`;
+  `junediverge` PASS; `junediverge --check-all` PASS; `enumscan` exit 0; `FINISH RESULT: PASS (8 gates, 0 failed, 4 skipped)`. SKIPPED: `LINEMAP_LAND_MONSTER_ROAD` ( guard target ), `stateends` / `skillicons` / `luabind` ( none apply ).
+- **Build:** none ( no code change, no play-test ). No debug define to retire.
+- **Next:** CH3c's CH1i2 dependency is met; the CH1i review is independent ( `/x2-phase char-luciel CH1i review`, Opus 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
