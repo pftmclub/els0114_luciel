@@ -1,10 +1,10 @@
-# June character Lu/Ciel (Stage 8) - Phase DU1 review (covers DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d)
+# June character Lu/Ciel (Stage 8) - Phase DU1 review (covers DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d, DU1d2)
 
 | | |
 |---|---|
-| Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel DU1 review` (after DU1d is done) |
+| Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel DU1 review` (after DU1d2 is done) |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d done (their Done notes and commits) |
+| Depends on | DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d, DU1d2 done (their Done notes and commits) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (+ `SERV_IRUHADEV_JUNE_CHAR_CLASS_GRADE`, DU1) |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) |
 
@@ -34,6 +34,13 @@ and `python tools/junediverge.py --check-all`. Paste the summary lines. Explain 
 Spot-check 2-3 items in Ghidra (read-only); if one fails, re-check that part whole. Fix clear transcription errors under the same flag;
 design decisions go to the user. Write "DU1 - Review" into the plan doc, update STATUS.md (CH1a0, CH1p and CH3c wait on this review),
 and commit.
+
+## Amended by DU1d (2026-11-14)
+
+- DU1d split again: the review also covers **DU1d2** (add `"DU1d2 - Done"` to the docsection line; it now runs after DU1d2). Check DU1d's 22
+  macro twins in `X2GUUser.h` (each reads `GetXSkinAnimFuture()` where the original read `m_pXSkinAnimFuture`, nothing else changed) against
+  June's expansions in `31fcc350` / `31fcc9d0` / `31fe7610`, and that every DU1d / DU1d2 site is a `du1d_body_reads.tsv` row (no extra sites).
+  Spot-check two "none" owners (`31fcce20`, `3200c550` unreferenced; `31fcbd10` = SUMMON_MAGIC_SPEAR by Elsword's registration `@32d22329`).
 
 ## Amended by DU1b3 (2026-11-14)
 

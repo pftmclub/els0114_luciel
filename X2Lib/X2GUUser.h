@@ -45,62 +45,129 @@ typedef srutil::delegate1<void, CKTDGLineMap*> DelegatePhysicProcessPortalByGame
 
 //{{오현빈 // 2012-04-30 // 스킬슬롯 체인지 없이 확장 스킬 사용 할 수 있도록 수정
 // 특정 애니메이션 시간이 지난 후에 방향키, ZXASDCQWER를 눌렀을 때 (QWER추가)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_ARROW_ZXASDC_PRESSED_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	( m_InputData.pureUp == true || m_InputData.pureDown == true || m_InputData.pureRight == true || m_InputData.pureLeft == true \
+	|| m_InputData.pureZ == true || m_InputData.pureX == true \
+	|| m_InputData.pureA == true || m_InputData.pureS == true || m_InputData.pureD == true || m_InputData.pureC == true \
+	|| m_InputData.pureQ == true || m_InputData.pureW == true || m_InputData.pureE == true || m_InputData.pureR == true) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_ARROW_ZXASDC_PRESSED_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	( m_InputData.pureUp == true || m_InputData.pureDown == true || m_InputData.pureRight == true || m_InputData.pureLeft == true \
 	|| m_InputData.pureZ == true || m_InputData.pureX == true \
 	|| m_InputData.pureA == true || m_InputData.pureS == true || m_InputData.pureD == true || m_InputData.pureC == true \
 	|| m_InputData.pureQ == true || m_InputData.pureW == true || m_InputData.pureE == true || m_InputData.pureR == true) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 
 // 특정 애니메이션 시간이 지난 후에 방향키, ASDCQWER를 눌렀을 때 (QWER추가)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_ARROW_ASDC_PRESSED_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	( m_InputData.pureUp == true || m_InputData.pureDown == true || m_InputData.pureRight == true || m_InputData.pureLeft == true \
+	|| m_InputData.pureA == true || m_InputData.pureS == true || m_InputData.pureD == true || m_InputData.pureC == true \
+	|| m_InputData.pureQ == true || m_InputData.pureW == true || m_InputData.pureE == true || m_InputData.pureR == true) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_ARROW_ASDC_PRESSED_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	( m_InputData.pureUp == true || m_InputData.pureDown == true || m_InputData.pureRight == true || m_InputData.pureLeft == true \
 	|| m_InputData.pureA == true || m_InputData.pureS == true || m_InputData.pureD == true || m_InputData.pureC == true \
 	|| m_InputData.pureQ == true || m_InputData.pureW == true || m_InputData.pureE == true || m_InputData.pureR == true) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 
 
 
 // 특정 애니메이션 시간이 지난 후에 ASDCQWER를 눌렀을 때 (QWER추가)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_ASDC_PRESSED_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	( m_InputData.pureA == true || m_InputData.pureS == true || m_InputData.pureD == true || m_InputData.pureC == true \
+	|| m_InputData.pureQ == true || m_InputData.pureW == true || m_InputData.pureE == true || m_InputData.pureR == true) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_ASDC_PRESSED_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	( m_InputData.pureA == true || m_InputData.pureS == true || m_InputData.pureD == true || m_InputData.pureC == true \
 	|| m_InputData.pureQ == true || m_InputData.pureW == true || m_InputData.pureE == true || m_InputData.pureR == true) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 
 // 특정 애니메이션 시간이 지난 후에 ZX를 눌렀을 때
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_ZX_PRESSED_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	(m_InputData.pureZ == true || m_InputData.pureX == true) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_ZX_PRESSED_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	(m_InputData.pureZ == true || m_InputData.pureX == true) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 //}}오현빈 // 2012-04-30 // 스킬슬롯 체인지 없이 확장 스킬 사용 할 수 있도록 수정
 
 #ifdef ELSWORD_SHEATH_KNIGHT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define BWALK_CANCEL_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	( ( m_InputData.pureLeft == true && m_FrameDataFuture.syncData.bIsRight == true) || \
+	( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == false) ) ) \
+	{ StateChange( USI_WAIT ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define BWALK_CANCEL_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	( ( m_InputData.pureLeft == true && m_FrameDataFuture.syncData.bIsRight == true) || \
 	( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == false) ) ) \
 	{ StateChange( USI_WAIT ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define WALK_CANCEL_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	( true == m_InputData.pureRight || true == m_InputData.pureLeft ) ) \
+	{ StateChange( USI_WAIT ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define WALK_CANCEL_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	( true == m_InputData.pureRight || true == m_InputData.pureLeft ) ) \
 	{ StateChange( USI_WAIT ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define WALK_CANCEL_AFTER_CANNOT_ATTACKTIME( time, cannotattacktime ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	( true == m_InputData.pureRight || true == m_InputData.pureLeft ) ) \
+	{ StateChange( USI_WAIT ); m_fCanNotAttackTime = cannotattacktime; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define WALK_CANCEL_AFTER_CANNOT_ATTACKTIME( time, cannotattacktime ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	( true == m_InputData.pureRight || true == m_InputData.pureLeft ) ) \
 	{ StateChange( USI_WAIT ); m_fCanNotAttackTime = cannotattacktime; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define DASH_CANCEL_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) ) \
+	{ StateChangeDashIfPossible(); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define DASH_CANCEL_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) ) \
 	{ StateChangeDashIfPossible(); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	
 #ifdef SKILL_CANCEL_BY_HYPER_MODE // 김태환
 
@@ -110,6 +177,19 @@ typedef srutil::delegate1<void, CKTDGLineMap*> DelegatePhysicProcessPortalByGame
 	/// about 950 sites set +0x8d4c this way). The skill branch also needs IsOnSomethingFuture() (+0x7e1c); the awakening
 	/// branch tests CanHyperMode (slot 344) and the quick-slot item wait (32070d60), and sets the awakening-by-key flag
 	/// (+0x8d4c) before the state change. June does not test IsAwakeImpossible (slot 345) here (JUNE_BUGS.md #11).
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+	#define SKILL_CANCEL_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	true == IsOnSomethingFuture() && SpecialAttackEventProcess() == true ) \
+	{ } \
+	else if( false == IsThereEffectiveBlackHoleDamageEffect() && \
+	m_InputData.oneLCtr == true && m_FrameDataFuture.syncData.m_HyperModeCount > 0 && \
+	true == CanHyperMode() && \
+	(time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	false == IsQuickSlotSpecialItemWaiting() ) \
+	{ m_bHyperModeStartedByInput = true; StateChange( GetHypetMpdeStateID() ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	#define SKILL_CANCEL_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	true == IsOnSomethingFuture() && SpecialAttackEventProcess() == true ) \
@@ -120,7 +200,20 @@ typedef srutil::delegate1<void, CKTDGLineMap*> DelegatePhysicProcessPortalByGame
 	(time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	false == IsQuickSlotSpecialItemWaiting() ) \
 	{ m_bHyperModeStartedByInput = true; StateChange( GetHypetMpdeStateID() ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+	#define SKILL_CANCEL_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	SpecialAttackEventProcess() == true ) \
+	{ } \
+	else if( false == IsThereEffectiveBlackHoleDamageEffect() && \
+	m_InputData.oneLCtr == true && m_FrameDataFuture.syncData.m_HyperModeCount > 0 && \
+	( GetRemainHyperModeTime() <= 0.0f || true == GetCanChangeHyperModeInHyperModeState() ) && \
+	(time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) ) \
+	{ StateChange( GetHypetMpdeStateID() ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	#define SKILL_CANCEL_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	SpecialAttackEventProcess() == true ) \
@@ -130,11 +223,25 @@ typedef srutil::delegate1<void, CKTDGLineMap*> DelegatePhysicProcessPortalByGame
 	( GetRemainHyperModeTime() <= 0.0f || true == GetCanChangeHyperModeInHyperModeState() ) && \
 	(time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) ) \
 	{ StateChange( GetHypetMpdeStateID() ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK
 
 	/// if로 시작하는 스킬 캔슬 메크로가 필요하여 추가 ( 위의 스킬 캔슬 메크로와 완전 동일 )
 #ifdef SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK
 	/// June buff port Phase 7c: the same expansion as SKILL_CANCEL_AFTER above, starting with if
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+	#define IF_SKILL_CANCEL_AFTER( time ) \
+	if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	true == IsOnSomethingFuture() && SpecialAttackEventProcess() == true ) \
+	{ } \
+	else if( false == IsThereEffectiveBlackHoleDamageEffect() && \
+	m_InputData.oneLCtr == true && m_FrameDataFuture.syncData.m_HyperModeCount > 0 && \
+	true == CanHyperMode() && \
+	(time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	false == IsQuickSlotSpecialItemWaiting() ) \
+	{ m_bHyperModeStartedByInput = true; StateChange( GetHypetMpdeStateID() ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	#define IF_SKILL_CANCEL_AFTER( time ) \
 	if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	true == IsOnSomethingFuture() && SpecialAttackEventProcess() == true ) \
@@ -145,7 +252,20 @@ typedef srutil::delegate1<void, CKTDGLineMap*> DelegatePhysicProcessPortalByGame
 	(time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	false == IsQuickSlotSpecialItemWaiting() ) \
 	{ m_bHyperModeStartedByInput = true; StateChange( GetHypetMpdeStateID() ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+	#define IF_SKILL_CANCEL_AFTER( time ) \
+	if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	SpecialAttackEventProcess() == true ) \
+	{ } \
+	else if( false == IsThereEffectiveBlackHoleDamageEffect() && \
+	m_InputData.oneLCtr == true && m_FrameDataFuture.syncData.m_HyperModeCount > 0 && \
+	( GetRemainHyperModeTime() <= 0.0f || true == GetCanChangeHyperModeInHyperModeState() ) && \
+	(time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) ) \
+	{ StateChange( GetHypetMpdeStateID() ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	#define IF_SKILL_CANCEL_AFTER( time ) \
 	if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	SpecialAttackEventProcess() == true ) \
@@ -155,34 +275,68 @@ typedef srutil::delegate1<void, CKTDGLineMap*> DelegatePhysicProcessPortalByGame
 	( GetRemainHyperModeTime() <= 0.0f || true == GetCanChangeHyperModeInHyperModeState() ) && \
 	(time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) ) \
 	{ StateChange( GetHypetMpdeStateID() ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK
 
 #else // SKILL_CANCEL_BY_HYPER_MODE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+	#define SKILL_CANCEL_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	SpecialAttackEventProcess() == true ) \
+	{ }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	#define SKILL_CANCEL_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	SpecialAttackEventProcess() == true ) \
 	{ }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif //SKILL_CANCEL_BY_HYPER_MODE
 
 // 특정 애니메이션 시간이 지난 후에 ZX가 눌려져 있을 때
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ZX_CANCEL_AFTER( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) )\
+	{ if ( m_InputData.pureZ == true ) StateChange( GetComboZStateID() ); \
+      else if ( m_InputData.pureX == true ) StateChange( GetComboXStateID() ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ZX_CANCEL_AFTER( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) )\
 	{ if ( m_InputData.pureZ == true ) StateChange( GetComboZStateID() ); \
       else if ( m_InputData.pureX == true ) StateChange( GetComboXStateID() ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 // 특정 애니메이션 시간이 지난 후에 ZX가 눌렀을 때( OneX, OneZ )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ZX_CANCEL_AFTER_EX( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) )\
+	{ if ( m_InputData.oneZ == true ) StateChange( GetComboZStateID() ); \
+	  else if ( m_InputData.oneX == true ) StateChange( GetComboXStateID() ); }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ZX_CANCEL_AFTER_EX( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) )\
 	{ if ( m_InputData.oneZ == true ) StateChange( GetComboZStateID() ); \
 	  else if ( m_InputData.oneX == true ) StateChange( GetComboXStateID() ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif ELSWORD_SHEATH_KNIGHT
 
 #ifdef SERV_RAVEN_VETERAN_COMMANDER		/// 공중에서 사용할 수 있는 스킬에 대해서만 캔슬할 수 있다.
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define SKILL_CANCEL_AFTER_FLY( time ) \
+	else if( (time) >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > (time) && \
+	SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) == true ) \
+
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define SKILL_CANCEL_AFTER_FLY( time ) \
 	else if( (time) >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > (time) && \
 	SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) == true ) \
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #endif SERV_RAVEN_VETERAN_COMMANDER
 
@@ -260,44 +414,96 @@ typedef srutil::delegate1<void, CKTDGLineMap*> DelegatePhysicProcessPortalByGame
 
 
 // 0~지정된 시간사이에 특정 조건을 만족하면 flag = true로 만들고, 지정된 시간이 되었을 때 flag == true이면 지정된 상태로 바뀐다
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_STATE_CHANGE_ON_( iEventFlagIndex, fInputTiming, fChangeTiming, bCondition, iStateID ) \
+	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && GetXSkinAnimFuture()->GetNowAnimationTime() > (float)(fChangeTiming) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( true == (bCondition) && GetXSkinAnimFuture()->GetNowAnimationTime() < (float)(fInputTiming) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_STATE_CHANGE_ON_( iEventFlagIndex, fInputTiming, fChangeTiming, bCondition, iStateID ) \
 	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && m_pXSkinAnimFuture->GetNowAnimationTime() > (float)(fChangeTiming) ) \
 	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
 	else if( true == (bCondition) && m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(fInputTiming) ) \
 	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef ELSWORD_SHEATH_KNIGHT
 // 0~지정된 시간사이에 특정 조건을 만족하면 flag = true로 만들고, 지정된 시간이 되었을 때 flag == true이면 지정된 상태로 바뀐다
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define IF_STATE_CHANGE_ON_EX_( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, bCondition, iStateID ) \
+	if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && GetXSkinAnimFuture()->GetNowAnimationTime() > (float)(fChangeTiming) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( true == (bCondition) && GetXSkinAnimFuture()->GetNowAnimationTime() < (float)(fInputTiming) && GetXSkinAnimFuture()->GetNowAnimationTime() >= (float)(fInputTimingStart) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define IF_STATE_CHANGE_ON_EX_( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, bCondition, iStateID ) \
 	if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && m_pXSkinAnimFuture->GetNowAnimationTime() > (float)(fChangeTiming) ) \
 	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
 	else if( true == (bCondition) && m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(fInputTiming) && m_pXSkinAnimFuture->GetNowAnimationTime() >= (float)(fInputTimingStart) ) \
 	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_STATE_CHANGE_ON_EX_( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, bCondition, iStateID ) \
+	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && GetXSkinAnimFuture()->GetNowAnimationTime() > (float)(fChangeTiming) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( true == (bCondition) && GetXSkinAnimFuture()->GetNowAnimationTime() < (float)(fInputTiming) && GetXSkinAnimFuture()->GetNowAnimationTime() >= (float)(fInputTimingStart) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_STATE_CHANGE_ON_EX_( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, bCondition, iStateID ) \
 	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && m_pXSkinAnimFuture->GetNowAnimationTime() > (float)(fChangeTiming) ) \
 	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
 	else if( true == (bCondition) && m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(fInputTiming) && m_pXSkinAnimFuture->GetNowAnimationTime() >= (float)(fInputTimingStart) ) \
 	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif ELSWORD_SHEATH_KNIGHT
 
 #ifdef NEW_CHARACTER_EL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define IF_STATE_CHANGE_ON_EX_STRUCT( iEventFlagIndex, iEventTImeIndex, bCondition, iStateID ) \
+	if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && GetXSkinAnimFuture()->GetNowAnimationTime() > (float)(m_fEventTime[iEventTImeIndex].stateChange) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( true == (bCondition) && GetXSkinAnimFuture()->GetNowAnimationTime() < (float)(m_fEventTime[iEventTImeIndex].keyInputEnd) && GetXSkinAnimFuture()->GetNowAnimationTime() >= (float)(m_fEventTime[iEventTImeIndex].keyInputStart) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define IF_STATE_CHANGE_ON_EX_STRUCT( iEventFlagIndex, iEventTImeIndex, bCondition, iStateID ) \
 	if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && m_pXSkinAnimFuture->GetNowAnimationTime() > (float)(m_fEventTime[iEventTImeIndex].stateChange) ) \
 	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
 	else if( true == (bCondition) && m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(m_fEventTime[iEventTImeIndex].keyInputEnd) && m_pXSkinAnimFuture->GetNowAnimationTime() >= (float)(m_fEventTime[iEventTImeIndex].keyInputStart) ) \
 	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_STATE_CHANGE_ON_EX_STRUCT( iEventFlagIndex, iEventTImeIndex, bCondition, iStateID ) \
+	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && GetXSkinAnimFuture()->GetNowAnimationTime() > (float)(m_fEventTime[iEventTImeIndex].stateChange) ) \
+	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( true == (bCondition) && GetXSkinAnimFuture()->GetNowAnimationTime() < (float)(m_fEventTime[iEventTImeIndex].keyInputEnd) && GetXSkinAnimFuture()->GetNowAnimationTime() >= (float)(m_fEventTime[iEventTImeIndex].keyInputStart) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_STATE_CHANGE_ON_EX_STRUCT( iEventFlagIndex, iEventTImeIndex, bCondition, iStateID ) \
 	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && m_pXSkinAnimFuture->GetNowAnimationTime() > (float)(m_fEventTime[iEventTImeIndex].stateChange) ) \
 	{ StateChange( (iStateID) ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
 	else if( true == (bCondition) && m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(m_fEventTime[iEventTImeIndex].keyInputEnd) && m_pXSkinAnimFuture->GetNowAnimationTime() >= (float)(m_fEventTime[iEventTImeIndex].keyInputStart) ) \
 	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif //NEW_CHARACTER_EL
 
 #ifdef SERV_ARA_CHANGE_CLASS_SECOND // 김태환
 // 0~지정된 시간사이에 특정 조건을 만족하면 flag = true로 만든다
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc350 / 31fcc9d0, the active body's anim
+#define ELSE_IF_SET_EVENT_FLAG( iEventFlagIndex, fInputTimingStart, fInputTiming, bCondition ) \
+	else if( true == (bCondition) && GetXSkinAnimFuture()->GetNowAnimationTime() < (float)(fInputTiming) && GetXSkinAnimFuture()->GetNowAnimationTime() >= (float)(fInputTimingStart) ) \
+	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define ELSE_IF_SET_EVENT_FLAG( iEventFlagIndex, fInputTimingStart, fInputTiming, bCondition ) \
 	else if( true == (bCondition) && m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(fInputTiming) && m_pXSkinAnimFuture->GetNowAnimationTime() >= (float)(fInputTimingStart) ) \
 	{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif // SERV_ARA_CHANGE_CLASS_SECOND
 
 // 공중에 떠 있는 시간이 일정시간 이상되면 wait 상태로 바꾼다

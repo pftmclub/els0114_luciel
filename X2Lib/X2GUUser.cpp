@@ -2428,6 +2428,13 @@ void CX2GUUser::ReInit( bool bUseTeamPos, int startPosIndex )
 
 	m_pXSkinAnimFuture->SetPlaySpeed( 1.0f );
 	m_pXSkinAnim->SetPlaySpeed( 1.0f );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 32022380 @32023e04 / @32023e4b, the second body's anims too
+	if( NULL != m_pMinorUnitXSkinAnimFuture )
+		m_pMinorUnitXSkinAnimFuture->SetPlaySpeed( 1.0f );
+	if( NULL != m_pMinorUnitXSkinAnim )
+		m_pMinorUnitXSkinAnim->SetPlaySpeed( 1.0f );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 #ifdef ATTACK_DELAY_GAGE
@@ -25161,7 +25168,12 @@ void CX2GUUser::EventSniperStateStart()
 /// and a new one is requested Now USEFUL_VALUE0[0] ( +0x8eb8 ) ahead on the line map ( game vslot 0x90 -> +0x34, 31c5f090 ).
 void CX2GUUser::EventSniperReadyFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 3200d1d0 @3200d1e3, the active body's anim
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( 0.001f ) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnim->EventTimerOneshot( 0.001f ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		const bool bIsRight = GetIsRight();
 		D3DXVECTOR3 vPos = GetPos();
@@ -25183,7 +25195,12 @@ void CX2GUUser::EventSniperReadyFrameMove()
 /// without it -> END once the state time passes 5 ( 33443804 ) or the game stops running ( 3201bd60( false ) ). Keys are cleared every frame ( 31fc66d0 ).
 void CX2GUUser::EventSniperReadyEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 320211d0 @320211d3
+	if( static_cast<double>( GetXSkinAnimFuture()->GetNowAnimationTime() ) >= 0.6 )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( static_cast<double>( m_pXSkinAnimFuture->GetNowAnimationTime() ) >= 0.6 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		CX2GUNPC* pNpc = g_pX2Game->GetNPCUnitByUID( m_iEventNpcUID );
 		if( NULL != pNpc )
@@ -25347,7 +25364,12 @@ void CX2GUUser::EventProtonBombInit()
 /// vslot 0x19c call, then SetNowHp( 0 ) ), its UID is forgotten; the new one is requested m_fEventTime[0].keyInputStart ( +0x8c10, EVENT_PROCESS_TIME0[1] ) ahead.
 void CX2GUUser::EventProtonBombReadyFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 3200e040 @3200e053, the active body's anim
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( 0.001f ) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnim->EventTimerOneshot( 0.001f ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		const bool bIsRight = GetIsRight();
 		D3DXVECTOR3 vPos = GetPos();
@@ -25369,7 +25391,12 @@ void CX2GUUser::EventProtonBombReadyFrameMove()
 /// June 320212b0: as 320211d0, for the bomb: with it -> PROTON CONTROL_IDLE, without it ( state time past 5 or the game stopped ) -> PROTON CONTROL_FIRE
 void CX2GUUser::EventProtonBombReadyEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 320212b0 @320212b3
+	if( static_cast<double>( GetXSkinAnimFuture()->GetNowAnimationTime() ) >= 0.6 )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( static_cast<double>( m_pXSkinAnimFuture->GetNowAnimationTime() ) >= 0.6 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		CX2GUNPC* pNpc = g_pX2Game->GetNPCUnitByUID( m_iEventBombNpcUID );
 		if( NULL != pNpc )
@@ -25473,22 +25500,42 @@ void CX2GUUser::EventProtonBombControlFireStateStart()
 /// JUNE_BUFF_AWAKE_LOCK ), WALK ( +0x8c98 ), BWALK ( +0x8c94 ), DASH ( +0x8c9c ). No ATTACK cancel.
 void CX2GUUser::EventProtonBombControlFireEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfb70 @31fcfb75
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		StateChange( USI_WAIT, false );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfb70 @31fcfcad
+	else if( m_fWalkCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fWalkCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fWalkCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fWalkCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
 	{
 		StateChange( USI_WAIT, false );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfb70 @31fcfcfd
+	else if( m_fBWalkCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fBWalkCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fBWalkCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fBWalkCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( ( true == m_InputData.pureLeft && true == m_FrameDataFuture.syncData.bIsRight ) || ( true == m_InputData.pureRight && false == m_FrameDataFuture.syncData.bIsRight ) ) )
 	{
 		StateChange( USI_WAIT, false );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfb70 @31fcfd71
+	else if( m_fDashCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fDashCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fDashCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fDashCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) )
 	{
 		StateChangeDashIfPossible();
@@ -25516,7 +25563,12 @@ void CX2GUUser::EventMecaDropInit()
 /// ( vslot 0x4b0 / 0x4b4 ). Every path ends by opening the kit latch ( @31fd00ef ), so it is open the whole state ( JUNE_BUGS ).
 void CX2GUUser::EventMecaDropEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfde0 @31fcfde5
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( true == IsOnSomethingFuture() )
 			StateChange( USI_WAIT, false );
@@ -25524,27 +25576,52 @@ void CX2GUUser::EventMecaDropEventProcess()
 			StateChange( USI_JUMP_DOWN, false );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfde0 @31fcff18
+	else if( m_fWalkCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fWalkCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fWalkCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fWalkCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
 	{
 		StateChange( USI_WAIT, false );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfde0 @31fcff79
+	else if( m_fBWalkCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fBWalkCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fBWalkCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fBWalkCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( ( true == m_InputData.pureLeft && true == m_FrameDataFuture.syncData.bIsRight ) || ( true == m_InputData.pureRight && false == m_FrameDataFuture.syncData.bIsRight ) ) )
 	{
 		StateChange( USI_WAIT, false );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfde0 @31fcffdb
+	else if( m_fDashCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fDashCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fDashCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fDashCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) )
 	{
 		StateChangeDashIfPossible();
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfde0 @31fd003f
+	else if( m_fAttackCancelAfterEx >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfterEx && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fAttackCancelAfterEx >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fAttackCancelAfterEx && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		true == m_InputData.oneZ )
 	{
 		StateChange( GetComboZStateID(), false );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcfde0 @31fd0094
+	else if( m_fAttackCancelAfterEx >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfterEx && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_fAttackCancelAfterEx >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fAttackCancelAfterEx && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		true == m_InputData.oneX )
 	{
 		StateChange( GetComboXStateID(), false );
@@ -25629,20 +25706,45 @@ void CX2GUUser::CommonEventProcess()
 	if( true == m_bUseCommonCancelAfter )
 	{
 		IF_SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31fe7610 @31fe7716
+		else if( m_fBWalkCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fBWalkCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		else if( m_fBWalkCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fBWalkCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			( ( true == m_InputData.pureLeft && true == m_FrameDataFuture.syncData.bIsRight ) ||
 			( true == m_InputData.pureRight && false == m_FrameDataFuture.syncData.bIsRight ) ) )
 		{ StateChange( USI_WAIT ); }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31fe7610 @31fe778c
+		else if( m_fWalkCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fWalkCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		else if( m_fWalkCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fWalkCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
 		{ StateChange( USI_WAIT ); }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31fe7610 @31fe77f0
+		else if( m_fDashCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fDashCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		else if( m_fDashCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fDashCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) )
 		{ StateChangeDashIfPossible(); }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31fe7610 @31fe7857
+		else if( m_fAttackCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		else if( m_fAttackCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fAttackCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			true == m_InputData.pureZ )
 		{ StateChange( GetComboZStateID() ); }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31fe7610 @31fe78ae
+		else if( m_fAttackCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfter && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		else if( m_fAttackCancelAfter >= 0.f && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fAttackCancelAfter && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			true == m_InputData.pureX )
 		{ StateChange( GetComboXStateID() ); }
 	}
@@ -33246,7 +33348,12 @@ bool CX2GUUser::IsImmuneBySocketOption( CX2DamageManager::EXTRA_DAMAGE_TYPE exDa
 
 void CX2GUUser::PEPPER_RUN_READY_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcb930 @31fcb933
+	if( GetXSkinAnimFuture()->GetNowAnimationTime() > 0.3f )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnimFuture->GetNowAnimationTime() > 0.3f )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		StateChange( USI_PEPPER_RUN );
 		m_TimerPepperRun.restart();
@@ -33307,7 +33414,12 @@ void CX2GUUser::PEPPER_RUN_END_FrameMove()
 
 void CX2GUUser::PEPPER_RUN_END_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcb990 @31fcb993
+	if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{	
 		if( false == IsOnSomethingFuture() )
 		{
@@ -33499,8 +33611,13 @@ void CX2GUUser::THROW_ITEM_CameraMove()
 void CX2GUUser::THROW_ITEM_EventProcess()
 {
 #ifdef SERV_IRUHADEV_JUNE_USER_BASE_STATE_BODIES
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcbc10 @31fcbc13
+	if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	// stand-in: June 31fcbc10 reads the second body's anim ( +0x8e84 while +0x8e90, Lu/Ciel ); not ported
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( false == IsOnSomethingFuture() )
 		{
@@ -33525,7 +33642,12 @@ void CX2GUUser::THROW_ITEM_EventProcess()
 void CX2GUUser::THROW_ITEM_FrameMove()
 {
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+    // char-luciel DU1d: June 31ff92d0 @31ff9304, the active body's anim
+    if( GetXSkinAnimPtr()->EventTimerOneshot( m_fThrowStartTime ) == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     if( m_pXSkinAnim->EventTimerOneshot( m_fThrowStartTime ) == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	if( m_pXSkinAnim->EventTimer( m_fThrowStartTime ) == true && EventCheck( m_fThrowStartTime, false ) == true )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -34406,7 +34528,12 @@ void CX2GUUser::SUMMON_MAGIC_SPEAR_FrameMove()
 
 void CX2GUUser::SUMMON_MAGIC_SPEAR_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcbd10 @31fcbd13 ( Elsword's ESSI_SUMMON_MAGIC_SPEAR registration )
+	if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		StateChange( m_CommonState.m_Wait );
 	}
@@ -34418,7 +34545,12 @@ void CX2GUUser::SUMMON_MAGIC_SPEAR_EventProcess()
 */
 void CX2GUUser::COMMON_BUFF_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcbd60 @31fcbd63
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( false == IsOnSomethingFuture() )
 			StateChange( USI_JUMP_DOWN );
@@ -34747,7 +34879,12 @@ void CX2GUUser::StartIntrudeEventProcess()
 {
 	CommonEventProcess();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcbdb0 @31fcbdbd
+	if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		StateChange( USI_WAIT );
 	}
@@ -35212,7 +35349,12 @@ void CX2GUUser::DamageStandUpEventProcess()
 		const float MAGIC_NUMBER_MULTIPLY_LINE_RADIUS = 1.5f;
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * MAGIC_NUMBER_MULTIPLY_LINE_RADIUS;
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc0e0 @31fcc10b
+	else if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{	
 		StateChange( USI_WAIT );
 	}
@@ -35422,10 +35564,20 @@ void CX2GUUser::BoundingDownEventProcess()
 void CX2GUUser::BoundingLandCrashEventProcess()
 {
 	const float fTime = GetUsefulValueNow( 0, 0 );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fd0260 @31fd0264
+	if( NULL != GetXSkinAnimFuture() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( NULL != m_pXSkinAnimFuture )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31fd0260 @31fd0264
+		if( true == GetXSkinAnimFuture()->EventTimerOneshot( fTime ) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( true == m_pXSkinAnimFuture->EventTimerOneshot( fTime ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 		if( true == m_pXSkinAnimFuture->EventTimer( fTime ) && true == EventCheck( fTime, true ) )
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -35732,7 +35884,12 @@ void CX2GUUser::DamageSmallEventProcess()
 	{
 		if( false == SpecialAttackEventProcess( CX2SkillTree::ASUT_DAMAGE_EXCEPT_AIR ) )
 		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			// char-luciel DU1d: June 31fcbed0 @31fcbf22
+			if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			{
 				if( false == IsOnSomethingFuture() )
 				{
@@ -35762,7 +35919,12 @@ void CX2GUUser::DamageBigEventProcess()
 	{
 		if( false == SpecialAttackEventProcess( CX2SkillTree::ASUT_DAMAGE_EXCEPT_AIR ) )
 		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			// char-luciel DU1d: June 31fcbf80 @31fcbfdb
+			if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			{
 				if( false == IsOnSomethingFuture() )
 				{
@@ -35776,7 +35938,12 @@ void CX2GUUser::DamageBigEventProcess()
 			}
 			ELSE_IF_KEY_PRESSED_AT_SKIP_POINT_ZXC
 			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+				// char-luciel DU1d: June 31fcbf80 @31fcc0a0
+				if( GetXSkinAnimFuture()->GetNowAnimationTime() > 0.93f )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				if( m_pXSkinAnimFuture->GetNowAnimationTime() > 0.93f )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 					StateChange( USI_WAIT, false );
 			}
 		}
@@ -35797,6 +35964,27 @@ void CX2GUUser::StartStateStart()
 	/// June's PvP best-of-N round particles follow here; no PvP offline
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d: June 31fcc740 / 31fcc9d0, the active body's anim
+#define USER_SKILL_STATE_CANCEL_CHAIN \
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter ) \
+	else if( 0.f <= m_fWalkCancelAfter && m_fWalkCancelAfter < GetXSkinAnimFuture()->GetNowAnimationTime() && true == IsOnSomethingFuture() && \
+		( m_InputData.pureRight == true || m_InputData.pureLeft == true ) ) \
+	{ \
+		StateChange( USI_WAIT, false ); \
+	} \
+	else if( 0.f <= m_fDashCancelAfter && m_fDashCancelAfter < GetXSkinAnimFuture()->GetNowAnimationTime() && true == IsOnSomethingFuture() && \
+		( m_InputData.pureDoubleRight == true || m_InputData.pureDoubleLeft == true ) ) \
+	{ \
+		StateChangeDashIfPossible(); \
+	} \
+	else if( 0.f <= m_fBWalkCancelAfter && m_fBWalkCancelAfter < GetXSkinAnimFuture()->GetNowAnimationTime() && true == IsOnSomethingFuture() && \
+		( ( m_InputData.pureLeft == true && m_FrameDataFuture.syncData.bIsRight == true ) || \
+		( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == false ) ) ) \
+	{ \
+		StateChange( USI_WAIT, false ); \
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #define USER_SKILL_STATE_CANCEL_CHAIN \
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter ) \
 	else if( 0.f <= m_fWalkCancelAfter && m_fWalkCancelAfter < m_pXSkinAnimFuture->GetNowAnimationTime() && true == IsOnSomethingFuture() && \
@@ -35815,6 +36003,7 @@ void CX2GUUser::StartStateStart()
 	{ \
 		StateChange( USI_WAIT, false ); \
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 //}} Iruha : 2026-10-21 // June character pilot Phase CH1k
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
@@ -35914,7 +36103,12 @@ void CX2GUUser::DamageRevengeCameraMove()
 */
 void CX2GUUser::DamageRevengeEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc2b0 @31fcc2b3
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{	
 		if( true == IsOnSomethingFuture() )
 			StateChange( USI_WAIT );
@@ -36072,7 +36266,12 @@ void CX2GUUser::HyperModeStartFuture()
 
 void CX2GUUser::HyperModeEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc300 @31fcc303
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( false == IsOnSomethingFuture() )
 			StateChange( USI_JUMP_DOWN );
@@ -36280,7 +36479,12 @@ void CX2GUUser::GenericGroundComboEndEventProcess()
 		StateChange( USI_JUMP_DOWN );
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 @31fcc471
+	else if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{	
 		StateChange( m_CommonState.m_Wait );
 	}
@@ -36291,12 +36495,22 @@ void CX2GUUser::GenericGroundComboEndEventProcess()
 #ifdef SERV_IRUHADEV_JUNE_GROUND_COMBO_END_EVENT
 	// June 31fcc350: the cancel chain of 31fcc9d0 without its back-walk branch
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 @31fcc666
+	else if( 0.f <= m_fWalkCancelAfter && m_fWalkCancelAfter < GetXSkinAnimFuture()->GetNowAnimationTime() && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( 0.f <= m_fWalkCancelAfter && m_fWalkCancelAfter < m_pXSkinAnimFuture->GetNowAnimationTime() && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( m_InputData.pureRight == true || m_InputData.pureLeft == true ) )
 	{
 		StateChange( USI_WAIT, false );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc350 @31fcc6c8
+	else if( 0.f <= m_fDashCancelAfter && m_fDashCancelAfter < GetXSkinAnimFuture()->GetNowAnimationTime() && true == IsOnSomethingFuture() &&
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	else if( 0.f <= m_fDashCancelAfter && m_fDashCancelAfter < m_pXSkinAnimFuture->GetNowAnimationTime() && true == IsOnSomethingFuture() &&
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		( m_InputData.pureDoubleRight == true || m_InputData.pureDoubleLeft == true ) )
 	{
 		StateChangeDashIfPossible();
@@ -36313,7 +36527,12 @@ void CX2GUUser::GenericSpecialActiveSkillEventProcess()
 {
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
 // June 31fcc740
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc740 @31fcc745
+	if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( false == IsOnSomethingFuture() )
 			StateChange( USI_JUMP_DOWN, false );
@@ -36345,7 +36564,12 @@ void CX2GUUser::GenericActiveSkillEventProcess()
 	float fSkipTime = -1.f;
 	LUA_GET_VALUE( m_LuaManager, "SKIP_TIME",	fSkipTime,		-1.f );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcc9d0 @31fccac3
+	if( GetXSkinAnimFuture()->IsAnimationEnd() == true )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( false == IsOnSomethingFuture() )
 			StateChange( USI_JUMP_DOWN, false );
@@ -36962,17 +37186,33 @@ void CX2GUUser::ResetAnimSpeed( float fAnimSpeed, bool bSpeedUpByItem, bool bFut
 
 	if( true == bFuture )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31ffe190 @31ffe3f6
+		if( NULL != GetXSkinAnimFuture() )
+		{
+			GetXSkinAnimFuture()->SetPlaySpeed( fAnimSpeed );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( NULL != m_pXSkinAnimFuture )
 		{
 			m_pXSkinAnimFuture->SetPlaySpeed( fAnimSpeed );
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 	else
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d: June 31ffe190 @31ffe471 / @31ffe4a0 ( 32071d80 )
+		if( GetXSkinAnimPtr() != NULL )
+		{
+			GetXSkinAnimPtr()->SetPlaySpeed( fAnimSpeed );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( m_pXSkinAnim != NULL )
 		{
 			m_pXSkinAnim->SetPlaySpeed( fAnimSpeed );
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 }
 
@@ -39456,7 +39696,12 @@ void CX2GUUser::RandomLoseEventProcess()
 	/// C9h-4g ( supersedes the note above ): June 31fcd0b0's StateChange( 0x82, false ) = USI_WAIT_STATE_CHANGE once the animation ends ( June byte +0x2ac ).
 	/// Not June: only when the class registered the state ( JuneInitWaitStateChange; June's vector would fall back to vec[0] ), so a class whose port has not
 	/// brought the table stays in WIN / LOSE as before.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcd0b0 @31fcd0b3
+	if( NULL != GetXSkinAnimFuture() && true == GetXSkinAnimFuture()->IsAnimationEnd() && m_StateList.end() != m_StateList.find( USI_WAIT_STATE_CHANGE ) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( NULL != m_pXSkinAnimFuture && true == m_pXSkinAnimFuture->IsAnimationEnd() && m_StateList.end() != m_StateList.find( USI_WAIT_STATE_CHANGE ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		StateChange( USI_WAIT_STATE_CHANGE, false );
 #endif SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE
 
@@ -47954,7 +48199,12 @@ void CX2GUUser::COMMON_RELATIONSHIP_SKILL_FrameMove()
 }
 void CX2GUUser::COMMON_RELATIONSHIP_SKILL_EventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 31fcdc30 @31fcdc33
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( false == IsOnSomethingFuture() )
 			StateChange( USI_JUMP_DOWN );
@@ -50648,7 +50898,12 @@ void CX2GUUser::RidingHyperModeStart()
 }
 void CX2GUUser::RidingHyperModeEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d: June 32006b90 @32006b94
+	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	{
 		if( false == IsOnSomethingFuture() )
 			StateChange( USI_RIDING_JUMP_DOWN );

@@ -985,6 +985,44 @@ Opus 5.5 high. Part 7 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (Always.h:
   fire); `cl /P` shows the new function, the virtual and the three `UT_LUCIEL` cases live. Full build skipped: no play-test.
 - **In game:** nothing new. Other classes are never `UT_LUCIEL` and have form 0, so `InitSocketData( 0 )` / `GetEqipStat( false, 0 )` as before.
 
+### DU1d - Done (2026-11-14)
+
+Opus 5.5 high. Part 8 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new define, Always.h untouched). Files: `X2GUUser.h` (+206), `X2GUUser.cpp`
+(+255), both insert-only. No `_DEBUG`, no log line (nothing reads a second body before CH1). funcmap rows: `grep "(DU1d)" june2017_re/funcmap.tsv` (11).
+- **Split again (kickoff's own rule).** NU0's `DU1` rows came from an inline-member scan; June also reads the active body through out-of-line
+  getter calls (`32071d80` x105, `32070cf0` x14, `32071db0` x16 in the user band) that no row lists. New census
+  `june2017_re/char_luciel/du1d_body_reads.tsv` (104 functions, rows + calls, each with an owner). **DU1d** = kickoff bullet 1 (the accessor sites);
+  **DU1d2** (kickoff written) = the bones / hands / head / emotion / after-image / sound / socket readers, the 63 `DU1d2` functions of the
+  census, then the full build and the regression play-test. `DU1-review.md` now also covers DU1d2.
+- **The cancel macros (X2GUUser.h, 22 twins).** June expands `ELSE_IF_ARROW_*_PRESSED_AFTER`, `ELSE_IF_ZX / ASDC_PRESSED_AFTER`, `*WALK / DASH /
+  SKILL / ZX_CANCEL_AFTER(_EX / _FLY)`, `IF_SKILL_CANCEL_AFTER` and the `*_STATE_CHANGE_ON_*` / `ELSE_IF_SET_EVENT_FLAG` macros with the
+  active-body accessor (inline in `31fcc350` / `31fcc9d0`, called at `@31fcc60f` / `@31fe76ce`). Each `#define` gets a flagged twin reading
+  `GetXSkinAnimFuture()`, so the base functions, every class and Lu/Ciel's own CH1 states read the active body. `X2GUAdd.h`'s Add-only macros are
+  not touched. `cl /P` of `X2GUChung.cpp`: 264 twin expansions (Chung's form is 0: the same anim).
+- **Base functions (X2GUUser.cpp, 46 sites, March's line in `#else`):** event processes PEPPER_RUN_READY `31fcb930` (sits after `31fcb2f0`'s
+  jump table), PEPPER_RUN_END `31fcb990`, THROW_ITEM `31fcbc10` (inside the USER_BASE_STATE_BODIES body; its stand-in comment stays in `#else`),
+  SUMMON_MAGIC_SPEAR `31fcbd10` (named by Elsword's `ESSI_SUMMON_MAGIC_SPEAR` registration, thunk `32d25f80`), COMMON_BUFF, StartIntrude,
+  DamageSmall / Big / StandUp / Revenge, HyperMode, BoundingLandCrash `31fd0260`, GenericGroundComboEnd / SpecialActive / Active (June bodies
+  only), RandomLose `31fcd0b0`, COMMON_RELATIONSHIP, RidingHyperMode `32006b90`; `CommonEventProcess`'s USE_COMMON_CANCEL block `31fe7610`; the
+  event kit (PROTON CONTROL_FIRE `31fcfb70`, MECA_DROP `31fcfde0`, SNIPER / PROTON ready events `320211d0` / `320212b0`); the cpp macro
+  `USER_SKILL_STATE_CANCEL_CHAIN`. Now-anim sites to `GetXSkinAnimPtr()`: SNIPER / PROTON ready frames (`3200d1d0` / `3200e040`, inline
+  `+0x8e90 ? +0x8e88 : +0x87d4`), THROW_ITEM_FrameMove (`31ff92d0 @31ff9304`), ResetAnimSpeed's Now branch (`31ffe190`: two calls to `32071d80`;
+  its Future branch reads the inline accessor).
+- **ReInit (`32022380 @32023e04 / @32023e4b`):** after March's two `SetPlaySpeed( 1.0f )`, the second body's Future / Now anims too, each NULL-tested.
+- **Not edited (census owners):** DANCE_Z / DANCE_X `31fcbb60` / `31fcbba0` (June amusement states, no March id); `31fcce20` / `3200c550`
+  (no call or pointer anywhere in the exe); `31fcd0f0` / `31fcd160` / `31fcd1b0` / `31fcd220` (base helpers only Lu/Ciel's thunks `32b4aa20..70`
+  call: CH1); March's THROW_WOODEN_PIECE / MACHINE_GUN_* / WallLanding have no June accessor row (June reads `+0x87d0` or lacks them): unchanged.
+  `Send_SKILL_USE_REQ` `32006b30` has no read of its own (the rows are `32006b90`'s).
+- **Kickoff amendment carried to DU1d2:** the DU1b4 note (minor `passiveSpeed` resets beside March's `( -1, -1 )` sites) and the DU1b after-image
+  note were not reached; both are in `DU1d2.md`.
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files X2GUUser.cpp X2GUUser.h`: 1 PASS (+255), 1 PASS~ (+206, one blank line), 0 OTHER,
+  0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check` (2 files): RESULT: PASS. `enumscan --check X2GUUser.cpp`: the 4 known DU1b3
+  rows only. No `JUNE_BUGS` row, no divergent function (each June body differs from March's only by the accessor). Flag probe: DUO_BODY,
+  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE, SKILL_CANCEL_BY_HYPER_MODE, JUNE_BUFF_AWAKE_LOCK, CHAR_ARME_CORE, USER_BASE_STATE_BODIES all on.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GUChung.cpp`, `X2GUElsword_SwordMan.cpp`, `X2GUAdd.cpp`, `X2GuEve.cpp`:
+  0 errors each. Full build skipped: no play-test (DU1d2 builds and hands off the regression pass).
+- **In game:** nothing to see. Every other class has form 0: `GetXSkinAnimFuture()` / `GetXSkinAnimPtr()` return March's members.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,
