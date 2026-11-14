@@ -2041,7 +2041,7 @@ Opus 5.5. Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( + `_SKILL_DEBUG`, stays
 - **Deploy:** `DEPLOY OK: X2_offline.exe is 26,548,736 B, dated 2026-11-14 06:50:30, md5 1cf32172859e1dffd879a1f87b249f64, equal to X2/US_SERVICE/x2.exe (2026-11-14 06:50:23); built at main 633d4817 + 7 uncommitted code file(s).`
   `EXESTR OK: 3 of 3` ( wide `DamageEffect_SCA_SHADOW_EDGE_Projectile_EXPLOSION`, `DAMAGE_EFFECT_SCA_SHADOW_EDGE_Link`, the `shadow edge cast marks` log ) and `1 of 1` ( narrow `SI_A_SCA_SHADOW_EDGE` ), md5 1cf32172.
 - **Save** ( backup `db_backup/els_db_20261114_063955_pre_sql.sql` ): unit 146 `CAvenger80`: Shadow Edge 28215 ( level 1 ) into A 0, Brandish Breaker 28022 unslotted; the rest as CH3c.
-- **Play-test:** owed.
+- **Play-test: passed (2026-11-14, exe `1cf32172`, run 07:08:56-07:10:00).** Logs: equip `skill 28215 slot 0 bank A state 49`; 5 casts: `cast marks 2`, `3`, `3`, `0` ( back turned ), `3`, each `mark N uid ... npc 1 time 8.00 level 1`; `heal 773.3` per mark once a second ( first tick on the first frame, 8 ticks over 8 s: June's floor math ); `mark end ... found 1` on target loss and on every recast ( clear before the new marks ); the last cast ran to `time 0.99` and the client closed 0.7 s before its expiry, so the time-out end is not in this log. ErrorLog 0 lines, 0 Motion Error / BLANK / EXCEPTION, 0 unbound Lua names; `JUNE_FX unsupported APPLIED_SKILL_ID` on the explosion = the known applied-skill-ID engine gap, not this phase ( 2 old UNHANDLED `E_DISABLE_HB_CHECK_REQ` ).
 
 ## Phase CH4 - Passives and class mechanics
 
