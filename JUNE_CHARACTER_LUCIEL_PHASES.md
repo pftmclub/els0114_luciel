@@ -1903,6 +1903,34 @@ Code commit `feb8091e`. funcmap: `grep "(CH1l30)" june2017_re/funcmap.tsv` ( 4 r
 - **Peer:** char-luciel CH1k0 ran at the same time in `X2GameUnit.*` / `Always.h`; this phase applied its hunks there only after `88c14ed5` landed.
 - **How to see it in game:** nothing yet ( inert ); CH1l3 / CH1m / CH2d2's callers reach it when `_LIVE` lands.
 
+### CH1l30 - Review (2026-11-14)
+
+Opus 5.5 high ( Ghidra `disassemble_function` on `322f1a90`, `32295360`, `31e4f900`, `322aa800`, `322d7b30`; constants read from `unpacked_x2.exe` with
+`charport_consts.read_va` ). **Verdict: pass after one fix.**
+- **`322f1a90`:** EBX = hidden return `[esp+0xa0]`, EBP = unit `+0xa4`, team `+0xa8`, range `+0xac`, `RET 0x10`; ECX is never read ( the body fetches the
+  game itself ), so a member called on `g_pX2Game` is the same. NULL unit -> empty vector. Order = port: NULL, inlined `+0x304` list ( IsValidUnit ),
+  team ( `+0x278` decrypt ) `==` skip, vslot 0x174 `== 4`, `31e4f900 fcomp [3342e84c] / test ah,0x41 / jnp` ( skips `<= 0`, keeps NaN = March `<= 0.f` ),
+  `+0x264` equal then vslot 0x54 64-bit UID equal = self. Aim: `L""` built, vslot 0x138 ( 0 ) on the unit, vslot 0x3e4 on the target. NPC `+0x85f8`
+  `+4 == 0` else skip, ( `+0x3e34` + `+0x3e30` ) x `[33437830]`. Range `fcom / test ah,0x41 / jp`: keeps `<=`, NaN refused. Sort `322acc40` -> insertion
+  `322aa800` @`322aa82b`-`322aa839` moves when `new < first`: ascending, 8-byte pairs. No cap. = port.
+- **`32295360`:** `*out = [3344915c]`, AL = found flag, `RET 4`; order valid ( `322ccf50` ), team, die, inlined HP, aim, NPC size, `test ah,0x41 / jnz`
+  ( keeps strict `<`, NaN refused ). Locals `[esp+0x28]` / `[esp+0x44]` only freed. **Fix:** the inlined HP test @`322954c7`-`322954e0`
+  ( `fldz / fcomp hp / test ah,1 / jz skip` ) keeps only `0 < hp`, so a NaN HP skips; the port's `GetNowHp() <= 0.f` kept it. Now
+  `false == ( 0.f < GetNowHp() )` ( `X2GameUnit.cpp`, same flag, one line ). The gage cases agree: June `31e4f900` = gage `+0xc04` NULL -> 1.0
+  ( passes, as the inlined test ), HP object `+0x20` NULL -> 0.0; March's `GetNowHp` returns 1 for a NULL `m_pGageData` and has no HP sub-object.
+- **Constants:** `[3344915c]` = 9999999.0f, `[33437830]` = 0.25 ( double ), `[3342e84c]` = 0.0f, `[3344f1f4]` = `00 00` ( `L""` ), caller range
+  `[334ed3dc]` = 500.0f.
+- **`322d7b30` 4th argument:** @`322d7c30` loads the argument itself ( a pointer ) and passes it to vslot 0x178: a `const int&`. Elesis's by-value
+  `iAttackType_` with -1 is the same. No change.
+- **`friend class CX2Game;`** sits in `CEffect` beside the CX2GUUser / CX2GameUnit friends of `GetLockOnAimPos`, under the flag. The `Always.h` `#error`
+  guard reads `JUNE_DAMAGEEFFECT_RUNTIME` ( line 4415 ) and `JUNE_DAMAGEDATA` ( 4439 ), both defined before it ( line 13466 ); the CH1l30 probes passed it.
+- **Hygiene:** `finish.py --review --commits feb8091e`: `flagcheck JUNE_CHAR_ENEMY_SCAN PASS` ( `5 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` ),
+  `junediverge RESULT: PASS`, `junediverge --check-all RESULT: PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`. `JUNE_DAMAGEDATA` /
+  `JUNE_DAMAGEEFFECT_RUNTIME` SKIPPED: targets of the guard ( a run without the skip lists their `#if` guard lines in `Always.h` as ERROR and the
+  scan's files as OTHER, nothing of theirs changed ). Fix, worktree: `flagcheck JUNE_CHAR_ENEMY_SCAN PASS` ( 1 PASS; the 1 deleted line is the
+  replaced HP test inside this flag's own block ), `junediverge PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`.
+- **Compile:** `/Zs` probe of `X2GameUnit.cpp` ( census `cl_cmd`, no PCH ): 0 errors. Full build skipped: no play-test.
+
 ### CH1b - Done (2026-11-14)
 
 Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.h` / `.cpp`, nothing references it until CH1 ). funcmap `grep "(CH1b)" june2017_re/funcmap.tsv` ( 43 rows ); JUNE_BUGS 692; no review of its own ( CH1f2 covers it ).

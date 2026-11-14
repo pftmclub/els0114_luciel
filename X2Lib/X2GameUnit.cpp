@@ -13944,7 +13944,7 @@ bool CX2GameUnit::GetNearestEnemyUnitDistance( OUT float& fNearestDistance_ )
 			continue;
 		if ( GUSI_DIE == pUnit->GetGameUnitState() )
 			continue;
-		if ( pUnit->GetNowHp() <= 0.f )
+		if ( false == ( 0.f < pUnit->GetNowHp() ) )	// char-luciel CH1l30 review: June @322954c7 inlines fldz / fcomp / test ah,1, so a NaN HP skips too
 			continue;
 
 		const D3DXVECTOR3 vAimPos = CX2DamageEffect::CEffect::GetLockOnAimPos( pUnit, GetPos( false ) );
