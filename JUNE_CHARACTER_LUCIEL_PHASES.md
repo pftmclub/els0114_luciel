@@ -1677,6 +1677,32 @@ c29941ce^..c29941ce --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: `RESULT: PASS` 
 - **How to see it in game:** nothing yet ( inert ). From CH1 final: the HUD's Combination Point row, the full mark + `LD_Arousal_UI_01` at 10, Ciel's
   portrait on a body swap, the resting body's MP on the unselected bar.
 
+### CH1a3 - Review (2026-11-14)
+
+Opus 5.5 high, Ghidra read-only (vtable dump from the exe, `decompile_function`, `disasm_range.py` for uncarved bodies). **Verdict: pass, no code change.**
+- **Slot map:** vt `3353375c` vs base `3353336c`, Rena `3353363c`, Eve `335336cc` (29 slots each): Lu/Ciel differs from the base only at 0 `32e72770`,
+  1 `32e6e230`, 2 `32e719b0`, 8 `32e5ed90`, 19 `32e62d50`, 24 `32e63070` (base `32e62d10`); 25 `32e66cc0` / 27 `32e5e120` = the base's (vslots 0x64 /
+  0x6c); 21 `32e5b310` = base and Rena (Eve's is `32e5b7b0`). Secondary vt `33533744`: slot 0 `32e72670` (thunk), 1-3 = `32e5c470` / `31f3f070` x2.
+- **Spot-checks (3, all = commit):** (1) the slot map above. (2) `UpdateFormMpGage` `32e62410`: the same NULL chain (gauge data `+0x10`, both statics,
+  `g_pData +0x68 +0x90`); index `31d717e0` = selected unit `+0xe40 == 1` (bool, so `iVar == 0` = the port's other index); bar call `32e5c1e0( bar, 0,
+  L"MP" (33532aec), now / max, 1 )` = `UpdateGageForUV( PGUB_MY_MP (0), L"MP" )`; `g_pStatic_MP` "%ld/%ld" now / max; `32e5c7f0`; resting rate on
+  picture 1 through `31c966d0( L"BG_LUCIEL_MANA", rate, 1 )`, whose body is March's `UpdateGageForUV` width branch behind `334350e8 <= rate <=
+  334355b0` and the same texture checks; string 0 = `3344f1f4` (empty). (3) `UpdateCombinationPointUI` `32e6e2c0` (uncarved, ends `32e6e3c7`):
+  protected count `+0x114`, `>= 10` -> full; changed byte `+0x110` cleared; `Luciel_Combination_Point` (33534860) pictures 0-9 `bShow = count > i`,
+  picture 10 = full; `+0x60 = -1` when the `g_pX2Game` holder `3372c0fc` (funcmap row 151) is dead; `CX2GageManager +0xd1 == 1` -> show 0 (left out);
+  vslot 0x1c `GetShow` then `32e6ae10( show )`.
+- **`+0xd1` writers:** `3245c5bd`, `32465b8d`, `32478137`, `32edbe4d` each sit right after a code `0x86b` (2155) test; the left-out test stays left out.
+- **Manager:** `324910c0` passes `movzx word [edi + 0x24]` (the party class read as a word, agreeing with NU2's `SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD`)
+  to `3248ec80`; `32491200` passes the user's `+0x867c -> +0x38` class or 0 = March's null-safe `CX2GUUser::GetUnitClass()` (`UC_NONE`). The factory's
+  seven-class switch equals June's `31eca1d0 == UT_LUCIEL` within scope (third jobs out, memory rule). Stage 9 PvP bullet and Stage 17 note present.
+- **Routing:** `kickoffs/char-luciel/CH1.md` "Amended by char-luciel CH1a3" carries the `DLG_Luciel_CombinationPoint.lua` adoption and `LD_Arousal_UI_01`.
+- **Hygiene:** flagcheck `JUNE_CHAR_LUCIEL_CORE --range c29941ce^..c29941ce --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: `files: 1 PASS, 3 PASS~
+  (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR` / `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted
+  line(s), 0 #else/#endif without the flag token, 0 encoding change(s)` / `RESULT: PASS` (PASS~ = one blank line before each new block). `git log
+  -S SERV_IRUHADEV_JUNE_CHAR_LUCIEL c29941ce..HEAD` on the four Gage files: none (no later commits touch them). `junediverge.py --check-all`:
+  `allow-listed: 242` / `RESULT: PASS`. `enumscan.py --check` (4 files): `0 A/B row(s) remain in 4 file(s) (C 0, D 0, X 1 ignored)`.
+- **Build:** none (no code change). CH1's CH1a3 dependency is met.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
