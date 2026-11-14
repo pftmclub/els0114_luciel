@@ -1559,6 +1559,36 @@ is the 11-line comment + `#define` block ( DEFINE in the layout-flag run ), the 
 - **How to see it in game:** nothing yet ( Lu/Ciel inert until `_LIVE` ). Every class: the play-status packet carries three more fields ( 0, 0, -1 );
   the save gains two columns on the next deployed build. CH1 final play-tests Ciel's MP and form surviving a village -> dungeon hop.
 
+### CH1a2 - Review (2026-11-14)
+
+Opus 5.5 high, Ghidra read-only ( `disassemble_function` + `disasm_range.py` for the uncarved bodies ). **Verdict: pass, no code change.**
+- **Struct ( spot-checks 1-2, = commit ):** Put `320bcbd0` ends `Put(int) [+0x5a]`, `Put(int) [+0x5e]` ( `33051fa0` ), `movzx [+0x62]` -> `33051ce0`;
+  Get `320dbbd0` ends `33052000( +0x5a )`, `33052000( +0x5e )`, `33051d30( +0x62 )`. Ctor `31f3b0a0`: `+4`..`+0x16` zeroed ( word at `+0x14` = hyper
+  count + CAC type ), four containers at `+0x1a` / `+0x2a` / `+0x3a` / `+0x4a`, then `+0x5a = 0`, `+0x5e = 0`, `+0x62 = 0xff`; `+0` ( `m_iMaxHP` ) unset.
+- **Offset probe ( re-run ):** X2Lib US_SERVICE ( `offsetprobe.py` ) and X2ServerProtocol X2TOOL defines ( `/Zs` C2440 probe ): `m_iMinorUnitMaxMP` 0x5a,
+  `m_iMinorUnitCurMP` 0x5e, `m_cMinorUnitForm` 0x62, `sizeof` 0x63, `CAC_COMBINATION_POINT` 6, identical in both ( X2Lib `m_mapRidingPetCoolTime` 0x4a ).
+- **CAC values:** every `cmp byte ptr [edi + 0x15], N` in `32a30000`-`32a40000`: `32a348ee` 1, `32a34a1e` 3, `32a34c7e` 1, `32a34e2e` 4, `32a34fae` 5,
+  `32a35123` 6; March's enum gives `CAC_NATURAL_FORCE` 5 implicitly, so the explicit `= 6` follows on.
+- **Gauge pair ( spot-check 3, = commit ):** `32a32530`: vslot 1( 1 ) twice through `max( 0, ftol )` -> `+0x5e`, then vslot 4( 1 ) -> `+0x5a`, the
+  protected point at `+0x114` decoded and `movsx al` -> `+0x16`, `[g_pData + 0x68] + 0x90` -> `+0xe40 == 1` -> `+0x62` with no NULL test, base `32a32200`
+  last ( `ret` = its return ). `32a350d0`: base `32a33fa0` first, `SetMinorUnitForm` `3234b8c0`( `+0x62 == 1` ), vslot 5( `+0x5a`, 1 ), vslot 2( `+0x5e`,
+  0, 1 ), `32a327a0`( type `== 6` ? `+0x16` : 0 ), `32a36ef0`( 10 ), `+0x110 = 1`. March's base pair ( `X2GageData.cpp:442` / `:462` ) touches neither
+  `m_iCharAbilCount` nor the new fields, so the call order is safe. JUNE_BUGS 685-687 match the listings.
+- **Emulator:** `CharAbilTypeOf` `UT_LUCIEL` -> 6 and `MakeGamePlayStatus` ( `X2OfflineServer.cpp:1195` ) fill only Lu/Ciel ( labelled stand-in max );
+  other classes keep 0 / 0 / -1, which their gauges echo, so the first on-change write stores the column defaults. `Handler_EGS_UPDATE_PLAY_STATUS_NOT`
+  writes before the four-value early return, after the `m_iMaxHP <= 0` guard; its session cache follows the existing four ( not reset per unit, as
+  theirs ). v23 rung: `DEFAULT 0` / `DEFAULT -1` = ctor values, so no existing row changes meaning; `UNIT_COLUMNS` ends `minor_cur_mp, minor_unit_form`
+  = `ReadUnitRow` 24 / 25; `SCHEMA_VERSION` 23 branch keeps `DEFAULT_RESURRECTION_STONE` 10.
+- **Hygiene:** flagcheck `JUNE_CHAR_MINOR_UNIT_PLAY_STATUS --range 29ff06ae^..29ff06ae`: `files: 3 PASS, 5 PASS~ (blank/marker only), 2 DEFINE, 2 OTHER
+  (other flags), 0 FAIL, 0 ERROR` / `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag
+  token, 0 encoding change(s)` / `RESULT: PASS` ( OTHER = `X2GageData.*`, `_CORE`'s ). `JUNE_CHAR_LUCIEL_CORE --range` same: `2 PASS, 0 PASS~, 0 DEFINE,
+  9 OTHER, 0 FAIL, 1 ERROR` / `0 deleted line(s)` / `RESULT: FAIL`: the ERROR is Always.h:13430's existing `LIVE && !CORE` guard ( unevaluable; the
+  commit's Always.h hunk is the layout flag's comment + `#define`, DEFINE in the first run ), the 9 OTHER rows are the layout flag's files. Resolved by
+  hand, as in the Done note. `git log -S<flag> 29ff06ae..HEAD`: empty for both. `junediverge.py --check-all`: `allow-listed: 242` / `RESULT: PASS`.
+  `enumscan.py --check X2GageData.cpp X2OfflineServer.cpp X2OfflineStatTable.cpp`: `0 A/B row(s) remain` ( a first run's `cl /P failed` was transient;
+  the same command passed on re-run ).
+- No build ( no code change ). CH1's CH1a2 dependency is met.
+
 ### CH1a - Done (2026-11-14)
 
 Opus 5.5 high. New `X2Lib/X2GULuciel.h` / `.cpp` ( ASCII, CRLF; in `X2Lib_2010.vcxproj` + `.filters` ) under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`;
