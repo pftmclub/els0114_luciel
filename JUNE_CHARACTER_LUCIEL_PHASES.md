@@ -1172,7 +1172,8 @@ Opus 5.5 high. Part 11 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new d
   parked PvP item bar = auto-potion gate `3200c030` (note on that line).
 - **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files X2Lib/X2GUUser.cpp`: 1 PASS (+95), 0 OTHER, 0 FAIL, 0 deleted, 0 non-ASCII,
   RESULT: PASS. `junediverge --check X2GUUser.cpp`: RESULT: PASS (allow-listed 8, unchanged). `enumscan --check X2GUUser.cpp`: the 4 known DU1b3
-  rows only. No JUNE_BUGS row, no new divergent function. Flag probe (`/Zs`): DUO_BODY, X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE, EDT_WATER_HOLD_TEST,
+  rows only. No JUNE_BUGS row, no new divergent function. Commit `2b3d1b60`; `--range 2b3d1b60^..2b3d1b60`: 1 PASS (+95), 0 OTHER, 0 FAIL,
+  0 deleted, RESULT: PASS. Flag probe (`/Zs`): DUO_BODY, X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE, EDT_WATER_HOLD_TEST,
   DIVERGE_DIE_FRAME_MOVE, DIVERGE_COMMON_CAMERA_MOVE, JUNE_WORLD_COLOR_WINDOW, JUNE_HYPER_CUT_IN_TIME, JUNE_DAMAGE_REACT_ORDER, GUILD_SKILL_PART_2 on.
 - **Build:** `DEPLOY OK: X2_offline.exe is 26,600,960 B, dated 2026-11-14 12:17:46, md5 8e5646f370573b533533a5e21a6190cf, equal to
   X2/US_SERVICE/x2.exe (2026-11-14 12:17:38); built at main d3cfe730 + 1 uncommitted code file(s).` (the file is this phase's).
