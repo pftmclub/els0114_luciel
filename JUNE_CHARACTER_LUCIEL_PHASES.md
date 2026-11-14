@@ -1854,7 +1854,7 @@ with an `#error` guard in `X2GameUnit.cpp` on `SERV_IRUHADEV_JUNE_BUFF_BINDING` 
 Opus 5.5 high. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN` ( `Always.h`, no `_DEBUG`, no log tag, inert until CH1l3 / CH1m call it ),
 with an `#error` guard beside the define on `SERV_IRUHADEV_JUNE_DAMAGEEFFECT_RUNTIME` and `SERV_IRUHADEV_JUNE_DAMAGEDATA` ( `CEffect::GetLockOnAimPos`
 and its `CX2GameUnit` friend ). Files: `Always.h`, `X2Game.h` / `.cpp`, `X2GameUnit.h` / `.cpp`, `X2DamageEffect.h` ( insert-only, 128 lines ).
-funcmap: `grep "(CH1l30)" june2017_re/funcmap.tsv` ( 4 rows; the CH0 candidate rows stay, superseded ). No `JUNE_BUGS.md` row: no quirk with an effect.
+Code commit `feb8091e`. funcmap: `grep "(CH1l30)" june2017_re/funcmap.tsv` ( 4 rows; the CH0 candidate rows stay, superseded ). No `JUNE_BUGS.md` row: no quirk with an effect.
 - **Already ported?** `322d7b30` = char-elesis CH3c2's `CX2Game::GetFrontNearestEnemyUnit`; `31f75980` = March's `CEffect::SetLinkMainEffectByPos`
   ( both settled by the 2026-11-14 kickoff amendment ). `32294e30` ( C3c `CX2GameUnit::CollectUnitsAround` ) is the twin of the two new bodies.
 - **`322f1a90` -> `std::vector<CX2GameUnit*> CX2Game::GetEnemyUnitListInRange( pUnit_, iMyTeam_, fRange_ )`:** thiscall on the game ( caller sets ECX =
@@ -1876,7 +1876,7 @@ funcmap: `grep "(CH1l30)" june2017_re/funcmap.tsv` ( 4 rows; the CH0 candidate r
 - **Names:** `junediverge.py --list` checked; no June / address / phase-tag names.
 - **Hygiene:** `finish.py --files` ( worktree ): `flagcheck JUNE_CHAR_ENEMY_SCAN PASS` ( `5 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` ),
   `junediverge RESULT: PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`. `JUNE_DAMAGEEFFECT_RUNTIME` / `JUNE_DAMAGEDATA` SKIPPED: targets of the
-  `#error` guard, not this phase's. stateends / skillicons / luabind: n/a. Range block: see the commit note below.
+  `#error` guard, not this phase's. stateends / skillicons / luabind: n/a. `--range feb8091e^..feb8091e`: same verdicts, `FINISH RESULT: PASS`.
 - **Compile:** `/Zs` probes of `X2Game.cpp` and `X2GameUnit.cpp` ( census `cl_cmd`, no PCH, the real `Always.h` ): 0 errors each; a `cl /P` holds both
   bodies ( flag on, guard passes ). Full build skipped: no play-test.
 - **Peer:** char-luciel CH1k0 ran at the same time in `X2GameUnit.*` / `Always.h`; this phase applied its hunks there only after `88c14ed5` landed.
