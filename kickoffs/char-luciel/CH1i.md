@@ -45,3 +45,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7 L254 class code scales the cached state power rate (+0x7cc8), e.g. 32b1cd20; §7l L471 bounding-target hook: BOUNDING_UP StateStart 31fd02d0 calls 32b38cb0( type, uid6; §7y L680 GetLandPosition bMonster true in Luciel class code; §7ac L777 user landing prediction 32021390 has Luciel callers; §7ac L778 Luciel's CanDown call shape in states @32b2fd79, @32b33fb7, @32b33d09.
 - **CH1j is merged in** (CH0): the 3 riding functions (`LSI_RIDING_*`). The rest of riding is `CX2GUUser` code.
 - Checklist 7ac L777: `32ae9b40` (LDB dash-jump combo XZ landing) calls the user landing prediction `32021390`, which Aisha ported class-local: hoist it or take a second local copy.
+
+## Amended by CH1f2 review (2026-11-14)
+
+- **One-shot timers:** where June tests the anim's `+0x24c` against `t` before `31d28e10( t )` ( `fld [anim + 0x24c]` / `fcom [anim + 0x24c]` next to `EventTimer( float )` ), write
+  `EventTimerOneshot( t )`, never `EventTimer( t )` ( `+0x24c` = `m_fAnimOneshotTimer`; CH1f / CH1f2 missed it at 16 sites ). A bare `31d28e10` call is plain `EventTimer`.

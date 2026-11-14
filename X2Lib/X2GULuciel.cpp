@@ -3603,7 +3603,7 @@ void CX2GULuciel::LSI_LU_DASH_JUMP_COMBO_X_EventProcess()
 // char-luciel CH1f: June 32aef530 ( June reads the future animation here; the passive speed aims at the nearest target )
 void CX2GULuciel::LSI_LU_DASH_JUMP_COMBO_XX_START_FrameMove()
 {
-	if( true == GetXSkinAnimFuture()->EventTimer( DASH_JUMP_COMBO_XX_START_AIM_TIME ) )
+	if( true == GetXSkinAnimFuture()->EventTimerOneshot( DASH_JUMP_COMBO_XX_START_AIM_TIME ) )
 	{
 		float fPassiveSpeedX = DASH_JUMP_COMBO_XX_START_SPEED_X;
 
@@ -4177,7 +4177,7 @@ void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_EventProcess()
 // char-luciel CH1f2: June 32af59c0 ( June reads the future animation here too, JUNE_BUGS; the passive speed aims at the nearest target )
 void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_FrameMove()
 {
-	if( true == GetXSkinAnimFuture()->EventTimer( DASH_JUMP_COMBO_XXXXZ_AIM_TIME ) )
+	if( true == GetXSkinAnimFuture()->EventTimerOneshot( DASH_JUMP_COMBO_XXXXZ_AIM_TIME ) )
 	{
 		float fPassiveSpeedX = DASH_JUMP_COMBO_XXXXZ_SPEED_X;
 
@@ -4283,7 +4283,7 @@ void CX2GULuciel::LSI_LU_JUMP_COMBO_Z_SECOND_EventProcess()
 // char-luciel CH1f2: June 32b21cd0 ( the end blast grows with the charge: power x ( 1 + charge ), size and set scale 1 + charge / 2 )
 void CX2GULuciel::LSI_LU_COMBO_XXXZ_END_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( LU_COMBO_XXXZ_END_EFFECT_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( LU_COMBO_XXXZ_END_EFFECT_TIME ) )
 	{
 		const float fPowerRate = ( m_fComboXXXZChargeTime + 1.f ) * GetPowerRate();
 		const float fScale = 1.f + m_fComboXXXZChargeTime * COMBO_XXXZ_END_SCALE_PER_CHARGE;
@@ -4306,7 +4306,7 @@ void CX2GULuciel::LSI_LU_COMBO_XXXZ_END_FrameMove()
 // char-luciel CH1f2: June 32b21f80
 void CX2GULuciel::LSI_LU_DASH_JUMP_COMBO_ZX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( LU_DASH_JUMP_COMBO_ZX_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( LU_DASH_JUMP_COMBO_ZX_PROJECTILE_TIME ) )
 	{
 		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
 
@@ -4342,7 +4342,7 @@ void CX2GULuciel::PlayComboProjectileEffectSet( const WCHAR* pwszEffectSetName_,
 // char-luciel CH1f2: June 32b23820
 void CX2GULuciel::LSI_CIEL_COMBO_X_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_COMBO_X_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_COMBO_X_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Combo_X_Projectile", CIEL_COMBO_X_PROJECTILE_MP, true );
 	}
@@ -4353,7 +4353,7 @@ void CX2GULuciel::LSI_CIEL_COMBO_X_FrameMove()
 // char-luciel CH1f2: June 32b23b80
 void CX2GULuciel::LSI_CIEL_COMBO_XX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_COMBO_XX_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_COMBO_XX_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Combo_X_Projectile", CIEL_COMBO_XX_PROJECTILE_MP, true );
 	}
@@ -4364,12 +4364,12 @@ void CX2GULuciel::LSI_CIEL_COMBO_XX_FrameMove()
 // char-luciel CH1f2: June 32b23ee0 ( two projectiles, the second at 0.667 s for 2 MP )
 void CX2GULuciel::LSI_CIEL_COMBO_XXX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_COMBO_XXX_PROJECTILE1_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_COMBO_XXX_PROJECTILE1_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Combo_XXX_Projectile1", CIEL_COMBO_XXX_PROJECTILE1_MP, true );
 	}
 
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_COMBO_XXX_PROJECTILE2_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_COMBO_XXX_PROJECTILE2_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Combo_XXX_Projectile2", CIEL_COMBO_XXX_PROJECTILE2_MP, true );
 	}
@@ -4380,7 +4380,7 @@ void CX2GULuciel::LSI_CIEL_COMBO_XXX_FrameMove()
 // char-luciel CH1f2: June 32b24560
 void CX2GULuciel::LSI_CIEL_COMBO_XXXX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_COMBO_XXXX_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_COMBO_XXXX_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Combo_XXXX_Projectile", CIEL_COMBO_XXXX_PROJECTILE_MP, true );
 	}
@@ -4391,7 +4391,7 @@ void CX2GULuciel::LSI_CIEL_COMBO_XXXX_FrameMove()
 // char-luciel CH1f2: June 32b248c0 ( a damage effect, not an effect set: power x ( 1 + charge ), life time rate 1 + charge / 2; the MP test sits on the bone position )
 void CX2GULuciel::LSI_CIEL_COMBO_XXXZ_END_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_COMBO_XXXZ_END_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_COMBO_XXXZ_END_PROJECTILE_TIME ) )
 	{
 		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
 
@@ -4424,7 +4424,7 @@ void CX2GULuciel::LSI_CIEL_COMBO_XXXZ_END_FrameMove()
 // char-luciel CH1f2: June 32b24c40
 void CX2GULuciel::LSI_CIEL_DASH_COMBO_X_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_DASH_COMBO_X_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_DASH_COMBO_X_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Combo_X_Projectile_Reverse", CIEL_DASH_COMBO_X_PROJECTILE_MP, true );
 	}
@@ -4435,7 +4435,7 @@ void CX2GULuciel::LSI_CIEL_DASH_COMBO_X_FrameMove()
 // char-luciel CH1f2: June 32b24fa0
 void CX2GULuciel::LSI_CIEL_JUMP_COMBO_X_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_JUMP_COMBO_X_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_JUMP_COMBO_X_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Combo_X_Projectile", CIEL_JUMP_COMBO_X_PROJECTILE_MP, true );
 	}
@@ -4446,7 +4446,7 @@ void CX2GULuciel::LSI_CIEL_JUMP_COMBO_X_FrameMove()
 // char-luciel CH1f2: June 32b25300 ( the one projectile without the max count modifier )
 void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_ZX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_DASH_JUMP_COMBO_ZX_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_DASH_JUMP_COMBO_ZX_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Dash_Jump_Combo_ZX_Projectile", CIEL_DASH_JUMP_COMBO_ZX_PROJECTILE_MP, false );
 	}
@@ -4457,7 +4457,7 @@ void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_ZX_FrameMove()
 // char-luciel CH1f2: June 32b25610
 void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_DASH_JUMP_COMBO_XX_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_DASH_JUMP_COMBO_XX_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Dash_Jump_Combo_XX_Projectile", CIEL_DASH_JUMP_COMBO_XX_PROJECTILE_MP, true );
 	}
@@ -4468,7 +4468,7 @@ void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XX_FrameMove()
 // char-luciel CH1f2: June 32b25970 ( the same effect set as XX at 0.05 s )
 void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_DASH_JUMP_COMBO_XXX_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_DASH_JUMP_COMBO_XXX_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Dash_Jump_Combo_XX_Projectile", CIEL_DASH_JUMP_COMBO_XXX_PROJECTILE_MP, true );
 	}
@@ -4479,7 +4479,7 @@ void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXX_FrameMove()
 // char-luciel CH1f2: June 32b25cd0
 void CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXX_FrameMove()
 {
-	if( true == GetXSkinAnimPtr()->EventTimer( CIEL_DASH_JUMP_COMBO_XXXX_PROJECTILE_TIME ) )
+	if( true == GetXSkinAnimPtr()->EventTimerOneshot( CIEL_DASH_JUMP_COMBO_XXXX_PROJECTILE_TIME ) )
 	{
 		PlayComboProjectileEffectSet( L"EffectSet_LD_M_Dash_Jump_Combo_XXXX_Projectile", CIEL_DASH_JUMP_COMBO_XXXX_PROJECTILE_MP, true );
 	}

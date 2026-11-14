@@ -48,3 +48,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - `StartTransformedForm` `32b34fe0` is the other half of CH1a4's `EndTransformedForm`: it reads the same `CX2GUUser::m_aTransformedSkin` sets
   ( `+0x8f74` / `+0x8f8c`, `STransformedSkin`, `X2GUUser.h` ) and swaps with `SetFormSkinAnim`; use those, never a copy. Settle the reach of
   JUNE_BUGS 689 ( a transformed form whose set was never swapped skips the buff and effect-set clears ) from its body.
+
+## Amended by CH1f2 review (2026-11-14)
+
+- **Name the three provisional members from their writer:** `m_fPowerOfOriaxDamageRate` ( `+0x9614` ), `m_fSoulCollectorDamageRate` ( `+0x9618` ), `m_usSoulCollectorMaxCount` ( `+0x961c` ).
+  CH1f2's projectile FrameMoves read them as a power rate, an effect-set life time ( and modifier tag 2 ) and a modifier-tag-4 count. Keep CH1a's names if the passive that writes them
+  agrees, else rename them in `X2GULuciel.h` / `.cpp` in this phase.

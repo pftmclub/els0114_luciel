@@ -2028,6 +2028,32 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **Commit** `b346db2f`; `finish.py --range b346db2f^..b346db2f`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1f2 review` ( Opus 5.5 high ), then CH1g ( Sonnet ).
 
+### CH1f2 - Review (2026-11-14)
+
+Opus 5.5 high. Covers CH1b `8716f6b7`, CH1d `814dc0e6`, CH1f `1335ce1b`, CH1f2 `b346db2f`. **Verdict: pass after one fix** ( 16 timer calls, below ). No debug define to retire ( none was added ).
+- **The fix: `EventTimer` -> `EventTimerOneshot` at 16 sites** ( CH1f `LSI_LU_DASH_JUMP_COMBO_XX_START_FrameMove`; CH1f2 `LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_FrameMove`, `LSI_LU_COMBO_XXXZ_END_FrameMove`, `LSI_LU_DASH_JUMP_COMBO_ZX_FrameMove`
+  and the ten Ciel projectile FrameMoves, `LSI_CIEL_COMBO_XXX_FrameMove` twice ). June tests `anim+0x24c < t` before `31d28e10( t )` at each of them, which is March's inline
+  `EventTimerOneshot` ( `KTDGXSkinAnim.h:277`, `m_fAnimOneshotTimer < fTime && EventTimer( fTime )`; `+0x24c` = `m_fAnimOneshotTimer`, effect-completion notes ). Ghidra's decompile of
+  `32b248c0` reads `if( *(float*)(anim + 0x24c) < 0.05 ) FUN_31d28e10( 0.05 )`. The x87 forms were decoded both ways: `fld [+0x24c]; fcomp t; test 5; jp` and `fld t; fcom [+0x24c]; test 0x41; jne`, both = timer < t.
+  Plain `EventTimer` lets a projectile or the dive fire again when the timer is crossed twice in one state. CH1b / CH1d had it right: the DAMAGE_DOWN_FRONT FrameMoves are one-shot, BACK and DASH_END plain, as June.
+  A scan of all four phases' listings found no other one-shot site.
+- **Spot-checks ( listing, then Ghidra read-only ):** Ciel `DASH_JUMP_COMBO_Z` `32af4fc0`: event 1 ( `IsInJobLine( 1 )` + double tap -> `LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH` ) before event 0 ( X -> `ZX` ), macro comparisons = June's x87 ( change: `stateChange < now || end`;
+  input: `start <= now < end` ). `XXXZ_LOOP` `32af3fe0`: `3.0 <= fStateTime || !pureZ` -> END, then the skill / hyper / walk / dash cancels as else-ifs = `SKILL_CANCEL_AFTER` and the two on-line macros.
+  Ciel `XXXZ_END_FrameMove` `32b248c0`: `Bip01` + 40 up + 35 along `GetDirVector` ( minus when facing left ), MP 5 on the unmoved bone, `CreateInstance( this, name, ( 1 + charge ) * GetPowerRate(), pos, rot, rot, landPosition.y, false, -1, 1, 1 + charge * 0.5, -1, -1, 0, -1 )` = June's 17 pushes.
+  Also read: CH1b `32aebd10` ( flag [1] before [4], `GetRandomInt() < m_iNoDownDamageAtStandUpAttackPercent` ), CH1d `32b22e30` ( Ciel DASH: switching at `m_fSwitchingCoolTime <= 0`, then Z / X, no job-line split ), CH1f `32af2860` ( Royal Guard event 1, Chiliarch event 2, `oneX` before `IsInJobLine` ). All = June.
+- **`PlayComboProjectileEffectSet`:** June's `321e1e60` pushes ( name, this, NULL, now-state `+0x10` = `IsHyperState()`, `GetPowerRate() * m_fPowerOfOriaxDamageRate`, life time `m_fSoulCollectorDamageRate`, scale ( 1, 1, 1 ), false, three zero vectors, 1.0 ) = the helper with March's defaults.
+  Modifiers `321db050`: ( handle, 2, `m_fSoulCollectorDamageRate`, false ) then ( handle, 4, `(float)m_usSoulCollectorMaxCount`, true ). MP test `vslot 0x6f0( mp, Bip01, 0, 0-vector )` = `IsEnoughMPForAttack( mp, vBonePos )`, after the game / effect-set checks as June.
+  Modifier count per FrameMove: two everywhere, four in `32b23ee0`, **one ( tag 2 ) only in `32b25300`**, none in Lu's `32b21f80`. Effect-set names and MP costs match per caller. JUNE_BUGS 699 stands.
+- **Constants:** every float / double of `_CONST_LUCIEL_CH1F2_` = the listing ( `f=` / `d=` ): 3.0, 0.2, 0.369, -20 / 80 / 120 / 1200, 3500 / -2500, 90.0 / -2500.0 ( doubles ), 0.25, 0.5, 0.1 / 4, 0.28 / 4, 0.42 / 4, 0.622 / 4, 0.667 / 2, 0.577 / 5, 0.05 / 5, 40, 35, 0.3 / 5, 0.2 / 5,
+  0.28 / 4, 0.28 / 5, 0.05 / 5, 0.378 / 5. The dive's radian factor is `D3DXToRadian`'s ( double 0.01745329238474369 ), its `0 != z` test takes NaN into the aim branch as June's `fucompp` / `test 0x44` does.
+- **Provisional members: left to CH4a** ( kickoff amended ). Their only readers so far are these FrameMoves and no writer is in CH1b-CH1f2; `InitPassiveSkillState` `32b45820` and `SI_P_LCG_SOUL_COLLECTOR` ( 10401 / 30406 ) are CH4a's, so CH4a names them from what writes them. Renaming now would be a second guess.
+- **Kickoffs amended:** CH1g, CH1g2, CH1h, CH1i ( the one-shot timer idiom ), CH4a ( the three member names ).
+- **Gates:** `finish.py --review --commits 8716f6b7 814dc0e6 1335ce1b b346db2f -v`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `8 PASS, 0 OTHER, 0 FAIL`, 0 deleted lines / `RESULT: PASS`; `junediverge` PASS; `junediverge --check-all` PASS; `enumscan` exit 0;
+  `FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped)` ( stateends / skillicons / luabind: no state registered, no skill, no script ). The fix, `finish.py --files X2Lib/X2GULuciel.cpp`: `1 PASS, 0 OTHER, 0 FAIL`, `RESULT: PASS`,
+  16 deleted lines = the 16 replaced timer lines, in this flag's own new code ( no March line touched ); `junediverge` PASS; `enumscan` exit 0.
+- **Compile:** `/Zs` probes of `X2GULuciel.cpp` ( census `cl_cmd`, no PCH ), plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
