@@ -58,3 +58,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - Script states: 25 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
 - Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L675.
 - Calls `32293d70` (line-side test): CH1d0 writes it first. The untagged nasod-armor combos (`ANSI_COMBO_NASOD_ARMOR_*`, 11 tables) are here; their nasod lines go under `_NASOD` inside the `_LIVE` body. March's class tests in `NasodArmorComboZZEventProcess` / `NasodArmorComboXEventProcess` (`X2GUAdd.cpp:5798` / `:5910`) follow June's bodies.
+
+## Added by char-luciel CH1i2 (2026-11-14)
+
+- `GetFixedDistancePositionForWeaponTaker` is June's now ( `SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER` ). June's `NasodArmorAttackStartFuture` ( `329edde0`, call `@329ee138` ) passes a position March does not: `CX2GameUnit::GetBoneLinePos` ( `32293f80` ) of the target toward this unit, replaced by the target's own `GetPos()` when the two are within 500.0 ( `33458fa8`, `@329ee0af` ); March passes `&pUnit->GetPos()` ( `X2GUAdd.cpp:5649` ). Distance 100, `!GetIsRight()` and the `== true` test match. `329ef130` has the same pattern ( `@329ef3c8` ).

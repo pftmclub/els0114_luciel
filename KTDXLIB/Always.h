@@ -13468,3 +13468,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN needs JUNE_DAMAGEEFFECT_RUNTIME and JUNE_DAMAGEDATA ( CEffect::GetLockOnAimPos ), char-luciel CH1l30
 #endif SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel CH1i2 - June's CKTDGLineMap::GetFixedDistancePositionForWeaponTaker ( 31c60890 ) replaces March's whole:
+//              a negative distance walks the other way, the start line is GetLandPosition with monster roads counted, the first
+//              stretch is measured at the line's height, and a walk that runs off the line group stops 15 in from the edge.
+//              Reaches every caller ( Add, Elesis, Raven, Lu/Ciel ). Needs RAVEN_WEAPON_TAKER and
+//              SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD ( the bool GetLandPosition; #error guard ).
+#define SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER
+#if defined( SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER ) && ( !defined( RAVEN_WEAPON_TAKER ) || !defined( SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD ) )
+#error SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER needs RAVEN_WEAPON_TAKER and JUNE_LINEMAP_LAND_MONSTER_ROAD, char-luciel CH1i2
+#endif SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER
+//////////////////////////////////////////////////////////////////////////

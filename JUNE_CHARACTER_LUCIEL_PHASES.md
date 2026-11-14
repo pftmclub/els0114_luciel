@@ -2160,6 +2160,32 @@ no review of its own: the CH1i review ( `kickoffs/char-luciel/CH1i-review.md`, O
 - **Commit** `a20ce8f2`; `finish.py --range a20ce8f2^..a20ce8f2`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1i review` ( Opus 5.5 high ); `/x2-phase char-luciel CH1i2` ( Opus 5.5 high, independent of the review ).
 
+### CH1i2 - Done (2026-11-14)
+
+Opus 5.5 high. June `31c60890` replaces March's `CKTDGLineMap::GetFixedDistancePositionForWeaponTaker` whole ( `KTDXLIB/KTDGLineMap.cpp`, D1 shape: June's body under `SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER`, March's in `#else` ).
+funcmap row `31c60890 (CH1i2)`; JUNE_BUGS 706; the CH1i2 review ( `kickoffs/char-luciel/CH1i2-review.md`, Opus ) checks it.
+- **How it was read:** `decompile_function 0x31c60890` ( 682 lines ), `charport_consts.py --fn 31c60890` ( widths: dword -1.0 / 999999.0, qwords 30.0 / 900.0 / 0.0 / 1.0 / 0.5 / 15.0 ), raw listing of the flip ( `31c60890`-`31c609c0` ) and the walk ( `31c61c80`-`31c62000` ).
+- **What June does, against March:**
+  - `fDist < 0` flips `bIsRight` and negates ( `@31c608a3`-`31c608ba`, `test ah,5 / jp`: NaN does not flip ); March has no flip.
+  - **The start line is `GetLandPosition` after all** ( CH1i's "scan of every line" corrected ): the 600-line block is June's `GetLandPosition` ( `31c7bb00`, funcmap row ) inlined with only `LT_WALL` skipped ( no `cmp 7`: monster roads count = `bMonster` true ),
+    the `( pos.x, 0, pos.z )` LineToLine with eps 30 / 900, the Manhattan < 30 hit keeping the highest, no index fallback ( index -1 ) and the 999999 nearest-end pass. The port calls `GetLandPosition( *pvPos, true, 30.f, &iLineIndex )`. No line: `false`, as March.
+  - The first stretch is measured from `( pos.x, line start y, pos.z )` to the start ( left ) / `( pos.x, line end y, pos.z )` to the end ( right ) ( `@31c61d4e`-`31c61d7b` ); March measures from `pos` itself.
+  - The walk ( `beforeLine` / `nextLine` while walk < dist, add each line's length ) is March's.
+  - Walk < dist + 15 ( qword `33449130`; NaN takes the lerp branch, as March's compare ): June returns `false` with the point **15 in from the edge** ( `lerp = 15 / length`, `@31c61e2a`-`31c61e50` ); March returns the bare edge. Else March's lerp and `true`.
+  - March's unused `GetLineGroupIncludesLineData` line ( `#ifndef X2OPTIMIZE_LINEMAP_LINEGROUP`, compiled out ) has no June counterpart and is not in June's body.
+- **JUNE_BUGS 706:** the 15-in point is not clamped: a last line shorter than 15 puts it past the line's far end; a zero-length line divides by 0. Kept verbatim.
+- **Callers ( all now June's ):** Lu/Ciel `32b341b0` / `32b343b0` / `32b35fd0` ( `X2GULuciel.cpp:7644` / `7669` / `7712`, inert ), Elesis `ESI_SI_A_SBH_SCALET_ROSE_SUCCESS_End` ( already June's caller ), Raven `RSI_SA_RWT_GIGA_PROMINENCE_LOOP_FrameMove` ( June `32c4bcd0` `@32c4bdd2`: same arguments as March ),
+  Add `NasodArmorAttackStartFuture` ( `X2GUAdd.cpp:5649` ): **finding** — June `329edde0` `@329ee138` passes the target's `GetBoneLinePos` toward this unit, or the target's `GetPos()` when the two are within 500.0 ( `@329ee0af` ); March passes `&pUnit->GetPos()`.
+  Not fixed here: char-add CH1d owns `329edde0` ( class map ) and ports its whole body; a note went into `kickoffs/char-add/CH1d.md` ( "Added by char-luciel CH1i2" ), with `329ef130` ( same pattern ).
+- **Divergence table:** `june_march_divergent.tsv` row `GetFixedDistancePositionForWeaponTaker`: `june_does` / `march_does` corrected as above, `source` = "ported under `SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER`" ( done ); the four `june_diverge_allow.tsv` rows deleted ( 0 left ).
+- **Flag:** `Always.h` house block, `#error` unless `RAVEN_WEAPON_TAKER` and `SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD` ( the bool `GetLandPosition` ); both ON at the end of `Always.h` by a `cl /EP` probe before saving.
+- **Gates ( `finish.py --files KTDXLIB/KTDGLineMap.cpp KTDXLIB/Always.h tools/data/june_march_divergent.tsv tools/data/june_diverge_allow.tsv --skip-flag SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD` ):**
+  `flagcheck JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER` `1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge` `RESULT: PASS`; `enumscan` exit 0; `FINISH RESULT: PASS (7 gates, 0 failed, 4 skipped)`.
+  SKIPPED: `LINEMAP_LAND_MONSTER_ROAD` ( the guard's target, not this phase's flag ); `stateends` / `skillicons` / `luabind` ( no state, skill or script ). `junediverge --check-all`: `RESULT: PASS`, no `GetFixedDistancePositionForWeaponTaker` allow row.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ): `KTDGLineMap.cpp` flag on 0 errors; flag off ( a wrapper that `#undef`s it after `StdAfx.h` ) 0 errors; `X2GULuciel.cpp` plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` 0 errors ( warnings are the usual header noise ).
+  Full build skipped: no play-test.
+- **How to see it in game:** March's live callers ( Raven's Giga Prominence flames, Add's nasod armor attack ) use it from the next full build; Elesis's Scarlet Rose fire once char-elesis registers it; the first planned check is CH3c ( Demonio bounding strike ). No play-test in this phase.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

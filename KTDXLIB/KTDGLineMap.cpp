@@ -2228,6 +2228,78 @@ D3DXVECTOR3 CKTDGLineMap::GetFixedDistancePosition( D3DXVECTOR3* pvPos, float fD
 #ifdef RAVEN_WEAPON_TAKER
 bool CKTDGLineMap::GetFixedDistancePositionForWeaponTaker( const D3DXVECTOR3* pvPos, float fDist, bool bIsRight, OUT D3DXVECTOR3& vResultPos )
 {
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER
+	// char-luciel CH1i2: June 31c60890
+	if( fDist < 0.f )
+	{
+		bIsRight = !bIsRight;
+		fDist = -fDist;
+	}
+
+	int iLineIndex = -1;
+
+	const float MAGIC_LINE_RADIUS = 30.f;
+	const float LINE_END_MARGIN = 15.f;
+
+	// June inlines GetLandPosition with no monster-road skip
+	GetLandPosition( *pvPos, true, MAGIC_LINE_RADIUS, &iLineIndex );
+	if( -1 == iLineIndex )
+		return false;
+
+	const LineData* pLineData = GetLineData( iLineIndex );
+
+	if( false == bIsRight )
+	{
+		// June measures the first stretch at the line's height, not the unit's
+		const D3DXVECTOR3 vLevelPos( pvPos->x, pLineData->startPos.y, pvPos->z );
+		float fWalkDist = GetDistance( vLevelPos, pLineData->startPos );
+		const LineData* pTempLineData = pLineData;
+		while( pTempLineData->beforeLine >= 0 && fWalkDist < fDist )
+		{
+			pTempLineData = this->GetLineData( pTempLineData->beforeLine );
+			fWalkDist += GetDistance( pTempLineData->startPos, pTempLineData->endPos );
+		}
+
+		if( fWalkDist < fDist + LINE_END_MARGIN )
+		{
+			// JUNE_BUGS 706: stops 15 in from the edge, past the far end on a line shorter than 15
+			float fLerp = LINE_END_MARGIN / GetDistance( pTempLineData->startPos, pTempLineData->endPos );
+			vResultPos = (1.f - fLerp) * pTempLineData->startPos + fLerp * pTempLineData->endPos;
+			return false;
+		}
+		else
+		{
+			float fLerp = (fWalkDist - fDist) / GetDistance( pTempLineData->startPos, pTempLineData->endPos );
+			vResultPos = (1.f - fLerp) * pTempLineData->startPos + fLerp * pTempLineData->endPos;
+			return true;
+		}
+	}
+	else
+	{
+		const D3DXVECTOR3 vLevelPos( pvPos->x, pLineData->endPos.y, pvPos->z );
+		float fWalkDist = GetDistance( vLevelPos, pLineData->endPos );
+		const LineData* pTempLineData = pLineData;
+		while( pTempLineData->nextLine >= 0 && fWalkDist < fDist )
+		{
+			pTempLineData = this->GetLineData( pTempLineData->nextLine );
+			fWalkDist += GetDistance( pTempLineData->startPos, pTempLineData->endPos );
+		}
+
+		if( fWalkDist < fDist + LINE_END_MARGIN )
+		{
+			// JUNE_BUGS 706
+			float fLerp = LINE_END_MARGIN / GetDistance( pTempLineData->startPos, pTempLineData->endPos );
+			vResultPos = fLerp * pTempLineData->startPos + (1.f - fLerp) * pTempLineData->endPos;
+			return false;
+		}
+		else
+		{
+			float fLerp = (fWalkDist - fDist) / GetDistance( pTempLineData->startPos, pTempLineData->endPos );
+			vResultPos = fLerp * pTempLineData->startPos + (1.f - fLerp) * pTempLineData->endPos;
+			return true;
+		}
+	}
+#else SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER
 	int iLineIndex = -1;
 
 	const float MAGIC_LINE_RADIUS = 30.f;
@@ -2287,6 +2359,7 @@ bool CKTDGLineMap::GetFixedDistancePositionForWeaponTaker( const D3DXVECTOR3* pv
 	}
 	// 여기까지 오면 에러 
 	return false;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER
 }
 #endif RAVEN_WEAPON_TAKER
 
