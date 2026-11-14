@@ -46,3 +46,12 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - **One-shot timers:** where June tests the anim's `+0x24c` against `t` before `31d28e10( t )` ( `fld [anim + 0x24c]` / `fcom [anim + 0x24c]` next to `EventTimer( float )` ), write
   `EventTimerOneshot( t )`, never `EventTimer( t )` ( `+0x24c` = `m_fAnimOneshotTimer`; CH1f / CH1f2 missed it at 16 sites ). A bare `31d28e10` call is plain `EventTimer`.
+
+## Amended by CH1g (2026-11-14)
+
+- **Macros and constants already in `X2GULuciel.cpp`** ( CH1f / CH1g ): `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_`, `WALK_CANCEL_AFTER_ON_LINE_`, `DASH_CANCEL_AFTER_ON_LINE_`, `BWALK_CANCEL_AFTER_ON_LINE_` ( back walk, `m_fBWalkCancelAfter` ),
+  `HYPER_MODE_CANCEL_AFTER_` ( the awakening branch of `SKILL_CANCEL_AFTER` alone ), and `_CONST_LUCIEL_CH1G_` ( `COMBO_LOOP_END_TIME` 3 s, `COMBO_LOOP_RELEASE_TIME` 0.4 as a double, `EVENT_TIME_NEVER` 9999 ). Reuse them; add a `_CONST_LUCIEL_CH1G2_` block for new values.
+- **The order of the cancels is not fixed:** read each listing's block order ( CH1g had skill / walk / dash, walk / dash / skill and walk / skill / dash ), and the F / M states carry a back-walk cancel after the walk one. A cancel block that is not token-equal to a macro is written out.
+- **A state may tail-call another class function** ( `jmp` to a `state-fn` address at the head of an EventProcess ): write the call and `return`; JUNE_BUGS only if it looks unintended.
+- **`charport_adis.py` bounds run into the next function:** stop reading at the `int3`.
+- **June's END states are copies:** CH1g found three loop bodies that end in `LSI_LCG_F_COMBO_ZZZXX_END` instead of their own END ( JUNE_BUGS 700 ); check the id each function pushes against its own state name.

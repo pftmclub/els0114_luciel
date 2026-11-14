@@ -2056,6 +2056,32 @@ Opus 5.5 high. Covers CH1b `8716f6b7`, CH1d `814dc0e6`, CH1f `1335ce1b`, CH1f2 `
 - **Commit** `c7a6dced`; `finish.py --range c7a6dced^..c7a6dced`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `1 PASS, 0 OTHER, 0 FAIL` ( 16 deleted = the replaced timer lines ) / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1g` ( Sonnet 5.5 high ).
 
+### CH1g - Done (2026-11-14)
+
+Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.h` / `.cpp`, nothing references it until CH1 ). funcmap `grep "(CH1g)" june2017_re/funcmap.tsv` ( 38 rows ); JUNE_BUGS 700-701; no review of its own ( the CH1i review covers CH1g, CH1g2, CH1h, CH1i ).
+- **38 functions, June addresses** ( every `state-fn` row of `ch0_class_map.tsv` col 6 = CH1g ): StateStart / StartFuture `32ae5c70` `32ae5c90` `32ae5cb0` `32ae5db0` `32ae5dd0` `32ae5e10` `32ae5e30` `32ae5f40` `32ae6090` `32ae60b0`; Sniping X charge EventProcess / FrameMove `32ae5ce0` / `32ae5d20`;
+  Royal Guard F loops `32ae5e60` ( FrameMove ), `32ae5ef0` / `32ae5f60` / `32ae5fb0` / `32ae6000` ( EventProcess ); Chiliarch `32af0270` ZZZX, `32af0570` / `32af0860` / `32af0b50` / `32af0e50` dash Z / ZX / ZXX / XX, `32af7960` / `32af7c10` F dash ZXXX / XXX,
+  `32af7ec0` M ZZZX, `32af8230` / `32af85a0` / `32af8910` / `32af8bc0` / `32af8f30` M dash ZX / ZXX / ZXXX / XX / XXX; Royal Guard `32af5d20` dash ZX, `32af6110` ZZZX, `32af6330` / `32af6560` / `32af6780` Sniping Z / Z_FINISH / X_FIRE, `32af69b0` / `32af6a20` / `32af6c20` dash jump Sniping START / LOOP / FINISH.
+  The 38 thunks are CH1m's registration.
+- **How it was read:** `charport_adis.py luciel --phase CH1g` listings ( the tool's function bounds run into the next function: each body was read to its `int3` ), a scratch condenser that reduced each listing to its distinct parts and checked the skill / walk / dash cancel blocks
+  against June's expansion token by token ( `SKILL_CANCEL_AFTER`, the CH1f `WALK_CANCEL_AFTER_ON_LINE_` / `DASH_CANCEL_AFTER_ON_LINE_`, all equal ); the x87 compares decoded as in CH1f; job-line arguments checked at each `vslot 0x670` call.
+- **The shapes ( kept as June has them ):** the combo / dash combo chains are CH1f's ( event macro, then the three cancels ). Differences: the order of the cancels is not fixed ( `32af6110`, `32af6330` walk, dash, skill; `32af6560` walk, skill, dash; the rest skill, walk, dash );
+  the F / M states add a back-walk cancel ( `m_fBWalkCancelAfter`, a walk key against the facing, on the line: file-local `BWALK_CANCEL_AFTER_ON_LINE_` ); `32af6a20` has the awakening branch only ( file-local `HYPER_MODE_CANCEL_AFTER_`, no special attack );
+  `32af6110` / `32af6330` / `32af6560` test the animation end in an `if` of its own, then the foot ( `y -= LINE_RADIUS * 1.5f` ); `32af0b50` / `32af0e50` land ( `LSI_LU_JUMP_LANDING` ) on the line after 0.7 s with no animation end test.
+- **Tail calls:** from the state change time on ( `m_fEventTime[0].stateChange <= now` ), the four F / M dash states ( `32af7960` `32af7c10` `32af8910` `32af8f30` ) hand the frame to another state's EventProcess: the F pair to `LSI_CIEL_DASH_JUMP_COMBO_X_EventProcess` ( `32af52c0` ),
+  the M pair to `LSI_LU_DASH_JUMP_COMBO_X_EventProcess` ( `32aef160` ), both CH1f / CH1f2's; else the animation end with `stateChange == 9999` goes to `LSI_LU_WAIT`.
+- **Sniping X charge:** `FrameMove` ( `32ae5d20`, twin `32ae5e60` ) drains `float( elapsed * 10.0 )` MP and adds the elapsed time to `m_fChargeTime` ( capped at 1 ) only while that MP is available and the charge is below 1; `EventProcess` ends at 3 s or on X released ( the F loops also need 0.4 s, a double ).
+- **June quirks kept ( JUNE_BUGS 700-701 ):** three F loop bodies ( `32ae5f60` `32ae5fb0` `32ae6000` ) end in the ZZZXX END state, never their own; `32ae5e30` is the StartFuture callback of four loop states but calls `CommonStateStart` and drains 10 MP ( its twin `32ae5cb0` is a Start callback ).
+  Not bugs, noted: the Sniping loop's missing special-attack cancel; `m_iSnipingComboMaxCount` is unset by the ctor ( CH1a ).
+- **Constants:** namespace `_CONST_LUCIEL_CH1G_` ( 3 s, 0.4 as a double, -10 MP, 10 MP per second as a double, the 1.0 charge cap, the 5 / 8 Sniping counts, 0.7, 9999 ); state ids and unit classes are enum members ( `UC_LUCIEL_DREAD_LORD` 127 / `UC_LUCIEL_NOBLESSE` 128 ); `LINE_RADIUS` is June's 30, `* 1.5f` its 45.
+- **Names:** `junediverge.py --list` checked; names are the CH0 map's ( `LSI_<STATE>_<Fn>` ), the macros `BWALK_CANCEL_AFTER_ON_LINE_` / `HYPER_MODE_CANCEL_AFTER_` follow the file's existing `_ON_LINE_` pattern; no `June`, address or phase tag in any identifier.
+- **Callees:** nothing new to write: `UpNowMp`, `GetNowMp`, `IsInJobLine`, `CAN_WALK_CANCEL`, `CanHyperMode`, `IsQuickSlotSpecialItemWaiting`, `GetHypetMpdeStateID`, `CommonStateStartFuture`, and CH1f / CH1f2's two dash jump EventProcess.
+- **Not in this phase:** checklist row §7 L254 ( `+0x7cc8` ): no site in these 38; no state is registered, so `stateends` / `skillicons` / `luabind` do not apply.
+- **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge` `RESULT: PASS`; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each; `cl /P` holds 186 `LSI_*` definitions ( 148 + these 38 ). Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1g2` ( Sonnet 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

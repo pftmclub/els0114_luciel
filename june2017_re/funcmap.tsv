@@ -11753,3 +11753,41 @@ du1d_body_reads.tsv (DU1d)	every June user-band function that reads a body acces
 32b25610 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.28 s: projectile ( 5 MP )
 32b25970 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.05 s: the XX projectile ( 5 MP )
 32b25cd0 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.378 s: projectile ( 5 MP )
+32ae5c70 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_ZZZX_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStartFuture; Sniping Z count = 0
+32ae5c90 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_Z_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStartFuture; Sniping Z count + 1
+32ae5cb0 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_CHARGE_StateStart	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStart; charge = 0; MP -10
+32ae5ce0 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_CHARGE_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); 3 s or X released -> LSI_LCG_COMBO_SNIPING_X_FIRE
+32ae5d20 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_CHARGE_FrameMove	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); MP drain 10/s ( float ) while MP lasts and charge < 1; charge + elapsed ( max 1 )
+32ae5db0 (CH1g)	CX2GULuciel::LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStartFuture; max count = 0; count = 0
+32ae5dd0 (CH1g)	CX2GULuciel::LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStartFuture; count + 1
+32ae5e10 (CH1g)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZX_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStartFuture; count = 0
+32ae5e30 (CH1g)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_LOOP_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); Future slot runs CommonStateStart; charge = 0; MP -10 ( JUNE_BUGS 701 )
+32ae5e60 (CH1g)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_LOOP_FrameMove	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); same body as 32ae5d20
+32ae5ef0 (CH1g)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXX_LOOP_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); 3 s, or X released after 0.4 s ( double ) -> LSI_LCG_F_COMBO_ZZZXX_END
+32ae5f40 (CH1g)	CX2GULuciel::LSI_LCG_F_COMBO_ZZZXZ_LOOP_StateStart	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStart; count + 1
+32ae5f60 (CH1g)	CX2GULuciel::LSI_LCG_F_COMBO_XXXXX_LOOP_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); ZZZXX loop body; ends in LSI_LCG_F_COMBO_ZZZXX_END ( JUNE_BUGS 700 )
+32ae5fb0 (CH1g)	CX2GULuciel::LSI_LCG_F_DASH_COMBO_ZXXX_LOOP_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); ZZZXX loop body; ends in LSI_LCG_F_COMBO_ZZZXX_END ( JUNE_BUGS 700 )
+32ae6000 (CH1g)	CX2GULuciel::LSI_LCG_F_DASH_COMBO_XXXX_LOOP_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); ZZZXX loop body; ends in LSI_LCG_F_COMBO_ZZZXX_END ( JUNE_BUGS 700 )
+32ae6090 (CH1g)	CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStartFuture; max count = 0; count = 0
+32ae60b0 (CH1g)	CX2GULuciel::LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_StateStartFuture	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); CommonStateStartFuture; count + 1
+32af0270 (CH1g)	CX2GULuciel::LSI_LLC_COMBO_ZZZX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); foot, anim end, event 0 Z on a Dread Lord unit -> LSI_LLD_COMBO_ZZZXZ; skill / walk / dash cancels
+32af0570 (CH1g)	CX2GULuciel::LSI_LLC_DASH_COMBO_Z_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); anim end, event 0 X -> LSI_LLC_DASH_COMBO_ZX
+32af0860 (CH1g)	CX2GULuciel::LSI_LLC_DASH_COMBO_ZX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); foot, anim end, event 0 X -> LSI_LLC_DASH_COMBO_ZXX
+32af0b50 (CH1g)	CX2GULuciel::LSI_LLC_DASH_COMBO_ZXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); foot + 0.7 s -> LSI_LU_JUMP_LANDING; event 0 Z + job line 1 -> LSI_LLC_F_DASH_COMBO_ZXXX
+32af0e50 (CH1g)	CX2GULuciel::LSI_LLC_DASH_COMBO_XX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); foot + 0.7 s -> LSI_LU_JUMP_LANDING; event 0 Z + job line 1 -> LSI_LLC_F_DASH_COMBO_XXX
+32af5d20 (CH1g)	CX2GULuciel::LSI_LCG_DASH_COMBO_ZX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 1 Down + X on a Noblesse unit -> LSI_LCN_DASH_COMBO_ZX_DOWN_X; event 0 X + job line 2 -> LSI_LCG_DASH_COMBO_ZXX
+32af6110 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_ZZZX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); anim end -> SNIPING_READY ( own if ); foot; cancels walk, dash, skill
+32af6330 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_Z_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); anim end -> READY below 5 Z else Z_FINISH; cancels walk, dash, skill
+32af6560 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_Z_FINISH_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); anim end -> WAIT; cancels walk, skill, dash
+32af6780 (CH1g)	CX2GULuciel::LSI_LCG_COMBO_SNIPING_X_FIRE_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); anim end; skill / walk / dash cancels
+32af69b0 (CH1g)	CX2GULuciel::LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); Z raises max count ( cap 8 ); foot -> LSI_LU_DASH_JUMP_LANDING; anim end -> SNIPING_LOOP
+32af6a20 (CH1g)	CX2GULuciel::LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); Z raises max count; foot -> landing; anim end -> LOOP while max > count else FINISH; awakening cancel only, walk, dash
+32af6c20 (CH1g)	CX2GULuciel::LSI_LCG_DASH_JUMP_COMBO_SNIPING_FINISH_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); foot -> LSI_LU_DASH_JUMP_LANDING
+32af7960 (CH1g)	CX2GULuciel::LSI_LLC_F_DASH_COMBO_ZXXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 0 time passed -> tail call of Ciel DASH_JUMP_COMBO_X ( 32af52c0 ); skill / walk / back-walk / dash cancels
+32af7c10 (CH1g)	CX2GULuciel::LSI_LLC_F_DASH_COMBO_XXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); same as 32af7960
+32af7ec0 (CH1g)	CX2GULuciel::LSI_LLC_M_COMBO_ZZZX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); foot, anim end, event 0 Z on a Dread Lord unit -> LSI_LLD_M_COMBO_ZZZXZ; cancels with back walk
+32af8230 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_ZX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 0 X + job line 1 -> LSI_LLC_M_DASH_COMBO_ZXX
+32af85a0 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_ZXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 0 Z + job line 1 -> LSI_LLC_M_DASH_COMBO_ZXXX
+32af8910 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_ZXXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 0 time passed -> tail call of Lu DASH_JUMP_COMBO_X ( 32aef160 ); cancels with back walk
+32af8bc0 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_XX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); event 0 Z + job line 1 -> LSI_LLC_M_DASH_COMBO_XXX
+32af8f30 (CH1g)	CX2GULuciel::LSI_LLC_M_DASH_COMBO_XXX_EventProcess	PORTED	Char Luciel CH1g: inert ( _CORE, not wired until CH1 ); same as 32af8910

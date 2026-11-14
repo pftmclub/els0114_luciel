@@ -787,6 +787,46 @@ protected:
 	void				LSI_CIEL_DASH_JUMP_COMBO_XXXX_FrameMove();	// June 32b25cd0
 	void				PlayComboProjectileEffectSet( const WCHAR* pwszEffectSetName_, const float fConsumeMP_, const bool bAddMaxCountModifier_ );	// June 32b23820 and its siblings, inline in each
 
+	// char-luciel CH1g: Chiliarch and Royal Guard combos ( June 32ae5c70 - 32af8f30 )
+	void				LSI_LCG_COMBO_ZZZX_StateStartFuture();	// June 32ae5c70
+	void				LSI_LCG_COMBO_SNIPING_Z_StateStartFuture();	// June 32ae5c90
+	void				LSI_LCG_COMBO_SNIPING_X_CHARGE_StateStart();	// June 32ae5cb0
+	void				LSI_LCG_COMBO_SNIPING_X_CHARGE_EventProcess();	// June 32ae5ce0
+	void				LSI_LCG_COMBO_SNIPING_X_CHARGE_FrameMove();	// June 32ae5d20
+	void				LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_StateStartFuture();	// June 32ae5db0
+	void				LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_StateStartFuture();	// June 32ae5dd0
+	void				LSI_LCG_F_COMBO_ZZZX_StateStartFuture();	// June 32ae5e10
+	void				LSI_LCG_F_COMBO_ZZZXX_LOOP_StateStartFuture();	// June 32ae5e30
+	void				LSI_LCG_F_COMBO_ZZZXX_LOOP_FrameMove();	// June 32ae5e60
+	void				LSI_LCG_F_COMBO_ZZZXX_LOOP_EventProcess();	// June 32ae5ef0
+	void				LSI_LCG_F_COMBO_ZZZXZ_LOOP_StateStart();	// June 32ae5f40
+	void				LSI_LCG_F_COMBO_XXXXX_LOOP_EventProcess();	// June 32ae5f60
+	void				LSI_LCG_F_DASH_COMBO_ZXXX_LOOP_EventProcess();	// June 32ae5fb0
+	void				LSI_LCG_F_DASH_COMBO_XXXX_LOOP_EventProcess();	// June 32ae6000
+	void				LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY_StateStartFuture();	// June 32ae6090
+	void				LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_StateStartFuture();	// June 32ae60b0
+	void				LSI_LLC_COMBO_ZZZX_EventProcess();	// June 32af0270
+	void				LSI_LLC_DASH_COMBO_Z_EventProcess();	// June 32af0570
+	void				LSI_LLC_DASH_COMBO_ZX_EventProcess();	// June 32af0860
+	void				LSI_LLC_DASH_COMBO_ZXX_EventProcess();	// June 32af0b50
+	void				LSI_LLC_DASH_COMBO_XX_EventProcess();	// June 32af0e50
+	void				LSI_LCG_DASH_COMBO_ZX_EventProcess();	// June 32af5d20
+	void				LSI_LCG_COMBO_ZZZX_EventProcess();	// June 32af6110
+	void				LSI_LCG_COMBO_SNIPING_Z_EventProcess();	// June 32af6330
+	void				LSI_LCG_COMBO_SNIPING_Z_FINISH_EventProcess();	// June 32af6560
+	void				LSI_LCG_COMBO_SNIPING_X_FIRE_EventProcess();	// June 32af6780
+	void				LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_EventProcess();	// June 32af69b0
+	void				LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_EventProcess();	// June 32af6a20
+	void				LSI_LCG_DASH_JUMP_COMBO_SNIPING_FINISH_EventProcess();	// June 32af6c20
+	void				LSI_LLC_F_DASH_COMBO_ZXXX_EventProcess();	// June 32af7960
+	void				LSI_LLC_F_DASH_COMBO_XXX_EventProcess();	// June 32af7c10
+	void				LSI_LLC_M_COMBO_ZZZX_EventProcess();	// June 32af7ec0
+	void				LSI_LLC_M_DASH_COMBO_ZX_EventProcess();	// June 32af8230
+	void				LSI_LLC_M_DASH_COMBO_ZXX_EventProcess();	// June 32af85a0
+	void				LSI_LLC_M_DASH_COMBO_ZXXX_EventProcess();	// June 32af8910
+	void				LSI_LLC_M_DASH_COMBO_XX_EventProcess();	// June 32af8bc0
+	void				LSI_LLC_M_DASH_COMBO_XXX_EventProcess();	// June 32af8f30
+
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )
 	CKTDGParticleSystem::CParticleEventSequenceHandle	m_ahLucielMajorParticleInstance[LUCIEL_MAJOR_PII_END];	// +0x959c
