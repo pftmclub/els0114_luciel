@@ -1849,6 +1849,27 @@ with an `#error` guard in `X2GameUnit.cpp` on `SERV_IRUHADEV_JUNE_BUFF_BINDING` 
 - **Peer:** char-luciel CH1l30 ran at the same time in `X2Game.*` / `X2DamageEffect.h` / `funcmap.tsv`; this phase committed only its own hunks.
 - **How to see it in game:** nothing yet ( inert ); CH1k / CH1m's callers reach it when `_LIVE` lands.
 
+### CH1k0 - Review (2026-11-14)
+
+Opus 5.5 high, read-only ( Ghidra `disassemble_function` on `322a74a0`, `322a7000`, `3227bcb0`, `31e8c9d0` ). **Verdict: pass, no code change.**
+- **Debuff filter, both ways:** `322a74a0` @`322a7531`-`322a7538`: templet NULL -> scaled, `+0x64 == 0` -> `jnz` not taken -> skip; so debuffs and missing
+  templets are scaled = port `NULL != ptr && false == IsDeBuff()`. `322a7000` @`322a70b1`-`322a70b8`: NULL -> added, `+0x64 == 0` -> added, else skip = port
+  `NULL != ptr && IsDeBuff()`. `+0x64` = `IS_DEBUFF` per four confirmed funcmap rows ( `32369cc0`, `326c31c0`, `326c9530`, `3204dcd0` ); March
+  `IsDeBuff()` returns `m_bDeBuff` ( `X2BuffTemplet.h:113` ). The templet comes from `GetInstance()` ( `31ef6990` / inlined lazy create ) + `326c3170`.
+- **Rate guard:** `fldz / fcomp [rate]`, `test ah,0x41`, `jz` out: out only with C0 = C3 = 0 ( 0 > rate ); NaN sets both and runs = port `fRate_ < 0.f`.
+- **Awakening clock:** @`322a714f` BTI 5 / 0x336, unit `+0xc04` NULL-tested ( March `GetGageData()` is the non-virtual `m_pGageData`,
+  `X2GameUnit.h:2420` ), protected `+0xe8` read twice, `test ah,5 / jp` skips 0, < 0 and NaN = port `0.f < remain`; `31e8c9d0` stores the protected
+  `+0xe8` ( March `SetHyperModeRemainTime`, `X2GageData.h:555` ); all inside the `pTimeFinalizer != NULL` branch of the finalizer loop ( row 691 ).
+- **`3227bcb0`:** arg 1 ( `[esp+0x44]` ) -> `3227b920` = BTI, arg 2 ( `[esp+0x48]` ) `fadd` = float, `ret 8`; vslot 0x3c Get, `fadd`, vslot 0x38 Set
+  ( slots 15 / 14 per Eve CH4b2 rows `3227bfa0` / `3227c110` ); `3227ba10` after the loop with no test of `3227b920`'s result = port.
+- **Loops:** factor stride 0x5b, BTI `+0x20`; `ChangeBuffFinalizerTempletPtrList` once per non-skipped factor in both passes ( row 690 ) = port.
+- **`#error` guard:** `cl /P` of `X2GameUnit.cpp` ( census `cl_cmd` ): rc 0, no `C1189`, one definition of each function in the `.i`.
+- **Hygiene ( `finish.py --review --commits 88c14ed5 -v`, two `--skip-flag` for the guard's targets ):** `JUNE_CHAR_BUFF_TIME_PASS` `2 PASS, 0 PASS~,
+  1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` / `0 deleted` / `RESULT: PASS`; `junediverge` and `--check-all` `RESULT: PASS`; `enumscan exit 0`;
+  `FINISH RESULT: PASS (9 gates, 0 failed, 5 skipped)`. No OTHER rows or deleted lines to explain. Later commit `feb8091e` ( CH1l30 ) adds its own hunks to
+  `X2GameUnit.*`, none in this flag's blocks.
+- **Build:** none ( no code change ). CH1k now waits only on the CH1i review.
+
 ### CH1l30 - Done (2026-11-14)
 
 Opus 5.5 high. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN` ( `Always.h`, no `_DEBUG`, no log tag, inert until CH1l3 / CH1m call it ),
