@@ -3469,6 +3469,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		/// vecUnits_ with the game units around this one, nearest first. iCount_ is June's second argument, which its body never reads
 		void CollectUnitsAround( OUT std::vector<CX2GameUnit*>& vecUnits_, IN const int iCount_, IN const float fMaxDistance_, IN const float fMinAngle_, IN const float fMaxAngle_, IN const bool bFacingOnly_, IN const bool bSameTeam_ );
 #endif SERV_IRUHADEV_JUNE_DAMAGEDATA
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
+		bool GetNearestEnemyUnitDistance( OUT float& fNearestDistance_ );	/// char-luciel CH1l30: June 32295360
+#endif SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
 		bool GetEnableWeaponRenderEffect(){ return m_bEnableWeaponRenderEffect; }
 		void SetEnableWeaponRenderEffect( bool _bVal );
 		D3DXCOLOR GetWeaponRenderEffectColor(){ return m_WeaponRenderEffectColor; }

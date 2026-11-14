@@ -55,3 +55,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - `3227bcb0` is `CX2GameUnit::AddBuffTimeFinalizerDuration( BUFF_TEMPLET_ID, float )` (caller `32b3d380`); `322a7000` is
   `CX2GameUnit::AddAllBuffTimeFinalizerDuration( float )` (callers `32b3db80` / `32b3dea0`). Both under `SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS`: call them by name.
+
+## Amended by char-luciel CH1l30 (2026-11-14)
+
+- `32295360` is ported: `bool CX2GameUnit::GetNearestEnemyUnitDistance( OUT float& )` ( start 9999999.0 ) under `SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN`; `32b3e470` calls it by that name.

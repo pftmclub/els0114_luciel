@@ -13455,3 +13455,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              callers ( CH1k / CH1m ) go live. Needs SERV_IRUHADEV_JUNE_BUFF_BINDING and SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE ( #error guard ).
 #define SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel CH1l30 - two class-agnostic enemy scans: CX2Game::GetEnemyUnitListInRange ( June 322f1a90, live units of
+//              another team within a range of a unit, nearest first ) and CX2GameUnit::GetNearestEnemyUnitDistance ( June 32295360 ).
+//              Inert until Lu/Ciel's callers ( CH1l3 / CH1m ) go live. Needs SERV_IRUHADEV_JUNE_DAMAGEEFFECT_RUNTIME and
+//              SERV_IRUHADEV_JUNE_DAMAGEDATA ( CEffect::GetLockOnAimPos and its CX2GameUnit friend; #error guard ).
+#define SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN ) && ( !defined( SERV_IRUHADEV_JUNE_DAMAGEEFFECT_RUNTIME ) || !defined( SERV_IRUHADEV_JUNE_DAMAGEDATA ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN needs JUNE_DAMAGEEFFECT_RUNTIME and JUNE_DAMAGEDATA ( CEffect::GetLockOnAimPos ), char-luciel CH1l30
+#endif SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
+//////////////////////////////////////////////////////////////////////////

@@ -1849,6 +1849,39 @@ with an `#error` guard in `X2GameUnit.cpp` on `SERV_IRUHADEV_JUNE_BUFF_BINDING` 
 - **Peer:** char-luciel CH1l30 ran at the same time in `X2Game.*` / `X2DamageEffect.h` / `funcmap.tsv`; this phase committed only its own hunks.
 - **How to see it in game:** nothing yet ( inert ); CH1k / CH1m's callers reach it when `_LIVE` lands.
 
+### CH1l30 - Done (2026-11-14)
+
+Opus 5.5 high. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN` ( `Always.h`, no `_DEBUG`, no log tag, inert until CH1l3 / CH1m call it ),
+with an `#error` guard beside the define on `SERV_IRUHADEV_JUNE_DAMAGEEFFECT_RUNTIME` and `SERV_IRUHADEV_JUNE_DAMAGEDATA` ( `CEffect::GetLockOnAimPos`
+and its `CX2GameUnit` friend ). Files: `Always.h`, `X2Game.h` / `.cpp`, `X2GameUnit.h` / `.cpp`, `X2DamageEffect.h` ( insert-only, 128 lines ).
+funcmap: `grep "(CH1l30)" june2017_re/funcmap.tsv` ( 4 rows; the CH0 candidate rows stay, superseded ). No `JUNE_BUGS.md` row: no quirk with an effect.
+- **Already ported?** `322d7b30` = char-elesis CH3c2's `CX2Game::GetFrontNearestEnemyUnit`; `31f75980` = March's `CEffect::SetLinkMainEffectByPos`
+  ( both settled by the 2026-11-14 kickoff amendment ). `32294e30` ( C3c `CX2GameUnit::CollectUnitsAround` ) is the twin of the two new bodies.
+- **`322f1a90` -> `std::vector<CX2GameUnit*> CX2Game::GetEnemyUnitListInRange( pUnit_, iMyTeam_, fRange_ )`:** thiscall on the game ( caller sets ECX =
+  `g_pX2Game` ), hidden return vector, `RET 0x10`. NULL unit -> empty. Per unit: `IsValidUnit` ( inlined `+0x304` list ), team `== iMyTeam_` skip,
+  `GUSI_DIE` ( vslot 0x174 == 4 ), `GetNowHp() <= 0` ( `[3342e84c]` = 0.0 ), same `GameUnitType` + same UID = self skip; aim point = vslot 0x3e4 with
+  `L""` ( `[3344f1f4]` is zero bytes ) from `pUnit_->GetPos( false )` = `CEffect::GetLockOnAimPos`; an NPC must be `NCT_BASIC` and subtracts
+  ( `+0x3e30` + `+0x3e34` ) x 0.25 ( `[33437830]` double 0.25 ); kept when distance `<=` range ( `fcom / test ah,0x41 / jp`: NaN refused ); `std::sort`
+  ( `322acc40`, the same ascending float sort as `32294e30` ) then the units copied out. **No count cap:** CH0's "nearest-N" was a guess. Caller
+  `32b34c70` ( CH1l3 ): unit = the one from `31e55340`, team = Lu/Ciel's ( `+0x278` ), range 500.0 ( `[334ed3dc]` ). Needs `friend class CX2Game;` in
+  `CEffect` ( `X2DamageEffect.h`, under the flag ) for the protected aim helper.
+- **`32295360` -> `bool CX2GameUnit::GetNearestEnemyUnitDistance( OUT float& )`:** thiscall, `RET 4`, returns AL ( true when a unit beat the start ).
+  `*out = 9999999.0` ( `[3344915c]` ). Per unit: `IsValidUnit` `322ccf50`, same team skip, `GUSI_DIE`; the HP gage test is inlined ( `+0xc04` NULL
+  passes, `+0x20` NULL or HP `<= 0` skips ) = March `GetNowHp() <= 0.f` ( June `31e4f900` returns 0 for a NULL HP gage ); aim point as above from this
+  unit's `GetPos( false )`; NPC `NCT_BASIC` + size x 0.25; kept when distance `<` `*out` ( `test ah,0x41 / jnz`: equal or NaN refused ). Two local
+  vectors June builds and frees are never filled ( no behaviour, not ported ). Null-game check added as a labelled stand-in, as `CollectUnitsAround`.
+  Caller `32b3e470` ( CH1m ).
+- **`322d7b30` at `32b318e0` ( CH2d2 ):** pushes ( unit, float range, an empty `std::set`, `&int` = -1 ). June's 4th argument is a `const int&`: it
+  goes straight to vslot 0x178, and NPC `3275bc30` compares `[esi]`. Elesis's by-value `iAttackType_` with -1 is the same; no new body.
+- **Names:** `junediverge.py --list` checked; no June / address / phase-tag names.
+- **Hygiene:** `finish.py --files` ( worktree ): `flagcheck JUNE_CHAR_ENEMY_SCAN PASS` ( `5 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` ),
+  `junediverge RESULT: PASS`, `enumscan exit 0`, `FINISH RESULT: PASS`. `JUNE_DAMAGEEFFECT_RUNTIME` / `JUNE_DAMAGEDATA` SKIPPED: targets of the
+  `#error` guard, not this phase's. stateends / skillicons / luabind: n/a. Range block: see the commit note below.
+- **Compile:** `/Zs` probes of `X2Game.cpp` and `X2GameUnit.cpp` ( census `cl_cmd`, no PCH, the real `Always.h` ): 0 errors each; a `cl /P` holds both
+  bodies ( flag on, guard passes ). Full build skipped: no play-test.
+- **Peer:** char-luciel CH1k0 ran at the same time in `X2GameUnit.*` / `Always.h`; this phase applied its hunks there only after `88c14ed5` landed.
+- **How to see it in game:** nothing yet ( inert ); CH1l3 / CH1m / CH2d2's callers reach it when `_LIVE` lands.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

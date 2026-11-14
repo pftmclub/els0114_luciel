@@ -1270,6 +1270,9 @@ class CX2DamageEffect
 				friend class CX2GUUser;	/// Eve CH2b0: CX2GUUser::JuneCollectEnemyUnitsInCone (June 32009180) reads the aim point too
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_SKILL
 				static D3DXVECTOR3	GetNearestCollisionPos( const CX2GameUnit* pUnit_, const D3DXVECTOR3& vFrom_, OUT bool& bFound_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
+				friend class CX2Game;	/// char-luciel CH1l30: CX2Game::GetEnemyUnitListInRange (June 322f1a90) reads the aim point too
+#endif SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
 
 				// June2017 CREATE_DAMAGE_EFFECT loop runtime (Phase 7c); evidence in june2017_re/funcmap.tsv.
 				// SET_DIE_WHEN_MASTER_EFFECT_DIE @31f89e77-31f89e95: June pushes the new child's handle onto

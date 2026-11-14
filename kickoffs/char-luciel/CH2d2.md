@@ -43,3 +43,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **States:** the ones whose callbacks are listed above (the state table's col 8 keeps the unsplit `CH2d`).
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7y L680 GetLandPosition bMonster true in Luciel class code; §7ai L835-841 pass June skip / adjust / level / creator at every ported BFI call.
 - **Depends on CH2d20** (transform HUD).
+
+## Amended by char-luciel CH1l30 (2026-11-14)
+
+- `322d7b30` is char-elesis's `CX2Game::GetFrontNearestEnemyUnit( pUnit, fRange, set, iAttackType )`: `32b318e0` passes an empty set and -1 ( June's `const int&` = March's by-value int ). `31f75980` is March's `CEffect::SetLinkMainEffectByPos`.

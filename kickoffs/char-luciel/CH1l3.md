@@ -43,3 +43,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   Still `?` (name it by the class pattern from the hint in col 7): `32aebb60` `32b0e550` `32b153d0` `32b15780` `32b16760` `32b16880` `32b16940` `32b176a0` `32b18060` `32b1eca0` `32b1f650` `32b204d0` `32b20780` `32b347f0` `32b349f0` `32b34a90` `32b35c60` `32b4c7f0` `32b4cb40` `32b4cef0` `32b4cff0` `32b4d140` `32b4d260`.
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7 L240 SetBuffAccumulationCount 322a7660 / AddBuffAccumulationCount 322a8a70 callers in; §7ai L835-841 pass June skip / adjust / level / creator at every ported BFI call.
 - **Depends on CH1l30** (unit scans, effect aim).
+
+## Amended by char-luciel CH1l30 (2026-11-14)
+
+- `322f1a90` is ported: `CX2Game::GetEnemyUnitListInRange( pUnit_, iMyTeam_, fRange_ )` returns the units, nearest first ( no count cap ), under `SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN`; `32b34c70` calls it on `g_pX2Game` with Lu/Ciel's team and range 500.
+- `31f75980` is March's `CX2DamageEffect::CEffect::SetLinkMainEffectByPos` ( `32b34a90` ).

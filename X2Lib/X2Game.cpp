@@ -20202,6 +20202,66 @@ CX2GameUnit* CX2Game::GetFrontNearestEnemyUnit( CX2GameUnit* pUnit_, float fRang
 	return pNearestUnit;
 }
 #endif SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
+namespace _CONST_GAME_CH1L30_	// char-luciel CH1l30
+{
+	bool IsEnemyUnitNearer( const std::pair<CX2GameUnit*, float>& lhs_, const std::pair<CX2GameUnit*, float>& rhs_ )
+	{
+		return lhs_.second < rhs_.second;
+	}
+}
+using namespace _CONST_GAME_CH1L30_;
+
+// char-luciel CH1l30: June 322f1a90 ( live units not of iMyTeam_ within fRange_ of pUnit_, nearest first; no count cap )
+std::vector<CX2GameUnit*> CX2Game::GetEnemyUnitListInRange( CX2GameUnit* pUnit_, const int iMyTeam_, const float fRange_ )
+{
+	std::vector<CX2GameUnit*> vecUnits;
+	if ( NULL == pUnit_ )
+		return vecUnits;
+
+	std::vector< std::pair<CX2GameUnit*, float> > vecFound;
+	for ( int i = 0; i < GetUnitNum(); ++i )
+	{
+		CX2GameUnit* pTargetUnit = GetUnit( i );
+		if ( NULL == pTargetUnit )
+			continue;
+		if ( false == IsValidUnit( pTargetUnit ) )
+			continue;
+		if ( iMyTeam_ == pTargetUnit->GetTeam() )
+			continue;
+		if ( CX2GameUnit::GUSI_DIE == pTargetUnit->GetGameUnitState() )
+			continue;
+		if ( pTargetUnit->GetNowHp() <= 0.f )
+			continue;
+		if ( pUnit_->GetGameUnitType() == pTargetUnit->GetGameUnitType() && pUnit_->GetUnitUID() == pTargetUnit->GetUnitUID() )
+			continue;
+
+		const D3DXVECTOR3 vAimPos = CX2DamageEffect::CEffect::GetLockOnAimPos( pTargetUnit, pUnit_->GetPos( false ) );
+
+		float fOffset = 0.f;
+		if ( CX2GameUnit::GUT_NPC == pTargetUnit->GetGameUnitType() )
+		{
+			CX2GUNPC* pNpc = static_cast<CX2GUNPC*>( pTargetUnit );
+			if ( CX2UnitManager::NCT_BASIC != pNpc->GetClassType() )
+				continue;
+			fOffset = ( pNpc->GetOrgUnitSize().x + pNpc->GetOrgUnitSize().y ) * 0.25f;	// June +0x3e30 / +0x3e34 x [33437830]
+		}
+
+		const D3DXVECTOR3 vDistance = vAimPos - pUnit_->GetPos( false );
+		const float fDistance = D3DXVec3Length( &vDistance ) - fOffset;
+		if ( false == ( fDistance <= fRange_ ) )
+			continue;
+
+		vecFound.push_back( std::make_pair( pTargetUnit, fDistance ) );
+	}
+
+	std::sort( vecFound.begin(), vecFound.end(), IsEnemyUnitNearer );	// June 322acc40
+
+	for ( UINT uFound = 0; uFound < vecFound.size(); ++uFound )
+		vecUnits.push_back( vecFound[uFound].first );
+	return vecUnits;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 // char-elesis CH4a: June 322d4a60 ( living, hittable units of another team nearer than fRange_ to vPos_ )
 int CX2Game::GetEnemyUnitCountInRange( const float fRange_, const int iMyTeam_, const D3DXVECTOR3& vPos_ )

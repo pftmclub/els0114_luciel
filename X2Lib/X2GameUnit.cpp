@@ -13923,6 +13923,52 @@ void CX2GameUnit::CollectUnitsAround( OUT std::vector<CX2GameUnit*>& vecUnits_, 
 		vecUnits_.push_back( vecFound[uFound].first );
 }
 #endif SERV_IRUHADEV_JUNE_DAMAGEDATA
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
+// char-luciel CH1l30: June 32295360 ( distance to the nearest live unit of another team; true when one is nearer than the start value )
+bool CX2GameUnit::GetNearestEnemyUnitDistance( OUT float& fNearestDistance_ )
+{
+	fNearestDistance_ = 9999999.f;	// June [3344915c]
+	bool bFound = false;
+
+	if ( NULL == g_pX2Game )
+		return bFound;	// stand-in: June reads the game unchecked
+
+	for ( int iUnit = 0; iUnit < g_pX2Game->GetUnitNum(); ++iUnit )
+	{
+		CX2GameUnit* pUnit = g_pX2Game->GetUnit( iUnit );
+		if ( NULL == pUnit )
+			continue;
+		if ( false == g_pX2Game->IsValidUnit( pUnit ) )
+			continue;
+		if ( GetTeam() == pUnit->GetTeam() )
+			continue;
+		if ( GUSI_DIE == pUnit->GetGameUnitState() )
+			continue;
+		if ( pUnit->GetNowHp() <= 0.f )
+			continue;
+
+		const D3DXVECTOR3 vAimPos = CX2DamageEffect::CEffect::GetLockOnAimPos( pUnit, GetPos( false ) );
+
+		float fExtraDistance = 0.f;
+		if ( GUT_NPC == pUnit->GetGameUnitType() )
+		{
+			CX2GUNPC* pNpc = static_cast<CX2GUNPC*>( pUnit );
+			if ( CX2UnitManager::NCT_BASIC != pNpc->GetNPCTemplet().m_ClassType )
+				continue;
+			fExtraDistance = ( pUnit->GetOrgUnitSize().x + pUnit->GetOrgUnitSize().y ) * 0.25f;	// June +0x3e30 / +0x3e34 x [33437830]
+		}
+
+		const D3DXVECTOR3 vToUnit = vAimPos - GetPos( false );
+		const float fDistance = D3DXVec3Length( &vToUnit ) - fExtraDistance;
+		if ( false == ( fDistance < fNearestDistance_ ) )
+			continue;
+
+		fNearestDistance_ = fDistance;
+		bFound = true;
+	}
+	return bFound;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN
 void CX2GameUnit::FadeInWeaponRenderEffect(const D3DXCOLOR& _StartColor, const D3DXCOLOR& _EndColor, float _fChangeTime, float _fDuration)
 {
 #ifdef NEW_HENIR_TEST
