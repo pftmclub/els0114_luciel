@@ -2236,7 +2236,8 @@ the slotted id in June too, `32024b00` @`32024d2c`, and June names only 28014: *
 28014 ) and CH4a's `blood runaway cleanse` ( no debuff reached unit 146 ): carried to CH4c, the Crimson Avenger phase. User owes nothing more for CH4b.
 
 ### CH4b2 - Done (2026-11-14)
-**Landed.** Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` (on since CH4a; `_PASSIVE_DEBUG` stays on for the CH4c stage review). No review of its own: the CH4c
+**Landed.** Commit `abe3a805`; `flagcheck --range abe3a805^..abe3a805`: `files: 5 PASS, 0 PASS~ (blank/marker only), 0 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR`,
+0 deleted, `RESULT: PASS`. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` (on since CH4a; `_PASSIVE_DEBUG` stays on for the CH4c stage review). No review of its own: the CH4c
 stage review covers it, with its own verdict line for the `X2GUUser.*` hunks (shared file). Files: `X2GUEL.cpp`, `X2GUEl.h`, `X2GUUser.cpp`, `X2GUUser.h`, `Always.h`.
 Read from Ghidra (`320462a0`, `31feabd0`), `charport_adis.py elesis 32b524f0`, and an operand scan of `.text` for `+0x9175` (6 sites, all ported below).
 - **The roll** `32b524f0` = `CX2GUEL::IsAdvancedKnightMasteryGuard()`: `0 < m_fAdvancedKnightMasteryEffectiveRate` (+0x978c), then `GetRandomFloat( 0 ) <= ` it.
