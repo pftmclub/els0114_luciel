@@ -2180,6 +2180,7 @@ Opus 5.5 high. Reviewed CH1g ( `69234352` ), CH1g2 ( `2e5864b0` ), CH1h ( `4946d
 - **Gates, this fix ( `finish.py --files X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `1 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS` ( 11 deleted lines: the replaced lines above, all inside the `_CORE` block ); `junediverge` PASS; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`; `stateends` / `skillicons` / `luabind` skipped: nothing registered or staged.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings. Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** `15229af5`; `finish.py --range 15229af5^..15229af5`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `1 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1k` ( Sonnet 5.5 high ); `/x2-phase char-luciel CH1i2 review` ( Opus 5.5 high ) is independent.
 
 ### CH1i2 - Done (2026-11-14)
