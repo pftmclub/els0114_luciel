@@ -2127,6 +2127,7 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS` ( 2 deleted lines = CH1a's ctor initialiser and member declaration, renamed and retyped ); `junediverge` `RESULT: PASS`; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings in the new lines; `cl /P` holds 271 `LSI_*` definitions ( 224 + these 47 ). Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** `4946d4f1`; `finish.py --range 4946d4f1^..4946d4f1`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1i` ( Sonnet 5.5 high; its Opus review covers CH1g, CH1g2, CH1h, CH1i ).
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
