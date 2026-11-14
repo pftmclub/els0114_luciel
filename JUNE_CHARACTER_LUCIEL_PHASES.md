@@ -1220,6 +1220,9 @@ No `_DEBUG`, no log line. funcmap rows: `grep "(DU1d5)" june2017_re/funcmap.tsv`
 - **In game:** March classes have one body, so the second call and the second draw never run. What changes for every class: the body is
   drawn with its equips even when its anim's prepare says no-render (a stopped anim, e.g. water hold), a colour-edge super armor gets the red outline, the
   hard-body debuff looks petrified, and the unit goes to the non-alpha chain while a world mesh hides. Ciel is drawn from CH1.
+- **Play-test PASSED 2026-11-14** (user: all checks; run 13:05-13:10 on the deployed exe md5 0475c657): ravbe and reyaa, village and dungeon.
+  Logs: 0 EXCEPTION, ErrorLog has no render line, UNHANDLED only the known `E_DISABLE_HB_CHECK_REQ` x3. Side note (not this phase, since the
+  import): `/invin` fails, its `Slash_invin` calls the unbound `SetInvincibleAndNoMpConsume_Cheat` (ErrorLog 13:06:14). DU1 review ready.
 
 ### DU2 - Done (2026-11-14)
 
