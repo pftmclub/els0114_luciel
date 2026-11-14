@@ -3748,6 +3748,10 @@ public:
 		virtual void OnAttackerDamageReact_Slot4F8( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ ) {}
 		virtual void OnAttackerDamageReact_Slot4FC( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ ) {}
 #endif SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+		virtual void SetShadowEdgeTransitionDamage( const float fDamage_ ) {}	// char-elesis CH4c: June user vslot 0x730 ( base 3208ddc0, empty; only Elesis overrides it )
+		virtual void OnDefenderDamageReact( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ ) {}	// char-elesis CH4c: June user vslot 0x734 ( base 33093ad0, empty; only Elesis overrides it )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #ifdef SERV_IRUHADEV_JUNE_SOCKET_COOLTIME_ON_HIT
 		/// effect completion C10e: socket option 2000145. +0x7ca8 is set by SumSocketOption ( 3204f190 @3204fff5 ) and
 		/// cleared in UpdateSocketDataAndEnchantData ( @3204b5a0 ), +0x7cac is the 0.5 s cool-down between procs

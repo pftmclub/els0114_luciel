@@ -11794,7 +11794,15 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 	#endif //SERV_9TH_NEW_CHARACTER
 
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+		if ( NULL != GetUnit() && CX2Unit::UT_ELESIS == GetUnit()->GetType() )	// char-elesis CH4c: June @320499dc-32049a19
+		{
+			SetShadowEdgeTransitionDamage( fFinalDamage );
+			OnDefenderDamageReact( pDamageData, fFinalDamage );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 		// stand-in: Elesis not ported; June @320499dc-32049a19: a UT_ELESIS defender calls vslots 0x730( damage ) and 0x734( DD, damage ) ( char-elesis CH4c )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 		// june-stat-calc D4b: June @32049a1b-32049a47 stores the hit on the attacker or an NPC attacker's owner ( 320832a0, +0x90fc; reader 32955210 ): Stage 40
 #endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		if( IsMyUnit() == true )

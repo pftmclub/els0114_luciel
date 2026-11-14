@@ -12679,7 +12679,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: June character port ( Elesis ) Phase CH1h - her blood lines ( the Shadow Edge list clear in ReInit, the Madness doubling in DamageReact, the
 //              two attacker hit hooks ): declared here, bodies in CH4c. Stays commented out until CH4c; only with _LIVE.
 //              Revert: comment out the #define ( JUNE_CHAR_ELESIS_BLOOD ).
-//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+//              char-elesis CH4c: on. The hit hooks 0x4f8 / 0x4fc, the defender hooks 0x730 / 0x734 with their base virtuals and call site, Blood Runaway's
+//              delegate, Madness and the Crimson Avenger transcendence tick; its other dependencies are checked at the end of this file.
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
@@ -13353,4 +13355,22 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY )
 #error SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( m_bMinorUnitActive )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-elesis CH4c - what SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD reads from flags defined after it ( the passive and summon members, Shadow
+//              Edge's records, the Way of the Sword getter, the hook call sites ), and the temporary "[JUNE_CHAR] ELESIS BLOOD ..." lines ( each hook
+//              at most once a second, Madness on / off, the Blood Runaway damage swap ). The CH4c review retires the debug flag.
+//              Revert: comment out the #define ( JUNE_CHAR_ELESIS_BLOOD_DEBUG ).
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE, _SUMMON ( the blood members ), _SKILL ( ShadowEdgeRecord ) and _WOS ( GetVigorHpIntakeRate )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD ) && ( !defined( SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS ) || !defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD needs SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS ( 0x4f8 / 0x4fc calls ), SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ( the 0x730 / 0x734 call site ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( the BFI / BTI names )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
 //////////////////////////////////////////////////////////////////////////

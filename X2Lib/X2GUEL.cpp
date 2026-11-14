@@ -539,6 +539,7 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 , m_usMadnessLevel(0)	// char-elesis CH1h
 , m_bIsMadnessActive(false)
+, m_usBerserkerEnemyCount(0)	// char-elesis CH4c
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 , m_fWayOfSwordPointMultiplier(1.f)	// char-elesis CH1q: June 32b70ee0 @32b71fb6 / @32b71fd3 / @32b71fbc / @32b71fc4
@@ -985,6 +986,7 @@ CX2GUEL::~CX2GUEL(void)
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	m_usMadnessLevel = 0;	// June's dword store at +0x97a8 also zeroes CH4c's berserker enemy count
 	m_bIsMadnessActive = false;
+	m_usBerserkerEnemyCount = 0;	// char-elesis CH4c
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	m_fFireBlossomsCheckTime = -1.f;
 	m_fWallOfProminenceLifeTime = 0.f;
@@ -20525,6 +20527,274 @@ void CX2GUEL::ApplyGrandMasterAura()
 	}
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+// char-elesis CH4c: constants and helpers of the blood hooks
+namespace _CONST_EL_CH4C_
+{
+	const int		JUDGMENT_RANDOM_OFFSET				= 21;	// June @32b8997c ( no Enum entry )
+	const int		BLOOD_REVENGE_RANDOM_OFFSET			= 22;	// June @32b7bb55 ( no Enum entry )
+	const UCHAR		BLOOD_RUNAWAY_DAMAGE_STACK			= 4;	// June @32b87a00: a Blood Runaway buff stacked past this turns into the damage buff
+	const int		BERSERKER_MAX_ENEMY_COUNT			= 5;	// June @32b7eb64
+	const UINT		BERSERKER_ON_ALL_LEVEL				= 1;	// June @32b7eb95: the stack buff is set at level 1, not the skill level
+
+	// June 322cf1b0 ( CX2Game ): the value as a number in the plain PicChar, no offset
+	void DisplayDamageNumber( const float fValue_, const D3DXVECTOR3& vPos_, const D3DXVECTOR3& vDirVector_ )
+	{
+		if ( NULL != g_pData && NULL != g_pData->GetPicChar() )
+			g_pData->GetPicChar()->DrawText( static_cast<int>( fValue_ ), vPos_, vDirVector_, CKTDGPicChar::AT_CENTER );
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	bool IsBloodLogDue( DWORD& dwLastLogTime_ )
+	{
+		const DWORD dwNow = timeGetTime();
+		if ( dwNow - dwLastLogTime_ < 1000 )
+			return false;
+		dwLastLogTime_ = dwNow;
+		return true;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+}
+using namespace _CONST_EL_CH4C_;
+
+// char-elesis CH4c: June 32b7beb0 ( user vslot 0x4f8, Dark Force: a Vigor hit heals her by the HP intake rate )
+void CX2GUEL::OnAttackerDamageReact_Slot4F8( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ )
+{
+	if ( true == GetRidingOn() || false == ( 0.f < GetVigorHpIntakeRate() ) )
+		return;
+
+	if ( CX2DamageManager::WST_VIGOR_NORMAL != pDamageData_->m_WayofSwordType && CX2DamageManager::WST_VIGOR_ACTIVE != pDamageData_->m_WayofSwordType
+		&& CX2DamageManager::WST_VIGOR_SPECIAL != pDamageData_->m_WayofSwordType )
+		return;
+
+	if ( WSS_VIGOR != GetWayOfSwordState() )
+		return;
+
+	const float fHealHp = GetVigorHpIntakeRate() * fDamage_;
+	UpNowHp( fHealHp, 0.f );
+	g_pX2Game->DisplayAddHPInformation( fHealHp, GetHeadBonePos(), GetDirVector(), false );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_B_EL_Blood_Sucking", this );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	static DWORD s_dwDarkForceLogTime = 0;
+	if ( true == IsBloodLogDue( s_dwDarkForceLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS BLOOD dark force heal ( damage %.1f x %.3f = hp %.1f )", fDamage_, GetVigorHpIntakeRate(), fHealHp );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+}
+
+// char-elesis CH4c: June 32b898a0 ( user vslot 0x4fc, Judgment: bleeding on the defender, then a chance to heal by the hit )
+void CX2GUEL::OnAttackerDamageReact_Slot4FC( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ )
+{
+	if ( true == GetRidingOn() || m_usJudgmentLevel < 1 || CX2DamageManager::AT_SPECIAL == pDamageData_->attackType )
+		return;
+
+	CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefenderUnit )
+		return;
+
+	pDefenderUnit->SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_DEBUFF_JUDGEMENT_BLEEDING ), m_usJudgmentLevel, this, 0, false );
+	if ( false == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_BLEEDING ) )
+		return;
+
+	if ( false == ( GetRandomFloat( JUDGMENT_RANDOM_OFFSET ) < m_fJudgmentRate ) )
+		return;
+
+	float fHealHp = 0.f;
+	if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_HP_INTAKE_REL_DAMAGE, CX2SkillTree::RNSI_P_SDK_JUDGMENT, false, fHealHp ) )
+		fHealHp *= fDamage_;
+
+	UpNowHp( fHealHp, 0.f );
+	g_pX2Game->DisplayAddHPInformation( fHealHp, GetHeadBonePos(), GetDirVector(), false );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_B_EL_SDC_Bleeding", pDefenderUnit );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_B_EL_Blood_Sucking", this );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	static DWORD s_dwJudgmentLogTime = 0;
+	if ( true == IsBloodLogDue( s_dwJudgmentLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS BLOOD judgment heal ( target %I64d bleeding, chance %.3f, damage %.1f, hp %.1f )", pDefenderUnit->GetUnitUID(), m_fJudgmentRate, fDamage_, fHealHp );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+}
+
+// char-elesis CH4c: June 32b7bad0 ( user vslot 0x734, Blood Revenge: her buff on every hit, then a chance to take the hit's HP from the attacker; capped by her own HP, JUNE_BUGS )
+void CX2GUEL::OnDefenderDamageReact( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ )
+{
+	if ( true == GetRidingOn() || m_usBloodRevengeLevel < 1 )
+		return;
+
+	SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_BLOOD_REVENGE ), m_usBloodRevengeLevel, NULL, 0, false );
+	if ( false == ( GetRandomFloat( BLOOD_REVENGE_RANDOM_OFFSET ) < m_fBloodRevengeRate ) )
+		return;
+
+	CX2GameUnit* pAttackerUnit = pDamageData_->optrAttackerGameUnit.GetObservable();
+	if ( NULL == pAttackerUnit )
+		return;
+
+	const float fCappedDamage = ( GetNowHp() > fDamage_ ? fDamage_ : GetNowHp() );
+	const float fStolenHp = fCappedDamage * m_fBloodRevengeAbsorbRate;
+	pAttackerUnit->UpNowHp( -fStolenHp, 0.f );
+	UpNowHp( fStolenHp, 0.f );
+	DisplayDamageNumber( fStolenHp, pAttackerUnit->GetHeadBonePos(), pAttackerUnit->GetDirVector() );
+	g_pX2Game->DisplayAddHPInformation( fStolenHp, GetHeadBonePos(), GetDirVector(), false );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_B_EL_SDC_Bleeding", pAttackerUnit );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_B_EL_Blood_Sucking", this );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	static DWORD s_dwBloodRevengeLogTime = 0;
+	if ( true == IsBloodLogDue( s_dwBloodRevengeLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS BLOOD revenge ( attacker %I64d, damage %.1f, chance %.3f, rate %.3f, stolen hp %.1f )", pAttackerUnit->GetUnitUID(), fDamage_, m_fBloodRevengeRate, m_fBloodRevengeAbsorbRate, fStolenHp );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+}
+
+// char-elesis CH4c: June 32b816a0 ( user vslot 0x730 ): Add's Reverse Reactor shape with its body optimised away, the lookup is discarded ( JUNE_BUGS )
+void CX2GUEL::SetShadowEdgeTransitionDamage( const float fDamage_ )
+{
+	BOOST_FOREACH( const ShadowEdgeRecord& record_, m_vecShadowEdgeRecord )
+	{
+		if ( 0.f < record_.m_fRemainTime )
+			record_.GetTargetUnit();
+	}
+}
+
+// char-elesis CH4c: June 32b87880 ( Blood Runaway's attack-result delegate: a stack per non-special hit once the cool time is over; past 4 stacks the damage buff )
+void CX2GUEL::ApplyBloodRunawayOnAttack( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() || false == ( m_fBloodRunawayCoolTime <= m_fBloodRunawayCoolTimeElapsed ) || CX2DamageManager::AT_SPECIAL == damageData_.attackType )
+		return;
+
+	if ( null == damageData_.optrDefenderGameUnit || NULL == damageData_.optrDefenderGameUnit.GetObservable() )
+		return;
+
+	if ( true == SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_BLOOD_RUNAWAY ), m_usBloodRunawayLevel, NULL, 0, false ) && 0.f != m_fBloodRunawayCoolTimeElapsed )
+		m_fBloodRunawayCoolTimeElapsed = 0.f;
+
+	vector<KBuffFactor> vecBuffFactor;
+	GetBuffFactor( vecBuffFactor );
+	BOOST_FOREACH( const KBuffFactor& kBuffFactor_, vecBuffFactor )
+	{
+		if ( BTI_BUFF_BLOOD_RUNAWAY != kBuffFactor_.m_BuffIdentity.m_eBuffTempletID || kBuffFactor_.m_ucAccumulationCountNow <= BLOOD_RUNAWAY_DAMAGE_STACK )
+			continue;
+
+		EraseBuffTempletFromGameUnit( BTI_BUFF_BLOOD_RUNAWAY );
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_BLOOD_RUNAWAY_DAMAGE ), m_usBloodRunawayLevel, NULL, 0, false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS BLOOD runaway damage ( %u stacks erased, level %d )", static_cast<UINT>( kBuffFactor_.m_ucAccumulationCountNow ), static_cast<int>( m_usBloodRunawayLevel ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	static DWORD s_dwBloodRunawayLogTime = 0;
+	if ( true == IsBloodLogDue( s_dwBloodRunawayLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS BLOOD runaway stack ( level %d, buff %d, cool %.2f )", static_cast<int>( m_usBloodRunawayLevel ), HaveThisBuff( BTI_BUFF_BLOOD_RUNAWAY ) ? 1 : 0, m_fBloodRunawayCoolTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+}
+
+// char-elesis CH4c: June 32b7e9a0 ( Crimson Avenger transcendence: under SA_DECREASE_REL HP the berserker buff of her Way of the Sword side, and one stack per enemy within SA_SCOPE_ABS )
+void CX2GUEL::TranscendenceBerserkerFrameMove()
+{
+	if ( true == GetRidingOn() || m_usCrimsonAvengerTranscendenceLevel < 1 )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_SCA_TRANSCENDENCE );
+	if ( NULL == pSkillTemplet )
+		return;
+
+	const float fRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_SCOPE_ABS, m_usCrimsonAvengerTranscendenceLevel, false );
+	const float fHpThreshold = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DECREASE_REL, m_usCrimsonAvengerTranscendenceLevel, false );
+	int iEnemyCount = g_pX2Game->GetEnemyUnitCountInRange( fRange, GetTeam(), GetPos() );
+
+	float fHpRate = 0.f;
+	if ( 0.f < GetNowHp() )
+		fHpRate = GetNowHp() / GetMaxHp();
+
+	if ( fHpRate < fHpThreshold && WSS_DESTRUCTION == GetWayOfSwordState() )
+	{
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_1 ), m_usCrimsonAvengerTranscendenceLevel, NULL, 0, false );
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_2 );
+	}
+	else if ( fHpRate < fHpThreshold && WSS_VIGOR == GetWayOfSwordState() )
+	{
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_1 );
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_2 ), m_usCrimsonAvengerTranscendenceLevel, NULL, 0, false );
+	}
+	else
+	{
+		if ( true == HaveThisBuff( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_1 ) )
+			EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_1 );
+		if ( true == HaveThisBuff( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_2 ) )
+			EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_2 );
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	static DWORD s_dwBerserkerLogTime = 0;
+	if ( true == IsBloodLogDue( s_dwBerserkerLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS BLOOD berserker ( hp rate %.3f under %.3f, way of sword %d, berserker 1 %d / 2 %d, enemies %d within %.0f, stacks %u )", fHpRate, fHpThreshold, GetWayOfSwordState(),
+			HaveThisBuff( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_1 ) ? 1 : 0, HaveThisBuff( BTI_BUFF_P_SCA_TRANSCENDENCE_BERSERKER_2 ) ? 1 : 0, iEnemyCount, fRange, static_cast<UINT>( m_usBerserkerEnemyCount ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+
+	if ( 0 < iEnemyCount )
+	{
+		iEnemyCount = min( iEnemyCount, BERSERKER_MAX_ENEMY_COUNT );
+		if ( static_cast<int>( m_usBerserkerEnemyCount ) == iEnemyCount )
+			return;
+
+		if ( false == HaveThisBuff( BTI_BUFF_P_SCA_TRANSCENDENCE_1_ON_ALL ) )
+			SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SCA_TRANSCENDENCE_1_ON_ALL ), BERSERKER_ON_ALL_LEVEL, NULL, 0, false );
+		SetBuffAccumulationCount( static_cast<UINT>( BFI_BUFF_P_SCA_TRANSCENDENCE_1_ON_ALL ), iEnemyCount, 1, 0 );
+		m_usBerserkerEnemyCount = static_cast<USHORT>( iEnemyCount );
+	}
+	else
+	{
+		m_usBerserkerEnemyCount = 0;
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_TRANSCENDENCE_1_ON_ALL );
+	}
+}
+
+// char-elesis CH4c: June 32b6ff20 ( Madness: under SA_DECREASE_REL HP her knight buff and the double Way of the Sword gain; Endurance Power, Brutal Cutter and Shade each add their own buff )
+void CX2GUEL::MadnessFrameMove()
+{
+	if ( true == GetRidingOn() || m_usMadnessLevel < 1 )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_SCA_MADNESS );
+	if ( NULL == pSkillTemplet )
+		return;
+
+	const float fHpThreshold = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DECREASE_REL, m_usMadnessLevel, false );
+	float fHpRate = 0.f;
+	if ( 0.f < GetNowHp() )
+		fHpRate = GetNowHp() / GetMaxHp();
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	const bool bWasMadnessActive = m_bIsMadnessActive;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	if ( fHpRate < fHpThreshold )
+	{
+		m_bIsMadnessActive = true;
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SCA_MADNESS_KNIGHT ), m_usMadnessLevel, NULL, 0, false );
+	}
+	else
+	{
+		m_bIsMadnessActive = false;
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_MADNESS_KNIGHT );
+	}
+
+	if ( true == m_bIsActiveEndurancePower )
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SCA_MADNESS_ENDURANCE_POWER ), m_usMadnessLevel, NULL, 0, false );
+	else
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_MADNESS_ENDURANCE_POWER );
+
+	if ( true == HaveThisBuff( BTI_BUFF_BRUTAL_CUTTER_MEMO ) || true == HaveThisBuff( BTI_BUFF_BRUTAL_CUTTER ) )
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SCA_MADNESS_BRUTAL_CUTTER ), m_usMadnessLevel, NULL, 0, false );
+	else
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_MADNESS_BRUTAL_CUTTER );
+
+	if ( true == HaveThisBuff( BTI_BUFF_SHADE_THE_ILLUSION ) )
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SCA_MADNESS_SHADE_THE_ILLUSION ), m_usMadnessLevel, NULL, 0, false );
+	else
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SCA_MADNESS_SHADE_THE_ILLUSION );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+	if ( bWasMadnessActive != m_bIsMadnessActive )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS BLOOD madness %s ( hp rate %.3f, threshold %.3f, endurance %d, brutal cutter %d, shade %d )", m_bIsMadnessActive ? L"on" : L"off", fHpRate, fHpThreshold,
+			m_bIsActiveEndurancePower ? 1 : 0, ( HaveThisBuff( BTI_BUFF_BRUTAL_CUTTER_MEMO ) || HaveThisBuff( BTI_BUFF_BRUTAL_CUTTER ) ) ? 1 : 0, HaveThisBuff( BTI_BUFF_SHADE_THE_ILLUSION ) ? 1 : 0 );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #endif // NEW_CHARACTER_EL
 
 

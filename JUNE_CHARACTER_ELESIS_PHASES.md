@@ -2279,6 +2279,43 @@ rate 0.560 ( blaze resist 220.0 )` x3 = 1 - 0.002 x 220, closing CH4b's carried 
 misses for `SA_SPK_INFERNAL_BLADE_WEAPON_DUMMY.XET` / `SPK_INFERNALBLADE_WEAPONM01.XET`: in no June kom and no March kom ( the engine's optional texture-change probe
 beside the mesh ), not this phase's. User owes nothing more for CH4b2.
 
+### CH4c - Done (2026-11-14)
+**Landed.** Commit `<COMMIT>`; flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD` **on** (+ `_BLOOD_DEBUG`, retired by the CH4c review). Files: `X2GUEL.cpp`, `X2GUEl.h`, `X2GUUser.cpp`,
+`X2GUUser.h`, `X2BuffFactor.h`, `Always.h`. Read from Ghidra (decompile + listing of the seven bodies and `322cf1b0`); constants by `charport_consts.py` (0.0, -1.0 only).
+- **0x4f8** `32b7beb0` = `OnAttackerDamageReact_Slot4F8` (Dark Force): not riding, `GetVigorHpIntakeRate() > 0`, the hit's `m_WayofSwordType` in `WST_VIGOR_NORMAL..SPECIAL`,
+  `WSS_VIGOR` -> `UpNowHp( rate x damage )`, `DisplayAddHPInformation( head bone, dir, false )`, `EffectSet_B_EL_Blood_Sucking`. June heals, it makes no damage effect (checklist L457 said so).
+- **0x4fc** `32b898a0` = `..._Slot4FC` (Judgment): level, not `AT_SPECIAL`, defender valid -> defender `BFI_DEBUFF_JUDGEMENT_BLEEDING` (creator = her, before any roll),
+  `HaveThisBuff( BTI_DEBUFF_BLEEDING )`, `GetRandomFloat( 21 ) < m_fJudgmentRate` -> heal `SA_HP_INTAKE_REL_DAMAGE` of 28411 x damage, bleeding effect on the defender, sucking on her.
+  June's unused `DamageData` copy is dropped (no effect). Both attacker call sites were already live (C10e, user and NPC `DamageReact`).
+- **0x734** `32b7bad0` = new `OnDefenderDamageReact` (Blood Revenge): `BFI_BUFF_BLOOD_REVENGE` on every hit, `GetRandomFloat( 22 ) < rate`, steal `min( damage, her own HP ) x
+  m_fBloodRevengeAbsorbRate` from the attacker (JUNE_BUGS 671), the attacker's number in the plain PicChar (`DisplayDamageNumber` = June `322cf1b0`, file-local), hers in green.
+- **0x730** `32b816a0` = new `SetShadowEdgeTransitionDamage`: walks the Shadow Edge records and discards the lookup, verbatim (JUNE_BUGS 670).
+- **Base virtuals** for 0x730 / 0x734 in `CX2GUUser` (empty, as June `3208ddc0` / `33093ad0`) and their call in `CX2GUUser::DamageReact` @`320499dc`-`32049a19` (a `UT_ELESIS`
+  defender, after the Add block), replacing D4b's stand-in comment (kept in `#else`).
+- **Blood Runaway** `32b87880` = `ApplyBloodRunawayOnAttack` (CH4a pushes it): cool time <= elapsed (June's `jp` test), not `AT_SPECIAL`, defender valid -> `BFI_BUFF_BLOOD_RUNAWAY`;
+  a set resets the elapsed counter; `GetBuffFactor`: a factor of `BTI_BUFF_BLOOD_RUNAWAY` with more than 4 stacks -> erase it, `BFI_BUFF_BLOOD_RUNAWAY_DAMAGE`
+  (June's `KBuffFactor` +0x20 / +0x34 = `m_BuffIdentity.m_eBuffTempletID` / `m_ucAccumulationCountNow`, stride 0x5b).
+- **Madness** `32b6ff20` = `MadnessFrameMove`: HP rate < `SA_DECREASE_REL` (0.3) -> `BFI_BUFF_P_SCA_MADNESS_KNIGHT` + `m_bIsMadnessActive` (CH1h's double Way of the Sword gain reads
+  it), else erase; Endurance Power (+0x95d4 = March's `m_bIsActiveEndurancePower`), Brutal Cutter (BTI 509 or 429) and Shade (430) each set or erase their own buff.
+- **Transcendence berserker** `32b7e9a0` = `TranscendenceBerserkerFrameMove`: HP rate < `SA_DECREASE_REL` (0.65): `WSS_DESTRUCTION` -> berserker 1 + erase 2, `WSS_VIGOR` -> erase 1 +
+  berserker 2, else erase both; enemies within `SA_SCOPE_ABS` (900, max 5) -> `BFI_BUFF_P_SCA_TRANSCENDENCE_1_ON_ALL` at level 1 (JUNE_BUGS 672) + `SetBuffAccumulationCount( 913, n, 1, 0 )`;
+  new `m_usBerserkerEnemyCount` (+0x97a8; ctor and `InitPassiveSkillState` reset).
+- **Names:** 8 BTI + 11 BFI registered under `SERV_IRUHADEV_JUNE_ENUM_NAMES` in `X2BuffFactor.h`, values = June's `Enum.lua`, no value clash. `32b7e3b0` / `32b734d0` were CH4a's.
+- **HP cost:** none in these bodies; Blood Revenge takes HP from the attacker. The Dark Knight / Crimson Avenger skill HP cost is `32b89470` (CH2d, live since then).
+- **Always.h:** `_BLOOD` uncommented; a new end-of-file block checks `_PASSIVE`, `_SUMMON`, `_SKILL`, `_WOS`, `JUNE_DAMAGE_REACT_HOOKS`, `JUNE_STATCALC_DAMAGE_REACT` and
+  `JUNE_ENUM_NAMES` (all defined above it) and defines `_BLOOD_DEBUG`.
+- No `june_march_divergent.tsv` row (no March namesake). Checklist L245 / L278 / L457 / L458 / L935 marked `(Elesis: CH4c)`; 8 funcmap rows. JUNE_BUGS 670-672.
+
+**Gates.** `flagcheck JUNE_CHAR_ELESIS_BLOOD --worktree --with _BLOOD_DEBUG` (6 files): `files: 4 PASS, 0 PASS~, 1 DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR`, 1 deleted
+(`Always.h`'s commented `#define`), `RESULT: PASS`; the OTHER is `X2BuffFactor.h` under `JUNE_ENUM_NAMES`. `junediverge.py --check` (6 files): `allow-listed: 21`, `RESULT: PASS`.
+`enumscan.py --check X2Lib/X2GUEL.cpp`: 0 A/B rows, `RESULT: PASS`. No states registered (stateends n/a), no skills added (skillicons n/a), no June `.lua` staged (luabind n/a).
+`DEPLOY OK: X2_offline.exe is 26,607,616 B, dated 2026-11-14 11:38:23, md5 309ddfed14c45463d3c07e1adae79c10, equal to X2/US_SERVICE/x2.exe (2026-11-14 11:38:16); built at main 6f45b3fa + 6 uncommitted code file(s).` (the 6 = this phase's)
+`EXESTR OK: 5 of 5 found in X2_offline.exe, 26607616 B, dated 2026-11-14 11:38:23, md5 309ddfed14c45463d3c07e1adae79c10` (wide: dark force, revenge, madness, berserker, runaway damage).
+**Save** (backup `db_backup/els_db_20261114_113037_pre_sql.sql`): unit 146 `CAvenger80` (class 125, transcended) level 80 -> 90 and Madness 28420 level 1 learned and unsealed
+(the skill needs level 90 and is born sealed). Unit 144 `DKnight80` (35) unchanged: Dark Force 28410 lv 3, Judgment 28411 lv 1.
+**In game** (`python tools/logs.py --grep "ELESIS BLOOD"`): `dark force heal`, `judgment heal`, `revenge`, `runaway stack`, `runaway damage`, `madness on` / `off`, `berserker`;
+CH4a / CH4b's carried `ELESIS PASSIVE blood runaway cleanse` on unit 146.
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended

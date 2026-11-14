@@ -583,6 +583,8 @@ protected:
 	void TranscendenceBerserkerFrameMove();	/// char-elesis CH1j: June 32b7e9a0 ( RNSI_P_SCA_TRANSCENDENCE ): body in CH4c
 	void MadnessFrameMove();				/// char-elesis CH1j: June 32b6ff20 ( RNSI_P_SCA_MADNESS, tail-jumped from CommonFrameMove ): body in CH4c
 	void ApplyBloodRunawayOnAttack( const CX2DamageManager::DamageData& damageData_ );	/// char-elesis CH4a: June 32b87880 ( the delegate InitPassiveSkillState pushes ): body in CH4c
+	virtual void SetShadowEdgeTransitionDamage( const float fDamage_ );	/// char-elesis CH4c: June 32b816a0 ( user vslot 0x730 )
+	virtual void OnDefenderDamageReact( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ );	/// char-elesis CH4c: June 32b7bad0 ( user vslot 0x734, Blood Revenge )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	void ESI_COMBO_SGM_ZZZX_EventProcess();					/// char-elesis CH1e: June 32b6ad40
@@ -1343,6 +1345,7 @@ protected:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 	USHORT m_usMadnessLevel;			/// char-elesis CH1h: June +0x97aa ( level of RNSI_P_SCA_MADNESS; CH4c writes it )
 	bool m_bIsMadnessActive;			/// char-elesis CH1h: June +0x97ac ( set while the HP share is under the Madness threshold; CH4c writes it )
+	USHORT m_usBerserkerEnemyCount;		/// char-elesis CH4c: June +0x97a8 ( enemies the last Crimson Avenger transcendence stack counted, at most 5 )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
 	float m_fWayOfSwordPointMultiplier;		/// char-elesis CH1q: June +0x9714 ( ctor 1.0; SA_WAY_OF_SWORD_POINT_MULTIPLIER of RNSI_P_SDK_DARK_FORCE, CH4a writes it )
