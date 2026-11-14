@@ -2070,6 +2070,7 @@ Opus 5.5. Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( + `_SKILL_DEBUG`, the C
 - `EXESTR OK: 1 of 1` ( narrow `SI_HA_SCA_FATE_SMASHER` ) and `5 of 5` ( wide `DAMAGE_EFFECT_SA_SBH_ANCIENT_FIRE_UPGRADE_Attack01_Pvp`, `DLG_UI_Common_Texture102_NEW.tga`, `G_MASTER`, `C_AVENGER`, `SCA_FATE_SMASHER_DUMMY01.X` ), md5 864d37cd.
 
 **Save** ( backup by `elsdb.py x`, `db_backup/` ): units 29 `ElesisGM` ( 120 ), 30 `ElesisBH` ( 121 ), 146 `CAvenger80` ( 125 ), lv 80, transcendence 1; learned 28603 ( 29 ), 28604 ( 30 ), 28044 / 28602 ( 146 ). Slots ( old slots cleared ): A1-A4 = 28039 / 28040 / 28062 / 28205, 28041 / 28042 / 28063 / 28210, 28043 / 28044 / 28064 / 28215; A-5 ( slot 4 ) = 28603 / 28604 / 28602; B1-B4 = 28206 / 28008 / 28011 / 28010, 28211 / 28012 / 28016 / 28013, 28216 / 28023 / 28025 / 28022; B-5 ( slot 9 ) = 28222 / 28223 / 28224. Not exercised: the base ids 28600 / 28601 and 28605 ( the same cases ), the level-70 guide popup ( CH6 walks the transition on un-transcended units ).
+- Post-commit ( `d6612f76` ): `flagcheck JUNE_CHAR_ELESIS_SKILL --with ..._SKILL_DEBUG --range d6612f76^..d6612f76`: `2 PASS, 0 DEFINE, 4 OTHER ( X2SkillTree.h JUNE_ENUM_NAMES; Always.h / X2Data.cpp / Handlers_Quest.cpp = _ELESIS_TRANSCEND ), 0 FAIL`, `0 deleted line(s)`, `RESULT: PASS`; `_ELESIS_TRANSCEND --range` same commit, `--files` the three: `2 PASS, 1 DEFINE, 0 OTHER, 0 FAIL`, `0 deleted line(s)`, `RESULT: PASS`.
 
 ## Phase CH4 - Passives and class mechanics
 
