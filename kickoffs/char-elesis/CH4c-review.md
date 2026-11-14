@@ -26,7 +26,8 @@ Commits: CH4a `ce0bcdf4`, CH4b `4353d257`, CH4b2 `abe3a805`, CH4c (`git log --gr
   count, stride 0x5b), the transcendence tick `32b7e9a0` (the level-1 stack buff, JUNE_BUGS 672) or Madness `32b6ff20`; and one each from CH4a / CH4b / CH4b2.
 - **Shared-file verdicts** (one line each): CH4b2's `X2GUUser.*` hunks and CH4c's `X2GUUser.h` base virtuals ( vslots 0x730 / 0x734 ) and `X2GUUser.cpp` call site
   ( June @`320499dc`-`32049a19`, inside `JUNE_STATCALC_DAMAGE_REACT`'s block ); CH4c's `X2BuffFactor.h` names ( 8 BTI, 11 BFI, values = June's `Enum.lua` ).
-- **Not reached in CH4** (each Done note names its own): list them and hand them to `CH6.md` (amend it).
+- **Not reached in CH4** (each Done note names its own): list them and hand them to `CH6.md` (amend it). CH4c's: the Blood Runaway past-4-stacks swap
+  (`ELESIS BLOOD runaway damage`) and berserker 2 (Vigor under 0.650 HP) never logged in its play-test.
 - **Retire the debug defines**: comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG`, `..._BLOOD_DEBUG`, `..._SUMMON_DEBUG` and `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`
   ( the `SBUF` lines: retire it whether or not `at once` / `state end` showed, CH3d review ) in `KTDXLIB/Always.h`. If that is the only code change, no build runs and the
   Done note says "build skipped: debug retire only" (standing rule 2026-11-13).

@@ -2316,6 +2316,8 @@ beside the mesh ), not this phase's. User owes nothing more for CH4b2.
 **In game** (`python tools/logs.py --grep "ELESIS BLOOD"`): `dark force heal`, `judgment heal`, `revenge`, `runaway stack`, `runaway damage`, `madness on` / `off`, `berserker`;
 CH4a / CH4b's carried `ELESIS PASSIVE blood runaway cleanse` on unit 146.
 
+**Play-test PASS (user, 2026-11-14; run 11:43-11:47 on md5 `309ddfed`; 0 EXCEPTION, 0 `KEM_ERROR` / `Motion Error`, 0 ErrorLog lines of this phase; known `E_DISABLE_HB_CHECK_REQ` UNHANDLED x3).** Unit 144: `dark force heal` x12 ( damage x 0.250 ), `judgment heal` x27 ( chance 0.300, bleeding target, damage x 0.05 = SA 0x31 ), `revenge` x4 ( 144 has 28412 learned in the save, an old save row; June's hook gates on the level only ). Unit 146: `revenge` x5 ( stolen = damage x 0.150; the 1506.6 hit equal to the previous steal is a real monster hit, STATCALC motion 1621 ), `runaway stack` x3 ( cool 1.00 s; buff 1 on the third ), `madness on` at hp rate 0.281 / `off` at 1.000 ( threshold 0.300 ), `berserker` x85 ( stacks = enemies 2-3 within 900; berserker 1 = 1 x18 under 0.650 with way of sword -2 ), and the carried `blood runaway cleanse` ( hp rate 0.405, tier 2 ) closes CH4a / CH4b's check. **Not reached in the logs:** `runaway damage` ( the past-4-stacks swap ) and berserker 2 ( Vigor, way of sword 2, under 0.650 HP ): handed to the CH4c review's not-reached list for CH6. User owes nothing more for CH4c; next the CH4 stage review.
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended
