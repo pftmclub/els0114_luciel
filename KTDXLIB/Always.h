@@ -13374,3 +13374,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel DU1d5 - the lines June's user render ( CommonRender_Prepare 31fd07b0 -> per-body prepare 31ff03d0, OnFrameRender_Draw
+//              31fd0880 ) has beyond the two-body pick: Z write / Z test forced on, the super-armor red outline also on a colour-edge type, the
+//              hard-body debuff ( BTI_DEBUFF_HARD_BODY ) drawn petrified, the body's anim shown whatever its prepare hint, the user's force-layer
+//              copied from the camera's world-mesh-hidden flag ( june-engine R5's +0x160 item ), and no GetShowObject test at the draw's top.
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+#if defined( SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) || !defined( SERV_IRUHADEV_JUNE_RENDER_CAMERA_MESH_HIDDEN ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( CommonRender_PrepareBody ), SERV_IRUHADEV_JUNE_RENDER_CAMERA_MESH_HIDDEN ( GetWorldMeshHidden ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( BTI_DEBUFF_HARD_BODY )
+#endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+//////////////////////////////////////////////////////////////////////////

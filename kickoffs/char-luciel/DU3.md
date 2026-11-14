@@ -66,3 +66,10 @@ strings), `328825c0`, `32882540`. `31fd48a0`, `31fd63c0`, `32882540` have no Mar
 - **Socket options by body:** `InitSocketData` `3206d770 @3206d8f7`: per equip, `3286a4b0` (the item's minor-unit field, 2 = both) not both and
   not the active body (`+0x8e90`) -> that equip's socket options are skipped. Port it with the field (funcmap row `3206d770 @3206d8f7 / @3206da0f (DU1d3b)`).
 - The emotion setter's equip show by `+0x15d4` (`31fe0bb0`) goes with Stage 10's emotion rewrite, not here.
+
+## Amended by DU1d5 (2026-11-14)
+
+- `3204e4a0`'s members are declared (zeroed in the ctor, nothing writes them yet): `m_bHideEquipByBody` (+0x8fa4), `m_iHideEquipBody` (+0x8fa8),
+  `m_bHideEquipByBodyApplied` (+0x8fb4), under `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` in `X2GUUser.h`. DU3 adds the window floats (+0x8fac / +0x8fb0),
+  the script keys that set them, the pass itself (`CommonFrameMove` @`320661f9`) and its restore `3204df80`. `CommonRender_PrepareBody` already reads
+  the three (June `31ff03d0`'s override: body 0 hidden draws the second body, 1 draws the first); JUNE_BUGS 673 is what to watch in the play-test.

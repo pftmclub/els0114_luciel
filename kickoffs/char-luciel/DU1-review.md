@@ -98,3 +98,10 @@ and commit.
   docsection line. Check DU1d4's hunks (`X2GUUser.cpp`, `grep -n "char-luciel DU1d4"`, 21 blocks) against the funcmap rows `(DU1d4)` and the
   census's corrected function starts (`du1d_body_reads.tsv` rows whose owner begins `DU1d4`).
 - The DU1 regression play-test ran in DU1d4 (its Done note has the result); DU1d5 hands off its own render check.
+
+## Amended by DU1d5 (2026-11-14)
+
+- DU1d5 added `SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER` (June-only render lines, every class; two `june_march_divergent.tsv` rows). Hygiene over the
+  range: `flagcheck JUNE_CHAR_DUO_BODY --with JUNE_DIVERGE_USER_RENDER` on the code files, and `Always.h` per flag without `--with` (the DU1d2
+  compound guard is an ERROR under `--with`). Read `CommonRender_PrepareBody` against `31ff03d0` line by line (the five DIVERGE lines and the
+  hide-equip override), `CommonRender_Prepare` against `31fd07b0` (hint order) and `OnFrameRender_Draw` against `31fd0880`; JUNE_BUGS 673.

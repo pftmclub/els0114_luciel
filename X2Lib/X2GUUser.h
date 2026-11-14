@@ -4130,6 +4130,9 @@ public:
 //{{ robobeg : 2008-10-28
 		//virtual void				CommonRender();
         virtual RENDER_HINT			CommonRender_Prepare();	//optimization
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		virtual RENDER_HINT			CommonRender_PrepareBody( bool bActiveBody_ );	// char-luciel DU1d5: June 31ff03d0 ( user vslot 0x7e4 ), called by CommonRender_Prepare per body
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //}} robobeg : 2008-10-28
 		virtual void				CreateStepDust();	// kimhc // 2010-11-19 // 라인맵의 eDustType에 따라 보여줄 파티클을 플레이함(각 캐릭터에 있는 중복 코드를 옮겨옴)
 
@@ -5019,6 +5022,9 @@ public:
 		bool											m_bUseNotSelectUnitAnimTimeInSpeed;	/// char-luciel DU1b4: June +0x8f6d, USE_NOT_SELECT_UNIT_ANIM_TIME_IN_SPEED
 		D3DXCOLOR										m_coSuperArmorCustomColor;		/// char-luciel DU1b4: June +0x8a2c, SUPER_ARMOR_CUSTOM_COLOR
 		D3DXVECTOR2										m_v2NowMinorUnitAfterImageTime;	/// char-luciel DU1d3: June +0x852c, MINOR_UNIT_AFTER_IMAGE
+		bool											m_bHideEquipByBody;				/// char-luciel DU1d5: June +0x8fa4, set by DU3's hide-equip-by-body pass ( 3204e4a0 ); false until then
+		int												m_iHideEquipBody;				/// char-luciel DU1d5: June +0x8fa8, the body whose equips hide ( 0 first, 1 second )
+		bool											m_bHideEquipByBodyApplied;		/// char-luciel DU1d5: June +0x8fb4, the pass is inside its time window
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		
 

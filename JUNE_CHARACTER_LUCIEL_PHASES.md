@@ -1182,6 +1182,44 @@ Opus 5.5 high. Part 11 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new d
 - **Play-test PASSED 2026-11-14** (user: all checks; run 12:20-12:26 on the deployed exe md5 8e5646f3): ravbe, Iivue, reyaa as handed off.
   Logs: 0 EXCEPTION, ErrorLog clean, UNHANDLED only the known `E_DISABLE_HB_CHECK_REQ` x4 (outside this phase). DU1d5 ready.
 
+### DU1d5 - Done (2026-11-14)
+
+Opus 5.5 high. Part 12 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` plus a new `SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER` (Always.h, needs DUO_BODY,
+`JUNE_RENDER_CAMERA_MESH_HIDDEN`, `JUNE_ENUM_NAMES`; `#error` guard). Files: `X2GUUser.cpp` (+297), `X2GUUser.h` (+6), `Always.h` (+13), insert-only.
+No `_DEBUG`, no log line. funcmap rows: `grep "(DU1d5)" june2017_re/funcmap.tsv` (3). `june_march_divergent.tsv`: `CommonRender_Prepare`,
+`OnFrameRender_Draw (CX2GUUser)` (replace, done). JUNE_BUGS 673.
+- **`CommonRender_Prepare` = June `31fd07b0`** (June's body inside March's, March's in `#else`): active body NULL -> no render; the per-body
+  prepare for the active body (hint kept), then for the not-selected one when it exists (hint dropped, June's order @`31fd0844`).
+- **`CommonRender_PrepareBody( bActiveBody_ )` = June `31ff03d0`** (user vslot 0x7e4, none in March; virtual like June's, no class overrides it):
+  the anim is `GetXSkinAnimPtr()` / `GetNotSelectXSkinAnimPtr()`; with `m_bHideEquipByBody` (+0x8fa4) and `m_bHideEquipByBodyApplied` (+0x8fb4),
+  `m_iHideEquipBody` (+0x8fa8) 0 takes `GetMinorUnitXSkinAnimPtr()` (`32071d40`), 1 takes `GetSkinAnimPtr()` (vslot 0x58 = `32071d20`). The three
+  members are declared here, zeroed, unwritten until DU3 (DU3 kickoff amended). Line-by-line against March's body, the same: pain / sacrifice
+  types, world light, ApplyRenderParam gate (+0x8e04), outline width (700 / 1000 / 500), unit-detail types, damage light (four branches, CTT_DAMAGE,
+  the ADD switch), invincible white, the extra-damage chain and its constants, under-water colour, alpha, room slot refresh, equip loop. The R0
+  world cartoon / rim copy moves before the pain test (June @`31ff05c2`; fields disjoint). **June-only, under DIVERGE_USER_RENDER:**
+  `bZWriteEnable` / `bZEnable` = true (RenderParam +0x65 word 0x101 @`31ff060f`); the super-armor red outline also when the type is already
+  `RT_CARTOON_COLOR_EDGE` (@`31ff06fa`); `HaveThisBuff( BTI_DEBUFF_HARD_BODY )` (0x3b1) -> black edge, `CTT_PETRIFIED`, grey 0.7 outline (@`31ff0c5b`,
+  inside the pain == 0 block, after the colour chain); the anim's instant-show set whatever its hint (@`31ff0d40`); `SetForceLayer( camera
+  world-mesh-hidden )` after the equip loop (@`31ff0e3a`: user +0x160 = `CKTDGObject::m_bForceLayer`, row `31d28a20`).
+- **`OnFrameRender_Draw` = June `31fd0880`:** hide-no-renderable on both anims, the active anim then the not-selected one when instant-show; the
+  equip loop is March's. June's top tests only NULL (no `GetShowObject`): under DIVERGE_USER_RENDER, March's test in its `#else`.
+- **Class overrides (kickoff ask):** all 12 June user vtables override slot 0x7e8 and call `31fd07b0`; none overrides 0x7e4. `334fa61c` /
+  `33522914` set `m_RenderParam.cartoonTexType` by WOS state first (Elsword / Elesis, already in their `_LIVE` branches). March's nine overrides
+  all call `CX2GUUser::CommonRender_Prepare()`, so every class reaches the two-body path. Lu/Ciel's own (`32ae4f90`) is a plain base call (CH1).
+- **june-engine R5 (kickoff amended):** the `+0x160` copy is done here; R5 keeps the NPC / riding-pet render and checks `CX2GUNPC` for the same copy.
+- **Not ported (none found):** nothing else in the three functions; the DIVERGE lines are every difference beyond the body pick.
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files X2GUUser.cpp X2GUUser.h --with JUNE_DIVERGE_USER_RENDER`: 1 PASS, 1 PASS~ (2 blank
+  lines), 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS. `flagcheck JUNE_DIVERGE_USER_RENDER --worktree --files Always.h`: 1 DEFINE, RESULT: PASS
+  (with `--with` the DU1d2 compound guard at Always.h:13355 is an ERROR the tool cannot evaluate). `junediverge --check` (3 files): RESULT: PASS
+  (allow-listed 8). `enumscan --check`: the 6 known rows only. Flag probe (`/P` via stdafx): DIVERGE_USER_RENDER, DUO_BODY, CAMERA_MESH_HIDDEN,
+  ENUM_NAMES, RENDER_WORLD_CARTOON, CASH_SKILL_FOR_CHUNG_2011_04, GUILD_SKILL_PART_2, SERV_ELESIS_SECOND_CLASS_CHANGE, FACE_OFF_MONSTER_HEAD_TEST on.
+  `/Zs` probes: `X2GUUser.cpp`, `X2GUChung.cpp`, `X2GURaven.cpp` 0 errors.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,601,984 B, dated 2026-11-14 12:54:14, md5 0475c657fa982b7f260892bdf4af33f7, equal to
+  X2/US_SERVICE/x2.exe (2026-11-14 12:54:07); built at main 7f4afddf + 3 uncommitted code file(s).` (the three are this phase's).
+- **In game:** March classes have one body, so the second call and the second draw never run. What changes for every class: the body is
+  drawn with its equips even when its anim's prepare says no-render (a stopped anim, e.g. water hold), a colour-edge super armor gets the red outline, the
+  hard-body debuff looks petrified, and the unit goes to the non-alpha chain while a world mesh hides. Ciel is drawn from CH1.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

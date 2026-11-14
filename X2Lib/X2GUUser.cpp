@@ -1077,6 +1077,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_bUsePhysicProcessNotSelectUnit	= false;
 	m_bUseNotSelectUnitAnimTimeInSpeed	= false;	// char-luciel DU1b4: June's ctor leaves +0x8f6d to the first state start ( miss 0 )
 	m_coSuperArmorCustomColor			= D3DXCOLOR( 1.f, 0.f, 0.f, 1.f );	// char-luciel DU1b4: June's ctor leaves +0x8a2c to the first state start ( miss red )
+	m_bHideEquipByBody					= false;	// char-luciel DU1d5: DU3 writes the three
+	m_iHideEquipBody					= 0;
+	m_bHideEquipByBodyApplied			= false;
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
@@ -8641,6 +8644,17 @@ RENDER_HINT CX2GUUser::OnFrameRender_Prepare()
 /*virtual*/
 RENDER_HINT CX2GUUser::CommonRender_Prepare()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d5: June 31fd07b0, the active body then the not-selected one ( its hint dropped, June's order )
+	if ( NULL == GetXSkinAnimPtr() )
+		return RENDER_HINT_NORENDER;
+
+	RENDER_HINT renderHintActiveBody = CommonRender_PrepareBody( true );
+	if ( NULL != GetNotSelectXSkinAnimPtr() )
+		CommonRender_PrepareBody( false );
+
+	return renderHintActiveBody;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( m_pXSkinAnim == NULL )
 		return RENDER_HINT_NORENDER;
 
@@ -8858,13 +8872,295 @@ RENDER_HINT CX2GUUser::CommonRender_Prepare()
 
 	return  renderHintResult;
 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 }//CX2GUUser::CommonRender_Prepare()
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+/*virtual*/
+RENDER_HINT CX2GUUser::CommonRender_PrepareBody( bool bActiveBody_ )
+{
+	// char-luciel DU1d5: June 31ff03d0; past the body pick it is March's CommonRender_Prepare body on that anim
+	CKTDGXSkinAnimPtr pXSkinAnim = ( true == bActiveBody_ ) ? GetXSkinAnimPtr() : GetNotSelectXSkinAnimPtr();
+	if ( true == m_bHideEquipByBody && true == m_bHideEquipByBodyApplied )
+	{
+		if ( 0 == m_iHideEquipBody )	// first body hidden: June 32071d40 takes the second body
+			pXSkinAnim = GetMinorUnitXSkinAnimPtr();
+		else if ( 1 == m_iHideEquipBody )	// second body hidden: June vslot 0x58 takes the first body
+			pXSkinAnim = GetSkinAnimPtr();
+	}
+
+	if ( NULL == pXSkinAnim )
+		return RENDER_HINT_NORENDER;
+
+	pXSkinAnim->SetInstantShow( false );
+	if ( !pXSkinAnim->GetShowObject() )
+		return RENDER_HINT_NORENDER;
+
+	CKTDGXRenderer::RenderParam* pRenderParam = pXSkinAnim->GetRenderParam();
+	*pRenderParam = m_RenderParam;
+
+#ifdef SERV_IRUHADEV_JUNE_RENDER_WORLD_CARTOON
+	if( g_pX2Game->GetWorld() != NULL )
+	{
+		pRenderParam->iWorldCartoonTexIndex		= g_pX2Game->GetWorld()->GetCartoonTextureIndex();	// June 31ff05c2
+		pRenderParam->iWorldRimLightTexIndex	= g_pX2Game->GetWorld()->GetRimLightTextureIndex();
+	}
+#endif SERV_IRUHADEV_JUNE_RENDER_WORLD_CARTOON
+
+#ifdef	CASH_SKILL_FOR_CHUNG_2011_04
+	if ( 0 < m_ExtraDamagePack.m_Pain.m_Accumulation )
+		pRenderParam->renderType = CKTDGXRenderer::RT_CARTOON_FADE;
+#endif	CASH_SKILL_FOR_CHUNG_2011_04
+
+#ifdef	GUILD_SKILL_PART_2
+	if ( m_bHaveSacrificeOfHero == true )
+		pRenderParam->renderType = CKTDGXRenderer::RT_CARTOON_FADE_NONTEX;
+#endif	GUILD_SKILL_PART_2
+
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	pRenderParam->bZWriteEnable	= true;	// June @31ff060f, every frame
+	pRenderParam->bZEnable		= true;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+
+	if( g_pX2Game->GetWorld() != NULL && m_bUseWorldColor == true )
+	{
+		pRenderParam->lightPos = g_pX2Game->GetWorld()->GetLightPos();
+	}
+
+#ifdef SERV_ELESIS_SECOND_CLASS_CHANGE
+	if( false == m_bSetCustomRenderParam )
+#endif SERV_ELESIS_SECOND_CLASS_CHANGE
+		ApplyRenderParam( pRenderParam );
+
+	if( GetDistanceToCamera() > 700.0f )
+	{
+		pRenderParam->fOutLineWide = GetDistanceToCamera() / 1000.0f ;
+	}
+	else
+	{
+		pRenderParam->fOutLineWide = GetDistanceToCamera() / 500.0f ;
+	}
+
+	if( IsSuperArmor() && m_FrameDataNow.stateParam.bSuperArmorNotRed == false)
+	{
+		if( pRenderParam->renderType == CKTDGXRenderer::RT_CARTOON_BLACK_EDGE )
+		{
+			pRenderParam->renderType = CKTDGXRenderer::RT_CARTOON_COLOR_EDGE;
+			pRenderParam->outLineColor = 0xffff0000;
+		}
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+		else if( pRenderParam->renderType == CKTDGXRenderer::RT_CARTOON_COLOR_EDGE )
+		{
+			pRenderParam->outLineColor = 0xffff0000;	// June @31ff06fa: a colour edge turns red too
+		}
+#endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	}
+
+	if( g_pMain->GetGameOption().GetOptionList().m_UnitDetail == CX2GameOption::OL_MEDIUM )
+	{
+		pRenderParam->renderType = CKTDGXRenderer::RT_CARTOON;
+	}
+	else if( g_pMain->GetGameOption().GetOptionList().m_UnitDetail == CX2GameOption::OL_LOW )
+	{
+		pRenderParam->renderType = CKTDGXRenderer::RT_REAL_COLOR;
+	}
+
+	if( m_DamageLightTime > 0.0f && g_pMain->GetGameOption().GetOptionList().m_UnitDetail != CX2GameOption::OL_LOW )
+	{
+		if( m_FrameDataNow.unitCondition.bAttackerFront == true )
+		{
+			if( m_FrameDataNow.syncData.bIsRight == true )
+			{
+				pRenderParam->lightPos = GetPos() + GetDirVector() * 1000.0f;
+				pRenderParam->lightPos -= GetPos();
+			}
+			else
+			{
+				pRenderParam->lightPos = GetPos() - GetDirVector() * 1000.0f;
+				pRenderParam->lightPos -= GetPos();
+			}
+		}
+		else
+		{
+			if( m_FrameDataNow.syncData.bIsRight == true )
+			{
+				pRenderParam->lightPos = GetPos() - GetDirVector() * 1000.0f;
+				pRenderParam->lightPos -= GetPos();
+			}
+			else
+			{
+				pRenderParam->lightPos = GetPos() + GetDirVector() * 1000.0f;
+				pRenderParam->lightPos -= GetPos();
+			}
+		}
+
+		pRenderParam->cartoonTexType	= CKTDGXRenderer::CTT_DAMAGE;
+
+		switch( pRenderParam->renderType )
+		{
+		case CKTDGXRenderer::RT_CARTOON_BLACK_EDGE:
+			pRenderParam->renderType = CKTDGXRenderer::RT_ADD_CARTOON_BLACK_EDGE;
+			break;
+
+		case CKTDGXRenderer::RT_CARTOON_COLOR_EDGE:
+			pRenderParam->renderType = CKTDGXRenderer::RT_ADD_CARTOON_COLOR_EDGE;
+			break;
+
+		case CKTDGXRenderer::RT_CARTOON:
+			pRenderParam->renderType = CKTDGXRenderer::RT_ADD_CARTOON;
+			break;
+		}
+	}
+
+	if( m_fShowInvincibleTime > 0.0f && m_bShowInvincibleWhite == true )
+	{
+		pRenderParam->cartoonTexType	= CKTDGXRenderer::CTT_INVINCIBLE;
+		pRenderParam->renderType		= CKTDGXRenderer::RT_ADD_CARTOON;
+	}
+
+#ifdef	CASH_SKILL_FOR_CHUNG_2011_04
+	if ( m_ExtraDamagePack.m_Pain.m_Accumulation == 0 )
+#endif	CASH_SKILL_FOR_CHUNG_2011_04
+	{
+		if( m_ExtraDamagePack.m_Frozen.m_fTime > 0.f )
+		{
+			pRenderParam->renderType			= CKTDGXRenderer::RT_CARTOON_FADE;
+			m_RenderParam.color = D3DXCOLOR( 160.f/255.f, 235.f/255.f, 1.f, 0.7f );
+		}
+		else if( m_ExtraDamagePack.m_EnchantShock.m_fTime > 0.f )
+		{
+			pRenderParam->renderType			= CKTDGXRenderer::RT_CARTOON_BLACK_EDGE;
+			pRenderParam->cartoonTexType		= CKTDGXRenderer::CTT_PETRIFIED;
+			pRenderParam->outLineColor			= D3DXCOLOR( 0.7f, 0.7f, 0.7f, 1.f );
+		}
+		else if( m_ExtraDamagePack.m_Cold.m_fTime > 0.0f ||
+			m_ExtraDamagePack.m_EnchantFrozen.m_fTime > 0.0f )
+		{
+			pRenderParam->color = D3DXCOLOR(0.15f, 0.8f, 1.f, 1.f );
+		}
+		else if( m_ExtraDamagePack.m_Fire.m_fTime > 0.0f ||
+			m_ExtraDamagePack.m_EnchantBlaze.m_fTime > 0.0f )
+		{
+			pRenderParam->color = 0xffff0000;
+		}
+		else if( m_ExtraDamagePack.m_Poison.m_fTime  > 0.0f )
+		{
+			pRenderParam->color = 0xff00ff00;
+		}
+		else if( m_ExtraDamagePack.m_Curse.m_fTime > 0.0f )
+		{
+			pRenderParam->color = 0xff6600ff;
+		}
+		else if( m_fPepperRunTime > 0.f )
+		{
+			pRenderParam->color = 0xffff0000;
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+		if ( true == HaveThisBuff( BTI_DEBUFF_HARD_BODY ) )	// June @31ff0c5b: the hard-body debuff draws petrified
+		{
+			pRenderParam->renderType			= CKTDGXRenderer::RT_CARTOON_BLACK_EDGE;
+			pRenderParam->cartoonTexType		= CKTDGXRenderer::CTT_PETRIFIED;
+			pRenderParam->outLineColor			= D3DXCOLOR( 0.7f, 0.7f, 0.7f, 1.f );
+		}
+#endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	}
+
+	if( m_bUnderWaterHead == true || m_bForceChagneColor == true )
+	{
+		pRenderParam->color.r -= m_cLineUnitColor.r;
+		pRenderParam->color.g -= m_cLineUnitColor.g;
+		pRenderParam->color.b -= m_cLineUnitColor.b;
+	}
+
+	pRenderParam->color.a = m_RenderParam.color.a;
+	if ( g_pX2Room != NULL )
+	{
+		CX2Room::SlotData* pSlotData = g_pX2Room->GetSlotDataByUnitUID( m_UnitUID );
+		if( pSlotData != NULL
+			&& pSlotData->GetSlotState() != CX2Room::SS_CLOSE
+			&& pSlotData->GetSlotState() != CX2Room::SS_EMPTY
+			&& pSlotData->m_pUnit != GetUnit() )
+			m_pUnit = pSlotData->m_pUnit;
+	}
+
+	RENDER_HINT renderHintResult = pXSkinAnim->OnFrameRender_Prepare();
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	pXSkinAnim->SetInstantShow( true );	// June @31ff0d40: set whatever the anim's hint
+#else SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	if ( renderHintResult.m_eHint != RENDER_HINT::NORENDER )
+		pXSkinAnim->SetInstantShow( true );
+#endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+
+	if ( !IsRecursivelyManagedByDGManager() && !m_ViewEqipList.empty() )
+	{
+		RENDER_HINT renderHint;
+		for( int i = 0; i < (int)m_ViewEqipList.size(); i++ )
+		{
+			CX2EqipPtr pCX2Eqip = m_ViewEqipList[i];
+			ASSERT( pCX2Eqip != NULL && !pCX2Eqip->IsManagedByDGManager() );
+			if ( pCX2Eqip == NULL || pCX2Eqip->IsManagedByDGManager() )
+				continue;
+			pCX2Eqip->SetInstantShow( false );
+			if ( !pCX2Eqip->GetShowObject() )
+				continue;
+			renderHint = pCX2Eqip->OnFrameRender_Prepare();
+			if ( renderHint.m_eHint != RENDER_HINT::NORENDER )
+			{
+				pCX2Eqip->SetInstantShow( true );
+				renderHintResult.MergeRenderHint( renderHint );
+			}
+		}
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	if ( NULL != g_pKTDXApp->GetDGManager() )
+		SetForceLayer( g_pKTDXApp->GetDGManager()->GetCamera().GetWorldMeshHidden() );	// June @31ff0e3a ( R5's +0x160 ): non-alpha chain while a world mesh hides
+#endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+
+	return renderHintResult;
+}//CX2GUUser::CommonRender_PrepareBody()
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 /*virtual*/
 void    CX2GUUser::OnFrameRender_Draw()
 {
 	KTDXPROFILE();
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d5: June 31fd0880, the active body then the not-selected one
+	CKTDGXSkinAnimPtr pXSkinAnim = GetXSkinAnimPtr();
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	if ( NULL == pXSkinAnim )	// June tests no GetShowObject here
+		return;
+#else SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+	if ( NULL == pXSkinAnim || !pXSkinAnim->GetShowObject() )
+		return;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
+
+	CKTDGXSkinAnimPtr pNotSelectXSkinAnim = GetNotSelectXSkinAnimPtr();
+#ifdef FACE_OFF_MONSTER_HEAD_TEST
+	if( m_bHideNoRenderable == true )
+	{
+		pXSkinAnim->SetHideNoRenderable( true );
+		if ( NULL != pNotSelectXSkinAnim )
+			pNotSelectXSkinAnim->SetHideNoRenderable( true );
+	}
+#endif FACE_OFF_MONSTER_HEAD_TEST
+	if ( pXSkinAnim->IsInstantShow() )
+		pXSkinAnim->OnFrameRender_Draw();
+	if ( NULL != pNotSelectXSkinAnim && pNotSelectXSkinAnim->IsInstantShow() )
+		pNotSelectXSkinAnim->OnFrameRender_Draw();
+#ifdef FACE_OFF_MONSTER_HEAD_TEST
+	if( m_bHideNoRenderable == true )
+	{
+		pXSkinAnim->SetHideNoRenderable( false );
+		if ( NULL != pNotSelectXSkinAnim )
+			pNotSelectXSkinAnim->SetHideNoRenderable( false );
+	}
+#endif FACE_OFF_MONSTER_HEAD_TEST
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	if ( m_pXSkinAnim == NULL || !m_pXSkinAnim->GetShowObject() )
 		return;
@@ -8885,6 +9181,7 @@ void    CX2GUUser::OnFrameRender_Draw()
 		m_pXSkinAnim->SetHideNoRenderable(false);
 	}
 #endif FACE_OFF_MONSTER_HEAD_TEST
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	if ( !IsRecursivelyManagedByDGManager() )
 	{
