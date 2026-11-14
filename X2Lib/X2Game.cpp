@@ -20158,6 +20158,51 @@ CX2GameUnit* CX2Game::GetFrontNearestEnemyUnit( CX2GameUnit* pUnit_, float fRang
 	return pNearestUnit;
 }
 #endif SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4a: June 322d4a60 ( living, hittable units of another team nearer than fRange_ to vPos_ )
+int CX2Game::GetEnemyUnitCountInRange( const float fRange_, const int iMyTeam_, const D3DXVECTOR3& vPos_ )
+{
+	int iEnemyCount = 0;
+	for ( UINT uIndex = 0; uIndex < m_UnitList.size(); ++uIndex )
+	{
+		CX2GameUnit* pUnit = m_UnitList[uIndex];
+		if ( NULL == pUnit || iMyTeam_ == pUnit->GetTeam() || true == pUnit->GetInvincible() || 0.f >= pUnit->GetNowHp() )
+			continue;
+
+		if ( CX2GameUnit::GUT_NPC == pUnit->GetGameUnitType() )
+		{
+#ifdef FIELD_BOSS_RAID
+			if ( true == pUnit->GetIsBosRaidNPC() )
+				continue;
+#endif // FIELD_BOSS_RAID
+			const CX2GUNPC* pNPC = static_cast<const CX2GUNPC*>( pUnit );
+			if ( CX2UnitManager::NCT_THING_TRAP == pNPC->GetNPCTemplet().m_ClassType || CX2UnitManager::NCT_THING_CHECKER == pNPC->GetNPCTemplet().m_ClassType )
+				continue;
+			/// stand-in: June also skips an NPC whose byte +0x8fb6 is 1 (member not identified, as GetLockOnNearstTarget)
+		}
+
+		if ( GetDistance( vPos_, pUnit->GetPos() ) < fRange_ )
+			++iEnemyCount;
+	}
+	return iEnemyCount;
+}
+
+// char-elesis CH4a: June 322d4ba0 ( living, hittable user units of team iTeam_ nearer than fRange_ to vPos_; June's float -1 counts them all )
+int CX2Game::GetAllyUserUnitCountInRange( const float fRange_, const int iTeam_, const D3DXVECTOR3& vPos_ )
+{
+	int iAllyCount = 0;
+	for ( UINT uIndex = 0; uIndex < m_UserUnitList.size(); ++uIndex )
+	{
+		CX2GUUser* pUser = m_UserUnitList[uIndex];
+		if ( NULL == pUser || iTeam_ != pUser->GetTeam() || true == pUser->GetInvincible() || 0.f >= pUser->GetNowHp() )
+			continue;
+
+		if ( GetDistance( vPos_, pUser->GetPos() ) < fRange_ || -1.f == fRange_ )
+			++iAllyCount;
+	}
+	return iAllyCount;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_SKILL
 // June 322f0e60: target in my view cone ( height band on the land offset, side angle to my last touched line ); June ignores this
 bool CX2Game::IsUnitInViewCone( CX2GameUnit* pMyUnit_, CX2GameUnit* pTargetUnit_, float fUpDegree_, float fDownDegree_, float fSideDegree_ )

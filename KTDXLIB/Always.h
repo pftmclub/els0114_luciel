@@ -12691,10 +12691,23 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: June character port ( Elesis ) Phase CH1j - her passive ticks CommonFrameMove calls ( Blood Runaway, the Grand Master transcendence and aura ):
 //              declared here, bodies in CH4a. Stays commented out until CH4a; only with _LIVE.
 //              Revert: comment out the #define ( JUNE_CHAR_ELESIS_PASSIVE ).
-//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+//              char-elesis CH4a: on. InitPassiveSkillState = June 32b88300 on her June ids, its delegates, the three ticks, the
+//              CX2Game counters 322d4a60 / 322d4ba0 and CX2GameUnit::GetBuffChangeNowHpPerSecond ( 3227c200 ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: June character port ( Elesis ) Phase CH4a - debug lines "[JUNE_CHAR] ELESIS PASSIVE ..." ( the init values once per load, each
+//              delegate / tick as it fires, at most once a second each ). The CH4c review retires it. Revert: undefine the flag ( JUNE_CHAR_ELESIS_PASSIVE_DEBUG ).
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -13297,6 +13310,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE ) && !defined( SERV_IRUHADEV_JUNE_SPEED_TIME )
 #error SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE needs SERV_IRUHADEV_JUNE_SPEED_TIME ( TIME_SPEED::bRotateByDirZ )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_COMMON_STATE_END_FUTURE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-elesis CH4a - guard only ( no new flag ): what JUNE_CHAR_ELESIS_PASSIVE needs, checked here because those flags are defined below its block.
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_CLASS ) || !defined( SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_JUNE_DAMAGEDATA ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE needs _CORE / _SKILL / _SUMMON ( the members it writes ), _CLASS ( classes 35 / 125 ), JUNE_SKILL_STATE_BUFF, JUNE_ENUM_NAMES and JUNE_DAMAGEDATA ( IsAttackTrigger )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) && ( !defined( SERV_IRUHADEV_ELYSION_SCRIPT_B ) || !defined( SERV_IRUHADEV_JUNE_MP_CHANGE_TEXT ) || !defined( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY ) || !defined( SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE ) || !defined( SERV_IRUHADEV_JUNE_DIVERGE_SKILL_LEVEL_VALUE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_RENA_TRAP ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE needs ELYSION_SCRIPT_B + JUNE_MP_CHANGE_TEXT ( UpNowHp / UpNowMp with text ), JUNE_BUFF_BEHAVIOR_PARITY + JUNE_CHAR_EVE_PASSIVE ( finalizer duration, stack count ), JUNE_DIVERGE_SKILL_LEVEL_VALUE and JUNE_CHAR_RENA_TRAP ( the public GetLearnedSkillAbilityValue )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha

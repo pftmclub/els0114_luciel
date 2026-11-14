@@ -50,3 +50,12 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH1o (2026-11-13)
 
 - `GetActualCoolTime` 0x6a4 `32b7ee10` calls vslot 0x534 `@32b7ef2c` with `false`: that is `IsDamageState( false )`, written by CH1o under `_LIVE` (base `CX2GUUser::IsDamageState`, Elesis's override adds Endurance Power's two active states). Call it by name.
+
+## Amended by CH4a (2026-11-14)
+
+- CH4a declared and writes ( `X2GUEl.h`, `_PASSIVE` ) what your overrides read: `m_fMPConsumeRate` ( +0x9750, reset 1.0 in the 35 / 125 arm; `GetActualMPConsume` `32b7ebe0`
+  @`32b7ecb9` multiplies by it ), `m_fAdvancedKnightMasteryEffectiveRate` ( +0x978c, SA_EFFECTIVE_RATE of 28404, -1.0 without it; June's roll `32b524f0` reads it, not yet ported:
+  find its caller in your set ), `m_fAdvancedKnightMasteryDamagedRate` ( +0x9784, SA_DAMAGED_REL ), and the Blazing Heart transcendence trio `m_usBlazingHeartTranscendenceLevel` /
+  `m_fBlazingHeartTranscendenceRate` / `m_fBlazingHeartTranscendenceDamageRate` ( +0x979a / +0x979c / +0x97a0: the 28417 part of `SetDamageExceptionProcess` ). Dignity's level is
+  `m_usDignityOfGrandMasterLevel` ( 28416 part ). Never write them again in an override.
+- Carried from CH4a's play-test if it did not show: the Advanced Knight Mastery quick stand on unit 29 ( both flags are now set by 28404 alone, no Get Chance test ).

@@ -132,6 +132,12 @@ class CX2DamageManager
 			DTT_ASR_LIGHTNING                     = 28,	// char-ara CH4a: June's Enum.lua; Spiritism Weird Fox's Spell: Thunder trigger
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH4a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			DTT_BURST_FIRE                        = 8,	// char-elesis CH4a: June's Enum.lua; the trigger whose hit lands the target's fire damage at once
+			DTT_BURNING_PHANTOM                   = 9,	// char-elesis CH4a: June's Enum.lua; Burning Phantom's blood-sucking trigger
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-11 // enum-gate-fix F1
 #ifdef SERV_IRUHADEV_ENUM_GATE_AISHA_TRIGGER
 			DTT_AISHA_STICK_ATTACK                = 17,	// June's Enum.lua; Open Mind's trigger ( OpenMindAttackResult, June 32ce9f90 )

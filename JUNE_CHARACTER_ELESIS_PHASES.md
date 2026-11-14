@@ -2115,6 +2115,58 @@ Opus 5.5. Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( + `_SKILL_DEBUG`, the C
 **Done gate:** each passive's effect shows (CH0 names the stat or log line per passive); blood sucking heals and bleeding ticks on a Dark Knight;
 0 Elesis `no_state` rows left except passives with no state in June.
 
+### CH4a - Done (2026-11-14)
+
+Opus 5.5. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` now **on** ( CH1j's `//#define` ), its needs checked by a guard-only block at the end of `Always.h` ( `_CORE`, `_SKILL`,
+`_SUMMON`, `_CLASS`, `JUNE_SKILL_STATE_BUFF`, `JUNE_ENUM_NAMES`, `JUNE_DAMAGEDATA`, `ELYSION_SCRIPT_B`, `JUNE_MP_CHANGE_TEXT`, `JUNE_BUFF_BEHAVIOR_PARITY`, `JUNE_CHAR_EVE_PASSIVE`,
+`JUNE_DIVERGE_SKILL_LEVEL_VALUE`, `JUNE_CHAR_RENA_TRAP`: all ON by `flagprobe.py` ), + `_PASSIVE_DEBUG` ( on until the CH4c stage review ). Files: `X2GUEL.cpp` / `X2GUEl.h`,
+`X2Game.*`, `X2GameUnit.*`, `X2BuffBehaviorTemplet.*`, `X2SkillTree.h` / `X2BuffFactor.h` / `X2DamageManager.h` ( `JUNE_ENUM_NAMES` ), `Always.h`. `funcmap.tsv` rows `Char Elesis CH4a`
+( 15 ); checklist rows marked `(Elesis: CH4a ...)` ( `322a7660` row, the `32b88300` delegate row ); `JUNE_BUGS` 664-666; `june_march_divergent.tsv` 3 rows. No review of its own: the
+CH4c stage review covers it ( `CH4b.md` / `CH4c.md` amended ).
+
+**Ported ( decompile + listing, `charport_adis.py elesis --phase CH4a` ).**
+- **`InitPassiveSkillState` `32b88300` whole** inside March's ( March in `#else` ). March read 8400s ids, which a June save never has: **every Elesis passive was off** before. June's
+  head: base, three delegates always, every passive member reset ( March's plus the new ones ), Dodge and Slash `SA_EFFECTIVE_COUNT` -> max re-use ( the CH2a wait ). One switch, no
+  fall-through: **29 / 120** Advanced Knight Mastery 28404 ( **both** quick-stand flags, no Get Chance test; force-down melee / range += `CalculateIncreasingRate( SA_FORCE_DOWN_REL )`;
+  MP value / damaged rate / effective rate ), `m_fDodgeAndSlashConsumedMp` = 0, Waltz 28403 ( rushing loop, `m_iWaltzOfSwordDodgeAbility` = `SA_MP_CONSUME_REL`: June's one member at
+  +0x9654, March's `m_iDecreaseMPRushingSword` is not written ), First Strike 28401, Agility Mastery 28402 ( walk / dash passive x ( 1 + `SA_MOVE_SPEED` ), anim factor ), Chivalry 28400,
+  levels of 28415 / 28416 ( memo-aware `GetSkillLevelValue` ); **30 / 121** Scalet Rose push, Flame Sword ( level + push ), Wall of Prominence life, Body of Fire, Fire Blossoms,
+  Concentration Mastery ( magic critical, skill level with `true` ), Stigma of Fire ( level, push, damage value ), Unextinguishable, Blazing Heart transcendence 28417 ( level / rate /
+  damage ), Blaze Absolu level; **35 / 125** Dark Force ( `_WOS` lines, the CH1q amendment ), Judgment, Blood Revenge, Punish ( `m_fMPConsumeRate` = 1.0, `m_fPunishEffectPowerRate` =
+  `SA_ATK_REL` ), Blood Runaway ( tiers 9999 reset, cool -1; learned: cleanse timer 999, level, the `32b87880` push under `_BLOOD`, tiers `SA_COOLTIME_1-3`, cool = counter =
+  `SA_EFFECTIVE_TIME` ), Crimson Avenger transcendence level, Madness level ( `_BLOOD` ). Elesis 8 takes the head only. June's `+0x97b0 = -1` has no reader in the class: not ported.
+- **Delegates:** new `RefundDodgeAndSlashMpOnAttack` `32b52470`, `CountScaletRoseHitOnAttack` `32b524b0` ( **backSpeed.x < -500**: the CH3b0 note said "> -500"; the listing's
+  `test ah,5; jp` skips the increment when NOT below ), `ApplyBurstFireOnAttack` `32b6fd50` ( `DTT_BURST_FIRE`: the target's `EDT_FIRE` / `EDT_ENCHANT_BLAZE` time x damage per second and
+  BTI 37 / 293 HP per second x finalizer duration land at once through `UpNowHpWithText`, each cleared; Pyro Knight's Big Burst carries it ), `HealByBurningPhantomOnAttack` `32b7e3b0`;
+  June's bodies inside March's `ApplyDebuffStigmaOfFire` `32b872d0` / `ApplyDebuffFlameSword` `32b6f820` ( riding and `AT_SPECIAL` gates, her as creator: divergent rows ).
+- **Ticks ( CH1j's declarations ):** `BloodRunawayProc_FrameMove` `32b734d0` ( BFI / BTI 666 by half HP, the cleanse, the cool counter; the debuff walk uses a copy: JUNE_BUGS 666 ),
+  `GrandMasterTranscendenceProc_FrameMove` `32b7e580` ( BFI 907 after a dash past `SA_EFFECTIVE_TIME` with no enemy within `SA_SCOPE_ABS`; BFI 908 with exactly one enemy within
+  `SA_SCOPE_ABS_PVP`, else BTI 879 erased ), `ApplyGrandMasterAura` `32b7e740` ( BFI 909 on herself; the ally stack: JUNE_BUGS 664 / 665, unreachable offline ).
+- **Engine pieces ( new, `_PASSIVE` ):** `CX2Game::GetEnemyUnitCountInRange` `322d4a60` ( the `+0x8fb6` NPC byte stays a stand-in, as `GetLockOnNearstTarget` ),
+  `CX2Game::GetAllyUserUnitCountInRange` `322d4ba0`, `CX2GameUnit::GetBuffChangeNowHpPerSecond` `3227c200`, `CX2BuffChangeNowHpPerSecondBehaviorTemplet::GetChangeNowHpPerSecond`
+  `32e75fb0`. June's gage-icon erase `32489b20` is called as March's `CX2GageManager::EraseBuff( uid, BTI, false )` ( same lists; its third never holds an ally ).
+- **Already done, checked:** 0x83c ( CH1o ), 0x29c `32b6fc40` ( CH1h, reads `m_uiChivalryLevel` which this phase now writes ), the class float writer `32b73bf0` / reader `32b7d550` ( CH1g,
+  checklist l.504 ). The CH1b review's `+0x4060` note holds ( no writer here ).
+- **Names:** `X2SkillTree.h` 17 `RNSI_P_*` ( 28400 / 28402 / 28404 / 28406-28419, June `Enum.src.lua` ); `X2BuffFactor.h` BTI 879-881, BFI 666 / 907-910; `X2DamageManager.h`
+  `DTT_BURST_FIRE` 8 / `DTT_BURNING_PHANTOM` 9 ( the live data036 `Enum.lua` has both ).
+- **Passive-id check ( the Rules ):** the 14 `SI_*` ids March's `InitPassiveSkillState` read ( `ch0_passive_ids.tsv`: 8200, 8217, 8016, 104, 8400-8409 ) are off the live path; June's body
+  reads only 28200 / 28210 / 28211 / 28018 and 284xx ( Get Chance 104 no longer ).
+
+**Gates.**
+- One-file probes ( `/c /Zs /EHsc` ): `X2GUEL.cpp`, `X2Game.cpp`, `X2GameUnit.cpp`, `X2BuffBehaviorTemplet.cpp` exit 0, 0 errors.
+- `flagcheck JUNE_CHAR_ELESIS_PASSIVE --with ..._PASSIVE_DEBUG --worktree --files` ( 12 ): `files: 6 PASS, 0 PASS~ (blank/marker only), 0 DEFINE, 6 OTHER (other flags), 0 FAIL, 0 ERROR`;
+  `in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`
+  ( OTHER = `JUNE_ENUM_NAMES` in the three enum headers, `Always.h`'s comment lines, the `_BLOOD` declaration in `X2GUEl.h`, a peer's DU1c hunks in `X2Game.cpp`, not committed here ).
+- `junediverge.py --check` ( 8 files ): `allow-listed: 23`, `RESULT: PASS`. `enumscan.py --check` the four `.cpp`: 1 row, `X2BuffBehaviorTemplet.cpp:5261` ( `fb062a6b`, a buff debug
+  line's BBT number ), not this phase's; 0 in this phase's code.
+- `DEPLOY OK: X2_offline.exe is 26,570,752 B, dated 2026-11-14 08:40:52, md5 4b5aadce6d5a7f8f98ab309849f31196, equal to X2/US_SERVICE/x2.exe (2026-11-14 08:40:45); built at main 194d520b + 12 uncommitted code file(s).`
+- `EXESTR OK: 3 of 3 found in X2_offline.exe, 26570752 B, dated 2026-11-14 08:40:52, md5 4b5aadce6d5a7f8f98ab309849f31196` ( wide: the init and burst-fire lines, `EffectSet_B_EL_Blood_Sucking` ).
+- **Save:** backup `db_backup/els_db_20261114_083128_pre_sql.sql`; learned 29 + 28404 / 28416, 30 + 28409 / 28418, 144 + 28411, 146 + 28414 ( level 1 each ).
+
+**How to see it in game:** one `[JUNE_CHAR] ELESIS PASSIVE init ( ... )` line per load with the values above, then `dodge and slash mp refund`, `scalet rose hit counted`,
+`burst fire`, `burning phantom blood sucking`, `stigma of fire` / `stigma of fire judgement`, `flame sword debuff`, `blood runaway tick` / `blood runaway cleanse`,
+`grand master transcendence moving buff` / `one on one`, `dignity of grand master buff` as each fires.
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended

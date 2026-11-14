@@ -133,6 +133,9 @@ public:
 	virtual void GetFactor( OUT vector<KBuffBehaviorFactor>& vecFactors_ ) const;
 	virtual void SetFactorFromPacket( const KBuffFactor& kBuffFactor_, const KBuffBehaviorFactor& kFactor_, CX2GameUnit* pGameUnit_ );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	float GetChangeNowHpPerSecond( CX2GameUnit* pGameUnit_ ) const;	/// char-elesis CH4a: June 32e75fb0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 protected:
 	CX2BuffChangeNowHpPerSecondBehaviorTemplet() : CX2BuffBehaviorTemplet(),
 		m_fResultValue( 0.0f ),	m_delegateChangeHpByTypeFunc(), 

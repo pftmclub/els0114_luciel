@@ -65,3 +65,14 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - The CH4 stage review also retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG` (CH3b0; its Scalet Rose / Fire Blossoms lines are CH4a's to show) and
   `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG` (the `SBUF` lines: `parse` and `frame` seen in CH2a-CH3d; `at once` and `state end` never seen, the user was asked once in the CH3d review
   hand-off; retire it whether or not they show), plus `_SKILL_DEBUG` if CH4a turned it back on.
+
+## Amended by CH4a (2026-11-14)
+
+- Already done by CH4a: the `ApplyBloodRunawayOnAttack` ( `32b87880` ) push and declaration ( under `_BLOOD`; write the body ), `BloodRunawayProc_FrameMove` `32b734d0` ( drop it
+  from your list ), the Blood Runaway cool members `m_fBloodRunawayCoolTime` / `m_fBloodRunawayCoolTimeElapsed` ( +0x9760 / +0x976c, plain floats ), Judgment
+  `m_usJudgmentLevel` / `m_fJudgmentRate` ( +0x9748 / +0x974c: the 0x4fc hook's gate ), Blood Revenge `m_usBloodRevengeLevel` / `m_fBloodRevengeRate` / `m_fBloodRevengeAbsorbRate`
+  ( +0x973e / +0x9740 / +0x9744 ), `m_usCrimsonAvengerTranscendenceLevel` ( +0x97a6 ), `m_usMadnessLevel` written under `_BLOOD`, and `CX2GameUnit::GetBuffChangeNowHpPerSecond`
+  ( `3227c200` ) / `CX2Game::GetEnemyUnitCountInRange` ( `322d4a60` ) if your berserker chain needs them.
+- The berserker tick's enemy-count member ( u16 +0x97a8 ) is yours to declare; June's InitPassiveSkillState zeroes it with Madness's level ( one dword store ): add its reset beside
+  `m_usMadnessLevel = 0;` in `InitPassiveSkillState`'s `_BLOOD` lines.
+- The stage review also retires `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG` ( CH4a ).

@@ -538,6 +538,10 @@ protected:
 	void BloodRunawayProc_FrameMove();				/// char-elesis CH1j: June 32b734d0 ( per-frame Blood Runaway upkeep, called by CommonFrameMove ): body in CH4a
 	void GrandMasterTranscendenceProc_FrameMove();	/// char-elesis CH1j: June 32b7e580 ( RNSI_P_SGM_TRANSCENDENCE ): body in CH4a
 	void ApplyGrandMasterAura();					/// char-elesis CH1j: June 32b7e740 ( Dignity of Grand Master aura ): body in CH4a
+	void RefundDodgeAndSlashMpOnAttack( const CX2DamageManager::DamageData& damageData_ );	/// char-elesis CH4a: June 32b52470 ( attack-result delegate )
+	void CountScaletRoseHitOnAttack( const CX2DamageManager::DamageData& damageData_ );		/// char-elesis CH4a: June 32b524b0 ( attack-result delegate )
+	void ApplyBurstFireOnAttack( const CX2DamageManager::DamageData& damageData_ );			/// char-elesis CH4a: June 32b6fd50 ( attack-result delegate )
+	void HealByBurningPhantomOnAttack( const CX2DamageManager::DamageData& damageData_ );	/// char-elesis CH4a: June 32b7e3b0 ( attack-result delegate )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 	bool IsBloodRunawayCleanseReady();	/// char-elesis CH3b0: June 32b6fb10
@@ -571,6 +575,7 @@ protected:
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	void TranscendenceBerserkerFrameMove();	/// char-elesis CH1j: June 32b7e9a0 ( RNSI_P_SCA_TRANSCENDENCE ): body in CH4c
 	void MadnessFrameMove();				/// char-elesis CH1j: June 32b6ff20 ( RNSI_P_SCA_MADNESS, tail-jumped from CommonFrameMove ): body in CH4c
+	void ApplyBloodRunawayOnAttack( const CX2DamageManager::DamageData& damageData_ );	/// char-elesis CH4a: June 32b87880 ( the delegate InitPassiveSkillState pushes ): body in CH4c
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE
 	void ESI_COMBO_SGM_ZZZX_EventProcess();					/// char-elesis CH1e: June 32b6ad40
@@ -1350,6 +1355,24 @@ protected:
 	float m_fBloodRunawayCleanseElapsedTime;	/// char-elesis CH3b0: June +0x9734 ( CH4a's frame move runs it )
 	BUFF_TEMPLET_ID m_eBloodRunawaySaveDebuffID;	/// char-elesis CH3b0: June +0x9738 ( the debuff the next cleanse removes )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	float m_fAdvancedKnightMasteryDamagedRate;		/// char-elesis CH4a: June +0x9784 ( SA_DAMAGED_REL of RNSI_P_SGM_ADVANCED_KNIGHT_MASTERY, 1.0 without it )
+	float m_fAdvancedKnightMasteryEffectiveRate;	/// char-elesis CH4a: June +0x978c ( its SA_EFFECTIVE_RATE, -1.0 without it; June's roll 32b524f0 reads it )
+	USHORT m_usGrandMasterTranscendenceLevel;		/// char-elesis CH4a: June +0x9794 ( level of RNSI_P_SGM_TRANSCENDENCE )
+	USHORT m_usDignityAuraAllyCount;				/// char-elesis CH4a: June +0x9798 ( allies the last aura stack counted )
+	USHORT m_usBlazingHeartTranscendenceLevel;		/// char-elesis CH4a: June +0x979a ( level of RNSI_P_SBH_TRANSCENDENCE )
+	float m_fBlazingHeartTranscendenceRate;			/// char-elesis CH4a: June +0x979c ( its SA_EFFECTIVE_RATE )
+	float m_fBlazingHeartTranscendenceDamageRate;	/// char-elesis CH4a: June +0x97a0 ( its SA_DAMAGE_REL )
+	USHORT m_usCrimsonAvengerTranscendenceLevel;	/// char-elesis CH4a: June +0x97a6 ( level of RNSI_P_SCA_TRANSCENDENCE; CH4c's berserker tick reads it )
+	USHORT m_usJudgmentLevel;						/// char-elesis CH4a: June +0x9748 ( level of RNSI_P_SDK_JUDGMENT )
+	float m_fJudgmentRate;							/// char-elesis CH4a: June +0x974c ( its SA_EFFECTIVE_RATE )
+	USHORT m_usBloodRevengeLevel;					/// char-elesis CH4a: June +0x973e ( level of RNSI_P_SCA_BLOOD_REVENGE; CH4c's hit hook reads it )
+	float m_fBloodRevengeRate;						/// char-elesis CH4a: June +0x9740 ( its SA_EFFECTIVE_RATE )
+	float m_fBloodRevengeAbsorbRate;				/// char-elesis CH4a: June +0x9744 ( its SA_DAMAGE_ABSORB_REL_MAX_HP )
+	float m_fMPConsumeRate;							/// char-elesis CH4a: June +0x9750 ( 1.0 here; GetActualMPConsume 32b7ebe0 multiplies by it, CH4b )
+	float m_fBloodRunawayCoolTime;					/// char-elesis CH4a: June +0x9760 ( KProtectedType, ported plain ): SA_EFFECTIVE_TIME of Blood Runaway, -1 without it
+	float m_fBloodRunawayCoolTimeElapsed;			/// char-elesis CH4a: June +0x976c ( KProtectedType, ported plain ): counts up to the cool time; CH4c's delegate reads both
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 	//~ protected º¯¼ö
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®

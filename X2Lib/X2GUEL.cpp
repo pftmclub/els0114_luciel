@@ -405,6 +405,28 @@ namespace _CONST_EL_CH3B0_
 }
 using namespace _CONST_EL_CH3B0_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4a: InitPassiveSkillState, the attack-result delegates and the passive ticks
+namespace _CONST_EL_CH4A_
+{
+	const float			BLOOD_RUNAWAY_PASSIVE_HP_RATE				= 0.5f;		// June double 3342ebc8: at or over half HP the passive buff is erased
+	const float			BLOOD_RUNAWAY_LEARNED_CLEANSE_ELAPSED_TIME	= 999.f;	// June 3344ce90: a learned Blood Runaway starts with its cleanse ready
+	const float			SCALET_ROSE_COUNTED_BACK_SPEED_X			= -500.f;	// June double 334fa4d8: only hits whose knock-back x is under it count
+	const int			DIGNITY_AURA_MAX_STACK						= 4;		// June @32b7e8e1
+	const float			DIGNITY_AURA_DURATION						= 10.f;		// June 334f80ec: the aura's time finalizer, set on every refresh
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	bool IsPassiveLogDue( DWORD& dwLastLogTime_ )
+	{
+		const DWORD dwNow = timeGetTime();
+		if ( dwNow - dwLastLogTime_ < 1000 )
+			return false;
+		dwLastLogTime_ = dwNow;
+		return true;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+}
+using namespace _CONST_EL_CH4A_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
@@ -523,6 +545,24 @@ CX2GUEL::CX2GUEL( int unitIndex, int teamNum, lua_State*   pScriptLuaState, int 
 , m_fBloodRunawayCleanseElapsedTime(0.f)
 , m_eBloodRunawaySaveDebuffID(BTI_NONE)
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+, m_fAdvancedKnightMasteryDamagedRate(1.f)	// char-elesis CH4a: June 32b70ee0
+, m_fAdvancedKnightMasteryEffectiveRate(-1.f)
+, m_usGrandMasterTranscendenceLevel(0)
+, m_usDignityAuraAllyCount(0)
+, m_usBlazingHeartTranscendenceLevel(0)
+, m_fBlazingHeartTranscendenceRate(0.f)
+, m_fBlazingHeartTranscendenceDamageRate(0.f)
+, m_usCrimsonAvengerTranscendenceLevel(0)
+, m_usJudgmentLevel(0)
+, m_fJudgmentRate(0.f)
+, m_usBloodRevengeLevel(0)
+, m_fBloodRevengeRate(0.f)
+, m_fBloodRevengeAbsorbRate(0.f)
+, m_fMPConsumeRate(1.f)
+, m_fBloodRunawayCoolTime(0.f)
+, m_fBloodRunawayCoolTimeElapsed(0.f)
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 , m_uiDodgeAndSlashMaxReuseCount(0)
 , m_uiDodgeAndSlashReuseCount(0)
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
@@ -901,6 +941,298 @@ CX2GUEL::~CX2GUEL(void)
 }
 /*virtual*/ void CX2GUEL::InitPassiveSkillState()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	// char-elesis CH4a: June 32b88300 ( one switch: 29 / 120, 30 / 121, 35 / 125; Elesis 8 takes only the head )
+	CX2GUUser::InitPassiveSkillState();
+	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
+	CX2SkillTree* const pSkillTree = g_pData->GetSkillTree();
+
+	InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GUEL, RefundDodgeAndSlashMpOnAttack ) );
+	InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GUEL, ApplyBurstFireOnAttack ) );
+	InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GUEL, HealByBurningPhantomOnAttack ) );
+
+	SetAddMagicAttackCriticalDamageRate( 0.f );
+	SetAddMagicAttackCriticalRate( 0.f );
+	SetAddAnimSpeedFactor( 0.f );
+	m_uiChivalryAttackBuffFactorID = 0;
+	m_uiChivalryDefenceBuffFactorID = 0;
+	SetFireBallPowerRate( 1.f );
+	m_uiChivalryLevel = 0;
+	m_bAbleQuickStand = false;
+	m_bAbleQuickStandAttack = false;
+	m_fAdvancedKnightMasteryMPValue = 0.f;
+	m_fAdvancedKnightMasteryDamagedRate = 1.f;
+	m_fAdvancedKnightMasteryEffectiveRate = -1.f;
+	m_uiDodgeAndSlashMaxReuseCount = 0;
+	m_fStigmaOfFireCoolTime = 0.f;
+	m_fStigmaOfFireDamageValue = 1.f;
+	m_usGrandMasterTranscendenceLevel = 0;
+	m_usDignityOfGrandMasterLevel = 0;
+	m_fFireBlossomsCoolTime = 0.f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+	m_usMadnessLevel = 0;	// June's dword store at +0x97a8 also zeroes CH4c's berserker enemy count
+	m_bIsMadnessActive = false;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+	m_fFireBlossomsCheckTime = -1.f;
+	m_fWallOfProminenceLifeTime = 0.f;
+	m_bIsStigmaOfFire = false;
+	m_fDashChargeTime = 0.f;
+	m_uiSkillLevelStigmaOfFire = 0;
+	m_fBlazingHeartTranscendenceRate = 0.f;
+	m_eFireBlossomsSaveDebuffID = BTI_NONE;
+	m_fBlazingHeartTranscendenceDamageRate = 0.f;
+	m_bIsFireBlossoms = false;
+	m_uiFireBlossomsSkillLevel = 0;
+	m_bIsLearnUnextinguishableFire = false;
+	m_uiSkillLevelFlameSword = 0;
+	m_usDignityAuraAllyCount = 0;
+	m_usBlazingHeartTranscendenceLevel = 0;
+	m_usBlazeAbsoluLevel = 0;
+	m_usCrimsonAvengerTranscendenceLevel = 0;
+
+	{
+		const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH, false, 0, true );
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH ) : NULL );
+		if ( NULL != pSkillTemplet )
+			m_uiDodgeAndSlashMaxReuseCount = static_cast<UINT>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_COUNT, iSkillLevel, false ) );
+	}
+
+	switch ( GetUnitClass() )
+	{
+	case CX2Unit::UC_ELESIS_SABER_KNIGHT:
+	case CX2Unit::UC_ELESIS_GRAND_MASTER:
+		{
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SGM_ADVANCED_KNIGHT_MASTERY, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SGM_ADVANCED_KNIGHT_MASTERY ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_bAbleQuickStand = true;	// June's word store 0x101: both flags, with no Get Chance test
+					m_bAbleQuickStandAttack = true;
+					const float fForceDownRate = CalculateIncreasingRate( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_FORCE_DOWN_REL, iSkillLevel, false ) );
+					m_SkillRelatedData.SetForceDownValueRateOfMeleeAttack( m_SkillRelatedData.m_fForceDownValueRateOfMeleeAttack + fForceDownRate );
+					m_SkillRelatedData.SetForceDownValueRateOfRangeAttack( m_SkillRelatedData.m_fForceDownValueRateOfRangeAttack + fForceDownRate );
+					m_fAdvancedKnightMasteryMPValue = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MP_REGENERATION_ABS, iSkillLevel, false );
+					m_fAdvancedKnightMasteryDamagedRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGED_REL, iSkillLevel, false );
+					m_fAdvancedKnightMasteryEffectiveRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+				}
+			}
+			m_fDodgeAndSlashConsumedMp = 0.f;
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SGM_WALTZ_OF_SWORD, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SGM_WALTZ_OF_SWORD ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_iRushingSwordAddLoopValue = static_cast<int>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_COUNT, iSkillLevel, false ) );
+					m_iWaltzOfSwordDodgeAbility = static_cast<int>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MP_CONSUME_REL, iSkillLevel, false ) );
+				}
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SSK_FIRST_STRIKE, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SSK_FIRST_STRIKE ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_cFirstStrikeData.SetFirstStrikeData( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_TIME, iSkillLevel, false ),
+						pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, iSkillLevel, false ), pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MP_REGENERATION_ABS, iSkillLevel, false ) );
+				}
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SGM_AGILITY_MASTERY, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SGM_AGILITY_MASTERY ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					const float fMoveSpeedRate = 1.f + pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MOVE_SPEED, iSkillLevel, false );
+					m_AdditionalWalkSpeed.SetPassiveMultiple( m_AdditionalWalkSpeed.GetPassiveMultiple() * fMoveSpeedRate );
+					m_AdditionalDashSpeed.SetPassiveMultiple( m_AdditionalDashSpeed.GetPassiveMultiple() * fMoveSpeedRate );
+					SetAddAnimSpeedFactor( max( 0.f, CalculateIncreasingRate( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ANI_SPEED, iSkillLevel, false ) ) ) );
+				}
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SSK_CHIVALRY, false, 0, true );
+				if ( 0 < iSkillLevel )
+				{
+					m_uiChivalryLevel = static_cast<UINT>( iSkillLevel );
+					const CX2SkillTree::SkillTemplet* pSkillTemplet = pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SSK_CHIVALRY );
+					if ( NULL != pSkillTemplet && 2 <= pSkillTemplet->m_vecBuffFactorID.size() )
+					{
+						m_uiChivalryAttackBuffFactorID = pSkillTemplet->m_vecBuffFactorID[0];
+						m_uiChivalryDefenceBuffFactorID = pSkillTemplet->m_vecBuffFactorID[1];
+					}
+				}
+			}
+			m_usGrandMasterTranscendenceLevel = static_cast<USHORT>( GetSkillLevelValue( CX2SkillTree::RNSI_P_SGM_TRANSCENDENCE ) );
+			m_usDignityOfGrandMasterLevel = static_cast<USHORT>( GetSkillLevelValue( CX2SkillTree::RNSI_P_SGM_DIGNITY_OF_GRAND_MASTER ) );
+		} break;
+
+	case CX2Unit::UC_ELESIS_PYRO_KNIGHT:
+	case CX2Unit::UC_ELESIS_BLAZING_HEART:
+		{
+			if ( 0 < userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_SBH_SCALET_ROSE, false, 0, true ) )
+				InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GUEL, CountScaletRoseHitOnAttack ) );
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_SBH_FLAME_SWORD, false, 0, true );
+				if ( 0 < iSkillLevel )
+				{
+					m_uiSkillLevelFlameSword = static_cast<UINT>( iSkillLevel );
+					InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GUEL, ApplyDebuffFlameSword ) );
+				}
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_SBH_WALL_OF_PROMINENCE, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_SA_SBH_WALL_OF_PROMINENCE ) : NULL );
+				if ( NULL != pSkillTemplet )
+					m_fWallOfProminenceLifeTime = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, iSkillLevel, false );
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SPK_BODY_OF_FIRE, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SPK_BODY_OF_FIRE ) : NULL );
+				if ( NULL != pSkillTemplet )
+					SetFireBallPowerRate( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, iSkillLevel, false ) * GetFireBallPowerRate() );
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SPK_FIRE_BLOSSOMS, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SPK_FIRE_BLOSSOMS ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_fFireBlossomsCheckTime = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, iSkillLevel, false );
+					m_uiFireBlossomsSkillLevel = static_cast<UINT>( iSkillLevel );
+					m_bIsFireBlossoms = true;
+				}
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SBH_CONCENTRATION_MASTERY, true, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SBH_CONCENTRATION_MASTERY ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					SetAddMagicAttackCriticalDamageRate( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_CRITICAL_DAM_ABS, iSkillLevel, false ) );
+					SetAddMagicAttackCriticalRate( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_CRITICAL_RATE_ABS, iSkillLevel, false ) );
+				}
+			}
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SBH_STIGMA_OF_FIRE, false, 0, true );
+				if ( 0 < iSkillLevel )
+				{
+					m_uiSkillLevelStigmaOfFire = static_cast<UINT>( iSkillLevel );
+					InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GUEL, ApplyDebuffStigmaOfFire ) );
+					const CX2SkillTree::SkillTemplet* pSkillTemplet = pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SBH_STIGMA_OF_FIRE );
+					if ( NULL != pSkillTemplet )
+						m_fStigmaOfFireDamageValue = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, iSkillLevel, false );
+				}
+			}
+			if ( 0 < userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SBH_UNEXTINGUISHABLE_FIRE, false, 0, true ) )
+				m_bIsLearnUnextinguishableFire = true;
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SBH_TRANSCENDENCE, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SBH_TRANSCENDENCE ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_usBlazingHeartTranscendenceLevel = static_cast<USHORT>( iSkillLevel );
+					m_fBlazingHeartTranscendenceRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+					m_fBlazingHeartTranscendenceDamageRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, iSkillLevel, false );
+				}
+			}
+			m_usBlazeAbsoluLevel = static_cast<USHORT>( GetSkillLevelValue( CX2SkillTree::RNSI_P_SBH_BLAZE_ABSOLU ) );
+		} break;
+
+	case CX2Unit::UC_ELESIS_DARK_KNIGHT:
+	case CX2Unit::UC_ELESIS_CRIMSON_AVENGER:
+		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+			m_fWayOfSwordPointMultiplier = 1.f;
+			m_fVigorHpIntakeRate = 0.f;
+			m_fDestructionDamageRate = 1.f;
+			m_fDestructionBleedingDamageRate = 1.f;
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SDK_DARK_FORCE, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SDK_DARK_FORCE ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_fWayOfSwordPointMultiplier = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_WAY_OF_SWORD_POINT_MULTIPLIER, iSkillLevel, false );
+					m_fVigorHpIntakeRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_HP_INTAKE_REL_DAMAGE, iSkillLevel, false );
+					m_fDestructionDamageRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, iSkillLevel, false );
+				}
+			}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_WOS
+			m_fJudgmentRate = 0.f;
+			m_usJudgmentLevel = 0;
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SDK_JUDGMENT, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SDK_JUDGMENT ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_usJudgmentLevel = static_cast<USHORT>( iSkillLevel );
+					m_fJudgmentRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+				}
+			}
+			m_fBloodRevengeRate = 0.f;
+			m_fBloodRevengeAbsorbRate = 0.f;
+			m_usBloodRevengeLevel = 0;
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SCA_BLOOD_REVENGE, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SCA_BLOOD_REVENGE ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_usBloodRevengeLevel = static_cast<USHORT>( iSkillLevel );
+					m_fBloodRevengeRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+					m_fBloodRevengeAbsorbRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_ABSORB_REL_MAX_HP, iSkillLevel, false );
+				}
+			}
+			m_fMPConsumeRate = 1.f;
+			m_fPunishEffectPowerRate = 0.f;
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SCA_PUNISH, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SCA_PUNISH ) : NULL );
+				if ( NULL != pSkillTemplet )
+					m_fPunishEffectPowerRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+			}
+			m_fBloodRunawayCleanseIntervalTier1 = BLOOD_RUNAWAY_NO_TIER_CLEANSE_INTERVAL;
+			m_usBloodRunawayLevel = 0;
+			m_fBloodRunawayCleanseIntervalTier2 = BLOOD_RUNAWAY_NO_TIER_CLEANSE_INTERVAL;
+			m_fBloodRunawayCleanseIntervalTier3 = BLOOD_RUNAWAY_NO_TIER_CLEANSE_INTERVAL;
+			m_eBloodRunawaySaveDebuffID = BTI_NONE;
+			m_fBloodRunawayCleanseElapsedTime = 0.f;
+			m_fBloodRunawayCoolTime = -1.f;
+			m_fBloodRunawayCoolTimeElapsed = 0.f;
+			{
+				const int iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_SCA_BLOOD_RUNAWAY, false, 0, true );
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ? pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_SCA_BLOOD_RUNAWAY ) : NULL );
+				if ( NULL != pSkillTemplet )
+				{
+					m_fBloodRunawayCleanseElapsedTime = _CONST_EL_CH4A_::BLOOD_RUNAWAY_LEARNED_CLEANSE_ELAPSED_TIME;
+					m_usBloodRunawayLevel = static_cast<USHORT>( iSkillLevel );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+					InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GUEL, ApplyBloodRunawayOnAttack ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+					m_fBloodRunawayCleanseIntervalTier1 = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_1, iSkillLevel, false );
+					m_fBloodRunawayCleanseIntervalTier2 = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_2, iSkillLevel, false );
+					m_fBloodRunawayCleanseIntervalTier3 = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_3, iSkillLevel, false );
+					m_fBloodRunawayCoolTime = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, iSkillLevel, false );
+					m_fBloodRunawayCoolTimeElapsed = m_fBloodRunawayCoolTime;
+				}
+			}
+			m_usCrimsonAvengerTranscendenceLevel = static_cast<USHORT>( GetSkillLevelValue( CX2SkillTree::RNSI_P_SCA_TRANSCENDENCE ) );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+			m_usMadnessLevel = static_cast<USHORT>( GetSkillLevelValue( CX2SkillTree::RNSI_P_SCA_MADNESS ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
+		} break;
+
+	default:
+		break;
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE init ( unit %I64d class %d: dodge reuse %u, chivalry %u ( %u / %u ), quick stand %d / %d, knight mastery mp %.3f damaged %.3f rate %.3f, rushing loop %d, waltz dodge %d, walk x%.3f dash x%.3f, anim %.3f, fire ball %.3f, flame sword %u, wall life %.2f, blossoms %u ( %.2f ), magic critical %.3f / %.3f, stigma %u ( %.3f ), unextinguishable %d, transcendence GM %d BH %d ( %.3f / %.3f ) CA %d, dignity %d, blaze absolu %d, judgment %d ( %.3f ), revenge %d ( %.3f / %.3f ), punish %.3f, blood runaway %d ( %.1f / %.1f / %.1f, cool %.1f ), attack result list %d )",
+		GetUnitUID(), static_cast<int>( GetUnitClass() ), m_uiDodgeAndSlashMaxReuseCount, m_uiChivalryLevel, m_uiChivalryAttackBuffFactorID, m_uiChivalryDefenceBuffFactorID, m_bAbleQuickStand ? 1 : 0, m_bAbleQuickStandAttack ? 1 : 0,
+		m_fAdvancedKnightMasteryMPValue, m_fAdvancedKnightMasteryDamagedRate, m_fAdvancedKnightMasteryEffectiveRate, m_iRushingSwordAddLoopValue, m_iWaltzOfSwordDodgeAbility,
+		m_AdditionalWalkSpeed.GetPassiveMultiple(), m_AdditionalDashSpeed.GetPassiveMultiple(), GetAddAnimSpeedFactor(), GetFireBallPowerRate(), m_uiSkillLevelFlameSword, m_fWallOfProminenceLifeTime,
+		m_uiFireBlossomsSkillLevel, m_fFireBlossomsCheckTime, GetAddMagicAttackCriticalDamageRate(), GetAddMagicAttackCriticalRate(), m_uiSkillLevelStigmaOfFire, m_fStigmaOfFireDamageValue,
+		m_bIsLearnUnextinguishableFire ? 1 : 0, static_cast<int>( m_usGrandMasterTranscendenceLevel ), static_cast<int>( m_usBlazingHeartTranscendenceLevel ), m_fBlazingHeartTranscendenceRate,
+		m_fBlazingHeartTranscendenceDamageRate, static_cast<int>( m_usCrimsonAvengerTranscendenceLevel ), static_cast<int>( m_usDignityOfGrandMasterLevel ), static_cast<int>( m_usBlazeAbsoluLevel ),
+		static_cast<int>( m_usJudgmentLevel ), m_fJudgmentRate, static_cast<int>( m_usBloodRevengeLevel ), m_fBloodRevengeRate, m_fBloodRevengeAbsorbRate, m_fPunishEffectPowerRate,
+		static_cast<int>( m_usBloodRunawayLevel ), m_fBloodRunawayCleanseIntervalTier1, m_fBloodRunawayCleanseIntervalTier2, m_fBloodRunawayCleanseIntervalTier3, m_fBloodRunawayCoolTime,
+		static_cast<int>( m_vecDelegateProcessInAttackResult.size() ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 	CX2GUUser::InitPassiveSkillState();
  	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
  	CX2SkillTree* const pSkillTree = g_pData->GetSkillTree();
@@ -1208,6 +1540,7 @@ CX2GUEL::~CX2GUEL(void)
 	default:
 		break;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 }
 /*virtual*/ void CX2GUEL::SetEquippedSkillFuncBySkillSlotIndex( const CX2SkillTree::SKILL_ID eSkillID_, const int iSlotIndex_, const bool bSlotB_ )
 {
@@ -16531,6 +16864,41 @@ void CX2GUEL::StigmaOfFireProc_FrameMove()
 
 void CX2GUEL::ApplyDebuffStigmaOfFire( const CX2DamageManager::DamageData& damageData_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	// char-elesis CH4a: June 32b872d0 ( not while riding, any attack but AT_SPECIAL, the debuffs carry her as their creator )
+	if ( true == GetRidingOn() || true != m_bIsStigmaOfFire || 0 == m_uiSkillLevelStigmaOfFire || CX2DamageManager::AT_SPECIAL == damageData_.attackType )
+		return;
+
+	if ( null != damageData_.optrDefenderGameUnit )
+	{
+		CX2GameUnit* pDefenderUnit = damageData_.optrDefenderGameUnit.GetObservable();
+		if ( NULL != pDefenderUnit )
+		{
+			pDefenderUnit->SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_DEBUFF_STIGMA_OF_FIRE ), m_uiSkillLevelStigmaOfFire, this, 0, false );
+			vector<KBuffFactor> vecDebuffFactor;
+			pDefenderUnit->GetBuffFactorOnlyDebuff( vecDebuffFactor );
+			BOOST_FOREACH( const KBuffFactor& kFactor_, vecDebuffFactor )
+			{
+				if ( BTI_DEBUFF_STIGMA_OF_FIRE == kFactor_.m_BuffIdentity.m_eBuffTempletID && kFactor_.m_ucAccumulationCountNow > 4 )	// June @32b873c8: five stacks
+				{
+					pDefenderUnit->SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_DEBUFF_JUDGEMENT_FIRE ), m_uiSkillLevelStigmaOfFire, this, 0, false );
+					pDefenderUnit->SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_DEBUFF_JUDGEMENT_FIRE2 ), m_uiSkillLevelStigmaOfFire, this, 0, false );
+					g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SBH_Judgement_Fire", GetPowerRate() * m_fStigmaOfFireDamageValue, pDefenderUnit->GetPos(), GetRotateDegree(), GetRotateDegree() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE stigma of fire judgement ( level %u, stacks %d, power x%.3f )", m_uiSkillLevelStigmaOfFire, static_cast<int>( kFactor_.m_ucAccumulationCountNow ), m_fStigmaOfFireDamageValue );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+				}
+			}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			static DWORD s_dwStigmaLogTime = 0;
+			if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwStigmaLogTime ) )
+				CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE stigma of fire ( level %u, attack type %d, skill %d )", m_uiSkillLevelStigmaOfFire, static_cast<int>( damageData_.attackType ), damageData_.m_iAppliedSkillID );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		}
+	}
+	m_bIsStigmaOfFire = false;
+	m_fStigmaOfFireCoolTime = 0.f;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 	//불꽃의 낙인 스킬은 스폐셜, 하이퍼 액티브에는 반응하지 않는다. 0.5초의 쿨타임이 지나야 다시 사용 가능하다.
 	if( CX2DamageManager::AT_NORMAL == damageData_.attackType && true == m_bIsStigmaOfFire && 0 < m_uiSkillLevelStigmaOfFire )
 	{	
@@ -16561,10 +16929,28 @@ void CX2GUEL::ApplyDebuffStigmaOfFire( const CX2DamageManager::DamageData& damag
 		m_bIsStigmaOfFire = false; 
 		m_fStigmaOfFireCoolTime = 0.0f;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 }
 
 void CX2GUEL::ApplyDebuffFlameSword( const CX2DamageManager::DamageData& damageData_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	// char-elesis CH4a: June 32b6f820 ( not while riding, any attack but AT_SPECIAL, no level test, the debuffs carry her as their creator )
+	if ( true == GetRidingOn() || true != m_bIsFrameSword || CX2DamageManager::AT_SPECIAL == damageData_.attackType || null == damageData_.optrDefenderGameUnit )
+		return;
+
+	CX2GameUnit* pDefenderUnit = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefenderUnit )
+		return;
+
+	pDefenderUnit->SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_DEBUFF_HIGH_FEVER ), m_uiSkillLevelFlameSword, this, 0, false );
+	pDefenderUnit->SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_DEBUFF_FLAME_SWORD ), m_uiSkillLevelFlameSword, this, 0, false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	static DWORD s_dwFlameSwordLogTime = 0;
+	if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwFlameSwordLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE flame sword debuff ( level %u, attack type %d, skill %d )", m_uiSkillLevelFlameSword, static_cast<int>( damageData_.attackType ), damageData_.m_iAppliedSkillID );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 	//홍련의 검 스킬은 스폐셜, 하이퍼 액티브에는 반응하지 않는다.
 	if( CX2DamageManager::AT_NORMAL == damageData_.attackType && true == m_bIsFrameSword )
 	{	
@@ -16578,6 +16964,7 @@ void CX2GUEL::ApplyDebuffFlameSword( const CX2DamageManager::DamageData& damageD
 			}
 		}	
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 }
 
 void CX2GUEL::FireBlossomsProc_FrameMove()
@@ -19680,6 +20067,239 @@ void CX2GUEL::SI_A_SCA_SHADOW_EDGE_EventProcess()
 	CommonEventProcess();
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4a: June 32b52470 ( a Dodge and Slash hit gives back the MP its start spent, once )
+void CX2GUEL::RefundDodgeAndSlashMpOnAttack( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH != damageData_.m_iAppliedSkillID || 0.f >= m_fDodgeAndSlashConsumedMp )
+		return;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE dodge and slash mp refund ( %.1f )", m_fDodgeAndSlashConsumedMp );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	UpNowMpWithText( m_fDodgeAndSlashConsumedMp );
+	m_fDodgeAndSlashConsumedMp = 0.f;
+}
+
+// char-elesis CH4a: June 32b524b0 ( a Scalet Rose hit whose knock-back x is under -500 counts one Fire Blossom )
+void CX2GUEL::CountScaletRoseHitOnAttack( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( CX2SkillTree::RNSI_A_SBH_SCALET_ROSE != damageData_.m_iAppliedSkillID && CX2SkillTree::RNSI_A_SBH_SCALET_ROSE_UPGRADE != damageData_.m_iAppliedSkillID )
+		return;
+
+	if ( damageData_.backSpeed.x < _CONST_EL_CH4A_::SCALET_ROSE_COUNTED_BACK_SPEED_X )
+	{
+		++m_ucScaletRoseHitCount;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE scalet rose hit counted ( %d, back speed x %.0f )", static_cast<int>( m_ucScaletRoseHitCount ), damageData_.backSpeed.x );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	}
+}
+
+// char-elesis CH4a: June 32b6fd50 ( DTT_BURST_FIRE: the target's fire damage still to come lands at once and its fires end )
+void CX2GUEL::ApplyBurstFireOnAttack( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( false == damageData_.IsAttackTrigger( CX2DamageManager::DTT_BURST_FIRE ) || null == damageData_.optrDefenderGameUnit )
+		return;
+
+	CX2GameUnit* pDefenderUnit = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefenderUnit )
+		return;
+
+	float fBurstHp = 0.f;
+	CX2GameUnit::ExtraDamagePack& extraDamagePack = pDefenderUnit->AccessExtraDamagePack();
+	if ( 0.f < extraDamagePack.m_Fire.m_fTime )
+	{
+		fBurstHp = 0.f - static_cast<float>( extraDamagePack.m_Fire.m_DamagePerSec ) * static_cast<float>( extraDamagePack.m_Fire.m_fTime );
+		extraDamagePack.Init( CX2DamageManager::EDT_FIRE );
+	}
+	if ( 0.f < extraDamagePack.m_EnchantBlaze.m_fTime )
+	{
+		fBurstHp -= static_cast<float>( extraDamagePack.m_EnchantBlaze.m_DamagePerSec ) * static_cast<float>( extraDamagePack.m_EnchantBlaze.m_fTime );
+		extraDamagePack.Init( CX2DamageManager::EDT_ENCHANT_BLAZE );
+	}
+	if ( true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_FIRE ) )
+	{
+		fBurstHp += pDefenderUnit->GetBuffChangeNowHpPerSecond( BTI_DEBUFF_FIRE ) * pDefenderUnit->GetBuffTimeFinalizerDuration( BTI_DEBUFF_FIRE );
+		pDefenderUnit->EraseBuffTempletFromGameUnit( BTI_DEBUFF_FIRE );
+	}
+	if ( true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_UNEXTINGUISHABLE_FIRE ) )
+	{
+		fBurstHp += pDefenderUnit->GetBuffChangeNowHpPerSecond( BTI_DEBUFF_UNEXTINGUISHABLE_FIRE ) * pDefenderUnit->GetBuffTimeFinalizerDuration( BTI_DEBUFF_UNEXTINGUISHABLE_FIRE );
+		pDefenderUnit->EraseBuffTempletFromGameUnit( BTI_DEBUFF_UNEXTINGUISHABLE_FIRE );
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE burst fire ( target %I64d, hp %.1f )", pDefenderUnit->GetUnitUID(), fBurstHp );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	pDefenderUnit->UpNowHpWithText( fBurstHp );
+}
+
+// char-elesis CH4a: June 32b7e3b0 ( Burning Phantom's blood sucking: SA_ATK_PHYSIC_REL of the state's skill times her physic attack )
+void CX2GUEL::HealByBurningPhantomOnAttack( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( false == damageData_.IsAttackTrigger( CX2DamageManager::DTT_BURNING_PHANTOM ) || null == damageData_.optrDefenderGameUnit || NULL == damageData_.optrDefenderGameUnit.GetObservable() )
+		return;
+
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_B_EL_Blood_Sucking", this );
+	const float fHealHp = GetPhysicAttackValue() * GetLearnedSkillAbilityValue( CX2SkillTree::SA_ATK_PHYSIC_REL, GetNowStateSkillID() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	static DWORD s_dwBurningPhantomLogTime = 0;
+	if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwBurningPhantomLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE burning phantom blood sucking ( skill %d, hp %.1f )", static_cast<int>( GetNowStateSkillID() ), fHealHp );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	UpNowHp( fHealHp );
+}
+
+// char-elesis CH4a: June 32b734d0 ( Blood Runaway: the passive buff under half HP, the timed cleanse, then the cool-time counter its delegate reads )
+void CX2GUEL::BloodRunawayProc_FrameMove()
+{
+	if ( true == GetRidingOn() || 0 == m_usBloodRunawayLevel )
+		return;
+
+	const float fHpRate = ( NULL == GetGageData() ? 1.f : GetNowHp() / GetMaxHp() );	// June reads 1.0 / 1.0 without a gage data
+	if ( _CONST_EL_CH4A_::BLOOD_RUNAWAY_PASSIVE_HP_RATE <= fHpRate )
+		EraseBuffTempletFromGameUnit( BTI_BUFF_BLOOD_RUNAWAY_PASSIVE );
+	else
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_BLOOD_RUNAWAY_PASSIVE ), m_usBloodRunawayLevel, NULL, 0, false );
+
+	if ( true == IsBloodRunawayCleanseReady() )
+	{
+		bool bCleansed = false;
+		if ( BTI_NONE != m_eBloodRunawaySaveDebuffID )
+		{
+			EraseBuffTempletFromGameUnit( m_eBloodRunawaySaveDebuffID );
+			bCleansed = true;
+		}
+		else if ( CX2DamageManager::EDT_NONE != GetApplyWeaponExtraDamageType() )
+		{
+			AccessExtraDamagePack().Init( GetApplyWeaponExtraDamageType() );
+			bCleansed = true;
+		}
+		else
+		{
+			const vector<CX2BuffTempletPtr> vecBuffTempletPtr = m_vecBuffTempletPtr;	// June walks the live list while erasing ( JUNE_BUGS ); a copy keeps the walk defined
+			BOOST_FOREACH( CX2BuffTempletPtr ptr, vecBuffTempletPtr )
+			{
+				if ( NULL != ptr && false == ptr->GetDidFinish() && true == ptr->IsDeBuff() && false == ptr->IsWorldBuff() && false == ptr->IsNonControlDebuff() && BTI_NONE != ptr->GetBuffTempletID() )
+				{
+					EraseBuffTempletFromGameUnit( ptr->GetBuffTempletID() );
+					bCleansed = true;
+				}
+			}
+		}
+
+		if ( true == bCleansed )
+		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE blood runaway cleanse ( hp rate %.3f, tier %d, after %.2f s )", fHpRate, GetHpTier(), m_fBloodRunawayCleanseElapsedTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			m_fBloodRunawayCleanseElapsedTime = 0.f;
+			m_eBloodRunawaySaveDebuffID = BTI_NONE;
+		}
+	}
+	else
+		m_fBloodRunawayCleanseElapsedTime += m_fElapsedTime;
+
+	if ( m_fBloodRunawayCoolTimeElapsed <= m_fBloodRunawayCoolTime )
+		m_fBloodRunawayCoolTimeElapsed += m_fElapsedTime;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	static DWORD s_dwBloodRunawayLogTime = 0;
+	if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwBloodRunawayLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE blood runaway tick ( hp rate %.3f, passive buff %d, cleanse timer %.2f, cool %.2f of %.2f )", fHpRate,
+			HaveThisBuff( BTI_BUFF_BLOOD_RUNAWAY_PASSIVE ) ? 1 : 0, m_fBloodRunawayCleanseElapsedTime, m_fBloodRunawayCoolTimeElapsed, m_fBloodRunawayCoolTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+}
+
+// char-elesis CH4a: June 32b7e580 ( no enemy within SA_SCOPE_ABS and a dash held past SA_EFFECTIVE_TIME -> the moving buff; one enemy within SA_SCOPE_ABS_PVP -> the one-on-one buff )
+void CX2GUEL::GrandMasterTranscendenceProc_FrameMove()
+{
+	if ( true == GetRidingOn() || m_usGrandMasterTranscendenceLevel < 1 )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_SGM_TRANSCENDENCE );
+	if ( NULL == pSkillTemplet )
+		return;
+
+	const float fNoEnemyRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_SCOPE_ABS, m_usGrandMasterTranscendenceLevel, false );
+	const float fOneOnOneRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_SCOPE_ABS_PVP, m_usGrandMasterTranscendenceLevel, false );
+	const float fNeededDashChargeTime = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, m_usGrandMasterTranscendenceLevel, false );
+	const int iEnemyCountNear = g_pX2Game->GetEnemyUnitCountInRange( fNoEnemyRange, GetTeam(), GetPos() );
+	const int iEnemyCountOneOnOne = g_pX2Game->GetEnemyUnitCountInRange( fOneOnOneRange, GetTeam(), GetPos() );
+
+	if ( 0 != iEnemyCountNear )
+		m_fDashChargeTime = 0.f;
+	else if ( m_fDashChargeTime > fNeededDashChargeTime )
+	{
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SGM_TRANSCENDENCE_MOVING_AND_SUPERARMOR ), m_usGrandMasterTranscendenceLevel, NULL, 0, false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE grand master transcendence moving buff ( dash %.2f s over %.2f s, no enemy within %.0f )", m_fDashChargeTime, fNeededDashChargeTime, fNoEnemyRange );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		m_fDashChargeTime = 0.f;
+	}
+
+	if ( 1 == iEnemyCountOneOnOne )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		static DWORD s_dwOneOnOneLogTime = 0;
+		if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwOneOnOneLogTime ) )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE grand master transcendence one on one ( one enemy within %.0f )", fOneOnOneRange );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SGM_TRANSCENDENCE_1_ON_1 ), m_usGrandMasterTranscendenceLevel, NULL, 0, false );
+	}
+	else
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_SGM_TRANSCENDENCE_1_ON_1 );
+}
+
+// char-elesis CH4a: June 32b7e740 ( Dignity of Grand Master: her own buff, then the aura stack on each living ally user of her team who lacks the skill )
+void CX2GUEL::ApplyGrandMasterAura()
+{
+	if ( true == GetRidingOn() || m_usDignityOfGrandMasterLevel < 1 )
+		return;
+
+	if ( NULL == g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_SGM_DIGNITY_OF_GRAND_MASTER ) )
+		return;
+
+	if ( false == HaveThisBuff( BTI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER ) )
+	{
+		SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER ), m_usDignityOfGrandMasterLevel, NULL, 0, false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE dignity of grand master buff ( level %d )", static_cast<int>( m_usDignityOfGrandMasterLevel ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	}
+
+	for ( int iUserIndex = 0; iUserIndex < g_pX2Game->GetUserUnitListSize(); ++iUserIndex )
+	{
+		CX2GUUser* pAllyUser = g_pX2Game->GetUserUnit( iUserIndex );
+		if ( NULL == pAllyUser || GetTeam() != pAllyUser->GetTeam() || true == pAllyUser->GetInvincible() || 0.f >= pAllyUser->GetNowHp() )
+			continue;
+
+		const int iAllySkillLevel = pAllyUser->GetSkillLevelValue( CX2SkillTree::RNSI_P_SGM_DIGNITY_OF_GRAND_MASTER );
+		if ( 0 < iAllySkillLevel )
+			continue;
+
+		// June reads SA_SCOPE_ABS above and drops it: the count has no range ( JUNE_BUGS )
+		int iAllyCount = g_pX2Game->GetAllyUserUnitCountInRange( -1.f, GetTeam(), GetPos() );
+		if ( iAllyCount < 2 )
+			continue;
+		iAllyCount = min( iAllyCount, _CONST_EL_CH4A_::DIGNITY_AURA_MAX_STACK );
+
+		pAllyUser->SetBuffTimeFinalizerDuration( BTI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA, _CONST_EL_CH4A_::DIGNITY_AURA_DURATION );
+		if ( NULL != CX2GageManager::GetInstance() )
+			CX2GageManager::GetInstance()->EraseBuff( pAllyUser->GetUnitUID(), BTI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA, false );	// June 32489b20 = this search without the debuff flag ( its third list is never an ally's )
+
+		if ( false == pAllyUser->HaveThisBuff( BTI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA ) || iAllyCount != static_cast<int>( pAllyUser->GetBuffAccumulationCountNowInFactor( BTI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA ) ) )
+		{
+			pAllyUser->SetBuffFactorToGameUnitByBuffFactorID( static_cast<UINT>( BFI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA ), iAllySkillLevel, this, 0, false );	// June passes the ally's own level, 0 or less ( JUNE_BUGS )
+			pAllyUser->SetBuffAccumulationCount( static_cast<UINT>( BFI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA ), iAllyCount, 1, 0 );
+			m_usDignityAuraAllyCount = static_cast<USHORT>( iAllyCount );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE dignity aura ( ally %I64d, stack %d )", pAllyUser->GetUnitUID(), iAllyCount );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		}
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #endif // NEW_CHARACTER_EL
 
 

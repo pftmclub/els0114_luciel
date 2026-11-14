@@ -5551,3 +5551,19 @@ void CX2BuffImmuneBuffDebuffBehaviorTemplet::InsertToGameUnit( const KBuffBehavi
 }
 #endif SERV_IRUHADEV_JUNE_BUFF_NEW_FLAG
 //}}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4a: June 32e75fb0 ( fixed and relation values as they are, a percent of the unit's max HP, else 0 )
+float CX2BuffChangeNowHpPerSecondBehaviorTemplet::GetChangeNowHpPerSecond( CX2GameUnit* pGameUnit_ ) const
+{
+	switch ( m_eChangeType )
+	{
+	case BCT_FIX_VALUE:
+	case BCT_RELATION_VALUE:
+		return m_fResultValue;
+	case BCT_PERCENT:
+		return pGameUnit_->GetMaxHp() * m_fResultValue;
+	default:
+		return 0.f;
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE

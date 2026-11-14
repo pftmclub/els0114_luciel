@@ -583,6 +583,13 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_SOUL_IGNITION                = 940,	// June's Enum.lua; Elesis's vslots 0x24c / 0x250 set and clear its effect-set rate
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH4a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_P_SGM_TRANSCENDENCE_1_ON_1   = 879,	// June's Enum.lua; the Grand Master transcendence one-on-one buff
+	BTI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER = 880,	// June's Enum.lua
+	BTI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA = 881,	// June's Enum.lua
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-10-26 // June character port Phase CH1l3 (JUNE_CHARACTER_EVE_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June BTI names the Eve skill use spells
@@ -925,6 +932,15 @@ enum BUFF_FACTOR_ID
 //{{ Iruha : 2026-11-14 // char-elesis CH3c
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	BFI_BUFF_BRANDISH_BREAKER_MEMO        = 594,	// June's Enum.lua
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-14 // char-elesis CH4a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_BUFF_BLOOD_RUNAWAY_PASSIVE        = 666,	// June's Enum.lua
+	BFI_BUFF_P_SGM_TRANSCENDENCE_MOVING_AND_SUPERARMOR = 907,	// June's Enum.lua
+	BFI_BUFF_P_SGM_TRANSCENDENCE_1_ON_1   = 908,	// June's Enum.lua
+	BFI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER = 909,	// June's Enum.lua
+	BFI_BUFF_P_SGM_DIGNITY_OF_GRAND_MASTER_AURA = 910,	// June's Enum.lua
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };

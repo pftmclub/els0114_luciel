@@ -2659,6 +2659,28 @@ public:
 	RNSI_A_SBH_SCALET_ROSE_UPGRADE                        = 28232,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH4a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of Elesis's passives InitPassiveSkillState and her ticks read ( values from June's Enum.lua )
+	RNSI_P_SSK_CHIVALRY                                   = 28400,
+	RNSI_P_SGM_AGILITY_MASTERY                            = 28402,
+	RNSI_P_SGM_ADVANCED_KNIGHT_MASTERY                    = 28404,
+	RNSI_P_SPK_FIRE_BLOSSOMS                              = 28406,
+	RNSI_P_SBH_CONCENTRATION_MASTERY                      = 28407,
+	RNSI_P_SBH_STIGMA_OF_FIRE                             = 28408,
+	RNSI_P_SBH_UNEXTINGUISHABLE_FIRE                      = 28409,
+	RNSI_P_SDK_DARK_FORCE                                 = 28410,
+	RNSI_P_SDK_JUDGMENT                                   = 28411,
+	RNSI_P_SCA_BLOOD_REVENGE                              = 28412,
+	RNSI_P_SCA_PUNISH                                     = 28413,
+	RNSI_P_SCA_BLOOD_RUNAWAY                              = 28414,
+	RNSI_P_SGM_TRANSCENDENCE                              = 28415,
+	RNSI_P_SGM_DIGNITY_OF_GRAND_MASTER                    = 28416,
+	RNSI_P_SBH_TRANSCENDENCE                              = 28417,
+	RNSI_P_SBH_BLAZE_ABSOLU                               = 28418,
+	RNSI_P_SCA_TRANSCENDENCE                              = 28419,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-12 // char-elesis CH1k
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	// June SKILL_ID names Elesis's skill-use functions spell ( values from June's Enum.lua )

@@ -1439,6 +1439,10 @@ class CX2Game : public CKTDXStage
 #ifdef SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
 		CX2GameUnit* GetFrontNearestEnemyUnit( CX2GameUnit* pUnit_, float fRange_, const std::set<UidType>& setExceptUnitUID_, const int iAttackType_ );	/// char-elesis CH3c2: June 322d7b30
 #endif SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+		int GetEnemyUnitCountInRange( const float fRange_, const int iMyTeam_, const D3DXVECTOR3& vPos_ );	/// char-elesis CH4a: June 322d4a60
+		int GetAllyUserUnitCountInRange( const float fRange_, const int iTeam_, const D3DXVECTOR3& vPos_ );	/// char-elesis CH4a: June 322d4ba0
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 		void						UpdateEveElectraSkillSlotIcon();
 	#ifdef SERV_RENA_NIGHT_WATCHER
 		void						UpdateNightWatcherSkillSlotIcon();

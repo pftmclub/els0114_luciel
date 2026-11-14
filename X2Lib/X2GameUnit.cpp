@@ -15491,6 +15491,30 @@ void CX2GameUnit::SetBuffTimeFinalizerDuration( const BUFF_TEMPLET_ID eBuffTempl
 	ChangeBuffFinalizerTempletPtrList( eBuffTempletID_, vecFinalizerPtr );
 }
 //}} Iruha : 2026-10-28 // June character Eve Phase CH4b2
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4a: June 3227c200 ( the HP-per-second behaviors of the first buff eBuffTempletID_, summed )
+float CX2GameUnit::GetBuffChangeNowHpPerSecond( const BUFF_TEMPLET_ID eBuffTempletID_ )
+{
+	vector<CX2BuffBehaviorTempletPtr> vecBehaviorPtr;
+	BOOST_FOREACH( CX2BuffTempletPtr ptrBuffTemplet, m_vecBuffTempletPtr )
+	{
+		if ( NULL != ptrBuffTemplet && eBuffTempletID_ == ptrBuffTemplet->GetBuffTempletID() )
+		{
+			ptrBuffTemplet->GetBehaviorPtrList( vecBehaviorPtr );
+			break;
+		}
+	}
+
+	float fChangeNowHpPerSecond = 0.f;
+	BOOST_FOREACH( CX2BuffBehaviorTempletPtr ptrBehavior, vecBehaviorPtr )
+	{
+		const CX2BuffChangeNowHpPerSecondBehaviorTemplet* pChangeNowHpBehavior = dynamic_cast<const CX2BuffChangeNowHpPerSecondBehaviorTemplet*>( ptrBehavior.get() );
+		if ( NULL != pChangeNowHpBehavior )
+			fChangeNowHpPerSecond += pChangeNowHpBehavior->GetChangeNowHpPerSecond( this );
+	}
+	return fChangeNowHpPerSecond;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE
 #endif SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
 

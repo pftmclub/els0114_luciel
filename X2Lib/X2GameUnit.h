@@ -3211,6 +3211,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		float GetBuffTimeFinalizerDuration( const BUFF_TEMPLET_ID eBuffTempletID_ );	/// June 3227bfa0
 		void SetBuffTimeFinalizerDuration( const BUFF_TEMPLET_ID eBuffTempletID_, const float fDurationTime_ );	/// June 3227c110
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+		float GetBuffChangeNowHpPerSecond( const BUFF_TEMPLET_ID eBuffTempletID_ );	/// char-elesis CH4a: June 3227c200
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 		/// June unit slot 476 (users only, 32028250): adjusts the levelled factor by an index (June-only system)
 		virtual void AdjustBuffFactorByIndex( CX2BuffFactorPtr ptrBuffFactor_, const int iAdjustIndex_ ) {}
 		/// June unit slot 141 (322b5630: empty; only Ain 32a6aa10 and Rose 32ac8f10 override it)
