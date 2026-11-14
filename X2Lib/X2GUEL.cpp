@@ -427,6 +427,19 @@ namespace _CONST_EL_CH4A_
 }
 using namespace _CONST_EL_CH4A_;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4b: the overrides' constants
+namespace _CONST_EL_CH4B_
+{
+	const float			RUSHING_SWORD_MP_RATE_PER_LOOP				= 0.1f;		// June double 334395e8 ( 0.1f widened ) @32b7ec64
+	const double		INFERNAL_BLADE_DEFENCE_RATE_PER_RESIST		= 0.002;	// June double 334fa4d0 @32b52289
+	const int			BLAZING_HEART_ROLL_RANDOM_OFFSET			= 27;		// June @32b8113e: no SPECIAL_RANDOM_OFFSET member has it
+	const double		BLAZE_RESIST_DAMAGE_DIVISOR					= 500.0;	// June double 33458fa8 @32b811b4
+	const double		BLAZE_RESIST_DAMAGE_STEP					= 0.1;		// June double 3343a810 @32b811ba
+	const double		BLAZE_RESIST_DAMAGE_MAX_RATE				= 1.1;		// June double 3347ae18 / float 3348a3a8 @32b811ce
+}
+using namespace _CONST_EL_CH4B_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 namespace _CONST_EL_CH1C_ { bool ElesisAwakeningEffectSetPresent(); }	// char-elesis CH1h: defined with the CH1c stand-ins below
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
@@ -4046,6 +4059,66 @@ bool CX2GUEL::IsNotCommonMoveState()
 
 /*virtual*/ float CX2GUEL::GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	// char-elesis CH4b: June 32b7ebe0 ( the base with June's bool 1 = March's path; March's memo cases are gone )
+	float fMpConsumption = CX2GUUser::GetActualMPConsume( eSkillID_, iSkillLevel_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	const float fBaseMpConsumption = fMpConsumption;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+
+	switch ( eSkillID_ )
+	{
+	case CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH:
+	case CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH_UPGRADE:
+		{
+			if ( true == m_bIsApplyVictoriousSword )
+				fMpConsumption = 0.f;
+		} break;
+
+	case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER:
+	case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER_UPGRADE:
+		{
+			fMpConsumption *= m_fMPConsumeRate;
+		} break;
+
+	case CX2SkillTree::RNSI_A_SSK_RUSHING_SWORD:
+	case CX2SkillTree::RNSI_A_SSK_RUSHING_SWORD_UPGRADE:
+		{
+			// June @32b7ec2c: 10 % less per loop count, less Waltz of Sword's ability ( +0x9654 ), never below 0
+			const float fRushingSwordMp = fMpConsumption - static_cast<float>( m_iRushingSwordNowLoopValue ) * fMpConsumption * RUSHING_SWORD_MP_RATE_PER_LOOP
+				- static_cast<float>( m_iWaltzOfSwordDodgeAbility );
+			fMpConsumption = max( 0.f, fRushingSwordMp );
+		} break;
+
+	default:
+		break;
+	}
+
+	if ( CX2GUUser::WSS_VIGOR == GetWayOfSwordState() )
+	{
+		// June's memo exemption @32b7ecf0 reads the memo stub 31fca9e0, never true
+		const CX2SkillTree::SkillTemplet* pVigorSkillTemplet = GetEquippedActiveSkillTemplet( eSkillID_, true );
+		if ( NULL != pVigorSkillTemplet && WSS_VIGOR == pVigorSkillTemplet->m_iWOSType )
+		{
+			if ( NULL != g_pX2Game && CX2Game::GT_PVP == g_pX2Game->GetGameType() )
+				fMpConsumption *= _CONST_EL_::GALE_MP_CONSUME_RATE_PVP;
+			else
+				fMpConsumption *= _CONST_EL_::GALE_MP_CONSUME_RATE;
+		}
+	}
+
+	const CX2SkillTree::SkillTemplet* pEquippedSkillTemplet = GetEquippedActiveSkillTemplet( eSkillID_, true );
+	float fMpDecreaseRate = 1.f;
+	if ( NULL != pEquippedSkillTemplet )
+		fMpDecreaseRate = g_pData->GetMyUser()->GetSelectUnit()->GetSkillMpDecreaseRate( eSkillID_, pEquippedSkillTemplet->m_eType );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	static DWORD s_dwMpLogTime = 0;
+	if ( fBaseMpConsumption != fMpConsumption && true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwMpLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE mp: skill %d base %.2f -> %.2f ( loop %d, waltz %d, rate %.3f, decrease rate %.3f )", static_cast<int>( eSkillID_ ), fBaseMpConsumption, fMpConsumption, m_iRushingSwordNowLoopValue, m_iWaltzOfSwordDodgeAbility, m_fMPConsumeRate, fMpDecreaseRate );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	return fMpDecreaseRate * fMpConsumption;
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 	float fMpConsumption = CX2GUUser::GetActualMPConsume( eSkillID_, iSkillLevel_ );
 	
 	switch ( eSkillID_ )
@@ -4128,9 +4201,58 @@ bool CX2GUEL::IsNotCommonMoveState()
 #else SERV_BALANCE_FINALITY_SKILL_EVENT
 	return fMpConsumption;
 #endif //SERV_BALANCE_FINALITY_SKILL_EVENT
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 }
 /*virtual*/ float CX2GUEL::GetActualCoolTime( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_, IN int iSkillLevel ) const
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	// char-elesis CH4b: June 32b7ee10 ( the base with June's 0 = March's path )
+	if ( NULL == pSkillTemplet_ )
+		return 0.f;
+
+	float fSkillCoolTime = CX2GUUser::GetActualCoolTime( pSkillTemplet_, iSkillLevel );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	const float fBaseCoolTime = fSkillCoolTime;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+
+	// June's memo exemption @32b7ee49 reads the memo stub 31fca9e0, never true
+	if ( WSS_VIGOR == GetWayOfSwordState() && WSS_VIGOR == pSkillTemplet_->m_iWOSType )
+	{
+		float fGaleCoolTimeDecreaseRate = _CONST_EL_::GALE_COOL_TIME_DECREASE_RATE;
+		if ( NULL != g_pX2Game && CX2Game::GT_PVP == g_pX2Game->GetGameType() )
+			fGaleCoolTimeDecreaseRate = _CONST_EL_::GALE_COOL_TIME_DECREASE_RATE_PVP;
+
+		fSkillCoolTime *= fGaleCoolTimeDecreaseRate;
+	}
+
+	switch ( pSkillTemplet_->m_eID )
+	{
+	case CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH:
+	case CX2SkillTree::RNSI_A_EL_DODGE_AND_SLASH_UPGRADE:
+		{
+			if ( true == m_bIsApplyVictoriousSword )
+				fSkillCoolTime *= m_fDodgeAndSlashCoolTimeDecreaseRate;
+		} break;
+
+	case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER:
+	case CX2SkillTree::RNSI_A_EL_ENDURANCE_POWER_UPGRADE:
+		{
+			// June @32b7ef2c: vslot 0x534 IsDamageState( false ) doubles it ( June's override is not const )
+			if ( true == const_cast<CX2GUEL*>( this )->IsDamageState( false ) )
+				fSkillCoolTime += fSkillCoolTime;
+		} break;
+
+	default:
+		break;
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	static DWORD s_dwCoolTimeLogTime = 0;
+	if ( fBaseCoolTime != fSkillCoolTime && true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwCoolTimeLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE cool time: skill %d base %.2f -> %.2f", static_cast<int>( pSkillTemplet_->m_eID ), fBaseCoolTime, fSkillCoolTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	return max( 0.f, fSkillCoolTime );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 	if( NULL == pSkillTemplet_ )
 		return 0.f;
 
@@ -4169,7 +4291,29 @@ bool CX2GUEL::IsNotCommonMoveState()
 	}
 
 	return max( 0.f, fSkillCoolTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+// char-elesis CH4b: June 32b52260 ( vslot 0x428 ): in Infernal Blade's state her blaze resistance lowers the defence term
+/*virtual*/ float CX2GUEL::GetDefenceRateBySkill( const int iAttackType_ )
+{
+	UNREFERENCED_PARAMETER( iAttackType_ );
+	float fDefenceRate = 1.f;
+	if ( CX2SkillTree::RNSI_SA_SPK_INFERNAL_BLADE == GetNowStateSkillID() )
+	{
+		const float fBlazeResist = GetEnchantResist( CX2EnchantItem::ET_BLAZE );
+		fDefenceRate = static_cast<float>( 1.0 - INFERNAL_BLADE_DEFENCE_RATE_PER_RESIST * fBlazeResist );
+		if ( fDefenceRate < 0.f )
+			fDefenceRate = 0.f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		static DWORD s_dwDefenceRateLogTime = 0;
+		if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwDefenceRateLogTime ) )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE infernal blade defence rate %.3f ( blaze resist %.1f )", fDefenceRate, fBlazeResist );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	}
+	return fDefenceRate;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 /*virtual*/ CX2GageData* CX2GUEL::CreateGageData()
 {
 	if ( true == IsMyUnit() )
@@ -17610,6 +17754,70 @@ void CX2GUEL::SnapCrasherProc_FrameMove()
 		}
 	}
 #endif // ELSWORD_WAY_OF_SWORD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	// char-elesis CH4b: June 32b80f20 @32b81008-32b811ef, Dignity of Grand Master and Blazing Heart's transcendence ( the part above = March )
+	if ( 0 < m_usDignityOfGrandMasterLevel
+		&& ( true == HaveThisBuff( BTI_BUFF_SGM_VICTORIOUS_SWORD ) || true == HaveThisBuff( BTI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE ) )
+		&& CX2DamageManager::AT_EFFECT != pDamageData_->attackerType && INVALID_DAMAGE_EFFECT_HANDLE == pDamageData_->hAttackerEffect )
+	{
+		pDamageData_->m_bIgnoreStateDefence = true;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		static DWORD s_dwDignityLogTime = 0;
+		if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwDignityLogTime ) )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE dignity: ignore state defence ( level %d )", static_cast<int>( m_usDignityOfGrandMasterLevel ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+	}
+
+	if ( 0 < m_usBlazingHeartTranscendenceLevel )
+	{
+		if ( CX2DamageManager::AT_SPECIAL != pDamageData_->attackType && null != pDamageData_->optrDefenderGameUnit )
+		{
+			CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+			if ( NULL != pDefenderUnit )
+			{
+				const bool bBurningDebuff = ( true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_FIRE ) || true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_SWORD_FIRE )
+					|| true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_SWORD_ENCHANT_FIRE ) || true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_IGNITION_CROW_INCINERATION_BURN )
+					|| true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_STIGMA_OF_FIRE ) || true == pDefenderUnit->HaveThisBuff( BTI_DEBUFF_PARANOIA_FIRE ) );
+				const CX2GameUnit::ExtraDamagePack& extraDamagePack = pDefenderUnit->GetExtraDamagePack();
+				if ( 0.f < extraDamagePack.m_EnchantBlaze.m_fTime || 0.f < extraDamagePack.m_Fire.m_fTime || true == bBurningDebuff )
+				{
+					const float fRoll = GetRandomFloat( BLAZING_HEART_ROLL_RANDOM_OFFSET );
+					if ( fRoll < m_fBlazingHeartTranscendenceRate )
+					{
+						pDamageData_->m_bIgnoreDefence = true;
+						pDamageData_->m_bIgnoreDefenceOnPvp = true;
+						pDamageData_->m_bIgnoreStateDefence = true;
+						pDamageData_->m_bIgnoreDefenceDecline = true;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+						static DWORD s_dwBlazingHeartIgnoreLogTime = 0;
+						if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwBlazingHeartIgnoreLogTime ) )
+							CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE blazing heart transcendence: ignore defence ( target %I64d, roll %.3f < %.3f )", pDefenderUnit->GetUnitUID(), fRoll, m_fBlazingHeartTranscendenceRate );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+					}
+				}
+			}
+		}
+
+		// June @32b8116c: the magic damage grows with her blaze resistance ( every attack type; the templet is only tested for presence )
+		if ( NULL != g_pData->GetSkillTree() && NULL != g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_SBH_TRANSCENDENCE ) )
+		{
+			const CX2Stat::EnchantStat& enchantStat = GetUnit()->GetEnchantStat( true, false, false );
+			float fBlazeDamageRate = 1.f;
+			if ( 0.f < enchantStat.m_fDefBlaze )
+			{
+				fBlazeDamageRate = static_cast<float>( enchantStat.m_fDefBlaze / BLAZE_RESIST_DAMAGE_DIVISOR * BLAZE_RESIST_DAMAGE_STEP + 1.0 );
+				if ( BLAZE_RESIST_DAMAGE_MAX_RATE < fBlazeDamageRate )
+					fBlazeDamageRate = static_cast<float>( BLAZE_RESIST_DAMAGE_MAX_RATE );
+			}
+			pDamageData_->damage.fMagic *= fBlazeDamageRate;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+			static DWORD s_dwBlazingHeartDamageLogTime = 0;
+			if ( true == _CONST_EL_CH4A_::IsPassiveLogDue( s_dwBlazingHeartDamageLogTime ) )
+				CX2OfflineLog::Server( L"[JUNE_CHAR] ELESIS PASSIVE blazing heart transcendence: magic damage x %.3f ( blaze resist %.1f )", fBlazeDamageRate, enchantStat.m_fDefBlaze );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 }
 #endif //MODIFY_SET_DAMAGE_DATA
 

@@ -342,6 +342,9 @@ protected:
 	virtual float GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const;
 
 	virtual float GetActualCoolTime( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_, IN int iSkillLevel ) const;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
+	virtual float GetDefenceRateBySkill( const int iAttackType_ );	// char-elesis CH4b: June 32b52260 ( vslot 0x428 )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE
 
 	virtual CX2GageData* CreateGageData();
 

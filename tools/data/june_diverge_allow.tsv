@@ -26,3 +26,5 @@ X2GUEL.cpp	CX2GUEL::GetFinalDamage_WayOfSword	GT_PVP	June 32b74ed0 @32b74f14: vs
 X2PlayGuide.cpp	*	OnFrameMove	tsv CX2PlayGuide::OnFrameMove (3289e490) -> Stage 9; june-dungeons C3y-2 inserted only June's jump-guide call (3289e370) at June's place
 X2SlideShot.cpp	*	ScenEnd	tsv CX2SlideShot::ScenEnd (325c7140) -> Stage 9; june-dungeons C3y-2b's ScenEnd_LUA (325c74a0) / MsgProc (325c74b0) call March's scene end until then
 X2GUEL.cpp	CX2GUEL::SI_A_SCA_SHADOW_EDGE_FrameMove	GT_PVP	June 32b84390 @32b844df: vslot 0x10c, cmp eax, 1 (type 1 only: the mark max-HP share); the search range beside it is 322cc1a0 = GetIsNowPVPCorrectionGame; char-elesis CH3c2
+X2GUEL.cpp	CX2GUEL::GetActualMPConsume	GT_PVP	June 32b7ebe0 @32b7ed7c: vslot 0x10c, cmp eax, 1 (type 1 only: the Vigor MP rate 0.8 / 0.6); char-elesis CH4b
+X2GUEL.cpp	CX2GUEL::GetActualCoolTime	GT_PVP	June 32b7ee10 @32b7eedf: vslot 0x10c, cmp eax, 1 (type 1 only: the Vigor cool-time rate 0.6 / 0.2); char-elesis CH4b

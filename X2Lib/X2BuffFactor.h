@@ -542,6 +542,10 @@ enum BUFF_TEMPLET_ID
 //}}
 //{{ Iruha : 2026-11-13 // char-elesis CH2b
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_DEBUFF_SWORD_FIRE                 = 47,		// char-elesis CH4b: June's Enum.lua; the burning debuffs Blazing Heart's transcendence tests
+	BTI_DEBUFF_SWORD_ENCHANT_FIRE         = 167,
+	BTI_DEBUFF_IGNITION_CROW_INCINERATION_BURN = 243,
+	BTI_DEBUFF_PARANOIA_FIRE              = 443,
 	BTI_BUFF_SGM_VICTORIOUS_SWORD_UPGRADE = 565,	// June's Enum.lua; the enhanced Victorious Sword buff Extinction's attack reads
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}

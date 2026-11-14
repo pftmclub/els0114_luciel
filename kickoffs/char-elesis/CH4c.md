@@ -4,10 +4,10 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-elesis CH4c` |
 | Plan doc | `JUNE_CHARACTER_ELESIS_PHASES.md` (branch `main`) |
-| Depends on | CH4b. One at a time with CH1-CH4: they all edit `X2GUEL.*` |
+| Depends on | CH4b2 (amended by CH4b, 2026-11-14: the guard phase split from CH4b runs first). One at a time with CH1-CH4: they all edit `X2GUEL.*` |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD` (+ `..._BLOOD_DEBUG`) |
 | Log tag | `[JUNE_CHAR]` (`ELESIS BLOOD`) |
-| Review | `kickoffs/char-elesis/CH4c-review.md` (Opus 5.5 high; the phase writes it when done); the CH4 stage review: covers CH4a-CH4c, retires `_PASSIVE_DEBUG` and `_BLOOD_DEBUG` |
+| Review | `kickoffs/char-elesis/CH4c-review.md` (Opus 5.5 high; the phase writes it when done); the CH4 stage review: covers CH4a-CH4c and CH4b2, retires `_PASSIVE_DEBUG` and `_BLOOD_DEBUG` |
 
 ## Read first (and nothing else from the plan doc unless you need it)
 

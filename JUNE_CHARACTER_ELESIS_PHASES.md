@@ -2110,6 +2110,7 @@ Opus 5.5. Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( + `_SKILL_DEBUG`, the C
 |---|---|
 | CH4a | `InitPassiveSkillState` `32b88300` (vslot 0x690) whole on June's ids, her passive ids, their objects and readers, its 7 attack-result delegate pushes replacing March's own (checklist l.920 / l.930); the June-only hook 0x83c `32b732e0`; 0x29c `32b6fc40` (the `GetReduceDebuffDurationRate` shape); the class float writer `32b73bf0` / reader `32b7d550` (l.496); the passive-id check of the Rules; flag `_PASSIVE` |
 | CH4b | Overrides and memo: `SetDamageExceptionProcess` 0x2b8 `32b80f20` whole (the June-only 28416 / 28417 part `@32b81008-32b811ef`), `GetActualMPConsume` 0x6a0 `32b7ebe0` and `GetActualCoolTime` 0x6a4 `32b7ee10` with the memo reader `31fca9e0`, 0x428 `32b52260` (l.942), 0x558 `32b6fb80`; `MemoConditionElesis` (vtable `334fa4f4`, `32b51980` / `32b519a0`) and the four `MEMO` states' readers; what Elsword's CH4b took for the shared Way of the Sword leftovers (`CureExtraDamage`, `ResetAnimSpeed`'s vigor factor, `SAT_WAY_OF_SWORD_GAUGE_UP`) checked in her class |
+| CH4b2 | Split from CH4b (2026-11-14): Advanced Knight Mastery's guard: the roll `32b524f0`, its caller `CX2GUUser::DamageReact @320476a2` ( user byte `+0x9175`, damage x `+0x9784` ), the `DamageReactStateChange` branch to states 332 / 333 |
 | CH4c | **Blood hooks** (`ch0_blood.tsv`), flag `_BLOOD`: the hit hooks 0x4f8 `32b7beb0`, 0x4fc `32b898a0`, 0x734 `32b7bad0` and their base call sites (the hooks are inert stubs today, l.454-455), Blood Runaway `32b87880` (BFI 462 registered with it, BTI 426 erased above 4 stacks) and `32b734d0`, `32b7e3b0`, Madness `32b6ff20`, the transcendence berserker chain `32b7e9a0` (BFI 913 passing `x`), the per-frame list 0x730 `32b816a0` / `32b81220`; tested on 35 / 125 units; CH4 stage review |
 
 **Done gate:** each passive's effect shows (CH0 names the stat or log line per passive); blood sucking heals and bleeding ticks on a Dark Knight;
@@ -2178,6 +2179,53 @@ tick` x71 ( `passive buff 1` from hp rate 0.463 down, 0 above half ). **User: ev
 BTI 666 `BTI_BUFF_BLOOD_RUNAWAY_PASSIVE` no `BUFF_ICON_TEXTURE_KEY` ( its neighbours have one ), so June shows no icon either; the buff is on ( `passive buff 1` ). Not seen: `burst fire`
 ( Big Burst 28207 hit twice, its follow-up `DAMAGE_EFFECT_Elesis_Big_Burst` that carries `DTT_BURST_FIRE` was made at 09:41:33 and hit nothing ), `blood runaway cleanse` ( no
 debuff on her ), the Dodge and Slash refund ( base id only ): carried to CH4b's play-test ( kickoff amended ). User owes nothing more for CH4a.
+
+### CH4b - Done (2026-11-14)
+**Landed.** Commit: see `git log`, "char-elesis Phase CH4b". Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` (on since CH4a; `_PASSIVE_DEBUG` stays on for the CH4c stage review).
+Files: `X2GUEL.cpp`, `X2GUEl.h`, `X2BuffFactor.h` (`JUNE_ENUM_NAMES`). Read from `charport_adis.py elesis` listings (no Ghidra function for 4 of the 6).
+- **`SetDamageExceptionProcess` 0x2b8 `32b80f20`:** the part up to @`32b81008` = March's Way of the Sword block (Vigor normal force-down x 0.6 / PvP 0.8, Destruction types
+  4-6 ignore state defence), kept; June's two parts appended under the flag. Dignity of Grand Master (`m_usDignityOfGrandMasterLevel` > 0) with BTI 326 or 565 on her, on a
+  hit whose `attackerType` != `AT_EFFECT` and `hAttackerEffect` invalid -> `m_bIgnoreStateDefence`. Blazing Heart transcendence (`m_usBlazingHeartTranscendenceLevel` > 0):
+  a non-special hit on a defender burning (`m_EnchantBlaze` / `m_Fire` time > 0, or BTI 37 / 47 / 167 / 243 / 290 / 443) rolls `GetRandomFloat( 27 )` <
+  `m_fBlazingHeartTranscendenceRate` -> `m_bIgnoreDefence`, `_OnPvp`, `m_bIgnoreStateDefence`, `m_bIgnoreDefenceDecline` (June's word store 0x101 + bytes +0x541 / +0x534);
+  then, every hit, `damage.fMagic` x min( 1.1, 1 + `EnchantStat.m_fDefBlaze` / 500 x 0.1 ) (`GetEnchantStat( true, false, false )`; June's 4th argument is null).
+  DamageData offsets proven by a probe: head +4 / +8 / +0x14 / +0x3c = June's; the ignore flags keep June's relative order (+0xc / +0xd), June's tail is 0xc4 longer.
+- **`GetActualMPConsume` 0x6a0 `32b7ebe0`** whole inside March's: base, then on the base / upgrade pairs 28200 / 28217 free under Victorious Sword, 28201 / 28218 x
+  `m_fMPConsumeRate`, 28202 / 28219 max( 0, MP - `m_iRushingSwordNowLoopValue` x MP x 0.1 - `m_iWaltzOfSwordDodgeAbility` ) (June +0x9648 = the loop count CH2b2 named, +0x9654
+  = Waltz of Sword's `SA_MP_CONSUME_REL`, which replaces March's `m_iDecreaseMPRushingSword`); Vigor x 0.6 / PvP 0.8 on the upgrade-swapped templet; x `GetSkillMpDecreaseRate`.
+  March's memo cases 5 / 16 / 8 stay in `#else`. The kickoff's "x0.7" does not exist in her class: June's Vigor rate is March's 0.6.
+- **`GetActualCoolTime` 0x6a4 `32b7ee10`** whole inside March's: Vigor x 0.2 / PvP 0.6 (= March), 28200 / 28217 x the Victorious Sword rate, 28201 / 28218 doubled while
+  `IsDamageState( false )` (vslot 0x534, CH1o; `const_cast`: June's override is not const), clamp < 0.
+- **Memo:** both overrides' 8023 + memo 608111 exemption reads June's `GetEqippedSkillMemo` stub `31fca9e0` (always false): no code, one comment each.
+  `MemoConditionElesis` (vtable `334fa4f4`): **n/a** as Ara / Chung: slot 1 `32b51980` returns the base decide `31fd4450` (always false), ctor `32b642f0` only sets the vtable;
+  `m_bApplyMemo = false` already covers it (JUNE_BUGS 332). The four `MEMO` state tables have no reader beyond that.
+- **0x428 `GetDefenceRateBySkill` `32b52260`** (new override, base declared by `JUNE_USER_PASSIVE_HOOKS`): in Infernal Blade's state (`GetNowStateSkillID()` ==
+  `RNSI_SA_SPK_INFERNAL_BLADE`) max( 0, 1 - 0.002 x `GetEnchantResist( ET_BLAZE )` ), else 1.0. The kickoff's "level term" is vslot 0x30c = `GetEnchantResist`, type 1.
+- **0x558 `32b6fb80`** = `GetHpTier`, ported in CH1h with no caller (CH1o): nothing to do.
+- **Shared Way of the Sword leftovers in her class: all = March, nothing to port.** `ResetAnimSpeed` `31ffe190` @`31ffe27e`: the Vigor factor tests unit type 1 only (Elsword),
+  as March `X2GUUser.cpp` `ResetAnimSpeed`; `UseItemSpecialAbility` case 33 @`322fd29d` = March `X2Game.cpp` (my unit, `SetWayOfSwordPoint` virtual, her class side is CH1q);
+  `CureExtraDamage` `3227d390` is generic (funcmap 7320).
+- **Names:** BTI 47 `BTI_DEBUFF_SWORD_FIRE`, 167 `BTI_DEBUFF_SWORD_ENCHANT_FIRE`, 243 `BTI_DEBUFF_IGNITION_CROW_INCINERATION_BURN`, 443 `BTI_DEBUFF_PARANOIA_FIRE` (June
+  `Enum.src.lua`) under `JUNE_ENUM_NAMES`. Numbers kept, in `_CONST_EL_CH4B_` with June's constant addresses: 0.1f, 0.002, 500.0, 0.1, 1.1, and the random offset 27 (no
+  `SPECIAL_RANDOM_OFFSET` member).
+- **Divergence:** three `june_march_divergent.tsv` rows (`CX2GUEL::GetActualMPConsume` / `GetActualCoolTime` / `SetDamageExceptionProcess`, replaced in this commit); two allow rows
+  (both bodies test game type 1 only, @`32b7ed7c` / @`32b7eedf`). Checklist rows marked `(Elesis: CH4b)`: L331 (memo condition n/a), L333, the vslot 0x428 row.
+- **Routed: the Advanced Knight Mastery guard** (CH4a asked for the caller of `32b524f0`): its only caller is `CX2GUUser::DamageReact @320476a2`, a shared condition chain
+  that sets user byte `+0x9175`, multiplies the damage by `+0x9784` and sends `DamageReactStateChange` to her states 332 / 333. New phase **CH4b2** (`kickoffs/char-elesis/CH4b2.md`),
+  before CH4c; the CH4c stage review covers it.
+- **For the CH4c review:** `junediverge.py --list` still shows CH4a's two rows (`ApplyDebuffStigmaOfFire` / `ApplyDebuffFlameSword`) as open, though their source column says
+  "ported (char-elesis CH4a)": the lister does not read that wording.
+
+**Gates.** One-file probe (`/Zs /EHsc`) `X2GUEL.cpp`: exit 0, 0 errors.
+`flagcheck JUNE_CHAR_ELESIS_PASSIVE --with ..._PASSIVE_DEBUG --worktree --files` (3): `files: 2 PASS, 0 PASS~ (blank/marker only), 0 DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR`;
+`in this flag's files: 0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without the flag token, 0 encoding change(s)`; `RESULT: PASS`
+(OTHER = `X2BuffFactor.h` under `JUNE_ENUM_NAMES`). `junediverge.py --check` (3 files): `allow-listed: 13`, `RESULT: PASS`. `enumscan.py --check X2GUEL.cpp`: `0 A/B row(s)`.
+`DEPLOY OK: X2_offline.exe is 26,573,824 B, dated 2026-11-14 10:18:21, md5 c01fa8ce1fef66fe112fb0d4c625775b, equal to X2/US_SERVICE/x2.exe (2026-11-14 10:18:14); built at main 98a35eed + 5 uncommitted code file(s).` (2 of the 5 are a peer's `X2GUUser.*`)
+`EXESTR OK: 5 of 5 found in X2_offline.exe, 26573824 B, dated 2026-11-14 10:18:21, md5 c01fa8ce1fef66fe112fb0d4c625775b` (wide: the mp, cool time, dignity, blazing heart ignore-defence and infernal blade lines).
+**Save** (backup `db_backup/els_db_20261114_100847_pre_sql.sql`): unit 29 `ElesisGM` Rushing Sword 28202 into slot 5 (B-1), Dodge and Slash 28217 into slot 7 (B-3); Drastic
+Charge 28206 and Sonic Blade 28011 out. Units 30 / 21 / 146 unchanged (Infernal Blade upgrade 28050 is on unit 21 slot 2).
+**In game:** `[JUNE_CHAR] ELESIS PASSIVE mp: skill ...`, `cool time: skill ...`, `dignity: ignore state defence`, `blazing heart transcendence: ignore defence` /
+`magic damage x`, `infernal blade defence rate` (each at most once a second).
 
 ## Phase CH6 - Whole-character walk and gap reruns
 
