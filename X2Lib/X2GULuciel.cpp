@@ -8029,7 +8029,7 @@ void CX2GULuciel::SetNowCombinationPoint( const int iCombinationPoint_ )
 	UpCombinationPoint( static_cast<int>( static_cast<double>( pLucielGageData->GetMaxCombinationPoint() ) * static_cast<double>( fRate_ ) ) );
 }
 
-// char-luciel CH1k: June 32b151b0 ( vslot 0x2b0 ); the first weapon with a model at the index for the body in play ( Ciel: the normal anim, Lu: CX2Eqip +0x5a4 ), else 0
+// char-luciel CH1k: June 32b151b0 ( vslot 0x2b0 ); the first weapon with a model at the index for the body in play ( Ciel: the normal anim, Lu: the normal model ), else 0
 /*virtual*/ int CX2GULuciel::GetWeaponIndexHavingModel( const int iModelIndex_ ) const
 {
 	const bool bMinorUnitActive = IsMinorUnitActive();
@@ -8051,7 +8051,7 @@ void CX2GULuciel::SetNowCombinationPoint( const int iCombinationPoint_ )
 		}
 		else
 		{
-			if ( NULL != pWeapon->m_pUserWeaponEquip->GetHyperModel( iModelIndex_ ) )	// June +0x5a4 = the array after the normal model's
+			if ( NULL != pWeapon->m_pUserWeaponEquip->GetNormalModel( iModelIndex_ ) )	// char-luciel CH1k2 review: June CX2Eqip +0x5a4 is the normal model ( 3295bdf0 ), June has one more anim array before it
 				return iWeaponIndex;
 		}
 	}

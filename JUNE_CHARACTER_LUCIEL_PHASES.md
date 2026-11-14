@@ -2292,6 +2292,33 @@ funcmap: `grep "(CH1k2)" june2017_re/funcmap.tsv` ( 11 rows, getters grouped ). 
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Next:** `/x2-phase char-luciel CH1k2 review` ( Opus 5.5 high; covers CH1k and CH1k2 ), then `/x2-phase char-luciel CH1l`.
 
+### CH1k2 - Review (2026-11-15)
+
+Opus 5.5 high. Covers CH1k ( `da5999ca` ) and CH1k2 ( `3880c02b` ). **Verdict: pass after one fix.** Listings: `charport_adis.py luciel --phase CH1k` / `--phase CH1k2`, `june2017_re/funcdis.py`.
+- **Fix ( CH1k's one inference was wrong ):** `GetWeaponIndexHavingModel` `32b151b0` reads Lu's model from June `CX2Eqip +0x5a4`, which is the **normal** model, not the hyper one. June's `CX2Eqip` has one
+  more array than March's before the models, so March's member order does not carry over. Read in June: `_UpdateSkin( int )` `3295bdf0` ( hyper branch `+0x1c4 && +0x1c5`: removes `+0x5a4`, adds `+0x5c4` with
+  the hyper XETs `+0x814 / +0x81c`; normal branch the reverse; `+0x320` = attachment 1 / 2 ), `InitSkin` `32963eb0` ( models open into `+0x5a4`; the hyper loop stores the model at `+0x5c4` and its skin anim at
+  `+0x564` ), attach-anim init `3295dfa0` ( normal skin anim at `+0x544` built on the `+0x5a4` model; a June-only anim at `+0x584` ). June layout: `+0x544` normal anim, `+0x564` hyper anim, `+0x584` June-only
+  anim, `+0x5a4` normal model, `+0x5c4` hyper model. Lu's test now calls `GetNormalModel`; Ciel's `+0x544` = `GetNormalAnim` was right. Same flag ( `_CORE` ), comment tagged `CH1k2 review`.
+- **Confirmed = June:** `ReInit` `32b373e0`: base, the three summons ( 1906 / 1937 / 1908 ) then 2269 last, `IsMyUnit` ( vslot 0x198 ) sync of the Combination Point into `iClassSyncInt` ( Future `+0x7ec0` ),
+  team 0 / 1 only, the PvP room ( `g_pData +0x6c` ) then `+0xd8 == 8`, other form = `+0x8e90 == 1 ? 0 : 1` ( `m_bMinorUnitActive` ), **kill lead `+0x4a4` / `+0x4a8` = `m_RedTeamKill` / `m_BlueTeamKill`**
+  ( March `X2Game.h:2010-2011` order; Red = team 0 takes `+0x4a4 - +0x4a8` ), lead > 1 / == 1 / amusement branches with their constants ( 0.5, 3.0 ) and gauge null tests exactly where June has them ( JUNE_BUGS 708 ),
+  `+0x8f70` delete stand-in. `IsInvasionOfDarkEnergyActive` `32b4b580`: `test ah, 0x41` / `jp` returns true on C0 or C3 alone = `0 <= time`, NaN false; the code's `0.f <=` matches.
+  `GetWaitStateID`: riding ( vslot 0x200 ) -> `LSI_RIDING_WAIT` ( 0x4c ), else `GetStateIDByForm( m_CommonState.m_Wait )` ( `+0x4088` ); the only getter that calls it. The other 20 getters: every `and` / `add`
+  constant decoded by script to its `LSI_*` member and compared with the code: 80 of 80 equal; the damage ten answer the transformed WAIT, the Die pair a bare `mov eax, 7 / 8` ( Lu ) while transformed.
+  Both `StateChange` overloads = `GetStateIDByForm` then June's base. `32b4cfb0` = `vector<12-byte>::erase`, `32b4dd50` = `SetHyperModeCountByBuff` on `+0x6844`: no class code owed.
+- **The `+` declarations:** the eleven getters `GetWaitStateID` .. `GetDieBackStateID` are `virtual` in `X2GULuciel.h` only; March has `GetWaitStateID` / `GetWalkStateID` / `GetDash*` non-virtual
+  ( `X2GUUser.h:1742-1768` ) and the other seven not at all. CH1o's kickoff carries the bases. The damage ten override DU2's virtual bases.
+- **Hygiene** ( `finish.py --review --commits da5999ca 3880c02b --skip-flag JUNE_DIVERGE_GAGE_TALLY / JUNE_CHAR_FORM_MP_GAGE` ( the `#error` guard's targets ) `-v` ): `JUNE_CHAR_UNIT_MP_VIRTUAL` `1 PASS, 1 DEFINE,
+  5 OTHER, 0 FAIL` / PASS; `JUNE_CHAR_LUCIEL_CORE` `5 PASS, 4 OTHER, 0 FAIL, 1 ERROR` and `JUNE_ENUM_NAMES` `1 PASS, 2 PASS~, 6 OTHER, 0 FAIL, 1 ERROR`: each ERROR is `Always.h`'s existing `#if` guard
+  ( line 13430 / 10175 ) the tool cannot evaluate once `Always.h` joins the set, resolved by hand as CH1k ( the commit's `Always.h` hunk is the 13-line `UNIT_MP_VIRTUAL` block ). Every OTHER is a file of one of the
+  other two flags ( `X2BuffFactor.h`, `X2DamageManager.h`, `X2PVPRoom.h` = `ENUM_NAMES`; `X2GameUnit.h` = `UNIT_MP_VIRTUAL`; the class files = `_CORE` ). The one deleted line is CH1k2's header comment `body in CH1k2`.
+  `junediverge` PASS, `--check-all` PASS. `enumscan` exit 1: the 212 class A rows are the `BFI_` / `BTI_` definition lines of `X2BuffFactor.h`'s enum ( as CH1k ), no literal in code.
+  The fix: `finish.py --files X2Lib/X2GULuciel.cpp`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `1 PASS, 0 OTHER, 0 FAIL, 0 ERROR` ( 2 deleted lines = the two replaced lines ), `junediverge` PASS, `enumscan` exit 0.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp` plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each. Full build skipped: no play-test. No debug define to retire.
+- **Routed:** June `320708b0` ( a bounds-checked `+0x5a4 + 4 * i`, i < 8, CH0 named it a `CX2GUUser` getter ) is June's `CX2Eqip::GetNormalModel` by this layout: CH1l's kickoff amended ( its `32b18220` caller ).
+- **Next:** `/x2-phase char-luciel CH1l` ( Sonnet 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

@@ -69,3 +69,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by CH1a4 (2026-11-14)
 
 - `32b13b60` ( GetSkinAnimByForm ) reads the transformed anims `+0x8f84` / `+0x8f9c`: `m_aTransformedSkin[0 / 1].m_pXSkinAnim` ( CH1a4 ).
+
+## Amended by CH1k2 review (2026-11-15)
+
+- June's `CX2Eqip` layout is not March's member order: `+0x544` normal anim, `+0x564` hyper anim, `+0x584` June-only anim, `+0x5a4` normal model, `+0x5c4` hyper model ( read from `3295bdf0`, `32963eb0`, `3295dfa0` ).
+  `320708b0` ( `+0x5a4 + 4 * i`, i < 8, 0 past the end ), which `32b18220` calls, is `CX2Eqip::GetNormalModel` on the equip, not a `CX2GUUser` member.
