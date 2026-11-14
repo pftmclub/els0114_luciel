@@ -75,3 +75,10 @@ and commit.
   (strings `33473188` "MAJOR:" / `33473178` "MINOR:"; the D-phase `"MAJOR_"` was the error DU1d2 fixed), `RotateBone`'s second call
   (`@31fd954e`, JUNE_BUGS 668), the `UT_LUCIEL` finger loops (`@31fde94f` / `@31fdeffa`: start 0, end 4, unit `+0xe40 != 1`) and that the
   census rows DU1d3 re-attributed name the right function.
+
+## Amended by DU1d3 (2026-11-14)
+
+- DU1d3 split again: the review also covers **DU1d3b** (add `"DU1d3b - Done"` to the docsection line). Check DU1d3's second after-image against
+  June (`32275a30` / `322720f0` mode pick, InitComponent `@31feec8a`, TimedEvent `@31ff2882`, CommonStateStart `@3205b699`, NotifyShowObjectChanged
+  `@31ff1dac` / `@31ff1db7` = JUNE_BUGS 669), that `IsMinorUnitActive` is virtual in `CX2GameUnit` (base false = June `31e4c550`), and that
+  every March caller of `EnableAfterImage` / `DisableAfterImage` keeps mode 3 (June's NPC callers pass 3 too).

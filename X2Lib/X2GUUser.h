@@ -3651,7 +3651,17 @@ public:
 #endif //FIX_FORCE_DOWN_AND_DETONATION_BUG
 
 #ifdef MODIFY_AFTER_IMAGE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		virtual void UpdateAfterImageEquip( const AFTER_IMAGE_BODY eBody_ = AIB_FIRST_UNIT )	// char-luciel DU1d3: June 3208e530 ( vslot 0x6b0; 0 first, 1 second, else none )
+		{
+			if( AIB_FIRST_UNIT == eBody_ && NULL != m_pAfterImage )
+				m_pAfterImage->UpdateEquipView( m_pXSkinAnim.get() );
+			else if( AIB_MINOR_UNIT == eBody_ && NULL != m_pMinorUnitAfterImage )
+				m_pMinorUnitAfterImage->UpdateEquipView( m_pMinorUnitXSkinAnim.get() );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		void UpdateAfterImageEquip() { if( NULL != m_pAfterImage ) m_pAfterImage->UpdateEquipView( m_pXSkinAnim.get() ); }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif // MODIFY_AFTER_IMAGE
 
 #ifdef SERV_ARA_CHANGE_CLASS_SECOND // ±èÅÂÈ¯
@@ -3785,7 +3795,17 @@ public:
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
 		virtual void AfterEquipSlotChange() {}	/// June user vslot 0x654 ( base 31f3f070, empty )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		virtual void AfterImageFrameMove()	// char-luciel DU1d3: June 31fd8230 @31fd8320, the second after-image too ( class 13's toggle: checklist 7al )
+		{
+			if( m_pAfterImage != NULL )
+				m_pAfterImage->OnFrameMove( m_fTime, m_fElapsedTime );
+			if( m_pMinorUnitAfterImage != NULL )
+				m_pMinorUnitAfterImage->OnFrameMove( m_fTime, m_fElapsedTime );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		virtual void AfterImageFrameMove() { if( m_pAfterImage != NULL ) m_pAfterImage->OnFrameMove( m_fTime, m_fElapsedTime ); }	/// June user vslot 0x850 ( base 31fd8230 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		virtual void SummonedNPCInfo( CX2GUNPC* pNPC_ ) {}	/// June user vslot 0x860 ( base 3208ddc0, empty )
 		virtual void ReservedSkillStart( const CX2SkillTree::SkillTemplet* pSkillTemplet_ ) {}	/// June 32057b80 @32057c4c-cb2 ( vslots 0x800 / 0x764 )
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
@@ -4994,6 +5014,7 @@ public:
 		std::vector<TIME_SPEED>							m_vecMinorUnitSpeedFactor;		/// char-luciel DU1b4: June +0x8604, the minor unit's SPEED_TIME list
 		bool											m_bUseNotSelectUnitAnimTimeInSpeed;	/// char-luciel DU1b4: June +0x8f6d, USE_NOT_SELECT_UNIT_ANIM_TIME_IN_SPEED
 		D3DXCOLOR										m_coSuperArmorCustomColor;		/// char-luciel DU1b4: June +0x8a2c, SUPER_ARMOR_CUSTOM_COLOR
+		D3DXVECTOR2										m_v2NowMinorUnitAfterImageTime;	/// char-luciel DU1d3: June +0x852c, MINOR_UNIT_AFTER_IMAGE
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		
 

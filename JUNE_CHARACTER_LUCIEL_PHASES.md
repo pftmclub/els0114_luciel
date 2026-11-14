@@ -1068,6 +1068,42 @@ No `_DEBUG`, no log line (nothing reads a second body before CH1). funcmap rows:
   builds and hands off the regression pass).
 - **In game:** nothing to see for March classes except the revive voice (Rena's file name). Form 0 and no second anim leave every other path as before.
 
+### DU1d3 - Done (2026-11-14)
+
+Opus 5.5 high. Part 10 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new define, Always.h untouched). Files: `X2GameUnit.h` (+17),
+`X2GameUnit.cpp` (+66), `X2GUUser.h` (+21), `X2GUUser.cpp` (+104 / -1, the DU1b stand-in line in `SetActiveBody`). No `_DEBUG`, no log line.
+funcmap rows: `grep "(DU1d3)" june2017_re/funcmap.tsv` (10).
+- **Census re-check (kickoff ask).** Each site's real start = a `ret` / `int3` followed by a call target or pointer. Wrong rows corrected in
+  `du1d_body_reads.tsv` (owner column): `31fcb1b0` is the `GetWeaponEnchantData` thunk, the reads are `31fcb1c0` `ChangeModelDetail`; `31fee682` is
+  inside `InitComponent` `31fee090` and its three sites are the second after-image, not the marker particles; `31fdb800` / `31fdf5d0` (PlayEmotion
+  helpers) split off `31fdb4e0` / `31fdf4c0`; `OnFrameMove` `3206eaf0` off slot 484; `CommonFrameMove_TimedEvent` `31ff27c0` off `31ff1ff0`;
+  `3201f8d0` / `3204e4a0` (known). `31fceeb0` and `3204e110` are dead (no call, jump or pointer). `322726f0`'s `+0x8e80` is the NPC defender's byte.
+- **Second after-image (ported).** `CX2GameUnit::m_pMinorUnitAfterImage` (+0x6758, ctor / dtor), `EnableAfterImage( body )` / `DisableAfterImage(
+  bForce, body )` = June `32275a30` / `322720f0` through `GetAfterImageByBody` (`AFTER_IMAGE_BODY` 0 / 1 / 3, no June Enum entry, default 3 = what
+  every March caller passes in June), virtual `IsMinorUnitActive` (unit vslot 152, base false; the user's DU1 getter now overrides it). User side:
+  created in `InitComponent` on the second anim (10 / 5 images, no hair mesh), `UpdateAfterImageEquip( body )` (vslot 0x6b0, virtual: Lu/Ciel
+  overrides), `AfterImageFrameMove` ticks both, ReInit colour, `NotifyShowObjectChanged` (JUNE_BUGS 669: hide leaves Lu's on while Ciel is active),
+  `SetActiveBody` tests the active body's after-image, `MINOR_UNIT_AFTER_IMAGE` (`m_v2NowMinorUnitAfterImageTime`, +0x852c) read in
+  `CommonStateStart` and run in `CommonFrameMove_TimedEvent` on the second anim's clock; the first body's timed pair now names body 0.
+- **Readers (ported):** `ChangeModelDetail` (second anims), `CommonFrameMove_InsertBuffFactor` (active clock), `ApplyRotateBoneMap` (active body;
+  it exists since Char Chung CH1j0), `UpdateEquipCollisionData` (skip unless duo or the equip's body is the active one; the equip byte is DU3's
+  stand-in 0), `ProcessEnchantedWeaponEffectAtHand` (`UT_LUCIEL`: Ciel `Dummy1_Rhand` on the second anim, Lu `Bone_RFinger2`, rates 15 / 30 /
+  60 / 25 read from June's floats), `Init` (`SetActiveBody`: a battle field keeps the unit's form, any other game resets to Lu).
+- **Routed:** DU3 = `3201f8d0` (equip pass), `3204e4a0` (June hide-equip-by-body pass `+0x8fa4`-`+0x8fb4`), `InitEqip` @`32024a35` (3286a350 vs
+  the active body); all three read the equip's `+0x15d4`. Not ported here (not this flag's subject): `+0x7c80` and `+0x1d1` after-image flags
+  (class 13's toggle, checklist 7al), the `CommonFrameMove` `+0x941c` hide block (@32065c06, June-only, already passes mode 3). The Elsword /
+  Rena / Aisha `AfterImageFrameMove` overrides also tick +0x6758, always NULL for those classes: their stand-in comments stay.
+- **Split again (kickoff's own rule).** **DU1d3b** (kickoff written) = PlayEmotion + helpers, EmotionFrameMove, `31fe0bb0`, slot 484 /
+  OnFrameMove / `320200b0`, `31ff1ff0` and the rest of TimedEvent, `31ff3ce0`, `31fe2fb0`, `31fe4210`, and the lead below. DU1d4 now depends on it.
+- **Lead for DU1d3b:** June's `Init` state switch (game type 1 / 5 -> state 9, 3 -> 13, others no state change there) not compared beyond the body.
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files` (4 files, the peer's uncommitted `JUNE_CHAR_ELESIS_PASSIVE` hunks not staged):
+  4 PASS, 0 OTHER, 0 FAIL, 1 deleted (above), 0 non-ASCII, RESULT: PASS. `junediverge --check` (4 files): RESULT: PASS. `enumscan --check`: the
+  known DU1b3 rows and two older header rows only. JUNE_BUGS 669 added.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GameUnit.cpp`, `X2GUNPC.cpp`, `X2StateMenu.cpp`, `X2GURaven.cpp`,
+  `X2GUChung.cpp`, `X2GUElsword_SwordMan.cpp`, `X2GULire_ElvenRanger.cpp`, `X2GUArme_VioletMage.cpp`: 0 errors each. Full build skipped: no play-test
+  (DU1d4 builds and hands off the regression pass).
+- **In game:** nothing to see. March classes have no second anim, so no second after-image; body 3 picks the first after-image as before.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

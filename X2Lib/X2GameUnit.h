@@ -3612,8 +3612,22 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		/// BuffIdentity에 의해 구분되는 효과 중 AfterImage 관련 함수
 		void CreateAndInsertAfterImageByBuff( const KBuffIdentity& BuffIdentity_, const D3DXCOLOR& d3dxColor_ );
 		void EraseAfterImageByBuff( const KBuffIdentity& BuffIdentity_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		enum AFTER_IMAGE_BODY	// char-luciel DU1d3: June 32275a30 / 322720f0 mode ( no June Enum entry )
+		{
+			AIB_FIRST_UNIT	= 0,
+			AIB_MINOR_UNIT	= 1,
+			AIB_ACTIVE_UNIT	= 3,
+		};
+		void EnableAfterImage( const AFTER_IMAGE_BODY eBody_ = AIB_ACTIVE_UNIT );
+		void DisableAfterImage( const bool bForce_ = false, const AFTER_IMAGE_BODY eBody_ = AIB_ACTIVE_UNIT );
+		CKTDGXSkinAfterImage* GetAfterImageByBody( const AFTER_IMAGE_BODY eBody_ ) const;
+		CKTDGXSkinAfterImage* GetMinorUnitAfterImage() const { return m_pMinorUnitAfterImage; }
+		virtual bool IsMinorUnitActive() const { return false; }	// char-luciel DU1d3: June unit vslot 152 ( base 31e4c550 )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		void EnableAfterImage();
 		void DisableAfterImage( const bool bForce_ = false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		virtual bool IsSuperArmor() const = NULL;
 		bool ShouldAttackAllTeam() const { return !m_vecAttackAllTeamPtr.empty(); }
@@ -5481,6 +5495,9 @@ protected:
 		float																		m_fLimitMaxGSpeed;			/// June +0x40f8 ( protected ): the state's SET_LIMIT_MAX_G_SPEED, 1.0 = no limit
 #endif SERV_IRUHADEV_JUNE_LIMIT_MAX_G_SPEED
 		CKTDGXSkinAfterImage*						m_pAfterImage;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		CKTDGXSkinAfterImage*						m_pMinorUnitAfterImage;	// char-luciel DU1d3: June +0x6758, the second body's after-image
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
 		D3DXCOLOR									m_coAfterImageColorByState;	/// June +0x6880: the user state's AFTER_IMAGE_COLOR; EnableAfterImage uses it while no buff after-image is on
 #endif SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY

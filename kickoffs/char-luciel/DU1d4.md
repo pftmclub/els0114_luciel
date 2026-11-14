@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel DU1d4` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | DU1d3 |
+| Depends on | DU1d3b |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) |
 | Review | none of its own: `kickoffs/char-luciel/DU1-review.md` covers DU1-DU1d4 |
@@ -12,7 +12,7 @@
 ## Read first (and nothing else from the plan doc unless you need it)
 
 ```sh
-python tools/docsection.py JUNE_CHARACTER_LUCIEL_PHASES.md "Rules" "DU1b2 - Done" "DU1d - Done" "DU1d2 - Done" "DU1d3 - Done"
+python tools/docsection.py JUNE_CHARACTER_LUCIEL_PHASES.md "Rules" "DU1b2 - Done" "DU1d - Done" "DU1d2 - Done" "DU1d3 - Done" "DU1d3b - Done"
 python tools/docsection.py kickoffs/char-luciel/DU1d.md "Amended by DU1b4 (2026-11-14)" "Amended by DU1c (2026-11-14)" "Amended by DU1c2 (2026-11-14)"
 ```
 Then `june2017_re/char_luciel/du1d_body_reads.tsv`: every row with `owner` = `DU1d4` (26 June functions whose sites are only out-of-line

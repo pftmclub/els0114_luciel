@@ -942,6 +942,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 //}} kimhc // 2011.1.21 // 청 1차 전직
     m_v2NowAfterImageTime = D3DXVECTOR2( -1.f, -1.f );
 	m_bDeleteEffectSetOnStateEnd = false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	m_v2NowMinorUnitAfterImageTime = D3DXVECTOR2( -1.f, -1.f );	// char-luciel DU1d3: June ctor @320422f0
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	m_bDeleteEffectSetOnDamageReact = false;
 	m_bDeleteEffectSetOnDie = false;
 #ifdef DELETE_EFFECTSET_ON_CUSTOM_STATE
@@ -1903,6 +1906,9 @@ void CX2GUUser::Init( bool bUseTeamPos, int startPosIndex )
 	// FieldFix: 임시로 이렇게 처리...
 	if ( NULL != g_pX2Game )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		SetActiveBody( CX2Game::GT_BATTLE_FIELD == g_pX2Game->GetGameType() && true == m_pUnit->IsMinorUnitForm() );	// char-luciel DU1d3: June Init 3204ea20 @3204ed8f-3204edde, a battle field keeps the unit's form
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		switch ( g_pX2Game->GetGameType() )
 		{
 		case CX2Game::GT_BATTLE_FIELD:
@@ -2107,6 +2113,9 @@ void CX2GUUser::ReInit( bool bUseTeamPos, int startPosIndex )
     m_fNowSlashTraceTipWide = 4.0f;
     m_mapNowAddSlashTrace.clear();
     m_v2NowAfterImageTime = D3DXVECTOR2( -1.f, -1.f );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+    m_v2NowMinorUnitAfterImageTime = D3DXVECTOR2( -1.f, -1.f );	// char-luciel DU1d3: June ReInit @3202281d
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 
 
@@ -2340,6 +2349,10 @@ void CX2GUUser::ReInit( bool bUseTeamPos, int startPosIndex )
 		{
 			m_pAfterImage->SetAfterImageColor( 0xffcccccc );
 		}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		if ( m_pMinorUnitAfterImage != NULL )
+			m_pMinorUnitAfterImage->SetAfterImageColor( 0xffcccccc );	// char-luciel DU1d3: June ReInit @32023c90
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 		//{{ kimhc // 2010.6.16 // 같은 기능을 하는 함수가 존재하여 함수를 사용함
 #ifdef	ENCHANT_BUG_TEST
@@ -4574,6 +4587,22 @@ void CX2GUUser::InitComponent()
 			}
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		if ( m_pMinorUnitAfterImage == NULL && NULL != m_pMinorUnitXSkinAnim )	// char-luciel DU1d3: June 31fee090 @31feec8a, no hair mesh
+		{
+			const int iAfterImageNum = ( g_pX2Room->GetMySlot()->GetUnit()->GetUID() == m_UnitUID ) ? 10 : 5;
+			m_pMinorUnitAfterImage = CKTDGXSkinAfterImage::CreateSkinAfterImage( m_pMinorUnitXSkinAnim.get(), iAfterImageNum, XL_EFFECT_0 );
+			if ( m_pMinorUnitAfterImage != NULL )
+			{
+				m_pMinorUnitAfterImage->SetAfterImageColor( 0xffcccccc );
+				m_pMinorUnitAfterImage->AddMesh( m_pMinorUnitMotion );
+#ifdef MODIFY_AFTER_IMAGE
+				UpdateAfterImageEquip( AIB_MINOR_UNIT );
+#endif // MODIFY_AFTER_IMAGE
+			}
+		}
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifndef X2TOOL
 		if( m_hSeqHeadMarker == INVALID_PARTICLE_SEQUENCE_HANDLE )
 		{
@@ -6014,7 +6043,13 @@ void CX2GUUser::UpdateEquipCollisionData( IN vector<CX2EqipPtr>& m_vecEquipList 
 		if( pEqip == NULL )
 			continue;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		const bool bEquipForMinorUnit = false;	// char-luciel DU1d3: June @31fd8cff; stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+		if( false == m_bDuoEnabled && bEquipForMinorUnit != IsMinorUnitActive() )
+			continue;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		// stand-in: Lu/Ciel not ported ( June skips an equip whose body +0x15d4 is not the selected body vslot 0x260, unless +0x8e91 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( pEqip->GetEqipType() != CX2Item::UT_ATTACH_ANIM )
 			continue;
 
@@ -16273,6 +16308,10 @@ void CX2GUUser::NotifyShowObjectChanged()
 
 	if( false == bShow )
 		DisableAfterImage( true );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( false == bShow )
+		DisableAfterImage( true, AIB_MINOR_UNIT );	// char-luciel DU1d3: June 31ff1950 @31ff1db7 ( the first call is the active body's, JUNE_BUGS 669 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	BOOST_TEST_FOREACH( CX2EqipPtr, pEqip, m_ViewEqipList )
 	{
@@ -17910,6 +17949,20 @@ void CX2GUUser::CommonStateStart()
 		v2AfterImage.y	= -1.0f;
 		DisableAfterImage();
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( m_LuaManager.BeginTable( "MINOR_UNIT_AFTER_IMAGE" ) == true )	// char-luciel DU1d3: June 32057b80 @3205b699
+	{
+		LUA_GET_VALUE( m_LuaManager, 1,	m_v2NowMinorUnitAfterImageTime.x,	-1.0f );
+		LUA_GET_VALUE( m_LuaManager, 2,	m_v2NowMinorUnitAfterImageTime.y,	-1.0f );
+		m_LuaManager.EndTable();
+	}
+	else
+	{
+		m_v2NowMinorUnitAfterImageTime.x	= -1.0f;
+		m_v2NowMinorUnitAfterImageTime.y	= -1.0f;
+		DisableAfterImage( false, AIB_MINOR_UNIT );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
 	/// June CommonStateStart 32057b80 @3205b70d: the state's AFTER_IMAGE_COLOR (key from the
 	/// function's own XOR bytes at 3379d708), 0.8 gray (3343b240, fld1) when missing; EnableAfterImage
@@ -22863,10 +22916,26 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 	    {
 		    if( v2AfterImage.x <= m_pXSkinAnim->GetNowAnimationTime()
 			    && v2AfterImage.y > m_pXSkinAnim->GetNowAnimationTime() )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			    EnableAfterImage( AIB_FIRST_UNIT );	// char-luciel DU1d3: June 31ff27c0 @31ff285e, the first body by name
+		    else
+			    DisableAfterImage( false, AIB_FIRST_UNIT );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			    EnableAfterImage();
 		    else
 			    DisableAfterImage();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	    }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	    if( m_v2NowMinorUnitAfterImageTime.x != -1.0f && m_v2NowMinorUnitAfterImageTime.y != -1.0f )	// char-luciel DU1d3: June @31ff2882, the second anim's clock
+	    {
+		    if( m_v2NowMinorUnitAfterImageTime.x <= m_pMinorUnitXSkinAnim->GetNowAnimationTime()
+			    && m_v2NowMinorUnitAfterImageTime.y > m_pMinorUnitXSkinAnim->GetNowAnimationTime() )
+			    EnableAfterImage( AIB_MINOR_UNIT );
+		    else
+			    DisableAfterImage( false, AIB_MINOR_UNIT );
+	    }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     }
 
 	//공격 체크
@@ -23973,7 +24042,11 @@ void CX2GUUser::ApplyRotateBoneMap()
 		if( false == rotateBoneData.m_bEnable || true == rotateBoneData.m_wstrBoneName.empty() )
 			continue;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = GetXSkinAnimPtr()->GetCloneFrame( rotateBoneData.m_wstrBoneName.c_str() );	// char-luciel DU1d3: June 31fdb4e0 @31fdb593, the active body
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = m_pXSkinAnim->GetCloneFrame( rotateBoneData.m_wstrBoneName.c_str() );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if( NULL == pFrame )
 			continue;
 
@@ -24830,7 +24903,7 @@ void CX2GUUser::SetActiveBody( const bool bMinorUnit_ )
 	if( bMinorUnit_ == m_bMinorUnitActive )
 		return;
 
-	CKTDGXSkinAfterImage* pAfterImage = GetAfterImage();	// stand-in: June tests the active body's after-image ( +0x6754 / +0x6758 ); the second one is DU1d's ( 31fee682 )
+	CKTDGXSkinAfterImage* pAfterImage = GetAfterImageByBody( AIB_ACTIVE_UNIT );	// char-luciel DU1d3: June @3204e049, the active body's after-image
 	const bool bAfterImageEnabled = ( NULL != pAfterImage && true == pAfterImage->GetEnable() );
 	if( true == bAfterImageEnabled )
 		DisableAfterImage( true );
@@ -32155,6 +32228,14 @@ void CX2GUUser::ChangeModelDetail( int detailPercent )
 		m_pXSkinAnimFuture->SetModelDetailPercent( detailPercent );	
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if ( m_pMinorUnitXSkinAnim != NULL )	// char-luciel DU1d3: June 31fcb1c0 @31fcb1e8, the second body's anims
+		m_pMinorUnitXSkinAnim->SetModelDetailPercent( detailPercent );
+
+	if ( m_pMinorUnitXSkinAnimFuture != NULL )
+		m_pMinorUnitXSkinAnimFuture->SetModelDetailPercent( detailPercent );
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if ( m_pOrgXSkinAnim != NULL )
 	{
 		m_pOrgXSkinAnim->SetModelDetailPercent( detailPercent );
@@ -33114,6 +33195,19 @@ void CX2GUUser::ProcessEnchantedWeaponEffectAtHand( CX2Unit::UNIT_TYPE unitType 
 			aEmitRate[3] = 25.f;
 		} break;
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	case CX2Unit::UT_LUCIEL:	// char-luciel DU1d3: June 31ff8510 @31ff864e, Ciel's hand on the second anim, Lu's finger on the first
+		{
+			if( true == m_bMinorUnitActive )
+				vHandPos = m_pMinorUnitXSkinAnim->GetCloneFramePosition( L"Dummy1_Rhand" );
+			else
+				vHandPos = m_pXSkinAnim->GetCloneFramePosition( L"Bone_RFinger2" );
+			aEmitRate[0] = 15.f;
+			aEmitRate[1] = 30.f;
+			aEmitRate[2] = 60.f;
+			aEmitRate[3] = 25.f;
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 
 
@@ -50813,13 +50907,22 @@ using namespace _CONST_GUUSER_EL_CH1_;
 */
 void CX2GUUser::CommonFrameMove_InsertBuffFactor()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( NULL == GetXSkinAnimPtr() )	// char-luciel DU1d3: June 31fdf4c0 @31fdf4ca, the active body's clock
+		return;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( NULL == m_pXSkinAnim )
 		return;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	UINT uiIndex = 0;
 	while ( uiIndex < m_vecStateInsertBuffFactor.size() )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		if ( GetXSkinAnimPtr()->GetNowAnimationTime() >= m_vecStateInsertBuffFactor[uiIndex].second )	// char-luciel DU1d3: June @31fdf50d
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		if ( m_pXSkinAnim->GetNowAnimationTime() >= m_vecStateInsertBuffFactor[uiIndex].second )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		{
 			const UINT uiBuffFactorID = m_vecStateInsertBuffFactor[uiIndex].first;
 			SetBuffFactorToGameUnitByBuffFactorID( uiBuffFactorID, max( m_uiNowStateSkillLevel, 1 ), NULL, 0, false );

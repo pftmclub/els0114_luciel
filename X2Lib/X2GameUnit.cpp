@@ -187,6 +187,9 @@ m_fNoSkillTime( 0 )
 , m_ucNumOfBuff( 0 )
 , m_eUnitSlashTraceConditionToDo( CX2UnitSlashTraceManager::STC_NONE )
 , m_pAfterImage( NULL )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+, m_pMinorUnitAfterImage( NULL )	// char-luciel DU1d3: June ctor @322a4d18
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
 , m_coAfterImageColorByState( 0.8f, 0.8f, 0.8f, 1.0f )	/// June ctor @322a5e05: 0.8 (3343b240) x3, fld1
 #endif SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
@@ -752,6 +755,9 @@ CX2GameUnit::~CX2GameUnit(void)
 	SAFE_DELETE( m_pGageData );
 	SAFE_DELETE( m_pGageUI );
 	SAFE_DELETE_KTDGOBJECT( m_pAfterImage );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	SAFE_DELETE_KTDGOBJECT( m_pMinorUnitAfterImage );	// char-luciel DU1d3: June dtor @322a0b47
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef DAMAGE_EFFECT_GROUP_DAMAGE		/// 데미지 그룹 데이터 해제
 	m_vecDamageEffectGroupDataPtr.resize(0);
@@ -19324,6 +19330,65 @@ void CX2GameUnit::EraseAfterImageByBuff( const KBuffIdentity& BuffIdentity_ )
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d3: June's mode pick in 32275a30 / 322720f0 ( 1 = second, 3 = unit vslot 152 the active body, else the first )
+CKTDGXSkinAfterImage* CX2GameUnit::GetAfterImageByBody( const AFTER_IMAGE_BODY eBody_ ) const
+{
+	if ( AIB_FIRST_UNIT != eBody_ && ( AIB_MINOR_UNIT == eBody_ || true == IsMinorUnitActive() ) )
+		return m_pMinorUnitAfterImage;
+
+	return m_pAfterImage;
+}
+
+// char-luciel DU1d3: June 32275a30
+void CX2GameUnit::EnableAfterImage( const AFTER_IMAGE_BODY eBody_ /*= AIB_ACTIVE_UNIT*/ )
+{
+	CKTDGXSkinAfterImage* pAfterImage = GetAfterImageByBody( eBody_ );
+	if ( NULL != pAfterImage )
+	{
+#ifdef X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
+		if( g_pMain->GetGameOption().GetOptionList().m_eEffect == CX2GameOption::OL_HIGH &&
+			false == GetAbsoluteInvisibility() )
+#else//X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
+		if( g_pMain->GetGameOption().GetOptionList().m_bEffect &&
+			false == GetAbsoluteInvisibility() )
+#endif//X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
+		{
+			pAfterImage->Enable();
+			if ( !m_vecAfterImageByBuff.empty() )
+				pAfterImage->SetAfterImageColor( m_vecAfterImageByBuff.back()->GetColor() );
+#ifdef SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
+			else
+				pAfterImage->SetAfterImageColor( m_coAfterImageColorByState );
+#endif SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
+		}
+	}
+}
+
+// char-luciel DU1d3: June 322720f0
+void CX2GameUnit::DisableAfterImage( const bool bForce_ /*= false*/, const AFTER_IMAGE_BODY eBody_ /*= AIB_ACTIVE_UNIT*/ )
+{
+	CKTDGXSkinAfterImage* pAfterImage = GetAfterImageByBody( eBody_ );
+	if ( NULL != pAfterImage )
+	{
+		if ( bForce_ ||
+			m_vecAfterImageByBuff.empty() ||
+#ifdef X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
+			g_pMain->GetGameOption().GetOptionList().m_eEffect == CX2GameOption::OL_LOW )
+#else//X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
+			false == g_pMain->GetGameOption().GetOptionList().m_bEffect )
+#endif//X2OPTIMIZE_USER_DAMAGEEFFECT_SHOW_BY_GAMEOPTION
+		{
+#ifdef SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
+			pAfterImage->Disable();
+#else SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
+			pAfterImage->SetAfterImageColor( 0xffcccccc );
+			pAfterImage->Disable();
+#endif SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
+		}
+	}
+}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 void CX2GameUnit::EnableAfterImage()
 {
 	if ( NULL != m_pAfterImage )
@@ -19374,6 +19439,7 @@ void CX2GameUnit::DisableAfterImage( const bool bForce_ /*= false*/ )
 		}
 	}
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 
