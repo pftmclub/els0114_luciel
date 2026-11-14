@@ -2915,6 +2915,7 @@ class CX2UnitManager
 			NUI_SI_HA_APOCALYPSE                    = 1604,
 			NUI_SI_SA_LLD_SUMMON_DARKNESS           = 1906,
 			NUI_SI_SA_LCN_SHADOW_BOLT               = 1908,
+			NUI_SA_LDN_GARDEN_OF_HAURES             = 2269,	// char-luciel CH1a: the Lu/Ciel dtor ( 32b39380 @32b394c7 ) and ReInit look it up
 			NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP       = 1937,
 			NUI_RENA_TARGETING_GUNGNIR              = 2083,
 			NUI_SI_SA_RG_RX78_LAND_RUNNER           = 2175,

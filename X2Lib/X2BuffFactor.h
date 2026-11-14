@@ -668,6 +668,13 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_GALE_WAY_OF_SWORD_DARK_KNIGHT         = 435,	// June's Enum.lua; Elesis's End_SwordmanVigor erases it
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-luciel CH1a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_SUMMON_DARKNESS                       = 474,	// June's Enum.lua; the Lu/Ciel dtor erases it
+	BTI_BUFF_SHADOW_BOLT                           = 481,	// June's Enum.lua; the Lu/Ciel dtor erases it
+	BTI_BUFF_TWILIGHT_JUDGEMENT                    = 482,	// June's Enum.lua; Lu/Ciel's Twilight Judgement reattack needs it
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID

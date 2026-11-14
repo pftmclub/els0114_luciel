@@ -220,7 +220,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32aea7c0	dead	-	-	-	n/a	no call, jmp or pointer reference anywhere in the exe ( also none through a thunk ); first bytes 568bf1e838fd4dff	y	-
 32aea800	not-luciel	-	-	-	n/a	called only from shared code 32b0f910	y	1 call/jmp: 32b0f91c
 32aea8c0	override 0x6a8	0x6a8	ShownSkillCoolTime	X2GUUser.h:3436 virtual float ShownSkillCoolTime( const float fCoolTime_, const int iSkillID_ ) { return fCoolTime_; }	CH1l2	base 3208e190	n	ptr: 334f0da4
-32aeaa10	helper	-	?	-	CH1a	called by 32b0f940 32b3acf0; 31 insns; hint: 625 insns; skills 30007 RUINOUS_IMPACT, 30009 DARK_CRESCENT, 30301 / 30302 AURA_PUNISHMENT_ACCEL, 30303 PHANTOM_CIRCLE; HaveThisBuff 0x1e2; callers vslot 0x648 override area 32b0f9d5 / 32b3b4df	y	2 call/jmp: 32b0f9d5 32b3b4df
+32aeaa10	helper	-	StateChangeBySkillID	-	CH1a	called by 32b0f940 32b3acf0; 31 insns; hint: 625 insns; skills 30007 RUINOUS_IMPACT, 30009 DARK_CRESCENT, 30301 / 30302 AURA_PUNISHMENT_ACCEL, 30303 PHANTOM_CIRCLE; HaveThisBuff 0x1e2; callers vslot 0x648 override area 32b0f9d5 / 32b3b4df	y	2 call/jmp: 32b0f9d5 32b3b4df
 32aeb090	helper	-	?	-	CH1k	called by 32b373e0; 7 insns; hint: gage ( +0xc04 ) byte +0x110 = 1 then tail-calls gage method 32a327a0; caller 32b373e0	y	1 call/jmp: 32b37665
 32aeb0c0	override 0xd8	0xd8	GetNowMp	-	CH1k	base 3208dc30	n	ptr: 334f07d4
 32aeb0f0	override 0xdc	0xdc	GetMaxMp	-	CH1k	base 3208dc40	n	ptr: 334f07d8
@@ -548,7 +548,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b0f080	override 0x3c	0x3c	InitComponent	X2GUUser.h:3544 virtual void InitComponent();	CH1k	base 31fee090	y	ptr: 334f0738
 32b0f910	not-luciel	-	-	-	n/a	referenced only from outside the range: 31fef571 ( shared / folded code )	y	1 call/jmp: 31fef571
 32b0f940	override 0x7fc	0x7fc	SpecialAttackUse	-	CH1l2	base 31aa1d30; name: X2GUChung.h SpecialAttackUse( int, bool ) vslot 0x7fc; calls 31fca8e0 templet, vslot 0x810, vslot 0x800, vslot 0x764	n	ptr: 334f0ef8
-32b0fa00	helper	-	?	-	CH1a	called by 32b347f0 32b3a310 32b3acf0; also referenced from outside the class: 322e1880; 9 insns; hint: non-virtual getter: gage ( +0xc04 ) protected float at +0x114; 0 without a gage	y	4 call/jmp: 322e1880 32b34881 32b3a990 32b3b0fe
+32b0fa00	helper	-	GetNowCombinationPoint	-	CH1a	called by 32b347f0 32b3a310 32b3acf0; also referenced from outside the class: 322e1880; 9 insns; hint: non-virtual getter: gage ( +0xc04 ) protected float at +0x114; 0 without a gage	y	4 call/jmp: 322e1880 32b34881 32b3a990 32b3b0fe
 32b0fa20	override 0x648	0x648	?	-	CH1l	base 33093ad0; hint: vslot 0x648 ( a, b ) ret 8: if +0x84dc: +0x96b4 = 1.0, +0x96bc = 0, +0x84dc = 0, ++counter +0x988c; no skill templet -> +0x96bc = b; base 33093ad0 bare ret 8	y	ptr: 334f0d44
 32b0fa90	override 0x664	0x664	ResetMaxMP	-	CH1l2	base 31fd2810; name: funcmap 31fd2810 CX2GUUser::ResetMaxMP is the base of vslot 0x664 ( X2GUUser.h:2709 ResetMaxMP ); body SetBasicStatValue 3236ca50 / ResetMaxMp 3234b9d0 / SetOptionValue 3236cb20	y	ptr: 334f0d60
 32b0fc50	helper	-	?	-	CH4a	called by 32b43d10; 46 insns; hint: HaveThisBuff 0x1d0 ( A_LDN_F_RAPID_IMPACT ) / 0x208 ( BOUNDING_TARGET ); fields +0x95f4 +0x470; caller 32b4cd91	y	1 call/jmp: 32b4cd91
@@ -594,21 +594,21 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b13940	dead	-	-	-	n/a	no call, jmp or pointer reference anywhere in the exe ( also none through a thunk ); first bytes 6aff68774c333364	y	-
 32b13b60	override 0x570	0x570	GetSkinAnimByForm	-	CH1l	base 31fd48a0; name: funcmap 31fd48a0 vslot 0x570 skin anim of a form (no March name in X2GUUser.h / X2GameUnit.h); body picks +0x87d4 / +0x8e88 / transformed +0x8f9c by form and vslot 0x260	y	ptr: 334f0c6c
 32b13c80	helper	-	?	-	CH4a	called by 32b43d10; 46 insns; hint: skill 30217 A_LDN_RAPID_IMPACT; fields +0x6898 +0x689c +0x68a0 +0x7d85; caller 32b4cdb1	y	1 call/jmp: 32b4cdb1
-32b13d30	helper	-	ReleaseTransformedSkinAnim	-	CH1a	called by 32b162e0 32b39380; 68 insns; name: ( iForm ): closes the two sounds and DeleteKTDGObject on the +0x8f78..+0x8fa0 members of form 0 or 1; callers 32b162e0 and the dtor 32b39380	y	3 call/jmp: 32b16387 32b39498 32b394a1
-32b13e20	helper	-	SetFormSkinAnim	-	CH1a	called by 32b34fe0 32b38f30; 162 insns; name: ( iForm, struct* ): writes +0x87d4 / +0x8e88 and the +0x87cc / +0x8e7c companions, DisableAfterImage 322720f0 / EnableAfterImage 32275a30; callers 32b34fe0 and 32b38f30	y	2 call/jmp: 32b3517b 32b38fb8
+32b13d30	helper	-	ReleaseTransformedSkinAnim	-	CH1a4	called by 32b162e0 32b39380; 68 insns; name: ( iForm ): closes the two sounds and DeleteKTDGObject on the +0x8f78..+0x8fa0 members of form 0 or 1; callers 32b162e0 and the dtor 32b39380	y	3 call/jmp: 32b16387 32b39498 32b394a1
+32b13e20	helper	-	SetFormSkinAnim	-	CH1a4	called by 32b34fe0 32b38f30; 162 insns; name: ( iForm, struct* ): writes +0x87d4 / +0x8e88 and the +0x87cc / +0x8e7c companions, DisableAfterImage 322720f0 / EnableAfterImage 32275a30; callers 32b34fe0 and 32b38f30	y	2 call/jmp: 32b3517b 32b38fb8
 32b14030	helper	-	?	-	CH3c2	called by 32b31e90 32b32090; 61 insns; hint: 285 insns; GetDirVecToDegree, HaveThisBuff, StateChange 320348c0, fields +0x97e4-0x9804 +0x7e1c; callers 32b32066 32b3250d	y	2 call/jmp: 32b32066 32b3250d
 32b14180	state-fn	-	LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_EventProcess	-	CH2d2	2 uses: LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP.EventProcess LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP.EventProcess	n	1 call/jmp: 32b4ce00
 32b143e0	override 0x62c	0x62c	?	-	CH1l	base 3208ddc0; hint: vslot 0x62c ( bool ): called with 0 in StateChange @320349cb and 1 in PlayEmotion @320447e9; toggles show flag +0x172 of the equip view objects ( +0x8834 ) and the two skin anims by +0x8e90 / +0x95d8; base 3208ddc0 empty	y	ptr: 334f0d28
 32b14640	override 0x6a0	0x6a0	GetActualMPConsume	X2GUUser.h:3146 virtual float GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const;	CH1l2	base 31fd1840	n	ptr: 334f0d9c
-32b14860	helper	-	?	-	CH1a	called by 32b14bc0 32b14c00 32b14cd0 32b16880; also referenced from outside the class: 3204def5; 279 insns; hint: GetSkillLevel / templet value of 30410 P_LCN_NOBILITY, UpNowMp text 32278070, fields +0x6c50 +0x6c54 +0x6d04-0x6d0c; 12 callers	y	12 call/jmp: 3204def5 32b14be3 32b14c21 32b14d04 ...
+32b14860	helper	-	UpCombinationPoint	-	CH1a	called by 32b14bc0 32b14c00 32b14cd0 32b16880; also referenced from outside the class: 3204def5; 279 insns; hint: GetSkillLevel / templet value of 30410 P_LCN_NOBILITY, UpNowMp text 32278070, fields +0x6c50 +0x6c54 +0x6d04-0x6d0c; 12 callers	y	12 call/jmp: 3204def5 32b14be3 32b14c21 32b14d04 ...
 32b14bc0	helper	-	AddCombinationPointOnHit	-	CH1p	combination-point delegate InitState pushes ( HIT_ADD_COMBINATION_POINT consumer ): CH1p owns combination points; name: funcmap: none in March: CX2GULuciel add HIT_ADD_COMBINATION_POINT on hit; ( DamageData ) tests +0x96a8 and calls 32b14860	y	1 call/jmp: 32b4cee1
 32b14c00	state-fn	-	LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd	-	CH1i	2 uses: LSI_BOUNDING_TARGET_LU_STRIKER.End LSI_BOUNDING_TARGET_CIEL_STRIKER.End	y	1 call/jmp: 32b4ced0
 32b14c30	state-fn	-	LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_StateStartFuture	-	CH1i	2 uses: LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X.StartFuture LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_X.StartFuture	y	1 call/jmp: 32b4cec0
 32b14cd0	override 0x324	0x324	ChangeMaxCharacterAddResource	X2GameUnit.h:3794 virtual void ChangeMaxCharacterAddResource( const float fRate_ ) {}	CH1k	base 3208ddc0	n	ptr: 334f0a20
 32b14d10	helper	-	UpdateOpenMindBuff	-	CH1l3	called by 32b397a0; 47 insns; name: HaveThisBuff 0x36d, GetSkillLevel by 32b4c7f0 / 0x76d0-0x76d4 ( OPEN_MIND ), erase-by-BTI 0x36d; mirrors 32b0eed0; caller 32b39d67	y	1 call/jmp: 32b39d67
-32b14db0	own-virtual 0x880	0x880	FindDamageEffectIndexEntry	-	CH1a	Lu/Ciel-only virtual ( no base entry ); name: own virtual: finds the +0x9890 vector entry ( 12 B: applied skill id, damage-effect index, ref-counted ptr ) matching DamageData +0x5c4 / +0x638 ( 32b4cb80 ) and takes a reference	n	ptr: 334f0f7c
+32b14db0	own-virtual 0x880	0x880	CountDamageEffectHit	-	CH1a	Lu/Ciel-only virtual ( no base entry ); name: own virtual: finds the +0x9890 vector entry ( 12 B: applied skill id, damage-effect index, ref-counted ptr ) matching DamageData +0x5c4 / +0x638 ( 32b4cb80 ) and takes a reference	n	ptr: 334f0f7c
 32b14e10	override 0x628	0x628	CanRidingState	X2GUUser.h:2593 virtual bool CanRidingState();	CH1l	base 31fd7930	n	ptr: 334f0d24
-32b14f70	helper	-	?	-	CH1a	called by 32b1eef0 32b3a310 32b3acf0; also referenced from outside the class: 322e186b; 17 insns; hint: GetSkillLevel + GetSkillTemplet + 32207210 + _ftol2, fields +0x7cbc +0x7cc0 +0x7cec +0x9444; 4 callers incl. 32b3ae06	y	4 call/jmp: 322e186b 32b1effe 32b3a680 32b3ae06
+32b14f70	helper	-	GetSkillCombinationPointCost	-	CH1a	called by 32b1eef0 32b3a310 32b3acf0; also referenced from outside the class: 322e186b; 17 insns; hint: GetSkillLevel + GetSkillTemplet + 32207210 + _ftol2, fields +0x7cbc +0x7cc0 +0x7cec +0x9444; 4 callers incl. 32b3ae06	y	4 call/jmp: 322e186b 32b1effe 32b3a680 32b3ae06
 32b15050	override 0x6a4	0x6a4	GetActualCoolTime	X2GUUser.h:3224 virtual float GetActualCoolTime( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_, IN int iSkillLevel ) const;	CH1l2	base 31fd1920	y	ptr: 334f0da0
 32b151b0	override 0x2b0	0x2b0	?	-	CH1k	base 330f9c30; hint: vslot 0x2b0 ( int index < 8 ) ret 4: scans the +0x3cfc vector of objects, tests mesh slot [+0x1c0 -> +0x544 or +0x5a4 + index*4] by form +0x8e90; base 330f9c30 ret 4 stub	n	ptr: 334f09ac
 32b15220	override 0x828	0x828	IsNotCommonMoveState	X2GUUser.h:3403 virtual bool IsNotCommonMoveState();	CH1l2	base 31fd7640	y	ptr: 334f0f24
@@ -675,7 +675,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b1e720	override 0x300	0x300	?	-	CH1k	base 3208ddc0; hint: vslot 0x300 void( DamageData* ): for applied skill 30207 ( A_LCG_SOUL_STRIKE ) scales dd +0x38 / +0x3c / +0x3f0 / +0x514 by +0x96c4 / +0x9740 / +0x97cc / +0x97d0 and records into the protected global 3376cdc8; base 3208ddc0 empty	y	ptr: 334f09fc
 32b1e8e0	override 0x40	0x40	Init	X2GUUser.h:1072 virtual void Init()	CH1k	base 3204ea20	y	ptr: 334f073c
 32b1ead0	dead	-	-	-	n/a	no call, jmp or pointer reference anywhere in the exe ( also none through a thunk ); first bytes 568bf1e8c8104dff	y	-
-32b1eb10	helper	-	DeleteMinorParticle	-	CH1a	called by 32b1f0a0 32b39380; 28 insns; name: 31fefc00 DeleteGUUserMinorParticle + game GetMinorParticle 322ceab0 + DestroyInstanceHandle 31cefbc0	y	2 call/jmp: 32b1f0ab 32b39409
+32b1eb10	helper	-	DeleteLucielMinorParticle	-	CH1a	called by 32b1f0a0 32b39380; 28 insns; name: 31fefc00 DeleteGUUserMinorParticle + game GetMinorParticle 322ceab0 + DestroyInstanceHandle 31cefbc0	y	2 call/jmp: 32b1f0ab 32b39409
 32b1eb70	dead	-	-	-	n/a	no call, jmp or pointer reference anywhere in the exe ( also none through a thunk ); first bytes 6aff68a752333364	y	-
 32b1eca0	helper	-	?	-	CH1l3	called by 32b37780; 90 insns; hint: CreateSequenceHandle on the game minor particle system + GetInstanceSequence; 7 callers 32b377b8..	y	7 call/jmp: 32b377b8 32b377ef 32b37824 32b37858 ...
 32b1edd0	override 0x7c8	0x7c8	CommonFrameMoveFuture	X2GUUser.h:3628 virtual void CommonFrameMoveFuture();	CH1l2	base 32061bf0	y	ptr: 334f0ec4
@@ -688,7 +688,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b1f7e0	not-luciel	-	-	-	n/a	cold-path chunk of 32b1f650 ( reached by a conditional / short jump from 32b1f7a0, no call ): part of that function, not a function	n	-
 32b1f800	helper	-	CreateChaserOfDarknessDamageEffect	-	CH1l3	called by 32b37730; 332 insns; strings: "DamageEffect_LD_M_CHASER_OF_DARKNESS_Projectile" | "DamageEffect_LD_F_CHASER_OF_DARKNESS_Projectile"; name: strings DamageEffect_LD_M_ / LD_F_CHASER_OF_DARKNESS_Projectile / _Ready, Dummy02; CX2DamageEffect::GetInstance 31f64190	y	1 call/jmp: 32b37741
 32b1fc90	helper	-	?	-	CH3a	called by 32b2b9c0; 328 insns; strings: "EffectSet_SA_LLC_OBLIVION_Death"; hint: string EffectSet_SA_LLC_OBLIVION_Death; skill 30014 SA_LLD_OBLIVION; 328 insns; caller 32b2ba44	y	1 call/jmp: 32b2ba44
-32b20100	helper	-	?	-	CH1a	called by 32b204d0 32b20780 32b33dc0 32b373e0; 108 insns; hint: 108 insns; game valid + fetch, team +0x264, +0x85f8, gage; 14 callers	y	14 call/jmp: 32b205f7 32b20603 32b209dc 32b33e64 ...
+32b20100	helper	-	KillMySummonedNPC	-	CH1a	called by 32b204d0 32b20780 32b33dc0 32b373e0; 108 insns; hint: 108 insns; game valid + fetch, team +0x264, +0x85f8, gage; 14 callers	y	14 call/jmp: 32b205f7 32b20603 32b209dc 32b33e64 ...
 32b20260	helper	-	?	-	CH3a	called by 32b2f3f0; 211 insns; hint: skill 30013 SA_LLD_SUMMON_DARKNESS ability value + HaveThisBuff 0x1da; caller 32b2f48b	y	1 call/jmp: 32b2f48b
 32b204d0	helper	-	?	-	CH1l3	called by 32b2f3f0 32b37c40; 126 insns; hint: skill 30013; HaveThisBuff 0x1da, GetBuffFinalizerTempletPtrList, GetActualMPConsume; callers 32b2f484 32b37c64	y	2 call/jmp: 32b2f484 32b37c64
 32b20670	helper	-	?	-	CH2c2	called by 32b30bc0 32b30d40; 79 insns; hint: skill 30209 A_LCG_SHADOW ability value; IsPVP/PVE 322cc1a0; callers 32b30d17 32b30e97	y	2 call/jmp: 32b30d17 32b30e97
@@ -803,12 +803,12 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b343b0	state-fn	-	LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_StateStartFuture	-	CH1i	2 uses: LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START.StartFuture LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_START.StartFuture	y	1 call/jmp: 32b4ddd0; ptr: 32d3a08f
 32b34680	override 0x568	0x568	CheckBoundingTarget	-	CH1l	base 31e4c550; name: funcmap C3j: Luciel virtual slot 0x568, bounding-target check ( target 32294460( +0x96f0 ), IsBoundingUp / IsBoundingLandCrash, vslot 0x5c state change 0x1fe / 0x1ff )	y	ptr: 334f0c64
 32b347f0	helper	-	?	-	CH1l3	called by 32b37730; 76 insns; hint: skills 30216 PHANTOM_RUSH + 30421; fields +0x9710-0x9728 +0x9860; caller 32b37749	y	1 call/jmp: 32b37749
-32b34920	helper	-	?	-	CH1a	called by 32b373e0 32b38140 32b38340 32b38540; 52 insns; hint: stops effect-set handles +0x9714 / +0x9720 / +0x9724 / +0x9728, UpdateSkillSlotUI, skill 30421 level; 7 callers	y	7 call/jmp: 32b376e2 32b381db 32b383db 32b38c4a ...
+32b34920	helper	-	ResetPhantomRushReady	-	CH1a	called by 32b373e0 32b38140 32b38340 32b38540; 52 insns; hint: stops effect-set handles +0x9714 / +0x9720 / +0x9724 / +0x9728, UpdateSkillSlotUI, skill 30421 level; 7 callers	y	7 call/jmp: 32b376e2 32b381db 32b383db 32b38c4a ...
 32b349f0	helper	-	?	-	CH1l3	called by 32b34a90 32b38110; 38 insns; hint: DestroyInstanceHandle on damage effect handles +0x97a0-0x97b8, erase-by-BTI 0x2f8; callers 32b34b94 32b3811f	y	2 call/jmp: 32b34b94 32b3811f
 32b34a90	helper	-	?	-	CH1l3	called by 32b397a0; 83 insns; strings: "Bip01"; hint: L"Bip01"; GetDistance, damage effect GetInstance / SetPos, fields +0x97a0-0x97bc; caller 32b39d36	y	1 call/jmp: 32b39d36
 32b34c70	helper	-	PlayPunisherEffectSet	-	CH1l3	called by 32b37730; 240 insns; strings: "EffectSet_A_LDN_PUNISHER" | "EffectSet_A_LDN_PUNISHER_TRANSCENDENCE"; name: strings EffectSet_A_LDN_PUNISHER / _TRANSCENDENCE ( chosen by skill 30421 / 0x76d5 level ), PlayEffectSet 321e1e60	y	1 call/jmp: 32b37751
 32b34fe0	helper	-	StartTransformedForm	-	CH4a	called by 32b37d40 32b38c70; 384 insns; strings: "EVIL_Ru_Wait" | "Wait"; name: ( iForm ): if !31fc9d90( iForm ): 31fc9d50( iForm, 1 ), hides equip objects ( vslot 0x63c( 0 ) ), 32b13e20, ChangeAnim L"EVIL_Ru_Wait" / L"Wait", SetUnitReForm 31fda0d0, effect set; 5 callers incl. the buff hook 0x24c	y	5 call/jmp: 32b37d6d 32b38c75 32b38c7e 32b38c95 ...
-32b35540	helper	-	?	-	CH1a	called by 32b373e0 32b37910 32b380a0 32b38f30; 63 insns; hint: stops effect-set handles +0x9758 / +0x975c / +0x9768 / +0x976c; 4 callers	y	4 call/jmp: 32b376e9 32b37bc2 32b380af 32b39314
+32b35540	helper	-	ClearAltarOfEvilEffectSet	-	CH1a	called by 32b373e0 32b37910 32b380a0 32b38f30; 63 insns; hint: stops effect-set handles +0x9758 / +0x975c / +0x9768 / +0x976c; 4 callers	y	4 call/jmp: 32b376e9 32b37bc2 32b380af 32b39314
 32b35600	helper	-	PlayAltarOfEvilEffectSet	-	CH1l3	called by 32b35c60 32b380a0; 199 insns; strings: "EffectSet_SA_LDB_ALTAR_OF_EVIL_XXX"; name: string EffectSet_SA_LDB_ALTAR_OF_EVIL_XXX, GetEffectSet 322ceae0 + PlayEffectSet 321e1e60, offsets from 32ae9d00	y	4 call/jmp: 32b35cdd 32b380da 32b380e1 32b380e9
 32b358b0	helper	-	CreateAltarOfEvilProjectile	-	CH2d2	called by 32b380f0; 283 insns; strings: "Luciel_Altar_Of_Evil_XXX02.ogg" | "LuVoice_Altar_of_Evil_XXX_End.ogg"; name: strings DamageEffect_SA_LDB_ALTAR_OF_EVIL_XXX_Projectile, Luciel_Altar_Of_Evil_XXX02.ogg, LuVoice_Altar_of_Evil_XXX_End.ogg, JuneCollectEnemyUnitsInCone 32009180	y	1 call/jmp: 32b380f3
 32b35c60	helper	-	?	-	CH1l3	called by 32b397a0; 19 insns; hint: StateChange 320348c0 + CKTDXCheckElapsedTime on +0x9750 / +0x9758; caller 32b39d44	y	1 call/jmp: 32b39d44
@@ -839,7 +839,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b38c70	dead	-	-	-	n/a	no call, jmp or pointer reference anywhere in the exe ( also none through a thunk ); first bytes 566a008bf1e866c3	n	-
 32b38cb0	not-luciel	-	-	-	n/a	referenced only from outside the range: 31fd032d 3275a111 ( shared / folded code )	y	2 call/jmp: 31fd032d 3275a111
 32b38ef0	dead	-	-	-	n/a	no call, jmp or pointer reference anywhere in the exe ( also none through a thunk ); first bytes 51d9eed891149700	n	-
-32b38f30	helper	-	EndTransformedForm	-	CH1a	called by 32b39380 32b3a250 32b3a270 32b3a290; 323 insns; strings: "Bip01_Head" | "EffectSet_SA_LDB_TRANSFORM_END_BY_DIE"; name: ( iForm ): mirror of 32b34fe0: 31fc9d50( iForm, 0 ), 32b13e20, 31fd6260, strings L"Bip01_Head", EffectSet_SA_LDB_TRANSFORM_END_BY_DIE; 12 callers incl. dtor 32b39380	y	12 call/jmp: 32b39486 32b39490 32b3a257 32b3a262 ...
+32b38f30	helper	-	EndTransformedForm	-	CH1a4	called by 32b39380 32b3a250 32b3a270 32b3a290; 323 insns; strings: "Bip01_Head" | "EffectSet_SA_LDB_TRANSFORM_END_BY_DIE"; name: ( iForm ): mirror of 32b34fe0: 31fc9d50( iForm, 0 ), 32b13e20, 31fd6260, strings L"Bip01_Head", EffectSet_SA_LDB_TRANSFORM_END_BY_DIE; 12 callers incl. dtor 32b39380	y	12 call/jmp: 32b39486 32b39490 32b3a257 32b3a262 ...
 32b39380	helper	-	~CX2GULuciel	-	CH1a	dtor ( rewrites 334f06fc at 32b393ac )	y	1 call/jmp: 32b4e663
 32b397a0	override 0x7cc	0x7cc	CommonFrameMove	X2GUUser.h:3633 virtual void CommonFrameMove();	CH1l2	base 32063650	y	ptr: 334f0ec8
 32b39e70	state-fn	-	LSI_RIDING_HYPER_MODE_FrameMove	-	CH1i	1 use: LSI_RIDING_HYPER_MODE.FrameMove	y	1 call/jmp: 32b4e620
@@ -851,7 +851,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b3a2d0	state-fn	-	LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_StateEnd	-	CH2d2	1 use: LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END.End	n	1 call/jmp: 32b4e630
 32b3a2f0	state-fn	-	LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_StateEnd	-	CH3c2	1 use: LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END.End	n	1 call/jmp: 32b4e640
 32b3a310	override 0x7f8	0x7f8	CanUseSpecialAttack	-	CH1l2	base 31aa1d30	y	ptr: 334f0ef4
-32b3acf0	own-virtual 0x884	0x884	?	-	CH1a	Lu/Ciel-only virtual ( no base entry ); hint: own virtual 0x884 ( 294 insns ): skill-use check like CanUseSpecialAttack 0x7f8: GetSkillTemplet, CheckSkillUseCondition, PVP bans, skill level, vslot 0x6a0, 32b14f70, message L"[S%1%]%2%"	y	ptr: 334f0f80
+32b3acf0	own-virtual 0x884	0x884	TryUseSkillWithCombinationPoint	-	CH1a	Lu/Ciel-only virtual ( no base entry ); hint: own virtual 0x884 ( 294 insns ): skill-use check like CanUseSpecialAttack 0x7f8: GetSkillTemplet, CheckSkillUseCondition, PVP bans, skill level, vslot 0x6a0, 32b14f70, message L"[S%1%]%2%"	y	ptr: 334f0f80
 32b3b530	state-fn	-	LSI_LCG_COMBO_SNIPING_READY_EventProcess	-	CH1g2	1 use: LSI_LCG_COMBO_SNIPING_READY.EventProcess	y	1 call/jmp: 32b4e680
 32b3bc70	state-fn	-	LSI_LCG_F_COMBO_ZZZX_WAIT_EventProcess	-	CH1g2	1 use: LSI_LCG_F_COMBO_ZZZX_WAIT.EventProcess	y	1 call/jmp: 32b4e690
 32b3c3b0	state-fn	-	LSI_SA_LLD_DANCING_BLADE_EventProcess	-	CH3a	2 uses: LSI_SA_LLD_DANCING_BLADE.EventProcess LSI_SA_LLD_DANCING_BLADE_LOOP.EventProcess	y	1 call/jmp: 32b4e6a0
@@ -1372,7 +1372,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b4cad0	thunk	-	-	-	CH3d	delegate maker ( dest, this ): dest[0] = this, dest[1] = 32b4b560 ( thunk>32b4b560 )	y	1 call/jmp: 32b4a6e0
 32b4caf0	helper	-	?	-	CH4a	called by 32b177b0; 26 insns; hint: STL instance: std::find over 16-byte elements comparing 3 dwords; caller 32b177b0	y	1 call/jmp: 32b1787d
 32b4cb40	helper	-	?	-	CH1l3	called by 32b18170; 18 insns; hint: STL instance: std::find over 12-byte elements ( 2 dwords ); caller 32b18170	y	1 call/jmp: 32b181f1
-32b4cb80	helper	-	?	-	CH1a	called by 32b14db0 32b16810; 21 insns; hint: STL instance: std::find_if over 12-byte entries ( +0 == dd +0x5c4, +4 == dd +0x638 ); callers 32b14db0 32b16810	y	2 call/jmp: 32b14ded 32b1684e
+32b4cb80	helper	-	(inlined in CountDamageEffectHit)	-	CH1a	called by 32b14db0 32b16810; 21 insns; hint: STL instance: std::find_if over 12-byte entries ( +0 == dd +0x5c4, +4 == dd +0x638 ); callers 32b14db0 32b16810	y	2 call/jmp: 32b14ded 32b1684e
 32b4cbc0	thunk	-	-	-	CH1b	jmp 32b0fd90 ( thunk>32b0fd90 )	n	ptr: 32b3f7d7 32b40cb7
 32b4cbd0	thunk	-	-	-	CH1b	jmp 32b0fde0 ( thunk>32b0fde0 )	n	ptr: 32b3f842
 32b4cbe0	thunk	-	-	-	CH1b	jmp 32b0fef0 ( thunk>32b0fef0 )	n	ptr: 32b3f97c 32b4802e 32b48a14
@@ -1429,7 +1429,7 @@ june_fn	kind	vslot	proposed_name	march_pair	phase	note	carved	callers
 32b4d120	thunk	-	-	-	CH1h	jmp 32b15fe0 ( thunk>32b15fe0 )	n	ptr: 32b42bcd
 32b4d130	thunk	-	-	-	CH2c2	jmp 32b16200 ( thunk>32b16200 )	n	ptr: 32b4748e 32b475ad
 32b4d140	helper	-	?	-	CH1l3	called by 32b4d260; 48 insns; strings: "vector<T> too long"; hint: STL instance: vector _Reserve with L"vector<T> too long" ( 24-byte elements ); callers 32b4d291 32b4d2d3	y	2 call/jmp: 32b4d291 32b4d2d3
-32b4d1c0	helper	-	?	-	CH1a	called by 32b1bd90; 55 insns; hint: member default initializer called only from the ctor 32b1bd90: floats 2.0 / 1200.0 / 0.2 and two vectors	y	1 call/jmp: 32b1c2d3
+32b4d1c0	helper	-	SAltarOfEvilData::SAltarOfEvilData	-	CH1a	called by 32b1bd90; 55 insns; hint: member default initializer called only from the ctor 32b1bd90: floats 2.0 / 1200.0 / 0.2 and two vectors	y	1 call/jmp: 32b1c2d3
 32b4d260	helper	-	?	-	CH1l3	called by 32b18060; 42 insns; hint: STL instance: vector push_back for 24-byte elements ( 32b4d140 ); caller 32b1815b	y	1 call/jmp: 32b1815b
 32b4d310	thunk	-	-	-	CH2b	jmp 32b16ca0 ( thunk>32b16ca0 )	n	ptr: 32b43489
 32b4d320	thunk	-	-	-	CH2d2	jmp 32b16f50 ( thunk>32b16f50 )	n	ptr: 32b47d3c

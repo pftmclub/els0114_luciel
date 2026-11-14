@@ -55,3 +55,8 @@ Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_
 
 - `_LIVE` adds the two `CX2Game` calls to `UpdateLucielSwitchingGuideUI( &false, 0.f )` ( June ctor @`32307bca`, dtor @`32308957`, each just
   before Eve's `UpdateEveRecoveryUI` call; `X2Game.cpp` ~468 / ~852 ).
+
+## Amended by char-luciel CH1a (2026-11-14)
+
+- `CX2GULuciel::CreateGULuciel` ( Chung's `CreateGUChung` pattern ) was left out of CH1a: the class stays abstract until CH1o wires the pure virtuals. Add it with the factory cases.
+- Depends on CH1a4's review as well ( the dtor calls `EndTransformedForm` / `ReleaseTransformedSkinAnim`, whose bodies are CH1a4's ).

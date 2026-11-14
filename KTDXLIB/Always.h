@@ -13421,3 +13421,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              ( 322e6300 ); CH1a adds the class CX2GULuciel. Revert: comment out the #define.
 #define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel - Lu/Ciel live: the factory cases ( CX2Game::CreateGUUser, the intruder copy ), the two class scripts and their
+//              motions. Defined by CH1 final; until then CX2GULuciel ( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ) compiles unreferenced.
+//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ( the class CX2GULuciel )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ) && !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( LUCIEL_STATE_ID, the Lu/Ciel SKILL_ID / BTI names; char-luciel CH1a )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+//////////////////////////////////////////////////////////////////////////

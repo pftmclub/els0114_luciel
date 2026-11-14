@@ -45,3 +45,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - Tree rows: 7 (part 3, col 10).
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7 L254 class code scales the cached state power rate (+0x7cc8), e.g. 32b1cd20.
 - **CH1c is merged in** (CH0): every Lu common state, movement and the rest (41 functions). The state table's col 8 says CH1b for all of them.
+
+## Amended by char-luciel CH1a (2026-11-14)
+
+- Member names: `june2017_re/char_luciel/ch1_offsets.tsv` ( `charport_adis.py luciel` prints them ). A name marked provisional there was read from its users; rename it in `X2GULuciel.h` and the tsv if the body you transcribe shows its real role.

@@ -1,0 +1,275 @@
+offset	kind	name	note
+0x2b0	field	m_fElapsedTime	CX2GameUnit
+0x304	field	m_PhysicParam.nowSpeed.x	
+0x308	field	m_PhysicParam.nowSpeed.y	
+0x314	field	m_PhysicParam.fDownAccel	FLY_DOWN StartFuture: = fGAccel * -0.8
+0x31c	field	m_PhysicParam.fGAccel	
+0x320	field	m_PhysicParam.fMaxGSpeed	
+0x3e59	field	m_bAbsoluteInvisibility	GetAbsoluteInvisibility()
+0x3eb0	field	m_vecEffectSetToDeleteOnDamageReact	CX2GameUnit; the CH1g Specter / Asura effect FrameMoves push their handles here ( 32bbbc70 ... 32bc08d0; funcmap 32007570 C9h-4 ) ( CH1g review )
+0x3ec0	field	m_vecEffectSetToDeleteOnStateEnd	CX2GameUnit; the ZZZX charge FrameMove 32bb4630 @32bb47f3 pushes here ( CH1g review )
+0x423c	field	m_fRunJumpSpeedRate	GetWalkSpeed / GetDashSpeed multiply it
+0x4910	field	walk speed triple ( +0x4910 ^ +0x4914 ^ &+0x4918 )	GetWalkSpeed()
+0x49c4	field	dash speed triple	GetDashSpeed() ( also called as 32071a80 )
+0x4a78	field	jump speed triple	GetJumpSpeed()
+0x4b2c	field	dash jump speed triple	GetDashJumpSpeed()
+0x7d14	field	m_FrameDataFuture	
+0x7d85	field	m_FrameDataFuture.stateParam.bEventFlagList[0]	
+0x7de8	field	m_FrameDataFuture.unitCondition.fStateTime	
+0x7e1c	field	m_FrameDataFuture.unitCondition.bFootOnLine	IsOnSomethingFuture()
+0x7e20	field	m_FrameDataFuture.unitCondition.landPosition	
+0x7e31	field	m_FrameDataFuture.unitCondition.bFootOnWall	
+0x7e3c	field	m_FrameDataFuture.syncData.position.x	+4 y, +8 z
+0x7e54	field	m_FrameDataFuture.syncData.lastTouchLineIndex	ushort
+0x7e56	field	m_FrameDataFuture.syncData.bIsRight	
+0x7fb4	field	m_FrameDataNow	
+0x80c4	field	m_FrameDataNow.unitCondition.landPosition.y	
+0x80f6	field	m_FrameDataNow.syncData.bIsRight	
+0x84f3	field	m_bDisableGravity	
+0x867c	field	GetUnit()	CX2Unit*
+0x86da	field	m_InputData.pureLeft	groups of 4 ( pure, one, pureDouble, oneDouble ) in March's key order; 0x8722 pureLCtr, 0x8726 pureSit, 0x8727 oneSit
+0x87d0	field	m_pXSkinAnimFuture	anim +0x214 now time, +0x220 max time, +0x2ac IsAnimationEnd, +0x2b0 transition time
+0x87d4	field	m_pXSkinAnim	
+0x89d8	field	m_ePlayedEmotion	GetNowEmotionId(); Wait EventProcess 32bf5de0 tests == ET_NONE
+0x8a60	field	m_pComboGuide	
+0x8bf8	field	m_bDownForce	
+0x8d4c	field	m_bHyperModeStartedByInput	set by SKILL_CANCEL_AFTER
+0x5c	vslot	StateChange( int, bool )	
+0x84	vslot	GetBonePos( wstring )	
+0xd8	vslot	GetNowMp()	
+0x150	vslot	GetRotateDegree()	
+0x16c	vslot	GetDirVector()	
+0x170	vslot	GetIsRight()	
+0x1cc	vslot	GetRandomFloat( int )	
+0x200	vslot	GetRidingOn()	
+0x55c	vslot	TryHyperModeStateChange( int )	
+0x5f4	vslot	COMMON_RELATIONSHIP_SKILL_FrameMove()	
+0x5f8	vslot	COMMON_RELATIONSHIP_SKILL_EventProcess()	
+0x5fc	vslot	DashStartFuture()	Eve override 32965f80
+0x668	vslot	StateChangeDashIfPossible()	
+0x6b8	vslot	GetHyperModeStateID()	Eve 32968470 returns 0x17 USI_HYPER_MODE
+0x7c0	vslot	CommonStateStartFuture()	
+0x7c4	vslot	CommonStateStart()	
+0x7c8	vslot	CommonFrameMoveFuture()	
+0x7cc	vslot	CommonFrameMove()	
+0x7d4	vslot	CommonEventProcess()	
+0x7d8	vslot	CommonStateEndFuture()	
+0x7dc	vslot	CommonStateEnd()	
+0x7ec	vslot	CreateStepDust()	
+0x7f4	vslot	SpecialAttackEventProcess( ASUT )	1 = ASUT_GROUND, 2 = ASUT_AIR
+0x8e84	field	alternate future animation	CX2GUUser: +0x8e90 ? +0x8e84 : m_pXSkinAnimFuture ( 32070cf0 ); read as m_pXSkinAnimFuture ( CH1b )
+0x4088	field	m_CommonState.m_Wait	Leap StartFuture / EventProcess push it to StateChange
+0x7e04	field	m_FrameDataFuture.unitCondition.dirDegree	Leap FrameMoveFuture
+0x7e10	field	m_FrameDataFuture.unitCondition.dirVector	Leap FrameMoveFuture
+0x8088	field	m_FrameDataNow.unitCondition.fStateTime	Wait EventProcess sword-wait test
+0x899d	field	m_bLeaping	CX2GUUser; Leap StartFuture = 1, End = 0
+0x138	vslot	GetPos()	
+0x674	vslot	GetWayOfSwordState()	base 31fc8770, Elsword 32cf50f0
+0x3d8	field	m_DamageData.damage.fPhysic	CX2GameUnit; +0x3c4 m_DamageData.reActType, +0x77c m_DamageData.backSpeed ( CH1b )
+0x9e0	field	m_fRevengeAddDamage	CX2GameUnit ( CH1b )
+0x7d86	field	m_FrameDataFuture.stateParam.bEventFlagList[1]	+0x7d87 [2], +0x7d88 [3], +0x7d89 [4] ( CH1b )
+0x8025	field	m_FrameDataNow.stateParam.bEventFlagList[0]	+0x8018 normalCamera ( CH1b )
+0x8c10	field	m_fEventTime[0].keyInputStart	+0x8c14 keyInputEnd, +0x8c18 stateChange; m_fEventTime[1] at +0x8c1c / +0x8c20 / +0x8c24 ( CH1g review )
+0x8c88	field	m_fAttackCancelAfterEx	Future set: +0x8c8c m_fAttackCancelAfter, +0x8c90 m_fSkillCancelAfter, +0x8c94 m_fBWalkCancelAfter, +0x8c98 m_fWalkCancelAfter, +0x8c9c m_fDashCancelAfter, +0x8ca4 m_fUpDownCancelAfter ( CH1g review )
+0x8d38	field	m_fDashCancelAfter	Now set ( +0x8d24 Ex .. +0x8d38 Dash, same order as +0x8c88 ); March keeps one set ( funcmap 32057b80 C9h-4c ); the sheath FrameMoves read it ( CH1g review )
+0x8040	field	m_FrameDataNow.stateParam.bSuperArmorNotRed	COMBO_XXX_LOOP / XXX_END StateStart = 0, XXX_LOOP StateEnd = 1 ( CH1g review )
+0x411c	field	m_bApplyMotionOffset	CX2GameUnit; Compact Counter StartFuture sets it false ( CH1g2 )
+0x80bc	field	m_FrameDataNow.unitCondition.bFootOnLine	CX2GUUser; DamageReact tests it ( CH1h ); GetFrameData( false ) + 0x108 is the same byte
+0x8be8	field	m_iHoldStateID	CX2GUUser; DamageReact stores USI_DAMAGE_AIR_FALL ( CH1h )
+0x8ea0	field	m_iChosenSkillID	CX2GUUser; the skill the lookup 32d1bd10 chose, kept by 32cf3290 across the use ( CH1k )
+0x8ea4	field	m_iChosenSkillSlotIndex	CX2GUUser; its slot index, used by the use 32cf5760 and the cooldown 32d0d8e0 ( CH1k )
+0x8ea8	field	m_fReservedSkillMp	CX2GUUser; the MP a reserved skill keeps until its state starts ( CH1k )
+0x8eb0	field	m_fChosenSkillMp	CX2GUUser; the MP the chosen skill costs, set by the lookup, spent by the cooldown ( CH1k )
+0x88bc	field	m_iNowSpecialAttack	CX2GUUser; slot index + 1, set by 32cf3290 ( CH1k )
+0x8ac4	field	m_bSpecialAttackEventProcessedAtThisFrame	CX2GUUser; set by the use 32cf5760 ( CH1k )
+0x8ac8	field	m_iSkillCutInSetIndex	CX2GUUser; +0x8acc m_iSkillCutInSetSubIndex ( the index 32d09270 hands to 32d09050 ) ( CH1k )
+0x6754	field	m_pAfterImage	CX2GameUnit; +0x6758 is June's second after-image ( not ported ); AfterImageFrameMove 32d08d70 keeps byte +0x1d1 = the enable flag it hid ( CH1k )
+0x8ca8	field	m_fSkillCancelAfterFly	CX2GUUser; the air skill cancel time of SKILL_CANCEL_AFTER_FLY ( CH1g2 )
+0x422c	field	m_fForceHyperModeTime	CX2GameUnit (GetForceHyperModeTime); GetHyperModeTime 32c3db70 returns it when > 0 ( CH1h )
+0xc04	field	m_pGageData	CX2GameUnit (GetGageData()) ( CH1h )
+0x24c	field	m_fMaxHyperModeTime	CX2GameUnit (KProtectedType<float>, GetMaxHyperModeTime()) ( CH1h )
+0x404c	field	m_pUnitSlashTraceManager	CX2GameUnit; AddUnitSlashData 32c3ea70 ( CH1h )
+0x8e04	field	m_bSetCustomRenderParam	CX2GUUser; ctor 0 @32040e02; Guardian Strike sets it, CommonFrameMove 32c55240 clears it ( March: X2GUEL.cpp:9209 Ancient Fire pattern ) ( CH1j )
+0x7d10	field	MemoCondition pointer	CX2GUUser::MemoCondition new @32c4095b ( 12 bytes ); CH4c owns it ( CH1k )
+0x6894	field	(byte, CX2GUUser)	gate of June SetChangeRateMp 32071a50 / ResetMPChangeRate; only the constructor's zero-init writes it ( word store @322a5120 ) ( CH1a, review )
+0x264	field	m_GameUnitType	CX2GameUnit; 0 = user
+0x7d8a	field	m_FrameDataFuture.stateParam.bEventFlagList[5]	+0x7d8b [6], +0x7d8c [7]; DamageDown / AirDownLanding agile-movement and stand-up flags ( CH1b )
+0x4060	field	m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent	CX2GameUnit; DamageDown Front / Back roll, both outcomes go to the stand-up attack ( CH1b )
+0x85f8	field	CX2GUNPC::m_pNPCTemplet	+0 = NPC unit id ( KillMySummonedNPC ), +4 = class ( CH1b )
+0x7c98	field	CX2GUNPC::m_pAI	+0x38 = m_eAIType ( NAT_ALLY 1 ), CX2AllyNPCAI +0x78 / +0x7c = the owner's UID ( CH1b )
+0x393c	field	m_vecStartOfDelayedFiringData	CX2GameUnit begin; +0x3940 end; entry +4 m_iAttackerIndex, +0x10 m_fCoolTime ( ClearStartOfDelayedFiringData ) ( CH1b )
+0x268	field	m_iUnitIndex	CX2GameUnit::GetUnitIndex ( ClearStartOfDelayedFiringData ) ( CH1b )
+0x1e8	vslot	ProcessAttackResultPassive	user vslot, base 32011b80 ( CH4b ); Rena override 32ca9ca0, wired in CH1o
+0x318	vslot	ProcessEradicationHit	user vslot, base 3208ddc0 ( empty ); Rena override 32cb3200, wired in CH1o
+0x740	vslot	StoreGageSnapshot	user vslot, base 32009780 ( Crest of Time snapshot, not ported ); Rena override 32c852f0, wired in CH1o
+0x774	vslot	UpdateSpineAimRotation	user vslot, base 31f3f070 ( empty stub ); Rena override 32c863d0, called by name from the siege states
+0x6a8	vslot	ShownSkillCoolTime	user vslot, base 3208e190 ( returns the argument ); Rena override 32c7bed0 ( virtual under _LIVE )
+0x7e8	vslot	CommonRender_Prepare	Rena override 32c6a950 = the base 31fd07b0 ( takes and returns the render hint )
+0x850	vslot	AfterImageFrameMove()	Rena override 32c85c00, base 31fd8230 ( CH1k )
+0x824	vslot	GetStateAnimSpeedRate( bool )	Rena override 32c83320, base 3208dd70 = 1.0 ( CH1k )
+0x828	vslot	IsNotCommonMoveState()	Rena override 32c85a60, base 31fd7640 ( CH1k )
+0x8c14	field	m_fEventTime[0].keyInputEnd	CX2GUUser ( CH1a )
+0x8c18	field	m_fEventTime[0].stateChange	CX2GUUser; AirialDash FrameMoveFuture tests the anim time against it ( CH1a )
+0x8c1c	field	m_fEventTime[1].keyInputStart	CX2GUUser ( CH1a )
+0x8c20	field	m_fEventTime[1].keyInputEnd	CX2GUUser ( CH1a )
+0x8c24	field	m_fEventTime[1].stateChange	CX2GUUser ( CH1a )
+0x7d87	field	m_FrameDataFuture.stateParam.bEventFlagList[2]	CX2GUUser ( CH1a )
+0x7e08	field	m_FrameDataFuture.unitCondition.dirDegree.y	CX2GUUser; dirDegree.x at +0x7e04; AirialDashStart adds 180 when the dash turns the unit round ( CH1a )
+0xde4	field	m_fCanNotJumpTime	CX2GameUnit; JumpAttackZ / X EventProcess store 0.2 when the pure-down flag is set ( CH1a )
+0x7e40	field	m_FrameDataFuture.syncData.position.y	CX2GUUser; -= 45 ( LINE_RADIUS x 1.5 ) on the fall / jump-down arms ( CH1b review )
+0x30c	field	m_PhysicParam.passiveSpeed.x	CX2GameUnit; AirialDash FrameMoveFuture copies it to nowSpeed.x ( CH1b review )
+0x1c8	vslot	GetRandomInt()	DamageDown no-down roll against +0x4060 ( CH1b review )
+0x11c	vslot	SetForceInvincible( float )	StandUpRolling / StandUpAttack End 0.3 ( CH1b review )
+0x120	vslot	SetShowInvincible( float )	StandUpRolling / StandUpAttack End 0.3 ( CH1b review )
+0x21c	vslot	SetBuffFactorToGameUnitByBuffFactorID	June 322a6960 ( BFI, creator, level, adjust, skip ); March keeps ( BFI, level ) first ( CH1b review )
+0x6890	field	(byte, no-detonation by state)	CX2GameUnit; ZpushX Charge Start 32b99df0 = 1, ported as SetNoDetonation( true ); NPC CommonEventProcessNonHost reads +0x6890 / +0x6892 ( funcmap 3276cb20 ) ( CH1d2 review )
+0x7eb4	field	m_FrameDataFuture.syncData.m_HyperModeCount	KProtectedType ( &+0x7eb4 ^ +0x7eb8 ^ +0x7ebc ); the hyper entries test > 0 ( CH1d2 review )
+0x8e64	field	m_iCustomRenderState	CX2GameUnit in June; Ara holds it as a stand-in until the engine renderer phase: 1 CRS_SPECTOR_OF_THUNDER, 2 CRS_VERITABLE_PANDEMONIUM ( CH1h ApplyRenderParam )
+0x8908	field	m_fNowSkillPassiveRate	Ara-held stand-in for CX2GUUser +0x8908 ( ctor 1.0 ); GetNowSkillPassiveRate 32ba7ec0 is stored by CommonStateStartFuture, the base 320506f0 @32051bef multiplies it into +0x8900 and resets it ( CH1q2 ports that reader ) ( CH1j )
+0x7d88	field	m_FrameDataFuture.stateParam.bEventFlagList[3]	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x7d89	field	m_FrameDataFuture.stateParam.bEventFlagList[4]	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c28	field	m_fEventTime[2].keyInputStart	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c2c	field	m_fEventTime[2].keyInputEnd	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c30	field	m_fEventTime[2].stateChange	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c34	field	m_fEventTime[3].keyInputStart	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c38	field	m_fEventTime[3].keyInputEnd	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c3c	field	m_fEventTime[3].stateChange	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c40	field	m_fEventTime[4].keyInputStart	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c44	field	m_fEventTime[4].keyInputEnd	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c48	field	m_fEventTime[4].stateChange	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c4c	field	m_fEventTime[5].keyInputStart	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c50	field	m_fEventTime[5].keyInputEnd	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8c54	field	m_fEventTime[5].stateChange	CX2GUUser; the dash / combo flag chains read it ( CH1d2 review )
+0x8d5c	field	m_fThrowStartTime	CX2GUUser; June CX2GUEL ctor stores 0.66 ( = March ctor )
+0x8d60	field	m_vThrowStartPosOffset.x	CX2GUUser; ctor 40.0, y +0x8d64 130.0, z +0x8d68 0.0 ( = March ctor )
+0x8d6c	field	m_vThrowStartVelocity.x	CX2GUUser; ctor 2000.0, y +0x8d70 100.0, z +0x8d74 0.0 ( = March ctor )
+0x9598	field	m_iPreComboCount	CX2GUEL ( March, Way of the Sword combo count ); ctor -1; GaleBuffFrameMove skips an unchanged count
+0x8d64	field	unnamed_8d64	Elesis ctor 32b70ee0 stores 130.0 ( size 4 ); member named and declared by the phase that reads it ( CH1h offset map )
+0x8d68	field	unnamed_8d68	Elesis ctor 32b70ee0 stores 0.0 ( size 4 ); member named and declared by the phase that reads it ( CH1h offset map )
+0x8d70	field	unnamed_8d70	Elesis ctor 32b70ee0 stores 100.0 ( size 4 ); member named and declared by the phase that reads it ( CH1h offset map )
+0x8d74	field	unnamed_8d74	Elesis ctor 32b70ee0 stores 0.0 ( size 4 ); member named and declared by the phase that reads it ( CH1h offset map )
+0x190	field	(vtable 2)	CX2GUEL secondary vtable 334fa610 at +0x190 and 334fa608 at +0x1a0 ( ctor 32b70f44 / 32b70f4e, dtor resets them ) ( CH1h )
+0x92b8	field	m_fSnapshotWayOfSwordPoint	Elesis; CX2GUUser snapshot region: StoreGageSnapshot 32b6ac80 / RestoreGageSnapshot 32b6acb0 keep the point ( CH1q )
+0x959c	field	m_ahLucielMajorParticleInstance	CX2GULuciel CKTDGParticleSystem::CParticleEventSequenceHandle; users: 32aea6e0 dead/n ( a ), 32b1eb70 dead/n ( a ) ( CH1a )
+0x95a0	field	m_ahLucielMinorParticleInstance	CX2GULuciel CKTDGParticleSystem::CParticleEventSequenceHandle; users: 32aea7c0 dead/n ( a ), 32b1eca0 ? ( CH1l3 ) ( CH1a )
+0x95bc	field	m_fComboXXXZChargeTime	CX2GULuciel float; users: 32ae57b0 LSI_LU_COMBO_XXXZ_READY_StateStart ( CH1f ), 32ae5b80 LSI_CIEL_COMBO_XXXZ_START_StateStart ( CH1f ), 32ae5ba0 LSI_CIEL_COMBO_XXXZ_LOOP_StateEnd ( CH1f ), 32b103b0 LSI_LU_COMBO_XXXZ_CHARGE_StateEnd ( CH1f2 ) +2 ( CH1a )
+0x95c0	field	m_vecChaserOfDarknessEffect	CX2GULuciel std::vector<CX2DamageEffect::CEffectHandle>; users: 32b1f650 ? ( CH1l3 ), 32b1f800 CreateChaserOfDarknessDamageEffect ( CH1l3 ), 32b2a7a0 dead/n ( a ), 32b2a9e0 dead/n ( a ) ( CH1a )
+0x95d0	field	m_fChaserOfDarknessFireTimer	CX2GULuciel float; provisional name ( from its users ); users: 32b1f650 ? ( CH1l3 ), 32b1f800 CreateChaserOfDarknessDamageEffect ( CH1l3 ) ( CH1a )
+0x95d4	field	m_fChaserOfDarknessPowerRate	CX2GULuciel float; provisional name ( from its users ); users: 32b1f800 CreateChaserOfDarknessDamageEffect ( CH1l3 ), 32b2a7a0 dead/n ( a ), 32b2a9e0 dead/n ( a ) ( CH1a )
+0x95d8	field	m_bOtherEquipNotRendered	CX2GULuciel bool; provisional name ( from its users ); users: 32b143e0 ? ( CH1l ), 32b18220 UpdateNotRenderingOtherEquipList ( CH1l ) ( CH1a )
+0x95da	field	m_usStateLoopCount	CX2GULuciel USHORT; provisional name ( from its users ); users: 32ae5df0 LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture ( CH1h ), 32ae60f0 LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture ( CH1h ), 32ae6110 LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_StateStartFuture ( CH1h ), 32ae6a30 LSI_SA_LLC_DEAD_HANDS_StateStartFuture ( CH2b ) +10 ( CH1a )
+0x95dc	field	m_usSoulStrikeLoopCount	CX2GULuciel USHORT; users: 32b1e490 LSI_A_LCG_F_SOUL_STRIKE_READY_StateEndFuture ( CH2c2 ), 32b1e540 LSI_A_LCG_F_SOUL_STRIKE_LOOP_EventProcess ( CH2c2 ), 32b1e630 LSI_A_LCG_M_SOUL_STRIKE_LOOP_EventProcess ( CH2c2 ), 32b3dea0 LSI_A_LCG_F_SOUL_STRIKE_READY_StateEnd ( CH2c2 ) ( CH1a )
+0x95e0	field	m_iSnipingComboCount	CX2GULuciel int; users: 32ae5c70 LSI_LCG_COMBO_ZZZX_StateStartFuture ( CH1g ), 32ae5c90 LSI_LCG_COMBO_SNIPING_Z_StateStartFuture ( CH1g ), 32ae5db0 LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_StateStartFuture ( CH1g ), 32ae5dd0 LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_StateStartFuture ( CH1g ) +9 ( CH1a )
+0x95e4	field	m_iSnipingComboMaxCount	CX2GULuciel int; provisional name ( from its users ); users: 32ae5db0 LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_StateStartFuture ( CH1g ), 32ae6090 LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY_StateStartFuture ( CH1g ), 32af69b0 LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_EventProcess ( CH1g ), 32af6a20 LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_EventProcess ( CH1g ) +4 ( CH1a ); June's ctor leaves it unset
+0x95e8	field	m_fChargeTime	CX2GULuciel float; provisional name ( from its users ); users: 32ae5cb0 LSI_LCG_COMBO_SNIPING_X_CHARGE_StateStart ( CH1g ), 32ae5d20 LSI_LCG_COMBO_SNIPING_X_CHARGE_FrameMove ( CH1g ), 32ae5e30 LSI_LCG_F_COMBO_ZZZXX_LOOP_StateStartFuture ( CH1g ), 32ae5e60 LSI_LCG_F_COMBO_ZZZXX_LOOP_FrameMove ( CH1g ) +6 ( CH1a )
+0x95ec	field	m_fDeathCrisisOfMarbasWaitTime	CX2GULuciel float; provisional name ( from its users ); users: 32b00840 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart ( CH2c ), 32b00960 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_StateStartFuture ( CH2c ), 32b009a0 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_StateStartFuture ( CH2c ), 32b1d970 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_EventProcess ( CH2c2 ) ( CH1a )
+0x95f0	field	m_bDeadHandsActive	CX2GULuciel bool; users: 32b397a0 CommonFrameMove ( CH1l2 ) ( CH1a )
+0x95f4	field	m_iSeizedByFearSkillLevel	CX2GULuciel int; provisional name ( from its users ); users: 32b0fc50 ? ( CH4a ), 32b3ca30 CreateFearDamageEffect ( CH4a ), 32b3d380 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x95f8	field	m_fSeizedByFearRate	CX2GULuciel float; provisional name ( from its users ); users: 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x95fc	field	m_fSeizedByFearTimer	CX2GULuciel float; provisional name ( from its users ); users: 32b397a0 CommonFrameMove ( CH1l2 ), 32b3d380 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9600	field	m_afSeizedByFearValue	CX2GULuciel float; provisional name ( from its users ); users: 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9608	field	m_iSoulCollectorSkillLevel	CX2GULuciel int; provisional name ( from its users ); users: 32b3db80 ? ( CH2c2 ), 32b3dea0 LSI_A_LCG_F_SOUL_STRIKE_READY_StateEnd ( CH2c2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x960c	field	m_fPowerOfOriaxTime	CX2GULuciel float; provisional name ( from its users ); users: 32b397a0 CommonFrameMove ( CH1l2 ), 32b43590 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9610	field	m_ucSoulCollectorCount	CX2GULuciel UCHAR; provisional name ( from its users ); users: 32b43590 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9614	field	m_fPowerOfOriaxDamageRate	CX2GULuciel float; provisional name ( from its users ); users: 32b23820 LSI_CIEL_COMBO_X_FrameMove ( CH1f2 ), 32b23b80 LSI_CIEL_COMBO_XX_FrameMove ( CH1f2 ), 32b23ee0 LSI_CIEL_COMBO_XXX_FrameMove ( CH1f2 ), 32b24560 LSI_CIEL_COMBO_XXXX_FrameMove ( CH1f2 ) +9 ( CH1a )
+0x9618	field	m_fSoulCollectorDamageRate	CX2GULuciel float; provisional name ( from its users ); users: 32b23820 LSI_CIEL_COMBO_X_FrameMove ( CH1f2 ), 32b23b80 LSI_CIEL_COMBO_XX_FrameMove ( CH1f2 ), 32b23ee0 LSI_CIEL_COMBO_XXX_FrameMove ( CH1f2 ), 32b24560 LSI_CIEL_COMBO_XXXX_FrameMove ( CH1f2 ) +9 ( CH1a )
+0x961c	field	m_usSoulCollectorMaxCount	CX2GULuciel USHORT; provisional name ( from its users ); users: 32b23820 LSI_CIEL_COMBO_X_FrameMove ( CH1f2 ), 32b23b80 LSI_CIEL_COMBO_XX_FrameMove ( CH1f2 ), 32b23ee0 LSI_CIEL_COMBO_XXX_FrameMove ( CH1f2 ), 32b24560 LSI_CIEL_COMBO_XXXX_FrameMove ( CH1f2 ) +9 ( CH1a )
+0x9620	field	m_fSoulExtortionDrainRate	CX2GULuciel float; provisional name ( from its users ); users: 32b435f0 PlaySoulExtortionDrain ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9624	field	m_hDemonicBreathChargeEffectSet	CX2GULuciel CX2EffectSet::Handle; users: 32b004f0 LSI_SA_LCG_DEMONIC_BREATH_CHARGING_StateStart ( CH2c ) ( CH1a )
+0x9628	field	m_fFantasieImpromptuWaitTime	CX2GULuciel float; provisional name ( from its users ); users: 32ae7280 LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_StateStart ( CH2c ), 32ae72c0 LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_EventProcess ( CH2c ), 32ae7350 LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE_EventProcess ( CH2c ), 32ae73e0 LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE_EventProcess ( CH2c ) +6 ( CH1a )
+0x962c	field	m_fDeathCrisisOfMarbasChargeTime	CX2GULuciel float; provisional name ( from its users ); users: 32b00840 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart ( CH2c ), 32b00960 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_StateStartFuture ( CH2c ), 32b009a0 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_StateStartFuture ( CH2c ), 32b009e0 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_EventProcess ( CH2c ) +2 ( CH1a )
+0x9630	field	m_fLeftHandRotateDegree	CX2GULuciel float; provisional name ( from its users ); users: 32b00840 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart ( CH2c ), 32b15680 SetLeftHandRotateBone ( CH2c2 ), 32b2c7d0 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_FrameMove ( CH2c2 ), 32b2cd70 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_FrameMove ( CH2c2 ) ( CH1a )
+0x9634	field	m_fDeathCrisisOfMarbasMinChargeTime	CX2GULuciel float; provisional name ( from its users ); users: 32ae8760 dead/n ( a ), 32b00840 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart ( CH2c ), 32b1d970 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_EventProcess ( CH2c2 ) ( CH1a )
+0x9638	field	m_fDeathCrisisOfMarbasMaxChargeTime	CX2GULuciel float; provisional name ( from its users ); users: 32ae8780 dead/n ( a ), 32b00840 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart ( CH2c ), 32b00960 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_StateStartFuture ( CH2c ), 32b009a0 LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_StateStartFuture ( CH2c ) +2 ( CH1a )
+0x963c	field	m_hSoulShockEffectSet	CX2GULuciel CX2EffectSet::Handle; users: 32b2db60 LSI_A_LCG_F_SOUL_SHOCK_FrameMove ( CH2c2 ), 32b2e080 LSI_A_LCG_M_SOUL_SHOCK_FrameMove ( CH2c2 ), 32b397a0 CommonFrameMove ( CH1l2 ) ( CH1a )
+0x9640	field	m_fCommunionRate	CX2GULuciel float; provisional name ( from its users ); users: 32b37910 CommonStateStart ( CH1l2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9644	field	m_afFormMpRegenerationRate	CX2GULuciel float; provisional name ( from its users ); users: 32b0f080 InitComponent ( CH1k ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a ); June's ctor leaves them unset
+0x964c	field	m_fComboXXDownXXLoopTime	CX2GULuciel float; provisional name ( from its users ); users: 32ae5940 LSI_LLD_COMBO_XX_DOWN_XX_LOOP_StateStartFuture ( CH1h ), 32ae60d0 LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_StateStartFuture ( CH1h ), 32af16e0 LSI_LLD_COMBO_XX_DOWN_XX_LOOP_EventProcess ( CH1h ), 32afb450 LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_EventProcess ( CH1h ) ( CH1a )
+0x9650	field	m_hDashComboDownXEffectSet	CX2GULuciel CX2EffectSet::Handle; provisional name ( from its users ); users: 32af6c50 LSI_LCN_DASH_COMBO_ZX_DOWN_X_StateStartFuture ( CH1h ), 32afcdd0 LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_StateStartFuture ( CH1h ), 32afd6e0 LSI_LCN_F_DASH_COMBO_XX_DOWN_X_StateStartFuture ( CH1h ), 32b270b0 LSI_LCN_DASH_COMBO_ZX_DOWN_X_FrameMove ( CH1h ) +2 ( CH1a )
+0x9654	field	m_vDashComboDownXPosition	CX2GULuciel D3DXVECTOR3; provisional name ( from its users ); users: 32af6c50 LSI_LCN_DASH_COMBO_ZX_DOWN_X_StateStartFuture ( CH1h ), 32afcdd0 LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_StateStartFuture ( CH1h ), 32afd6e0 LSI_LCN_F_DASH_COMBO_XX_DOWN_X_StateStartFuture ( CH1h ), 32b15b20 LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_FrameMove ( CH1h ) +5 ( CH1a )
+0x9660	field	m_usDancingBladeLoopCount	CX2GULuciel USHORT; users: 32ae7bc0 LSI_SA_LLD_DANCING_BLADE_StateStartFuture ( CH3a ), 32ae7bf0 LSI_SA_LLD_DANCING_BLADE_LOOP_StateStartFuture ( CH3a ), 32ae7c10 LSI_SA_LLD_DANCING_BLADE_StateEndFuture ( CH3a ), 32b14640 GetActualMPConsume ( CH1l2 ) +1 ( CH1a )
+0x9664	field	m_fSummonedDarknessElapsedTime	CX2GULuciel float; provisional name ( from its users ); users: 32b20260 ? ( CH3a ), 32b397a0 CommonFrameMove ( CH1l2 ) ( CH1a )
+0x9668	field	m_iLordOfFearSkillLevel	CX2GULuciel int; provisional name ( from its users ); users: 32ae5470 dead/n ( a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x966c	field	m_fReduceDebuffDurationRate	CX2GULuciel float; users: 32ae5480 GetReduceDebuffDurationRate ( CH1k ), 32b1caa0 dead/n ( a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9670	field	m_fLordOfFearDamageRate	CX2GULuciel float; provisional name ( from its users ); users: 32b3ca30 CreateFearDamageEffect ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9674	field	m_fFearDamageEffectCoolTime	CX2GULuciel float; provisional name ( from its users ); users: 32b397a0 CommonFrameMove ( CH1l2 ), 32b3ca30 CreateFearDamageEffect ( CH4a ) ( CH1a )
+0x9678	field	m_bAuraOfFearActive	CX2GULuciel bool; provisional name ( from its users ); users: 32b15780 ? ( CH1l3 ), 32b3d380 ? ( CH4a ) ( CH1a )
+0x967c	field	m_fAuraOfFearTime	CX2GULuciel float; provisional name ( from its users ); users: 32b15780 ? ( CH1l3 ), 32b3d380 ? ( CH4a ) ( CH1a )
+0x9680	field	m_fAuraOfFearDuration	CX2GULuciel float; provisional name ( from its users ); users: 32b15780 ? ( CH1l3 ), 32b3d380 ? ( CH4a ) ( CH1a )
+0x9684	field	m_fEnhancedSpecterRate	CX2GULuciel float; provisional name ( from its users ); users: 32b2e5a0 LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b2ec50 LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9688	field	m_fEnhancedSpecterRange	CX2GULuciel float; provisional name ( from its users ); users: 32b2e5a0 LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b2ec50 LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x968c	field	m_fSoulStrikeChargeTime	CX2GULuciel float; provisional name ( from its users ); users: 32aebaf0 not-luciel/n ( a ), 32b20670 ? ( CH2c2 ) ( CH1a )
+0x9690	field	m_iShadowBoltControlIndex	CX2GULuciel int; provisional name ( from its users ); users: 32b20780 ? ( CH1l3 ), 32b2ff50 LSI_SA_LCN_SHADOW_BOLT_START_EventProcess ( CH3b ), 32b30000 LSI_SA_LCN_SHADOW_BOLT_END_StateEndFuture ( CH3b ), 32b30090 LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess ( CH3b ) +9 ( CH1a )
+0x9694	field	m_fShadowBoltTime	CX2GULuciel float; provisional name ( from its users ); users: 32b20780 ? ( CH1l3 ), 32b2fba0 LSI_SA_LCN_SHADOW_BOLT_START_FrameMove ( CH3b ) ( CH1a )
+0x9698	field	m_fShadowBoltDuration	CX2GULuciel float; provisional name ( from its users ); users: 32b20780 ? ( CH1l3 ), 32b2fba0 LSI_SA_LCN_SHADOW_BOLT_START_FrameMove ( CH3b ) ( CH1a )
+0x969c	field	m_bTwilightJudgementReattack	CX2GULuciel bool; provisional name ( from its users ); users: 32aebb60 ? ( CH1l3 ), 32b20ad0 dead/n ( a ), 32b308e0 LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_StateStart ( CH3b ) ( CH1a )
+0x96a0	field	m_fTwilightJudgementTime	CX2GULuciel float; provisional name ( from its users ); users: 32aebb60 ? ( CH1l3 ), 32b20a10 ? ( CH3b ) ( CH1a )
+0x96a4	field	m_fSoulStrikeCoolTime	CX2GULuciel float; provisional name ( from its users ); users: 32b397a0 CommonFrameMove ( CH1l2 ), 32b3db80 ? ( CH2c2 ), 32b3dea0 LSI_A_LCG_F_SOUL_STRIKE_READY_StateEnd ( CH2c2 ) ( CH1a )
+0x96a8	field	m_fCombinationPointOnHitCoolTime	CX2GULuciel float; provisional name ( from its users ); users: 32b14bc0 AddCombinationPointOnHit ( CH1p ), 32b397a0 CommonFrameMove ( CH1l2 ) ( CH1a )
+0x96ac	field	m_hDarkCrescentEffectSet	CX2GULuciel CX2EffectSet::Handle; users: 32affa70 LSI_SA_LLC_DARK_CRESCENT_StateStart ( CH2b ), 32b3d010 LSI_SA_LLC_DARK_CRESCENT_FrameMove ( CH2b ) ( CH1a )
+0x96b0	field	m_iEvilClawHitCount	CX2GULuciel int; provisional name ( from its users ); users: 32b29af0 LSI_SA_LD_EVIL_CLAW_FrameMove ( CH2a ) ( CH1a )
+0x96b4	field	m_fSwitchingCoolTime	CX2GULuciel float; users: 32ae5920 LSI_LU_SWITCHING_StateStartFuture ( CH1b ), 32b0fa20 ? ( CH1l ), 32b1edd0 CommonFrameMoveFuture ( CH1l2 ), 32b20b30 LSI_LU_WAIT_EventProcess ( CH1b ) +9 ( CH1a )
+0x96b8	field	m_iSpecialAttackCombinationPointCost	CX2GULuciel int; provisional name ( from its users ); users: 32b0f940 SpecialAttackUse ( CH1l2 ), 32b1eef0 SpecialAttackCooldown ( CH1l2 ) ( CH1a )
+0x96bc	field	m_iLastUsedSkillID	CX2GULuciel int; provisional name ( from its users ); users: 32b0fa20 ? ( CH1l ), 32b1eef0 SpecialAttackCooldown ( CH1l2 ), 32b32550 LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStart ( CH3c2 ) ( CH1a )
+0x96c0	field	m_fSoulStrikeMoveSpeed	CX2GULuciel float; provisional name ( from its users ); users: 32b2e5a0 LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b2ec50 LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ) ( CH1a )
+0x96c4	field	m_fSoulStrikeSpeedRate	CX2GULuciel float; provisional name ( from its users ); users: 32b1e720 ? ( CH1k ), 32b2e5a0 LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b2ec50 LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ) ( CH1a )
+0x96c8	field	m_vecDarkCrescentTargetUnit	CX2GULuciel std::vector<SGameUnitKey>; users: 32b16ca0 LSI_SA_LLC_RUINOUS_IMPACT_EventProcess ( CH2b ), 32b177b0 ? ( CH4a ), 32b2ac20 LSI_SA_LLC_DARK_CRESCENT_StateStartFuture ( CH2b ) ( CH1a )
+0x96dc	field	m_iBoundingStrikeCount	CX2GULuciel int; provisional name ( from its users ); users: 32b14c00 LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd ( CH1i ), 32b34680 CheckBoundingTarget ( CH1l ), 32b38cb0 not-luciel/n ( a ) ( CH1a ); June's ctor leaves it unset
+0x96e0	field	m_bBoundingStrikeHit	CX2GULuciel bool; provisional name ( from its users ); users: 32b14c00 LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd ( CH1i ), 32b153d0 ? ( CH1l3 ), 32b38cb0 not-luciel/n ( a ) ( CH1a ); June's ctor leaves it unset
+0x96e8	field	m_bBoundingTargetFound	CX2GULuciel bool; provisional name ( from its users ); users: 32b34680 CheckBoundingTarget ( CH1l ), 32b38cb0 not-luciel/n ( a ) ( CH1a )
+0x96ec	field	m_iBoundingTargetUnitIndex	CX2GULuciel int; provisional name ( from its users ); users: 32b34680 CheckBoundingTarget ( CH1l ), 32b38cb0 not-luciel/n ( a ) ( CH1a )
+0x96f0	field	m_BoundingTarget	CX2GULuciel SGameUnitKey; users: 32b34100 LSI_BOUNDING_TARGET_LU_STRIKER_StateStartFuture ( CH1i ), 32b341b0 LSI_BOUNDING_TARGET_LU_COMMAND_X_StateStartFuture ( CH1i ), 32b34680 CheckBoundingTarget ( CH1l ), 32b35fd0 LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture ( CH1i ) +1 ( CH1a )
+0x9700	field	m_fBoundingKeyShowTime	CX2GULuciel float; provisional name ( from its users ); users: 32b0e550 ? ( CH1l3 ), 32b38cb0 not-luciel/n ( a ) ( CH1a )
+0x9704	field	m_pDlgBoundingKey	CX2GULuciel CKTDGUIDialogType; users: 32b0e550 ? ( CH1l3 ), 32b1e8e0 Init ( CH1k ), 32b35cf0 not-luciel/n ( a ), 32b38cb0 not-luciel/n ( a ) ( CH1a )
+0x9710	field	m_bPhantomRushReady	CX2GULuciel bool; users: 32ae9bd0 ? ( CH1l2 ), 32aea8c0 ShownSkillCoolTime ( CH1l2 ), 32aeaa10 ? ( CH1a ), 32b14640 GetActualMPConsume ( CH1l2 ) +3 ( CH1a )
+0x9714	field	m_fPhantomRushReadyTime	CX2GULuciel float; users: 32b347f0 ? ( CH1l3 ), 32b34920 ? ( CH1a ), 32b38140 LSI_A_LDB_F_PHANTOM_RUSH_FrameMove ( CH2d2 ), 32b38340 LSI_A_LDB_M_PHANTOM_RUSH_CameraMove ( CH2d2 ) +2 ( CH1a )
+0x9718	field	m_hPhantomRushEffectSet	CX2GULuciel CX2EffectSet::Handle; users: 32b347f0 ? ( CH1l3 ), 32b34920 ? ( CH1a ), 32b38140 LSI_A_LDB_F_PHANTOM_RUSH_FrameMove ( CH2d2 ), 32b38340 LSI_A_LDB_M_PHANTOM_RUSH_CameraMove ( CH2d2 ) ( CH1a )
+0x9720	field	m_PhantomRushTarget	CX2GULuciel SGameUnitKey; users: 32b347f0 ? ( CH1l3 ), 32b34920 ? ( CH1a ), 32b38540 LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture ( CH2d2 ) ( CH1a )
+0x9730	field	m_fBoundingDamageRate	CX2GULuciel KProtectedType<float>; provisional name ( from its users ); users: 32b38cb0 not-luciel/n ( a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x973c	field	m_fBoundingDamageRateEx	CX2GULuciel KProtectedType<float>; provisional name ( from its users ); users: 32b1e720 ? ( CH1k ), 32b38cb0 not-luciel/n ( a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9748	field	m_AltarOfEvilData	CX2GULuciel SAltarOfEvilData; users: 32b35600 PlayAltarOfEvilEffectSet ( CH1l3 ), 32b380a0 LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_StateStart ( CH2d2 ) ( CH1a )
+0x9778	field	m_bNightmareTargetHit	CX2GULuciel bool; provisional name ( from its users ); users: 32ae89c0 LSI_SA_LDB_NIGHTMARE_StateStart ( CH2d ), 32b13360 LSI_SA_LDB_NIGHTMARE_TARGET_FrameMove ( CH2d2 ) ( CH1a ); June's ctor leaves it unset
+0x977c	field	m_vecNightmareTargetUnit	CX2GULuciel std::vector<CX2GameUnit*>; users: 32b30ec0 LSI_SA_LDB_NIGHTMARE_TARGET_StateStartFuture ( CH2d2 ) ( CH1a )
+0x978c	field	m_vecNightmareHitUnit	CX2GULuciel std::vector<SGameUnitKey>; users: 32b16f50 LSI_SA_LDB_NIGHTMARE_StateStartFuture ( CH2d2 ), 32b30ec0 LSI_SA_LDB_NIGHTMARE_TARGET_StateStartFuture ( CH2d2 ) ( CH1a )
+0x97a0	field	m_fDeathTouchTime	CX2GULuciel float; provisional name ( from its users ); users: 32b318e0 LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove ( CH2d2 ), 32b349f0 ? ( CH1l3 ), 32b34a90 ? ( CH1l3 ) ( CH1a )
+0x97a4	field	m_fDeathTouchRange	CX2GULuciel float; provisional name ( from its users ); users: 32b318e0 LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove ( CH2d2 ), 32b34a90 ? ( CH1l3 ) ( CH1a )
+0x97a8	field	m_DeathTouchTarget	CX2GULuciel SGameUnitKey; provisional name ( from its users ); users: 32b318e0 LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove ( CH2d2 ), 32b349f0 ? ( CH1l3 ), 32b34a90 ? ( CH1l3 ) ( CH1a )
+0x97b8	field	m_uidDeathTouchUnit	CX2GULuciel UidType; provisional name ( from its users ); users: 32b318e0 LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove ( CH2d2 ), 32b349f0 ? ( CH1l3 ), 32b34a90 ? ( CH1l3 ) ( CH1a )
+0x97c0	field	m_fRapidImpactCoolTime	CX2GULuciel float; provisional name ( from its users ); users: 32b17f90 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x97c4	field	m_fRapidImpactRange	CX2GULuciel float; provisional name ( from its users ); users: 32b16760 ? ( CH1l3 ), 32b17f90 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x97c8	field	m_fRapidImpactMaxRange	CX2GULuciel float; provisional name ( from its users ); users: 32b17f90 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x97cc	field	m_fInvasionOfDarkEnergyTime	CX2GULuciel float; provisional name ( from its users ); users: 32b17f90 ? ( CH4a ), 32b1e720 ? ( CH1k ), 32b45820 InitPassiveSkillState ( CH4a ), 32b4b580 ? ( CH1k2 ) ( CH1a )
+0x97d0	field	m_fInvasionOfDarkEnergyDuration	CX2GULuciel float; provisional name ( from its users ); users: 32b1e720 ? ( CH1k ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x97d4	field	m_vecInvasionOfDarkEnergyTarget	CX2GULuciel std::vector<STimedGameUnitKey>; users: 32b16260 ? ( CH1k ), 32b166e0 ? ( CH1k ), 32b16760 ? ( CH1l3 ), 32b17f90 ? ( CH4a ) +1 ( CH1a )
+0x97e4	field	m_iDesperadoAttackCount	CX2GULuciel int; users: 32b04950 LSI_SA_LDN_DESPERADO_EventProcess ( CH3c ), 32b04cd0 LSI_SA_LDN_DESPERADO_ATTACK_EventProcess ( CH3c ), 32b14030 ? ( CH3c2 ), 32b16fc0 LSI_SA_LDN_DESPERADO_StateStart ( CH3c2 ) +2 ( CH1a )
+0x97e8	field	m_iDesperadoMaxAttackCount	CX2GULuciel int; users: 32b04950 LSI_SA_LDN_DESPERADO_EventProcess ( CH3c ), 32b135e0 LSI_SA_LDN_DESPERADO_FrameMove ( CH3c2 ), 32b16fc0 LSI_SA_LDN_DESPERADO_StateStart ( CH3c2 ), 32b17040 LSI_SA_LDN_DESPERADO_ATTACK_END_StateStart ( CH3c2 ) +1 ( CH1a )
+0x97ec	field	m_vecDesperadoTarget	CX2GULuciel std::vector<STimedGameUnitKey>; users: 32b04cd0 LSI_SA_LDN_DESPERADO_ATTACK_EventProcess ( CH3c ), 32b135e0 LSI_SA_LDN_DESPERADO_FrameMove ( CH3c2 ), 32b14030 ? ( CH3c2 ), 32b16fc0 LSI_SA_LDN_DESPERADO_StateStart ( CH3c2 ) +4 ( CH1a )
+0x97fc	field	m_fDesperadoAimDegreeX	CX2GULuciel float; provisional name ( from its users ); users: 32b14030 ? ( CH3c2 ), 32b16fc0 LSI_SA_LDN_DESPERADO_StateStart ( CH3c2 ), 32b32090 LSI_SA_LDN_DESPERADO_ATTACK_FrameMove ( CH3c2 ) ( CH1a ); June's ctor leaves it unset
+0x9800	field	m_fDesperadoAimDegreeY	CX2GULuciel float; provisional name ( from its users ); users: 32b14030 ? ( CH3c2 ), 32b16fc0 LSI_SA_LDN_DESPERADO_StateStart ( CH3c2 ), 32b32090 LSI_SA_LDN_DESPERADO_ATTACK_FrameMove ( CH3c2 ) ( CH1a ); June's ctor leaves it unset
+0x9804	field	m_fDesperadoAttackTime	CX2GULuciel float; provisional name ( from its users ); users: 32ae9ea0 ChangeDesperadoAttackState ( CH3c ), 32b14030 ? ( CH3c2 ), 32b16fc0 LSI_SA_LDN_DESPERADO_StateStart ( CH3c2 ), 32b32090 LSI_SA_LDN_DESPERADO_ATTACK_FrameMove ( CH3c2 ) ( CH1a ); June's ctor leaves it unset
+0x9808	field	m_fMadnessCraveAttackRate	CX2GULuciel float; provisional name ( from its users ); users: 32b3e470 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x980c	field	m_fMadnessCraveMagicAttackRate	CX2GULuciel float; provisional name ( from its users ); users: 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9810	field	m_fMadnessCraveDefenceRate	CX2GULuciel float; provisional name ( from its users ); users: 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9814	field	m_fMadnessCraveMagicDefenceRate	CX2GULuciel float; provisional name ( from its users ); users: 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9818	field	m_fMadnessCraveHpRate	CX2GULuciel float; provisional name ( from its users ); users: 32b3e470 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x981c	field	m_fMadnessCraveCoolTime	CX2GULuciel float; provisional name ( from its users ); users: 32b3e470 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9820	field	m_fMadnessCraveElapsedTime	CX2GULuciel float; provisional name ( from its users ); users: 32b3e470 ? ( CH4a ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9824	field	m_fMadnessCraveDuration	CX2GULuciel float; provisional name ( from its users ); users: 32b3e470 ? ( CH4a ) ( CH1a )
+0x9828	field	m_fMadnessDestroyRate	CX2GULuciel float; provisional name ( from its users ); users: 32b0e3f0 ? ( CH1k ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x982c	field	m_fMadnessDestroyCoolTime	CX2GULuciel float; provisional name ( from its users ); users: 32b0e3f0 ? ( CH1k ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9830	field	m_ptrShrewdCutterLockOn	CX2GULuciel CX2GUAra::sLockOnSystemPtr; users: 32b07a40 LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_StateStart ( CH3c2 ), 32b07ac0 LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_EventProcess ( CH3c2 ), 32b07b20 LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture ( CH3c2 ), 32b13940 dead/n ( a ) +3 ( CH1a ); Ara's type until CH3c20 moves it out of CX2GUAra
+0x9834	field	m_iShrewdCutterAttackCount	CX2GULuciel int; users: 32b07a40 LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_StateStart ( CH3c2 ), 32b15290 LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess ( CH3c2 ) ( CH1a )
+0x9838	field	m_fShadowFuryAccumulatedDamage	CX2GULuciel float; users: 32ae96e0 LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateStart ( CH3c ), 32b0e4e0 AccumulateShadowFuryDamage ( CH1l3 ), 32b33b00 LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateEnd ( CH3c2 ) ( CH1a ); June's ctor leaves it unset
+0x983c	field	m_hTransformedFormEffectSet	CX2GULuciel CX2EffectSet::Handle; users: 32b34fe0 StartTransformedForm ( CH4a ) ( CH1a )
+0x9840	field	m_hPunisherEffectSet	CX2GULuciel CX2EffectSet::Handle; users: 32b32b30 LSI_A_LDN_M_PUNISHER_FrameMove ( CH3c2 ), 32b397a0 CommonFrameMove ( CH1l2 ) ( CH1a )
+0x9844	field	m_clockCreated	CX2GULuciel clock_t; provisional name ( from its users ); users: 32b20780 ? ( CH1l3 ) ( CH1a )
+0x9848	field	m_mapScaleHeadByForm	CX2GULuciel std::map<int, bool>; users: 32b171c0 ScaleHead ( CH1l2 ), 32b18220 UpdateNotRenderingOtherEquipList ( CH1l ) ( CH1a )
+0x9858	field	m_iSoulSpreadCount	CX2GULuciel int; users: 32b0e710 LSI_A_LCN_SOUL_SPREAD_LU_READY_EventProcess ( CH3b ), 32b0e7f0 LSI_A_LCN_SOUL_SPREAD_LU_LOOP_StateEndFuture ( CH3b ), 32b0e850 LSI_A_LCN_SOUL_SPREAD_CIEL_READY_EventProcess ( CH3b ), 32b0e930 LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP_StateEndFuture ( CH3b ) ( CH1a )
+0x985c	field	m_fThroneAuthorityRate	CX2GULuciel float; provisional name ( from its users ); users: 32b2b050 LSI_SA_LLC_APOLLYON_FrameMove ( CH2b ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x9860	field	m_bStableDarkEnergyLocked	CX2GULuciel bool; users: 32b347f0 ? ( CH1l3 ), 32b34920 ? ( CH1a ), 32b3a310 CanUseSpecialAttack ( CH1l2 ) ( CH1a )
+0x9864	field	m_vAbyssSnipingAimPosition	CX2GULuciel D3DXVECTOR3; provisional name ( from its users ); users: 32b172d0 LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove ( CH3c2 ), 32b36d90 LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove ( CH3c2 ) ( CH1a )
+0x9870	field	m_vAbyssSnipingAimRange	CX2GULuciel D3DXVECTOR2; provisional name ( from its users ); users: 32b0ed50 LSI_SA_LDN_ABYSS_SNIPING_READY_EventProcess ( CH3c2 ), 32b172d0 LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove ( CH3c2 ), 32b36d90 LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove ( CH3c2 ) ( CH1a )
+0x9878	field	m_vecAbyssSnipingTarget	CX2GULuciel std::vector<int>; provisional name ( from its users ); users: 32b0ed50 LSI_SA_LDN_ABYSS_SNIPING_READY_EventProcess ( CH3c2 ), 32b172d0 LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove ( CH3c2 ) ( CH1a )
+0x9888	field	m_fCombinationPointOverflowCoolTime	CX2GULuciel float; users: 32b14860 ? ( CH1a ), 32b397a0 CommonFrameMove ( CH1l2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
+0x988c	field	m_iDamageEffectIndex	CX2GULuciel int; users: 32b0efc0 StampEffectSetIndex ( CH1k ), 32b0efe0 GetDamageEffectIndex ( CH1k ), 32b0fa20 ? ( CH1l ), 32b18170 ? ( CH1l2 ) ( CH1a ); June's ctor leaves it unset
+0x9890	field	m_vecDamageEffectHitCount	CX2GULuciel std::vector<SDamageEffectHitCount>; users: 32b14db0 FindDamageEffectIndexEntry ( CH1a ), 32b16810 EraseDamageEffectIndexEntry ( CH1k ), 32b16880 ? ( CH1l3 ), 32b18170 ? ( CH1l2 ) ( CH1a )

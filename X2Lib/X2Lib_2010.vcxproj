@@ -1866,6 +1866,7 @@
     <ClInclude Include="X2GUAra.h" />
     <ClInclude Include="X2GUArme_VioletMage.h" />
     <ClInclude Include="X2GUChung.h" />
+    <ClInclude Include="X2GULuciel.h" />
     <ClInclude Include="X2GUEl.h" />
     <ClInclude Include="X2GUElsword_SwordMan.h" />
     <ClInclude Include="X2GuEve.h" />
@@ -2829,6 +2830,7 @@
     <ClCompile Include="X2GUAra.cpp" />
     <ClCompile Include="X2GUArme_VioletMage.cpp" />
     <ClCompile Include="X2GUChung.cpp" />
+    <ClCompile Include="X2GULuciel.cpp" />
     <ClCompile Include="X2GUEL.cpp" />
     <ClCompile Include="X2GUElsword_SwordMan.cpp" />
     <ClCompile Include="X2GuEve.cpp" />

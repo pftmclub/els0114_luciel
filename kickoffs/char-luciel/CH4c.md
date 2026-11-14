@@ -39,3 +39,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   June addresses: `32ae5150` MemoConditionLuciel::IsCondition `32ae5170`.
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7b L325-326 skill-memo entry 31fdbbb0 / class callers of 31fdbcc0.
 - `MemoConditionLuciel::IsCondition` `32ae5150` (`31fd4450( arg ) != 0`) and its slot-2 thunk `32ae5170`.
+
+## Amended by char-luciel CH1a (2026-11-14)
+
+- `MemoConditionLuciel` ( ctor `32aeb3f0`, `IsCondition` `32ae5150` ) is not ported: March has no `CX2GUUser::MemoCondition` ( Skill S3f: the base and every class override decide false, the memo never applies ). The Lu/Ciel ctor carries a one-line stand-in comment; CH4c ports nothing for it unless the user's MemoCondition is ported first.

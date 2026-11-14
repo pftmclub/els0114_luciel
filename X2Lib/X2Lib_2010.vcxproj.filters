@@ -192,6 +192,9 @@
     <ClInclude Include="X2GUChung.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="X2GULuciel.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
     <ClInclude Include="X2GUElsword_SwordMan.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -1179,6 +1182,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="X2GUChung.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="X2GULuciel.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="X2GUElsword_SwordMan.cpp">

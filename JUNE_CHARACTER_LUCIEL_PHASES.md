@@ -1484,6 +1484,54 @@ the worktree run below ).
 - **How to see it in game:** nothing for Lu/Ciel yet ( inert ). Every class: MP regen and detonation now feed the gained / spent MP tallies, and the
   gauge's per-frame `Veryfy` is gone; regen amounts are unchanged.
 
+### CH1a - Done (2026-11-14)
+
+Opus 5.5 high. New `X2Lib/X2GULuciel.h` / `.cpp` ( ASCII, CRLF; in `X2Lib_2010.vcxproj` + `.filters` ) under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`;
+`//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` added ( `Always.h`, with `#error` guards: `_LIVE` needs `_CORE`, `_CORE` needs `JUNE_ENUM_NAMES` ). funcmap
+`grep "(CH1a)" june2017_re/funcmap.tsv` ( 19 rows ); `JUNE_BUGS.md` 679-681; member table `june2017_re/char_luciel/ch1_offsets.tsv` ( 123 class rows +
+Elesis's base rows ); `ch0_class_map.tsv` names / phases updated.
+- **Class.** `CX2GULuciel : CX2GUUser`; the ctor is private ( Chung's pattern ); `CreateGULuciel` waits for CH1 final ( the class is abstract until
+  CH1o wires the pure virtuals ). **123 members** at June's `+0x959c`..`+0x98a0`, in June's order, named from a census of every class-range access
+  ( each with its users in `ch1_offsets.tsv`; names read only from users are marked provisional there ). Inits from the ctor's x87 run with its `fxch`es
+  followed ( `0x334380f0` = -1.0 ); nine members June leaves unset stay unset ( JUNE_BUGS 681 ). Types from the users: eleven vectors ( damage-effect
+  handles, `{ UID, GAME_UNIT_TYPE }` keys = `SGameUnitKey`, 24-byte `STimedGameUnitKey`, `SDamageEffectHitCount`, effect-set handles, `D3DXVECTOR3` ),
+  `std::map<int,bool>` ( heads by form ), two `KProtectedType<float>`, `SAltarOfEvilData` ( June's member initializer `32b4d1c0` / dtor `32699670` ),
+  Ara's `sLockOnSystemPtr` ( until CH3c20 moves it ), the bounding-key dialog as `CKTDGUIDialogType`.
+- **State enum `LUCIEL_STATE_ID`:** 531 June names over 493 ids ( `ch0_reg.tsv` + `ch0_state_skill.tsv` + the setter's extra states ), June's values,
+  under `JUNE_ENUM_NAMES`. Five names are registered at several ids; the name takes its own slot ( `..._PHOENIX_RUN` 123 / 571, `LSI_LU_JUMP_COMBO_Z`
+  178, `LSI_CIEL_THROW_ITEM` 228, `LSI_LCG_F_DASH_COMBO_XXXZ_END` 333 ); the 17 re-registered ids and USI 111-116 are listed in CH1m's kickoff.
+- **Bodies ( 15 of 21 + 4 thunks ):** ctor `32b1bd90` ( June's base-ctor 6th argument 0x251 = state-vector size, not in March ), dtor `32b39380`,
+  particle inits ( inlined in June ), `DeleteLucielMinorParticle` `32b1eb10` ( CH0's "DeleteMinorParticle" is the user virtual ), `StateChangeBySkillID`
+  `32aeaa10` ( decoded from its two jump tables: 44 skill ids ), `UpGageNowMpOfForm` `32aeb1e0`, `GetNowCombinationPoint` `32b0fa00`, `UpCombinationPoint`
+  `32b14860`, `CountDamageEffectHit` `32b14db0` ( own 0x880: entry `+8` is a hit counter June increments; CH0 read it as a reference ) with `32b4cb80`
+  inlined, `GetSkillCombinationPointCost` `32b14f70` ( templet `+0x10` = `m_usFPConsumtion` ), `KillMySummonedNPC` `32b20100`, `ResetPhantomRushReady`
+  `32b34920`, `ClearAltarOfEvilEffectSet` `32b35540`, `TryUseSkillWithCombinationPoint` `32b3acf0` ( own 0x884; Elesis CH1k's idioms; cool-time / MP checks
+  behind `IsDevUnlimitedSkillUse`; June's string 33027 has no March `STR_ID` and stays a number ), `PreloadAuraAccelResources` `32ae6130` ( own 0x888 ),
+  InitState's `+0x8ac8` switch as `SetSkillCutInSetIndexByUnitClass` ( CH1m calls it ).
+- **Not ported:** `MemoConditionLuciel` `32aeb3f0` ( March has no `CX2GUUser::MemoCondition`; Skill S3f: it never applies; CH4c amended ).
+- **New phase CH1a4 ( this plan's subject ):** `ReleaseTransformedSkinAnim` `32b13d30`, `SetFormSkinAnim` `32b13e20`, `EndTransformedForm` `32b38f30` need
+  `CX2GUUser`'s transformed-skin pair `+0x8f74` / `+0x8f8c` ( ctor `32073d50`, dtor `@3203b530` ), the `+0x200` / `+0x210` set clears, the `+0x3cfc`
+  equipment show loop and user vslot 0x634, none in March. Declared here ( the dtor calls two ); kickoff `CH1a4.md`, STATUS row; CH1 final waits for it.
+- **Registered ( `JUNE_ENUM_NAMES`, June's `Enum.src.lua` values ):** 188 Lu/Ciel `SKILL_ID` names ( `X2SkillTree.h`: the 187 CH0 found unnamed but
+  `RNSI_P_LCN_TRIBUTE`, which a peer added, + `SI_SA_COMMON_AURA_DARKNESS_ACCEL` 208 ), `BTI_BUFF_SUMMON_DARKNESS` 474 / `_SHADOW_BOLT` 481 /
+  `_TWILIGHT_JUDGEMENT` 482 ( `X2BuffFactor.h` ), `NUI_SA_LDN_GARDEN_OF_HAURES` 2269 ( `X2UnitManager.h` ). An `enumprobe.py` run confirmed the SA / ST /
+  item / state / NUI names used resolve to June's values ( `SA_EFFECTIVE_RATE` 5, `SA_MP_REGENERATION_ABS` 43, `SA_COOLTIME_1` 148, `SA_TIME_ABS` 169 ).
+- **Kept from June ( JUNE_BUGS ):** 679 Ciel's Chaser of Darkness changes to state 268, which nothing registers; 680 the cost getter re-reads the level;
+  681 the nine unset members. Also kept without a row: the form-3 test in `UpGageNowMpOfForm` ( dead ), the `-10` combination-point literal.
+- **Reading to check in review:** `UpCombinationPoint` reads June's raw `+0x6c50` as `GetCharacterSpecializationA() + 1.0`, Eve's port's reading
+  ( `X2GUEve.cpp:49919` ); `+0x6d04` as `GetCharacterSpecializationB()` ( Chung's ).
+- **Routed / amended:** CH1m ( the cut-in switch call, the unnamed ids ), CH2d20 ( the window's dialog release in the dtor ), CH4c ( MemoCondition ),
+  CH1 ( `CreateGULuciel`, depends on CH1a4 ), CH1b ( `ch1_offsets.tsv` names, provisional ones ).
+- **Hygiene:** flagcheck `LUCIEL_CORE --worktree --files X2GULuciel.h X2GULuciel.cpp`: `0 PASS, 1 PASS~, 0 OTHER, 1 FAIL` / `0 deleted, 0 non-ASCII,
+  0 EOL-mismatched` ( the FAIL = the new `.cpp`'s PCH include outside the guard, precedent C3z-4t1 / RM1 ); `Always.h` = the tool's Unevaluable ERROR on
+  the compound `#if` guards. `JUNE_ENUM_NAMES --worktree` ( 4 files ): `1 PASS, 2 PASS~, 1 OTHER, 0 FAIL` / `RESULT: PASS` ( OTHER = `X2GULuciel.h`,
+  `_CORE`'s ). `_LIVE`: the define is commented out ( inert by design ), so the tool reports "not defined". `junediverge.py --check` ( 5 files ): `RESULT: PASS`.
+  `enumscan.py --check X2GULuciel.h X2GULuciel.cpp`: `0 A/B row(s)` ( 7 enumerator values misread as SKILL_ID / SA, `LSI_` names contain `SI_`: `stray`
+  verdicts in `enum_literals.tsv` ).
+- **Compile:** `/Zs` probes of `X2GULuciel.cpp` ( census `cl_cmd` ), plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each ( an earlier
+  abstract-class error proved the guarded code compiles; neither `#error` guard fires ). Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
