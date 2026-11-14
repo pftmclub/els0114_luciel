@@ -1788,6 +1788,7 @@ JUNE_BUGS 689; `ch0_vtable_all.tsv` slot 0x634 named.
   new bodies compiled in. Full build skipped: no play-test. Header edits ( `X2GUUser.h`, `X2BuffFactor.h`, `KTDGXSkinAfterImage.h` ) sit in the PCH: the
   next full build must rebuild it ( `--pch force` if in doubt ).
 - **How to see it in game:** nothing yet ( inert until CH1 final; CH2d2 / CH3c2 hand off the transform play-test ).
+- **Commit** `27c7bdd5`; flagcheck `--range 27c7bdd5^..27c7bdd5`: `TRANSFORM_LINK` `2 PASS, 1 PASS~, 3 OTHER, 0 FAIL` / `0 deleted` / `RESULT: PASS`; `LUCIEL_CORE` ( class files ) `2 PASS` / `RESULT: PASS`; `JUNE_ENUM_NAMES` ( `X2BuffFactor.h` ) `1 PASS~` / `RESULT: PASS`.
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
