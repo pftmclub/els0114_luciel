@@ -2002,6 +2002,32 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Commit** `1335ce1b`; `finish.py --range 1335ce1b^..1335ce1b`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 
+### CH1f2 - Done (2026-11-14)
+
+Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.h` / `.cpp`, nothing references it until CH1 ). funcmap `grep "(CH1f2)" june2017_re/funcmap.tsv` ( 38 rows ); JUNE_BUGS 697-699; review `CH1f2-review.md` ( Opus ) covers CH1b, CH1d, CH1f, CH1f2.
+- **38 functions, June addresses** ( every `state-fn` row of `ch0_class_map.tsv` col 6 = CH1f2 ): Ciel EventProcess `32af2fb0` ZZZZX, `32af31e0` X, `32af3500` XX, `32af38b0` XXX, `32af3d30` XXXX, `32af3f60` XXXZ_START, `32af3fe0` XXXZ_LOOP, `32af41e0` XXXZ_END, `32af44d0` XXXZX,
+  `32af4700` DASH_COMBO_Z, `32af4b90` DASH_COMBO_X, `32af4f80` JUMP_COMBO_X, `32af4fc0` / `32af51b0` / `32af52c0` DASH_JUMP_COMBO Z / ZX / X, `32af5690` / `32af5790` / `32af5890` XX / XXX / XXXX, `32af5990` XXXXZ, `32af5af0` XXXXZ_LANDING, `32b11cf0` JUMP_COMBO_Z;
+  Ciel FrameMove `32af59c0` DASH_JUMP_COMBO_XXXXZ, `32b23820` X, `32b23b80` XX, `32b23ee0` XXX, `32b24560` XXXX, `32b248c0` XXXZ_END, `32b24c40` DASH_COMBO_X, `32b24fa0` JUMP_COMBO_X, `32b25300` DASH_JUMP_COMBO_ZX, `32b25610` / `32b25970` / `32b25cd0` DASH_JUMP_COMBO XX / XXX / XXXX;
+  Lu `32b103b0` XXXZ_CHARGE StateEnd, `32b10540` JUMP_COMBO_Z EventProcess, `32b12ed0` ( `LSI_LU_JUMP_COMBO_Z_SECOND_EventProcess`, state 338 ), `32b21cd0` XXXZ_END FrameMove, `32b21f80` DASH_JUMP_COMBO_ZX FrameMove. The 38 thunks are CH1m's registration.
+- **How it was read:** `charport_adis.py luciel --phase CH1f2` ( and `--phase CH1f` for the Lu twins ), a scratch normaliser ( addresses and jump targets reduced to relative offsets ) diffed each Ciel EventProcess against its Lu twin from CH1f:
+  `ZZZZX`, `X`, `XX`, `XXX`, `XXXX`, `XXXZ_END`, `XXXZX`, `JUMP_COMBO_X`, `DASH_JUMP_COMBO_ZX`, `XXXXZ_LANDING` differ only in ids ( and the job-line arguments ); the rest were read in full.
+- **Where Ciel differs from Lu:** `DASH_COMBO_Z` has three X events ( job lines 2 / 1 / 3 ), `DASH_COMBO_X` swaps the two lines against Lu's `X_LANDING`, `DASH_JUMP_COMBO_Z` tests event 1 ( Chiliarch dash ) *before* event 0 ( X ), `XXXZ_START` goes to LOOP while Z is held else END,
+  `XXXZ_LOOP` ends at 3 s ( Lu's 2 s ) and then runs the cancels as else-ifs, `DASH_JUMP_COMBO_X` events 2 / 3 test the job line before Z and reach `LSI_LCG_DASH_JUMP_COMBO_SNIPING_START` / `LSI_LDB_F_DASH_JUMP_COMBO_XZ_START`.
+- **The projectile FrameMoves:** ten Ciel FrameMoves and Lu's `32b21f80` play one effect set at a time ( `EventTimer` on the present animation ) after `IsEnoughMPForAttack( mp, bone )`; June inlines the body, written once as `PlayComboProjectileEffectSet( name, mp, bAddMaxCountModifier )`
+  ( `PlayEffectSet` with power `GetPowerRate() * m_fPowerOfOriaxDamageRate` and life time `m_fSoulCollectorDamageRate`, then `AddDamageEffectModifier` tag 2 = the same rate, tag 4 = `m_usSoulCollectorMaxCount` added ).
+  `32b25300` skips tag 4; `32b23ee0` plays two; Lu's `32b21f80` is the plain March call ( life time -1, no modifiers ). `32b21cd0` scales the effect set and its damage by `1 + charge * 0.5` ( `SetEffectScale( v, true )` = June's `+0x70..+0x7c` stores ) with power `( 1 + charge ) * GetPowerRate()`;
+  Ciel's `32b248c0` is a damage effect ( `CreateInstance`, life time rate `1 + charge * 0.5`, 35 ahead and 40 up of the bone, the MP test on the unmoved bone position ).
+- **June quirks kept ( JUNE_BUGS 697-699 ):** the `XXXXZ_FrameMove` dive reads the future animation ( as 694 ); `DASH_JUMP_COMBO_X`'s last branch needs the air special attack and Z ( as 696 ); the Duo damage rate is passed where `PlayEffectSet` takes the life time.
+- **Constants:** namespace `_CONST_LUCIEL_CH1F2_` ( times, MP costs, the 3500 / -2500 dive speeds and aim cone, the 40 / 35 offsets, modifier tags 2 and 4 with no Enum entry ); `LINE_RADIUS * 1.5f` is June's 45.
+- **Names:** `junediverge.py --list` checked; the map's `LSI_<STATE>_<Fn>`, the CH1f `_SECOND_` suffix, and `PlayComboProjectileEffectSet` ( the class's `Play...` pattern ). Members `m_fSoulCollectorDamageRate` / `m_fPowerOfOriaxDamageRate` / `m_usSoulCollectorMaxCount` keep CH1a's provisional names ( their users here read like a life-time rate, a power rate and a count ): the review decides.
+- **Callees:** nothing new to write: `IsEnoughMPForAttack`, `PlayEffectSet`, `AddDamageEffectModifier`, `CX2DamageEffect::CreateInstance`, `GetNearestTargetAimDegree`, `SetEffectScale` all exist in March / earlier ports. June's `PlayEffectSet` extra argument ( force down rate 1.0 ) is March's default.
+- **Not in this phase:** modifier tags 2 / 4 only take effect in `ApplyDamageEffectModifiers` for their classes' phases ( CH2 ); no state is registered, so `stateends` / `skillicons` / `luabind` do not apply.
+- **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge` `RESULT: PASS`; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors each; `cl /P` holds 148 `LSI_*` definitions ( 110 + these 38 ). Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Commit** `b346db2f`; `finish.py --range b346db2f^..b346db2f`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
+- **Next:** `/x2-phase char-luciel CH1f2 review` ( Opus 5.5 high ), then CH1g ( Sonnet ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
