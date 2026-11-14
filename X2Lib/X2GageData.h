@@ -907,6 +907,42 @@ private:
 };
 #endif // NEW_CHARACTER_EL
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+// char-luciel CH1a0: June CX2LucielGageData ( vt 3349b2a4, 0x130 bytes ), the Combination Point gauge; its virtual overrides are CH1a1's
+class CX2LucielGageData : public CX2GageData
+{
+public:
+	CX2LucielGageData() : CX2GageData(), m_bCombinationPointChanged( false ), m_iNowCombinationPoint( 0 ), m_iMaxCombinationPoint( 10 )
+		, m_fRestFormMpRate( 1.f )	// June 32498e40
+	{}
+
+	CX2LucielGageData( const CX2LucielGageData& rhs_ ) : CX2GageData( rhs_ ), m_bCombinationPointChanged( rhs_.m_bCombinationPointChanged )
+		, m_iNowCombinationPoint( rhs_.m_iNowCombinationPoint ), m_iMaxCombinationPoint( rhs_.m_iMaxCombinationPoint ), m_fRestFormMpRate( rhs_.m_fRestFormMpRate )	// June 32a38250
+	{}
+
+	bool GetCombinationPointChanged() const { return m_bCombinationPointChanged; }
+	void SetCombinationPointChanged( const bool bCombinationPointChanged_ ) { m_bCombinationPointChanged = bCombinationPointChanged_; }
+	int GetNowCombinationPoint() const { return m_iNowCombinationPoint; }
+	int GetMaxCombinationPoint() const { return m_iMaxCombinationPoint; }
+
+	void SetNowCombinationPoint( const int iNowCombinationPoint_ )	// June 32a327a0: stored first, then clamped to 0 .. max
+	{
+		m_iNowCombinationPoint = iNowCombinationPoint_;
+		const int iNowCombinationPoint = m_iNowCombinationPoint;
+		if( GetMaxCombinationPoint() < iNowCombinationPoint )
+			m_iNowCombinationPoint = GetMaxCombinationPoint();
+		else if( 0 > iNowCombinationPoint )
+			m_iNowCombinationPoint = 0;
+	}
+
+private:
+	bool				m_bCombinationPointChanged;		/// June +0x110
+	KProtectedType<int>	m_iNowCombinationPoint;			/// June +0x114
+	KProtectedType<int>	m_iMaxCombinationPoint;			/// June +0x120
+	float				m_fRestFormMpRate;				/// June +0x12c, scales the MP the other form gains in the gauge frame move ( 32a35170 )
+};
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+
 #ifdef SERV_9TH_NEW_CHARACTER // ±Ë≈¬»Ø
 class CX2AddGageData : public CX2GageData
 {

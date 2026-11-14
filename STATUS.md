@@ -244,8 +244,9 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH1a0 | ready (NU1, DU1 reviews done): Opus helpers CH1a calls: Lu/Ciel gauge class, `CX2GUUser` transform link (`31fc9d90` family), hold-key selector, switching guide | Opus 5.5 / high, Opus review | CH0, NU1 review, DU1 review (done) | `X2GUUser.*`, `X2GageData.*`, `X2Game.*`, Always.h | `CH1a0.md` |
+| CH1a0 | review ready: transform link ( `TRANSFORM_LINK` ), window cool/slot reads, switching guide + gauge ctor ( `LUCIEL_CORE` ); gauge virtuals split to CH1a1 | Opus 5.5 / high, Opus review | CH0, NU1 review, DU1 review (done) | `X2GUUser.*`, `X2GageData.*`, `X2Game.*`, `X2UISkillTreeNew2015.*`, `KTDGUISlot.h`, Always.h | `CH1a0-review.md` |
 | CH1a | blocked (CH1a0 review): new `X2GULuciel.*` skeleton (ctor / dtor / members / own virtuals, LSI enum), flags `_CORE` / `_LIVE` | Opus 5.5 / high, Opus review | CH1a0 review | `X2GULuciel.*` (new), `X2Lib_2010.vcxproj`, `X2UnitManager.h`, Always.h | `CH1a.md` |
+| CH1a1 | blocked (CH1a0 review): Opus: `CX2LucielGageData` 20 virtual overrides (CH0 missed them), `CX2LucielMyGageUI`, gage manager Lu/Ciel cases | Opus 5.5 / high, Opus review | CH1a0 review | `X2GageData.*`, `X2GageUI.*`, `X2GageManager.*` | `CH1a1.md` |
 | CH1b | blocked (CH1a review): Lu common states (CH1c merged in by CH0), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1f2 review covers it) | CH1a review | `X2GULuciel.*` | `CH1b.md` |
 | CH1d | blocked (CH1b): Ciel common states (CH1e merged in by CH0), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1f2 review covers it) | CH1b | `X2GULuciel.*` | `CH1d.md` |
 | CH1f | blocked (CH1d): Duo combos part 1, transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1f2 review covers it) | CH1d | `X2GULuciel.*` | `CH1f.md` |
@@ -255,7 +256,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH1h | blocked (CH1g2): Dread Lord + Noblesse states, transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1i review covers it) | CH1g2 | `X2GULuciel.*` | `CH1h.md` |
 | CH1i | blocked (CH1h): Demonio script states + riding (CH1j merged in by CH0), transcription under `_CORE` | Sonnet 5.5 / high, Opus review (also covers CH1g, CH1g2, CH1h) | CH1h | `X2GULuciel.*` | `CH1i.md` |
 | CH1k0 | blocked (CH1a0 review): Opus helpers: buff Time-finalizer passes `322a74a0` / `322a7000` / `3227bcb0` | Opus 5.5 / high, Opus review | CH1a0 review | `X2GameUnit.*`, `X2Buff*`, Always.h | `CH1k0.md` |
-| CH1k | blocked (CH1i, CH1k0 reviews): overrides band 1 part 1, transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1k2 review covers it) | CH1i review, CH1k0 review | `X2GULuciel.*` | `CH1k.md` |
+| CH1k | blocked (CH1i, CH1k0, CH1a1 reviews): overrides band 1 part 1, transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1k2 review covers it) | CH1i review, CH1k0 review, CH1a1 review | `X2GULuciel.*` | `CH1k.md` |
 | CH1k2 | blocked (CH1k): overrides band 1 part 2 (state-id getters), transcription under `_CORE` | Sonnet 5.5 / high, Opus review (also covers CH1k) | CH1k | `X2GULuciel.*` | `CH1k2.md` |
 | CH1l | blocked (CH1k2 review): overrides band 2 part 1 (DU2 getters), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1l3 review covers it) | CH1k2 review | `X2GULuciel.*` | `CH1l.md` |
 | CH1l2 | blocked (CH1l): overrides band 2 part 2 | Sonnet 5.5 / high, no review of its own (CH1l3 review covers it) | CH1l | `X2GULuciel.*` | `CH1l2.md` |

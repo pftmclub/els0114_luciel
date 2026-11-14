@@ -13387,3 +13387,24 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( CommonRender_PrepareBody ), SERV_IRUHADEV_JUNE_RENDER_CAMERA_MESH_HIDDEN ( GetWorldMeshHidden ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( BTI_DEBUFF_HARD_BODY )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_USER_RENDER
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel CH1a0 - the class-agnostic transform link June's CX2GUUser keeps for Lu/Ciel's transform skills: the transformed
+//              pair setter / getter ( 31fc9d50 / 31fc9d90 ), the three-slot transform skill window's cool times, slot pick and slot reads ( the
+//              window at June +0x8f70; its slot data CX2TransFormSkillSlotData is slot data type 6 ), the linked skill's cost, key check and state
+//              change, the shown row's fourth slot key, and the base GetTransformedSkillStateID virtual. Inert: nothing creates the window until
+//              char-luciel CH2d20 / CH2d2. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+#if defined( SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) || !defined( SERV_IRUHADEV_JUNE_SKILL_TREE_UI ) )
+#error SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( the transformed pair, CX2Unit::DT_* ) and SERV_IRUHADEV_JUNE_SKILL_TREE_UI ( X2UISkillTreeNew2015.h )
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel - Lu/Ciel's own code, compiled and unreferenced until SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE. CH1a0 adds the Combination
+//              Point gauge CX2LucielGageData ( ctor, copy ctor, point setter; its virtual overrides are CH1a1's ) and CX2Game's switching guide
+//              ( 322e6300 ); CH1a adds the class CX2GULuciel. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+//////////////////////////////////////////////////////////////////////////

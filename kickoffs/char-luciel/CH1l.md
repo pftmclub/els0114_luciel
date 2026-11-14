@@ -58,3 +58,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - Vslot 0x64c (`32b1c960`) writes gauge MP slot 0 to Future `fNowMP` and slot 1 to Future `syncData.fMinorUnitNowMP` (June E, +0x7ea8, synced on
   bit 0x10000 since DU1c); vslot 0x650 (`32aeb2c0`) reads Now `fMinorUnitNowMP` back into the gauge's second form. Use DU1c's member names.
+
+## Amended by char-luciel CH1a0 (2026-11-14)
+
+- `CX2GUUser` declares `virtual int GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ )` (vslot 0x57c, base returns 0, **not
+  const**, flag `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`). Lu/Ciel's `32ae9c00` overrides it with exactly that signature.
+- The transform pair is `IsTransformed( int iDuoType_ )` / `SetTransformed( int, bool )` ( `31fc9d90` / `31fc9d50` ): pass `CX2Unit::DT_*`
+  ( 2 = either body, 3 = both ).

@@ -14819,6 +14819,50 @@ void CX2Game::SetEveRecoveryToolTip( const wstring& wstrToolTip_ )
 }
 //}} Iruha : 2026-10-28 // June character Eve Phase CH4c
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_UI
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+// char-luciel CH1a0: June 322e6300, the skill slot dialog's switching guide ( the V key ), its cool-time count and the tooltip button
+void CX2Game::UpdateLucielSwitchingGuideUI( const bool* pbShow_, const float fCoolTimeLeft_ )
+{
+	if( NULL == m_pDLGSkillSlot )
+		return;
+
+	CKTDGUIStatic* pStaticGuide = static_cast<CKTDGUIStatic*>( m_pDLGSkillSlot->GetControl( L"Static_LucielSwitchingGuide" ) );
+	if( NULL != pStaticGuide )
+	{
+		pStaticGuide->SetShowEnable( false, false );
+		if( true == *pbShow_ )
+		{
+			pStaticGuide->SetShowEnable( true, false );
+			if( NULL != pStaticGuide->GetString( 0 ) )
+				pStaticGuide->GetString( 0 )->msg = g_pMain->GetKeyPad()->GetKeyString( GAMEACTION_SIT );	// June game action 0x27
+		}
+	}
+
+	CKTDGUIStatic* pStaticCoolTime = static_cast<CKTDGUIStatic*>( m_pDLGSkillSlot->GetControl( L"g_pStatic_LucielCooltime" ) );
+	if( NULL != pStaticCoolTime )
+	{
+		pStaticCoolTime->SetShowEnable( false, false );
+		if( true == *pbShow_ && 0.f < fCoolTimeLeft_ )
+		{
+			pStaticCoolTime->SetShowEnable( true, false );
+			if( NULL != pStaticCoolTime->GetString( 0 ) )
+			{
+				WCHAR wszCoolTime[32] = L"";
+				StringCchPrintfW( wszCoolTime, ARRAY_SIZE( wszCoolTime ), L"%d", static_cast<int>( fCoolTimeLeft_ + 1.0 ) );
+				pStaticCoolTime->GetString( 0 )->msg = wszCoolTime;
+			}
+		}
+	}
+
+	CKTDGUIControl* pButtonToolTip = m_pDLGSkillSlot->GetControl( L"Button_V_Key_ToolTip" );
+	if( NULL != pButtonToolTip )
+	{
+		pButtonToolTip->SetShowEnable( false, false );
+		if( true == *pbShow_ )
+			pButtonToolTip->SetShowEnable( true, true );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 void CX2Game::UpdateSkillCoolTime( float fElapsedTime )
 {
 	if( g_pData != NULL &&

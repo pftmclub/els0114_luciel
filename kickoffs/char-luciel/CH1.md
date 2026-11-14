@@ -50,3 +50,8 @@ June's member to `Enum.lua` (core-list source, `-- char-luciel CH1` one-line com
 `STATE MISMATCH / NO C++ MEMBER` so the Lua value equals the C++ enum (add the C++ member first when it is missing). `enum nil in June` lines
 are June's own nils: leave them.
 Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_A_LLD_BLUFF` missing.
+
+## Amended by char-luciel CH1a0 (2026-11-14)
+
+- `_LIVE` adds the two `CX2Game` calls to `UpdateLucielSwitchingGuideUI( &false, 0.f )` ( June ctor @`32307bca`, dtor @`32308957`, each just
+  before Eve's `UpdateEveRecoveryUI` call; `X2Game.cpp` ~468 / ~852 ).

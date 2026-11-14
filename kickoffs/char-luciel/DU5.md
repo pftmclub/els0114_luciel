@@ -83,3 +83,8 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
 
 - `InitSocketData` `3206d770 @3206da0f`: the set-socket count `3286a6b0( set, my unit +0xe40 )` reads the unit form; it is the same count helper
   as above (funcmap row `3206d770 @3206d8f7 / @3206da0f (DU1d3b)`).
+
+## Amended by char-luciel CH1a0 (2026-11-14)
+
+- Three of the packet / unit-viewer sites also read the transform pair `31fc9d90` ( `CX2GUUser::IsTransformed`, CH1a0 ): `31f1ed70` @`31f1f1d8`,
+  `32461e80` @`324620b9` and `32195e40` @`3219618d` skip vslots 0x63c / 0x630 while a body is transformed. Port that test with the site.

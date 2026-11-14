@@ -1366,6 +1366,51 @@ and skill-use reads go through the shared `CX2GUUser` helpers (Chung plan, Rules
 | CH1p | **Opus.** The in-class duo switch: `DUO_TYPE` (`DT_BOTH` / `DT_KEEP` added to the live `Enum.lua`, core list), `MINOR_UNIT_ANIM_NAME`, `MINOR_UNIT_SPEED_TIME0-4`, `NOT_SHOW_UNIT_BY_DUOTYPE`, the body switch and its key (`DLG_LUCIEL_BOUNDING_KEY.lua`), combination points (`HIT_ADD_COMBINATION_POINT`, `CP_AMOUNT`). Flag `_DUO`, sub-tag `DUO` | Opus high |
 | CH1 | **Opus.** Final: `_LIVE` (+ `_DUO`) defined; `CreateGUUser` / intruder case `UT_LUCIEL`; `Luciel_Duo.lua` + `Luciel_Demonio.lua` adopted (bytecode, `luabind.py check` both); motions copied with them (CH0b's holds); `[JUNE_CHAR] LUCIEL DATA` line at the end of InitState (class, script, motions, states, duo); play-test: create, enter the village, walk, jump, dash, combo, swap bodies, enter a dungeon, relog | Opus high, user play-test |
 
+### CH1a0 - Done (2026-11-14)
+
+Opus 5.5 high. Two new flags ( `Always.h`, no `_DEBUG`, no log tag, inert ): class-agnostic `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK` ( needs
+`_DUO_BODY` and `_SKILL_TREE_UI`, `#error` guard ) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( defined here; CH1a adds only `//#define _LIVE` ).
+Files: `Always.h`, `KTDGUISlot.h`, `X2GUUser.h/.cpp`, `X2Game.h/.cpp`, `X2GageData.h`, `X2UISkillTreeNew2015.h/.cpp`. funcmap:
+`grep "Char Luciel CH1a0" june2017_re/funcmap.tsv` ( 23 rows ). `JUNE_BUGS.md` 674. Commit: see `git log --grep "char-luciel Phase CH1a0"`.
+- **Already ported:** `31fc8900` = Chung CH2b0's `SkillSlotKey::IsKeyPressedOnce` ( Lu/Ciel calls it with `m_InputData` ).
+- **Transform pair** ( `CX2GUUser`, DU1b's members `+0x8f6e` / `+0x8f6f` ): `SetTransformed( int, bool )` `31fc9d50`, `IsTransformed( int )` `31fc9d90`.
+  Arguments are `CX2Unit::DT_*`: the getter's 2 ( `DT_BOTH` ) means either body, 3 ( `DT_KEEP` ) both; kept as June has them.
+- **The transform window ( user `+0x8f70` ).** CH0's "linked slot table" is a 0x18-byte UI object ( no vtable / RTTI ): dialog handle +0,
+  `float[3]` cool times +8, selected slot +0x14. Created by Lu/Ciel's ALTAR_OF_EVIL / TRANSCENDENCE transform starts ( `32b43910` / `32b43b10`: new 0x18
+  + `3200f380` ), deleted by `32b38f30` / `32b39380` / ReInit. Declared as `CX2TransformSkillSlotUI` ( `X2GUUser.h`, name from
+  `DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua` ) with the members this phase's callers need: `SetCoolTime` `31fc9e80`, `SetCoolTimeShow` `31fc9df0`,
+  `GetSlotSkillID` / `GetSlotSkillLevel` `31fdc680` / `31fdc810`, `SelectSlot` `31fdc9a0`, `CanUseSlot` `3200f680`. Its slot data, RTTI
+  `CX2TransFormSkillSlotData` ( type 6, new `CKTDGUISlotData::SDT_TRANSFORM_SKILL_SLOT = 6`; ctor `328d9b00`, `UpdateUI` `328da050` = the memorize
+  slot's tail ), is ported whole next to `CX2MemorizeSkillSlotData`. Member `m_pTransformSkillSlotUI`, NULL in the user ctor ( June @320431fd ).
+- **User helpers:** `ApplyTransformSkillCoolTime( float, bool bAdd )` `31fc9f00`, `ApplyTransformSkillCost()` `31fd0490`, `CheckTransformSkillSlotKey()`
+  `32030160` ( messages `STR_ID_2549` / `STR_ID_226` in March's `X2GUAdd.cpp:2569` form; June's `[S%1%]%2%` string-id debug form is not ported, March's
+  `GET_STRING` has none ), `StateChangeToTransformSkill()` `32039dc0`, `IsFourthSkillSlotKeyPressedOnce()` `31fd0440` ( `oneC`, `oneR` on the swapped row;
+  input offsets 0x19 / 0x39 from `+0x86da` match Chung's `IsKeyPressedOnce` table ). New base virtual `GetTransformedSkillStateID( SKILL_ID )`
+  ( vslot 0x57c, base `330f9c30` returns 0; Lu/Ciel `32ae9c00` = CH1l ). `GetNowStateSkillID` / `GetActualCoolTime` / 2-arg `GetActualMPConsume` /
+  `UpNowMp` are June's vslots 0x524 / 0x6a4 / 0x6a0 / 0xf0 ( funcmap ).
+- **Switching guide:** `CX2Game::UpdateLucielSwitchingGuideUI( const bool*, float )` `322e6300` ( `_CORE` ), Eve's `322e65c0` port's idiom; it
+  differs from Eve's: count shown only when cool > 0 ( no empty-string branch ), tooltip `( 0, 0 )` then `( 1, 1 )`.
+- **Gauge:** RTTI `CX2LucielGageData` ( vt `3349b2a4`, 0x130 bytes ), the Combination Point gauge ( `DLG_Luciel_CombinationPoint.lua` ):
+  ctor `32498e40` ( +0x110 changed 0, +0x114 now 0, +0x120 max 10, +0x12c float 1.0 ), copy ctor `32a38250`, `SetNowCombinationPoint` `32a327a0`
+  ( store, then clamp 0 .. max ). `X2GageData.h` ( `_CORE` ).
+- **New phase CH1a1 ( this plan's subject ).** The gauge overrides **20 of 22** `CX2GageData` virtuals ( all but slots 12 / 14 ), and RTTI names a
+  `CX2LucielMyGageUI`; CH0 mapped neither. Decompiles saved to `june2017_re/char_luciel/ghidra/gage/` ( 10 bodies uncarved ). Kickoff `CH1a1.md`,
+  STATUS row; CH1k / CH1k2 now wait on its review.
+- **Routed, kickoffs amended:** the window's ctor / slot set / show / TransFormEnd / per-frame count `3200f7a0` / handle release `31fd03f0` and the
+  engine hooks ( `CX2GUUser::OnFrameMove` @32070133, `CX2UIManager::ToggleUI` @32158ef9 via `31fe3c90`, `CX2Game::KeyProcess` @322f7b5a ) -> CH2d20;
+  `UpNowMp` is virtual in June ( Lu/Ciel `32aeb160` ) -> CH1k; the `CX2Game` ctor / dtor guide calls ( @32307bca / @32308957 ) -> CH1 final ( `_LIVE` );
+  `IsTransformed` readers in packet / viewer sites `31f1ed70`, `32461e80`, `32195e40` -> DU5; signature note -> CH1l; `_CORE` note -> CH1a.
+  Not routed ( scattered systems, identified only ): `321faa90`, a per-frame UI tick in dungeon `0xa1c2` that tests `UT_LUCIEL` + buff `0x3a3` and
+  `IsTransformed( DT_BOTH )` ( caller `321facb0` ).
+- **DU1d4's helpers** ( shared DIE_FRONT / DIE_BACK `31fd2d60` / `31fd2e30`, `31fcd0f0..31fcd220` ) stay with CH1m's registrations, as DU1d4 allowed.
+- **Hygiene:** flagcheck `TRANSFORM_LINK --worktree` ( 9 files ): `files: 4 PASS, 1 PASS~, 0 DEFINE, 4 OTHER, 0 FAIL, 0 ERROR` / `0 deleted, 0 non-ASCII,
+  0 EOL-mismatched, 0 #else/#endif without token, 0 encoding change(s)` / `RESULT: PASS` ( OTHER = `Always.h` and the three `_CORE` files ).
+  `LUCIEL_CORE --worktree` ( its 4 files; on all 9 the tool stops on `X2GUUser.cpp`'s CHUNG_CORE `#if`, Unevaluable ): `2 PASS, 1 PASS~, 1 OTHER,
+  0 FAIL` / `RESULT: PASS`. `junediverge.py --check` ( 9 files ): `RESULT: PASS`. `enumscan.py --check`: no row in the new code ( the 6 rows are older ).
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GUUser.cpp`, `X2Game.cpp`, `X2UISkillTreeNew2015.cpp`, `X2GageData.cpp`: 0 errors each;
+  a `cl /P` probe shows both flags and `_SKILL_TREE_UI` on and the four classes / function present. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert ); CH2d2 / CH3c2 hand off the transform-skill play-test.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

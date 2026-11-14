@@ -907,6 +907,37 @@ CX2MemorizeSkillSlotData::CX2MemorizeSkillSlotData( int index, bool bSlotb )
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_MEMORIZE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+// char-luciel CH1a0: June 328d9b00
+CX2TransFormSkillSlotData::CX2TransFormSkillSlotData()
+{
+	m_eSlotDataType	= SDT_TRANSFORM_SKILL_SLOT;
+	m_bDataUpdated	= true;
+	m_eSkillID		= CX2SkillTree::SI_NONE;
+	m_iSkillLevel	= -1;
+	m_iReserved		= -1;
+}
+
+// char-luciel CH1a0: June 328da050, the slot skill's icon once my unit has learned it ( any class )
+/*virtual*/ void CX2TransFormSkillSlotData::UpdateUI( CKTDGUISlot* pSlot )
+{
+	if ( NULL == pSlot || NULL == g_pData || NULL == g_pData->GetMyUser() || NULL == g_pData->GetMyUser()->GetSelectUnit() ||
+		 NULL == g_pData->GetSkillTree() || 0 >= static_cast<int>( m_eSkillID ) )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( m_eSkillID );
+	if ( NULL == pSkillTemplet )
+		return;
+
+	const CX2UserSkillTree& refUserSkillTree = g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UserSkillTree;
+	if ( 0 < refUserSkillTree.GetSkillLevel( m_eSkillID, true, 0, true ) )
+	{
+		pSlot->SetItemTex( pSkillTemplet->m_wstrIconName.c_str(), pSkillTemplet->m_wstrIconPieceName.c_str() );
+		pSlot->SetDragable( false );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+
 /////////////////////////////////////////////////////////////////////////
 // CX2UISkillTreeNew
 /////////////////////////////////////////////////////////////////////////

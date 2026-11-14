@@ -528,6 +528,30 @@ class CX2GUNPC;
 #endif // SUPERPOSITION_HYPER_MODE_BUG
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+// char-luciel CH1a0: June's transform skill window ( the user's +0x8f70, 0x18 bytes, no vtable ); CH2d20 ports its ctor, slot set and show
+class CX2TransformSkillSlotUI
+{
+public:
+	enum { TRANSFORM_SKILL_SLOT_NUM = 3 };
+
+	void SetCoolTime( const int iSlot_, const float fCoolTime_ );		/// June 31fc9e80
+	float GetCoolTime( const int iSlot_ ) const { return m_afCoolTime[iSlot_]; }
+	CX2SkillTree::SKILL_ID GetSlotSkillID( const UINT uiSlot_ );		/// June 31fdc680
+	int GetSlotSkillLevel( const UINT uiSlot_ );						/// June 31fdc810
+	bool SelectSlot( const int iSlot_ );								/// June 31fdc9a0
+	bool CanUseSlot( const int iSlot_ );								/// June 3200f680
+	int GetSelectedSlot() const { return m_iSelectedSlot; }
+	void ClearSelectedSlot() { m_iSelectedSlot = -1; }
+
+private:
+	void SetCoolTimeShow( const int iSlot_, const bool bShow_ );		/// June 31fc9df0
+
+	CKTDGUIDialogHandle	m_hDlgTransformSkillSlot;					/// +0x00 DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua
+	float				m_afCoolTime[TRANSFORM_SKILL_SLOT_NUM];		/// +0x08
+	int					m_iSelectedSlot;							/// +0x14, -1 = none
+};
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 class CX2GUUser : public CX2GameUnit
 {
 public:
@@ -2383,6 +2407,17 @@ public:
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		//{{ kimhc // 실시간 엘소드 중 실시간 레벨업 이펙트 효과
 		const CKTDXDeviceXSkinMesh* GetMotion() const { return m_pMotion; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+		void SetTransformed( const int iDuoType_, const bool bTransformed_ );		/// char-luciel CH1a0: June 31fc9d50
+		bool IsTransformed( const int iDuoType_ ) const;							/// char-luciel CH1a0: June 31fc9d90
+		void ApplyTransformSkillCoolTime( const float fValue_, const bool bAdd_ );	/// char-luciel CH1a0: June 31fc9f00
+		void ApplyTransformSkillCost();												/// char-luciel CH1a0: June 31fd0490
+		void CheckTransformSkillSlotKey();											/// char-luciel CH1a0: June 32030160
+		void StateChangeToTransformSkill();											/// char-luciel CH1a0: June 32039dc0
+		bool IsFourthSkillSlotKeyPressedOnce() const;								/// char-luciel CH1a0: June 31fd0440
+		virtual int GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ ) { UNREFERENCED_PARAMETER( eSkillID_ ); return 0; }	/// char-luciel CH1a0: June vslot 0x57c ( base 330f9c30 ); Lu/Ciel's 32ae9c00 is CH1l's
+		CX2TransformSkillSlotUI* GetTransformSkillSlotUI() const { return m_pTransformSkillSlotUI; }
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
 
 #ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
@@ -5026,6 +5061,9 @@ public:
 		int												m_iHideEquipBody;				/// char-luciel DU1d5: June +0x8fa8, the body whose equips hide ( 0 first, 1 second )
 		bool											m_bHideEquipByBodyApplied;		/// char-luciel DU1d5: June +0x8fb4, the pass is inside its time window
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+		CX2TransformSkillSlotUI*						m_pTransformSkillSlotUI;		/// char-luciel CH1a0: June +0x8f70; the class news and deletes it ( Lu/Ciel 32b43910 / 32b39380 )
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 		
 
 		bool						m_bHyperModeUsed;	/// 튜토리얼에서 각성을 사용했는지 체크하기 위한 용도

@@ -46,3 +46,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **States enum** for `X2GULuciel.h`: 515 registered ids (7-592; 7-130 shared USI, 154-592 the class's); 585 LSI names across both scripts (28 alias lines in Duo); neither June's `Enum.lua` nor the live one has an `LSI_` entry. State ids are 16-bit already (`SERV_IRUHADEV_JUNE_USER_STATE_ID16`, `Always.h:6188`).
 - **June ids are not March's USI from 24 up:** June inserts a state at 24 (`USI_DAMAGE_GROGGY` is 25 in June, 24 in March's enum). Name ids from `ch0_reg.tsv`, never by counting March's enum.
 - **Register `NUI_SA_LDN_GARDEN_OF_HAURES` = 2269** in `X2UnitManager.h` under `SERV_IRUHADEV_JUNE_ENUM_NAMES`: the dtor (`@32b394c7`) and ReInit (`@32b37713`, CH1k2) look the NPC up (`ch0_summons.tsv` last row). 1906 / 1908 are already named.
+
+## Amended by char-luciel CH1a0 (2026-11-14)
+
+- `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` is already `#define`d in `Always.h` (CH1a0: the gauge class and the switching guide). CH1a puts the class
+  under it and adds only `//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`; do not define `_CORE` a second time.
+- The ctor / dtor of `CX2GULuciel` use CH1a0's names: the transform window is `m_pTransformSkillSlotUI` ( `CX2GUUser`, June `+0x8f70` ); June's
+  dtor `32b39380` releases its dialog with `31fd03f0` (CH2d20's) before `delete`, and calls `g_pX2Game->UpdateLucielSwitchingGuideUI( &false, 0 )`
+  ( `322e6300` ). The gauge class is `CX2LucielGageData` ( `X2GageData.h` ).

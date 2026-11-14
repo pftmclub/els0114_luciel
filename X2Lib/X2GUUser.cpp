@@ -1081,6 +1081,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_iHideEquipBody					= 0;
 	m_bHideEquipByBodyApplied			= false;
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+	m_pTransformSkillSlotUI				= NULL;	// char-luciel CH1a0: June ctor @320431fd
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
 
 	m_bHyperModeUsed					= false;
@@ -25407,6 +25410,216 @@ void CX2GUUser::ApplyDuoTypeAtStateStart( const int iDuoType_, const bool bHasAn
 	}
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+// char-luciel CH1a0: June 31fc9d50, DT_MAJOR the first unit, DT_MINOR the minor unit, DT_BOTH both
+void CX2GUUser::SetTransformed( const int iDuoType_, const bool bTransformed_ )
+{
+	if( CX2Unit::DT_MAJOR == iDuoType_ )
+	{
+		m_bFirstUnitTransformed = bTransformed_;
+	}
+	else if( CX2Unit::DT_MINOR == iDuoType_ )
+	{
+		m_bMinorUnitTransformed = bTransformed_;
+	}
+	else if( CX2Unit::DT_BOTH == iDuoType_ )
+	{
+		m_bFirstUnitTransformed = bTransformed_;
+		m_bMinorUnitTransformed = bTransformed_;
+	}
+}
+
+// char-luciel CH1a0: June 31fc9d90, DT_BOTH asks for either body, DT_KEEP ( 3 ) for both
+bool CX2GUUser::IsTransformed( const int iDuoType_ ) const
+{
+	switch( iDuoType_ )
+	{
+	case CX2Unit::DT_MAJOR:		return m_bFirstUnitTransformed;
+	case CX2Unit::DT_MINOR:		return m_bMinorUnitTransformed;
+	case CX2Unit::DT_BOTH:		return ( true == m_bFirstUnitTransformed || true == m_bMinorUnitTransformed );
+	case CX2Unit::DT_KEEP:		return ( true == m_bFirstUnitTransformed && true == m_bMinorUnitTransformed );
+	}
+	return false;
+}
+
+// char-luciel CH1a0: June 31fc9f00, bAdd_ adds fValue_ to the three window cool times, else multiplies them
+void CX2GUUser::ApplyTransformSkillCoolTime( const float fValue_, const bool bAdd_ )
+{
+	if( NULL == m_pTransformSkillSlotUI || ( false == m_bFirstUnitTransformed && false == m_bMinorUnitTransformed ) )
+		return;
+
+	for( int iSlot = 0; iSlot < CX2TransformSkillSlotUI::TRANSFORM_SKILL_SLOT_NUM; ++iSlot )
+	{
+		const float fCoolTime = m_pTransformSkillSlotUI->GetCoolTime( iSlot );
+		m_pTransformSkillSlotUI->SetCoolTime( iSlot, ( true == bAdd_ ? fValue_ + fCoolTime : fValue_ * fCoolTime ) );
+	}
+}
+
+// char-luciel CH1a0: June 31fd0490, the selected window slot starts the state skill's cool time and the skill pays its MP
+void CX2GUUser::ApplyTransformSkillCost()
+{
+	if( NULL == m_pTransformSkillSlotUI || NULL == g_pData->GetSkillTree() || NULL == m_pUnit )
+		return;
+
+	const CX2SkillTree::SKILL_ID eSkillID = GetNowStateSkillID();
+	const int iSkillLevel = m_pUnit->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID, true, 0, true );
+	if( 0 >= iSkillLevel )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( eSkillID );
+	if( NULL == pSkillTemplet )
+		return;
+
+	const float fCoolTime = GetActualCoolTime( pSkillTemplet, iSkillLevel );
+	m_pTransformSkillSlotUI->SetCoolTime( m_pTransformSkillSlotUI->GetSelectedSlot(), fCoolTime );	// JUNE_BUGS: with no slot selected this writes slot -1
+	UpNowMp( -GetActualMPConsume( eSkillID, iSkillLevel ) );	// June vslot 0xf0; Lu/Ciel's override 32aeb160 is CH1k's
+	m_pTransformSkillSlotUI->ClearSelectedSlot();
+}
+
+// char-luciel CH1a0: June 32030160, A S D ( Q W E on the swapped row ) pick a ready window slot, else the MP or cool-time message
+void CX2GUUser::CheckTransformSkillSlotKey()
+{
+	if( NULL == m_pTransformSkillSlotUI || 0 <= m_pTransformSkillSlotUI->GetSelectedSlot() || ( false == m_bFirstUnitTransformed && false == m_bMinorUnitTransformed ) )
+		return;
+
+	int iSlot = -1;
+	if( NULL != g_pData->GetUIManager() && NULL != g_pData->GetUIManager()->GetUISkillTree() && true == g_pData->GetUIManager()->GetUISkillTree()->GetSkillSlotSwap() )
+	{
+		if( true == m_InputData.oneQ )
+			iSlot = 0;
+		if( true == m_InputData.oneW )
+			iSlot = 1;
+		if( true == m_InputData.oneE )
+			iSlot = 2;
+	}
+	else
+	{
+		if( true == m_InputData.oneA )
+			iSlot = 0;
+		if( true == m_InputData.oneS )
+			iSlot = 1;
+		if( true == m_InputData.oneD )
+			iSlot = 2;
+	}
+	if( 0 > iSlot )
+		return;
+
+	if( m_pTransformSkillSlotUI->GetCoolTime( iSlot ) <= 0.f )
+	{
+		if( true == m_pTransformSkillSlotUI->CanUseSlot( iSlot ) )
+		{
+			m_pTransformSkillSlotUI->SelectSlot( iSlot );
+			return;
+		}
+		g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_2549 ), D3DXCOLOR(1,1,1,1),
+			D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+	}
+	else
+	{
+		g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_226 ), D3DXCOLOR(1,1,1,1),
+			D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
+	}
+}
+
+// char-luciel CH1a0: June 32039dc0
+void CX2GUUser::StateChangeToTransformSkill()
+{
+	if( NULL == m_pTransformSkillSlotUI )
+		return;
+
+	const CX2SkillTree::SKILL_ID eSkillID = m_pTransformSkillSlotUI->GetSlotSkillID( static_cast<UINT>( m_pTransformSkillSlotUI->GetSelectedSlot() ) );
+	StateChange( GetTransformedSkillStateID( eSkillID ), false );
+}
+
+// char-luciel CH1a0: June 31fd0440, the shown row's fourth slot key ( C, or R on the swapped row )
+bool CX2GUUser::IsFourthSkillSlotKeyPressedOnce() const
+{
+	if( NULL != g_pData->GetUIManager() && NULL != g_pData->GetUIManager()->GetUISkillTree() && true == g_pData->GetUIManager()->GetUISkillTree()->GetSkillSlotSwap() )
+		return m_InputData.oneR;
+	return m_InputData.oneC;
+}
+
+// char-luciel CH1a0: June 31fc9df0, a slot's cool-time cover; hiding it also clears the slot's count
+void CX2TransformSkillSlotUI::SetCoolTimeShow( const int iSlot_, const bool bShow_ )
+{
+	if( m_hDlgTransformSkillSlot == NULL )
+		return;
+
+	CKTDGUIStatic* pStaticCoolTimeCover = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"Skill_CoolTime" ) );
+	if( NULL == pStaticCoolTimeCover )
+		return;
+
+	if( NULL != pStaticCoolTimeCover->GetPicture( iSlot_ ) )
+		pStaticCoolTimeCover->GetPicture( iSlot_ )->SetShow( bShow_ );
+
+	if( false == bShow_ )
+	{
+		CKTDGUIStatic* pStaticCoolTime = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"CoolTime" ) );
+		if( NULL != pStaticCoolTime )
+			pStaticCoolTime->SetString( iSlot_, L"" );
+	}
+}
+
+// char-luciel CH1a0: June 31fc9e80, a negative cool time is 0; JUNE_BUGS: the slot range test never rejects ( && for || )
+void CX2TransformSkillSlotUI::SetCoolTime( const int iSlot_, const float fCoolTime_ )
+{
+	if( iSlot_ < 0 && TRANSFORM_SKILL_SLOT_NUM - 1 < iSlot_ )
+		return;
+
+	m_afCoolTime[iSlot_] = ( fCoolTime_ < 0.0 ) ? 0.f : fCoolTime_;
+	SetCoolTimeShow( iSlot_, 0.f < m_afCoolTime[iSlot_] );
+}
+
+// char-luciel CH1a0: June 31fdc680, the skill id in SlotB0-2's slot data ( SI_NONE when absent )
+CX2SkillTree::SKILL_ID CX2TransformSkillSlotUI::GetSlotSkillID( const UINT uiSlot_ )
+{
+	if( m_hDlgTransformSkillSlot == NULL || TRANSFORM_SKILL_SLOT_NUM <= uiSlot_ )
+		return CX2SkillTree::SI_NONE;
+
+	CKTDGUISlot* pSlot = static_cast<CKTDGUISlot*>( m_hDlgTransformSkillSlot->GetControl( GET_REPLACED_STRING( ( STR_ID_3738, "Li", std::wstring( L"SlotB" ), static_cast<int>( uiSlot_ ) ) ) ) );
+	if( NULL == pSlot || NULL == pSlot->GetSlotData() )
+		return CX2SkillTree::SI_NONE;
+
+	return static_cast<CX2TransFormSkillSlotData*>( pSlot->GetSlotData() )->m_eSkillID;
+}
+
+// char-luciel CH1a0: June 31fdc810, the skill level in SlotB0-2's slot data ( 0 when absent )
+int CX2TransformSkillSlotUI::GetSlotSkillLevel( const UINT uiSlot_ )
+{
+	if( m_hDlgTransformSkillSlot == NULL || TRANSFORM_SKILL_SLOT_NUM <= uiSlot_ )
+		return 0;
+
+	CKTDGUISlot* pSlot = static_cast<CKTDGUISlot*>( m_hDlgTransformSkillSlot->GetControl( GET_REPLACED_STRING( ( STR_ID_3738, "Li", std::wstring( L"SlotB" ), static_cast<int>( uiSlot_ ) ) ) ) );
+	if( NULL == pSlot || NULL == pSlot->GetSlotData() )
+		return 0;
+
+	return static_cast<CX2TransFormSkillSlotData*>( pSlot->GetSlotData() )->m_iSkillLevel;
+}
+
+// char-luciel CH1a0: June 31fdc9a0
+bool CX2TransformSkillSlotUI::SelectSlot( const int iSlot_ )
+{
+	if( CX2SkillTree::SI_NONE == GetSlotSkillID( static_cast<UINT>( iSlot_ ) ) )
+		return false;
+
+	m_iSelectedSlot = iSlot_;
+	return true;
+}
+
+// char-luciel CH1a0: June 3200f680, the slot's skill exists and my unit has its MP
+bool CX2TransformSkillSlotUI::CanUseSlot( const int iSlot_ )
+{
+	if( NULL == g_pData->GetSkillTree() || NULL == g_pX2Game->GetMyUnit() )
+		return false;
+
+	const CX2SkillTree::SKILL_ID eSkillID = GetSlotSkillID( static_cast<UINT>( iSlot_ ) );
+	if( NULL == g_pData->GetSkillTree()->GetSkillTemplet( eSkillID ) )
+		return false;
+
+	const int iSkillLevel = GetSlotSkillLevel( static_cast<UINT>( iSlot_ ) );
+	return ( g_pX2Game->GetMyUnit()->GetActualMPConsume( eSkillID, iSkillLevel ) <= g_pX2Game->GetMyUnit()->GetNowMp() );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 #ifdef SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE
 /// June class InitState ( e.g. Eve 329ba9c0 @329bae2a-329bae48 ): UpdateUserUnitStateData( 0x82 = USI_WAIT_STATE_CHANGE, "<prefix>WAIT_STATE_CHANGE", data ) with only
 /// OnEventProcess = thunk 329cb720 -> 31fc8620; StateStart is empty, so CommonStateStart runs ( as in March ). Not June: a missing table registers nothing and logs once

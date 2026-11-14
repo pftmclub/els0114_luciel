@@ -417,4 +417,18 @@ public:
 	bool					m_bSlotb;		/// +0x14
 };
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_MEMORIZE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+// char-luciel CH1a0: June slot data type 6 ( vt 334c2eb8 ): a slot of the transform skill window ( DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua SlotB0-2 )
+class CX2TransFormSkillSlotData : public CKTDGUISlotData
+{
+public:
+	CX2TransFormSkillSlotData();						/// June 328d9b00
+	virtual ~CX2TransFormSkillSlotData() {}
+	virtual void UpdateUI( CKTDGUISlot* pSlot );		/// June 328da050
+
+	CX2SkillTree::SKILL_ID	m_eSkillID;		/// +0x0c, written by the window's slot set ( 31fdc4c0, CH2d20 )
+	int						m_iSkillLevel;	/// +0x10
+	int						m_iReserved;	/// +0x14, -1 at construction; no June reader found
+};
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 #endif SERV_IRUHADEV_JUNE_SKILL_TREE_UI

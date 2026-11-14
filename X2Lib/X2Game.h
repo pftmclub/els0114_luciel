@@ -1427,6 +1427,9 @@ class CX2Game : public CKTDXStage
 		void						UpdateEveRecoveryUI( const bool* pbShow_, const bool bShowCoolTime_, const float fCoolTimeLeft_ );	/// June 322e65c0
 		void						SetEveRecoveryToolTip( const wstring& wstrToolTip_ );	/// June 322dee90
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_UI
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+		void						UpdateLucielSwitchingGuideUI( const bool* pbShow_, const float fCoolTimeLeft_ );	/// char-luciel CH1a0: June 322e6300
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_SLOTBUFF
 		void						TranscendSlotGuideFrameMove();		/// June 322d8100
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_SLOTBUFF

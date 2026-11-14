@@ -52,3 +52,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `GetDamageAirSmallStateID`, 0x488 `GetDamageAirDownStateID`, 0x48c `GetDamageAirDownInvincibleStateID`, 0x490 `GetDamageAirDownLanding`, 0x494
   `GetDamageAirFallStateID`, 0x498 `GetDamageAirUpStateID`, 0x49c `GetDamageAirFlyFrontStateID`, 0x4a0 `GetDamageAirFlyBackStateID`, 0x4a4
   `GetDamageRevengeStateID`; and `virtual int GetJumpDownStateID()` (0x458, not const). The engine readers already ask them (DU2 Done note).
+
+## Amended by char-luciel CH1a0 (2026-11-14)
+
+- `CreateGageData` ( `32b37c70` ) news `CX2LucielGageData` ( default ctor `32498e40`, copy ctor `32a38250` when the gage manager already holds my
+  gauge ); both exist ( CH1a0 ), the virtuals are CH1a1's. Depends also on CH1a1 review.

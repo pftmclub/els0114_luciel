@@ -52,3 +52,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Amended by DU1c2 (2026-11-14):** vslot `0x2b0` is `CX2GameUnit::GetWeaponIndexHavingModel( int iModelIndex ) const` (base declared by
   DU1c2, returns 0 as June's `330f9c30`; caller `ProcessUpgradeWeaponParticle`'s `UT_LUCIEL` case). Name Luciel's `32b151b0` so: the first
   index in `m_vecpWeapon` whose weapon (+0x1c0) has a model at `iModelIndex` (< 8) for the active body (Ciel +0x544, Lu +0x5a4), else 0.
+
+## Amended by char-luciel CH1a0 (2026-11-14)
+
+- Depends also on **CH1a1 review** (the gauge virtuals). The gauge is `CX2LucielGageData`: `SetNowCombinationPoint` ( `32a327a0` ),
+  `SetCombinationPointChanged` ( the `+0x110` byte `32aeb090` writes ), `GetNowCombinationPoint` / `GetMaxCombinationPoint`.
+- June's unit vslot 0xf0 ( `UpNowMp` ) is virtual and Lu/Ciel overrides it ( `32aeb160` ); March's `CX2GameUnit::UpNowMp` is not virtual, and
+  CH1a0's `ApplyTransformSkillCost` calls it by name. Make the override reachable from base callers the way DU2 made the damage getters virtual.
+- `31fc9f00` is `ApplyTransformSkillCoolTime( float, bool bAdd )`; `31fc9d90` is `IsTransformed( int )`.
