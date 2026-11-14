@@ -18,6 +18,13 @@
 
 CX2OfflineDB* CX2OfflineDB::ms_pInstance = NULL;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+/*static*/ const char* CX2OfflineDB::UNIT_COLUMNS =
+	"unit_uid, user_uid, unit_class, nickname, level, exp, ed, sp, spirit, "
+	"last_pos, last_line_index, last_pos_value, cur_hp, cur_mp, hyper_gage, abil_count, "
+	"reg_date, del_date, last_date, csp, title_id, skill_note_page, resurrection_stone, transcendence, "
+	"minor_cur_mp, minor_unit_form";
+#else SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 /*static*/ const char* CX2OfflineDB::UNIT_COLUMNS =
 	"unit_uid, user_uid, unit_class, nickname, level, exp, ed, sp, spirit, "
@@ -36,6 +43,7 @@ CX2OfflineDB* CX2OfflineDB::ms_pInstance = NULL;
 	"reg_date, del_date, last_date, csp, title_id, skill_note_page";
 #endif SERV_IRUHADEV_OFFLINE_RES_STONE
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 
 /*static*/ const char* CX2OfflineDB::ITEM_COLUMNS =
 	"item_uid, unit_uid, category, slot, item_id, count, "
@@ -553,6 +561,10 @@ sqlite3_stmt* CX2OfflineDB::Prepare( const char* szSQL )
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 	kOut.m_iTranscendence	= sqlite3_column_int( pStmt, 23 );
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	kOut.m_iMinorUnitCurMP	= sqlite3_column_int( pStmt, 24 );
+	kOut.m_iMinorUnitForm	= sqlite3_column_int( pStmt, 25 );
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 }
 
 /*static*/ void CX2OfflineDB::ReadItemRow( sqlite3_stmt* pStmt, OUT KOfflineItemRow& kOut )
@@ -1202,6 +1214,19 @@ bool CX2OfflineDB::Migrate()
 		CX2OfflineLog::Server( L"[JUNE_TRANSCEND] DB MIG v22 done: unit.transcendence added, every unit 0" );
 	}
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	if( iFrom < 23 )
+	{
+		// char-luciel CH1a2: the defaults are KGamePlayStatus's ctor values ( June 31f3b0a0 ), so no existing row changes meaning
+		if( false == Exec( "BEGIN;" ) )			return false;
+		if( false == Exec( "ALTER TABLE unit ADD COLUMN minor_cur_mp INTEGER NOT NULL DEFAULT 0;" ) )		{ Exec( "ROLLBACK;" ); return false; }
+		if( false == Exec( "ALTER TABLE unit ADD COLUMN minor_unit_form INTEGER NOT NULL DEFAULT -1;" ) )	{ Exec( "ROLLBACK;" ); return false; }
+		if( false == Exec( "COMMIT;" ) )		return false;
+
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DATA DB MIG v23 done: unit.minor_cur_mp 0, unit.minor_unit_form -1 added" );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 	char szSetVersion[64];
 	_snprintf( szSetVersion, 64, "PRAGMA user_version = %d;", (int)SCHEMA_VERSION );
 	szSetVersion[63] = '\0';
@@ -2334,6 +2359,29 @@ bool CX2OfflineDB::SaveGamePlayStatus( UidType nUnitUID, int iCurHP, int iCurMP,
 	sqlite3_finalize( pStmt );
 	return bOK;
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+bool CX2OfflineDB::SaveMinorUnitPlayStatus( UidType nUnitUID, int iMinorUnitCurMP, int iMinorUnitForm )	// char-luciel CH1a2
+{
+	KLocker lock( m_cs );
+
+	if( NULL == m_pDB )
+		return false;
+
+	sqlite3_stmt* pStmt = Prepare( "UPDATE unit SET minor_cur_mp = ?2, minor_unit_form = ?3 WHERE unit_uid = ?1;" );
+	if( NULL == pStmt )
+		return false;
+
+	sqlite3_bind_int64( pStmt, 1, (sqlite3_int64)nUnitUID );
+	sqlite3_bind_int(   pStmt, 2, iMinorUnitCurMP );
+	sqlite3_bind_int(   pStmt, 3, iMinorUnitForm );
+
+	bool bOK = ( SQLITE_DONE == sqlite3_step( pStmt ) );
+
+	sqlite3_finalize( pStmt );
+	return bOK;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 
 bool CX2OfflineDB::SaveProgress( UidType nUnitUID, int iLevel, int iEXP, int iED )
 {

@@ -1232,6 +1232,15 @@ void CX2OfflineServer::PushLevelUp( KOfflineSession& kSes, UidType nUnitUID )
 	kOut.m_cCharAbilType	= CX2OfflineStatTable::CharAbilTypeOf( kRow.m_iUnitClass );
 	kOut.m_iCharAbilCount	= kRow.m_iAbilCount;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	if( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) )
+	{
+		kOut.m_iMinorUnitMaxMP	= (int)( ONE_CHARGE * 3.0f );	// char-luciel CH1a2: stand-in ( no June server ), sized like the main gauge above
+		kOut.m_iMinorUnitCurMP	= min( kRow.m_iMinorUnitCurMP, kOut.m_iMinorUnitMaxMP );
+		kOut.m_cMinorUnitForm	= (char)kRow.m_iMinorUnitForm;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+
 	kOut.m_mapSkillCoolTime.clear();
 	kOut.m_mapQuickSlotCoolTime.clear();
 	kOut.m_mapPetMP.clear();

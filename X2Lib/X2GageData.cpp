@@ -1825,6 +1825,26 @@ void CX2LucielGageData::operator=( const CX2LucielGageData& rhs_ )	// char-lucie
 	*this = *( static_cast<CX2LucielGageData*>( pGageData_ ) );
 	SetCombinationPointChanged( true );
 }
+
+/*virtual*/ bool CX2LucielGageData::GetMyPlayStatusToPacket( OUT KGamePlayStatus& kGamePlayStatus_ ) const	// char-luciel CH1a2: June 32a32530, the base call comes last
+{
+	kGamePlayStatus_.m_iMinorUnitCurMP	= max( static_cast<int>( 0 ), static_cast<int>( GetNowMp( 1 ) ) );
+	kGamePlayStatus_.m_iMinorUnitMaxMP	= max( static_cast<int>( 0 ), static_cast<int>( GetMaxMp( 1 ) ) );
+	kGamePlayStatus_.m_iCharAbilCount	= static_cast<char>( GetNowCombinationPoint() );	// June movsx: the point goes out cut to a char
+	kGamePlayStatus_.m_cMinorUnitForm	= static_cast<char>( true == g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() );	// June reads +0xe40 inline, no NULL test
+	return CX2GageData::GetMyPlayStatusToPacket( kGamePlayStatus_ );
+}
+
+/*virtual*/ void CX2LucielGageData::SetMyPlayStatusFromPacket( IN const KGamePlayStatus& kGamePlayStatus_ )	// char-luciel CH1a2: June 32a350d0, the point is set before its max ( JUNE_BUGS )
+{
+	CX2GageData::SetMyPlayStatusFromPacket( kGamePlayStatus_ );
+	g_pData->GetMyUser()->GetSelectUnit()->SetMinorUnitForm( 1 == kGamePlayStatus_.m_cMinorUnitForm );	// June 3234b8c0, no NULL test
+	SetMaxMp( static_cast<const float>( kGamePlayStatus_.m_iMinorUnitMaxMP ), 1 );
+	SetNowMp( static_cast<const float>( kGamePlayStatus_.m_iMinorUnitCurMP ), false, 1 );
+	SetNowCombinationPoint( kGamePlayStatus_.GetCombinationPoint() );
+	SetMaxCombinationPoint( 10 );	// June pushes 10, the ctor's max
+	SetCombinationPointChanged( true );
+}
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 
 

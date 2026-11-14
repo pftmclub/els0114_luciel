@@ -42,8 +42,9 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` (`migration` rows). **Map** (checked agai
 values and names; `NESI_ONEPIECE_FASHION` 20 -> 35; `NESI_END` 21 -> 43; June adds Ciel's slots 20-34, 36, 38, 40, 42
 (`NESI_MINORUNIT_DEFENCE_HAIR_FASHION` = 20 ...) and the main body's `NESI_AC_MINIME` 37, `NESI_AC_EARRING` 39, `NESI_AC_RING2` 41.
 `SERV_NEW_ONE_PIECE_AVATAR_SLOT` is on for US, so a March save can hold slot 20.
-**Save shape** (schema v22 now, `X2OfflineDB.h:452`, rung `X2OfflineDB.cpp:1195`; the step is v23 under this flag, `#error` guard on
-`SERV_IRUHADEV_JUNE_TRANSCEND_UNIT`):
+**Save shape** (amended by CH1a2, 2026-11-14: schema v23 now, CH1a2's `unit.minor_cur_mp` / `minor_unit_form` under
+`SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS`, `X2OfflineDB.h` `SCHEMA_VERSION` chain and the `iFrom < 23` rung; the step is **v24** under this
+flag, nested over the v23 branch, `#error` guard on `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS`):
 1. `item.slot` where `category` = the equipped category (9): `UPDATE item SET slot = 35 WHERE category = 9 AND slot = 20`.
 2. `inventory_size.size` for category 9: 21 -> 43 (`UPDATE inventory_size SET size = 43 WHERE category = 9 AND size = 21`); the loader only
    fills missing rows, so a stale 21 leaves slot 35 out of range.

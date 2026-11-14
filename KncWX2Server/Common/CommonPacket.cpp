@@ -1639,6 +1639,11 @@ SERIALIZE_DEFINE_PUT( KGamePlayStatus, obj, ks )
 #ifdef	SERV_RIDING_PET_SYSTM// 적용날짜: 2013-04-21
 		&& PUT( m_mapRidingPetCoolTime )
 #endif	// SERV_RIDING_PET_SYSTM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+		&& PUT( m_iMinorUnitMaxMP )	// char-luciel CH1a2: June 320bcbd0
+		&& PUT( m_iMinorUnitCurMP )
+		&& PUT( m_cMinorUnitForm )
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 		;
 }
 
@@ -1658,6 +1663,11 @@ SERIALIZE_DEFINE_GET( KGamePlayStatus, obj, ks )
 #ifdef	SERV_RIDING_PET_SYSTM// 적용날짜: 2013-04-21
 		&& GET( m_mapRidingPetCoolTime )
 #endif	// SERV_RIDING_PET_SYSTM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+		&& GET( m_iMinorUnitMaxMP )	// char-luciel CH1a2: June 320dbbd0
+		&& GET( m_iMinorUnitCurMP )
+		&& GET( m_cMinorUnitForm )
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 		;
 }
 

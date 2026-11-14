@@ -316,6 +316,11 @@ void CX2OfflineStatTable::SetUnitStat_LUA( int iUnitClass, int iLevel )
 		return (char)KGamePlayStatus::CAC_NATURAL_FORCE;
 #endif SERV_IRUHADEV_JUNE_CHAR_RENA_NF
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	case CX2Unit::UT_LUCIEL:	// char-luciel CH1a2: stand-in ( no June server switch ); June 32a350d0 reads type 6
+		return (char)KGamePlayStatus::CAC_COMBINATION_POINT;
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+
 	default:
 		break;
 	}

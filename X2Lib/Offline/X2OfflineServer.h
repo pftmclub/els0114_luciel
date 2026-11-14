@@ -85,6 +85,10 @@ public:
 		int				m_iSavedMP;
 		int				m_iSavedHyper;
 		int				m_iSavedAbil;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+		int				m_iSavedMinorUnitMP;		///< char-luciel CH1a2: -1 = nothing written yet
+		int				m_iSavedMinorUnitForm;	///< char-luciel CH1a2: -2 = nothing written yet ( -1 is a value )
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 		std::wstring	m_wstrLoginID;
 		std::wstring	m_wstrPassport;
 
@@ -129,6 +133,10 @@ public:
 			, m_iSavedMP( -1 )
 			, m_iSavedHyper( -1 )
 			, m_iSavedAbil( -1 )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+			, m_iSavedMinorUnitMP( -1 )
+			, m_iSavedMinorUnitForm( -2 )
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 			, m_nSummonedPetUID( 0 )
 #ifdef SERV_IRUHADEV_OFFLINE_ROOM_RIDING_PET
 			, m_nSummonedRidingPetUID( 0 )

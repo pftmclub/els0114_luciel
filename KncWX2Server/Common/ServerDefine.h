@@ -4800,3 +4800,9 @@
 // Description: char-luciel NU2: the unit class is June's word in the shared packets. Also defined in KTDXLIB/Always.h and in X2ServerProtocol_2010.vcxproj (X2TOOL); this second home exists because CommonPacket.h is compiled before Always.h is reachable. Comment out all three together.
 #define SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel CH1a2: KGamePlayStatus carries June's minor-unit gauge ( +0x5a / +0x5e ), the form byte ( +0x62 ) and CAC 6. Also defined in KTDXLIB/Always.h and in X2ServerProtocol_2010.vcxproj (X2TOOL); this second home exists because CommonPacket.h is compiled before Always.h is reachable. Comment out all three together.
+#define SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+//////////////////////////////////////////////////////////////////////////

@@ -13434,3 +13434,14 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( LUCIEL_STATE_ID, the Lu/Ciel SKILL_ID / BTI names; char-luciel CH1a )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel CH1a2 - June's KGamePlayStatus layout: the minor unit's max / now MP ( +0x5a / +0x5e ) and the form byte
+//              ( +0x62, -1 unset ) after the riding-pet map ( June ctor 31f3b0a0, Put 320bcbd0, Get 320dbbd0 ), CAC_COMBINATION_POINT 6,
+//              and the emulator fills / saves them ( save v23: unit.minor_cur_mp, unit.minor_unit_form ). Class-agnostic; Lu/Ciel's
+//              gauge pair ( 32a32530 / 32a350d0 ) is under SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE and needs this flag.
+//              Also defined at the end of KncWX2Server/Common/ServerDefine.h and in X2ServerProtocol_2010.vcxproj (X2TOOL): CommonPacket.h
+//              is compiled before Always.h is reachable. Revert: comment out all three together ( a v23 save then refuses to open ).
+#define SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+//////////////////////////////////////////////////////////////////////////

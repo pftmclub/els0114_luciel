@@ -287,6 +287,16 @@ bool CX2OfflineServer::Handler_EGS_UPDATE_PLAY_STATUS_NOT( KOfflineSession& kSes
 	if( kStatus.m_iMaxHP <= 0 )
 		return true;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	// char-luciel CH1a2: the minor unit's MP and the form, written on change like the four below
+	if( kStatus.m_iMinorUnitCurMP != kSes.m_iSavedMinorUnitMP || (int)kStatus.m_cMinorUnitForm != kSes.m_iSavedMinorUnitForm )
+	{
+		CX2OfflineDB::Instance()->SaveMinorUnitPlayStatus( kSes.m_nSelectedUnitUID, kStatus.m_iMinorUnitCurMP, (int)kStatus.m_cMinorUnitForm );
+		kSes.m_iSavedMinorUnitMP	= kStatus.m_iMinorUnitCurMP;
+		kSes.m_iSavedMinorUnitForm	= (int)kStatus.m_cMinorUnitForm;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+
 	// Fires every three seconds for the whole session, so only write when a
 	// value actually moved. The cache lives on the session, which means one
 	// redundant write after a reconnect - cheaper than the alternative of

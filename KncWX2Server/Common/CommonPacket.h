@@ -2059,6 +2059,9 @@ DECL_DATA( KGamePlayStatus )
 	#ifdef ADD_RENA_SYSTEM //김창한 // 해외팀 수정
 		CAC_NATURAL_FORCE,
 	#endif //ADD_RENA_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+		CAC_COMBINATION_POINT = 6,	// char-luciel CH1a2: Lu/Ciel's Combination Point, June 32a350d0 reads type 6
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 	};
 
 	enum COOL_TIME_TYPE
@@ -2084,6 +2087,11 @@ DECL_DATA( KGamePlayStatus )
 #ifdef	SERV_RIDING_PET_SYSTM// 적용날짜: 2013-04-21
 	std::map< int, int >			m_mapRidingPetCoolTime;
 #endif	// SERV_RIDING_PET_SYSTM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	int								m_iMinorUnitMaxMP;	// char-luciel CH1a2: June +0x5a, the minor unit's ( Ciel's ) max MP
+	int								m_iMinorUnitCurMP;	// char-luciel CH1a2: June +0x5e
+	char							m_cMinorUnitForm;	// char-luciel CH1a2: June +0x62, 1 = the minor unit in play, -1 = unset
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 
 	KGamePlayStatus()
 	{
@@ -2094,6 +2102,11 @@ DECL_DATA( KGamePlayStatus )
 		m_cCurHyperCount = 0;
 		m_cCharAbilType = CAC_NONE;
 		m_iCharAbilCount = 0;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+		m_iMinorUnitMaxMP = 0;	// char-luciel CH1a2: June ctor 31f3b0a0
+		m_iMinorUnitCurMP = 0;
+		m_cMinorUnitForm = -1;
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 	}
 
 	void SetCharAbilType( IN const CHAR_ABIL_TYPE eType )
@@ -2144,6 +2157,16 @@ DECL_DATA( KGamePlayStatus )
 		return m_iCharAbilCount;
 	}
 #endif //ADD_RENA_SYSTEM
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	int GetCombinationPoint() const	// char-luciel CH1a2: June 32a35123's inline test
+	{
+		if( m_cCharAbilType != CAC_COMBINATION_POINT )
+			return 0;
+
+		return m_iCharAbilCount;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 };
 
 DECL_DATA( KGamePlayStatusContainer )

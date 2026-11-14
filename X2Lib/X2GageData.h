@@ -1010,6 +1010,8 @@ public:
 	virtual bool	FlushMp( const float fFlushMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// June 32a31b30
 	virtual void	MpFrameMove( const float fElapsedTime_ );	// June 32a35170
 	virtual void	UpdateDataFromGameUnit( const CX2GageData* pGageData_ );	// June 32a35020
+	virtual bool	GetMyPlayStatusToPacket( OUT KGamePlayStatus& kGamePlayStatus_ ) const;	// char-luciel CH1a2: June 32a32530
+	virtual void	SetMyPlayStatusFromPacket( IN const KGamePlayStatus& kGamePlayStatus_ );	// char-luciel CH1a2: June 32a350d0
 	virtual CX2GageData* GetCloneGageData();	// June 32a360d0
 	virtual void	CopyGageData( IN CX2GageData* pGageData_ );	// June 32a35150
 private:

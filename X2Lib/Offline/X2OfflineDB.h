@@ -399,6 +399,10 @@ struct KOfflineUnitRow
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 	int				m_iTranscendence;		///< unit.transcendence, June's CX2Unit +0x3c ( 0 / 1 )
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	int				m_iMinorUnitCurMP;		///< unit.minor_cur_mp, KGamePlayStatus::m_iMinorUnitCurMP ( char-luciel CH1a2 )
+	int				m_iMinorUnitForm;		///< unit.minor_unit_form, KGamePlayStatus::m_cMinorUnitForm ( -1 unset, 1 = the minor unit in play )
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 	__int64			m_tRegDate;
 	__int64			m_tDelDate;
 	__int64			m_tLastDate;
@@ -432,6 +436,10 @@ struct KOfflineUnitRow
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 		, m_iTranscendence( 0 )
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+		, m_iMinorUnitCurMP( 0 )
+		, m_iMinorUnitForm( -1 )
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 		, m_tRegDate( 0 )
 		, m_tDelDate( 0 )
 		, m_tLastDate( 0 )
@@ -448,6 +456,12 @@ public:
 	{
 		/// Schema revision. Bump it and add a rung to Migrate() when a later
 		/// phase needs a new table, so existing saves are not wiped.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+		SCHEMA_VERSION			= 23,	///< v23: unit.minor_cur_mp + unit.minor_unit_form ( char-luciel CH1a2 )
+
+		/// As in the v22 branch below, which this one replaces wholesale.
+		DEFAULT_RESURRECTION_STONE	= 10,
+#else SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 		SCHEMA_VERSION			= 22,	///< v22: unit.transcendence ( June transcendence T1 )
 
@@ -510,6 +524,7 @@ public:
 #endif SERV_IRUHADEV_JUNE_SKILL_PAGE
 #endif SERV_IRUHADEV_JUNE_QUEST_DATA
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 
 		//{{ Iruha : 2026-09-16 // Vanilla hardcodes iDelableDay = 1 (one full
 		// day) for every region (GSGameDBThread.cpp). This build has no
@@ -665,6 +680,10 @@ public:
 	/// real server keeps the same values in its GUnitPlayInfo table.
 	bool	SaveGamePlayStatus( UidType nUnitUID, int iCurHP, int iCurMP,
 								int iHyperGage, int iAbilCount );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+	/// char-luciel CH1a2: the same packet's minor-unit MP and form byte ( unit.minor_cur_mp, unit.minor_unit_form ).
+	bool	SaveMinorUnitPlayStatus( UidType nUnitUID, int iMinorUnitCurMP, int iMinorUnitForm );
+#endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 
 	/// Level, EXP and ED after a dungeon run (phase 4). One statement rather
 	/// than three, because the three move together and a half-written level is

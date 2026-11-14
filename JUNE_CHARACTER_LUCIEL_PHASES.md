@@ -1512,6 +1512,50 @@ Opus 5.5 high, Ghidra read-only (`funcdis.py` + vtable dump from the exe). **Ver
   `allow-listed: 240` / `RESULT: PASS`. `enumscan.py --check X2GageData.h X2GageData.cpp`: `0 A/B row(s) remain`.
 - No build ( no code change ). CH1a2 and CH1a3 are unblocked; CH1k's CH1a1 dependency is met.
 
+### CH1a2 - Done (2026-11-14)
+
+Opus 5.5 high, Ghidra read-only. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS` in three homes ( `Always.h`, end of
+`ServerDefine.h`, `X2ServerProtocol_2010.vcxproj` X2TOOL as `=`; `SECOND_HOMES` row in `tools/flagcheck.py` ); the gauge pair under `_CORE`. Files:
+`CommonPacket.h` / `.cpp`, `X2GageData.h` / `.cpp`, `X2OfflineServer.h` / `.cpp`, `X2OfflineDB.h` / `.cpp`, `Handlers_Field.cpp`, `X2OfflineStatTable.cpp`.
+funcmap: `grep "Char Luciel CH1a2" june2017_re/funcmap.tsv` ( 8 rows ). `JUNE_BUGS.md` 685-687. Commit `<pending>`.
+- **June's struct ( found by a field-offset scan of `.text` ):** Get `320dbbd0`, Put `320bcbd0`, ctor `31f3b0a0`, copy ctor `31e85320`. After
+  `m_mapRidingPetCoolTime` ( `+0x4a` ) June has int `+0x5a` **`m_iMinorUnitMaxMP`**, int `+0x5e` **`m_iMinorUnitCurMP`**, char `+0x62`
+  **`m_cMinorUnitForm`** ( serialized through the char pair `33051d30` / `33051ce0`, not `Get(bool)`'s `== 1` body, so a `char` ). The ctor sets 0, 0,
+  **-1** and, like March, leaves `m_iMaxHP` unset. `CAC_COMBINATION_POINT = 6` ( the gauge setters' type compares in `32a30000`-`32a40000`: 1 Elsword /
+  Elesis, 3 Ara, 4 Add, 5 Rena, 6 Lu/Ciel ) and an inline `GetCombinationPoint()` beside `GetNaturalForce()`.
+- **Proof ( cl /P + offset probe, X2Lib US_SERVICE and X2ServerProtocol X2TOOL ):** flag ON in both ( X2Lib also `_CORE` ON ); `offsetof`
+  `m_iMinorUnitMaxMP` 90 / `m_iMinorUnitCurMP` 94 / `m_cMinorUnitForm` 98 / `m_iCharAbilCount` 22 / `m_mapRidingPetCoolTime` 74, `sizeof` 99,
+  `CAC_COMBINATION_POINT` 6, `CAC_NATURAL_FORCE` 5: identical in both projects and = June ( 0x5a / 0x5e / 0x62, 0x63 ).
+- **Gauge pair ( `_CORE` ).** `GetMyPlayStatusToPacket` `32a32530`: `max( 0, (int)GetNowMp( 1 ) )` to the now MP, then the max, the Combination
+  Point cut to a char into `m_iCharAbilCount` ( June `movsx`, row 685 ), the form = my select unit's `IsMinorUnitForm()` read inline with no NULL test
+  ( row 686; June does not call `31d717e0`, so CH1a1's guarded helper is not used ), base call last and its return kept. It writes no CAC type: the
+  type comes from the server ( base `32a32200` does not write it either ). `SetMyPlayStatusFromPacket` `32a350d0` ( uncarved, capstone ): base `32a33fa0`
+  first, `SetMinorUnitForm( 1 == form )` ( `3234b8c0`, no NULL test ), `SetMaxMp( max, 1 )`, `SetNowMp( now, false, 1 )`, point ( type 6, else 0 )
+  **before** `SetMaxCombinationPoint( 10 )` ( row 687 ), changed byte = 1. `32a32200` / `32a33fa0` = March's base pair ( Veryfy first; base setter calls
+  `SetNowMp( v, 0, 0 )` ), so the base bodies need no change.
+- **Emulator.** `CharAbilTypeOf`: `UT_LUCIEL` -> 6 ( stand-in: no June server switch; June's client reads 6 ). `MakeGamePlayStatus`: for `UT_LUCIEL`
+  only, max = `ONE_CHARGE * 3` ( stand-in, sized like the main gauge ), now = `min( saved, max )`, form = saved; every other class keeps the ctor values,
+  which is what their gauges send. `Handler_EGS_UPDATE_PLAY_STATUS_NOT` saves the minor MP and form on change ( own session cache, `-2` = unwritten
+  form ), before the four-value early return.
+- **Schema decision: v23, forward-only, no existing row changes.** June's setter always forces the form from the packet, so the emulator must carry it
+  ( and Ciel's MP ) across a village -> dungeon hop exactly as it carries `cur_mp`; a session-only cache would flip Ciel back to Lu on every relaunch.
+  `ALTER TABLE unit ADD COLUMN minor_cur_mp ... DEFAULT 0` and `minor_unit_form ... DEFAULT -1` ( the ctor values ), `UNIT_COLUMNS` / `ReadUnitRow`
+  24 / 25, `SaveMinorUnitPlayStatus`. Save backed up first: `db_backup/els_db_20261114_154414_pre_manual.sql` ( user_version 22 ). The rung runs on the
+  first launch of the next deployed build and logs `[JUNE_CHAR] LUCIEL DATA DB MIG v23 done`. **DU4's migration becomes v24** ( `DU4.md` amended ).
+  Flag off: `SCHEMA_VERSION` falls back to 22, so a v23 save refuses to open ( as every earlier rung ).
+- **Hygiene:** flagcheck `JUNE_CHAR_MINOR_UNIT_PLAY_STATUS --worktree --files <12 files>`: `files: 3 PASS, 5 PASS~ (blank/marker only), 2 DEFINE,
+  2 OTHER (other flags), 0 FAIL, 0 ERROR` / `0 deleted line(s), 0 non-ASCII inserted line(s), 0 EOL-mismatched inserted line(s), 0 #else/#endif without
+  the flag token, 0 encoding change(s)` / `RESULT: PASS` ( OTHER = the two gauge files, `_CORE`'s; PASS~ = one blank line before each new block ).
+  `JUNE_CHAR_LUCIEL_CORE --worktree --files X2GageData.h X2GageData.cpp`: `2 PASS` / `RESULT: PASS`. `--with` both gives an ERROR on Always.h's
+  existing `LIVE && !CORE` guard ( unevaluable with CORE stripped ), so each flag is checked alone. No `#error` guard for `_CORE` needing the layout
+  flag ( same reason as CH1a1's: the class does not compile without it ). `junediverge.py --check` ( 12 files ): `allow-listed: 0` / `RESULT: PASS`.
+  `enumscan.py --check` ( 4 files ): `0 A/B row(s) remain`.
+- **Compile:** `/Zs` probes ( no PCH ) of `X2GageData.cpp`, `X2ServerPacket.cpp` ( includes `CommonPacket.cpp` ), `X2OfflineServer.cpp`,
+  `X2OfflineDB.cpp`, `Handlers_Field.cpp`, `X2OfflineStatTable.cpp`, `X2GageManager.cpp`, and X2ServerProtocol `X2ServerProtocol.cpp` /
+  `Socket/Session.cpp` ( X2TOOL defines ): 0 errors each. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( Lu/Ciel inert until `_LIVE` ). Every class: the play-status packet carries three more fields ( 0, 0, -1 );
+  the save gains two columns on the next deployed build. CH1 final play-tests Ciel's MP and form surviving a village -> dungeon hop.
+
 ### CH1a - Done (2026-11-14)
 
 Opus 5.5 high. New `X2Lib/X2GULuciel.h` / `.cpp` ( ASCII, CRLF; in `X2Lib_2010.vcxproj` + `.filters` ) under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`;
