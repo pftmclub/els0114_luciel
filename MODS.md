@@ -7072,3 +7072,22 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, retired by the C
 - **Transcendence.** Grand Master 120, Blazing Heart 121 and Crimson Avenger 125 may transcend offline ( `TranscendCheck` ); the level-70 guide row `LevelUpEvent.lua` TYPE7 = June's ( data036, BOM source ); her transcended pictures ( `X2Data.cpp`: `TR_G_MASTER` / `TR_B_HEART` / `TR_C_AVENGER`, large and gray in Texture101, gauge in Texture102 with the bare key, the rest Texture100 / `GUI_character_01` as the other classes ).
 - **Damage.** June's script tables only ( the enhanced Ancient Fire damage effects are June's rows ); no March value changed.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND` ( pictures and allow-list ) or `_SKILL` ( hyper actives ), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`; `LevelUpEvent.lua`: drop TYPE7 ( backup `kom_backup_tools/data036.kom.20261114_072409` ), pack and copy data036.
+
+### June character: Elesis, the whole port (char-elesis, closed 2026-11-14)
+
+Plan `JUNE_CHARACTER_ELESIS_PHASES.md` (CH0-CH6, CHNa / CHNb, Z; 121 commits from 2026-11-03 before Z); per-phase entries are the `Stage 7 Elesis` sections above. All seven classes (8, 29, 30, 120, 121 + the June-only Dark Knight 35 and Crimson Avenger 125) run on June's class core, Way of the Sword class side (March's live code, June's rework), skills, four summons, passives, blood hooks, cut-in table, class path and transcendence rows. CH6 walk passed (2026-11-14).
+
+| Flag (all in `KTDXLIB/Always.h`) | What it holds |
+|---|---|
+| `SERV_IRUHADEV_JUNE_CHAR_ELESIS_CORE`, `_LIVE`, `_WOS` | class core (inert until LIVE); LIVE is the switch (June's bodies inside March's `CX2GUEL` functions, March's in `#else`); WOS = Way of the Sword class side and gauge twins |
+| `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL`, `_SUMMON`, `_TRANSCEND` | skill states CH2 / CH3; the four summons and buff vslots `0x24c` / `0x250` (CH3b0); 120 / 121 / 125 hyper actives, allow-list, pictures |
+| `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE`, `_BLOOD`, `_UI`, `_CLASS` | CH4a-CH4b2 passives and the Advanced Knight Mastery guard; CH4c blood hooks (Dark Force, Judgment, Blood Revenge, Blood Runaway, Madness, CA berserker); CH5 cut-in table and creation screen; 35 / 125 gauge arm, third line, portraits, level guides |
+| `SERV_IRUHADEV_JUNE_CLASS_PATH`, `SERV_IRUHADEV_JUNE_CLASS_CHANGE_GUIDE` | class-generic (Ara's), reused for 35 / 125; Add reuses them next |
+
+No `SERV_IRUHADEV_JUNE_CHAR_ELESIS_*_DEBUG` flag is defined (`_WOS_DEBUG`, `_DEBUG`, `_CLASS_DEBUG`, `_SKILL_DEBUG`, `_PASSIVE_DEBUG`, `_SUMMON_DEBUG`, `_BLOOD_DEBUG` are all commented out, retired in their reviews). `SERV_IRUHADEV_JUNE_EL_DASHJUMP_XZ_FIREBALL` (2026-10-17, dash-jump X-Z fireball) is superseded by her `_LIVE` body: with `_LIVE` on, June's own state body replaces it; it stays defined only as the `#else` path. JUNE_BUGS rows for Elesis: 625-652 (grep `Elesis`). Stand-ins are recorded in the per-phase sections above.
+
+**Stat rows:** none written for 35 / 120 / 121 / 125. The user's flat StatTable (one curve for all 123 class ids) is already packed in the live data036, so no `StatTable.lua` rows were added and nothing is owed.
+
+**Data (one deploy unit with the exe):** CH0b staged 6,452 June files (6,314 new, 138 replaced; backup `kom_backup_stage_june/20261112_144313`; new kom `data206`, 57 motions) and adopted the class-change dialogs; CH1 adopted `ELESIS_KNIGHT.lua` as June's bytecode and replaced `MOTION_EL_GM.x` / `Motion_EL_BH.x` in data033 (backup `kom_backup_stage_june/20261113_083036`); data036 core-list source: `Enum.lua` (4 RNSI names), `UnitTemplet.lua` (her 7 rows), `LevelUpEvent.lua` (level-15 / level-35 guide rows, TYPE7), NPC rows for the summons (CH3b0). Packed and copied by the phases.
+
+**Revert, in this order:** (1) comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` (the other Elesis flags then compile March's code; `_WOS` / `_SKILL` / `_PASSIVE` / `_BLOOD` / `_TRANSCEND` go with it); keep `JUNE_CLASS_PATH` / `JUNE_CLASS_CHANGE_GUIDE` while Add is ported on them; (2) restore data036 and data033 from the `kom_backup_tools/` backups and `kom.py copy`; (3) restore the staged koms from the `kom_backup_stage_june` backups named above (delete `data206`); (4) `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Exe, data036, data033 and the motion koms go together: June's script against March's exe stalls her states. `els_db.sql` is not touched by the revert.

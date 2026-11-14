@@ -2450,3 +2450,12 @@ Settled by standing rules, not decisions: the motion koms deploy with CH1 final 
 and listing-only functions are read with `charport_adis.py`; the lobby particle hard-codes are retired where June's table plays them (Ara's
 decision 2); June-side icon gaps and the three nil BFI names are `JUNE_BUGS.md` rows; the 54 emotion motions are staged, their behaviour is
 Stage 10; third jobs 171-173 are out of scope.
+
+### Z - Done (2026-11-14, Sonnet 5.5)
+
+Docs only; no code, no flag, no build (full build skipped: no play-test; the CH6 walk's exe stays deployed).
+- `MODS.md` "June character: Elesis, the whole port": flags, `SERV_IRUHADEV_JUNE_EL_DASHJUMP_XZ_FIREBALL` recorded as superseded by her `_LIVE` body, data, revert order (exe + data036 + data033 + motion koms together). No `StatTable.lua` rows (flat table already packed).
+- No `_DEBUG` flag defined: `_WOS_DEBUG`, `_DEBUG`, `_CLASS_DEBUG`, `_SKILL_DEBUG`, `_PASSIVE_DEBUG`, `_SUMMON_DEBUG`, `_BLOOD_DEBUG` all commented out in `Always.h`. No `SERV_NEW_CHARACTER_EL` file was touched, so no stale comment to fix.
+- Checklist: 64 rows already carry `(Elesis: CHn)`. Aisha doc "Template for Stage 7" gets the Elesis paragraph; backlog Stage 7 note added.
+- STATUS: `char-elesis` block moved to `STATUS_ARCHIVE.md` with a *Closed plans* row; `stage7-plan` updated; `char-add` CH0b and CH1a set ready.
+- Also committed: `june2017_re/char_elesis/ch6_walk.md` (pending line-ending change from the CH6 session, at the user's request).
