@@ -2318,6 +2318,53 @@ CH4a / CH4b's carried `ELESIS PASSIVE blood runaway cleanse` on unit 146.
 
 **Play-test PASS (user, 2026-11-14; run 11:43-11:47 on md5 `309ddfed`; 0 EXCEPTION, 0 `KEM_ERROR` / `Motion Error`, 0 ErrorLog lines of this phase; known `E_DISABLE_HB_CHECK_REQ` UNHANDLED x3).** Unit 144: `dark force heal` x12 ( damage x 0.250 ), `judgment heal` x27 ( chance 0.300, bleeding target, damage x 0.05 = SA 0x31 ), `revenge` x4 ( 144 has 28412 learned in the save, an old save row; June's hook gates on the level only ). Unit 146: `revenge` x5 ( stolen = damage x 0.150; the 1506.6 hit equal to the previous steal is a real monster hit, STATCALC motion 1621 ), `runaway stack` x3 ( cool 1.00 s; buff 1 on the third ), `madness on` at hp rate 0.281 / `off` at 1.000 ( threshold 0.300 ), `berserker` x85 ( stacks = enemies 2-3 within 900; berserker 1 = 1 x18 under 0.650 with way of sword -2 ), and the carried `blood runaway cleanse` ( hp rate 0.405, tier 2 ) closes CH4a / CH4b's check. **Not reached in the logs:** `runaway damage` ( the past-4-stacks swap ) and berserker 2 ( Vigor, way of sword 2, under 0.650 HP ): handed to the CH4c review's not-reached list for CH6. User owes nothing more for CH4c; next the CH4 stage review.
 
+### CH4c - Review (2026-11-14, Opus 5.5; the CH4 stage review: covers CH4a, CH4b, CH4b2, CH4c)
+
+**Verdict: pass, no code fix.** The one code change is retiring `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG`, `..._BLOOD_DEBUG`, `..._SUMMON_DEBUG` and `SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG`
+( `KTDXLIB/Always.h`, four `//#define`; the guarded lines stay ). `_PASSIVE` and `_BLOOD` stay on.
+
+**Spot-checks against the June exe** ( `charport_adis.py elesis <va>` ), all equal to the port:
+- CH4c Blood Revenge `32b7bad0`: `GetNowHp()` vs the damage ( `fcomp`, `test ah,0x41` ) takes the damage only while HP > damage, else HP = `min( damage, HP )` ( JUNE_BUGS 671 ); roll = `rate > random`;
+  vslot 0x21c ( BFI 0x1d0 = 464, creator 0, level, 0, 0 ) = March's ( BFI, level, NULL, 0, false ); attacker `UpNowHp( -steal )`, hers `+steal`; `322cf1b0` = `g_pData` +0x150 ( `m_pPicChar`, as March's
+  blaze-tick text ) `->332290a0( (int)value, pos, dir, 2 )` = `DrawText( int, pos, dir, AT_CENTER )`.
+- CH4c Blood Runaway `32b87880`: `fcompp` of cool ( +0x9760 ) and elapsed ( +0x976c ) with `test ah,0x41; jp` skips only when cool > elapsed ( = the port's `cool <= elapsed` ); AT_SPECIAL and defender gates;
+  a set that returns 1 zeroes a non-zero elapsed; the `GetBuffFactor` walk tests +0x20 == 0x1aa ( 426 ) and byte +0x34 > 4, erase 426 + BFI 0x293 ( 659 ), stride 0x5b, **no break** ( = the port's loop ).
+  +0x20 / +0x34 = BTI / `m_ucAccumulationCountNow` ( funcmap 569 / 738 ).
+- CH4c berserker `32b7e9a0`: templet 0x6f03 ( 28419 ); SA 0x1d range, 0x6a threshold; enemy count before the HP rate; WSS -2 -> BFI 911 + erase BTI 883, 2 -> erase 882 + BFI 912, else erase each if held;
+  count clamp 5, equal -> return, BTI 884 absent -> BFI 913 at level **1** ( JUNE_BUGS 672 ), `322a7660( 913, n, 1, 0 )`, store; 0 -> reset + erase 884.
+- CH4a `CountScaletRoseHitOnAttack` `32b524b0`: 28211 / 28232; `fcomp -500.0`, `test ah,5; jp` increments only on C0 = `x < -500` ( the CH4a correction holds ).
+- CH4b `GetDefenceRateBySkill` `32b52260`: vslot 0x524 == 0x6d6e ( 28014 ), `1 - 0.002 x` vslot 0x30c( 1 ), clamped at 0 ( recomputed, same value ), else 1.0.
+- CH4b2 `IsAdvancedKnightMasteryGuard` `32b524f0`: `0 < rate` ( `test ah,1` ), then false only when rate < random ( `random <= rate` ).
+
+**Shared-file verdicts.**
+- CH4a `X2Game.*` `GetEnemyUnitCountInRange` = `322d4a60` ( team via +0x278, vslot 0x180 invincible, gage HP > 0, NPC: vslot 0x3c8, class 0x66 / 0x6a, `dist < range` ); the `+0x8fb6 == 1` skip stays the
+  labelled stand-in ( as `GetLockOnNearstTarget` ). `X2GameUnit.*`, `X2BuffBehaviorTemplet.*`, the three enum headers: new members / names only. Pass.
+- CH4b2 `X2GUUser.*`: member +0x9175 beside the quicken pair, ctor and `DamageReact` resets, the `else if` between Ara and Eve, the enchant gate, the multiply @`320492ba`-`320492d5` ( byte == 1 ->
+  `x +0x9784`, re-read here ) in `JUNE_STATCALC_DAMAGE_REACT`'s block, the `DamageReactStateChange` branch to 332 / 333. Pass.
+- CH4c `X2GUUser.h` base virtuals 0x730 / 0x734 ( empty ) and the `X2GUUser.cpp` call @`320499dc`-`32049a19` ( `GetUnit()` type == 8, 0x730( damage ) then 0x734( DD, damage ), re-read here ). Pass.
+- CH4c `X2BuffFactor.h`: 8 BTI ( 426, 882-887, 896 ) + 11 BFI ( 462, 464, 465, 659, 911-916, 927 ) = June's `Enum.lua`; the IDs in the three listings above match. Pass.
+
+**Hygiene.**
+- `flagcheck JUNE_CHAR_ELESIS_PASSIVE --with ..._PASSIVE_DEBUG --range <c>^..<c>`: ce0bcdf4 `7 PASS, 1 DEFINE, 4 OTHER, 0 FAIL, 0 ERROR`, 1 deleted ( CH1j's `//#define` ); 4353d257 `2 PASS, 1 OTHER`, 0 deleted;
+  abe3a805 `5 PASS`, 0 deleted; all `RESULT: PASS` ( OTHER = `JUNE_ENUM_NAMES` headers, the `_BLOOD` declaration in `X2GUEl.h` ).
+- `flagcheck JUNE_CHAR_ELESIS_BLOOD --with ..._BLOOD_DEBUG --range dbc7c77a^..dbc7c77a`: `4 PASS, 1 DEFINE, 1 OTHER, 0 FAIL, 0 ERROR`, 1 deleted ( `_BLOOD`'s `//#define` ), `RESULT: PASS`.
+- `junediverge.py --check-all`: `allow-listed: 239`, `RESULT: PASS`. `enumscan.py --check X2Lib/X2GUEL.cpp`: `0 A/B row(s) remain ( C 0, D 1, X 0 ignored )`.
+  `stateends.py check X2Lib/X2GUEL.cpp ELESIS_KNIGHT`: `337 registered table(s), 312 with OnEventProcess, 0 STUCK`, `RESULT: PASS`.
+- This review's change ( 4 lines, `bytepatch` before / after: CP949, CRLF 13037, size +8 ): `flagcheck JUNE_CHAR_ELESIS_BLOOD --with ..._BLOOD_DEBUG --worktree --files KTDXLIB/Always.h`: `0 FAIL, 0 ERROR`,
+  `RESULT: PASS`; `junediverge.py --check KTDXLIB/Always.h`: `RESULT: PASS`. The same run for `_PASSIVE` stops with `ERROR` at line 13366, CH4c's dependency guard `#if defined( ..._BLOOD ) && ( !defined( ..._PASSIVE ) ... )`:
+  the tool cannot evaluate a guard that mixes the flag with another; it fails the same way on the `dbc7c77a` range, so it predates this review ( not a defect in the code ).
+
+**Play-tests.** As the four Done notes; the CH4c run re-read ( 11:43-11:47, md5 `309ddfed` ): BLOOD 138 lines ( dark force x12, judgment x27, revenge x9, berserker x85, runaway stack x3, madness on / off x1 ),
+PASSIVE 143 ( `init` x4, `mp` x51, `cool time` x2, `blood runaway tick` x85, `blood runaway cleanse` x1 ); 0 EXCEPTION; 0 `KEM_ERROR` ( 20 `ErrorEnum(433)` on `MESH_EL_SDK_CASH_*`: CH0b's known
+part-mesh lines, routed to CH1 final ); `E_DISABLE_HB_CHECK_REQ` UNHANDLED x3 ( known ). `SUMMON` / `SBUF`: 0 lines this run ( `SUMMON`'s scalet rose lines showed in CH4a; `SBUF` `at once` / `state end`
+never showed, retired anyway as the CH3d review asked ).
+
+**Not reached in CH4, handed to CH6** ( `CH6.md` amended ): the Blood Runaway past-4-stacks swap and berserker 2 ( CH4c ); the Dodge and Slash MP refund ( CH4a, carried to CH4b, whose play-test slotted
+the upgrade 28217; the delegate takes base 28200 only ). Not for CH6: the Grand Master aura ally stack ( needs an ally, offline has none; JUNE_BUGS 664 / 665 ), the Crimson Avenger passive buff icon
+( June's data has none ), Infernal Blade's upgrade ( JUNE_BUGS 667 ).
+
+**Build:** skipped: debug retire only ( standing rule 2026-11-13 ).
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Elesis per class (8 / 29 / 30 / 35 / 120 / 121 / 125), one transcended

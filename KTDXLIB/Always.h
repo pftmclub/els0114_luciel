@@ -12706,7 +12706,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-14
 // Description: June character port ( Elesis ) Phase CH4a - debug lines "[JUNE_CHAR] ELESIS PASSIVE ..." ( the init values once per load, each
 //              delegate / tick as it fires, at most once a second each ). The CH4c review retires it. Revert: undefine the flag ( JUNE_CHAR_ELESIS_PASSIVE_DEBUG ).
-#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE_DEBUG
@@ -12791,7 +12791,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-14
 // Description: June character port ( Elesis ) Phase CH3b0 - temporary [JUNE_CHAR] ELESIS SUMMON lines ( one per spawn request and Soul Ignition rate ) for the CH3b / CH3c play-tests; the CH3b0 review keeps it for them, CH3d's stage review retires it.
 //              Revert: comment out the #define ( JUNE_CHAR_ELESIS_SUMMON_DEBUG ).
-#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON_DEBUG
@@ -12851,7 +12851,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-13
 // Description: char-elesis CH1 debug: logs [JUNE_CHAR] ELESIS SKILL SBUF parse / at once / cleared / frame / state end ( her reserved-buff path, Elesis only,
 //              the parse line once a second per state ). The CH3d review retires it. Revert: undefine the flag ( JUNE_CHAR_ELESIS_DEBUG ).
-#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG needs SERV_IRUHADEV_JUNE_SKILL_STATE_BUFF ( June's ParsingBuffFactorID ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_DEBUG
@@ -13369,7 +13369,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD ) && ( !defined( SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS ) || !defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD needs SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS ( 0x4f8 / 0x4fc calls ), SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ( the 0x730 / 0x734 call site ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( the BFI / BTI names )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
-#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD_DEBUG

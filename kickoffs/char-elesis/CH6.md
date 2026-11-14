@@ -55,3 +55,11 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
   the enhanced Fate Smasher 28605, the gray / party transcended pictures of 120 / 121 / 125, and the level-70 guide popup ( the transition walk ).
 - Units 29 / 30 / 146 are transcended since CH3d: use un-transcended 120 / 121 / 125 units for the transition walk ( create them, or reset one with `elsdb.py settranscend <unit> 0` and empty slots 4 / 9 ).
 - The Blood Cutter's `NPC Motion Error` in State.log is June's data ( JUNE_BUGS 661 ), not a walk failure.
+
+## Amended by the CH4c review (2026-11-14)
+
+- The CH4 debug lines are retired ( `ELESIS PASSIVE` / `BLOOD` / `SUMMON` / `SBUF` print nothing now ): judge these by what the user sees, and if one fails, turn its `_DEBUG` back on for that phase's fix.
+- Not reached in CH4: **Blood Runaway past 4 stacks** ( class 125 with Blood Runaway 28414, e.g. unit 146 `CAvenger80`: keep hitting with non-special attacks past 4 stacks, one per cool time; the Blood Runaway buff gives way to the damage buff,
+  BFI 659 ); **berserker 2** ( class 125 transcended ( unit 146 ), Way of the Sword in Vigor, HP under 65 %: the second berserker buff, BTI 883, and the first one gone ); **the Dodge and Slash MP refund**
+  ( class 29 / 120 ( unit 29 `ElesisGM` ) with Waltz of Sword 28403 learned and **base** Dodge and Slash 28200 slotted, not 28217: a hit gives back the MP the skill spent, a blue MP number ).
+- Not for the walk: the Grand Master aura on allies ( none offline ), the Crimson Avenger passive buff icon ( June has none ), Infernal Blade's upgraded skill ( JUNE_BUGS 667 ).
