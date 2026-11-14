@@ -1517,7 +1517,10 @@ Opus 5.5 high, Ghidra read-only (`funcdis.py` + vtable dump from the exe). **Ver
 Opus 5.5 high, Ghidra read-only. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS` in three homes ( `Always.h`, end of
 `ServerDefine.h`, `X2ServerProtocol_2010.vcxproj` X2TOOL as `=`; `SECOND_HOMES` row in `tools/flagcheck.py` ); the gauge pair under `_CORE`. Files:
 `CommonPacket.h` / `.cpp`, `X2GageData.h` / `.cpp`, `X2OfflineServer.h` / `.cpp`, `X2OfflineDB.h` / `.cpp`, `Handlers_Field.cpp`, `X2OfflineStatTable.cpp`.
-funcmap: `grep "Char Luciel CH1a2" june2017_re/funcmap.tsv` ( 8 rows ). `JUNE_BUGS.md` 685-687. Commit `<pending>`.
+funcmap: `grep "Char Luciel CH1a2" june2017_re/funcmap.tsv` ( 8 rows ). `JUNE_BUGS.md` 685-687. Commit `29ff06ae`; flagcheck `--range
+29ff06ae^..29ff06ae`: layout flag `RESULT: PASS` ( same tallies as the worktree run below ); `_CORE`: `2 PASS, 9 OTHER, 1 ERROR`, the ERROR = Always.h's
+existing `LIVE && !CORE` guard, which the tool cannot evaluate once the new block's comment names `_CORE`; resolved by hand: the commit's Always.h hunk
+is the 11-line comment + `#define` block ( DEFINE in the layout-flag run ), the 9 OTHER rows are the layout flag's files.
 - **June's struct ( found by a field-offset scan of `.text` ):** Get `320dbbd0`, Put `320bcbd0`, ctor `31f3b0a0`, copy ctor `31e85320`. After
   `m_mapRidingPetCoolTime` ( `+0x4a` ) June has int `+0x5a` **`m_iMinorUnitMaxMP`**, int `+0x5e` **`m_iMinorUnitCurMP`**, char `+0x62`
   **`m_cMinorUnitForm`** ( serialized through the char pair `33051d30` / `33051ce0`, not `Get(bool)`'s `== 1` body, so a `char` ). The ctor sets 0, 0,
