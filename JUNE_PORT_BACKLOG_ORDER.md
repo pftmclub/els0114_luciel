@@ -1220,6 +1220,7 @@ june-effect C10d found two June damage steps that exist only for event dungeons.
 - **The NPC state's DIED_FUNC** (june-stat-calc D4a, 2026-11-13). June's InitState keys hold `DIED_FUNC` ( NPC `+0x848c`, beside D4a's `DAMAGED_FUNC` `+0x8488`;
   key order inferred from `3279dc80` ), used only by `Treasure_Charger` / `_Defender` / `_Walker` ( `DI_EVENT_2017_TREASURE` ). Find its caller ( the NPC
   die path ), then parse it beside `DAMAGED_FUNC` ( X2GUNPC.cpp, `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` shows the pattern ) when that dungeon is ported.
+- **The `DI_EVENT_HALLOWEEN_ZOMBIE` (41410) Lu/Ciel tick** (char-luciel CH1a0 review, 2026-11-14). `321faa90` (owner unnamed; caller `321facb0`, called from `CX2Game::OnFrameMove` `32308c20` @32309b4a and `CX2TFieldGame` `323b5970` @323b64b3) runs only in game type 2 and dungeon 0xa1c2. With my unit `UT_LUCIEL` (10) holding buff 0x3a3 it removes buff 0x2fc or 0x2fb (picked by unit vslot 0x260) and returns while `IsTransformed( DT_BOTH )` ( `31fc9d90`, ported CH1a0 ); otherwise it toggles entry 0x3d (`321f90a0` / `321f9700` / `321f7d80` / `321f9610` / `321f85c0`) on buff 0x3a3. Name the owner and the buff ids, then port it with the dungeon.
 **Depends on:** nothing in code. It is content, so plan it after Stage 1 has proven how a June dungeon is brought over.
 
 ### Stage 20: damage-number customization (june-effect C3e, 2026-10-09)

@@ -1411,6 +1411,34 @@ Files: `Always.h`, `KTDGUISlot.h`, `X2GUUser.h/.cpp`, `X2Game.h/.cpp`, `X2GageDa
   a `cl /P` probe shows both flags and `_SKILL_TREE_UI` on and the four classes / function present. Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert ); CH2d2 / CH3c2 hand off the transform-skill play-test.
 
+### CH1a0 - Review (2026-11-14)
+
+Opus 5.5 high, read-only Ghidra. **Verdict: pass, no code change; one routing fix (docs).**
+- **Every body re-read in Ghidra against the commit** (not only 3 spot-checks): `31fc9d50` / `31fc9d90` (0 / 1 / 2 set, getter 2 = either, 3 = both,
+  else false; `CX2Unit::DT_*` right), `31fc9e80` (`&&` test kept, below 0 -> 0, show = value > 0), `31fc9df0` (`Skill_CoolTime` picture show, hide
+  clears `CoolTime` string), `31fdc680` / `31fdc810` (`STR_ID_3738` = 0xe9a `SlotB` + index, slot `+0x3c4` data `+0xc` / `+0x10`, 0 on every miss),
+  `31fdc9a0`, `3200f680` (consume vslot 0x6a0 `<=` now MP vslot 0xd8, unordered -> false), `31fc9f00`, `31fd0490` (unit `+0x867c` -> `+0x494` skill
+  tree; cool time, then MP, then -1), `32030160` (rows `+0x86f7/fb/ff` = `oneA/S/D`, `+0x8707/0b/0f` = `oneQ/W/E` against `X2GameUnit.h`'s
+  `InputData`; last pressed wins; early return when selected; 0x9f5 / 0xe2, font 3 = `XUF_DODUM_20_BOLD`, colours (1,1,1,1) / (0,0,0,1)), `32039dc0`,
+  `31fd0440` (`+0x19` = `oneC`, `+0x39` = `oneR`).
+- **Slot data:** `328d9b00` (type 6, updated 1, id 0, `+0x10` / `+0x14` = -1), `328da050` (templet, then level from the selected unit `+0x494` > 0,
+  icon + piece, slot `+0x340` = 0 = `SetDragable( false )`). `SDT_END` has no user.
+- **Gauge:** `32498e40` (`+0x110` 0, `+0x114` 0, `+0x120` 10, `+0x12c` 1.0), `32a38250` (base copy `322b24f0`, cells by value), `32a327a0` (store,
+  then clamp; June writes only on change, same result).
+- **Switching guide `322e6300`:** guide `( 0, 0 )` / `( 1, 0 )` + key string of action 0x27, count `( int )( cool + 1.0 )` only when cool > 0, tooltip
+  `( 0, 0 )` / `( 1, 1 )`: the three differences from Eve's `322e65c0` hold.
+- **Routing:** CH1a1, CH2d20, CH1k, CH1k2, CH1l, CH1 final, DU5, CH1a amendments are in their kickoffs. **Fixed here:** the Done note left `321faa90`
+  "identified only"; the scope rule defers, never drops. Its dungeon `0xa1c2` is `DI_EVENT_HALLOWEEN_ZOMBIE` (41410), so it is now a bullet in
+  `JUNE_PORT_BACKLOG_ORDER.md` Stage 19 (event dungeons), and funcmap row `31fc9d90 (CH1a0)` names that stage.
+- **Hygiene:** flagcheck `TRANSFORM_LINK --range 3964df64^..3964df64`: `files: 4 PASS, 1 PASS~, 0 DEFINE, 4 OTHER, 0 FAIL, 0 ERROR` / `0 deleted,
+  0 non-ASCII, 0 EOL-mismatched, 0 #else/#endif without the flag token, 0 encoding change(s)` / `RESULT: PASS` (OTHER = `Always.h` with the other
+  flag's block, and `X2GageData.h` / `X2Game.cpp` / `X2Game.h`, which are `LUCIEL_CORE`'s; PASS~ = one blank line in `X2UISkillTreeNew2015.cpp`).
+  `LUCIEL_CORE --range ... --files Always.h X2Game.h X2Game.cpp X2GageData.h`: `2 PASS, 1 PASS~, 1 OTHER, 0 FAIL` / same zero line / `RESULT: PASS`
+  (OTHER = `Always.h`; PASS~ = one blank line in `X2GageData.h`; without `--files` the tool stops on `X2GUUser.cpp:29404`'s CHUNG_CORE `#if`, as the
+  Done note says). `git log -S<flag> 3964df64..HEAD`: nothing for either flag. `junediverge.py --check-all`: `allow-listed: 240` / `RESULT: PASS`.
+  `enumscan.py --check` (5 files): 6 rows, none in CH1a0's lines (DU1b3 `04d2cacf`, `09107672`).
+- No build: no code changed (the code is inert; CH2d2 / CH3c2 play-test it).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
