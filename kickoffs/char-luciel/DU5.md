@@ -65,3 +65,16 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
   `323571c0` (ret 0x38), called from seven packet sites (`31ed46e0`, `32360090`, `31ed57d0`, `31ed4c80`, `31f1ed70`, `32461e80`, `32473f70`): the
   June packets carry a second `KStat` beside `m_kGameStat`. Port the writer, the packet fields (the `CommonPacket.h` rule applies), and the
   emulator's per-body numbers (the minor unit's equipment, after DU3 / DU4) here.
+
+## Amended by char-luciel DU1c2 (2026-11-14)
+
+- **The type-10 socket aggregate.** `CX2Unit::Init` `32363ca0` makes a 0x488-byte aggregate (`32091730`) for `UT_LUCIEL` instead of March's
+  `SocketData` (0x468, `32091080`); its vslots 0xc / 0x10 take a body (0 / 1) and `InitSocketData`'s modes 0 / 1 / 2 and the group filter
+  `3286a4b0` (item: 0 = Lu, 1 = Ciel, 2 = both) act only with it. March has no class for it; port it here.
+- **The HUD's second gage** (`CX2Unit::ResetHudMaxHpMp`, June `3235a160` @`3235a29e-3235a339`, one-line stand-in comment in `X2Unit.cpp`):
+  for `UT_LUCIEL`, MP 2 = `ResetMaxMp( 300, 1 )` x ( 1 + aggregate vslot 0xc( 0 ) + ability x 0.01 ) + vslot 0x10( 0 ), sent as
+  `3248a800( uid, mp, 1 )`, the gage manager's second MP (CH1a0's Lu/Ciel gauge class). DU1c2 ported the two form reads of that function.
+- **The set-socket form reads.** `GetStat` `328842f0` @`32885558`, `InitSocketData` `32365d30` @`32365fe7` / @`3236616d` and the used-socket
+  count `328836c0` @`328837a5` all pass ( my select unit form == 1 ) to `CX2Inventory` `3286a6b0( set id, body )`, which counts the equipped
+  parts of a set that body wears (filter `3286a4b0`). All three sit inside the item +0xac "set complete" socket list, which March's
+  `ItemData` lacks and nobody has ported (funcmap S7m: "Stage 16"). Whoever ports that list passes the form; the count helper goes here.

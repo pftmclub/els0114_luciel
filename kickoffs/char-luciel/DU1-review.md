@@ -54,3 +54,8 @@ and commit.
   `SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE` (add it to the flagcheck `--with` list): June `322e8690` and @`322fd2fe` skip item 200680 in
   `GT_PVE`. Check DU1c's sync bit order against `32d5be30` (E, B x / y / z, F before 0x200000; I after 0x800000) and the `+0x88c8` / `+0x88d4`
   identification (`CashItemAbility`, three readers, three writers).
+
+## Amended by DU1c2 (2026-11-14)
+
+- Check DU1c2's `ProcessUpgradeWeaponParticle` `UT_LUCIEL` case against the listing of `32292610` (@`32292f71-3229328d`, tail `32293254` ->
+  `32292ae0`): which sequence gets which position (stack slots +0x10 ... +0x28 = seq 5 ... 10), and the new `GetWeaponIndexHavingModel` base.

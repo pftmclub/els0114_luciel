@@ -1824,17 +1824,28 @@ void CX2Unit::ResetHudMaxHpMp()
 
 	InitSocketData( 2 );
 	const float fHpCap = kAggregate.m_Stat.m_ExtraStat.m_fIncreaseHPRate;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	InitSocketData( true == IsMinorUnitForm() ? 1 : 0 );	// char-luciel DU1c2: June 3235a160 @3235a1d4, the unit form's sockets ( mode 0 / 1 )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	InitSocketData( 0 );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	const float fResetMaxMp = ResetMaxMp( 300.f, 0 );
 	const float fAbilityRate = 0.f;		/// 32358970( 5 ) x 0.01: June's per-unit ability map, 0 in March ( Buff Phase 16, S7j )
 	const float fMpRate = kAggregate.m_Stat.m_ExtraStat.m_fIncreaseMPRate + fAbilityRate;
 	const float fMaxMp = fResetMaxMp + fResetMaxMp * fMpRate + static_cast<float>( kAggregate.m_iAddMPValue );
 	pGageManager->SetMaxMp( GetUID(), fMaxMp );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// stand-in: June @3235a29e-3235a339, UT_LUCIEL's second gage MP from the type-10 socket aggregate, is DU5's
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	float fSumBaseHP = 0.f;
 	fSumBaseHP = GetUnitStat().m_fBaseHP + fSumBaseHP;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	fSumBaseHP = GetEqipStat( false, true == IsMinorUnitForm() ? 1 : 0 ).m_fBaseHP + fSumBaseHP;	// char-luciel DU1c2: June @3235a426, the form's equip group
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	fSumBaseHP = GetEqipStat( false, 0 ).m_fBaseHP + fSumBaseHP;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	fSumBaseHP = GetSkillStat().m_fBaseHP + fSumBaseHP;
 #ifdef GUILD_SKILL
 	fSumBaseHP = GetGuildSkillStat().m_fBaseHP + fSumBaseHP;

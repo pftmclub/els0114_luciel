@@ -70,3 +70,13 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   between DU1c and DU1d. DU1d depends on DU1c2.
 - The regression play-test also covers DU1c's every-class lines: the MP-on-hit cash ability (a SAT 12 item such as the Magic Necklace 200680
   still gives MP on hit and on damage), equip / unequip of that item in the village, and `InitStat` (HP / MP / attack unchanged at dungeon start).
+
+## Amended by DU1c2 (2026-11-14)
+
+- **Add `31fda280` to the bones:** `CX2GUUser::GetBonePos( const WCHAR* )` (user vslot 0x84, the one returning the vector; `31fda680` is vslot
+  0x80). June strips a `MAJOR:` / `MINOR:` prefix and takes the bone from Lu's (+0x87d0) or Ciel's (+0x8e88) anim. DU1c2's type-10 weapon
+  particles call `GetBonePos( L"MAJOR:Bone_RFinger2" )` / `L"MAJOR:Bone_LFinger2"`, which March's GetBonePos does not parse yet. DU3's kickoff
+  lists `31fda280` as "the equip dump" (wrong label); it belongs here with the other bones.
+- `ProcessEnchantedWeaponEffectAtHand` `31ff8510` (the type-10 hand sparks) stays here: DU1c2 left it, being an `X2GUUser.cpp` function.
+- The regression play-test also covers DU1c2's every-class lines: a +11 / +13 weapon still glows and an attribute-enchanted weapon still
+  sparks on a March class; the village HUD's max HP / MP are unchanged.

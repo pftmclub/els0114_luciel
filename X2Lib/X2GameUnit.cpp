@@ -10921,6 +10921,50 @@ void CX2GameUnit::Weapon::EnchantParticleFrameMoveForAdd()
 #endif //SERV_9TH_NEW_CHARACTER
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+void CX2GameUnit::Weapon::EnchantParticleFrameMoveForLuciel()
+{
+	// char-luciel DU1c2: June 3228c540, Ciel ( the active minor unit ) takes the trace midpoint, Lu the right finger
+	KTDXPROFILE();
+
+	if( INVALID_PARTICLE_SEQUENCE_HANDLE == m_ahEnchantWeapon[0] )
+		return;
+
+	if( GetOwnerUnit().GetGameUnitType() != CX2GameUnit::GUT_USER )
+		return;
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeqEnchant1 = g_pX2Game->GetMajorParticle()->GetInstanceSequence( m_ahEnchantWeapon[0] );
+	if( NULL == pSeqEnchant1 )
+		return;
+
+	CX2GUUser& refOwnerUser = static_cast<CX2GUUser&>( GetOwnerUnit() );
+	if ( true == GetShowObject() && true == refOwnerUser.CanShowWeaponEffect() )
+	{
+		D3DXVECTOR3 vEnchantPos( 0.f, 0.f, 0.f );
+		if( true == refOwnerUser.IsMinorUnitActive() )
+		{
+			D3DXVECTOR3 weaponPos( 0.f, 0.f, 0.f );
+			GetFramePos( &weaponPos, m_pFrame_TRACE_END[0] );
+
+			D3DXVECTOR3 traceEndPos( 0.f, 0.f, 0.f );
+			GetFramePos( &traceEndPos, m_pFrame_TRACE_START[0] );
+
+			vEnchantPos = ( traceEndPos - weaponPos ) * 0.5f + weaponPos;
+		}
+		else
+		{
+			vEnchantPos = refOwnerUser.GetBonePos( L"MAJOR:Bone_RFinger2" );
+		}
+
+		pSeqEnchant1->SetPosition( vEnchantPos );
+		pSeqEnchant1->SetEmitRate( 10, 10 );
+	}
+	else
+	{
+		pSeqEnchant1->SetEmitRate( 0, 0 );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 void CX2GameUnit::Weapon::CreateEnchantParticle( const WCHAR* pName1, const WCHAR* pName2, const WCHAR* pName3 )
 {
 	if( GetOwnerUnit().GetGameUnitType() != CX2GameUnit::GUT_USER )
@@ -12614,6 +12658,12 @@ void CX2GameUnit::Weapon::CommonFrameMoveForUser( double fTime, float fElapsedTi
 			EnchantParticleFrameMoveForAdd();
 		} break;
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	case CX2Unit::UT_LUCIEL:	// char-luciel DU1c2: June 32297d50 case 10
+		{
+			EnchantParticleFrameMoveForLuciel();
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 
 #ifdef ADD_UPGRADE_WEAPON_PARTICLE		/// 강화 무기 이펙트 처리
@@ -20130,6 +20180,9 @@ void CX2GameUnit::Weapon::InitUpgradeWeaponParticle()
 	case CX2Unit::UT_CHUNG:
 	case CX2Unit::UT_ARA:
 	case CX2Unit::UT_ELESIS:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	case CX2Unit::UT_LUCIEL:	// char-luciel DU1c2: June 32299730 case 10 shares the sword group
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		{
 			if( false == bSparkTier )
 				CreateUpgradeWeaponParticle( L"11Gang_Weapon_Effect_Lightning", L"11Gang_Weapon_Effect_Lightning02",
@@ -20259,6 +20312,36 @@ void CX2GameUnit::Weapon::ProcessUpgradeWeaponParticle()
 					ShowUpgradeWeaponSequences( vBonePos2, pSeqUpgradeWeapon7, pSeqUpgradeWeapon8, pSeqUpgradeWeapon10 );
 			}
 		} break;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	case CX2Unit::UT_LUCIEL:	// char-luciel DU1c2: June 32292610 case 10, Ciel ( unit form ) takes the weapon's two effect frames, Lu the finger bones
+		{
+			if( NULL == pSeqUpgradeWeapon || NULL == pSeqUpgradeWeapon2 || NULL == pSeqUpgradeWeapon3 || NULL == pSeqUpgradeWeapon4 )
+				return;
+
+			D3DXVECTOR3 vFirstPos( 0.f, 0.f, 0.f );
+			D3DXVECTOR3 vSecondPos( 0.f, 0.f, 0.f );
+			if( true == pUnit->IsMinorUnitForm() )
+			{
+				const int iWeaponIndex = GetOwnerUnit().GetWeaponIndexHavingModel( 0 );
+				vFirstPos = GetOwnerUnit().GetWeaponBonePos( iWeaponIndex, L"Effect_LWeapon", 0 );
+				vSecondPos = GetOwnerUnit().GetWeaponBonePos( iWeaponIndex, L"Effect_RWeapon", 1 );
+			}
+			else
+			{
+				vFirstPos = GetOwnerUnit().GetBonePos( L"MAJOR:Bone_RFinger2" );
+				vSecondPos = GetOwnerUnit().GetBonePos( L"MAJOR:Bone_LFinger2" );
+			}
+
+			ShowUpgradeWeaponSequences( vFirstPos, pSeqUpgradeWeapon, pSeqUpgradeWeapon2 );
+			ShowUpgradeWeaponSequences( vSecondPos, pSeqUpgradeWeapon3, pSeqUpgradeWeapon4 );
+			if( NULL != pSeqUpgradeWeapon5 && NULL != pSeqUpgradeWeapon6 && NULL != pSeqUpgradeWeapon7 &&
+				NULL != pSeqUpgradeWeapon8 && NULL != pSeqUpgradeWeapon9 && NULL != pSeqUpgradeWeapon10 )
+			{
+				ShowUpgradeWeaponSequences( vFirstPos, pSeqUpgradeWeapon5, pSeqUpgradeWeapon6, pSeqUpgradeWeapon9 );
+				ShowUpgradeWeaponSequences( vSecondPos, pSeqUpgradeWeapon7, pSeqUpgradeWeapon8, pSeqUpgradeWeapon10 );
+			}
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	}
 }
 

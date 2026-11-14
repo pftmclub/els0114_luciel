@@ -49,3 +49,6 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   (UnitToUnit / EffectToUnit / MeshToUnit, June @3262546d / @3262f1e6 / @32628652) under `#ifdef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE` + `#ifndef ADD_RENA_SYSTEM`:
   widen those four guards with Luciel's `_LIVE`. June calls the slot on every attacker: `CX2GUNPC`'s override `32778fe0` hands it to the owner of a
   `CX2AllyNPCAI` NPC (funcmap row). If a Luciel summon deals damage, port that override and drop the user-only test; Raven needed neither.
+- **Amended by DU1c2 (2026-11-14):** vslot `0x2b0` is `CX2GameUnit::GetWeaponIndexHavingModel( int iModelIndex ) const` (base declared by
+  DU1c2, returns 0 as June's `330f9c30`; caller `ProcessUpgradeWeaponParticle`'s `UT_LUCIEL` case). Name Luciel's `32b151b0` so: the first
+  index in `m_vecpWeapon` whose weapon (+0x1c0) has a model at `iModelIndex` (< 8) for the active body (Ciel +0x544, Lu +0x5a4), else 0.

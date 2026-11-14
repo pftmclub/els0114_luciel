@@ -1799,6 +1799,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 #ifdef SERV_9TH_NEW_CHARACTER // ±Ë≈¬»Ø
 			void EnchantParticleFrameMoveForAdd();
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			void EnchantParticleFrameMoveForLuciel();	// char-luciel DU1c2: June 3228c540
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 
 			void SetEnchantParticleShow(bool bShow);
@@ -3015,6 +3018,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		virtual float						GetEvadeUpPerBySMA( int npcID ) { return 0; }
 
 		int							GetWeaponCount() { return (int) m_vecpWeapon.size(); }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		virtual int					GetWeaponIndexHavingModel( const int /*iModelIndex_*/ ) const { return 0; }	// char-luciel DU1c2: June vslot 0x2b0, base 330f9c30; Lu/Ciel's 32b151b0 is CH1k's
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		D3DXVECTOR3					GetWeaponBoneRot( int iWeaponIndex, int iModelIndex );
 		D3DXVECTOR3					GetWeaponBonePos( int iWeaponIndex, const WCHAR* pBoneName, int iModelIndex ) const;
 		D3DXVECTOR3 				GetWeaponBonePos_LUA( int iWeaponIndex, const char* pBoneName );

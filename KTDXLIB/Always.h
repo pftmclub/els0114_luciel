@@ -13281,6 +13281,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !( defined( SERV_IRUHADEV_JUNE_BUFF_NEW_FINALIZER ) && defined( SERV_IRUHADEV_JUNE_CHARINFO_SHOW ) )
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs BUFF_NEW_FINALIZER ( the 32-bit sync field flag ) and CHARINFO_SHOW ( the char window's switching view ), char-luciel DU1c
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && !defined( SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_EFFECT_SHOW )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_BODY needs DIVERGE_WEAPON_EFFECT_SHOW ( CanShowWeaponEffect in the Lu/Ciel enchant frame move ), char-luciel DU1c2
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-14

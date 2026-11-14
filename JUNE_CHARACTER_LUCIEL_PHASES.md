@@ -948,6 +948,42 @@ the new divergence flag `SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE`. Files: `X2U
 - **In game:** nothing new. Other classes: I is always 0 and only Lu/Ciel reads it; E / B / F are 0; the MP-on-hit copy read is the first
   body's (form 0, window not switched); InitStat reads `m_GameStat`. The Magic Necklace gate is PvE-only.
 
+### DU1c2 - Done (2026-11-14)
+
+Opus 5.5 high. Part 7 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (Always.h: a sixth `#error` guard, DIVERGE_WEAPON_EFFECT_SHOW). Files:
+`X2GameUnit.h` / `.cpp`, `X2Unit.cpp`, `Always.h`. No `_DEBUG`, no log line (nothing type 10 runs before CH1). funcmap rows:
+`grep "(DU1c2)" june2017_re/funcmap.tsv` (8 new).
+- **Enchant particle, type 10 (ported).** `CommonFrameMoveForUser`'s switch gains `UT_LUCIEL` -> new `Weapon::EnchantParticleFrameMoveForLuciel`
+  (June `32297d50` case 10 -> `3228c540`, Eve's shape): Ciel active (`IsMinorUnitActive`, the `@3228c602` read NU0 called a game-loop reader)
+  takes the midpoint of `TRACE_END[0]` / `TRACE_START[0]`, Lu `GetBonePos( L"MAJOR:Bone_RFinger2" )`; emit 10.
+- **+11 / +13 glow, type 10 (ported, both inside DIVERGE_UPGRADE_WEAPON_PARTICLE's June bodies).** `InitUpgradeWeaponParticle` (`32299730`):
+  `UT_LUCIEL` joins the sword group. `ProcessUpgradeWeaponParticle` (`32292610` @`32292f71`): base **proven `CX2Unit`** (the register that
+  reads +0xe40 is the owner's +0x867c unit, the same one whose templet +0xaf0 drives the switch). Form 1 (Ciel): `GetWeaponBonePos( idx,
+  L"Effect_LWeapon", 0 )` / `( idx, L"Effect_RWeapon", 1 )`, form 0 (Lu): `MAJOR:` right / left finger; seq 1-2 first, 3-4 second; when all of
+  5-10 exist, 5 / 6 / 9 first and 7 / 8 / 10 second. Read from the listing: the decompile mixes the two position vectors. NU0's "vslot 0x2b0 =
+  skin anim" was wrong: it is a weapon index, new `CX2GameUnit::GetWeaponIndexHavingModel( int ) const` (base returns 0 as June `330f9c30`;
+  Lu/Ciel's `32b151b0` is CH1k's, kickoff amended with its body).
+- **`MAJOR:` bone names.** June's user `GetBonePos` (vslot 0x84, `31fda280`) strips `MAJOR:` / `MINOR:` to pick the body; March's does not
+  yet, so Lu's case-10 positions read no bone until **DU1d** ports it (kickoff amended; DU3's "equip dump" label for `31fda280` is wrong).
+- **Hand sparks `31ff8510`:** an `X2GUUser.cpp` function, left in DU1d's list.
+- **`ResetHudMaxHpMp` `3235a160` (ported; the kickoff's "not ported" was stale: Skill S7k ported it).** The two form reads: `InitSocketData(
+  form )` (@`3235a1d4`) and `GetEqipStat( false, form )` (@`3235a426`); `#else` keeps `0`. The `UT_LUCIEL` second-gage MP block
+  (@`3235a29e-3235a339`) needs the type-10 socket aggregate `32091730` (no March class) and the gage index of `3248a800`: one-line stand-in
+  comment, routed to **DU5** (kickoff amended with the formula).
+- **Set-socket form reads (routed).** `GetStat` `328842f0` @`32885558`, `InitSocketData` `32365d30` @`32365fe7` / @`3236616d`, used-socket
+  count `328836c0` @`328837a5`: base proven `CX2Unit` (g_pData +0x68 my user, +0x90 select unit). Each passes the form to `CX2Inventory`
+  `3286a6b0( set id, body )` (equipped parts of a set worn by that body, filter `3286a4b0`), inside the item +0xac "set complete" socket list
+  that March's `ItemData` lacks and no phase has ported (S7m: Stage 16). No March site to edit; the form goes with that list's port, the
+  count helper and the type-10 aggregate to DU5.
+- **`31ed3340` = `CX2Room::DeleteNpcSlot`** (g_pX2Room, caller `CX2Game` `322e7ba0`): reads `3234af90( 0 )`, the first body's game stat =
+  March's `m_GameStat`. No change.
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files` (4 files): 4 PASS (`X2GameUnit.cpp` +83, `X2Unit.cpp` +11, `X2GameUnit.h` +6,
+  `Always.h` +3), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check` (4 files): RESULT: PASS. `enumscan --check`: 190
+  older A/B rows in the three files, none in this phase's hunks. No `JUNE_BUGS` row (no quirk kept).
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GameUnit.cpp`, `X2Unit.cpp`, `X2GUChung.cpp`: 0 errors (so the new guard does not
+  fire); `cl /P` shows the new function, the virtual and the three `UT_LUCIEL` cases live. Full build skipped: no play-test.
+- **In game:** nothing new. Other classes are never `UT_LUCIEL` and have form 0, so `InitSocketData( 0 )` / `GetEqipStat( false, 0 )` as before.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,
