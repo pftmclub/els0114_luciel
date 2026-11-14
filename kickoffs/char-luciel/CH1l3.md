@@ -48,3 +48,13 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - `322f1a90` is ported: `CX2Game::GetEnemyUnitListInRange( pUnit_, iMyTeam_, fRange_ )` returns the units, nearest first ( no count cap ), under `SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN`; `32b34c70` calls it on `g_pX2Game` with Lu/Ciel's team and range 500.
 - `31f75980` is March's `CX2DamageEffect::CEffect::SetLinkMainEffectByPos` ( `32b34a90` ).
+
+## Amended by CH1l (2026-11-15)
+
+- CH1l declared these helpers in `X2GULuciel.h` ( `body in CH1l3` ); write each body under exactly that name and signature ( every `DamageData` argument is `const CX2DamageManager::DamageData*` ): `SetLucielMinorParticleByEnum` `32b1eca0`
+  ( `eVal_`, wstring, draw count; the Chung `SetChungMinorParticleByEnum` pattern on `m_ahLucielMinorParticleInstance` ), `CreateChaserOfDarknessDamageEffect` `32b1f800`, `ProcessPhantomRushHit` `32b347f0` ( CH0 `?` ), `PlayPunisherEffectSet` `32b34c70`,
+  `RegisterDesperadoTarget` `32b18060` ( CH0 `?`, `m_vecDesperadoTarget` ), `AccumulateShadowFuryDamage` `32b0e4e0`, `PlayBluffEffectSet` `32b37090`, `CheckBoundingStrikeHit` `32b153d0` ( CH0 `?`, sets `m_bBoundingStrikeHit` ),
+  `AddCombinationPointByDamageEffectHit` `32b16880` ( CH0 `?`, walks `m_vecDamageEffectHitCount` ), `GetFormEquipItemList` `32b176a0` ( CH0 `?`: `( eEquipPosition_, vector<SFormEquipItem>& )` appends { body byte, item id } of each worn equip at that position, stops at two ).
+- `LUCIEL_MINOR_PARTICLE_INSTANCE_ID` now names the seven handles ( `LUCIEL_MINOR_PII_REVENGE_WAIT` .. `_MAGNUM_BLADE_FIRE_WAVE`, `_END` = 7 ): index the array by them.
+- The equip's body byte ( `CX2Eqip +0x15d4` ) is DU3's. `GetFormEquipItemList` fills `SFormEquipItem::m_bMinorUnitEquip` with the same stand-in as CH1l's file-local `IsEquipForMinorUnit` ( false ), one-line comment, so both agree until DU3.
+- The review covers CH1l too: read its Done note ( `UpdateNotRenderingOtherEquipList` is the large row; the review compares it with a Ghidra decompile of `32b18220` and the per-group position lists in `_CONST_LUCIEL_CH1L_` ).

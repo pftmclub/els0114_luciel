@@ -66,3 +66,13 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   ( absent in March; June's bases are `3208ddd0 .. 33069eb0` returning the `USI_*` ids ). Add the bases ( non-const, as Lu/Ciel's ) under `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS`'s sibling guard or a new class-agnostic flag, make the
   engine and class readers ask them, and widen with `_LIVE`. The damage getters and `GetJumpDownStateID` are DU2's and already virtual.
 - `StateChange( int, bool )` and `( int, int, bool )` are overridden in Lu/Ciel ( CH1k2 ): the March bases are already virtual.
+
+## Amended by char-luciel CH1l (2026-11-15)
+
+- Twelve Lu/Ciel overrides were written with no March base ( `X2GULuciel.h`, marked `+`, virtual in the class only ): add each base as a virtual ( non-const unless noted ), make the engine callers ask it, and widen with `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`:
+  0x574 `CanPlayEmotion( EMOTION_TYPE )` ( base `32ec5990` returns true; `PlayEmotion` `32043380` @`320433d7` asks it first ), 0x580 `IsTransformSkillState` ( `31e4c550` false; `CommonStateStart` `32061976` stores `+0x94c0 = !it()` ),
+  0x640 `SetShowViewListAndUpdate( bool )` ( `31fca010`: `SetShowViewList( b )`, then `UpdateNotRenderingOtherEquipList()` when b ), 0x650 `SetNowMpFromStoredValue` ( `31fceed0` = `SetNowMp( Now fNowMP, 0 )`, called every frame after `SetNowHp` in `CommonFrameMove` @`3206c1e6` ),
+  0x648 `DoProcessWhenActiveBodyChangeApplied( int iDuoType, int iSkillID )` ( `33093ad0` empty; the call is June's `CommonStateStart` @`32051059`: ( DUO_TYPE value, the key int read before ) ), 0x570 `GetSkinAnimByForm( int ) -> CKTDGXSkinAnimPtr` ( base `31fd48a0`: form 1 ? `m_pMinorUnitXSkinAnim` : `m_pXSkinAnim` ),
+  0x62c `SetHandEquipShow( bool )` ( `3208ddc0` empty; `StateChange` @`320349cb` with 0, `PlayEmotion` @`320447e9` with 1 ), 0x504 `GetSkillIconTexture( CKTDGUISlot*, const SkillTemplet* )` ( `31fdb990` = `SetItemTex( icon, piece )` ), 0x64c `SyncFutureMpFromGage` ( `31fe9da0` ),
+  0x568 `CheckBoundingTarget() -> bool` ( `31e4c550` false; callers are the CH1h / CH1i states ), 0x87c `SetSDOnePieceAvatar( int, bool )` ( `3208e280` stores `m_bSDOnePieceAvatar` ), 0x5c4 `GetDanceWaitStateID` ( `3208e140` = the dance wait state ).
+- `IsHyperModeState` ( 0x51c ) is declared only under `SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME` in `X2GUUser.h`; widen its guard so `_LIVE` alone compiles Lu's override as an override.

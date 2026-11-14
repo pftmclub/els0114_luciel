@@ -45,3 +45,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by CH1a4 (2026-11-14)
 
 - `32b0e440` ( vslot 0x6b0 ) reads the transformed anims `+0x8f84` / `+0x8f9c` and after-images `+0x8f88` / `+0x8fa0`: `m_aTransformedSkin[0 / 1]` ( CH1a4 ).
+
+## Amended by CH1l (2026-11-15)
+
+- `32b172b0` ( vslot 0x87c, CH0 `?` ) is `virtual void SetSDOnePieceAvatar( const int iForm_, const bool bSDOnePieceAvatar_ )`, already declared in `X2GULuciel.h` ( marked `+`, base `3208e280` stores `m_bSDOnePieceAvatar` ).
+  Body: `m_mapScaleHeadByForm[ iForm_ ] = bSDOnePieceAvatar_` ( June `32898c80` map operator[] on `+0x9848` ). CH1l's `UpdateNotRenderingOtherEquipList` resets the map's entries 0 / 1 to false and calls it for each `DITT_SD_ONE_PEACE_AVATAR` one-piece item.
+- CH1l declared `IsEquipForMinorUnit` as a file-local stand-in ( `_CONST_LUCIEL_CH1L_`, returns false until DU3 adds the equip's body byte `+0x15d4` ): use it, not a new read, wherever a row tests an equip's body.

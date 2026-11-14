@@ -2319,6 +2319,36 @@ Opus 5.5 high. Covers CH1k ( `da5999ca` ) and CH1k2 ( `3880c02b` ). **Verdict: p
 - **Routed:** June `320708b0` ( a bounds-checked `+0x5a4 + 4 * i`, i < 8, CH0 named it a `CX2GUUser` getter ) is June's `CX2Eqip::GetNormalModel` by this layout: CH1l's kickoff amended ( its `32b18220` caller ).
 - **Next:** `/x2-phase char-luciel CH1l` ( Sonnet 5.5 high ).
 
+### CH1l - Done (2026-11-15)
+
+Sonnet 5.5 high. All 32 CH1l rows of the class map written under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.cpp` +1,028, `.h` +61 -3; inert, `_LIVE` stays `//#define` ). Code commit `f82df8f5`.
+funcmap: `grep "(CH1l)" june2017_re/funcmap.tsv` ( 11 rows, getters grouped ). `JUNE_BUGS.md` 709-712. No debug define. Review: none of its own, the CH1l3 review covers CH1l, CH1l2, CH1l3.
+- **Written ( June address / vslot ):** `CanPlayEmotion` `32ae9bf0` ( 0x574 ), `GetTransformedSkillStateID` `32ae9c00` ( 0x57c ), `IsTransformSkillState` `32ae9de0` ( 0x580 ), `SetShowViewListAndUpdate` `32ae9f20` ( 0x640 ), `InitEnchantWeaponEffectUnitSpecific` `32aea690` ( 0x54c ),
+  `SetNowMpFromStoredValue` `32aeb2c0` ( 0x650 ), `DoProcessWhenActiveBodyChangeApplied` `32b0fa20` ( 0x648 ), `COMMON_BUFF_FrameMove` `32b12fd0` ( 0x5f0 ), `GetSkinAnimByForm` `32b13b60` ( 0x570 ), `SetHandEquipShow` `32b143e0` ( 0x62c ),
+  `CanRidingState` `32b14e10` ( 0x628 ), `IsClassCommonMoveState` `32b15340` ( 0x578 ), `CreateMajorParticleArray` `32b154f0` ( 0x540 ), `GetSkillIconTexture` `32b15900` ( 0x504 ), `SkillIconOverride` `32b16220` ( 0x56c ),
+  `UpdateNotRenderingOtherEquipList` `32b18220` ( 0x630 ), `SyncFutureMpFromGage` `32b1c960` ( 0x64c ), `CheckBoundingTarget` `32b34680` ( 0x568, now `bool` ), `AttackResultByType` `32b37730` ( 0x4e0 ), `CreateMinorParticleArray` `32b37780` ( 0x548 ),
+  `HyperModeFrameMove` `32b38080` ( 0x600 ), `GetJumpDownStateID` `32b4d5b0` ( 0x458 ), the DU2 getters `32b4d810` .. `32b4db10` ( 0x114 / 0x118 / 0x48c / 0x490 / 0x494 / 0x49c / 0x4a0 / 0x4a4, DU2's exact names ), `GetDanceWaitStateID` `32b4db50` ( 0x5c4 ), `IsHyperModeState` `32b4dbe0` ( 0x51c ).
+- **Names CH0 left `?`, named here by what each does:** `IsTransformSkillState` ( 0x580 ), `SetShowViewListAndUpdate` ( 0x640, `SetShowViewList` then, when shown, `UpdateNotRenderingOtherEquipList` in June's base ), `DoProcessWhenActiveBodyChangeApplied` ( 0x648; June's `CommonStateStart` @`32051059` calls it with the
+  DUO_TYPE key and a key int ), `SetHandEquipShow` ( 0x62c; callers `StateChange` @`320349cb` with 0, `PlayEmotion` @`320447e9` with 1 ), `SyncFutureMpFromGage` ( 0x64c ). The 0x87c override `32b172b0` ( CH1l2 ) is declared as `SetSDOnePieceAvatar( int iForm, bool )` ( base `3208e280` stores `m_bSDOnePieceAvatar` ).
+- **Unmapped callees identified from their listings:** `32282440` = user `IsOnSomethingNow` / NPC `IsOnSomething` by unit type ( file-local `IsGameUnitOnSomething` ), `31fd5ab0` = `GetEquipPtrFromEquipViewListByEquipPosition`, `320708b0` = `CX2Eqip::GetNormalModel`, `31cd0850` = `CKTDGUISlot::SetItemTex( file, key )`,
+  `31fc9d90( 2 )` = `IsTransformed( DT_BOTH )`. No stop-and-ask case.
+- **`UpdateNotRenderingOtherEquipList` ( the one big row ):** it is not the base with a patch. June runs the base's one-piece rules once per body: the item list per body comes from `32b176a0` ( CH1l3 ), each of 16 division groups hides the shown equips of the item's own body at its case-list positions
+  ( `HideFormEquips` + one position array per group in `_CONST_LUCIEL_CH1L_`; a hair equip keeps its model as the hair mesh, marks the body only in the groups where June marks it ), then the Raven-arm, hand, two face-accessory passes, the hair-mesh hand-over to the after-image,
+  `m_bOtherEquipNotRendered` = body 0's mark, and one hair / face pass per body. June has no Arme / Ain or near-portal exception here ( the base's `bArmeOrAin`, `bNearPortal` are gone ), kept. The draw-face-accessory stores June makes in three groups are dead ( JUNE_BUGS 712 ) and not written.
+  The equip's body byte ( `CX2Eqip +0x15d4` ) is DU3's: `IsEquipForMinorUnit` is a file-local stand-in returning false, so Ciel's passes find no equip until DU3; every other row is exact.
+- **Shared-file hunk ( `X2GUUser.h` ):** `m_pHairXSkinMesh` is private; two 3-line hunks under `_CORE` make it `protected` ( `protected:` before the `MODIFY_AFTER_IMAGE` block, `private:` after ). Insert-only, flagcheck PASS. A header edit: the next full build should rebuild the PCH ( `build.py --pch force` if a hunk seems dead ).
+- **Quirks kept ( JUNE_BUGS 709-712 ):** the MP sync reads the gauge unchecked ( 709 ); `CheckBoundingTarget` starts Lu's strike state while Ciel is in play and Ciel's while Lu is ( 710 ); `IsTransformSkillState` compares a skill id with six transform state ids when not transformed ( 711 ); the dead draw-face stores ( 712 ).
+  Not rows: `GetSkinAnimByForm` crosses the bodies while transformed ( form 0 with Ciel in play returns Lu's own anim ), `GetSkillIconTexture` sets Twilight Judgement's texture name in all three branches, `IsHyperModeState` reads the state id where June reads the state record index ( same number, `LSI_*` = registration index ).
+- **Declared for later phases ( bodies owed ):** CH1l3 gets `SetLucielMinorParticleByEnum` `32b1eca0`, `CreateChaserOfDarknessDamageEffect` `32b1f800`, `ProcessPhantomRushHit` `32b347f0`, `PlayPunisherEffectSet` `32b34c70`, `RegisterDesperadoTarget` `32b18060`, `AccumulateShadowFuryDamage` `32b0e4e0`, `PlayBluffEffectSet` `32b37090`,
+  `CheckBoundingStrikeHit` `32b153d0`, `AddCombinationPointByDamageEffectHit` `32b16880`, `GetFormEquipItemList` `32b176a0` ( names and signatures in `X2GULuciel.h`; kickoff amended ). The seven minor particle handles are named ( `LUCIEL_MINOR_PII_REVENGE_WAIT` .. `_MAGNUM_BLADE_FIRE_WAVE` ).
+  CH1l2 gets `SetSDOnePieceAvatar`. CH1o gets the `+` bases ( 12 virtuals with no March base, listed in its kickoff ).
+- **Gates:** `finish.py --files X2GULuciel.h/.cpp X2GUUser.h`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `3 PASS, 0 OTHER, 0 FAIL, 0 ERROR` ( the 3 deleted lines: `CheckBoundingTarget`'s old `void` declaration and the two `LUCIEL_MINOR_PII_BASE` / `_END = 7` enum lines ), `junediverge` PASS, `enumscan` on the two class files exit 0;
+  the finish run's `enumscan FAIL` is two lines of `X2GUUser.h` ( 2915-2916, `NUI_NEIL_THE_SNIPER_EVENT` / `NUI_PROTON_BOMB_EVENT` ) that this phase did not touch. Range gate `--range f82df8f5^..f82df8f5`: identical tallies. stateends / skillicons / luabind: nothing registered or staged.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp` plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, and `X2GUUser.cpp` ( includes the changed header ): 0 errors each ( first run: `GetSkillTemplet` takes one argument here, the `m_pHairXSkinMesh` access above ).
+  Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1l2` ( Sonnet 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
