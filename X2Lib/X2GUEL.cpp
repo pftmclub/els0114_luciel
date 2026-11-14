@@ -1731,6 +1731,10 @@ CX2GUEL::~CX2GUEL(void)
 		} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	case CX2SkillTree::SI_HA_SBH_ANCIENT_FIRE:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_HA_SBH_ANCIENT_FIRE:	// char-elesis CH3d: June 32b8c470 @32b8e991 ( tail @32b8c90b = March's case )
+	case CX2SkillTree::RNSI_HA_SBH_ANCIENT_FIRE_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{	//에이션트 파이어
 			m_LuaManager.MakeTableReference( "ESI_SI_HA_SBH_ANCIENT_FIRE", normalStateData.stateID );
 			normalStateData.StateInit		= SET_CB_FUNC( CX2GUEL, ESI_SI_HA_SBH_ANCIENT_FIRE_Init );
@@ -2865,6 +2869,10 @@ CX2GUEL::~CX2GUEL(void)
 	// 하이퍼 액티브 시작
 	// 소드 오브 렐릭스
 	case CX2SkillTree::SI_HA_SGM_SWORD_OF_RELICS:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_HA_SGM_SWORD_OF_RELICS:	// char-elesis CH3d: June 32b8c470 @32b8e95c ( 28600, and 28603 through the hyper table )
+	case CX2SkillTree::RNSI_HA_SGM_SWORD_OF_RELICS_UPGRADE:
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		{
 			m_LuaManager.MakeTableReference( "ESI_HA_SGM_SWORD_OF_RELICS", normalStateData.stateID );			
 			// 소드 오브 렐릭스
@@ -2874,11 +2882,30 @@ CX2GUEL::~CX2GUEL(void)
 
 			m_LuaManager.MakeTableReference( "ESI_HA_SGM_SWORD_OF_RELICS", hyperStateData.stateID );
 			hyperStateData.m_bHyperState		= true;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;	// char-elesis CH3d: June tail @32b8c8ac copies only the EventProcess
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 			hyperStateData.StateInit			= normalStateData.StateInit;
+			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+		}
+		break;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	case CX2SkillTree::RNSI_HA_SCA_FATE_SMASHER:	// char-elesis CH3d: June 32b8c470 @32b8e9ce ( tail @32b8e9fe: the hyper state takes only the EventProcess )
+	case CX2SkillTree::RNSI_HA_SCA_FATE_SMASHER_UPGRADE:
+		{
+			m_LuaManager.MakeTableReference( "SI_HA_SCA_FATE_SMASHER", normalStateData.stateID );
+			normalStateData.StateInit			= SET_CB_FUNC( CX2GUEL, SI_HA_SCA_FATE_SMASHER_Init );
+			normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUEL, SI_HA_SCA_FATE_SMASHER_EventProcess );
+
+			m_LuaManager.MakeTableReference( "SI_HA_SCA_FATE_SMASHER", hyperStateData.stateID );
+			hyperStateData.m_bHyperState		= true;
 			hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 		}
 		break;
 
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	// 하이퍼 액티브 끝
 
 
@@ -15088,13 +15115,57 @@ void CX2GUEL::ESI_HA_SGM_SWORD_OF_RELICS_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3d: June 32b61050 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+
+// char-elesis CH3d: June 32b52160 ( Fate Smasher preloads )
+void CX2GUEL::SI_HA_SCA_FATE_SMASHER_Init()
+{
+	XSkinMeshReadyInBackground( L"SCA_FATE_SMASHER_DUMMY01.X" );
+	XMeshReadyInBackground( L"SCA_FATE_SMASHER_P001.Y" );
+	XMeshReadyInBackground( L"SDK_BURNING_PHANTOM_P001.Y" );
+	TextureReadyInBackground( L"WhiteImage.dds" );
+	TextureReadyInBackground( L"smoke02.dds" );
+	XSkinMeshReadyInBackground( L"SCA_FATE_SMASHER_BLADE01.X" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+	XMeshReadyInBackground( L"SDK_Ejection_Buster_Blade01.Y" );
+	TextureReadyInBackground( L"EL_Base_Blood_M01.dds" );
+	TextureReadyInBackground( L"Mesh_Elsword_Event_AC_Upbody21A_Effect.tga" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_PT01.Y" );
+	TextureReadyInBackground( L"cube_light_P02.dds" );
+	XSkinMeshReadyInBackground( L"elsword_SA_rageCutter_attackSphere.X" );
+	XSkinMeshReadyInBackground( L"SDK_BRANDISH_BREAKER_DUMMY01.x" );
+}
+
+// char-elesis CH3d: June 32b6a980 ( the same listing as 32b61050 )
+void CX2GUEL::SI_HA_SCA_FATE_SMASHER_EventProcess()
+{
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+
+	CommonEventProcess();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16315,10 +16386,17 @@ void CX2GUEL::ESI_SI_HA_SBH_ANCIENT_FIRE_EventProcess()
 		StateChange( USI_WAIT );
 	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )	// char-elesis CH3d: June 32b63f90 ( the cancels need the foot on a line )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_EX_ON_LINE_( m_fAttackCancelAfterEx )
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
 	BWALK_CANCEL_AFTER( m_fBWalkCancelAfter )
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 	ZX_CANCEL_AFTER_EX( m_fAttackCancelAfterEx )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 
 	CommonEventProcess();
 }
@@ -16332,10 +16410,26 @@ void CX2GUEL::ESI_SI_HA_SBH_ANCIENT_FIRE_FrameMove()
 	{
 		D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+		// char-elesis CH3d: June 32b7a7a0, the enhanced skill has its own damage effects
+		const CX2SkillTree::SkillTemplet* pAncientFireTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_HA_SBH_ANCIENT_FIRE, true );
+		if ( NULL != pAncientFireTemplet && 0 != pAncientFireTemplet->m_iDeleteSkillIDByUpgrade )
+		{
+			if ( g_pMain->GetNowStateID() == CX2Main::XS_PVP_GAME )
+				g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DAMAGE_EFFECT_SA_SBH_ANCIENT_FIRE_UPGRADE_Attack01_Pvp", GetPowerRate(), vBonePos, GetRotateDegree(), GetRotateDegree() );
+			else
+				g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DAMAGE_EFFECT_SA_SBH_ANCIENT_FIRE_UPGRADE_Attack01_Dungeon", GetPowerRate(), vBonePos, GetRotateDegree(), GetRotateDegree() );
+		}
+		else if ( g_pMain->GetNowStateID() == CX2Main::XS_PVP_GAME )
+			g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DAMAGE_EFFECT_SA_SBH_ANCIENT_FIRE_Attack01_Pvp", GetPowerRate(), vBonePos, GetRotateDegree(), GetRotateDegree() );
+		else
+			g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DAMAGE_EFFECT_SA_SBH_ANCIENT_FIRE_Attack01_Dungeon", GetPowerRate(), vBonePos, GetRotateDegree(), GetRotateDegree() );
+#else SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 		if ( g_pMain->GetNowStateID() == CX2Main::XS_PVP_GAME )
 			g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DAMAGE_EFFECT_SA_SBH_ANCIENT_FIRE_Attack01_Pvp", GetPowerRate(), vBonePos, GetRotateDegree(), GetRotateDegree() );
 		else
 			g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DAMAGE_EFFECT_SA_SBH_ANCIENT_FIRE_Attack01_Dungeon", GetPowerRate(), vBonePos, GetRotateDegree(), GetRotateDegree() );
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	}
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
     if( m_pXSkinAnim->EventTimerOneshot( 2.177f ) == true )

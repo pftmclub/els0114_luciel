@@ -7064,3 +7064,11 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, stays on for the
 - **Shared.** `CX2Game::GetFrontNearestEnemyUnit` ( June `322d7b30`, class-agnostic, own flag ). `X2SkillTree.h`: `RNSI_A_SCA_SHADOW_EDGE` / `_UPGRADE`; `X2BuffFactor.h`: `BTI_DEBUFF_SHADOW_EDGE` 432 ( `JUNE_ENUM_NAMES` ). The mark record, its clear and its per-frame upkeep moved from `_BLOOD` ( CH1h / CH1j declarations ) to `_SKILL`.
 - **Damage.** June's script tables only ( explosion and buff ); no March row, nothing compared. The heal is June's: `SA_ATK_PHYSIC_REL` of 28215 x physical attack per second per mark.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` ( and `SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY` ), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
+## Stage 7 Elesis, CH3d: hyper actives and transcendence rows (char-elesis CH3d, 2026-11-14)
+
+Flags `SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL` (+ `_SKILL_DEBUG`, retired by the CH3d review) and new `SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND`. Plan `JUNE_CHARACTER_ELESIS_PHASES.md`.
+- **What changes in game.** Her June hyper-active ids 28600-28605 cast: Sword of Relics ( Grand Master ) and Ancient Fire ( Blazing Heart ) on March's states, now with June's rule that the walk / dash / Z-X cancels need her feet on a line; the enhanced Ancient Fire 28604 plays its own `_UPGRADE` damage effects; Crimson Avenger's Fate Smasher 28602 / 28605 is new ( June's script state ).
+- **Transcendence.** Grand Master 120, Blazing Heart 121 and Crimson Avenger 125 may transcend offline ( `TranscendCheck` ); the level-70 guide row `LevelUpEvent.lua` TYPE7 = June's ( data036, BOM source ); her transcended pictures ( `X2Data.cpp`: `TR_G_MASTER` / `TR_B_HEART` / `TR_C_AVENGER`, large and gray in Texture101, gauge in Texture102 with the bare key, the rest Texture100 / `GUI_character_01` as the other classes ).
+- **Damage.** June's script tables only ( the enhanced Ancient Fire damage effects are June's rows ); no March value changed.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND` ( pictures and allow-list ) or `_SKILL` ( hyper actives ), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`; `LevelUpEvent.lua`: drop TYPE7 ( backup `kom_backup_tools/data036.kom.20261114_072409` ), pack and copy data036.

@@ -3240,6 +3240,12 @@ void CX2Data::SetServerCurrentTime( wstring wstrTime )
 	case CX2Unit::UC_ARA_YAMA_RAJA:	pwszPrefix = L"Y_RAJA";	break;
 	case CX2Unit::UC_ARA_ASURA:	pwszPrefix = L"ASURA";	break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_TRANSCEND
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
+	// char-elesis CH3d: June's row pushes ( TR_G_MASTER @33377c56, TR_B_HEART @33377d1c, TR_C_AVENGER @33378416 )
+	case CX2Unit::UC_ELESIS_GRAND_MASTER:	pwszPrefix = L"G_MASTER";	break;
+	case CX2Unit::UC_ELESIS_BLAZING_HEART:	pwszPrefix = L"B_HEART";	break;
+	case CX2Unit::UC_ELESIS_CRIMSON_AVENGER:	pwszPrefix = L"C_AVENGER";	break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_TRANSCEND
 	default:	return true;
 	}
@@ -3313,6 +3319,21 @@ void CX2Data::SetServerCurrentTime( wstring wstrTime )
 	if( CX2Unit::UC_LIRE_NIGHT_WATCHER == eUnitClass && CIT_MyGage == eImageType )
 		pieceName = L"TR_N_ARCHER_STATE";
 #endif SERV_IRUHADEV_JUNE_CHAR_RENA_TRANSCEND
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
+	// char-elesis CH3d: June @33377c56 / @3337cea1 / @33372a0b: her large, gray and gauge rows are the bare TR_<class> ( gray + _GRAY ), large in Texture101, gauge in Texture102
+	if( ( CX2Unit::UC_ELESIS_GRAND_MASTER == eUnitClass || CX2Unit::UC_ELESIS_BLAZING_HEART == eUnitClass || CX2Unit::UC_ELESIS_CRIMSON_AVENGER == eUnitClass )
+		&& ( CIT_160by160 == eImageType || CIT_160by160Gray == eImageType || CIT_MyGage == eImageType ) )
+	{
+		if( CIT_MyGage == eImageType )
+			fileName = L"DLG_UI_Common_Texture102_NEW.tga";
+		else
+			fileName = ( CIT_160by160 == eImageType ) ? L"DLG_UI_Common_Texture101_NEW.tga" : L"DLG_UI_Common_Texture101_GRAY.tga";
+		pieceName = L"TR_";
+		pieceName += pwszPrefix;
+		if( CIT_160by160Gray == eImageType )
+			pieceName += L"_GRAY";
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_IMAGE
 	static std::set<int> s_setLogged;
 	if( true == s_setLogged.insert( static_cast<int>( eUnitClass ) * 16 + static_cast<int>( eImageType ) ).second )

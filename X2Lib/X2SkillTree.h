@@ -2762,6 +2762,17 @@ public:
 	RNSI_A_SGM_PROVOKE_UPGRADE                            = 28227,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-elesis CH3d
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	// June SKILL_ID names of her hyper actives ( values from June's Enum.lua )
+	RNSI_HA_SGM_SWORD_OF_RELICS                           = 28600,
+	RNSI_HA_SBH_ANCIENT_FIRE                              = 28601,
+	RNSI_HA_SCA_FATE_SMASHER                              = 28602,
+	RNSI_HA_SGM_SWORD_OF_RELICS_UPGRADE                   = 28603,
+	RNSI_HA_SBH_ANCIENT_FIRE_UPGRADE                      = 28604,
+	RNSI_HA_SCA_FATE_SMASHER_UPGRADE                      = 28605,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-04 // char-elsword CH2a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names Sword Man's skill switch cases spell ( values from June's Enum.lua )

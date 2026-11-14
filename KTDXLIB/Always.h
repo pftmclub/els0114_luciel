@@ -13270,3 +13270,14 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              unreferenced until a caller's flag. Revert: comment out the #define ( and the callers' flags ).
 #define SERV_IRUHADEV_JUNE_GAME_FRONT_NEAREST_ENEMY
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-elesis CH3d - Grand Master ( 120 ), Blazing Heart ( 121 ) and Crimson Avenger ( 125 ) join the transcendence allow-list
+//              ( TranscendCheck ) and the transcended class pictures ( T6c rows TR_G_MASTER / TR_B_HEART / TR_C_AVENGER, read from June's row
+//              pushes ). Log [JUNE_TRANSCEND] IMAGE. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ARA_TRANSCEND ) )
+#error SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND needs SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE and SERV_IRUHADEV_JUNE_CHAR_ARA_TRANSCEND ( the allow-list chain and the picture rows it extends )
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
+//////////////////////////////////////////////////////////////////////////

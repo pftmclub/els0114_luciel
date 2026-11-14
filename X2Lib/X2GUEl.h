@@ -1016,6 +1016,10 @@ protected:
 
 	void ESI_HA_SGM_SWORD_OF_RELICS_Init ();						// 소드 오브 렐릭스
 	void ESI_HA_SGM_SWORD_OF_RELICS_EventProcess();			 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
+	void SI_HA_SCA_FATE_SMASHER_Init();	/// char-elesis CH3d: June 32b52160
+	void SI_HA_SCA_FATE_SMASHER_EventProcess();	/// char-elesis CH3d: June 32b6a980
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 // #endif // SERV_ELESIS_SECOND_CLASS_CHANGE // 김종훈, 엘리시스 1-2 그랜드 마스터, 2-2 블레이징 하트
 
 
