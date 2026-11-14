@@ -1900,7 +1900,7 @@ Sonnet 5.5 high, inert transcription under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`
 - **Gates ( `finish.py --files X2Lib/X2GULuciel.h X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`; `junediverge --check` `RESULT: PASS`; `enumscan --check` exit 0 ( job lines 1 / 2 / 3 are no Enum, commented ).
 - **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GULuciel.cpp`, plain and `/D_LIVE`: 0 errors; `/P` shows the hyper-mode macro and `LINE_RADIUS` expanded. Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
-- **Commit** COMMIT_HASH; flagcheck `--range COMMIT_HASH^..COMMIT_HASH`: RANGE_LINE.
+- **Commit** `8716f6b7`; `finish.py --range 8716f6b7^..8716f6b7`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
