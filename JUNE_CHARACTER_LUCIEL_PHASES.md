@@ -1098,7 +1098,8 @@ funcmap rows: `grep "(DU1d3)" june2017_re/funcmap.tsv` (10).
 - **Lead for DU1d3b:** June's `Init` state switch (game type 1 / 5 -> state 9, 3 -> 13, others no state change there) not compared beyond the body.
 - **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files` (4 files, the peer's uncommitted `JUNE_CHAR_ELESIS_PASSIVE` hunks not staged):
   4 PASS, 0 OTHER, 0 FAIL, 1 deleted (above), 0 non-ASCII, RESULT: PASS. `junediverge --check` (4 files): RESULT: PASS. `enumscan --check`: the
-  known DU1b3 rows and two older header rows only. JUNE_BUGS 669 added.
+  known DU1b3 rows and two older header rows only. JUNE_BUGS 669 added. Commit `442529eb`; `--range 442529eb^..442529eb`: 4 PASS, 0 OTHER,
+  0 FAIL, 1 deleted (the same line), RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GameUnit.cpp`, `X2GUNPC.cpp`, `X2StateMenu.cpp`, `X2GURaven.cpp`,
   `X2GUChung.cpp`, `X2GUElsword_SwordMan.cpp`, `X2GULire_ElvenRanger.cpp`, `X2GUArme_VioletMage.cpp`: 0 errors each. Full build skipped: no play-test
   (DU1d4 builds and hands off the regression pass).
