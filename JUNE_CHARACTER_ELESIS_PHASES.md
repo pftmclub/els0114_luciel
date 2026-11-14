@@ -2280,7 +2280,7 @@ misses for `SA_SPK_INFERNAL_BLADE_WEAPON_DUMMY.XET` / `SPK_INFERNALBLADE_WEAPONM
 beside the mesh ), not this phase's. User owes nothing more for CH4b2.
 
 ### CH4c - Done (2026-11-14)
-**Landed.** Commit `<COMMIT>`; flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD` **on** (+ `_BLOOD_DEBUG`, retired by the CH4c review). Files: `X2GUEL.cpp`, `X2GUEl.h`, `X2GUUser.cpp`,
+**Landed.** Commit `dbc7c77a`; `flagcheck --range dbc7c77a^..dbc7c77a`: `files: 4 PASS, 0 PASS~ (blank/marker only), 1 DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR`, 1 deleted, `RESULT: PASS`; flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD` **on** (+ `_BLOOD_DEBUG`, retired by the CH4c review). Files: `X2GUEL.cpp`, `X2GUEl.h`, `X2GUUser.cpp`,
 `X2GUUser.h`, `X2BuffFactor.h`, `Always.h`. Read from Ghidra (decompile + listing of the seven bodies and `322cf1b0`); constants by `charport_consts.py` (0.0, -1.0 only).
 - **0x4f8** `32b7beb0` = `OnAttackerDamageReact_Slot4F8` (Dark Force): not riding, `GetVigorHpIntakeRate() > 0`, the hit's `m_WayofSwordType` in `WST_VIGOR_NORMAL..SPECIAL`,
   `WSS_VIGOR` -> `UpNowHp( rate x damage )`, `DisplayAddHPInformation( head bone, dir, false )`, `EffectSet_B_EL_Blood_Sucking`. June heals, it makes no damage effect (checklist L457 said so).
