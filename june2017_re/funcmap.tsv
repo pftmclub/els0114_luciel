@@ -11715,3 +11715,41 @@ du1d_body_reads.tsv (DU1d)	every June user-band function that reads a body acces
 32af2570 (CH1f)	CX2GULuciel::LSI_CIEL_COMBO_ZZ_EventProcess	PORTED	Char Luciel CH1f: inert ( _CORE, not wired until CH1 ); the same body as Lu's combo with Ciel's ids; jump down / wait keep Lu's ids
 32af2860 (CH1f)	CX2GULuciel::LSI_CIEL_COMBO_ZZZ_EventProcess	PORTED	Char Luciel CH1f: inert ( _CORE, not wired until CH1 ); Ciel: event 1 = Royal Guard line ( IsInJobLine 2 ) to LCG_COMBO_ZZZX, event 2 = Chiliarch line ( 1 ) to LLC_M_COMBO_ZZZX; Lu has them the other way round
 32af2cc0 (CH1f)	CX2GULuciel::LSI_CIEL_COMBO_ZZZZ_EventProcess	PORTED	Char Luciel CH1f: inert ( _CORE, not wired until CH1 ); the same body as Lu's combo with Ciel's ids; jump down / wait keep Lu's ids
+32af2fb0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_ZZZZX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's ZZZZX body; ends or cancels only
+32af31e0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_X_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's X body; X to LSI_CIEL_COMBO_XX
+32af3500 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's XX body; X to XXX, Down + X on Dread Lord to LSI_LLD_M_COMBO_XX_DOWN_X
+32af38b0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's XXX body; X to XXXX ( Royal Guard LSI_LCG_COMBO_XXXX ), Z to LSI_CIEL_COMBO_XXXZ_START
+32af3d30 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXXX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's XXXX body
+32af3f60 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXXZ_START_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); anim end to LOOP while Z is held, else END
+32af3fe0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXXZ_LOOP_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); END at state time >= 3 s or Z released, then the cancels
+32af41e0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXXZ_END_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's END body; X to LSI_CIEL_COMBO_XXXZX
+32af44d0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXXZX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's XXXZX body
+32af4700 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_COMBO_Z_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); three X events: Royal Guard, Chiliarch, Demonio lines
+32af4b90 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_COMBO_X_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); two X events: Royal Guard line first, Chiliarch second
+32af4f80 (CH1f2)	CX2GULuciel::LSI_CIEL_JUMP_COMBO_X_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Lu's body: landing, can-not-jump time when flag 0
+32af4fc0 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_Z_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); event 1 ( Chiliarch dash ) tested before event 0 ( X )
+32af51b0 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_ZX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); Z on the Royal Guard line to LSI_LCG_M_DASH_JUMP_COMBO_ZXX
+32af52c0 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_X_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); four events then the air special attack + Z branch ( JUNE_BUGS 698 )
+32af5690 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); landing, X to XXX
+32af5790 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); landing, X to XXXX
+32af5890 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXX_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); landing, Z to XXXXZ
+32af5990 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); landing to LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_LANDING
+32af59c0 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); at 0.369 s on the future animation ( JUNE_BUGS 697 ) the passive speed aims at the nearest target, 3500 / -2500 with none
+32af5af0 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_LANDING_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); anim end to wait, then the cancels
+32b103b0 (CH1f2)	CX2GULuciel::LSI_LU_COMBO_XXXZ_CHARGE_StateEnd	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); charge rate = anim time over anim length, at most 1
+32b10540 (CH1f2)	CX2GULuciel::LSI_LU_JUMP_COMBO_Z_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); landing ( can-not-jump 0.2 s on flag 0 ), a held direction the unit faces sets the walk speed
+32b11cf0 (CH1f2)	CX2GULuciel::LSI_CIEL_JUMP_COMBO_Z_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); same body as 32b10540
+32b12ed0 (CH1f2)	CX2GULuciel::LSI_LU_JUMP_COMBO_Z_SECOND_EventProcess	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); state 338: one double-Z event on the Royal Guard line, then 32b10540's body
+32b21cd0 (CH1f2)	CX2GULuciel::LSI_LU_COMBO_XXXZ_END_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.25 s: end effect set, power x ( 1 + charge ), scale 1 + charge / 2 on the set and its damage
+32b21f80 (CH1f2)	CX2GULuciel::LSI_LU_DASH_JUMP_COMBO_ZX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.1 s: projectile effect set when 4 MP are paid
+32b23820 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_X_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.28 s: projectile effect set ( 4 MP ), life time modifier and max count modifier
+32b23b80 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.42 s: the same projectile ( 4 MP )
+32b23ee0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.622 s and 0.667 s: two projectiles ( 4 MP, 2 MP )
+32b24560 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXXX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.577 s: projectile ( 5 MP )
+32b248c0 (CH1f2)	CX2GULuciel::LSI_CIEL_COMBO_XXXZ_END_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.05 s: damage effect ( 5 MP ), power x ( 1 + charge ), life time rate 1 + charge / 2, 35 ahead and 40 up of the bone
+32b24c40 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_COMBO_X_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.3 s: the reverse projectile ( 5 MP )
+32b24fa0 (CH1f2)	CX2GULuciel::LSI_CIEL_JUMP_COMBO_X_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.2 s: projectile ( 5 MP )
+32b25300 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_ZX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.28 s: projectile ( 4 MP ), life time modifier only
+32b25610 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.28 s: projectile ( 5 MP )
+32b25970 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.05 s: the XX projectile ( 5 MP )
+32b25cd0 (CH1f2)	CX2GULuciel::LSI_CIEL_DASH_JUMP_COMBO_XXXX_FrameMove	PORTED	Char Luciel CH1f2: inert ( _CORE, not wired until CH1 ); 0.378 s: projectile ( 5 MP )

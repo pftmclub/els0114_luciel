@@ -746,6 +746,47 @@ protected:
 	void				LSI_CIEL_COMBO_ZZZ_EventProcess();	// June 32af2860
 	void				LSI_CIEL_COMBO_ZZZZ_EventProcess();	// June 32af2cc0
 
+	// char-luciel CH1f2: Duo combos part 2 ( June 32af2fb0 - 32b25cd0 )
+	void				LSI_CIEL_COMBO_ZZZZX_EventProcess();	// June 32af2fb0
+	void				LSI_CIEL_COMBO_X_EventProcess();	// June 32af31e0
+	void				LSI_CIEL_COMBO_XX_EventProcess();	// June 32af3500
+	void				LSI_CIEL_COMBO_XXX_EventProcess();	// June 32af38b0
+	void				LSI_CIEL_COMBO_XXXX_EventProcess();	// June 32af3d30
+	void				LSI_CIEL_COMBO_XXXZ_START_EventProcess();	// June 32af3f60
+	void				LSI_CIEL_COMBO_XXXZ_LOOP_EventProcess();	// June 32af3fe0
+	void				LSI_CIEL_COMBO_XXXZ_END_EventProcess();	// June 32af41e0
+	void				LSI_CIEL_COMBO_XXXZX_EventProcess();	// June 32af44d0
+	void				LSI_CIEL_DASH_COMBO_Z_EventProcess();	// June 32af4700
+	void				LSI_CIEL_DASH_COMBO_X_EventProcess();	// June 32af4b90
+	void				LSI_CIEL_JUMP_COMBO_X_EventProcess();	// June 32af4f80
+	void				LSI_CIEL_DASH_JUMP_COMBO_Z_EventProcess();	// June 32af4fc0
+	void				LSI_CIEL_DASH_JUMP_COMBO_ZX_EventProcess();	// June 32af51b0
+	void				LSI_CIEL_DASH_JUMP_COMBO_X_EventProcess();	// June 32af52c0
+	void				LSI_CIEL_DASH_JUMP_COMBO_XX_EventProcess();	// June 32af5690
+	void				LSI_CIEL_DASH_JUMP_COMBO_XXX_EventProcess();	// June 32af5790
+	void				LSI_CIEL_DASH_JUMP_COMBO_XXXX_EventProcess();	// June 32af5890
+	void				LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_EventProcess();	// June 32af5990
+	void				LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_FrameMove();	// June 32af59c0
+	void				LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_LANDING_EventProcess();	// June 32af5af0
+	void				LSI_LU_COMBO_XXXZ_CHARGE_StateEnd();	// June 32b103b0
+	void				LSI_LU_JUMP_COMBO_Z_EventProcess();	// June 32b10540
+	void				LSI_CIEL_JUMP_COMBO_Z_EventProcess();	// June 32b11cf0
+	void				LSI_LU_JUMP_COMBO_Z_SECOND_EventProcess();	// June 32b12ed0
+	void				LSI_LU_COMBO_XXXZ_END_FrameMove();	// June 32b21cd0
+	void				LSI_LU_DASH_JUMP_COMBO_ZX_FrameMove();	// June 32b21f80
+	void				LSI_CIEL_COMBO_X_FrameMove();	// June 32b23820
+	void				LSI_CIEL_COMBO_XX_FrameMove();	// June 32b23b80
+	void				LSI_CIEL_COMBO_XXX_FrameMove();	// June 32b23ee0
+	void				LSI_CIEL_COMBO_XXXX_FrameMove();	// June 32b24560
+	void				LSI_CIEL_COMBO_XXXZ_END_FrameMove();	// June 32b248c0
+	void				LSI_CIEL_DASH_COMBO_X_FrameMove();	// June 32b24c40
+	void				LSI_CIEL_JUMP_COMBO_X_FrameMove();	// June 32b24fa0
+	void				LSI_CIEL_DASH_JUMP_COMBO_ZX_FrameMove();	// June 32b25300
+	void				LSI_CIEL_DASH_JUMP_COMBO_XX_FrameMove();	// June 32b25610
+	void				LSI_CIEL_DASH_JUMP_COMBO_XXX_FrameMove();	// June 32b25970
+	void				LSI_CIEL_DASH_JUMP_COMBO_XXXX_FrameMove();	// June 32b25cd0
+	void				PlayComboProjectileEffectSet( const WCHAR* pwszEffectSetName_, const float fConsumeMP_, const bool bAddMaxCountModifier_ );	// June 32b23820 and its siblings, inline in each
+
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )
 	CKTDGParticleSystem::CParticleEventSequenceHandle	m_ahLucielMajorParticleInstance[LUCIEL_MAJOR_PII_END];	// +0x959c
