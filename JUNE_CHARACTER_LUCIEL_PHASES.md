@@ -1790,6 +1790,37 @@ JUNE_BUGS 689; `ch0_vtable_all.tsv` slot 0x634 named.
 - **How to see it in game:** nothing yet ( inert until CH1 final; CH2d2 / CH3c2 hand off the transform play-test ).
 - **Commit** `27c7bdd5`; flagcheck `--range 27c7bdd5^..27c7bdd5`: `TRANSFORM_LINK` `2 PASS, 1 PASS~, 3 OTHER, 0 FAIL` / `0 deleted` / `RESULT: PASS`; `LUCIEL_CORE` ( class files ) `2 PASS` / `RESULT: PASS`; `JUNE_ENUM_NAMES` ( `X2BuffFactor.h` ) `1 PASS~` / `RESULT: PASS`.
 
+### CH1a4 - Review (2026-11-14)
+
+Opus 5.5 high, read-only ( `charport_adis.py` on all six June bodies, Ghidra `decompile_function` on `32b13e20` / `32b38f30` ). **Verdict: pass, no code change.**
+- **`STransformedSkin`:** ctor `32073d50` zeroes `+0x00` byte, `+0x04`..`+0x0c`, the ref at `+0x10`, `+0x14` = the struct; `32b13d30` closes `+4` then `+8`
+  ( `CloseDevice` only with `g_pKTDXApp +0x1f4` ), deletes `+0xc` then `+0x14`, releases `+0x10`, byte untouched = commit. Set bases `+0x8f74` / `+0x8f8c`
+  ( Ghidra `param_1 + 0x23dd` / `0x23e3` dwords ).
+- **`SetFormSkinAnim` `32b13e20`:** set `+4` <-> `+0x87c8` ( `m_pMotionFuture`, R12b row `31fe5860` ), set `+8` <-> `+0x87cc` ( `m_pMotion` ), `+0xc` <->
+  `+0x87d0`, `+0x10` <-> `+0x87d4`, `+0x14` <-> `+0x6754`; form 1 = `+0x8e7c`..`+0x8e88` / `+0x6758`. After-image `+0x194 == 1` -> `3322a9c0( 0 )` then
+  `322720f0( 1, 3 )` = `DisableAfterImage( true, AIB_ACTIVE_UNIT )` ( 3 in March `X2GameUnit.h:3620` ); new after-image set and flag 1 -> `32275a30( 3 )`;
+  byte = `sete` ( `!byte` ). Port order and slots equal.
+- **`EndTransformedForm` `32b38f30`:** BTI `0x2fb + ( form != 0 )`; not transformed -> straight to the tail; byte clear -> `goto` the epilogue past the tail
+  ( JUNE_BUGS 689 confirmed in Ghidra ); `+0x200` / `+0x210` = the collision / attack sets ( R12b `326bd250` row ); head frame `+0x4200` / `+0x4218` with no
+  NULL test; vslot 0x63c( 1 ); weapon loop `+0x3cfc`, Weapon `+0x1c0`, 8 x ( `+0x544 + 4i` then `+0x564 + 4i` ), inlined `SetShowObject( true )`.
+  `+0x564` = hyper per R14 `32963eb0` / R14b `3295a570` ( minor is `+0x584`, not read here; R12b's "hyper +0x584" row is that minor array ).
+  vslot 0x634, `31fd6260`; `PlayEffectSet` args ( name, this, 0, 0, -1, -1, (1,1,1), 0, 3 x zero vectors, 1.0 ) = March's defaults ( `X2EffectSet.h:1083` );
+  vslot 0x198, dialog-release stand-in ( CH2d20 ), `_ftol2` / `fild` / `/ 6.0` / `_ftol2` / `> 0`. Tail: `32b35540`, `3229e160` = March
+  `EraseBuffTempletFromGameUnit` ( find_if + `ByIterator`, `X2GameUnit.cpp:15357` ), `321dafb0( +0x983c, 0 )` = March's immediate `StopEffectSet` ( the
+  deferred-queue precedent, C9c-1 / C9d / C9f ).
+- **`RestoreHeadBySkinAnim` `31fdc9d0`:** NULL -> nothing; Face frame inline restore ( `+0xdc` = 0x100, scale 1 ) = `SetFrameScaleRestore` ( D1-3h row );
+  `SetUnitReForm` Bip01_Head / Bip01_Spine1 with the templet type and `+0x8c0c` ( `IsTransformed()`, as DU1d2's second-body calls ). Both calls follow
+  the second-body block `@31fde558-31fde67a`, unconditional = commit. **`SetShowAfterImage` `3322a9c0`:** 8-byte `m_AfterImageList` entries, `pAnim`
+  non-NULL -> inlined `SetShowObject( b )` = commit. **BTI 763 / 764** = `Enum.src.lua` L12193 / L12966.
+- **Hygiene ( `finish.py --review --commits 27c7bdd5 -v` ):** `TRANSFORM_LINK` `2 PASS, 1 PASS~, 3 OTHER, 0 FAIL` / `0 deleted` / `RESULT: PASS`.
+  `junediverge` and `--check-all`: `RESULT: PASS`. The four FAILs are the Done note's tool limits, re-run per file: `DUO_BODY` ( enclosing only ) and
+  `JUNE_ENUM_NAMES` FAIL on `X2GUUser.cpp` = TRANSFORM_LINK's lines; `flagcheck JUNE_ENUM_NAMES --range 27c7bdd5^..27c7bdd5 --files X2Lib/X2BuffFactor.h`:
+  `1 PASS~` / `RESULT: PASS`. `LUCIEL_CORE` Unevaluable on Chung's guard `X2GUUser.cpp:29404`; `--files X2GULuciel.h X2GULuciel.cpp`: `2 PASS` /
+  `RESULT: PASS` ( 2 deleted = the two "body in CH1a4" declaration comments ). OTHER rows = each file's own flag. `enumscan` 216 A/B in 6 files: filtered to
+  the commit's lines only `X2BuffFactor.h:680` / `:681`, the enum definitions themselves; the rest pre-exist. `stateends` / `skillicons` / `luabind`: n/a.
+  No later commit touches the six files.
+- **Build:** none ( no code change ). CH1's CH1a4 dependency is met.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
