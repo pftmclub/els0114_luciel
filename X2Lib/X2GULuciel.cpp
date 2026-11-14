@@ -78,16 +78,16 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fReduceDebuffDurationRate( 1.f )
 , m_fLordOfFearDamageRate( 1.f )
 , m_fFearDamageEffectCoolTime( 0.f )
-, m_bAuraOfFearActive( false )
+, m_ucAuraOfFearStackCount( 0 )
 , m_fAuraOfFearTime( 0.f )
 , m_fAuraOfFearDuration( 0.f )
 , m_fEnhancedSpecterRate( 1.f )
 , m_fEnhancedSpecterRange( 1.f )
 , m_fSoulStrikeChargeTime( 0.f )
-, m_iShadowBoltControlIndex( -1 )
+, m_iShadowBoltNpcUID( -1 )
 , m_fShadowBoltTime( 0.f )
 , m_fShadowBoltDuration( 0.f )
-, m_bTwilightJudgementReattack( false )
+, m_ucTwilightJudgementStackCount( 0 )
 , m_fTwilightJudgementTime( 0.f )
 , m_fSoulStrikeCoolTime( 0.f )
 , m_fCombinationPointOnHitCoolTime( 0.f )
@@ -109,7 +109,8 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fBoundingDamageRateEx( -1.f )
 , m_fDeathTouchTime( -1.f )
 , m_fDeathTouchRange( 1200.f )
-, m_uidDeathTouchUnit( -1 )
+, m_hDeathTouchBeamEffect( INVALID_DAMAGE_EFFECT_HANDLE )
+, m_hDeathTouchTargetEffect( INVALID_DAMAGE_EFFECT_HANDLE )
 , m_fRapidImpactCoolTime( -1.f )
 , m_fRapidImpactRange( 9999.f )
 , m_fRapidImpactMaxRange( 9999.f )
@@ -11030,6 +11031,712 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 	m_iChosenSkillID = pSkillTemplet->m_eID;
 	m_iChosenSkillSlotIndex = iPressedSkillSlotIndex;
 	return true;
+}
+
+// char-luciel CH1l3: the helper bodies CH1l and CH1l2 declared, and the hit readers of AttackResultByType ( June 32aeb1a0 - 32b4d260 )
+namespace _CONST_LUCIEL_CH1L3_
+{
+	const int		MP_FORM_ACTIVE_BODY									= 3;		// June 32aeb1a0: the form argument that means the body in play
+	const float		TWILIGHT_JUDGEMENT_MP_DIVISOR						= 6.f;		// June 32aebb60 ( 3343a468, a double )
+	const float		SHADOW_FURY_DAMAGE_RATE								= 0.5f;		// June 32b0e4e0 ( 3342ebc8, a double )
+	const float		SUMMON_DARKNESS_DURATION							= 30.f;		// June 32b204d0 ( 33439c68, a double ): the buff's full time
+	const float		SUMMON_DARKNESS_REFUND_RATE							= 0.5f;		// June 32b204d0 ( 3342ebc8, a double )
+	const float		SHADOW_BOLT_SELF_DESTRUCT_INTERVAL					= 1.f;		// June 32b20780 ( 334355b0, a double ): seconds between two held-state checks
+	const double	MILLISECONDS_PER_SECOND								= 1000.0;	// June 32b20780 ( 3342f008 )
+	const float		CHASER_OF_DARKNESS_FIRE_INTERVAL					= 0.3f;		// June 32b1f800 ( 3345993c )
+	const float		DEATH_TOUCH_SELF_BONE_OFFSET_Y						= 25.f;		// June 32b34a90 ( 33474890, a double ): added to Lu's Bip01
+	const float		DEATH_TOUCH_TARGET_BONE_OFFSET_Y					= 25.f;		// June 32b34a90 ( 33474890, a double ): added to the target's Bip01
+	const float		DEATH_TOUCH_TARGET_POSITION_OFFSET_Y				= 100.f;	// June 32b34a90 ( 3342f360, a double ): added to the target's position when it has no Bip01
+	const float		PUNISHER_RANGE										= 500.f;	// June 32b34c70 ( 334ed3dc )
+	const int		PUNISHER_MAX_TARGET_COUNT							= 5;		// June 32b34c70
+	const float		PUNISHER_FIRST_HIT_EFFECT_RATE						= 0.5f;		// June 32b34c70 ( 334ed42c ): the modifier value while the relate skill index is 0
+	const float		PUNISHER_LATER_HIT_EFFECT_RATE						= 0.25f;	// June 32b34c70 ( 33437818 )
+	const int		EFFECT_MODIFIER_TAG_FORCE_DOWN_VALUE				= 9;		// June 321db1b0 modifier tag ( no Enum entry ): the damage data's force down value, multiplied or added
+	const int		EFFECT_MODIFIER_TAG_EXTRA_DAMAGE					= 10;		// June 321db1b0 modifier tag ( no Enum entry ): the damage data's extra damage, multiplied or added
+	const int		EFFECT_MODIFIER_TAG_RELATE_SKILL_INDEX				= 11;		// June 321db1b0 modifier tag ( no Enum entry ): the damage data's relate skill index byte
+	const int		ALTAR_OF_EVIL_MAX_EFFECT_COUNT						= 8;		// June 32b35600
+	const int		STATE_ID_ALTAR_OF_EVIL_UNNAMED						= 444;		// June 32b35c60 ( 0x1bc ): Enum.lua has no name for it ( between COMBO_XXX_END 443 and DEATH_TOUCH 446 )
+	const int		OPEN_MIND_DEFAULT_COMBINATION_POINT					= 5;		// June 32b4c7f0: the threshold when the skill templet is missing
+	const int		MAX_AURA_OF_FEAR_STACK_COUNT						= 10;		// June 32b15780
+
+	// June 32007c40: the acquired skill's ability value ( Ara's and Rena's copies, carried per class )
+	bool TryGetAcquiredSkillAbilityValue( CX2Unit* pUnit_, const CX2SkillTree::SKILL_ABILITY_TYPE eType_, const CX2SkillTree::SKILL_ID eSkillID_, const bool bMemoSwap_, float& fOut_ )
+	{
+		if ( NULL == pUnit_ )
+			return false;
+
+		const int iSkillLevel = pUnit_->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID_, false, 0, true );
+		if ( iSkillLevel <= 0 )
+			return false;
+
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = pUnit_->GetUnitData().m_UserSkillTree.GetUserSkillTemplet( eSkillID_, bMemoSwap_ );
+		if ( NULL == pSkillTemplet )
+			return false;
+
+		const bool bPvpOrPve = ( NULL != g_pX2Game && true == g_pX2Game->GetIsNowPVPCorrectionGame() );	// June 322cc1a0: PVP or PVE
+		return pSkillTemplet->TryGetSkillAbilityValue( eType_, iSkillLevel, bPvpOrPve, fOut_ );
+	}
+
+	// June 337ad268 ( initializer 333a78e0 ): the cut-ins of four sets, three bodies each ( Lu, Ciel, both ); a set's entry is set index * 3 + the unit's cut-in sub index
+	const CX2GUUser::SkillCutIn		s_aSkillCutIn[] =
+	{
+		CX2GUUser::SkillCutIn( L"HQ_CutIn_Lu_01" ),			CX2GUUser::SkillCutIn( L"HQ_CutIn_Ciel_01" ),			CX2GUUser::SkillCutIn( L"HQ_CutIn_LuCiel_01" ),
+		CX2GUUser::SkillCutIn( L"HQ_CutIn_Lu_02_LLD" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_Ciel_02_LLD" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_LuCiel_02_LLD" ),
+		CX2GUUser::SkillCutIn( L"HQ_CutIn_Lu_02_LCN" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_Ciel_02_LCN" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_LuCiel_02_LCN" ),
+		CX2GUUser::SkillCutIn( L"HQ_CutIn_Lu_02_LDB" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_Ciel_02_LDN" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_Luciel_02_LDN" ),
+	};
+
+	// June 337ad4a8 ( initializer 333a8080 ): the third job's transformed forms ( Lu, Ciel, hyper active outside both )
+	const CX2GUUser::SkillCutIn		s_aTransformedFormSkillCutIn[] =
+	{
+		CX2GUUser::SkillCutIn( L"HQ_CutIn_Lu_02_LDB_Evil" ),	CX2GUUser::SkillCutIn( L"HQ_CutIn_Ciel_02_LDN_Evil" ),	CX2GUUser::SkillCutIn( L"HQ_CutIn_LuCiel_02_LDN_Evil" ),
+	};
+
+	// June 337ad148 / 337ad1d8 ( initializer 333a74e0 ): the cut-ins of code event 0x8b3, three bodies each; the even random roll takes the first
+	const CX2GUUser::SkillCutIn		s_aEventSkillCutInFirst[] =
+	{
+		CX2GUUser::SkillCutIn( L"HQ_CutIn_LU_CASH_21" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_CIEL_CASH_21" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_LUCIEL_CASH_21" ),
+	};
+	const CX2GUUser::SkillCutIn		s_aEventSkillCutInSecond[] =
+	{
+		CX2GUUser::SkillCutIn( L"HQ_CutIn_LU_CASH_22" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_CIEL_CASH_22" ),		CX2GUUser::SkillCutIn( L"HQ_CutIn_LUCIEL_CASH_22" ),
+	};
+	const int		SKILL_CUT_IN_COUNT_PER_SET							= 3;		// June 32b16940: set index * 3 + sub index
+}
+using namespace _CONST_LUCIEL_CH1L3_;
+
+// char-luciel CH1l3: June 32aeb1a0; the gauge changes the MP of one form, 3 = the body in play
+void CX2GULuciel::UpGageNowMp( const float fChangeOfNowMp_, const int iMpForm_ )
+{
+	if ( NULL == GetGageData() )
+		return;
+
+	int iMpGageIndex = iMpForm_;
+	if ( MP_FORM_ACTIVE_BODY == iMpForm_ )
+		iMpGageIndex = ( true == IsMinorUnitActive() ) ? 1 : 0;
+
+	GetGageData()->UpNowMp( fChangeOfNowMp_, true, iMpGageIndex );
+}
+
+// char-luciel CH1l3: June 32aebb60; the Twilight Judgement stacks pay back MP once the buff is gone, then the stack count and the buff time follow the buff
+void CX2GULuciel::FrameMoveTwilightJudgementMp()
+{
+	if ( 0 != m_ucTwilightJudgementStackCount && false == HaveThisBuff( BTI_BUFF_TWILIGHT_JUDGEMENT ) )
+	{
+		const float fMpConsume = GetActualMPConsume( GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT ), 1 );
+		UpNowMpWithText( static_cast<float>( m_ucTwilightJudgementStackCount ) * static_cast<float>( fMpConsume / TWILIGHT_JUDGEMENT_MP_DIVISOR ) );
+	}
+
+	m_ucTwilightJudgementStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_TWILIGHT_JUDGEMENT );
+	if ( true == HaveThisBuff( BTI_BUFF_TWILIGHT_JUDGEMENT ) )
+		m_fTwilightJudgementTime += m_fElapsedTime;
+}
+
+// char-luciel CH1l3: June 32b0e4e0; Shadow Fury keeps half of the mana damage its hits do
+void CX2GULuciel::AccumulateShadowFuryDamage( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || CX2SkillTree::RNSI_SA_LDN_SHADOW_FURY != pDamageData_->m_iAppliedSkillID )
+		return;
+
+	if ( CX2DamageManager::EDT_MANA_DAMAGE_WITH_NO_DISPLAY != pDamageData_->m_ExtraDamage.m_ExtraDamageType && CX2DamageManager::EDT_MANA_DAMAGE != pDamageData_->m_ExtraDamage.m_ExtraDamageType )
+		return;
+
+	const float fDamage = static_cast<float>( pDamageData_->m_ExtraDamage.m_Damage ) * SHADOW_FURY_DAMAGE_RATE;
+	if ( 0.f < fDamage )
+		m_fShadowFuryAccumulatedDamage += fDamage;
+}
+
+// char-luciel CH1l3: June 32b0e550; the bounding key dialog hides when its show time ends
+void CX2GULuciel::FrameMoveBoundingKeyDialog()
+{
+	if ( 0.f <= m_fBoundingKeyShowTime && NULL != m_pDlgBoundingKey )
+	{
+		m_fBoundingKeyShowTime -= m_fElapsedTime;
+		if ( m_fBoundingKeyShowTime <= 0.f )
+		{
+			m_pDlgBoundingKey->SetShow( false );
+			m_fBoundingKeyShowTime = -1.f;
+		}
+	}
+}
+
+// char-luciel CH1l3: June 32b0eed0; the Stable Dark Energy buff follows the transformed forms
+void CX2GULuciel::UpdateStableDarkEnergyBuff()
+{
+	if ( false == HaveThisBuff( BTI_BUFF_P_LDN_STABLE_DARKENERGY ) )
+	{
+		if ( true == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) || true == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
+		{
+			if ( 0 < GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true ) )
+				SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_P_LDN_STABLE_DARKENERGY, 1, NULL, 0, false );	// 7ai arguments
+		}
+	}
+
+	if ( true == HaveThisBuff( BTI_BUFF_P_LDN_STABLE_DARKENERGY ) && false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) && false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_LDN_STABLE_DARKENERGY );
+}
+
+// char-luciel CH1l3: June 32b0ef80; the Open Mind passive of the unit's third job, -1 for any other class
+int CX2GULuciel::GetOpenMindSkillID() const
+{
+	if ( NULL == GetUnit() )
+		return -1;
+
+	switch ( GetUnit()->GetClass() )
+	{
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+		return CX2SkillTree::RNSI_P_LLD_OPEN_MIND;
+
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+		return CX2SkillTree::RNSI_P_LCN_OPEN_MIND;
+
+	case CX2Unit::UC_LUCIEL_DEMONIO:
+		return CX2SkillTree::RNSI_P_LDN_OPEN_MIND;
+
+	default:
+		return -1;
+	}
+}
+
+// char-luciel CH1l3: June 32b4c7f0; the class's Open Mind is learned and the combination points are at or below its threshold ( ability 2, 5 without a templet ), JUNE_BUGS 719
+bool CX2GULuciel::IsOpenMindConditionMet() const
+{
+	if ( NULL == GetUnit() || NULL == GetGageData() )
+		return false;
+
+	const int iOpenMindSkillID = GetOpenMindSkillID();
+	if ( -1 == iOpenMindSkillID )
+		return false;
+
+	const CX2SkillTree::SKILL_ID eOpenMindSkillID = static_cast<CX2SkillTree::SKILL_ID>( iOpenMindSkillID );
+	const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( eOpenMindSkillID, false, 0, true );
+	if ( iSkillLevel <= 0 )
+		return false;
+
+	int iCombinationPointThreshold = OPEN_MIND_DEFAULT_COMBINATION_POINT;
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( eOpenMindSkillID );
+	if ( NULL != pSkillTemplet )
+		iCombinationPointThreshold = static_cast<int>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_COUNT, iSkillLevel, false ) );
+
+	return GetNowCombinationPoint() <= iCombinationPointThreshold;
+}
+
+// char-luciel CH1l3: June 32b14d10; the Open Mind buff follows the condition above
+void CX2GULuciel::UpdateOpenMindBuff()
+{
+	if ( false == HaveThisBuff( BTI_BUFF_P_LUCIEL_OPEN_MIND ) )
+	{
+		if ( true == IsOpenMindConditionMet() )
+		{
+			const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( static_cast<CX2SkillTree::SKILL_ID>( GetOpenMindSkillID() ), false, 0, true );
+			SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_P_LUCIEL_OPEN_MIND, iSkillLevel, NULL, 0, false );	// 7ai arguments
+		}
+	}
+	else if ( false == IsOpenMindConditionMet() )
+	{
+		EraseBuffTempletFromGameUnit( BTI_BUFF_P_LUCIEL_OPEN_MIND );
+	}
+}
+
+// char-luciel CH1l3: June 32b153d0; a command attack made while a bounding strike state runs marks the strike as landed
+void CX2GULuciel::CheckBoundingStrikeHit( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || CX2DamageManager::AT_COMMAND != pDamageData_->attackType || null == pDamageData_->optrDefenderGameUnit )
+		return;
+
+	if ( LSI_BOUNDING_TARGET_LU_STRIKER == GetNowStateID() || LSI_BOUNDING_TARGET_CIEL_STRIKER == GetNowStateID() )
+		m_bBoundingStrikeHit = true;
+}
+
+// char-luciel CH1l3: June 32b15780; when the Aura of Fear time ends the stacks ( 10 at most ) pay MP back, then the count, time and duration reset
+void CX2GULuciel::FrameMoveAuraOfFear()
+{
+	m_fAuraOfFearDuration -= m_fElapsedTime;
+
+	if ( 0.f < m_fAuraOfFearTime )
+	{
+		m_fAuraOfFearTime -= m_fElapsedTime;
+		if ( m_fAuraOfFearTime < 0.f )
+		{
+			const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION, false, 0, true );
+			const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ) ? GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION, true ) : NULL;
+			if ( NULL != pSkillTemplet )
+			{
+				const float fRecoverMp = GetSkillNumericalByName( L"SA_RECOVER_MP_ABS", CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION, true );
+				const float fRecoverMpPerStack = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_RECOVER_MP_ABS_2, iSkillLevel, false );
+				const int iStackCount = min( static_cast<int>( m_ucAuraOfFearStackCount ), MAX_AURA_OF_FEAR_STACK_COUNT );
+				UpNowMpWithText( static_cast<float>( iStackCount ) * fRecoverMpPerStack + fRecoverMp );
+			}
+
+			m_ucAuraOfFearStackCount = 0;
+			m_fAuraOfFearTime = 0.f;
+			m_fAuraOfFearDuration = 1.f;
+		}
+	}
+}
+
+// char-luciel CH1l3: June 32b16760; the Invasion of Dark Energy marks run out with their time, the Rapid Impact timer counts down
+void CX2GULuciel::UpdateInvasionOfDarkEnergyTargetTime()
+{
+	for ( std::vector<STimedGameUnitKey>::iterator vit = m_vecInvasionOfDarkEnergyTarget.begin(); vit != m_vecInvasionOfDarkEnergyTarget.end(); )
+	{
+		vit->m_fTime -= m_fElapsedTime;
+		if ( false == ( vit->m_fTime <= 0.f ) )
+			++vit;
+		else
+			vit = m_vecInvasionOfDarkEnergyTarget.erase( vit );
+	}
+
+	if ( 0.f < m_fRapidImpactRange )	// June counts it down every frame ( CH4a names the member with its readers )
+		m_fRapidImpactRange -= m_fElapsedTime;
+}
+
+// char-luciel CH1l3: June 32b16880; a damage effect hit of a skill that gains combination points pays them once and drops its counter entry
+void CX2GULuciel::AddCombinationPointByDamageEffectHit( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || true == m_vecDamageEffectHitCount.empty() || pDamageData_->m_iDamageEffectIndex < 0 || pDamageData_->m_iAppliedSkillID <= 0 )
+		return;
+
+	for ( std::vector<SDamageEffectHitCount>::iterator vit = m_vecDamageEffectHitCount.begin(); vit != m_vecDamageEffectHitCount.end(); ++vit )
+	{
+		if ( vit->m_iDamageEffectIndex == pDamageData_->m_iDamageEffectIndex && vit->m_iSkillID == pDamageData_->m_iAppliedSkillID && NULL != GetUnit() )
+		{
+			const CX2SkillTree::SKILL_ID eSwappedSkillID = GetUnit()->GetUnitData().m_UserSkillTree.GetUpgradeSwappedSkillID( static_cast<CX2SkillTree::SKILL_ID>( pDamageData_->m_iAppliedSkillID ) );
+			const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( eSwappedSkillID );
+			if ( NULL != pSkillTemplet )
+			{
+				UpCombinationPoint( pSkillTemplet->m_usFPGainCount );
+				m_vecDamageEffectHitCount.erase( vit );
+				return;
+			}
+		}
+	}
+}
+
+// char-luciel CH1l3: June 32b16940 ( the cut-in sets are file-local: CH5 owns the cut-in data ); the cut-in of a skill at an animation time, JUNE_BUGS 718
+void CX2GULuciel::ShowActiveSkillCutInAndLight( const float fTimeToShow_, const int iSkillCutInSetSubIndex_, const bool bOnlyLight_ )
+{
+	UNREFERENCED_PARAMETER( iSkillCutInSetSubIndex_ );	// June ignores it and reads m_iSkillCutInSetSubIndex
+
+	if ( false == GetXSkinAnimPtr()->EventTimerOneshot( fTimeToShow_ ) || false == GetShowCutInAndChangeWorldColor() || false == GetShowActiveSkillShow() )
+		return;
+
+	CX2GUUser::SkillCutIn cutIn = s_aSkillCutIn[m_iSkillCutInSetIndex * SKILL_CUT_IN_COUNT_PER_SET + m_iSkillCutInSetSubIndex];
+
+	// June 31fd8a50 / 3264e800: the applied customize item's cut-in replaces it ( CX2CustomizeManager, backlog Stage 12 ): stand-in, no item is ever applied
+	const bool bCustomizeCutInApplied = false;
+
+	if ( true == IsInJobLine( 3 ) )
+	{
+		bool bNowStateHyperActive = false;	// June 31fcef00 == 5: the now state's skill is a hyper active skill
+		if ( NULL != GetUnit() && NULL != g_pData->GetSkillTree() && CX2SkillTree::SI_NONE != GetNowStateSkillID() )
+		{
+			const CX2SkillTree::SkillTemplet* pNowSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( GetNowStateSkillID() );
+			if ( NULL != pNowSkillTemplet && CX2SkillTree::ST_HYPER_ACTIVE_SKILL == pNowSkillTemplet->m_eType )
+				bNowStateHyperActive = true;
+		}
+
+		if ( true == IsTransformed( CX2Unit::DT_MAJOR ) )
+			cutIn = s_aTransformedFormSkillCutIn[0];
+		else if ( true == IsTransformed( CX2Unit::DT_MINOR ) )
+			cutIn = s_aTransformedFormSkillCutIn[1];
+		else if ( true == bNowStateHyperActive && false == bCustomizeCutInApplied )
+			cutIn = s_aTransformedFormSkillCutIn[2];
+	}
+
+	IF_EVENT_ENABLED( 0x8b3 )
+	{
+		cutIn = ( 0 == ( rand() & 1 ) ) ? s_aEventSkillCutInFirst[m_iSkillCutInSetSubIndex] : s_aEventSkillCutInSecond[m_iSkillCutInSetSubIndex];	// June 32b16b9b: an even roll takes CASH_21
+	}
+
+	ActiveSkillShow( L"Dummy1_Rhand", cutIn.fileName.c_str(), cutIn.vSize, cutIn.vPosition, IsHyperState(), bOnlyLight_ );
+}
+
+// char-luciel CH1l3: June 32b176a0; appends { body byte, item id } of the worn equips at the position, two at most
+void CX2GULuciel::GetFormEquipItemList( const CX2Unit::EQIP_POSITION eEquipPosition_, std::vector<SFormEquipItem>& vecFormEquipItem_ )
+{
+	BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+	{
+		if ( NULL == pViewEquip || eEquipPosition_ != pViewEquip->GetEqipPos() )
+			continue;
+
+		SFormEquipItem formEquipItem;
+		formEquipItem.m_bMinorUnitEquip = IsEquipForMinorUnit( pViewEquip );	// stand-in until DU3, as CH1l's UpdateNotRenderingOtherEquipList
+		formEquipItem.m_iItemID = pViewEquip->GetItemID();
+		vecFormEquipItem_.push_back( formEquipItem );
+
+		if ( 2 <= vecFormEquipItem_.size() )
+			break;
+	}
+}
+
+// char-luciel CH1l3: June 32b18060; a Desperado hit registers its defender once ( the entry's time is the raw word -1, JUNE_BUGS 720 )
+void CX2GULuciel::RegisterDesperadoTarget( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || null == pDamageData_->optrDefenderGameUnit
+		|| CX2SkillTree::RNSI_SA_LDN_DESPERADO != pDamageData_->m_iAppliedSkillID || CX2SkillTree::RNSI_SA_LDN_DESPERADO != pDamageData_->m_eUsedSkillID )
+		return;
+
+	CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefenderUnit )
+		return;
+
+	for ( std::vector<STimedGameUnitKey>::const_iterator vit = m_vecDesperadoTarget.begin(); vit != m_vecDesperadoTarget.end(); ++vit )
+	{
+		const CX2GameUnit* pRegisteredUnit = g_pX2Game->GetUnitByUIDAndType( vit->m_GameUnitKey.m_uidGameUnit, vit->m_GameUnitKey.m_eGameUnitType );
+		if ( NULL != pRegisteredUnit && pRegisteredUnit->GetGameUnitType() == pDefenderUnit->GetGameUnitType() && pRegisteredUnit->GetUnitUID() == pDefenderUnit->GetUnitUID() )
+			return;
+	}
+
+	STimedGameUnitKey desperadoTarget;
+	*reinterpret_cast<DWORD*>( &desperadoTarget.m_fTime ) = 0xffffffff;
+	desperadoTarget.m_GameUnitKey.m_uidGameUnit = pDefenderUnit->GetUnitUID();
+	desperadoTarget.m_GameUnitKey.m_eGameUnitType = pDefenderUnit->GetGameUnitType();
+	m_vecDesperadoTarget.push_back( desperadoTarget );
+}
+
+// char-luciel CH1l3: June 32b1eca0 ( Chung's SetChungMinorParticleByEnum pattern ); the handle's sequence, created on first use
+CKTDGParticleSystem::CParticleEventSequence* CX2GULuciel::SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ )
+{
+	if ( INVALID_PARTICLE_SEQUENCE_HANDLE == m_ahLucielMinorParticleInstance[eVal_] )
+	{
+		m_ahLucielMinorParticleInstance[eVal_] = g_pX2Game->GetMinorParticle()->CreateSequenceHandle( (CKTDGObject*) this, wstrParticleName_.c_str(), D3DXVECTOR3( 0.f, 0.f, 0.f ), 0, 0, iDrawCount_, 0 );
+	}
+
+	return g_pX2Game->GetMinorParticle()->GetInstanceSequence( m_ahLucielMinorParticleInstance[eVal_] );
+}
+
+// char-luciel CH1l3: June 32b1f650; the Chaser of Darkness ready effects follow Lu's Bip01, the fire timer counts down
+void CX2GULuciel::FrameMoveChaserOfDarknessEffect()
+{
+	if ( true == m_vecChaserOfDarknessEffect.empty() || NULL == g_pX2Game || NULL == g_pX2Game->GetDamageEffect() )
+		return;
+
+	for ( std::vector<CX2DamageEffect::CEffectHandle>::iterator vit = m_vecChaserOfDarknessEffect.begin(); vit != m_vecChaserOfDarknessEffect.end(); )
+	{
+		CX2DamageEffect::CEffect* pChaserEffect = g_pX2Game->GetDamageEffect()->GetInstance( *vit, true );
+		if ( NULL == pChaserEffect )
+		{
+			vit = m_vecChaserOfDarknessEffect.erase( vit );
+		}
+		else
+		{
+			pChaserEffect->SetPos( GetBonePos( L"Bip01" ) );
+			++vit;
+		}
+	}
+
+	if ( 0.f < m_fChaserOfDarknessFireTimer )
+	{
+		m_fChaserOfDarknessFireTimer -= m_fElapsedTime;
+		if ( m_fChaserOfDarknessFireTimer <= 0.f )
+			m_fChaserOfDarknessFireTimer = 0.f;
+	}
+}
+
+// char-luciel CH1l3: June 32b1f800; a hit of the unit ( not a Chaser projectile ) turns the oldest ready effect into a projectile that locks on the defender
+void CX2GULuciel::CreateChaserOfDarknessDamageEffect( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || 0.f < m_fChaserOfDarknessFireTimer || true == m_vecChaserOfDarknessEffect.empty() || NULL == g_pX2Game || NULL == g_pX2Game->GetDamageEffect() )
+		return;
+
+	if ( null == pDamageData_->optrDefenderGameUnit || CX2DamageManager::AT_UNIT != pDamageData_->defenderType
+		|| CX2DamageManager::AT_SPECIAL == pDamageData_->attackType || CX2DamageManager::RT_DUMMY_DAMAGE == pDamageData_->reActResult )
+		return;
+
+	if ( INVALID_DAMAGE_EFFECT_HANDLE != pDamageData_->hAttackerEffect )
+	{
+		CX2DamageEffect::CEffect* pAttackerEffect = g_pX2Game->GetDamageEffect()->GetInstance( pDamageData_->hAttackerEffect, true );
+		if ( NULL != pAttackerEffect && ( 0 == wcscmp( L"DamageEffect_LD_M_CHASER_OF_DARKNESS_Projectile", pAttackerEffect->GetName() ) || 0 == wcscmp( L"DamageEffect_LD_F_CHASER_OF_DARKNESS_Projectile", pAttackerEffect->GetName() ) ) )
+			return;
+	}
+
+	CX2DamageEffect::CEffectHandle hChaserEffect = m_vecChaserOfDarknessEffect.front();
+	CX2DamageEffect::CEffect* pChaserEffect = g_pX2Game->GetDamageEffect()->GetInstance( hChaserEffect, true );
+	if ( NULL == pChaserEffect || NULL == pChaserEffect->GetMainEffect() )
+		return;
+
+	const D3DXVECTOR3 vBonePos = pChaserEffect->GetMainEffect()->GetBonePos( L"Dummy02" );
+	const bool bMaleReadyEffect = ( 0 == wcscmp( L"DamageEffect_LD_M_CHASER_OF_DARKNESS_Ready", pChaserEffect->GetName() ) );
+	const WCHAR* pwszProjectileName = ( true == bMaleReadyEffect ) ? L"DamageEffect_LD_M_CHASER_OF_DARKNESS_Projectile" : L"DamageEffect_LD_F_CHASER_OF_DARKNESS_Projectile";
+	const float fPowerRate = GetPowerRate() * m_fChaserOfDarknessPowerRate;
+
+	// June passes 1.0 as the reserve time ( the reserve flag is off )
+	CX2DamageEffect::CEffect* pProjectile = g_pX2Game->GetDamageEffect()->CreateInstance( this, pwszProjectileName, fPowerRate, vBonePos, GetRotateDegree(), GetRotateDegree(),
+		m_FrameDataNow.unitCondition.landPosition.y, false, 1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+	if ( NULL != pProjectile )
+	{
+		CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+		if ( CX2GameUnit::GUT_USER == pDefenderUnit->GetGameUnitType() )
+			pProjectile->SetLockOnUnitUID( pDefenderUnit->GetUnitUID() );
+		else if ( CX2GameUnit::GUT_NPC == pDefenderUnit->GetGameUnitType() )
+			pProjectile->SetLockOnNPCUID( static_cast<int>( pDefenderUnit->GetUnitUID() ) );
+	}
+
+	g_pX2Game->GetDamageEffect()->DestroyInstanceHandleSilently( hChaserEffect );
+	m_vecChaserOfDarknessEffect.erase( m_vecChaserOfDarknessEffect.begin() );
+	m_fChaserOfDarknessFireTimer = CHASER_OF_DARKNESS_FIRE_INTERVAL;
+	SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_CHASER_OF_DARKNESS_MEMO, 1, NULL, 0, false );	// 7ai arguments
+}
+
+// char-luciel CH1l3: June 32b204d0; ends Summon Darkness: half the unspent time's MP comes back, the summons die, the skill slots refresh
+void CX2GULuciel::CancelSummonDarkness()
+{
+	if ( false == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+		return;
+
+	float fRemainTime = 0.f;
+	std::vector<CX2BuffFinalizerTempletPtr> vecFinalizer;
+	GetBuffFinalizerTempletPtrList( BTI_BUFF_SUMMON_DARKNESS, vecFinalizer );
+	for ( std::vector<CX2BuffFinalizerTempletPtr>::iterator vit = vecFinalizer.begin(); vit != vecFinalizer.end(); ++vit )
+	{
+		const CX2BuffTimeFinalizerTemplet* pTimeFinalizer = dynamic_cast<const CX2BuffTimeFinalizerTemplet*>( vit->get() );
+		if ( NULL != pTimeFinalizer )
+			fRemainTime = pTimeFinalizer->GetDurationTime();
+	}
+
+	// June calls the base's cost ( 31fd1840 ), not this class's: Summon Darkness costs 0 while its buff is on
+	const float fMpConsume = CX2GUUser::GetActualMPConsume( GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS ), 1 );
+	UpNowMpWithText( ( fRemainTime / SUMMON_DARKNESS_DURATION ) * ( fMpConsume * SUMMON_DARKNESS_REFUND_RATE ) );
+
+	EraseBuffTempletFromGameUnit( BTI_BUFF_SUMMON_DARKNESS );
+	KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS );
+	KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP );
+
+	if ( true == IsMyUnit() )
+		g_pX2Game->UpdateSkillSlotUI( false );
+}
+
+// char-luciel CH1l3: June 32b20780; the Shadow Bolt spear: gone without its buff, a held spear owner blows it up each second, its stack timer plays the spear effect set
+void CX2GULuciel::FrameMoveShadowBoltSpear()
+{
+	if ( false == HaveThisBuff( BTI_BUFF_SHADOW_BOLT ) )
+	{
+		KillMySummonedNPC( CX2UnitManager::NUI_SI_SA_LCN_SHADOW_BOLT );
+		return;
+	}
+
+	CX2GUNPC* pSpearNpc = g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID );
+	if ( NULL != pSpearNpc )
+	{
+		const int iElapsedClock = static_cast<int>( static_cast<float>( clock() - m_clockCreated ) );
+		if ( SHADOW_BOLT_SELF_DESTRUCT_INTERVAL < static_cast<double>( iElapsedClock ) / MILLISECONDS_PER_SECOND )
+		{
+			m_clockCreated = clock();
+			if ( true == GetHold() || true == GetGrap() )
+				pSpearNpc->StateChange_LUA( "SHOT_SHADOW_BOLT_SELF_DESTRUCTION", true );
+		}
+	}
+
+	if ( 0.f < m_fShadowBoltTime )
+	{
+		m_fShadowBoltTime -= m_fElapsedTime;
+		if ( m_fShadowBoltTime <= 0.f )
+		{
+			AddBuffAccumulationCount( BFI_BUFF_SHADOW_BOLT, -1, 1, 0 );
+
+			if ( true == HaveThisBuff( BTI_BUFF_SHADOW_BOLT ) )
+			{
+				CX2GUNPC* pStackNpc = g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID );
+				if ( NULL != pStackNpc )
+				{
+					g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_SA_LCN_SHADOW_BOLT_Spear", this, pStackNpc, IsHyperState(), m_fShadowBoltDuration, -1.f,
+						D3DXVECTOR3( 1.f, 1.f, 1.f ), true, pStackNpc->GetPos( false ) );
+				}
+			}
+
+			TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_COOLTIME_1, CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT, true, m_fShadowBoltTime );
+		}
+	}
+}
+
+// char-luciel CH1l3: June 32b347f0; a Phantom Rush hit makes the next Phantom Rush ready, pointed at the defender
+void CX2GULuciel::ProcessPhantomRushHit( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || null == pDamageData_->optrDefenderGameUnit || true == m_bPhantomRushReady
+		|| CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH != pDamageData_->m_iAppliedSkillID || CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH != pDamageData_->m_eUsedSkillID )
+		return;
+
+	g_pX2Game->GetEffectSet()->StopEffectSet( m_hPhantomRushEffectSet );
+
+	if ( 0 < GetNowCombinationPoint() )
+	{
+		m_fPhantomRushReadyTime = 1.f;
+		m_bPhantomRushReady = true;
+
+		CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+		m_PhantomRushTarget.m_eGameUnitType = pDefenderUnit->GetGameUnitType();
+		m_PhantomRushTarget.m_uidGameUnit = pDefenderUnit->GetUnitUID();
+
+		if ( true == IsMyUnit() )
+			g_pX2Game->UpdateSkillSlotUI( false );
+
+		if ( 0 < GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true ) )
+			m_bStableDarkEnergyLocked = true;
+	}
+}
+
+// char-luciel CH1l3: June 32b349f0; Death Touch ends: the target is forgotten, both effects and the buff go
+void CX2GULuciel::ClearDeathTouch()
+{
+	m_fDeathTouchTime = -1.f;
+	m_DeathTouchTarget.m_uidGameUnit = -1;
+	m_DeathTouchTarget.m_eGameUnitType = CX2GameUnit::GUT_USER;
+
+	g_pX2Game->GetDamageEffect()->DestroyInstanceHandle( m_hDeathTouchBeamEffect, false );
+	g_pX2Game->GetDamageEffect()->DestroyInstanceHandle( m_hDeathTouchTargetEffect, false );
+	EraseBuffTempletFromGameUnit( BTI_BUFF_DEATH_TOUCH );
+}
+
+// char-luciel CH1l3: June 32b34a90; Death Touch: the beam links Lu's Bip01 to the target while it is in range, otherwise everything ends
+void CX2GULuciel::FrameMoveDeathTouchEffect()
+{
+	if ( m_fDeathTouchTime < 0.f )
+		return;
+
+	m_fDeathTouchTime -= m_fElapsedTime;
+	if ( 0.f <= m_fDeathTouchTime )
+	{
+		const CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( m_DeathTouchTarget.m_uidGameUnit, m_DeathTouchTarget.m_eGameUnitType );
+		if ( NULL != pTargetUnit )
+		{
+			D3DXVECTOR3 vMyPos = GetBonePos( L"Bip01" );
+			vMyPos.y += DEATH_TOUCH_SELF_BONE_OFFSET_Y;
+
+			D3DXVECTOR3 vTargetPos;
+			if ( true == pTargetUnit->GetBonePos( L"Bip01", vTargetPos ) )
+			{
+				vTargetPos.y += DEATH_TOUCH_TARGET_BONE_OFFSET_Y;
+			}
+			else
+			{
+				vTargetPos = pTargetUnit->GetPos( false );
+				vTargetPos.y += DEATH_TOUCH_TARGET_POSITION_OFFSET_Y;
+			}
+
+			if ( GetDistance( vMyPos, vTargetPos ) <= m_fDeathTouchRange )
+			{
+				CX2DamageEffect::CEffect* pBeamEffect = g_pX2Game->GetDamageEffect()->GetInstance( m_hDeathTouchBeamEffect, true );
+				if ( NULL != pBeamEffect )
+					pBeamEffect->SetLinkMainEffectByPos( vMyPos, vTargetPos );
+
+				CX2DamageEffect::CEffect* pTargetEffect = g_pX2Game->GetDamageEffect()->GetInstance( m_hDeathTouchTargetEffect, true );
+				if ( NULL != pTargetEffect )
+					pTargetEffect->SetPos( vTargetPos );
+
+				return;
+			}
+		}
+	}
+
+	ClearDeathTouch();
+}
+
+// char-luciel CH1l3: June 32b34c70; a Punisher hit plays its effect set on up to five enemies around the defender ( one on a boss )
+void CX2GULuciel::PlayPunisherEffectSet( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || null == pDamageData_->optrDefenderGameUnit || CX2SkillTree::RNSI_A_LDN_PUNISHER != pDamageData_->m_iAppliedSkillID
+		|| CX2DamageManager::EDT_MANA_DAMAGE != pDamageData_->m_ExtraDamage.m_ExtraDamageType || 2 <= pDamageData_->m_RelateSkillData.m_byteSkillIndex )
+		return;
+
+	CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefenderUnit )
+		return;
+
+	const std::vector<CX2GameUnit*> vecTargetUnit = g_pX2Game->GetEnemyUnitListInRange( pDefenderUnit, GetTeam(), PUNISHER_RANGE );
+
+	int iEffectCount = PUNISHER_MAX_TARGET_COUNT;
+	if ( true == pDefenderUnit->GetIsBosRaidNPC() )
+		iEffectCount = 1;
+	else
+		iEffectCount = min( static_cast<int>( vecTargetUnit.size() ), PUNISHER_MAX_TARGET_COUNT );
+
+	const BYTE byteRelateSkillIndex = pDamageData_->m_RelateSkillData.m_byteSkillIndex;
+	const float fEffectRate = ( 0 == byteRelateSkillIndex ) ? PUNISHER_FIRST_HIT_EFFECT_RATE : PUNISHER_LATER_HIT_EFFECT_RATE;
+
+	for ( int iTarget = 0; iTarget < iEffectCount && iTarget < static_cast<int>( vecTargetUnit.size() ); ++iTarget )	// June reads element 0 of an empty list on a boss with no target
+	{
+		const WCHAR* pwszEffectSetName = L"EffectSet_A_LDN_PUNISHER";
+		if ( 0 < GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true ) )
+			pwszEffectSetName = L"EffectSet_A_LDN_PUNISHER_TRANSCENDENCE";
+
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName, this, vecTargetUnit[iTarget], false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_FORCE_DOWN_VALUE, fEffectRate, false );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_EXTRA_DAMAGE, fEffectRate, false );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_RELATE_SKILL_INDEX, static_cast<float>( byteRelateSkillIndex + 1 ), true );
+	}
+}
+
+// char-luciel CH1l3: June 32b35600; one more Altar of Evil effect set ( eight at most ) for the form's MP, placed on its ring place
+void CX2GULuciel::PlayAltarOfEvilEffectSet()
+{
+	const int iAltarCount = static_cast<int>( m_AltarOfEvilData.m_vecEffectSet.size() );
+	if ( ALTAR_OF_EVIL_MAX_EFFECT_COUNT <= iAltarCount )
+		return;
+
+	if ( true != FlushMp( m_AltarOfEvilData.m_fMpCostPerEffectSet, ( true == IsMinorUnitActive() ) ? 1 : 0 ) )
+		return;
+
+	const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDB_ALTAR_OF_EVIL_XXX", this, this, false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+	CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet );
+	if ( NULL == pEffectSetInstance )
+		return;
+
+	D3DXVECTOR3 vOffset;
+	GetEffectOffsetByIndex( &vOffset, iAltarCount );
+	pEffectSetInstance->m_vInstancePositionOffset = vOffset;
+	m_AltarOfEvilData.m_vecEffectSet.push_back( hEffectSet );
+
+	if ( CX2GameOption::OL_LOW == g_pMain->GetGameOption().GetOptionList().m_eEffect )	// June 3241d2a0 on g_pMain +0x180 ( the game option ): the effect option is low
+	{
+		GetEffectOffsetByIndex( &vOffset, iAltarCount );
+		const D3DXVECTOR3 vEffectPos = g_pX2Game->GetEffectSet()->GetEffectPosition_LUA( hEffectSet, 0 );
+		m_AltarOfEvilData.m_vecPosition.push_back( vOffset + vEffectPos );
+	}
+}
+
+// char-luciel CH1l3: June 32b35c60; while altars exist: ends the state when the X key is released ( my unit ), otherwise places the next altar every interval
+void CX2GULuciel::FrameMoveAltarOfEvilEnd()
+{
+	if ( true == m_AltarOfEvilData.m_vecEffectSet.empty() )
+		return;
+
+	if ( true == IsMyUnit() && false == m_InputData.pureX )
+	{
+		SetNoDetonationByState( false );
+		StateChange( STATE_ID_ALTAR_OF_EVIL_UNNAMED, false );
+	}
+	else
+	{
+		SetNoDetonationByState( true );
+		m_AltarOfEvilData.m_fElapsedTime += m_fElapsedTime;
+		if ( m_AltarOfEvilData.m_fInterval <= m_AltarOfEvilData.m_fElapsedTime )
+		{
+			m_AltarOfEvilData.m_fElapsedTime = 0.f;
+			PlayAltarOfEvilEffectSet();
+		}
+	}
+}
+
+// char-luciel CH1l3: June 32b37090; a Bluff hit plays the effect set of the body in play, the super armor one when the defender has super armor
+void CX2GULuciel::PlayBluffEffectSet( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || null == pDamageData_->optrDefenderGameUnit
+		|| CX2SkillTree::RNSI_A_LLD_BLUFF != pDamageData_->m_iAppliedSkillID || CX2SkillTree::RNSI_A_LLD_BLUFF != pDamageData_->m_eUsedSkillID )
+		return;
+
+	CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefenderUnit )
+		return;
+
+	const bool bDefenderSuperArmor = pDefenderUnit->IsSuperArmor();
+	const WCHAR* pwszEffectSetName = NULL;
+	if ( false == IsMinorUnitActive() )
+		pwszEffectSetName = ( true == bDefenderSuperArmor ) ? L"EffectSet_A_LLD_Bluff_Lu_Super" : L"EffectSet_A_LLD_Bluff_Lu";
+	else
+		pwszEffectSetName = ( true == bDefenderSuperArmor ) ? L"EffectSet_A_LLD_Bluff_Ciel_Super" : L"EffectSet_A_LLD_Bluff_Ciel";
+
+	g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName, this, NULL, false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
 }
 
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE

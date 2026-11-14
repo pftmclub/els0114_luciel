@@ -692,6 +692,13 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_DEAD_HANDS                            = 463,	// June's Enum.lua; Lu/Ciel's CommonFrameMove releases the Dead Hands sound when it ends
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-15 // char-luciel CH1l3
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_DEATH_TOUCH                           = 760,	// June's Enum.lua; Lu's Death Touch reset erases it
+	BTI_BUFF_P_LUCIEL_OPEN_MIND                    = 877,	// June's Enum.lua; Lu/Ciel's Open Mind upkeep
+	BTI_BUFF_P_LDN_STABLE_DARKENERGY               = 895,	// June's Enum.lua; Lu/Ciel's Stable Dark Energy upkeep
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID
@@ -996,6 +1003,13 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_P_SCA_MADNESS_BRUTAL_CUTTER  = 915,
 	BFI_BUFF_P_SCA_MADNESS_SHADE_THE_ILLUSION = 916,
 	BFI_BUFF_P_SCA_MADNESS_KNIGHT         = 927,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-15 // char-luciel CH1l3
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_BUFF_CHASER_OF_DARKNESS_MEMO      = 603,	// June's Enum.lua; Lu/Ciel's Chaser of Darkness fire
+	BFI_BUFF_P_LUCIEL_OPEN_MIND           = 906,	// June's Enum.lua; Lu/Ciel's Open Mind upkeep
+	BFI_BUFF_P_LDN_STABLE_DARKENERGY      = 925,	// June's Enum.lua; Lu/Ciel's Stable Dark Energy upkeep
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };

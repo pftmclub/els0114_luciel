@@ -597,14 +597,14 @@ public:
 	// June +0x9748, member initializer 32b4d1c0, destructor 32699670 ( Altar of Evil, CH2d2 )
 	struct SAltarOfEvilData
 	{
-		float								m_fDuration;
+		float								m_fMpCostPerEffectSet;	// char-luciel CH1l3: June 32b35600 pays it per Altar of Evil effect set ( CH1a named it m_fDuration )
 		float								m_fRange;
 		float								m_fInterval;
 		float								m_fElapsedTime;
 		std::vector<CX2EffectSet::Handle>	m_vecEffectSet;
 		std::vector<D3DXVECTOR3>			m_vecPosition;
 
-		SAltarOfEvilData() : m_fDuration( 2.f ), m_fRange( 1200.f ), m_fInterval( 0.2f ), m_fElapsedTime( 0.f ) {}
+		SAltarOfEvilData() : m_fMpCostPerEffectSet( 2.f ), m_fRange( 1200.f ), m_fInterval( 0.2f ), m_fElapsedTime( 0.f ) {}
 	};
 
 	virtual void		CountDamageEffectHit( const CX2DamageManager::DamageData* pDamageData_ );	// own virtual 0x880, June 32b14db0
@@ -766,6 +766,8 @@ protected:
 	bool				IsInvasionOfDarkEnergyActive() const;	// June 32b4b580
 	void				ResetPhantomRushReady();	// June 32b34920
 	void				ClearAltarOfEvilEffectSet();	// June 32b35540
+	void				PlayAltarOfEvilEffectSet();	// char-luciel CH1l3: June 32b35600
+	void				ClearDeathTouch();	// char-luciel CH1l3: June 32b349f0
 	void				ReleaseTransformedSkinAnim( const int iForm_ );	// char-luciel CH1a4: June 32b13d30
 	void				SetFormSkinAnim( const int iForm_, STransformedSkin& transformedSkin_ );	// char-luciel CH1a4: June 32b13e20
 	void				EndTransformedForm( const int iForm_, const bool bByDie_ );	// char-luciel CH1a4: June 32b38f30
@@ -1182,16 +1184,16 @@ protected:
 	float								m_fReduceDebuffDurationRate;		// +0x966c
 	float								m_fLordOfFearDamageRate;			// +0x9670
 	float								m_fFearDamageEffectCoolTime;		// +0x9674
-	bool								m_bAuraOfFearActive;				// +0x9678
+	UCHAR								m_ucAuraOfFearStackCount;			// +0x9678: char-luciel CH1l3: a count ( June 32b15780 caps it at 10 ), CH1a named it a bool
 	float								m_fAuraOfFearTime;					// +0x967c
 	float								m_fAuraOfFearDuration;				// +0x9680
 	float								m_fEnhancedSpecterRate;				// +0x9684
 	float								m_fEnhancedSpecterRange;			// +0x9688
 	float								m_fSoulStrikeChargeTime;			// +0x968c
-	int									m_iShadowBoltControlIndex;			// +0x9690
+	int									m_iShadowBoltNpcUID;				// +0x9690: char-luciel CH1l3: the Shadow Bolt spear's NPC UID ( June 32b20780 looks it up by UID ), CH1a named it an index
 	float								m_fShadowBoltTime;					// +0x9694
 	float								m_fShadowBoltDuration;				// +0x9698
-	bool								m_bTwilightJudgementReattack;		// +0x969c
+	UCHAR								m_ucTwilightJudgementStackCount;	// +0x969c: char-luciel CH1l3: the Twilight Judgement buff's stack count ( June 32aebb60 ), CH1a named it a bool
 	float								m_fTwilightJudgementTime;			// +0x96a0
 	float								m_fSoulStrikeCoolTime;				// +0x96a4
 	float								m_fCombinationPointOnHitCoolTime;	// +0x96a8
@@ -1223,7 +1225,8 @@ protected:
 	float								m_fDeathTouchTime;					// +0x97a0
 	float								m_fDeathTouchRange;					// +0x97a4
 	SGameUnitKey						m_DeathTouchTarget;					// +0x97a8
-	UidType								m_uidDeathTouchUnit;				// +0x97b8
+	CX2DamageEffect::CEffectHandle		m_hDeathTouchBeamEffect;			// +0x97b8: char-luciel CH1l3: damage effect handles ( June 32b349f0 / 32b34a90 ); CH1a named the pair one UidType
+	CX2DamageEffect::CEffectHandle		m_hDeathTouchTargetEffect;			// +0x97bc
 	float								m_fRapidImpactCoolTime;				// +0x97c0
 	float								m_fRapidImpactRange;				// +0x97c4
 	float								m_fRapidImpactMaxRange;				// +0x97c8
