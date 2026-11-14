@@ -2160,6 +2160,28 @@ no review of its own: the CH1i review ( `kickoffs/char-luciel/CH1i-review.md`, O
 - **Commit** `a20ce8f2`; `finish.py --range a20ce8f2^..a20ce8f2`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0.
 - **Next:** `/x2-phase char-luciel CH1i review` ( Opus 5.5 high ); `/x2-phase char-luciel CH1i2` ( Opus 5.5 high, independent of the review ).
 
+### CH1i - Review (2026-11-14)
+
+Opus 5.5 high. Reviewed CH1g ( `69234352` ), CH1g2 ( `2e5864b0` ), CH1h ( `4946d4f1` ), CH1i ( `a20ce8f2` ) against June ( `charport_adis.py luciel --phase <id>` listings, Ghidra where the address is a function ). **Verdict: pass after five fixes**, all in CH1i except one CH1h constant, all under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( inert ).
+- **Fixes ( `X2Lib/X2GULuciel.cpp`, blocks tagged `char-luciel CH1i review` ):**
+  1. `32b0a420` / `32b0a780` / `32b0ab20` ( Z landing, ZZ, ZZZ ) test `sub al, bl` ( bl = 1 ) before the +20: the next state is the other body's, like `32b0a380` / `32b0a3e0`. CH1i had the normal order; now inverted as June, and **JUNE_BUGS 704 widened** to the five Z-chain states.
+  2. `32b09bb0`: the state change stores a **word** 0 at `+0x7d85` ( `@32b09cc2` ), clearing event flags 0 and 1; the macro cleared flag 0 only. Written out with both stores ( no other CH1g-CH1i listing has a word / dword flag store ).
+  3. `32b1f2b0`: `+0x8e90 == 1` ( `IsMinorUnitActive` ) picks `L"MINOR:"` ( `@32b1f336` ); CH1i had `MAJOR:` for the minor body.
+  4. CH1h `COMBO_XX_DOWN_XX_LOOP_REPEAT_TIME`: June `32af16e0` / `32afb450` add `qword 0.30000001192` = `0.3f` widened, not the double 0.3; now `= 0.3f` in the double constant.
+  5. `32b35fd0`'s line-group comment named the two bodies; it is the target's group against mine.
+- **CH1i, whole phase re-checked after the first fail** ( scratch scripts over all 45 listings ): next-state base and +20 / +5 direction per function ( only the five Z-chain states invert ), the event key per macro ( all equal ), the flag stores.
+- **Spot-checks, pass:** `32b08940` / `32b09bb0` / `32b09fa0` ( NOT_SELECT macro = June's two clauses on `GetNotSelectXSkinAnimFuture`, the duo / null / flag order, Demonio test 0x81, `if( false )` opening; entering the Demonio block skips the cancels in June too ), `32b0a380` ( Ghidra decompile ), `32b0a3e0`, `32b08d30` ( gate `0 < USEFUL_VALUE0 Now`, oneX, 0x202 ), `32b0aec0` ( `oneSit -> CheckBoundingTarget` ).
+  StartFutures `32b341b0` / `32b343b0` / `32b35fd0`: argument order ( pos*, dist, bIsRight, OUT ) = March's declaration, `!GetIsRight()`, `0.5 x GetUnitWidth( false ) + ( USEFUL_VALUE0 Future / 30.0 / 20.0 )` stored as a float, `GetPos( true )` everywhere except the attacked unit's distance origin ( `GetPos( false )`, `32b343b0` ), land radius 30, `lineType == 0 && bEnable`, position / `vNotSelectPosition` stores, `LineGroupID::IsValid` both indexes, `operator!=`.
+  `32b37d80`: `SetWorldColor` 2/15 ( = 0x22 ), two `EventTimerOneshot` ( oneshot timer `+0x24c` < t ), awakening stand-ins in June's order, crash camera 30 / 0.4, `ClearScreen()` = white x1, vslot 0xc0 = `ApplyHyperModeBuff`, the four sounds only with `bSound`. `32b1f2b0`: the three sequences ( handles +0x9010..+0x9018 = enum 4..6, counts 5/10/3, 10/10/1, 200/200/30, ground at landPosition.y + 5 ), TOKANG on the major system with the defaults.
+  CH1g `32ae5d20` ( MP drain, cap 1, `UpNowMp( -drain )` ) and `32af7960` ( tail call at `stateChange <= now`, 9999 test, skill / walk / back walk / dash ); CH1g2 `32afa7f0` ( `IsOnSomethingFuture` = `+0x7e1c` ), `32b26a40` ( loop / projectile sets, rotation +0xe4..+0xec, push to `+0x3ec0` ); CH1h `32b15d40` ( GetNowHp inline > 0, distance < 700, `GetPos( false )` ).
+- **All four phases by script:** cancel order of 168 functions = June ( the two awakening-only states use `HYPER_MODE_CANCEL_AFTER_` ); state-change targets per function = June ( flagged rows were macro / shared-tail noise, read by hand ); every float / double of `_CONST_LUCIEL_CH1G_` .. `_CH1I_` found in its cited listing ( the other widened-float `qword`s are compares, same result ).
+- **Debug defines:** none left by the four phases; nothing retired.
+- **Gates, reviewed commits ( `finish.py --review --commits 69234352 2e5864b0 4946d4f1 a20ce8f2 -v` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `8 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS` ( 12 deleted lines = CH1g2's helper body moved, CH1h's member rename ); `junediverge` PASS; `junediverge --check-all` PASS; `enumscan` exit 0; `FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped)`.
+- **Gates, this fix ( `finish.py --files X2Lib/X2GULuciel.cpp` ):** `flagcheck JUNE_CHAR_LUCIEL_CORE` `1 PASS, 0 OTHER, 0 FAIL` / `RESULT: PASS` ( 11 deleted lines: the replaced lines above, all inside the `_CORE` block ); `junediverge` PASS; `enumscan` exit 0; `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`; `stateends` / `skillicons` / `luabind` skipped: nothing registered or staged.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, the real `Always.h` ) of `X2GULuciel.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1k` ( Sonnet 5.5 high ); `/x2-phase char-luciel CH1i2 review` ( Opus 5.5 high ) is independent.
+
 ### CH1i2 - Done (2026-11-14)
 
 Opus 5.5 high. June `31c60890` replaces March's `CKTDGLineMap::GetFixedDistancePositionForWeaponTaker` whole ( `KTDXLIB/KTDGLineMap.cpp`, D1 shape: June's body under `SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER`, March's in `#else` ).

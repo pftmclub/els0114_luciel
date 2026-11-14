@@ -5960,7 +5960,7 @@ void CX2GULuciel::LSI_LCG_F_COMBO_ZZZX_WAIT_EventProcess()
 // char-luciel CH1h: Dread Lord / Noblesse combos ( June 32ae5940 - 32b29570 )
 namespace _CONST_LUCIEL_CH1H_
 {
-	const double	COMBO_XX_DOWN_XX_LOOP_REPEAT_TIME			= 0.3;		// June 32af16e0: the loop goes on after the last X + 0.3 s ( added as a double )
+	const double	COMBO_XX_DOWN_XX_LOOP_REPEAT_TIME			= 0.3f;		// char-luciel CH1i review: June 32af16e0 / 32afb450 add 0.3f widened to a double ( 0.30000001 )
 	const USHORT	DASH_COMBO_DOWN_XX_LOOP_MAX_COUNT			= 5;		// June 32af6fc0: loop count limit of the dash X loops
 	const float		COMBO_DOWN_X_EFFECT_TIME					= 0.01f;	// June 32b15b20 / 32b270b0 and their siblings
 	const float		DASH_COMBO_DOWN_XX_LOOP_TARGET_RANGE		= 700.f;	// June 32b15d40: the make target is followed within this distance
@@ -6985,7 +6985,7 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX_EventProcess()
 	CommonEventProcess();
 }
 
-// char-luciel CH1i: June 32b09bb0 ( event 0 is timed on the body not selected )
+// char-luciel CH1i review: June 32b09bb0 ( event 0 is timed on the body not selected; its state change also clears event flag 1, a word store at @32b09cc2 )
 void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX_EventProcess()
 {
 	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
@@ -6998,7 +6998,18 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX_EventProcess()
 	{
 		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
 	}
-	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_NOT_SELECT_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX ) )
+	else if( true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() && m_FrameDataFuture.stateParam.bEventFlagList[0] == true &&
+		( m_fEventTime[0].stateChange < GetNotSelectXSkinAnimFuture()->GetNowAnimationTime() || true == GetNotSelectXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		StateChange( ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX ) );
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+		m_FrameDataFuture.stateParam.bEventFlagList[1] = false;
+	}
+	else if( true == IsDuoEnabled() && NULL != GetNotSelectXSkinAnimFuture() &&
+		GetNotSelectXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd && m_fEventTime[0].keyInputStart <= GetNotSelectXSkinAnimFuture()->GetNowAnimationTime() && true == m_InputData.oneX )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
 	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
 	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
@@ -7057,14 +7068,14 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP_EventProcess()
 	CommonEventProcess();
 }
 
-// char-luciel CH1i: June 32b0a420
+// char-luciel CH1i review: June 32b0a420 ( the next state is the other body's, JUNE_BUGS 704 )
 void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING_EventProcess()
 {
 	if( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
 		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
 	}
-	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZ : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ ) )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ : LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZ ) )
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
 	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
 	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
@@ -7073,7 +7084,7 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING_EventProcess(
 	CommonEventProcess();
 }
 
-// char-luciel CH1i: June 32b0a780
+// char-luciel CH1i review: June 32b0a780 ( the next state is the other body's, JUNE_BUGS 704 )
 void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ_EventProcess()
 {
 	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
@@ -7086,7 +7097,7 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ_EventProcess()
 	{
 		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
 	}
-	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZ : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ ) )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ : LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZ ) )
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
 	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
 	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
@@ -7095,7 +7106,7 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ_EventProcess()
 	CommonEventProcess();
 }
 
-// char-luciel CH1i: June 32b0ab20
+// char-luciel CH1i review: June 32b0ab20 ( the next state is the other body's, JUNE_BUGS 704 )
 void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ_EventProcess()
 {
 	CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
@@ -7108,7 +7119,7 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ_EventProcess()
 	{
 		StateChange( true == m_FrameDataFuture.unitCondition.bFootOnLine ? LSI_LU_WAIT : LSI_LU_JUMP_DOWN );
 	}
-	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX : LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX ) )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, ( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX : LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX ) )
 	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
 	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
 	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
@@ -7551,7 +7562,7 @@ void CX2GULuciel::ShowMinorParticleHyperModeShockOfBody()
 		return;
 
 	wstring wstrBoneName;
-	wstrBoneName += ( true == IsMinorUnitActive() ? L"MAJOR:" : L"MINOR:" );
+	wstrBoneName += ( true == IsMinorUnitActive() ? L"MINOR:" : L"MAJOR:" );	// char-luciel CH1i review: +0x8e90 == 1 picks MINOR: ( @32b1f336 )
 	wstrBoneName += L"Bip01";
 	const D3DXVECTOR3 vBonePos = GetBonePos( wstrBoneName.c_str() );
 
@@ -7700,7 +7711,7 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture
 	if( NULL == pBoundingTarget || false == ( 0.f < pBoundingTarget->GetNowHp() ) )
 		return;
 
-	// the two bodies must stand on different line groups
+	// char-luciel CH1i review: the target's line group must differ from mine
 	const CKTDGLineMap::LineGroupID targetLineGroupID = pLineMap->GetLineGroupIncludesLineData( pBoundingTarget->GetLastTouchLineIndex( true ) );
 	const CKTDGLineMap::LineGroupID myLineGroupID = pLineMap->GetLineGroupIncludesLineData( GetLastTouchLineIndex( true ) );
 	if( false == targetLineGroupID.IsValid() || false == myLineGroupID.IsValid() || false == ( targetLineGroupID != myLineGroupID ) )
