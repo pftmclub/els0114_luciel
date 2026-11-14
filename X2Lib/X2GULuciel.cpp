@@ -8706,5 +8706,1033 @@ bool CX2GULuciel::IsInvasionOfDarkEnergyActive() const
 	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_UP : LSI_LU_DAMAGE_AIR_UP;
 }
 
+// char-luciel CH1l: constants and the helper of the band 2 overrides ( part 1 )
+namespace _CONST_LUCIEL_CH1L_
+{
+	const float		COMMON_BUFF_CRASH_TIME						= 0.83f;	// June 32b12fd0: the first event time of the common buff state
+	const float		COMMON_BUFF_ACCELERATOR_TIME				= 0.85f;	// June 32b12fd0: the second event time ( the accelerator buff )
+	const float		COMMON_BUFF_CRASH_CAMERA_GAP				= 30.f;		// June 32b12fd0
+	const float		COMMON_BUFF_CRASH_CAMERA_TIME				= 0.4f;		// June 32b12fd0
+	const float		HYPER_MODE_STATE_CHANGE_TIME				= 0.05f;	// June 32b38080: the hyper mode change time of the state FrameMove
+	const float		HYPER_MODE_STATE_SHOCK_TIME					= 0.83f;	// June 32b38080
+	const int		DAMAGE_IMPACT_DRAW_COUNT					= 2;		// June 32b154f0: the first four damage impact particles
+	const int		DAMAGE_IMPACT_RED_DRAW_COUNT				= 1;		// June 32b154f0: the three red ones
+	const int		MINOR_PARTICLE_DRAW_COUNT					= 2;		// June 32b37780: the shock wave and tick particles
+
+	// June 32b18220: the equip's body ( CX2Eqip +0x15d4 ); every equip is Lu's until DU3
+	bool IsEquipForMinorUnit( const CX2EqipPtr& pEquip_ )
+	{
+		UNREFERENCED_PARAMETER( pEquip_ );
+		return false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+	}
+
+	// June 32b18220: the equip positions each division group hides ( June's case lists, the hair position included where June handles it )
+	const CX2Unit::EQIP_POSITION	aeHideOnePieceAvatar[]				= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingAcBody[]			= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_BODY };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingArm[]				= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_ARM };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingFace1[]			= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingFace1Face2[]		= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingFaceFace2Face3[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_FACE, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingHairAndAllAccessory[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_BODY, CX2Unit::EP_AC_LEG, CX2Unit::EP_AC_ARM, CX2Unit::EP_AC_NECKLESS, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideRenderingHairAndFace1[]		= { CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT };
+	const CX2Unit::EQIP_POSITION	aeHideRenderingHairNotFace1[]		= { CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1 };
+	const CX2Unit::EQIP_POSITION	aeHideOnlyRenderingHairAndFace[]	= { CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_BODY, CX2Unit::EP_AC_LEG, CX2Unit::EP_AC_ARM, CX2Unit::EP_AC_NECKLESS, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideOnlyRenderingHairAndFaceFace2Face3[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_BODY, CX2Unit::EP_AC_LEG, CX2Unit::EP_AC_ARM, CX2Unit::EP_AC_NECKLESS, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideOnlyRenderingWeapon[]			= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_FACE, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_BODY, CX2Unit::EP_AC_LEG, CX2Unit::EP_AC_ARM, CX2Unit::EP_AC_RING, CX2Unit::EP_AC_NECKLESS, CX2Unit::EP_AC_TEMP3, CX2Unit::EP_AC_TEMP4, CX2Unit::EP_RAVEN_LEFT_ARM };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingAllFaceAccessory[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingFaceAndAllFaceAccessory[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_FACE, CX2Unit::EP_DEFENCE_BODY, CX2Unit::EP_DEFENCE_LEG, CX2Unit::EP_DEFENCE_HAND, CX2Unit::EP_DEFENCE_FOOT, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_TEMP3 };
+
+	// June 32b18220: the face accessory items of the AC_FACE1 / AC_FACE2 worn equips hide these positions ( the hair one keeps the hair mesh unless said )
+	const CX2Unit::EQIP_POSITION	aeHideFace1NotRenderingHairFace2Face3[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideFace1NotRenderingHairFace2[]		= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingHairHidden[]			= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingHairAlone[]			= { CX2Unit::EP_DEFENCE_HAIR };
+	const CX2Unit::EQIP_POSITION	aeHideFace1AndEarring[]					= { CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingHairFaceFace2Face3[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_FACE, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingHairAndAllFaceAccessory[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideFace2AndEarring[]					= { CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideNotRenderingHairFaceFace1Face3[]	= { CX2Unit::EP_DEFENCE_HAIR, CX2Unit::EP_DEFENCE_FACE, CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE3, CX2Unit::EP_AC_TEMP3 };
+	const CX2Unit::EQIP_POSITION	aeHideFace1Face2AndEarring[]			= { CX2Unit::EP_AC_FACE1, CX2Unit::EP_AC_FACE2, CX2Unit::EP_AC_TEMP3 };
+
+	// June 32b18220: one division group's pass over the view equips; the shown equips of one body at the given positions are hidden.
+	// A hair equip also becomes the hair mesh when none is kept ( Lu's own hair only ) and marks the body only when bMarkHairHidden_.
+	// pbHidden_ ( NULL for the face accessory groups ) is set when an equip was hidden.
+	void HideFormEquips( std::vector<CX2EqipPtr>& vecViewEquip_, CKTDXDeviceXSkinMesh*& pHairXSkinMesh_, const bool bMinorUnitEquip_,
+		const CX2Unit::EQIP_POSITION* paeHidePosition_, const int iHidePositionCount_, const bool bKeepHairMesh_, bool* pbHidden_, const bool bMarkHairHidden_ )
+	{
+		BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, vecViewEquip_ )
+		{
+			if ( false == pViewEquip->GetShowObject() || bMinorUnitEquip_ != IsEquipForMinorUnit( pViewEquip ) )
+				continue;
+
+			bool bHide = false;
+			for ( int i = 0; i < iHidePositionCount_; ++i )
+			{
+				if ( paeHidePosition_[i] == pViewEquip->GetEqipPos() )
+					bHide = true;
+			}
+
+			if ( false == bHide )
+				continue;
+
+			pViewEquip->SetShowObject( false );
+
+			if ( CX2Unit::EP_DEFENCE_HAIR == pViewEquip->GetEqipPos() )
+			{
+				if ( true == bMarkHairHidden_ && NULL != pbHidden_ )
+					*pbHidden_ = true;
+
+				if ( true == bKeepHairMesh_ && NULL == pHairXSkinMesh_ && false == IsEquipForMinorUnit( pViewEquip ) )
+					pHairXSkinMesh_ = pViewEquip->GetNormalModel( 0 );
+			}
+			else if ( NULL != pbHidden_ )
+			{
+				*pbHidden_ = true;
+			}
+		}
+	}
+
+	// June 32282440: the unit stands on something ( a user reads its Now condition, an NPC IsOnSomething ), any other type false
+	bool IsGameUnitOnSomething( CX2GameUnit* pGameUnit_ )
+	{
+		switch ( pGameUnit_->GetGameUnitType() )
+		{
+		case CX2GameUnit::GUT_USER:
+			return static_cast<CX2GUUser*>( pGameUnit_ )->IsOnSomethingNow();
+
+		case CX2GameUnit::GUT_NPC:
+			return static_cast<CX2GUNPC*>( pGameUnit_ )->IsOnSomething();
+
+		default:
+			return false;
+		}
+	}
+}
+using namespace _CONST_LUCIEL_CH1L_;
+
+// char-luciel CH1l: June 32ae9bf0 ( vslot 0x574 ); no emotion while either body is transformed
+/*virtual*/ bool CX2GULuciel::CanPlayEmotion( const CX2Unit::EMOTION_TYPE eEmotionType_ )
+{
+	UNREFERENCED_PARAMETER( eEmotionType_ );
+
+	return false == IsTransformed( CX2Unit::DT_BOTH );
+}
+
+// char-luciel CH1l: June 32ae9c00 ( vslot 0x57c ); the transform state of a transform skill, 0 for any other
+/*virtual*/ int CX2GULuciel::GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ )
+{
+	switch ( g_pData->GetSkillTree()->GetUpgradeBaseSkillID( eSkillID_ ) )
+	{
+	case CX2SkillTree::RNSI_SA_LDB_DEATH_TOUCH:
+		return LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH;
+
+	case CX2SkillTree::RNSI_SA_LDB_MORTAL_FEAR:
+		return LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR;
+
+	case CX2SkillTree::RNSI_SA_LDB_DARK_PLASMA:
+		return LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA;
+
+	case CX2SkillTree::RNSI_SA_LDN_SHADOW_FURY:
+		return LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY;
+
+	case CX2SkillTree::RNSI_SA_LDN_SHREWD_CUTTER:
+		return LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER;
+
+	case CX2SkillTree::RNSI_SA_LDN_SILENT_RAGE:
+		return LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE;
+
+	default:
+		return 0;
+	}
+}
+
+// char-luciel CH1l: June 32ae9de0 ( vslot 0x580 ); transformed: the state skill is a transform skill; not transformed: June tests the same id against six transform state ids
+/*virtual*/ bool CX2GULuciel::IsTransformSkillState()
+{
+	const int iBaseSkillID = g_pData->GetSkillTree()->GetUpgradeBaseSkillID( GetNowStateSkillID() );
+
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+	{
+		return CX2SkillTree::RNSI_SA_LDB_ALTAR_OF_EVIL == iBaseSkillID || CX2SkillTree::RNSI_SA_LDN_TRANSCENDENCE == iBaseSkillID;
+	}
+
+	switch ( iBaseSkillID )
+	{
+	case LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT:
+	case LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END:
+	case LSI_SA_LDB_ALTAR_OF_EVIL_END:
+	case LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT:
+	case LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END:
+	case LSI_SA_LDN_TRANSCENDENCE_END:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+// char-luciel CH1l: June 32ae9f20 ( vslot 0x640 ); showing goes through the active body's view list
+/*virtual*/ void CX2GULuciel::SetShowViewListAndUpdate( const bool bShow_ )
+{
+	if ( true == bShow_ )
+		UpdateShowViewListByActiveBody();
+	else
+		SetShowViewList( bShow_ );
+}
+
+// char-luciel CH1l: June 32aea690 ( vslot 0x54c )
+/*virtual*/ void CX2GULuciel::InitEnchantWeaponEffectUnitSpecific()
+{
+	BOOST_TEST_FOREACH( Weapon*, pWeapon, m_vecpWeapon )
+	{
+		ASSERT( NULL != pWeapon );
+		pWeapon->InitEnchantParticleForBow();
+	}
+}
+
+// char-luciel CH1l: June 32aeb2c0 ( vslot 0x650 ); each form's stored MP goes to its gauge
+/*virtual*/ void CX2GULuciel::SetNowMpFromStoredValue()
+{
+	SetGageNowMp( m_FrameDataNow.syncData.fNowMP, false, 0 );
+	SetGageNowMp( m_FrameDataNow.syncData.fMinorUnitNowMP, false, 1 );
+}
+
+// char-luciel CH1l: June 32b0fa20 ( vslot 0x648 ); the first state start after the active body changed
+/*virtual*/ void CX2GULuciel::DoProcessWhenActiveBodyChangeApplied( const int iDuoType_, const int iSkillID_ )
+{
+	UNREFERENCED_PARAMETER( iDuoType_ );
+
+	if ( true == m_bActiveBodyChanged )
+	{
+		m_fSwitchingCoolTime = 1.f;
+		m_iLastUsedSkillID = 0;
+		m_bActiveBodyChanged = false;
+
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( GetFutureStateSkillID() );	// June passes level 1 as a second argument
+
+		if ( ++m_iDamageEffectIndex < 0 )
+			m_iDamageEffectIndex = 0;
+
+		if ( NULL == pSkillTemplet )
+			m_iLastUsedSkillID = iSkillID_;
+	}
+}
+
+// char-luciel CH1l: June 32b12fd0 ( vslot 0x5f0 )
+/*virtual*/ void CX2GULuciel::COMMON_BUFF_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( COMMON_BUFF_CRASH_TIME ) )
+	{
+		UpDownCrashCamera( COMMON_BUFF_CRASH_CAMERA_GAP, COMMON_BUFF_CRASH_CAMERA_TIME );
+		g_pKTDXApp->GetDGManager()->ClearScreen();
+	}
+	else if ( true == GetXSkinAnimPtr()->EventTimerOneshot( COMMON_BUFF_ACCELERATOR_TIME ) )
+	{
+		ProcessAcceleraterBuff( GetNowStateSkillID(), IsHyperState() );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH1l: June 32b13b60 ( vslot 0x570 ); transformed: June crosses the bodies ( form 0 with Ciel in play reads Lu's own anim ), base 31fd48a0 otherwise
+/*virtual*/ CKTDGXSkinAnimPtr CX2GULuciel::GetSkinAnimByForm( const int iForm_ )
+{
+	CKTDGXSkinAnimPtr pXSkinAnim;
+
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+	{
+		if ( 0 == iForm_ )
+			pXSkinAnim = ( true == IsMinorUnitActive() ) ? m_pXSkinAnim : m_aTransformedSkin[0].m_pXSkinAnim;
+		else if ( 1 == iForm_ )
+			pXSkinAnim = ( true == IsMinorUnitActive() ) ? m_aTransformedSkin[1].m_pXSkinAnim : m_pMinorUnitXSkinAnim;
+	}
+	else
+	{
+		pXSkinAnim = ( 1 == iForm_ ) ? m_pMinorUnitXSkinAnim : m_pXSkinAnim;
+	}
+
+	return pXSkinAnim;
+}
+
+// char-luciel CH1l: June 32b143e0 ( vslot 0x62c ); Lu's hand and arm equips and the one-piece avatar's attached model
+/*virtual*/ void CX2GULuciel::SetHandEquipShow( const bool bShow_ )
+{
+	if ( true == IsMinorUnitActive() )
+		return;
+
+	if ( true == m_bOtherEquipNotRendered )
+	{
+		CX2EqipPtr pOnePieceEquip = GetEquipPtrFromEquipViewListByEquipPosition( CX2Unit::EP_ONEPIECE_FASHION );
+		if ( NULL != pOnePieceEquip )
+		{
+			CKTDXDeviceXSkinMesh* pAttachedModel = pOnePieceEquip->GetNormalModel( 2 );
+			if ( NULL == pAttachedModel )
+				pAttachedModel = pOnePieceEquip->GetNormalModel( 1 );
+
+			if ( NULL != pAttachedModel )
+				pAttachedModel->SetNoRenderable( false == bShow_ );
+		}
+	}
+
+	const bool bShowHandEquip = ( true == m_bOtherEquipNotRendered ) ? false : bShow_;
+	BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+	{
+		const bool bEquipForMinorUnit = false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+		if ( CX2Unit::EP_DEFENCE_HAND == pViewEquip->GetEqipPos() && false == bEquipForMinorUnit )
+			pViewEquip->SetShowObject( bShowHandEquip );
+	}
+
+	CX2EqipPtr pArmEquip = GetEquipPtrFromEquipViewListByEquipPosition( CX2Unit::EP_AC_ARM );
+	const bool bArmEquipForMinorUnit = false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+	if ( NULL != pArmEquip && false == bArmEquipForMinorUnit )
+		pArmEquip->SetShowObject( bShow_ );
+}
+
+// char-luciel CH1l: June 32b14e10 ( vslot 0x628 )
+/*virtual*/ bool CX2GULuciel::CanRidingState()
+{
+	bool bCanRiding = false;
+
+	if ( GetNowStateID() == GetWaitStateID() || GetNowStateID() == GetWalkStateID() || GetNowStateID() == GetDashStateID() || GetNowStateID() == GetDashEndStateID()
+		|| LSI_RIDING_WAIT == GetNowStateID() || LSI_RIDING_WALK == GetNowStateID() || LSI_RIDING_WAIT_HABIT == GetNowStateID()
+		|| LSI_RIDING_DASH == GetNowStateID() || LSI_RIDING_DASH_END == GetNowStateID() )
+	{
+		bCanRiding = true;
+	}
+
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return false;
+
+	return bCanRiding;
+}
+
+// char-luciel CH1l: June 32b15340 ( vslot 0x578 ); the move states of both transformed sets
+/*virtual*/ bool CX2GULuciel::IsClassCommonMoveState()
+{
+	const int iNowStateID = GetNowStateID();
+
+	return ( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT <= iNowStateID && iNowStateID <= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING )
+		|| ( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT <= iNowStateID && iNowStateID <= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING );
+}
+
+// char-luciel CH1l: June 32b154f0 ( vslot 0x540 )
+/*virtual*/ void CX2GULuciel::CreateMajorParticleArray()
+{
+	CX2GUUser::CreateMajorParticleArray();
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeq = NULL;
+
+	pSeq = SetCommonMajorParticleByEnum( COMMON_MAJOR_PII_DAMAGE_IMPACT, L"DamageImpact", DAMAGE_IMPACT_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetCommonMajorParticleByEnum( COMMON_MAJOR_PII_DAMAGE_IMPACT_CORE, L"DamageImpactCore", DAMAGE_IMPACT_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetCommonMajorParticleByEnum( COMMON_MAJOR_PII_DAMAGE_IMPACT_SLASH, L"DamageImpactSlash", DAMAGE_IMPACT_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetCommonMajorParticleByEnum( COMMON_MAJOR_PII_DAMAGE_IMPACT_RED, L"DamageImpactRed", DAMAGE_IMPACT_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetCommonMajorParticleByEnum( COMMON_MAJOR_PII_DAMAGE_IMPACT_RING_RED, L"DamageImpactRingRed", DAMAGE_IMPACT_RED_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetCommonMajorParticleByEnum( COMMON_MAJOR_PII_DAMAGE_IMPACT_CORE_RED, L"DamageImpactCoreRed", DAMAGE_IMPACT_RED_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetCommonMajorParticleByEnum( COMMON_MAJOR_PII_DAMAGE_IMPACT_SLASH_RED, L"DamageImpactSlashRed", DAMAGE_IMPACT_RED_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+}
+
+// char-luciel CH1l: June 32b15900 ( vslot 0x504 ); the slot icon of a skill templet, Summon Darkness and Twilight Judgement follow their buffs
+/*virtual*/ void CX2GULuciel::GetSkillIconTexture( CKTDGUISlot* pSlot_, const CX2SkillTree::SkillTemplet* pSkillTemplet_ )
+{
+	if ( NULL == pSlot_ || NULL == pSkillTemplet_ )
+		return;
+
+	wstring wstrIconTexName = pSkillTemplet_->m_wstrIconName;
+	wstring wstrIconTexKey = pSkillTemplet_->m_wstrIconPieceName;
+
+	switch ( g_pData->GetSkillTree()->GetUpgradeBaseSkillID( pSkillTemplet_->m_eID ) )
+	{
+	case CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS:
+		if ( true == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+		{
+			wstrIconTexName = L"DLG_SKILL_LUCIEL_Active_03.tga";
+			wstrIconTexKey = L"SI_SA_LLD_SUMMON_DARKNESS_END";
+		}
+		else
+		{
+			wstrIconTexName = L"DLG_SKILL_LUCIEL_Active_02.tga";
+			wstrIconTexKey = L"SI_SA_LLD_SUMMON_DARKNESS";
+		}
+		break;
+
+	case CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT:
+		wstrIconTexName = L"DLG_SKILL_LUCIEL_Active_03.tga";
+		if ( true == HaveThisBuff( BTI_BUFF_TWILIGHT_JUDGEMENT ) )
+		{
+			if ( 2 <= GetBuffAccumulationCountNowInFactor( BTI_BUFF_TWILIGHT_JUDGEMENT ) )
+				wstrIconTexKey = L"SI_SA_LCN_TWILIGHT_JUDGEMENT_02";
+			else
+				wstrIconTexKey = L"SI_SA_LCN_TWILIGHT_JUDGEMENT_01";
+		}
+		else
+		{
+			wstrIconTexKey = L"SI_SA_LCN_TWILIGHT_JUDGEMENT";
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	pSlot_->SetItemTex( wstrIconTexName.c_str(), wstrIconTexKey.c_str() );
+}
+
+// char-luciel CH1l: June 32b16220 ( vslot 0x56c ); Phantom Rush shows its chain icon while the chain is ready
+/*virtual*/ void CX2GULuciel::SkillIconOverride( const int iSkillID_, wstring& wstrIconTexName_, wstring& wstrIconTexKey_ )
+{
+	switch ( iSkillID_ )
+	{
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH:
+	case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH_UPGRADE:
+		if ( true == m_bPhantomRushReady )
+		{
+			wstrIconTexName_ = L"DLG_SKILL_LUCIEL_Active_04.tga";
+			wstrIconTexKey_ = L"RNSI_A_LDB_PHANTOM_RUSH_CHAIN";
+		}
+		break;
+
+	default:
+		break;
+	}
+}
+
+// char-luciel CH1l: June 32b1c960 ( vslot 0x64c ); each form's gauge MP goes to the Future sync data when it differs ( June tests no null gauge )
+/*virtual*/ void CX2GULuciel::SyncFutureMpFromGage()
+{
+	const float fFirstFormMp = GetGageData()->GetNowMp( 0 );
+	if ( fFirstFormMp != m_FrameDataFuture.syncData.fNowMP )
+		m_FrameDataFuture.syncData.fNowMP = fFirstFormMp;
+
+	const float fSecondFormMp = GetGageData()->GetNowMp( 1 );
+	if ( fSecondFormMp != m_FrameDataFuture.syncData.fMinorUnitNowMP )
+		m_FrameDataFuture.syncData.fMinorUnitNowMP = fSecondFormMp;
+}
+
+// char-luciel CH1l: June 32b34680 ( vslot 0x568 ); the bounding target is kept while it is a living enemy on its feet or in a bounding state, then the strike state starts
+/*virtual*/ bool CX2GULuciel::CheckBoundingTarget()
+{
+	if ( m_BoundingTarget.m_uidGameUnit < 0 || true == m_bBoundingTargetFound )
+		return false;
+
+	bool bValidTarget = true;
+
+	CX2GameUnit* pBoundingTarget = g_pX2Game->GetUnitByUIDAndType( m_BoundingTarget.m_uidGameUnit, m_BoundingTarget.m_eGameUnitType );
+	if ( false == g_pX2Game->IsValidUnit( pBoundingTarget ) || pBoundingTarget->GetTeam() == GetTeam() || false == ( 0.f < pBoundingTarget->GetNowHp() ) )
+	{
+		bValidTarget = false;
+	}
+	else
+	{
+		const bool bTargetOnSomething = IsGameUnitOnSomething( pBoundingTarget );
+		const bool bTargetBounding = ( true == pBoundingTarget->IsBoundingLandCrash() || true == pBoundingTarget->IsBoundingUp() );
+
+		if ( false == bTargetBounding && true == bTargetOnSomething )
+		{
+			bValidTarget = false;
+		}
+		else if ( false == bTargetOnSomething && pBoundingTarget->GetLastHitAttackSerial() < 0 )
+		{
+			bValidTarget = false;
+		}
+		else if ( true == GetRidingOn() )
+		{
+			bValidTarget = false;
+		}
+	}
+
+	if ( 1 < m_iBoundingStrikeCount )
+		bValidTarget = false;
+
+	if ( false == bValidTarget )
+	{
+		m_iBoundingTargetUnitIndex = -1;
+		m_bBoundingTargetFound = false;
+		m_BoundingTarget.m_uidGameUnit = -1;
+		m_BoundingTarget.m_eGameUnitType = CX2GameUnit::GUT_USER;
+		return false;
+	}
+
+	// June starts Lu's strike state while Ciel is in play and Ciel's while Lu is
+	StateChange( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_LU_STRIKER : LSI_BOUNDING_TARGET_CIEL_STRIKER, false );
+	m_bBoundingTargetFound = true;
+	return true;
+}
+
+// char-luciel CH1l: June 32b37730 ( vslot 0x4e0 ); the base first, then the class's hit readers in June's order
+/*virtual*/ void CX2GULuciel::AttackResultByType( CX2DamageManager::DamageData& pDamageData_ )
+{
+	CX2GUUser::AttackResultByType( pDamageData_ );
+
+	CreateChaserOfDarknessDamageEffect( &pDamageData_ );
+	ProcessPhantomRushHit( &pDamageData_ );
+	PlayPunisherEffectSet( &pDamageData_ );
+	RegisterDesperadoTarget( &pDamageData_ );
+	AccumulateShadowFuryDamage( &pDamageData_ );
+	PlayBluffEffectSet( &pDamageData_ );
+	CheckBoundingStrikeHit( &pDamageData_ );
+	AddCombinationPointByDamageEffectHit( &pDamageData_ );
+}
+
+// char-luciel CH1l: June 32b37780 ( vslot 0x548 )
+/*virtual*/ void CX2GULuciel::CreateMinorParticleArray()
+{
+	CX2GUUser::CreateMinorParticleArray();
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeq = NULL;
+
+	pSeq = SetLucielMinorParticleByEnum( LUCIEL_MINOR_PII_REVENGE_WAIT, L"RevengeWait", -1 );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetLucielMinorParticleByEnum( LUCIEL_MINOR_PII_GROUND_SHOCK_WAVE_BLUE, L"GroundShockWaveBlue", MINOR_PARTICLE_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetLucielMinorParticleByEnum( LUCIEL_MINOR_PII_IMPACT_TICK_BLUE, L"ImpactTickBlue", MINOR_PARTICLE_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetLucielMinorParticleByEnum( LUCIEL_MINOR_PII_KU_AANG, L"STR_KuAAang", -1 );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetLucielMinorParticleByEnum( LUCIEL_MINOR_PII_GROUND_SHOCK_WAVE_RED, L"GroundShockWaveRed", MINOR_PARTICLE_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetLucielMinorParticleByEnum( LUCIEL_MINOR_PII_IMPACT_TICK_RED, L"ImpactTickRed", MINOR_PARTICLE_DRAW_COUNT );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+
+	pSeq = SetLucielMinorParticleByEnum( LUCIEL_MINOR_PII_MAGNUM_BLADE_FIRE_WAVE, L"MagnumBladeFireWave", -1 );
+	if ( NULL != pSeq )
+		pSeq->SetTriggerWait( true );
+}
+
+// char-luciel CH1l: June 32b38080 ( vslot 0x600 )
+/*virtual*/ void CX2GULuciel::HyperModeFrameMove()
+{
+	CommonHyperModeFrameMove( HYPER_MODE_STATE_CHANGE_TIME, HYPER_MODE_STATE_SHOCK_TIME, false );
+}
+
+// char-luciel CH1l: June 32b4d5b0 ( vslot 0x458 ); riding first, then the common getter pattern ( see CH1k2 )
+/*virtual*/ int CX2GULuciel::GetJumpDownStateID()
+{
+	if ( true == GetRidingOn() )
+		return LSI_RIDING_JUMP_DOWN;
+
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_JUMP_DOWN : LSI_LU_JUMP_DOWN;
+}
+
+// char-luciel CH1l: June 32b4d810 ( vslot 0x114 ); DU2's name, the damage getters answer the transformed WAIT state while transformed
+/*virtual*/ int CX2GULuciel::GetDamageDownLandFront() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_DOWN_FRONT : LSI_LU_DAMAGE_DOWN_FRONT;
+}
+
+// char-luciel CH1l: June 32b4d850 ( vslot 0x118 )
+/*virtual*/ int CX2GULuciel::GetDamageDownLandBack() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_DOWN_BACK : LSI_LU_DAMAGE_DOWN_BACK;
+}
+
+// char-luciel CH1l: June 32b4d990 ( vslot 0x48c )
+/*virtual*/ int CX2GULuciel::GetDamageAirDownInvincibleStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_DOWN_INVINCIBLE : LSI_LU_DAMAGE_AIR_DOWN_INVINCIBLE;
+}
+
+// char-luciel CH1l: June 32b4d9d0 ( vslot 0x490 )
+/*virtual*/ int CX2GULuciel::GetDamageAirDownLanding() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_DOWN_LANDING : LSI_LU_DAMAGE_AIR_DOWN_LANDING;
+}
+
+// char-luciel CH1l: June 32b4da10 ( vslot 0x494 )
+/*virtual*/ int CX2GULuciel::GetDamageAirFallStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_FALL : LSI_LU_DAMAGE_AIR_FALL;
+}
+
+// char-luciel CH1l: June 32b4da90 ( vslot 0x49c )
+/*virtual*/ int CX2GULuciel::GetDamageAirFlyFrontStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_FLY_FRONT : LSI_LU_DAMAGE_AIR_FLY_FRONT;
+}
+
+// char-luciel CH1l: June 32b4dad0 ( vslot 0x4a0 )
+/*virtual*/ int CX2GULuciel::GetDamageAirFlyBackStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_AIR_FLY_BACK : LSI_LU_DAMAGE_AIR_FLY_BACK;
+}
+
+// char-luciel CH1l: June 32b4db10 ( vslot 0x4a4 )
+/*virtual*/ int CX2GULuciel::GetDamageRevengeStateID() const
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DAMAGE_REVENGE : LSI_LU_DAMAGE_REVENGE;
+}
+
+// char-luciel CH1l: June 32b4db50 ( vslot 0x5c4 )
+/*virtual*/ int CX2GULuciel::GetDanceWaitStateID()
+{
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
+		return ( true == IsMinorUnitActive() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+
+	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DANCE_WAIT : LSI_LU_DANCE_WAIT;
+}
+
+// char-luciel CH1l: June 32b4dbe0 ( vslot 0x51c ); June reads the state record index, which is the state id here
+/*virtual*/ bool CX2GULuciel::IsHyperModeState() const
+{
+	return LSI_LU_HYPER_MODE == GetNowStateID() || LSI_CIEL_HYPER_MODE == GetNowStateID();
+}
+
+// char-luciel CH1l: June 32b18220 ( vslot 0x630 ); the base's one-piece avatar rules run once per body ( June's list of one-piece items comes from 32b176a0, at most one per body ),
+// an equip is only touched by its own body's item. June drops the base's Arme / Ain and near-portal exceptions.
+/*virtual*/ void CX2GULuciel::UpdateNotRenderingOtherEquipList()
+{
+	SetHideNoRenderable( false );
+
+	bool abOnePieceHidden[2] = { false, false };		// June local_b0: a one-piece group hid an equip of the body
+	bool abRenderHairAndFace1[2] = { false, false };	// June local_80
+	bool abRenderHair[2] = { false, false };			// June local_88
+	m_pHairXSkinMesh = NULL;
+
+	CX2ItemManager* pItemManager = g_pData->GetItemManager();
+
+	std::vector<SFormEquipItem> vecFormEquipItem;
+	GetFormEquipItemList( CX2Unit::EP_ONEPIECE_FASHION, vecFormEquipItem );
+
+	m_mapScaleHeadByForm[0] = false;
+	m_mapScaleHeadByForm[1] = false;
+
+	for ( UINT i = 0; i < vecFormEquipItem.size(); ++i )
+	{
+		const int iOnePieceItemID = vecFormEquipItem[i].m_iItemID;
+		const bool bMinorUnitEquip = vecFormEquipItem[i].m_bMinorUnitEquip;
+		const int iForm = ( true == bMinorUnitEquip ) ? 1 : 0;
+
+		// June also flags a draw-face-accessory item ( DITT_ITEM_ID_DRAW_FACE_ACC_WITH_NO_ONE_PEACE_AVATAR_SET1 ) per body in four of these groups; nothing reads it, so it is not kept
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideOnePieceAvatar, _countof( aeHideOnePieceAvatar ), true, &abOnePieceHidden[iForm], true );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_AC_BODY, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingAcBody, _countof( aeHideNotRenderingAcBody ), true, &abOnePieceHidden[iForm], true );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_ARM, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingArm, _countof( aeHideNotRenderingArm ), true, &abOnePieceHidden[iForm], true );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_FACE1, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingFace1, _countof( aeHideNotRenderingFace1 ), true, &abOnePieceHidden[iForm], true );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_FACE1_FACE2, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingFace1Face2, _countof( aeHideNotRenderingFace1Face2 ), true, &abOnePieceHidden[iForm], true );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_FACE_FACE2_FACE3, iOnePieceItemID ) )
+		{
+			SetHideNoRenderable( true );
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingFaceFace2Face3, _countof( aeHideNotRenderingFaceFace2Face3 ), true, &abOnePieceHidden[iForm], true );
+		}
+
+		// the hair equip of this group does not mark the body ( June 32b18220 )
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_HAIR_AND_ALL_ACCESSORY, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingHairAndAllAccessory, _countof( aeHideNotRenderingHairAndAllAccessory ), true, &abOnePieceHidden[iForm], false );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_RENDERING_HAIR_AND_FACE1, iOnePieceItemID ) )
+		{
+			abRenderHairAndFace1[iForm] = true;
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideRenderingHairAndFace1, _countof( aeHideRenderingHairAndFace1 ), false, &abOnePieceHidden[iForm], true );
+		}
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_RENDERING_HAIR_NOT_FACE1, iOnePieceItemID ) )
+		{
+			abRenderHair[iForm] = true;
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideRenderingHairNotFace1, _countof( aeHideRenderingHairNotFace1 ), false, &abOnePieceHidden[iForm], true );
+		}
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_ONLY_RENDERING_HAIR_AND_FACE, iOnePieceItemID ) )
+		{
+			abRenderHair[iForm] = true;
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideOnlyRenderingHairAndFace, _countof( aeHideOnlyRenderingHairAndFace ), false, &abOnePieceHidden[iForm], true );
+		}
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_RENDERING_HAIR, iOnePieceItemID ) )
+		{
+			abRenderHair[iForm] = true;
+
+			BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+			{
+				if ( false == pViewEquip->GetShowObject() || bMinorUnitEquip != IsEquipForMinorUnit( pViewEquip ) )
+					continue;
+
+				// the equip's own item decides: a not-rendering-hair item also hides the second face accessory and the earring
+				const bool bNotRenderingHairItem = pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR, pViewEquip->GetItemID() );
+				bool bHide = false;
+				switch ( pViewEquip->GetEqipPos() )
+				{
+				case CX2Unit::EP_DEFENCE_BODY:
+				case CX2Unit::EP_DEFENCE_LEG:
+				case CX2Unit::EP_DEFENCE_HAND:
+				case CX2Unit::EP_DEFENCE_FOOT:
+					bHide = true;
+					break;
+
+				case CX2Unit::EP_AC_FACE2:
+				case CX2Unit::EP_AC_TEMP3:
+					bHide = bNotRenderingHairItem;
+					break;
+
+				default:
+					break;
+				}
+
+				if ( true == bHide )
+				{
+					pViewEquip->SetShowObject( false );
+					abOnePieceHidden[iForm] = true;
+				}
+			}
+		}
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_ONLY_RENDERING_HAIR_AND_FACE_FACE2_FACE3, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideOnlyRenderingHairAndFaceFace2Face3, _countof( aeHideOnlyRenderingHairAndFaceFace2Face3 ), true, &abOnePieceHidden[iForm], false );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_ONLY_RENDERING_WEAPON, iOnePieceItemID ) )
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideOnlyRenderingWeapon, _countof( aeHideOnlyRenderingWeapon ), true, &abOnePieceHidden[iForm], false );
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_ALL_FACE_ACCESSARY, iOnePieceItemID ) )
+		{
+			SetHideNoRenderable( true );
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingAllFaceAccessory, _countof( aeHideNotRenderingAllFaceAccessory ), true, &abOnePieceHidden[iForm], true );
+		}
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PICE_AVATAR_NOT_RENDERING_FACE_AND_ALL_FACE_ACCESSARY, iOnePieceItemID ) )
+		{
+			SetHideNoRenderable( true );
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingFaceAndAllFaceAccessory, _countof( aeHideNotRenderingFaceAndAllFaceAccessory ), true, &abOnePieceHidden[iForm], true );
+		}
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_SD_ONE_PEACE_AVATAR, iOnePieceItemID ) )
+			SetSDOnePieceAvatar( iForm, true );
+	}
+
+	// no one-piece avatar equip: a not-rendering-Nasod-hand item hides the Raven left arm equips
+	CX2EqipPtr pOnePieceEquip = GetEquipPtrFromEquipViewListByEquipPosition( CX2Unit::EP_ONEPIECE_FASHION );
+	if ( NULL == pOnePieceEquip )
+	{
+		BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+		{
+			if ( true == pViewEquip->GetShowObject() && true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_NASOD_HAND, pViewEquip->GetItemID() ) )
+			{
+				BOOST_TEST_FOREACH( CX2EqipPtr, pArmEquip, m_ViewEqipList )
+				{
+					if ( CX2Unit::EP_RAVEN_LEFT_ARM == pArmEquip->GetEqipPos() )
+						pArmEquip->SetShowObject( false );
+				}
+			}
+		}
+	}
+
+	// the worn arm accessory of each body: a not-rendering-hand item hides the same body's hand equip
+	vecFormEquipItem.clear();
+	GetFormEquipItemList( CX2Unit::EP_AC_ARM, vecFormEquipItem );
+	for ( UINT i = 0; i < vecFormEquipItem.size(); ++i )
+	{
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAND, vecFormEquipItem[i].m_iItemID ) )
+		{
+			BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+			{
+				if ( true == pViewEquip->GetShowObject() && vecFormEquipItem[i].m_bMinorUnitEquip == IsEquipForMinorUnit( pViewEquip ) && CX2Unit::EP_DEFENCE_HAND == pViewEquip->GetEqipPos() )
+					pViewEquip->SetShowObject( false );
+			}
+		}
+	}
+
+	// the worn first face accessory of each body
+	vecFormEquipItem.clear();
+	GetFormEquipItemList( CX2Unit::EP_AC_FACE1, vecFormEquipItem );
+	for ( UINT i = 0; i < vecFormEquipItem.size(); ++i )
+	{
+		const int iFaceItemID = vecFormEquipItem[i].m_iItemID;
+		const bool bMinorUnitEquip = vecFormEquipItem[i].m_bMinorUnitEquip;
+		const bool bOnePieceHidden = abOnePieceHidden[( true == bMinorUnitEquip ) ? 1 : 0];
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2_FACE3, iFaceItemID ) )
+		{
+			if ( NULL == pOnePieceEquip )
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideFace1NotRenderingHairFace2Face3, _countof( aeHideFace1NotRenderingHairFace2Face3 ), true, NULL, false );
+		}
+		else if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2, iFaceItemID ) )
+		{
+			HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideFace1NotRenderingHairFace2, _countof( aeHideFace1NotRenderingHairFace2 ), true, NULL, false );
+		}
+		else if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR, iFaceItemID ) )
+		{
+			if ( true == bOnePieceHidden )
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingHairHidden, _countof( aeHideNotRenderingHairHidden ), false, NULL, false );
+			else
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingHairAlone, _countof( aeHideNotRenderingHairAlone ), true, NULL, false );
+		}
+		else if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE2_FACE3, iFaceItemID ) )
+		{
+			if ( true == bOnePieceHidden )
+			{
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideFace1AndEarring, _countof( aeHideFace1AndEarring ), false, NULL, false );
+			}
+			else
+			{
+				SetHideNoRenderable( true );
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingHairFaceFace2Face3, _countof( aeHideNotRenderingHairFaceFace2Face3 ), true, NULL, false );
+			}
+		}
+		else if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_AND_ALL_FACE_ACCESSARY, iFaceItemID ) )
+		{
+			if ( true == bOnePieceHidden )
+			{
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideFace1AndEarring, _countof( aeHideFace1AndEarring ), false, NULL, false );
+			}
+			else
+			{
+				SetHideNoRenderable( true );
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingHairAndAllFaceAccessory, _countof( aeHideNotRenderingHairAndAllFaceAccessory ), true, NULL, false );
+			}
+		}
+	}
+
+	// the worn second face accessory of each body
+	vecFormEquipItem.clear();
+	GetFormEquipItemList( CX2Unit::EP_AC_FACE2, vecFormEquipItem );
+	for ( UINT i = 0; i < vecFormEquipItem.size(); ++i )
+	{
+		const int iFaceItemID = vecFormEquipItem[i].m_iItemID;
+		const bool bMinorUnitEquip = vecFormEquipItem[i].m_bMinorUnitEquip;
+		const bool bOnePieceHidden = abOnePieceHidden[( true == bMinorUnitEquip ) ? 1 : 0];
+
+		if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE1_FACE3, iFaceItemID ) )
+		{
+			if ( true == bOnePieceHidden )
+			{
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideFace2AndEarring, _countof( aeHideFace2AndEarring ), false, NULL, false );
+			}
+			else
+			{
+				SetHideNoRenderable( true );
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingHairFaceFace1Face3, _countof( aeHideNotRenderingHairFaceFace1Face3 ), true, NULL, false );
+			}
+		}
+		else if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR, iFaceItemID ) )
+		{
+			if ( true == bOnePieceHidden )
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideFace1Face2AndEarring, _countof( aeHideFace1Face2AndEarring ), false, NULL, false );
+			else
+				HideFormEquips( m_ViewEqipList, m_pHairXSkinMesh, bMinorUnitEquip, aeHideNotRenderingHairAlone, _countof( aeHideNotRenderingHairAlone ), true, NULL, false );
+		}
+	}
+
+	// stand-in: June's SetpHairSkinMesh ( 3322a5d0 ) also refs the mesh; March's only stores it
+	if ( NULL != m_pAfterImage )
+		m_pAfterImage->SetpHairSkinMesh( m_pHairXSkinMesh );
+
+	m_bOtherEquipNotRendered = abOnePieceHidden[0];
+
+	// Lu in play with no emotion and not riding: Lu's hand equip hides, so does the one-piece avatar's attached model when it hid equips; an arm accessory that is a not-rendering-hand item hides itself
+	if ( false == IsMinorUnitActive() && CX2Unit::ET_NONE == m_ePlayedEmotion )
+	{
+		BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+		{
+			if ( true == pViewEquip->GetShowObject() && CX2Unit::EP_DEFENCE_HAND == pViewEquip->GetEqipPos() && false == IsEquipForMinorUnit( pViewEquip ) && false == GetRidingOn() )
+				pViewEquip->SetShowObject( false );
+		}
+
+		if ( true == m_bOtherEquipNotRendered && false == GetRidingOn() )
+		{
+			CX2EqipPtr pAttachedOnePieceEquip = GetEquipPtrFromEquipViewListByEquipPosition( CX2Unit::EP_ONEPIECE_FASHION );
+			if ( NULL != pAttachedOnePieceEquip )
+			{
+				SetHideNoRenderable( true );
+
+				CKTDXDeviceXSkinMesh* pAttachedModel = pAttachedOnePieceEquip->GetNormalModel( 2 );
+				if ( NULL == pAttachedModel )
+					pAttachedModel = pAttachedOnePieceEquip->GetNormalModel( 1 );
+
+				if ( NULL != pAttachedModel )
+					pAttachedModel->SetNoRenderable( true );
+			}
+		}
+
+		CX2EqipPtr pArmEquip = GetEquipPtrFromEquipViewListByEquipPosition( CX2Unit::EP_AC_ARM );
+		if ( NULL != pArmEquip && true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAND, pArmEquip->GetItemID() ) )
+			pArmEquip->SetShowObject( false );
+	}
+
+	// the face accessory items of each body ( June runs one pass per body; the two passes read only the equip list )
+	bool abFace1HidesHair[2] = { false, false };		// June local_7c
+	bool abFace1HidesFace[2] = { false, false };		// June local_a8
+	bool abFace2HidesHair[2] = { false, false };		// June local_a4
+	bool abFace2HidesFace[2] = { false, false };		// June uStack_84
+	BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+	{
+		const int iEquipForm = ( true == IsEquipForMinorUnit( pViewEquip ) ) ? 1 : 0;
+		if ( CX2Unit::EP_AC_FACE1 == pViewEquip->GetEqipPos() )
+		{
+			if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR, pViewEquip->GetItemID() )
+				|| true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2_FACE3, pViewEquip->GetItemID() )
+				|| true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_DRAW_FACE_ACC_WITH_NO_ONE_PEACE_AVATAR_SET1, pViewEquip->GetItemID() ) )
+			{
+				abFace1HidesHair[iEquipForm] = true;
+			}
+			else if ( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE2_FACE3, pViewEquip->GetItemID() ) )
+			{
+				abFace1HidesHair[iEquipForm] = true;
+				abFace1HidesFace[iEquipForm] = true;
+			}
+		}
+		else if ( CX2Unit::EP_AC_FACE2 == pViewEquip->GetEqipPos()
+			&& true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE1_FACE3, pViewEquip->GetItemID() ) )
+		{
+			abFace2HidesHair[iEquipForm] = true;
+			abFace2HidesFace[iEquipForm] = true;
+		}
+	}
+
+	// each body shows or hides its hair and face equips by those flags; Lu's pass runs while Lu is in play or both bodies show, Ciel's the same for Ciel
+	for ( int iForm = 0; iForm < 2; ++iForm )
+	{
+		const bool bMinorUnitEquip = ( 1 == iForm );
+		if ( bMinorUnitEquip != IsMinorUnitActive() && false == m_bDuoEnabled )
+			continue;
+
+		if ( true == abOnePieceHidden[iForm] && false == abRenderHairAndFace1[iForm] )
+		{
+			BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+			{
+				if ( bMinorUnitEquip != IsEquipForMinorUnit( pViewEquip ) )
+					continue;
+
+				if ( CX2Unit::EP_DEFENCE_HAIR == pViewEquip->GetEqipPos()
+					|| ( CX2Unit::EP_AC_FACE1 == pViewEquip->GetEqipPos() && true == abFace1HidesHair[iForm] )
+					|| ( CX2Unit::EP_AC_FACE2 == pViewEquip->GetEqipPos() && true == abFace2HidesHair[iForm] ) )
+					pViewEquip->SetShowObject( false );
+			}
+		}
+		else if ( true == abFace1HidesHair[iForm] )
+		{
+			BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+			{
+				if ( bMinorUnitEquip != IsEquipForMinorUnit( pViewEquip ) )
+					continue;
+
+				switch ( pViewEquip->GetEqipPos() )
+				{
+				case CX2Unit::EP_DEFENCE_HAIR:
+				case CX2Unit::EP_AC_FACE2:
+					pViewEquip->SetShowObject( false );
+					break;
+
+				case CX2Unit::EP_DEFENCE_FACE:
+					pViewEquip->SetShowObject( false == abFace1HidesFace[iForm] );
+					break;
+
+				case CX2Unit::EP_AC_FACE1:
+					pViewEquip->SetShowObject( true );
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+		else if ( true == abFace2HidesHair[iForm] )
+		{
+			BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+			{
+				if ( bMinorUnitEquip != IsEquipForMinorUnit( pViewEquip ) )
+					continue;
+
+				switch ( pViewEquip->GetEqipPos() )
+				{
+				case CX2Unit::EP_DEFENCE_HAIR:
+				case CX2Unit::EP_AC_FACE1:
+					pViewEquip->SetShowObject( false );
+					break;
+
+				case CX2Unit::EP_DEFENCE_FACE:
+					pViewEquip->SetShowObject( false == abFace2HidesFace[iForm] );
+					break;
+
+				case CX2Unit::EP_AC_FACE2:
+					pViewEquip->SetShowObject( true );
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+
+		if ( true == abRenderHair[iForm] )
+		{
+			BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+			{
+				if ( bMinorUnitEquip == IsEquipForMinorUnit( pViewEquip ) && CX2Unit::EP_DEFENCE_HAIR == pViewEquip->GetEqipPos() )
+					pViewEquip->SetShowObject( true );
+			}
+		}
+	}
+
+	BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
+	{
+		if ( CX2Unit::EP_AC_TEMP4 == pViewEquip->GetEqipPos() )	// June EP_AC_RING2
+			pViewEquip->SetShowObject( false );
+	}
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}

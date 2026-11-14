@@ -553,8 +553,14 @@ public:
 
 	enum LUCIEL_MINOR_PARTICLE_INSTANCE_ID
 	{
-		LUCIEL_MINOR_PII_BASE,
-		LUCIEL_MINOR_PII_END = 7,	// June +0x95a0: seven handles, named by the phases that use them
+		LUCIEL_MINOR_PII_REVENGE_WAIT,			// char-luciel CH1l: June 32b37780 names the seven handles of +0x95a0
+		LUCIEL_MINOR_PII_GROUND_SHOCK_WAVE_BLUE,
+		LUCIEL_MINOR_PII_IMPACT_TICK_BLUE,
+		LUCIEL_MINOR_PII_KU_AANG,
+		LUCIEL_MINOR_PII_GROUND_SHOCK_WAVE_RED,
+		LUCIEL_MINOR_PII_IMPACT_TICK_RED,
+		LUCIEL_MINOR_PII_MAGNUM_BLADE_FIRE_WAVE,
+		LUCIEL_MINOR_PII_END,
 	};
 
 	// June's { UID, GAME_UNIT_TYPE } unit key ( 16 bytes; looked up by 32294460 )
@@ -579,6 +585,13 @@ public:
 		int								m_iSkillID;
 		int								m_iDamageEffectIndex;
 		int								m_iHitCount;
+	};
+
+	// char-luciel CH1l: June 8-byte entry of 32b176a0: a worn equip's body byte ( CX2Eqip +0x15d4 ) and item id ( +0x1a0 )
+	struct SFormEquipItem
+	{
+		bool							m_bMinorUnitEquip;
+		int								m_iItemID;
 	};
 
 	// June +0x9748, member initializer 32b4d1c0, destructor 32699670 ( Altar of Evil, CH2d2 )
@@ -652,6 +665,41 @@ public:
 	virtual int			GetDamageAirSmallStateID() const;	// June 32b4d910 ( vslot 0x484 )
 	virtual int			GetDamageAirDownStateID() const;	// June 32b4d950 ( vslot 0x488 )
 	virtual int			GetDamageAirUpStateID() const;	// June 32b4da50 ( vslot 0x498 )
+
+	// char-luciel CH1l: overrides band 2 part 1 ( June 32ae9bf0 - 32b4dbe0 ); ( + ) = the base is not declared in March, CH1o declares it virtual
+	virtual bool		CanPlayEmotion( const CX2Unit::EMOTION_TYPE eEmotionType_ );	// + June 32ae9bf0 ( vslot 0x574 ), base 32ec5990 returns true
+	virtual int			GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ );	// June 32ae9c00 ( vslot 0x57c ), base: CH1a0
+	virtual bool		IsTransformSkillState();	// + June 32ae9de0 ( vslot 0x580 ), base 31e4c550 returns false
+	virtual void		SetShowViewListAndUpdate( const bool bShow_ );	// + June 32ae9f20 ( vslot 0x640 ), base 31fca010: SetShowViewList( b ), then UpdateNotRenderingOtherEquipList() when b
+	virtual void		InitEnchantWeaponEffectUnitSpecific();	// June 32aea690 ( vslot 0x54c )
+	virtual void		SetNowMpFromStoredValue();	// + June 32aeb2c0 ( vslot 0x650 ), base 31fceed0
+	virtual void		DoProcessWhenActiveBodyChangeApplied( const int iDuoType_, const int iSkillID_ );	// + June 32b0fa20 ( vslot 0x648 ), base 33093ad0 is empty
+	virtual void		COMMON_BUFF_FrameMove();	// June 32b12fd0 ( vslot 0x5f0 )
+	virtual CKTDGXSkinAnimPtr	GetSkinAnimByForm( const int iForm_ );	// + June 32b13b60 ( vslot 0x570 ), base 31fd48a0
+	virtual void		SetHandEquipShow( const bool bShow_ );	// + June 32b143e0 ( vslot 0x62c ), base 3208ddc0 is empty
+	virtual bool		CanRidingState();	// June 32b14e10 ( vslot 0x628 )
+	virtual bool		IsClassCommonMoveState();	// June 32b15340 ( vslot 0x578 )
+	virtual void		CreateMajorParticleArray();	// June 32b154f0 ( vslot 0x540 )
+	virtual void		GetSkillIconTexture( CKTDGUISlot* pSlot_, const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	// + June 32b15900 ( vslot 0x504 ), base 31fdb990
+	virtual void		SkillIconOverride( const int iSkillID_, wstring& wstrIconTexName_, wstring& wstrIconTexKey_ );	// June 32b16220 ( vslot 0x56c )
+	virtual void		UpdateNotRenderingOtherEquipList();	// June 32b18220 ( vslot 0x630 )
+	virtual void		SyncFutureMpFromGage();	// + June 32b1c960 ( vslot 0x64c ), base 31fe9da0
+	virtual bool		CheckBoundingTarget();	// + June 32b34680 ( vslot 0x568 ), base 31e4c550 returns false
+	virtual void		AttackResultByType( CX2DamageManager::DamageData& pDamageData_ );	// June 32b37730 ( vslot 0x4e0 )
+	virtual void		CreateMinorParticleArray();	// June 32b37780 ( vslot 0x548 )
+	virtual void		HyperModeFrameMove();	// June 32b38080 ( vslot 0x600 )
+	virtual int			GetJumpDownStateID();	// June 32b4d5b0 ( vslot 0x458 ), not const as the base
+	virtual int			GetDamageDownLandFront() const;	// June 32b4d810 ( vslot 0x114 ), DU2's name
+	virtual int			GetDamageDownLandBack() const;	// June 32b4d850 ( vslot 0x118 )
+	virtual int			GetDamageAirDownInvincibleStateID() const;	// June 32b4d990 ( vslot 0x48c )
+	virtual int			GetDamageAirDownLanding() const;	// June 32b4d9d0 ( vslot 0x490 )
+	virtual int			GetDamageAirFallStateID() const;	// June 32b4da10 ( vslot 0x494 )
+	virtual int			GetDamageAirFlyFrontStateID() const;	// June 32b4da90 ( vslot 0x49c )
+	virtual int			GetDamageAirFlyBackStateID() const;	// June 32b4dad0 ( vslot 0x4a0 )
+	virtual int			GetDamageRevengeStateID() const;	// June 32b4db10 ( vslot 0x4a4 )
+	virtual int			GetDanceWaitStateID();	// + June 32b4db50 ( vslot 0x5c4 ), base 3208e140 returns the dance wait state
+	virtual bool		IsHyperModeState() const;	// June 32b4dbe0 ( vslot 0x51c )
+	virtual void		SetSDOnePieceAvatar( const int iForm_, const bool bSDOnePieceAvatar_ );	// + June 32b172b0 ( vslot 0x87c ): body in CH1l2, base 3208e280 stores m_bSDOnePieceAvatar
 
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,
@@ -1027,7 +1075,17 @@ protected:
 	void				LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture();	// June 32b35fd0
 	void				LSI_RIDING_HYPER_MODE_FrameMove();	// June 32b39e70
 	void				CommonHyperModeFrameMove( const float fChangeTime_, const float fShockTime_, const bool bSound_ );	// June 32b37d80 ( shared by the Lu / Ciel hyper mode states )
-	virtual void		CheckBoundingTarget();	// June 32b34680 ( vslot 0x568 ): body in CH1l
+	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
+	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
+	void				CreateChaserOfDarknessDamageEffect( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b1f800: body in CH1l3
+	void				ProcessPhantomRushHit( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b347f0: body in CH1l3
+	void				PlayPunisherEffectSet( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b34c70: body in CH1l3
+	void				RegisterDesperadoTarget( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b18060: body in CH1l3
+	void				AccumulateShadowFuryDamage( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b0e4e0: body in CH1l3
+	void				PlayBluffEffectSet( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b37090: body in CH1l3
+	void				CheckBoundingStrikeHit( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b153d0: body in CH1l3
+	void				AddCombinationPointByDamageEffectHit( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b16880: body in CH1l3
+	void				GetFormEquipItemList( const CX2Unit::EQIP_POSITION eEquipPosition_, std::vector<SFormEquipItem>& vecFormEquipItem_ );	// June 32b176a0: body in CH1l3
 
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )

@@ -5835,10 +5835,16 @@ private:
 	DWORD m_dwLastRecvFrameMoveCount;
 #endif//ACTIVE_KOG_GAME_PERFORMANCE_CHECK
 //#endif  SERV_KTDX_OPTIMIZE_UDP_PACKET_PACK
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+protected:	// char-luciel CH1l: June 32b18220 keeps the hair mesh in Lu / Ciel's UpdateNotRenderingOtherEquipList
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 
 #ifdef MODIFY_AFTER_IMAGE // 오현빈 // 2013-07-19	
 	CKTDXDeviceXSkinMesh* m_pHairXSkinMesh; // 모자 착용 중 애프터 이미지에 현재 착용중인 Hair를 추가 하기 위한 변수
 #endif //MODIFY_AFTER_IMAGE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+private:
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 
 #ifdef CHECK_SOUND_LOADING_TIME
 	DWORD dwStartTime;
