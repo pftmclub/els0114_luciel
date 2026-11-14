@@ -13403,6 +13403,19 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-14
+// Description: char-luciel CH1a1 - June's form-indexed MP gauge in every CX2GageData ( class-agnostic ): a second MP gauge ( June +0xc, the
+//              minor unit's ), the MP getters / setters virtual with June's gauge index ( 0 = main, 1 = the minor unit's; the base answers 1 with
+//              nothing ), SetAddMaxMP and FlushMp virtual, OnFrameMove split as June's into the HP half and the new MpFrameMove virtual ( the
+//              regeneration tracked, no Veryfy call ), and UpdateDamageFlushMP's tracked spend on my select unit's form index. Only
+//              CX2LucielGageData overrides them ( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ). Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE ) && !( defined( SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( FIX_LIMITED_MANA_MANAGEMENT ) && defined( DUNGEON_ITEM ) )
+#error SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE needs SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY ( the MP tallies ), SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( IsMinorUnitForm ), FIX_LIMITED_MANA_MANAGEMENT ( m_fAddMaxMP ) and DUNGEON_ITEM ( the item MP rate )
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
 // Description: char-luciel - Lu/Ciel's own code, compiled and unreferenced until SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE. CH1a0 adds the Combination
 //              Point gauge CX2LucielGageData ( ctor, copy ctor, point setter; its virtual overrides are CH1a1's ) and CX2Game's switching guide
 //              ( 322e6300 ); CH1a adds the class CX2GULuciel. Revert: comment out the #define.

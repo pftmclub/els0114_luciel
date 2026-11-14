@@ -114,6 +114,9 @@ public:
 		m_fChangeRateByItem( 0.0f ), m_fChangeRateTimeByItem( 0.0f ), m_fHyperModeRemainTime( 0.0f ),
 		m_byHyperModeCount( 0 ), m_bEnable( false ), m_bCanChargeMpForDetonation( false ),
 		m_bHpRelativeChangeRate( false ), m_ChargeMpGageForDetonation(), m_ForceDownGage(), m_bUpdateMpPoint(true)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+		, m_pMinorUnitMpGage( NULL ), m_fMinorUnitAddMaxMP( 0.f )	// char-luciel CH1a1: June 322b3a70
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
 		, m_fGainedMp( 0.f ), m_fSpentMp( 0.f ), m_fBeforeNowHp( 0.f ), m_fBeforeNowMp( 0.f )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
@@ -141,6 +144,9 @@ public:
 		m_bEnable( rhs_.m_bEnable ), m_bCanChargeMpForDetonation( rhs_.m_bCanChargeMpForDetonation ),
 		m_bHpRelativeChangeRate( rhs_.m_bHpRelativeChangeRate ), m_ChargeMpGageForDetonation( rhs_.m_ChargeMpGageForDetonation ),
 		m_ForceDownGage( rhs_.m_ForceDownGage ), m_bUpdateMpPoint( rhs_.m_bUpdateMpPoint )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+		, m_pMinorUnitMpGage( new Gage( rhs_.m_pMinorUnitMpGage ) ), m_fMinorUnitAddMaxMP( rhs_.m_fMinorUnitAddMaxMP )	// char-luciel CH1a1: June 322b24f0
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
 		, m_fGainedMp( rhs_.m_fGainedMp ), m_fSpentMp( rhs_.m_fSpentMp ), m_fBeforeNowHp( rhs_.m_fBeforeNowHp ), m_fBeforeNowMp( rhs_.m_fBeforeNowMp )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
@@ -162,6 +168,9 @@ public:
 	{
 		SAFE_DELETE( m_pHpGage );
 		SAFE_DELETE( m_pMpGage );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+		SAFE_DELETE( m_pMinorUnitMpGage );	// char-luciel CH1a1: June 322b2da0
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 	}
 
 	void operator=( const CX2GageData& rhs_ )
@@ -180,6 +189,10 @@ public:
 		*(m_pMpGage) = *(rhs_.m_pMpGage);		
 		m_SoulGage = rhs_.m_SoulGage;	
 		m_bUpdateMpPoint = rhs_.m_bUpdateMpPoint;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+		*(m_pMinorUnitMpGage) = *(rhs_.m_pMinorUnitMpGage);	// char-luciel CH1a1: June 32a36530
+		m_fMinorUnitAddMaxMP = rhs_.m_fMinorUnitAddMaxMP;
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 #ifdef FIX_LIMITED_MANA_MANAGEMENT
 		m_fAddMaxMP = rhs_.m_fAddMaxMP;
 #endif //FIX_LIMITED_MANA_MANAGEMENT
@@ -197,6 +210,10 @@ public:
 
 		SAFE_DELETE ( m_pMpGage );
 		m_pMpGage = new Gage();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+		SAFE_DELETE( m_pMinorUnitMpGage );	// char-luciel CH1a1: June 322b37a0
+		m_pMinorUnitMpGage = new Gage();
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 	}
 
 	void SetShow( const bool bShow_ ) { ASSERT( !L"Gage Data SetShow" ); }
@@ -268,6 +285,22 @@ public:
 
 	////////////////// Mp °ü·Ã Get/Set ///////////////////////////////////////////
 	////// NowMp
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+	// char-luciel CH1a1: June gauge vslots 4..0x28; index 0 = the main MP gauge, 1 = the minor unit's ( the base answers 1 with nothing )
+	virtual float	GetNowMp( const int iMpGageIndex_ = 0 ) const;	// June 322b2d00
+	virtual void	SetNowMp( const float fNowMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// June 322b3010
+#ifdef SERV_IRUHADEV_JUNE_RANDOM_MISSION
+	void			RandomMissionMpSpent( float fChangeOfNowMp_ );	/// X2RandomMission.cpp ( June 322b33d0 @322b3492 )
+#endif SERV_IRUHADEV_JUNE_RANDOM_MISSION
+	virtual void	UpNowMp( const float fChangeOfNowMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// June 322b33d0
+	virtual float	GetMaxMp( const int iMpGageIndex_ = 0 ) const;	// June 322b2d30
+	virtual void	SetMaxMp( const float fMaxMp_, const int iMpGageIndex_ = 0 );	// June 322b34d0
+	virtual void	UpMaxMp( const float fChangeOfMaxMp_, const int iMpGageIndex_ = 0 );	// June 322b35a0
+	virtual void	SetAddMaxMP( const float fAddMaxMP_ );	// June 322b2cb0
+	virtual float	GetChangeRateMp( const int iMpGageIndex_ = 0 ) const;	// June 322b2d60
+	virtual void	SetChangeRateMp( const float fChangeRateMp_, const int iMpGageIndex_ = 0 );	// June 322b3650
+	virtual void	UpChangeRateMp( const float fChangeofChangeRateMp_, const int iMpGageIndex_ = 0 );	// June 322b36f0
+#else SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 	float			GetNowMp() const { return ( NULL != m_pMpGage ? m_pMpGage->fNow : 0.0f );	}
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
 	/// June 322b3010 ( vslot 8 ): bTrackMp_ adds the change to the MP gained / spent tallies
@@ -398,6 +431,7 @@ public:
 		if ( NULL != m_pMpGage )
 			m_pMpGage->fChangeRate += fChangeofChangeRateMp_;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 
 	////////////////// Soul(°¢¼º) °ü·Ã Get/Set ///////////////////////////////////////////
 	////// NowSoul
@@ -485,11 +519,15 @@ public:
 	void			AddMPFactor( const float fFactor_, const float fTime_ ) { m_pMpGage->AddFactor( fFactor_, fTime_ ); }
 	void			ClearMPFactor() { m_pMpGage->ClearFactor(); }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+	virtual bool	FlushMp( const float fFlushMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// char-luciel CH1a1: June 32a31910 ( vslot 0x2c )
+#else SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
 	bool			FlushMp( const float fFlushMp_, const bool bTrackMp_ = false );	/// June 32a31910 ( vslot 0x2c )
 #else
 	bool			FlushMp( const float fFlushMp_ );
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 
 	// ¿ÀÇöºó // ¿¤¸®½Ã½º ¼¶¸ê ±âÆø ±¸ÇöÀ» À§ÇØ °¡»óÇÔ¼ö·Î º¯°æ
 	virtual bool	DamageFlushMp();
@@ -528,6 +566,9 @@ public:
 	virtual void	DetonationFrameMove( double fTime, float fElapsedTime );
 
 	virtual void	UpdateDataFromGameUnit( const CX2GageData* pGageData_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+	virtual void	MpFrameMove( const float fElapsedTime_ );	// char-luciel CH1a1: June vslot 0x54 ( base 32a344a0 ), the MP half of June's OnFrameMove
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 	virtual void	InitWhenGameIsOver();
 
 	virtual bool GetMyPlayStatusToPacket( OUT KGamePlayStatus& kGamePlayStatus_ ) const;
@@ -566,6 +607,19 @@ protected:
 	float GetSwapGageTime() const { return m_fSwapGageTime; }
 	void SetSwapGageTime( const float fSwapGageTime_ ) { m_fSwapGageTime = fSwapGageTime_; }
 	void UpSwapGageTime( const float fChangeOfSwapGageTime_ ) { m_fSwapGageTime += fChangeOfSwapGageTime_; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+	Gage* GetMpGageByIndex( const int iMpGageIndex_ ) const { return ( 0 == iMpGageIndex_ ? m_pMpGage : m_pMinorUnitMpGage ); }	// char-luciel CH1a1: June Lu/Ciel's pick, 0 -> +8, else +0xc
+	void TallyMpChange( const float fChangeOfNowMp_ )
+	{
+		if ( 0.f < fChangeOfNowMp_ )
+			m_fGainedMp += fChangeOfNowMp_;
+		else if ( 0.f > fChangeOfNowMp_ )
+			m_fSpentMp -= fChangeOfNowMp_;
+	}
+	float GetAddMaxMpAmount() const { return m_fAddMaxMP; }
+	void SetAddMaxMpAmount( const float fAddMaxMP_ ) { m_fAddMaxMP = fAddMaxMP_; }
+	float GetMinorUnitAddMaxMp() const { return m_fMinorUnitAddMaxMP; }
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 
 private:
 
@@ -602,6 +656,10 @@ private:
 	float					m_fBeforeNowHp;		/// June +0x108
 	float					m_fBeforeNowMp;		/// June +0x10c
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+	Gage*					m_pMinorUnitMpGage;		/// char-luciel CH1a1: June +0xc, the minor unit's MP gauge ( index 1 )
+	float					m_fMinorUnitAddMaxMP;	/// June +0x14, read only by Lu/Ciel's SetAddMaxMP ( 32a31800 ); nothing in June writes it
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 
 #ifdef FIX_LIMITED_MANA_MANAGEMENT
 	//¿ÀÇöºó//2013-01-23 //
@@ -913,11 +971,11 @@ class CX2LucielGageData : public CX2GageData
 {
 public:
 	CX2LucielGageData() : CX2GageData(), m_bCombinationPointChanged( false ), m_iNowCombinationPoint( 0 ), m_iMaxCombinationPoint( 10 )
-		, m_fRestFormMpRate( 1.f )	// June 32498e40
+		, m_fRestFormMpPerSecond( 1.f )	// June 32498e40
 	{}
 
 	CX2LucielGageData( const CX2LucielGageData& rhs_ ) : CX2GageData( rhs_ ), m_bCombinationPointChanged( rhs_.m_bCombinationPointChanged )
-		, m_iNowCombinationPoint( rhs_.m_iNowCombinationPoint ), m_iMaxCombinationPoint( rhs_.m_iMaxCombinationPoint ), m_fRestFormMpRate( rhs_.m_fRestFormMpRate )	// June 32a38250
+		, m_iNowCombinationPoint( rhs_.m_iNowCombinationPoint ), m_iMaxCombinationPoint( rhs_.m_iMaxCombinationPoint ), m_fRestFormMpPerSecond( rhs_.m_fRestFormMpPerSecond )	// June 32a38250
 	{}
 
 	bool GetCombinationPointChanged() const { return m_bCombinationPointChanged; }
@@ -935,11 +993,30 @@ public:
 			m_iNowCombinationPoint = 0;
 	}
 
+	// char-luciel CH1a1: June vt 3349b2a4; slots 13 / 16 are the base bodies, 17 / 18 ( the play-status pair ) are CH1a2's
+	void operator=( const CX2LucielGageData& rhs_ );	// June 32a36f70
+	void SetMaxCombinationPoint( const int iMaxCombinationPoint_ ) { m_iMaxCombinationPoint = iMaxCombinationPoint_; }	// June 32a36ef0
+
+	virtual float	GetNowMp( const int iMpGageIndex_ = 0 ) const;	// June 32a31a90
+	virtual void	SetNowMp( const float fNowMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// June 32a328d0
+	virtual void	UpNowMp( const float fChangeOfNowMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// June 32a35430
+	virtual float	GetMaxMp( const int iMpGageIndex_ = 0 ) const;	// June 32a31ac0
+	virtual void	SetMaxMp( const float fMaxMp_, const int iMpGageIndex_ = 0 );	// June 32a32bf0
+	virtual void	UpMaxMp( const float fChangeOfMaxMp_, const int iMpGageIndex_ = 0 );	// June 32a32cc0
+	virtual void	SetAddMaxMP( const float fAddMaxMP_ );	// June 32a31800
+	virtual float	GetChangeRateMp( const int iMpGageIndex_ = 0 ) const;	// June 32a31af0
+	virtual void	SetChangeRateMp( const float fChangeRateMp_, const int iMpGageIndex_ = 0 );	// June 32a32d70
+	virtual void	UpChangeRateMp( const float fChangeofChangeRateMp_, const int iMpGageIndex_ = 0 );	// June 32a32e10
+	virtual bool	FlushMp( const float fFlushMp_, const bool bTrackMp_ = false, const int iMpGageIndex_ = 0 );	// June 32a31b30
+	virtual void	MpFrameMove( const float fElapsedTime_ );	// June 32a35170
+	virtual void	UpdateDataFromGameUnit( const CX2GageData* pGageData_ );	// June 32a35020
+	virtual CX2GageData* GetCloneGageData();	// June 32a360d0
+	virtual void	CopyGageData( IN CX2GageData* pGageData_ );	// June 32a35150
 private:
 	bool				m_bCombinationPointChanged;		/// June +0x110
 	KProtectedType<int>	m_iNowCombinationPoint;			/// June +0x114
 	KProtectedType<int>	m_iMaxCombinationPoint;			/// June +0x120
-	float				m_fRestFormMpRate;				/// June +0x12c, scales the MP the other form gains in the gauge frame move ( 32a35170 )
+	float				m_fRestFormMpPerSecond;			/// June +0x12c, the MP the form not in play gains per second ( 32a35170 ); char-luciel CH1a1
 };
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 

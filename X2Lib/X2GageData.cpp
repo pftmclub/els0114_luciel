@@ -46,6 +46,163 @@ void CX2GageData::Gage::Increase( const float fIncrement, const float fMinimum /
 		SetCanChargeMpForDetonation( false );
 	}
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+namespace _CONST_GAGEDATA_CH1A1_
+{
+	bool IsMySelectUnitMinorForm()	// char-luciel CH1a1: June 31d717e0, my select unit's form byte ( +0xe40 ) is Ciel's
+	{
+		return ( NULL != g_pData && NULL != g_pData->GetMyUser() && NULL != g_pData->GetMyUser()->GetSelectUnit()
+			&& true == g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() );
+	}
+}
+using namespace _CONST_GAGEDATA_CH1A1_;
+
+/*virtual*/ float CX2GageData::GetNowMp( const int iMpGageIndex_ /*= 0*/ ) const	// char-luciel CH1a1: June 322b2d00
+{
+	if ( 1 == iMpGageIndex_ || NULL == m_pMpGage )
+		return 0.0f;
+
+	return m_pMpGage->fNow;
+}
+
+/*virtual*/ void CX2GageData::SetNowMp( const float fNowMp_, const bool bTrackMp_ /*= false*/, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 322b3010
+{
+	if ( 1 == iMpGageIndex_ || NULL == m_pMpGage )
+		return;
+
+	m_fBeforeNowMp = m_pMpGage->fNow;
+	if ( 0 > fNowMp_ )
+		m_pMpGage->fNow = fNowMp_;
+	else if ( fNowMp_ > GetMaxMp( 0 ) )
+		m_pMpGage->fNow = GetMaxMp( 0 );
+	else
+		m_pMpGage->fNow = fNowMp_;
+
+	if ( true == bTrackMp_ )
+		TallyMpChange( m_pMpGage->fNow - m_fBeforeNowMp );
+}
+
+/*virtual*/ void CX2GageData::UpNowMp( const float fChangeOfNowMp_, const bool bTrackMp_ /*= false*/, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 322b33d0
+{
+	if ( 1 == iMpGageIndex_ || NULL == m_pMpGage )
+		return;
+
+	m_fBeforeNowMp = m_pMpGage->fNow;
+	m_pMpGage->Increase( fChangeOfNowMp_ );
+	if ( true != bTrackMp_ )
+		return;
+
+	TallyMpChange( m_pMpGage->fNow - m_fBeforeNowMp );
+#ifdef SERV_IRUHADEV_JUNE_RANDOM_MISSION
+	RandomMissionMpSpent( fChangeOfNowMp_ );
+#endif SERV_IRUHADEV_JUNE_RANDOM_MISSION
+}
+
+/*virtual*/ float CX2GageData::GetMaxMp( const int iMpGageIndex_ /*= 0*/ ) const	// char-luciel CH1a1: June 322b2d30
+{
+	if ( 1 == iMpGageIndex_ || NULL == m_pMpGage )
+		return 0.0f;
+
+	return m_pMpGage->fMax;
+}
+
+/*virtual*/ void CX2GageData::SetMaxMp( const float fMaxMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 322b34d0
+{
+	if ( 1 != iMpGageIndex_ && NULL != m_pMpGage && m_pMpGage->fMax != fMaxMp_ )
+	{
+		m_pMpGage->fMax = fMaxMp_;
+		m_bUpdateMpPoint = true;
+	}
+}
+
+/*virtual*/ void CX2GageData::UpMaxMp( const float fChangeOfMaxMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 322b35a0
+{
+	if ( 1 != iMpGageIndex_ && NULL != m_pMpGage )
+	{
+		m_pMpGage->fMax += fChangeOfMaxMp_;
+		m_bUpdateMpPoint = true;
+	}
+}
+
+/*virtual*/ void CX2GageData::SetAddMaxMP( const float fAddMaxMP_ )	// char-luciel CH1a1: June 322b2cb0
+{
+	if ( fAddMaxMP_ == m_fAddMaxMP )
+		return;
+
+	SetMaxMp( GetMaxMp( 0 ) - m_fAddMaxMP + fAddMaxMP_, 0 );
+	m_fAddMaxMP = fAddMaxMP_;
+}
+
+/*virtual*/ float CX2GageData::GetChangeRateMp( const int iMpGageIndex_ /*= 0*/ ) const	// char-luciel CH1a1: June 322b2d60
+{
+	if ( 1 == iMpGageIndex_ || NULL == m_pMpGage )
+		return 0.0f;
+
+	return m_pMpGage->fChangeRate;
+}
+
+/*virtual*/ void CX2GageData::SetChangeRateMp( const float fChangeRateMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 322b3650
+{
+	if ( 1 != iMpGageIndex_ && NULL != m_pMpGage )
+		m_pMpGage->fChangeRate = fChangeRateMp_;
+}
+
+/*virtual*/ void CX2GageData::UpChangeRateMp( const float fChangeofChangeRateMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 322b36f0
+{
+	if ( 1 != iMpGageIndex_ && NULL != m_pMpGage )
+		m_pMpGage->fChangeRate += fChangeofChangeRateMp_;
+}
+
+/*virtual*/ void CX2GageData::OnFrameMove( double fTime, float fElapsedTime )	// char-luciel CH1a1: June 32a33c40, the MP half moved to MpFrameMove and no Veryfy call
+{
+	DetonationFrameMove( fTime, fElapsedTime );
+
+	if ( GetNowHp() > 0 )
+	{
+		if( GetEnableHPRelativeChangeRate() )
+			UpNowHp( GetChangeRateHp() * GetMaxHp() * fElapsedTime );
+		else
+			UpNowHp( GetChangeRateHp() * fElapsedTime );
+	}
+
+	MpFrameMove( fElapsedTime );
+}
+
+/*virtual*/ void CX2GageData::MpFrameMove( const float fElapsedTime_ )	// char-luciel CH1a1: June 32a344a0; its +0x18 gate is left out, both ctors set it to 1 and nothing writes it
+{
+	if( GetChangeRateTimeByItem() > 0.f )
+	{
+		SetChangeRateTimeByItem( GetChangeRateTimeByItem() - fElapsedTime_ );
+		if( GetChangeRateTimeByItem() <= 0.f )
+		{
+			SetChangeRateTimeByItem( 0.0f );
+			SetChangeRateByItem( 0.0f );
+		}
+	}
+
+	const float fMpToBeUp = ( GetChangeRateMp( 0 ) + GetChangeRateByItem() ) * fElapsedTime_;
+	UpNowMp( fMpToBeUp, true, 0 );
+
+	if( GetNowHp() <= 0 )
+		m_pMpGage->ClearFactor();
+
+	for ( UINT i = 0; i < m_pMpGage->vecFactor.size(); ++i )
+	{
+		GageFactor &gageFactor = m_pMpGage->vecFactor[i];
+		if( gageFactor.fTime > 0.f )
+		{
+			m_pMpGage->fNow += gageFactor.fFactor * fElapsedTime_;
+			gageFactor.fTime -= fElapsedTime_;
+
+			if( gageFactor.fTime <= 0.f )
+			{
+				m_pMpGage->vecFactor.erase( m_pMpGage->vecFactor.begin() + i );
+				--i;
+			}
+		}
+	}
+}
+#else SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 /*virtual*/ void CX2GageData::OnFrameMove( double fTime, float fElapsedTime )
 {
 	DetonationFrameMove(fTime, fElapsedTime);
@@ -97,7 +254,18 @@ void CX2GageData::Gage::Increase( const float fIncrement, const float fMinimum /
 		&& g_pInstanceData->GetVerifyGageManagerTimer() <= 0.f )
 		Veryfy();
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+/*virtual*/ bool CX2GageData::FlushMp( const float fFlushMp_, const bool bTrackMp_ /*= false*/, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a31910, the base spends on index 0 whatever it is given
+{
+	if( NULL == m_pMpGage || fFlushMp_ > m_pMpGage->fNow )
+		return false;
+
+	UpNowMp( -fFlushMp_, bTrackMp_, 0 );
+	return true;
+}
+#else SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
 /// June 32a31910: the spend goes through UpNowMp with the caller's track flag
 bool CX2GageData::FlushMp( const float fFlushMp_, const bool bTrackMp_ /*= false*/ )
@@ -122,6 +290,7 @@ bool CX2GageData::FlushMp( const float fFlushMp_ )
 	}
 }
 #endif SERV_IRUHADEV_JUNE_DIVERGE_GAGE_TALLY
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 
 /*virtual*/ bool CX2GageData::DamageFlushMp()
 {
@@ -184,7 +353,11 @@ bool CX2GageData::UpdateDamageFlushMP()
 	if( true == GetActivateDetonation() )
 	{
 		// MP 소모
+#ifdef SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
+		UpNowMp( m_fNowChargeMpForDetonation * -1, true, true == IsMySelectUnitMinorForm() ? 1 : 0 );	// char-luciel CH1a1: June 32a33d50, tracked, on my select unit's form index
+#else SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 		UpNowMp( m_fNowChargeMpForDetonation * -1 );
+#endif SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE
 		SetNowChargeMpForDetonation( 0.f );
 
 		// 기폭 활성화 여부 초기화
@@ -1460,6 +1633,199 @@ void CX2RenaGageData::CopyGageData( IN CX2GageData* pGageData_ )
 	*this = *( static_cast<CX2RenaGageData*>( pGageData_ ) );
 	SetNaturalForceChanged( true );
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+void CX2LucielGageData::operator=( const CX2LucielGageData& rhs_ )	// char-luciel CH1a1: June 32a36f70
+{
+	CX2GageData::operator=( rhs_ );
+	m_bCombinationPointChanged = rhs_.m_bCombinationPointChanged;
+	m_iNowCombinationPoint = rhs_.m_iNowCombinationPoint;
+	m_iMaxCombinationPoint = rhs_.m_iMaxCombinationPoint;
+	m_fRestFormMpPerSecond = rhs_.m_fRestFormMpPerSecond;
+}
+
+/*virtual*/ float CX2LucielGageData::GetNowMp( const int iMpGageIndex_ /*= 0*/ ) const	// char-luciel CH1a1: June 32a31a90
+{
+	const Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL == pMpGage )
+		return 0.0f;
+
+	return pMpGage->fNow;
+}
+
+/*virtual*/ void CX2LucielGageData::SetNowMp( const float fNowMp_, const bool bTrackMp_ /*= false*/, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a328d0, keeps no before-change MP ( JUNE_BUGS )
+{
+	Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL == pMpGage )
+		return;
+
+	const float fBeforeNowMp = pMpGage->fNow;
+	if ( 0 > fNowMp_ )
+		pMpGage->fNow = fNowMp_;
+	else if ( fNowMp_ > GetMaxMp( iMpGageIndex_ ) )
+		pMpGage->fNow = GetMaxMp( iMpGageIndex_ );
+	else
+		pMpGage->fNow = fNowMp_;
+
+	if ( true == bTrackMp_ )
+		TallyMpChange( pMpGage->fNow - fBeforeNowMp );
+}
+
+/*virtual*/ void CX2LucielGageData::UpNowMp( const float fChangeOfNowMp_, const bool bTrackMp_ /*= false*/, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a35430, keeps no before-change MP ( JUNE_BUGS )
+{
+	Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL == pMpGage )
+		return;
+
+	const float fBeforeNowMp = pMpGage->fNow;
+	pMpGage->Increase( fChangeOfNowMp_ );
+	if ( true != bTrackMp_ )
+		return;
+
+	TallyMpChange( pMpGage->fNow - fBeforeNowMp );
+#ifdef SERV_IRUHADEV_JUNE_RANDOM_MISSION
+	RandomMissionMpSpent( fChangeOfNowMp_ );
+#endif SERV_IRUHADEV_JUNE_RANDOM_MISSION
+}
+
+/*virtual*/ float CX2LucielGageData::GetMaxMp( const int iMpGageIndex_ /*= 0*/ ) const	// char-luciel CH1a1: June 32a31ac0
+{
+	const Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL == pMpGage )
+		return 0.0f;
+
+	return pMpGage->fMax;
+}
+
+/*virtual*/ void CX2LucielGageData::SetMaxMp( const float fMaxMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a32bf0
+{
+	Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL != pMpGage && pMpGage->fMax != fMaxMp_ )
+	{
+		pMpGage->fMax = fMaxMp_;
+		SetUpdateMpPoint( true );
+	}
+}
+
+/*virtual*/ void CX2LucielGageData::UpMaxMp( const float fChangeOfMaxMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a32cc0
+{
+	Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL != pMpGage )
+	{
+		pMpGage->fMax += fChangeOfMaxMp_;
+		SetUpdateMpPoint( true );
+	}
+}
+
+/*virtual*/ void CX2LucielGageData::SetAddMaxMP( const float fAddMaxMP_ )	// char-luciel CH1a1: June 32a31800, my Ciel first takes the never-written +0x14 ( JUNE_BUGS )
+{
+	if ( true == IsMySelectUnitMinorForm() )
+		SetAddMaxMpAmount( GetMinorUnitAddMaxMp() );
+
+	CX2GageData::SetAddMaxMP( fAddMaxMP_ );
+}
+
+/*virtual*/ float CX2LucielGageData::GetChangeRateMp( const int iMpGageIndex_ /*= 0*/ ) const	// char-luciel CH1a1: June 32a31af0
+{
+	const Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL == pMpGage )
+		return 0.0f;
+
+	return pMpGage->fChangeRate;
+}
+
+/*virtual*/ void CX2LucielGageData::SetChangeRateMp( const float fChangeRateMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a32d70
+{
+	Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL != pMpGage )
+		pMpGage->fChangeRate = fChangeRateMp_;
+}
+
+/*virtual*/ void CX2LucielGageData::UpChangeRateMp( const float fChangeofChangeRateMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a32e10
+{
+	Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL != pMpGage )
+		pMpGage->fChangeRate += fChangeofChangeRateMp_;
+}
+
+/*virtual*/ bool CX2LucielGageData::FlushMp( const float fFlushMp_, const bool bTrackMp_ /*= false*/, const int iMpGageIndex_ /*= 0*/ )	// char-luciel CH1a1: June 32a31b30
+{
+	const Gage* pMpGage = GetMpGageByIndex( iMpGageIndex_ );
+	if ( NULL == pMpGage || fFlushMp_ > pMpGage->fNow )
+		return false;
+
+	UpNowMp( -fFlushMp_, bTrackMp_, iMpGageIndex_ );
+	return true;
+}
+
+/*virtual*/ void CX2LucielGageData::MpFrameMove( const float fElapsedTime_ )	// char-luciel CH1a1: June 32a35170, the form in play regenerates, the other gains m_fRestFormMpPerSecond
+{
+	if( GetChangeRateTimeByItem() > 0.f )
+	{
+		SetChangeRateTimeByItem( GetChangeRateTimeByItem() - fElapsedTime_ );
+		if( GetChangeRateTimeByItem() <= 0.f )
+		{
+			SetChangeRateTimeByItem( 0.0f );
+			SetChangeRateByItem( 0.0f );
+		}
+	}
+
+	const int iFormMpGageIndex = ( true == IsMySelectUnitMinorForm() ? 1 : 0 );
+	const float fMpToBeUp = ( GetChangeRateMp( 0 ) + GetChangeRateByItem() ) * fElapsedTime_;
+	UpNowMp( fMpToBeUp, true, iFormMpGageIndex );
+	UpNowMp( m_fRestFormMpPerSecond * fElapsedTime_, true, ( 0 == iFormMpGageIndex ? 1 : 0 ) );
+
+	Gage* pMpGage = GetMpGageByIndex( iFormMpGageIndex );
+	if ( NULL == pMpGage )
+		return;
+
+	if( GetNowHp() <= 0 )
+		pMpGage->ClearFactor();
+
+	for ( UINT i = 0; i < pMpGage->vecFactor.size(); ++i )
+	{
+		GageFactor &gageFactor = pMpGage->vecFactor[i];
+		if( gageFactor.fTime > 0.f )
+		{
+			pMpGage->fNow += gageFactor.fFactor * fElapsedTime_;
+			gageFactor.fTime -= fElapsedTime_;
+
+			if( gageFactor.fTime <= 0.f )
+			{
+				pMpGage->vecFactor.erase( pMpGage->vecFactor.begin() + i );
+				--i;
+			}
+		}
+	}
+}
+
+/*virtual*/ void CX2LucielGageData::UpdateDataFromGameUnit( const CX2GageData* pGageData_ )	// char-luciel CH1a1: June 32a35020, the point is set before its max ( JUNE_BUGS )
+{
+	if ( NULL == pGageData_ )
+		return;
+
+	CX2GageData::UpdateDataFromGameUnit( pGageData_ );
+
+	const CX2LucielGageData* pLucielGageData = static_cast<const CX2LucielGageData*>( pGageData_ );
+	SetNowMp( pGageData_->GetNowMp( 1 ), false, 1 );
+	SetMaxMp( pGageData_->GetMaxMp( 1 ), 1 );
+	SetNowCombinationPoint( pLucielGageData->GetNowCombinationPoint() );
+	SetMaxCombinationPoint( pLucielGageData->GetMaxCombinationPoint() );
+	SetCombinationPointChanged( pLucielGageData->GetCombinationPointChanged() );
+}
+
+/*virtual*/ CX2GageData* CX2LucielGageData::GetCloneGageData()	// char-luciel CH1a1: June 32a360d0
+{
+	return new CX2LucielGageData( *this );
+}
+
+/*virtual*/ void CX2LucielGageData::CopyGageData( IN CX2GageData* pGageData_ )	// char-luciel CH1a1: June 32a35150
+{
+	ASSERT( NULL != pGageData_ );
+	*this = *( static_cast<CX2LucielGageData*>( pGageData_ ) );
+	SetCombinationPointChanged( true );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 
 
 #endif //ADD_RENA_SYSTEM

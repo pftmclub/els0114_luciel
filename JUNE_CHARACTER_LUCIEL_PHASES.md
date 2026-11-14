@@ -1439,6 +1439,50 @@ Opus 5.5 high, read-only Ghidra. **Verdict: pass, no code change; one routing fi
   `enumscan.py --check` (5 files): 6 rows, none in CH1a0's lines (DU1b3 `04d2cacf`, `09107672`).
 - No build: no code changed (the code is inert; CH2d2 / CH3c2 play-test it).
 
+### CH1a1 - Done (2026-11-14)
+
+Opus 5.5 high, Ghidra read-only. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE` ( `Always.h`, `#error` unless `DIVERGE_GAGE_TALLY`,
+`DUO_BODY`, `FIX_LIMITED_MANA_MANAGEMENT`, `DUNGEON_ITEM` ) plus `_CORE` for the class. Files: `Always.h`, `X2GageData.h`, `X2GageData.cpp`. funcmap:
+`grep "Char Luciel CH1a1" june2017_re/funcmap.tsv` ( 38 rows ). `JUNE_BUGS.md` 675-678. `june_march_divergent.tsv`: 2 rows ( base `OnFrameMove`,
+`UpdateDamageFlushMP` ), both ported.
+- **Slot map** ( vt `3349b2a4` vs base `33487acc`, Chung / Ara / Rena columns identical to the base in 1-12 / 14 / 21 ): 0 dtor, 1 `GetNowMp`,
+  2 `SetNowMp`, 3 `UpNowMp`, 4 `GetMaxMp`, 5 `SetMaxMp`, 6 `UpMaxMp`, 7 `SetAddMaxMP`, 8 `GetChangeRateMp`, 9 `SetChangeRateMp`, 10 `UpChangeRateMp`,
+  11 `FlushMp`, 12 `DamageFlushMp`, 13 `OnFrameMove`, 14 `DetonationFrameMove`, 15 `UpdateDataFromGameUnit`, 16 `InitWhenGameIsOver`, 17 / 18 the
+  play-status pair, 19 `GetCloneGageData`, 20 `CopyGageData`, 21 June-only `MpFrameMove`. Slots 1-11 take June's **gauge index** ( 0 = main,
+  1 = the minor unit's; the base answers 1 with nothing ); March had them inline, non-virtual and indexless. The TALLY port's third `bSkip`
+  argument of `SetNowMp` / `UpNowMp` was this index ( no March caller passes it ).
+- **Engine ( `FORM_MP_GAGE` ):** every gauge now owns `m_pMinorUnitMpGage` ( June `+0xc`: NULL in the ctor, newed by `Init` `322b37a0`, copied by the
+  copy ctor / `operator=`, deleted by the dtor ) and `m_fMinorUnitAddMaxMP` ( `+0x14`, copied only; no writer in the exe by byte scan ). Slots 1-11
+  are virtual with June's base bodies ( `322b2d00` ... `32a31910` ); base `FlushMp` ignores the index ( spends on 0 ). `OnFrameMove` is replaced by
+  June's `32a33c40`: Detonation, HP regen, then `MpFrameMove` ( `32a344a0`: item MP-rate timer, regen through `UpNowMp( v, true, 0 )` **tracked**,
+  factors ); **no `Veryfy` call** ( June dropped it ). June's byte `+0x18` gate ( MP regen x 0 unless 1 ) is left out: both ctors set 1, nothing
+  writes it ( comment at the site ). `UpdateDamageFlushMP` spends tracked on my select unit's form index ( `31d717e0` = file-local
+  `IsMySelectUnitMinorForm()`, `_CONST_GAGEDATA_CH1A1_` ). Protected helpers for the class: `GetMpGageByIndex`, `TallyMpChange`, `Get/SetAddMaxMpAmount`,
+  `GetMinorUnitAddMaxMp`.
+- **`CX2LucielGageData` ( `_CORE` ):** overrides 1-11 ( gauge by index: 0 -> main, else minor ), 15, 19, 20, 21, plus `operator=` `32a36f70` and
+  `SetMaxCombinationPoint` `32a36ef0`. **`MpFrameMove` `32a35170`:** the form in play ( `31d717e0` ) regenerates at the main gauge's rate + item rate,
+  the other form gains `+0x12c` x time flat, factors run on the form in play's gauge. So CH1a0's `m_fRestFormMpRate` is renamed
+  **`m_fRestFormMpPerSecond`** ( MP per second for the resting form, default 1.0 ). Not written ( recorded ): slot 0 ( compiler dtor ), 13 ( a bare
+  base call ), 16 ( = the base body ), 12 / 14 ( not overridden ).
+- **Routed ( new phases, this plan's subject ):** **CH1a2** = slots 17 / 18 ( `32a32530` / `32a350d0` ): they read June `KGamePlayStatus` fields
+  March lacks ( `+0x5a` / `+0x5e` minor max / now MP, `+0x62` form byte, `m_cCharAbilType` 6 ), a shared packet struct ( `CommonPacket.h` ->
+  `ServerDefine.h` second home, `SECOND_HOMES`, `X2TOOL` defines, emulator `MakeGamePlayStatus` / `SaveGamePlayStatus` ), outside this phase's
+  Touches. **CH1a3** = `CX2LucielMyGageUI` ( vt `3353375c` / `33533744`; overrides slots 0, 1 InitUI `32e6e230`, 2 `32e719b0`, 8 SetShow `32e5ed90`,
+  19 SetCharacterImage `32e62d50`, 24 `32e63070` ) and the gage manager cases `3248e290` @`3248e618`, `3248ec80`. Both kickoffs written; CH1 final
+  now waits on their reviews. June engine callers that pass a non-zero index ( the unit's `UpNowMp` vslot 0xf0 `32aeb160` ) stay CH1k's.
+- **Hygiene:** flagcheck `FORM_MP_GAGE --worktree --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE --files Always.h X2GageData.h X2GageData.cpp`:
+  `files: 1 PASS, 1 PASS~ (blank/marker only), 1 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR` / `3 deleted line(s), 0 non-ASCII, 0 EOL-mismatched,
+  0 #else/#endif without the flag token, 0 encoding change(s)` / `RESULT: PASS` ( the 3 deletions = CH1a0's own `m_fRestFormMpRate` lines inside
+  `_CORE`, renamed; PASS~ = one blank line before the `_CORE` block in `X2GageData.cpp`; each flag alone reports the other's hunks as OTHER, so both
+  are stripped together ). A `LUCIEL_CORE needs FORM_MP_GAGE` guard was dropped: flagcheck cannot evaluate an `#if` naming both, and the class does
+  not compile without the engine flag anyway. `junediverge.py --check` ( 3 files ): `allow-listed: 0` / `RESULT: PASS`. `enumscan.py --check`
+  ( 2 files ): `0 A/B row(s) remain`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GageData.cpp`, `X2GageManager.cpp`, `X2GageUI.cpp`, `X2RandomMission.cpp`,
+  `X2GameUnit.cpp`, `X2GUUser.cpp`, `X2GUNPC.cpp`: 0 errors each; a probe with `#error` on either flag off compiles ( both on ). Full build skipped:
+  no play-test.
+- **How to see it in game:** nothing for Lu/Ciel yet ( inert ). Every class: MP regen and detonation now feed the gained / spent MP tallies, and the
+  gauge's per-frame `Veryfy` is gone; regen amounts are unchanged.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

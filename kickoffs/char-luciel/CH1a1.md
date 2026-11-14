@@ -35,3 +35,6 @@ overrides **20 of the 22** `CX2GageData` virtuals (all but slots 12 and 14), so 
 June's numbers and quirks verbatim (a `JUNE_BUGS.md` row each), a funcmap row per function (`Char Luciel CH1a1`). Done gate: every slot has a
 March body or a recorded reason; `/Zs` probes of `X2GageData.cpp` / `X2GageUI.cpp` / `X2GageManager.cpp` 0 errors; `junediverge.py --check` and
 `enumscan.py --check` PASS; full build skipped (no play-test).
+
+**Amended by CH1a1 (2026-11-14):** the play-status pair (slots 17 / 18, June `KGamePlayStatus` fields March lacks) moved to `CH1a2.md`, and
+`CX2LucielMyGageUI` with the gage manager cases moved to `CH1a3.md`; see "CH1a1 - Done".
