@@ -21,8 +21,8 @@ namespace _CONST_LUCIEL_CH1A_
 
 	const int	STR_ID_NOT_ENOUGH_COMBINATION_POINT	= 33027;	// June's string 0x8103; March's StringID enum has no entry for it
 	const int	RANDOM_TABLE_OFFSET_NOBILITY		= 77;		// June's GetRandomFloat offset 0x4d in UpCombinationPoint
-	const float	FANTASIE_2ND_COST_RATE_AFTER_1ST	= 0.8f;		// June's double 0.8 ( 3343d750 )
-	const float	COMBINATION_POINT_MP_RATE			= 10.f;		// June's double 10.0 ( 33438088 )
+	const double	FANTASIE_2ND_COST_RATE_AFTER_1ST	= 0.8;		// char-luciel CH1a review: June's double 0.8 ( 3343d750 )
+	const double	COMBINATION_POINT_MP_RATE			= 10.0;		// char-luciel CH1a review: June's double 10.0 ( 33438088 )
 }
 using namespace _CONST_LUCIEL_CH1A_;
 
@@ -316,8 +316,8 @@ int CX2GULuciel::GetNowCombinationPoint() const
 // char-luciel CH1a: June 32b14860: combination points up or down, with Nobility's and Communion Absorb's bonuses and refunds
 void CX2GULuciel::UpCombinationPoint( const int iCombinationPoint_ )
 {
-	if ( 0 < iCombinationPoint_ )	// spec A as Eve's port reads June's +0x6c50
-		UpNowMpWithText( static_cast<float>( iCombinationPoint_ * static_cast<float>( GetCharacterSpecializationA() + 1.0 ) * COMBINATION_POINT_MP_RATE ) );
+	if ( 0 < iCombinationPoint_ )	// char-luciel CH1a review: June's raw +0x6c50 ( spec A ) with no + 1, unlike Eve's 3297ee20 ( JUNE_BUGS 688 )
+		UpNowMpWithText( static_cast<float>( iCombinationPoint_ * static_cast<double>( GetCharacterSpecializationA() ) * COMBINATION_POINT_MP_RATE ) );
 
 	int iBonusPoint = 0;
 	CX2UserSkillTree& accessUserSkillTree = GetUnit()->AccessUnitData().m_UserSkillTree;

@@ -1638,6 +1638,46 @@ Elesis's base rows ); `ch0_class_map.tsv` names / phases updated.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Commit** `ab709d9f`; flagcheck `--range ab709d9f^..ab709d9f`: `LUCIEL_CORE` ( the two class files ) `0 PASS, 1 PASS~, 1 FAIL` ( the precedented new `.cpp` ), `JUNE_ENUM_NAMES` ( 4 files ) `1 PASS, 2 PASS~, 1 OTHER, 0 FAIL` / `RESULT: PASS`, same tallies as the worktree run ( the `eol!` on `X2UnitManager.h` is the tool's mixed-EOL file note: the inserted line is CRLF like its neighbours ).
 
+### CH1a - Review (2026-11-14)
+
+Opus 5.5 high, Ghidra read-only (`decompile_function` / `disassemble_function`, `funcdis.py` for uncarved bodies, `charport_consts.py` for constant
+widths). **Verdict: pass after one fix** ( `UpCombinationPoint` ).
+- **Fix:** `UpCombinationPoint` `32b14860` multiplies the gain by the raw spec-A float `+0x6c50` ( `fild n; fmul [esp]; fmul qword 33438088 = 10.0` ),
+  with no `+ 1`; Eve's `3297ee20`, the reading CH1a copied, adds `fadd qword 334355b0 = 1.0` itself. The port now reads `n x GetCharacterSpecializationA()
+  x 10.0`; kept verbatim as JUNE_BUGS 688 ( with no spec-A bonus a point gain gives no MP ). Both "June's double" constants are now `double`
+  ( `0.8` cost rate, `10.0` MP rate ), as June's `fmul qword`s.
+- **Ctor `32b1bd90`, every store ( both runs ):** all 123 members' inits = the header's; x87 runs followed ( `334380f0` = -1.0 at `+0x9714`, `+0x9730`,
+  `+0x973c`, `+0x97a0`, `+0x97c0`, `+0x97cc` / `+0x97d0`, `+0x9828` / `+0x982c`, `+0x9700`; `334712f8` = 1200.0; `3346ede8` = 9999.0 x3; `3345b364` =
+  35.0 x2 ); user throw members 0.66 / ( 40, 130, 0 ) / ( 2000, 100, 0 ); `32b4d1c0` = `SAltarOfEvilData` ( 2.0, 1200.0, 0.2, 0, two empty vectors );
+  `328343d0( 0 )` on `+0x95c0` is `vector::reserve( 0 )` ( no effect, not ported ). Unset = `+0x95e4`, `+0x9644` / `+0x9648`, `+0x96dc`, `+0x96e0`,
+  `+0x9778`, `+0x97fc`..`+0x9804`, `+0x9838`, `+0x988c` = JUNE_BUGS 681 ( nine members, one an array ). `+0x9704` is June's dialog handle ( `-1, 0`,
+  reset by `31d41c20( 0 )` ): March also defines `DIALOG_HANDLE_TEST`, so `CKTDGUIDialogType( NULL )` and `SAFE_DELETE_DIALOG` = June's invalidate / delete.
+- **Dtor `32b39380`:** order = commit: user major particles, `+0x959c`, minor ( `32b1eb10` ), NPCs `0x772` / `0x791` / `0x774` ( 1906 / 1937 / 1908 ),
+  BTI `0x1da` / `0x1e1` ( 474 / 481 ), guide `322e6300( &false, 0.0 )`, `32b34920`, `32b38f30( 0, 0 )` / `( 1, 0 )`, `32b13d30( 0 )` / `( 1 )`, window
+  `+0x8f70` ( `31fd03f0` then delete: CH2d20 stand-in ), NPC `0x8dd` ( 2269 ), dialog.
+- **Bodies ( all = commit but the fix ):** `StateChangeBySkillID` `32aeaa10`: 37 case labels ( 9 unconditional, 28 behind vslot 0x260 ), every
+  skill -> state value resolved and equal ( `SI_ETC_WS_COMMON_LOVE` = 900 live by `enumprobe.py`; the 6001 copy is dead ), Twilight's buff 482 and
+  Magdonic's `+0x7e1c` tests in place, Phantom Rush `( minor != 1 ) x 2 + 460` with `true`; the Done note's "44 skill ids" is 37 labels.
+  `32b14f70` ( 30023 / 30021, 30216 / 30220 vs states 460 / 462 ), `32b3acf0` ( strings 226 / 2549 / 33027 / 26119, stone 130208, -1 test, MP `fchs`
+  from the consume slot ), `32aeb1e0` ( `cmp eax, 3` ), `32b0fa00`, `32b14db0` ( `+0x638` index at entry `+4`, `+0x5c4` skill at `+0`, `inc [+8]` ),
+  `32b20100`, `32b34920` ( 30421 ), `32b35540`, `32ae6130` ( nine names read from the exe, same order ), cut-in `@32b43d52` ( table `32b4577c`:
+  37 / 38 / 39 / 200 -> 0, 127 -> 1, 128 -> 2, 129 -> 3 ).
+- **State enum:** 531 names / 493 ids, no value disagrees with `ch0_reg.tsv` / `ch0_state_skill.tsv`; multi-id names take their own slot
+  ( `LSI_LCG_F_DASH_COMBO_XXXZ_END` 333: 327 is `..._ZXXZ_END`'s ); the 22 unnamed ids = CH1m's 17 re-registered + USI 111-113 / 115 / 116.
+- **Registrations:** 188 `SKILL_ID` + BTI 474 / 481 / 482 + NUI 2269 = June's `Enum.src.lua` ( 192 / 192 ), no collision.
+- **Provisional names ( 5 spot-checked, none renamed ):** `m_fSeizedByFearRate` ( SA 6 of 30401 in `32b45820` ), `m_fCommunionRate` ( 30402 ),
+  `m_fSoulExtortionDrainRate` ( `32b435f0`, 30019, x rate -> MP ), `m_fSummonedDarknessElapsedTime` ( `32b20260` reset with skill 30013 / BTI 474 ),
+  `m_iShadowBoltControlIndex` ( `32b2ff50`, game unit lookup ).
+- **Routing:** CH1a4, CH2d20, CH1m, CH4c, CH1 ( `CreateGULuciel`, CH1a4 dependency ), CH1b amendments all present.
+- **Hygiene ( CH1a commit ):** flagcheck `--range ab709d9f^..ab709d9f`: `LUCIEL_CORE` `0 PASS, 1 PASS~, 3 OTHER, 1 FAIL, 1 ERROR` ( FAIL = the new
+  `.cpp`'s PCH line, precedent; ERROR = `Always.h`'s `LIVE && !CORE` guard ); `JUNE_ENUM_NAMES` `1 PASS, 2 PASS~, 1 OTHER, 1 FAIL, 1 ERROR` ( the
+  same `.cpp` line and compound guard; `eol!` on `X2UnitManager.h` = the mixed-EOL file note ); `_LIVE` "not defined" ( commented out by design ).
+  `git log -S`: `_CORE` / `_LIVE` later only in CH1a1 / CH1a2 / CH1a3 ( reviewed ), `JUNE_ENUM_NAMES` none. `junediverge --check-all`: `RESULT: PASS`.
+  `enumscan --check X2GULuciel.h X2GULuciel.cpp`: `0 A/B`.
+- **Hygiene ( this fix ):** flagcheck `LUCIEL_CORE --worktree --files X2Lib/X2GULuciel.cpp`: `1 PASS` / `RESULT: PASS` ( 4 lines replaced inside the
+  file CH1a added under `_CORE`; no `#else`, the flag-off original is no file ); `junediverge --check`: `RESULT: PASS`; `enumscan`: `0 A/B`.
+- **Compile:** `/Zs` probe of `X2GULuciel.cpp` ( census `cl_cmd` ), plain and `/D _LIVE`: 0 errors each. Full build skipped: no play-test.
+
 ### CH1a3 - Done (2026-11-14)
 
 Opus 5.5 high, Ghidra read-only. Files: `X2GageUI.h` / `.cpp`, `X2GageManager.h` / `.cpp` ( CP949, `bytepatch.py`; 382 insertions, 0 deletions ).

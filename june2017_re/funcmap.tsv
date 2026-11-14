@@ -11549,7 +11549,7 @@ du1d_body_reads.tsv (DU1d)	every June user-band function that reads a body acces
 32aeaa10 (CH1a)	CX2GULuciel::StateChangeBySkillID	PORTED	Char Luciel CH1a: switch on GetUpgradeBaseSkillID; 44 skill ids, mostly Ciel-only ( IsMinorUnitActive = vslot 0x260 ); Twilight Judgement needs BTI 482; Phantom Rush reuse window; ids 263 / 268 stay numbers ( JUNE_BUGS 679 )
 32aeb1e0 (CH1a)	CX2GULuciel::UpGageNowMpOfForm	PORTED	Char Luciel CH1a: gauge vslot 0xc = CX2GageData::UpNowMp( f, true, form ) ( CH1a1's form index )
 32b0fa00 (CH1a)	CX2GULuciel::GetNowCombinationPoint	PORTED	Char Luciel CH1a: CX2LucielGageData::GetNowCombinationPoint ( +0x114 ), 0 without a gauge
-32b14860 (CH1a)	CX2GULuciel::UpCombinationPoint	PORTED	Char Luciel CH1a: MP text ( spec A x 10 ), Nobility 30410 bonus / slot cool-time shift, Communion Absorb 30412 bonus / overflow MP refund with +0x9888 cool time, gauge set
+32b14860 (CH1a)	CX2GULuciel::UpCombinationPoint	PORTED	Char Luciel CH1a: MP text ( n x raw spec A +0x6c50 x 10.0, no + 1: CH1a review fix, JUNE_BUGS 688 ), Nobility 30410 bonus / slot cool-time shift, Communion Absorb 30412 bonus / overflow MP refund with +0x9888 cool time, gauge set
 32b14db0 (CH1a)	CX2GULuciel::CountDamageEffectHit	PORTED	Char Luciel CH1a: own virtual 0x880; CH0's FindDamageEffectIndexEntry: the entry +8 is a hit counter it increments ( inc [eax+8] ), not a reference
 32b4cb80 (CH1a)	find_if over SDamageEffectHitCount	PORTED	Char Luciel CH1a: inlined into CountDamageEffectHit
 32b14f70 (CH1a)	CX2GULuciel::GetSkillCombinationPointCost	PORTED	Char Luciel CH1a: templet +0x10 = m_usFPConsumtion; Fantasie 2nd after 1st x 0.8; Phantom Rush costs only in its TARGET states 460 / 462
