@@ -1024,6 +1024,48 @@ Opus 5.5 high. Part 8 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (no new de
   0 errors each. Full build skipped: no play-test (DU1d2 builds and hands off the regression pass).
 - **In game:** nothing to see. Every other class has form 0: `GetXSkinAnimFuture()` / `GetXSkinAnimPtr()` return March's members.
 
+### DU1d2 - Done (2026-11-14)
+
+Opus 5.5 high. Part 9 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` plus a new `SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE` (Always.h, two
+`#error` guards: `JUNE_SELECT_VOICE_TABLE`, `JUNE_CHAR_DUO_BODY`). Files: `X2GUUser.cpp` (+207), `X2GUUser.h` (+6), `Always.h` (+15), all insert-only.
+No `_DEBUG`, no log line (nothing reads a second body before CH1). funcmap rows: `grep "(DU1d2)" june2017_re/funcmap.tsv` (11).
+- **Split again (kickoff's own rule).** The 63 census rows are ~6,000 decompiled lines. **DU1d2** = the bones and hands half of bullet 1 plus
+  the passive resets; **DU1d3** (kickoff written) = the rest of bullet 1 and the second after-image (24 rows); **DU1d4** (kickoff written) = the
+  out-of-line getter callers (26 rows), then the full build and the regression play-test that closes DU1. Census owners updated
+  (`DU1d2 done` / `routed: ...` / `DU1d3` / `DU1d4`).
+- **Census defect (for DU1d3).** `du1d_body_reads.tsv` files a read under the previous function when June has no padding between two functions:
+  `3201fb8d` is in uncarved `3201f8d0` (after `3201f850`'s `ret 8`; an equip pass on `+0x15d4` / `+0x172` / `+0x1b0 == 7`, called from Init
+  `3204ea20 @3204eb06`, so DU3's equip byte), `3204e4f3` is in `3204e4a0` (after one `int3`; `+0x8fa4` / `+0x8fa8`, called from CommonFrameMove
+  `@320661f9`). DU1d3 re-checks each row's start before transcribing.
+- **Bone names (ported).** New `GetCloneFrameByBodyPrefix` (June's inline test in `31fd9200` / `31fda280` / `31fda680`): `"MAJOR:"` (string
+  `33473188`) the first body by the rest of the name, `"MINOR:"` (`33473178`) the second when it exists, else the active body by the whole name.
+  `GetCombineMatrixFromBoneName`, `GetBonePos( name )` (vslot 0x84) and `GetBonePos( name, out )` (vslot 0x80, false and zero on a miss) use it,
+  so DU1c2's `L"MAJOR:Bone_RFinger2"` finds a bone. **Fix:** the D-phase port of `31fd9200` compared `"MAJOR_"` (wrong string); June's body is
+  re-ported under DUO_BODY, the old one stays in `#else`; divergence row corrected and a `GetBonePos` replace row added (ported).
+- **Head, rotate, re-form (ported).** `GetHeadBonePos` (`31fcac20`, uncarved): the active body's head frame. `RotateBone` (`@31fd954e`): the second
+  anim updates the **same** first-body frames again (JUNE_BUGS 668, kept). `SetUnitReForm` (`@31fda12e`): `UT_LUCIEL` re-forms only the second
+  body, as the second form. `RestoreHead` (`@31fde558`): face restore and `Bip01_Head` / `Bip01_Spine1` re-form on the second body; June's
+  `31fdc9d0` on the transformed anims `+0x8f84` / `+0x8f9c` stays a stand-in for CH1a0 (members not in March).
+- **ScaleHead (ported).** New `ScaleHeadBone( bone, head, face, iBody )` = June `31fd64a0` (body 0 / 1, else nothing); March's `ScaleHead`
+  (= `31fdc070`) calls it with body 0. The class overrides (Chung `32bf0480`, Lu/Ciel `32b17225`) call it directly in their ports.
+- **Hands (ported).** `ScaleHand` / `RestoreHand` (`31fde6d0` / `31fded80`): `UT_LUCIEL` with unit form Lu (`+0xe40 != 1`, `IsMinorUnitForm`) also
+  scales / restores `Bone_RFinger0-3` / `Bone_LFinger0-3`; the second body repeats the hand loop (ScaleHand also Eve's dummies, RestoreHand not).
+- **Revive voice (ported, divergent).** `PlaySoundRevive` = June `31fdb390`: types 1-12, the name from NU4's `GetVoiceFileName( class, SPT_REVIVE )`,
+  type 10 replaced by `LuVoice_Revival.ogg` / `CielVoice_Revival.ogg` by the active body. Every class: Rena now revives with `RenaVoice_Revive0n`
+  (was `LenaVoice_`; both files exist in data095). Divergence row added (ported).
+- **Feet (routed).** `31fdc0e0` / `31fdc310` (foot scale `+0x8e20` on both bodies) have no March counterpart: their only callers are June's base
+  `Set` / `UnSetSpecificValueByBuffTempletID` cases (`@3204c6ac` / `@3202f1ec`); they come with those cases (Char Eve CH4a checklist row).
+- **Passive resets (no change).** `dispsweep 378 37c` over the user band: June's only writers of the minor passive speed are `32050230 @32054283`
+  and `32061bf0 @32062537`, both DU1b4 ports. March's four `( -1, -1 )` resets (Process_ExtraDamage x2, GRAPPLE, WaterHold) have no minor twin.
+- **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files X2GUUser.cpp X2GUUser.h Always.h --with DIVERGE_PLAY_SOUND_REVIVE` (+ the peer's
+  uncommitted `JUNE_CHAR_ELESIS_PASSIVE` / `_DEBUG` stripped, their hunks not staged): 2 PASS (+270 / +9 incl. the peer's), 1 DEFINE, 0 OTHER,
+  0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check` (3 files): RESULT: PASS. `enumscan --check X2GUUser.cpp`: the 4 known DU1b3
+  rows only. Flag probe: DUO_BODY, DIVERGE_PLAY_SOUND_REVIVE, DIVERGE_SCALE_HEAD / RESTORE_HEAD / UNIT_REFORM / ROTATE_BONE / BONE_NAME_PREFIX,
+  USER_LEFT_HAND_SCALE, SERV_NEW_DEFENCE_DUNGEON, MODIFY_GET_BONE_POS, ADD_PLAY_SOUND, DUNGEON_ITEM, ELSWORD_SECOND_CLASS_CHANGE all on.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GUUser.cpp`, `X2GUChung.cpp`: 0 errors each. Full build skipped: no play-test (DU1d4
+  builds and hands off the regression pass).
+- **In game:** nothing to see for March classes except the revive voice (Rena's file name). Form 0 and no second anim leave every other path as before.
+
 ### DU2 - Done (2026-11-14)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS` (Always.h; no `_DEBUG`, no log tag). Files: `X2GUUser.h`, `X2GUUser.cpp`,

@@ -16062,10 +16062,27 @@ void CX2GUUser::Draw()
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+// char-luciel DU1d2: June's bone-name prefix ( inline in 31fd9200 / 31fda280 / 31fda680 ): "MAJOR:" the first body, "MINOR:" the second, else the active body by the whole name
+CKTDXDeviceXSkinMesh::MultiAnimFrame* CX2GUUser::GetCloneFrameByBodyPrefix( const wstring& wstrBoneName_ ) const
+{
+	if ( 0 == wstrBoneName_.compare( 0, 6, L"MAJOR:" ) )
+		return m_pXSkinAnim->GetCloneFrame( wstrBoneName_.substr( 6 ).c_str() );
+
+	if ( 0 == wstrBoneName_.compare( 0, 6, L"MINOR:" ) && NULL != m_pMinorUnitXSkinAnim )
+		return m_pMinorUnitXSkinAnim->GetCloneFrame( wstrBoneName_.substr( 6 ).c_str() );
+
+	return GetXSkinAnimPtr()->GetCloneFrame( wstrBoneName_.c_str() );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 D3DXVECTOR3 CX2GUUser::GetHeadBonePos() const
 {
 	D3DXVECTOR3 tempPos;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	GetFramePos( &tempPos, ( true == m_bMinorUnitActive ) ? m_pFrame_MinorUnit_Bip01_Head : m_pFrame_Bip01_Head );	// char-luciel DU1d2: June 31fcac20, the active body's head
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	GetFramePos( &tempPos, m_pFrame_Bip01_Head );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	tempPos.y += 70.0f;
 
 	return tempPos; 
@@ -16080,6 +16097,17 @@ D3DXVECTOR3 CX2GUUser::GetHeadBonePos() const
 /*virtual*/ const D3DXMATRIX*	CX2GUUser::GetCombineMatrixFromBoneName( const wstring& wstrBoneName ) const
 {
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_BONE_NAME_PREFIX
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d2: June 31fd9200, the prefix is "MAJOR:" / "MINOR:" ( strings 33473188 / 33473178 )
+	if ( true == wstrBoneName.empty() )
+		return NULL;
+
+	CKTDXDeviceXSkinMesh::MultiAnimFrame* pMultiAnimFrame = GetCloneFrameByBodyPrefix( wstrBoneName );
+	if ( NULL == pMultiAnimFrame )
+		return NULL;
+
+	return &(pMultiAnimFrame->combineMatrix);
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	// June 31fd9200: "MAJOR_" names a bone of the main body; stand-in: the second body ( +0x8e88, Lu/Ciel "MINOR_" ) is not ported
 	if ( true == wstrBoneName.empty() )
 		return NULL;
@@ -16094,6 +16122,7 @@ D3DXVECTOR3 CX2GUUser::GetHeadBonePos() const
 		return NULL;
 
 	return &(pMultiAnimFrame->combineMatrix);
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else SERV_IRUHADEV_JUNE_DIVERGE_BONE_NAME_PREFIX
 	if ( true == wstrBoneName.empty() )
 	{
@@ -23818,7 +23847,12 @@ void CX2GUUser::RotateBone( CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame, const 
 		if( NULL != pFrameFirstChildSrc )
 		{
 			m_pXSkinAnim->UpdateAnimationFrame_Public( pFrameFirstChildSrc, &pFrame->combineMatrix, pFrameFirstChildClone );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+			if( NULL != m_pMinorUnitXSkinAnim )	// char-luciel DU1d2: June @31fd954e, the second body's anim on the first body's frames ( JUNE_BUGS 668 )
+				m_pMinorUnitXSkinAnim->UpdateAnimationFrame_Public( pFrameFirstChildSrc, &pFrame->combineMatrix, pFrameFirstChildClone );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 			// stand-in: the second body ( +0x8e88, Lu/Ciel ) not ported
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		}
 	}
 #else SERV_IRUHADEV_JUNE_DIVERGE_ROTATE_BONE
@@ -39796,6 +39830,9 @@ void CX2GUUser::ScaleHead()
 #endif SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
 {
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	ScaleHeadBone( true == m_bSDOnePieceAvatar ? L"Bip01_Spine1" : L"Bip01_Head", fHeadScale, fFaceScale, 0 );	// char-luciel DU1d2: June 31fdc070 -> 31fd64a0 ( body 0 )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	// June 31fdc070 -> 31fd64a0 ( body 0 ): an SD one-piece avatar scales Bip01_Spine1 in place of Bip01_Head
 	// stand-in: Lu/Ciel not ported ( 31fd64a0's body 1 scales the second body +0x8e88, reached only from class overrides )
 	if( NULL == m_pXSkinAnim )
@@ -39814,6 +39851,7 @@ void CX2GUUser::ScaleHead()
 		D3DXVECTOR3 vScale = D3DXVECTOR3( fFaceScale, fFaceScale, fFaceScale );
 		SetFrameScale( &vScale, false, pFrame );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
 	if( m_pXSkinAnim != NULL )
 	{
@@ -39834,6 +39872,36 @@ void CX2GUUser::ScaleHead()
 #endif SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
+// char-luciel DU1d2: June 31fd64a0, the head and face of one body ( 0 the first, 1 the second, any other value nothing )
+void CX2GUUser::ScaleHeadBone( const wstring& wstrHeadBoneName_, const float fHeadScale_, const float fFaceScale_, const int iBody_ )
+{
+	CKTDGXSkinAnimPtr pXSkinAnim;
+	if ( 0 == iBody_ )
+		pXSkinAnim = m_pXSkinAnim;
+	else if ( 1 == iBody_ )
+		pXSkinAnim = m_pMinorUnitXSkinAnim;
+
+	if ( pXSkinAnim == NULL )
+		return;
+
+	CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = pXSkinAnim->GetCloneFrame( wstrHeadBoneName_.c_str() );
+	if ( NULL != pFrame )
+	{
+		D3DXVECTOR3 vScale = D3DXVECTOR3( fHeadScale_, fHeadScale_, fHeadScale_ );
+		SetFrameScale( &vScale, false, pFrame );
+	}
+
+	pFrame = pXSkinAnim->GetCloneFrame( L"COLLISION_SPHERE1_Face" );
+	if ( NULL != pFrame )
+	{
+		D3DXVECTOR3 vScale = D3DXVECTOR3( fFaceScale_, fFaceScale_, fFaceScale_ );
+		SetFrameScale( &vScale, false, pFrame );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 void CX2GUUser::RestoreHead()
 {
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_RESTORE_HEAD
@@ -39843,7 +39911,18 @@ void CX2GUUser::RestoreHead()
 	const CX2Unit::UNIT_TYPE eUnitType = ( NULL != m_pUnit && NULL != m_pUnit->GetUnitTemplet() ? m_pUnit->GetUnitTemplet()->m_UnitType : CX2Unit::UT_NONE );
 	g_pData->SetUnitReForm( m_pXSkinAnim, eUnitType, IsTransformed(), L"Bip01_Head" );
 	g_pData->SetUnitReForm( m_pXSkinAnim, eUnitType, IsTransformed(), L"Bip01_Spine1" );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d2: June @31fde558-31fde67a, the same on the second body
+	if( m_pMinorUnitXSkinAnim != NULL )
+	{
+		SetFrameScaleRestore( m_pMinorUnitXSkinAnim->GetCloneFrame( L"COLLISION_SPHERE1_Face" ) );
+		g_pData->SetUnitReForm( m_pMinorUnitXSkinAnim, eUnitType, IsTransformed(), L"Bip01_Head" );
+		g_pData->SetUnitReForm( m_pMinorUnitXSkinAnim, eUnitType, IsTransformed(), L"Bip01_Spine1" );
+	}
+	// stand-in: Lu/Ciel transform not ported ( June 31fdc9d0 restores the transformed anims +0x8f84 / +0x8f9c the same way: CH1a0 )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	// stand-in: Lu/Ciel not ported ( June repeats both on the second body +0x8e88 and, through 31fdc9d0, on +0x8f84 / +0x8f9c )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else SERV_IRUHADEV_JUNE_DIVERGE_RESTORE_HEAD
 	CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = m_pXSkinAnim->GetCloneFrame(L"COLLISION_SPHERE1_Face");
 	if(pFrame != NULL)
@@ -39903,9 +39982,59 @@ void CX2GUUser::ScaleHand( D3DXVECTOR3 vChangeScale )
 			if( pFrame != NULL )
 				SetFrameScale( &vChangeScale, true, pFrame );
 		}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		// char-luciel DU1d2: June @31fde930-31fdeb5b, Lu's finger bones while the unit's form is Lu
+		if ( NULL != GetUnit() && CX2Unit::UT_LUCIEL == GetUnit()->GetType() && false == GetUnit()->IsMinorUnitForm() )
+		{
+			for ( int i = 0; i < 4; ++i )
+			{
+				WCHAR wszFingerName[32] = {0};
+				StringCchPrintfW( wszFingerName, ARRAY_SIZE( wszFingerName ), L"Bone_RFinger%d", i );
+				pFrame = m_pXSkinAnim->GetCloneFrame( wszFingerName );
+				if( pFrame != NULL )
+					SetFrameScale( &vChangeScale, true, pFrame );
+
+				StringCchPrintfW( wszFingerName, ARRAY_SIZE( wszFingerName ), L"Bone_LFinger%d", i );
+				pFrame = m_pXSkinAnim->GetCloneFrame( wszFingerName );
+				if( pFrame != NULL )
+					SetFrameScale( &vChangeScale, true, pFrame );
+			}
+		}
+	}
+
+	// char-luciel DU1d2: June @31fdeb60-31fded4f, the hands and Eve's dummies again on the second body
+	if( m_pMinorUnitXSkinAnim != NULL )
+	{
+		const wstring wstrBoneName[] = { L"Bip01_R_Hand", L"Bip01_L_Hand" };
+
+		CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = NULL;
+
+		for ( int i = 0; i < ARRAY_SIZE( wstrBoneName ); ++i )
+		{
+			pFrame = m_pMinorUnitXSkinAnim->GetCloneFrame( wstrBoneName[i].c_str() );
+
+			if( pFrame != NULL )
+				SetFrameScale( ( wstrBoneName[i] == L"Bip01_L_Hand" ? &vLeftHandScale : &vChangeScale ), true, pFrame );
+		}
+
+		if ( NULL != GetUnit() && CX2Unit::UT_EVE == GetUnit()->GetType() )
+		{
+			pFrame = m_pMinorUnitXSkinAnim->GetCloneFrame( L"Dummy1_Rhand" );
+
+			if( pFrame != NULL )
+				SetFrameScale( &vChangeScale, true, pFrame );
+
+			pFrame = m_pMinorUnitXSkinAnim->GetCloneFrame( L"Dummy2_Lhand" );
+
+			if( pFrame != NULL )
+				SetFrameScale( &vChangeScale, true, pFrame );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		// stand-in: Lu/Ciel not ported ( June also scales Bone_RFinger0-3 / Bone_LFinger0-3 of UT_LUCIEL here )
 	}
 	// stand-in: Lu/Ciel not ported ( June repeats the hand loop and the Eve test on the second body +0x8e88 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else
 	if( m_pXSkinAnim != NULL )
 	{
@@ -39977,7 +40106,44 @@ void CX2GUUser::RestoreHand()
 		if( pFrame != NULL )
 			SetFrameScaleRestore( pFrame );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d2: June @31fdefd9-31fdf243, Lu's finger bones while the unit's form is Lu
+	if ( NULL != GetUnit() && CX2Unit::UT_LUCIEL == GetUnit()->GetType() && false == GetUnit()->IsMinorUnitForm() )
+	{
+		for ( int i = 0; i < 4; ++i )
+		{
+			WCHAR wszFingerName[32] = {0};
+			StringCchPrintfW( wszFingerName, ARRAY_SIZE( wszFingerName ), L"Bone_RFinger%d", i );
+			pFrame = m_pXSkinAnim->GetCloneFrame( wszFingerName );
+			if( pFrame != NULL )
+				SetFrameScaleRestore( pFrame );
+
+			StringCchPrintfW( wszFingerName, ARRAY_SIZE( wszFingerName ), L"Bone_LFinger%d", i );
+			pFrame = m_pXSkinAnim->GetCloneFrame( wszFingerName );
+			if( pFrame != NULL )
+				SetFrameScaleRestore( pFrame );
+		}
+	}
+
+	// char-luciel DU1d2: June @31fdf248-31fdf2f4, the hands of the second body ( no Eve test there )
+	if( m_pMinorUnitXSkinAnim != NULL )
+	{
+		for ( int i = 0; i < ARRAY_SIZE( wstrBoneName ); ++i )
+		{
+			pFrame = m_pMinorUnitXSkinAnim->GetCloneFrame( wstrBoneName[i].c_str() );
+
+			if( pFrame == NULL )
+				continue;
+
+			if( wstrBoneName[i] == L"Bip01_L_Hand" )
+				SetFrameScale( &vLeftHandScale, true, pFrame );
+			else
+				SetFrameScaleRestore( pFrame );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	// stand-in: Lu/Ciel not ported ( June also restores UT_LUCIEL's finger bones and the second body +0x8e88's hands here )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else
 	const wstring wstrBoneName[] = { L"Bip01_R_Hand", L"Bip01_L_Hand" };
 
@@ -40088,7 +40254,12 @@ void CX2GUUser::SetUnitReForm()
 		break;
 
 	case CX2Unit::UT_LUCIEL:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		g_pData->SetUnitReForm( m_pMinorUnitXSkinAnim, CX2Unit::UT_LUCIEL, true, L"" );	// char-luciel DU1d2: June @31fda12e, only the second body, as the second form
+		break;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		break;	// stand-in: Lu/Ciel not ported (June passes the second body +0x8e88 with flag 1)
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 	default:
 		g_pData->SetUnitReForm( m_pXSkinAnim, eUnitType, false, L"" );
@@ -48084,6 +48255,14 @@ void CX2GUUser::AppendUpgradeWeaponParticleToDeviceList( CKTDXDeviceDataList& li
 
 D3DXVECTOR3	CX2GUUser::GetBonePos( const WCHAR* pBoneName ) const
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d2: June 31fda280 ( vslot 0x84 ), the bone by its body prefix; no bone -> zero
+	const CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = GetCloneFrameByBodyPrefix( pBoneName );
+	if ( NULL == pFrame )
+		return D3DXVECTOR3( 0.f, 0.f, 0.f );
+
+	return D3DXVECTOR3( pFrame->combineMatrix._41, pFrame->combineMatrix._42, pFrame->combineMatrix._43 );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef EFFECT_TOOL
 	if( NULL != m_pXSkinAnim_EffectTool )
 	{
@@ -48092,11 +48271,24 @@ D3DXVECTOR3	CX2GUUser::GetBonePos( const WCHAR* pBoneName ) const
 #endif //EFFECT_TOOL
 
 	return m_pXSkinAnim->GetCloneFramePosition( pBoneName ); 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 }
 
 #ifdef MODIFY_GET_BONE_POS
 bool CX2GUUser::GetBonePos( const WCHAR* pBoneName, OUT D3DXVECTOR3& pos_ ) const 
 { 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	// char-luciel DU1d2: June 31fda680 ( vslot 0x80 ), the bone by its body prefix; no bone -> zero and false
+	const CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = GetCloneFrameByBodyPrefix( pBoneName );
+	if ( NULL == pFrame )
+	{
+		pos_ = D3DXVECTOR3( 0.f, 0.f, 0.f );
+		return false;
+	}
+
+	pos_ = D3DXVECTOR3( pFrame->combineMatrix._41, pFrame->combineMatrix._42, pFrame->combineMatrix._43 );
+	return true;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef EFFECT_TOOL
 	if( NULL != m_pXSkinAnim_EffectTool )
 	{
@@ -48105,6 +48297,7 @@ bool CX2GUUser::GetBonePos( const WCHAR* pBoneName, OUT D3DXVECTOR3& pos_ ) cons
 #endif //EFFECT_TOOL
 
 	return m_pXSkinAnim->GetCloneFramePosition( pBoneName, pos_ ); 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 };
 #endif //MODIFY_GET_BONE_POS
 
@@ -52514,6 +52707,19 @@ void CX2GameUnit::InputData::Init_ByInputGuideStep( int iInputGuideStep, int iUn
 #ifdef ADD_PLAY_SOUND //±èÃ¢ÇÑ
 void CX2GUUser::PlaySoundRevive()
 {
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE
+	// char-luciel DU1d2: June 31fdb390, the voice table's revive name ( types 1-12 ); Lu / Ciel by the active body
+	const CX2Unit::UNIT_TYPE eUnitType = GetUnitType();
+	if( NULL == g_pKTDXApp->GetDeviceManager() || eUnitType < CX2Unit::UT_ELSWORD || eUnitType > CX2Unit::UT_AIN )
+		return;
+
+	wstring wstrSoundFile = g_pData->GetUnitManager()->GetVoiceFileName( GetUnitClass(), CX2UnitManager::SPT_REVIVE );
+	if( CX2Unit::UT_LUCIEL == eUnitType )
+		wstrSoundFile = ( true == m_bMinorUnitActive ) ? L"CielVoice_Revival.ogg" : L"LuVoice_Revival.ogg";
+
+	if( false == wstrSoundFile.empty() )
+		g_pKTDXApp->GetDeviceManager()->PlaySound( wstrSoundFile.c_str(), false, false );
+#else SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE
 	const CX2Unit::UNIT_TYPE eUnitType = GetUnitType();
 
 	if( g_pKTDXApp->GetDeviceManager() == NULL )
@@ -52582,6 +52788,7 @@ void CX2GUUser::PlaySoundRevive()
 
 	if( wstrSoundFile.compare(L"") != 0 )
 		g_pKTDXApp->GetDeviceManager()->PlaySound(wstrSoundFile.c_str(), false, false );
+#endif SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE
 }
 #endif //ADD_PLAY_SOUND
 

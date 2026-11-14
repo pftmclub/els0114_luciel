@@ -1,4 +1,4 @@
-# June character Lu/Ciel (Stage 8) - Phase DU1 review (covers DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d, DU1d2)
+# June character Lu/Ciel (Stage 8) - Phase DU1 review (covers DU1, DU1b, DU1b2, DU1b3, DU1b4, DU1c, DU1c2, DU1d, DU1d2, DU1d3, DU1d4)
 
 | | |
 |---|---|
@@ -66,3 +66,12 @@ and commit.
 
 - Check DU1c2's `ProcessUpgradeWeaponParticle` `UT_LUCIEL` case against the listing of `32292610` (@`32292f71-3229328d`, tail `32293254` ->
   `32292ae0`): which sequence gets which position (stack slots +0x10 ... +0x28 = seq 5 ... 10), and the new `GetWeaponIndexHavingModel` base.
+
+## Amended by DU1d2 (2026-11-14)
+
+- DU1d2 split again: the review also covers **DU1d3** and **DU1d4** (add `"DU1d2 - Done"`, `"DU1d3 - Done"`, `"DU1d4 - Done"` to the docsection
+  line; it now runs after DU1d4, which builds and hands off the regression play-test). Add DU1d2's flag `SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE`
+  to the flagcheck `--with` list and read `31fdb390` against it. Check `GetCloneFrameByBodyPrefix` against `31fd9200` / `31fda280` / `31fda680`
+  (strings `33473188` "MAJOR:" / `33473178` "MINOR:"; the D-phase `"MAJOR_"` was the error DU1d2 fixed), `RotateBone`'s second call
+  (`@31fd954e`, JUNE_BUGS 668), the `UT_LUCIEL` finger loops (`@31fde94f` / `@31fdeffa`: start 0, end 4, unit `+0xe40 != 1`) and that the
+  census rows DU1d3 re-attributed name the right function.

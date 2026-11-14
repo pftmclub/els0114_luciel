@@ -13336,3 +13336,18 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( GT_PVE )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_UP_MP_ITEM_PVE
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-14
+// Description: char-luciel DU1d2 - CX2GUUser::PlaySoundRevive as June's ( 31fdb390 ): the revive voice comes from June's voice-name
+//              builder ( SelectVoiceTable.lua row, else <Unit>Voice_Revive0n.ogg ), types 1-12; Lu / Ciel play LuVoice_ /
+//              CielVoice_Revival.ogg by the active body. Change for March classes: Rena revives with RenaVoice_Revive0n (was
+//              LenaVoice_). Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE
+#if defined( SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE ) && !defined( SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE )
+#error SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE needs SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE ( GetVoiceFileName )
+#endif SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE
+#if defined( SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY )
+#error SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( m_bMinorUnitActive )
+#endif SERV_IRUHADEV_JUNE_DIVERGE_PLAY_SOUND_REVIVE
+//////////////////////////////////////////////////////////////////////////

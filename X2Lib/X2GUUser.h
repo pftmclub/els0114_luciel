@@ -1862,6 +1862,9 @@ public:
 		
 
 		virtual D3DXVECTOR3			GetBonePos( const WCHAR* pBoneName ) const;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		CKTDXDeviceXSkinMesh::MultiAnimFrame* GetCloneFrameByBodyPrefix( const wstring& wstrBoneName_ ) const;	/// char-luciel DU1d2: June's "MAJOR:" / "MINOR:" bone names
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		virtual D3DXVECTOR3			GetHeadBonePos() const;	//optimization	
 
 #ifdef MODIFY_GET_BONE_POS
@@ -3081,6 +3084,9 @@ public:
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
 		virtual void ScaleHead( float fHeadScale, float fFaceScale );	// June vslot 0x66c ( 31fdc070 )
 		bool IsSDOnePieceAvatar() const { return m_bSDOnePieceAvatar; }	// June +0x8fc0, read by the class ScaleHead overrides ( Chung 32bf0480 )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+		void ScaleHeadBone( const wstring& wstrHeadBoneName_, const float fHeadScale_, const float fFaceScale_, const int iBody_ );	// char-luciel DU1d2: June 31fd64a0
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #else SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
 		void ScaleHead();
 #endif SERV_IRUHADEV_JUNE_DIVERGE_SCALE_HEAD
