@@ -48,6 +48,16 @@ class CKTDGXSkinAfterImage : public CKTDGObject
 		void Enable(){ m_bEnable = true; }
 		void Disable(){ m_bEnable = false; }
 		bool GetEnable() { return m_bEnable; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+		void SetShowAfterImage( const bool bShow_ )	// char-luciel CH1a4: June 3322a9c0, every image's show flag
+		{
+			BOOST_TEST_FOREACH( AfterImageData&, afterImageData, m_AfterImageList )
+			{
+				if ( NULL != afterImageData.pAnim )
+					afterImageData.pAnim->SetShowObject( bShow_ );
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
 		void SetAfterImageColor( const D3DXCOLOR& afterImageColor ){ m_AfterImageColor = afterImageColor; }
 		void SetNextImageTime( float nextImageTime ){ m_NextImageTimeNow = m_NextImageTime = nextImageTime; }

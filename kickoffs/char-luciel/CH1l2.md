@@ -41,3 +41,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Functions: 32 to transcribe** (+ 0 thunks) (`awk -F'\t' '$6=="CH1l2"' june2017_re/char_luciel/ch0_class_map.tsv`; all new).
   June addresses: `32ae40c0` SetEquippedSkillLevel `32ae4f60` CommonStateStartFuture `32ae4f70` CommonStateEndFuture `32ae4f80` CommonStateEnd `32ae4f90` CommonRender_Prepare `32ae4fb0` SpecialAttackEventProcess `32ae5400` StateChangeDashIfPossible `32ae9bd0` `32ae9d00` GetEffectOffsetByIndex `32aea8c0` ShownSkillCoolTime `32aeb380` IsInJobLine `32aeb410` StoreGageSnapshot `32aeb430` RestoreGageSnapshot `32b0e440` `32b0e670` SumSocketOptionAfterSlots `32b0f940` SpecialAttackUse `32b0fa90` ResetMaxMP `32b14640` GetActualMPConsume `32b15050` GetActualCoolTime `32b15220` IsNotCommonMoveState `32b15430` AfterImageFrameMove `32b16c80` ShowActiveSkillCutInAndLightByScript `32b171c0` ScaleHead `32b172b0` `32b18170` `32b1c880` SpecialAttackNoStageChange `32b1edd0` CommonFrameMoveFuture `32b1eef0` SpecialAttackCooldown `32b37910` CommonStateStart `32b37c40` NoStateChangeActionFrameMove `32b397a0` CommonFrameMove `32b3a310` CanUseSpecialAttack.
   Still `?` (name it by the class pattern from the hint in col 7): `32ae9bd0` `32b0e440` `32b172b0` `32b18170`.
+
+## Amended by CH1a4 (2026-11-14)
+
+- `32b0e440` ( vslot 0x6b0 ) reads the transformed anims `+0x8f84` / `+0x8f9c` and after-images `+0x8f88` / `+0x8fa0`: `m_aTransformedSkin[0 / 1]` ( CH1a4 ).

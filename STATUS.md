@@ -244,7 +244,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH1a4 | ready (CH1a review done): Opus: transformed-form skin - `CX2GUUser` pair `+0x8f74` / `+0x8f8c` + `ReleaseTransformedSkinAnim` / `SetFormSkinAnim` / `EndTransformedForm` | Opus 5.5 / high, Opus review | CH1a review | `X2GUUser.*`, `X2GULuciel.*`, `X2BuffFactor.h` | `CH1a4.md` |
+| CH1a4 review | ready (CH1a4 done 2026-11-14: `m_aTransformedSkin` pair, 3 class bodies, `RestoreHeadBySkinAnim`, BTI 763 / 764; inert, no build) | Opus 5.5 / high | CH1a4 | `X2GUUser.*`, `X2GULuciel.*`, `X2BuffFactor.h`, `KTDGXSkinAfterImage.h` | `CH1a4-review.md` |
 | CH1b | ready (CH1a review done): Lu common states (CH1c merged in by CH0), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1f2 review covers it) | CH1a review | `X2GULuciel.*` | `CH1b.md` |
 | CH1d | blocked (CH1b): Ciel common states (CH1e merged in by CH0), transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1f2 review covers it) | CH1b | `X2GULuciel.*` | `CH1d.md` |
 | CH1f | blocked (CH1d): Duo combos part 1, transcription under `_CORE` | Sonnet 5.5 / high, no review of its own (CH1f2 review covers it) | CH1d | `X2GULuciel.*` | `CH1f.md` |

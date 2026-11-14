@@ -623,8 +623,9 @@ protected:
 	void				KillMySummonedNPC( const CX2UnitManager::NPC_UNIT_ID eNPCUnitID_ );	// June 32b20100
 	void				ResetPhantomRushReady();	// June 32b34920
 	void				ClearAltarOfEvilEffectSet();	// June 32b35540
-	void				ReleaseTransformedSkinAnim( const int iForm_ );	// June 32b13d30: body in CH1a4
-	void				EndTransformedForm( const int iForm_, const bool bByDie_ );	// June 32b38f30: body in CH1a4
+	void				ReleaseTransformedSkinAnim( const int iForm_ );	// char-luciel CH1a4: June 32b13d30
+	void				SetFormSkinAnim( const int iForm_, STransformedSkin& transformedSkin_ );	// char-luciel CH1a4: June 32b13e20
+	void				EndTransformedForm( const int iForm_, const bool bByDie_ );	// char-luciel CH1a4: June 32b38f30
 
 protected:
 	// June +0x959c .. +0x98a0 in June's order; ch1_offsets.tsv names the users ( a name marked provisional there is refined by its phase )

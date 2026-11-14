@@ -42,3 +42,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - Tree rows: 30 (part 3, col 10).
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §4 L178-181 June-only SKILL_ID members fail silently (52 SI_ 10000-10699 + 143 RNSI_ 30001-3; §7 L240 SetBuffAccumulationCount 322a7660 / AddBuffAccumulationCount 322a8a70 callers in; §7 L257 slot 251 3204dcd0 post-apply hook: Soul Collector, BTI 462, RNSI_P_LCN_TRIBUTE 3; §7ae L713-720 June skill-tree ids with no March class state (reform ids 21000+, RNSI_*); §7ai L835-841 pass June skip / adjust / level / creator at every ported BFI call; §7am L907 delegate-list registrations: Lu/Ciel 32b43d10 (slot 0x7a4 of 334f06fc) pushes te.
 - 15 functions: InitPassiveSkillState 0x690 `32b45820`, the buff-value setters 0x24c / 0x250, and **nine of InitState's ten delegate callbacks** (checklist 7am; `32b3d380`, `32b0fc50`, `32b43590`, `32b435f0`, `32b0fce0`, `32b177b0`, `32b13c80`, `32b17f90`, `32b3e470`) with what only they reach. 35 skill ids are passives here. Checklist 7: the slot-251 Soul Collector hook (`3204dcd0`, buff post-apply) has no March counterpart: add it with its passive.
+
+## Amended by CH1a4 (2026-11-14)
+
+- `StartTransformedForm` `32b34fe0` is the other half of CH1a4's `EndTransformedForm`: it reads the same `CX2GUUser::m_aTransformedSkin` sets
+  ( `+0x8f74` / `+0x8f8c`, `STransformedSkin`, `X2GUUser.h` ) and swaps with `SetFormSkinAnim`; use those, never a copy. Settle the reach of
+  JUNE_BUGS 689 ( a transformed form whose set was never swapped skips the buff and effect-set clears ) from its body.

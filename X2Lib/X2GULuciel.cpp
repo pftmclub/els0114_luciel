@@ -478,6 +478,132 @@ void CX2GULuciel::ClearAltarOfEvilEffectSet()
 	m_AltarOfEvilData.m_vecPosition.clear();
 }
 
+// char-luciel CH1a4: June 32b13d30: the form's transformed set closed and freed
+void CX2GULuciel::ReleaseTransformedSkinAnim( const int iForm_ )
+{
+	STransformedSkin& transformedSkin = m_aTransformedSkin[0 != iForm_ ? 1 : 0];
+
+	if ( NULL != transformedSkin.m_pMotionFuture && NULL != g_pKTDXApp->GetDeviceManager() )
+	{
+		g_pKTDXApp->GetDeviceManager()->CloseDevice( transformedSkin.m_pMotionFuture->GetDeviceID() );
+		transformedSkin.m_pMotionFuture = NULL;
+	}
+
+	if ( NULL != transformedSkin.m_pMotion && NULL != g_pKTDXApp->GetDeviceManager() )
+	{
+		g_pKTDXApp->GetDeviceManager()->CloseDevice( transformedSkin.m_pMotion->GetDeviceID() );
+		transformedSkin.m_pMotion = NULL;
+	}
+
+	SAFE_DELETE_KTDGOBJECT( transformedSkin.m_pXSkinAnimFuture );
+	SAFE_DELETE_KTDGOBJECT( transformedSkin.m_pAfterImage );
+	transformedSkin.m_pXSkinAnim.reset();
+}
+
+// char-luciel CH1a4: June 32b13e20: the form's body and the set trade motions, anims and after-image
+void CX2GULuciel::SetFormSkinAnim( const int iForm_, STransformedSkin& transformedSkin_ )
+{
+	CKTDXDeviceXSkinMesh*& pMotionFuture		= 0 != iForm_ ? m_pMinorUnitMotionFuture : m_pMotionFuture;
+	CKTDXDeviceXSkinMesh*& pMotion				= 0 != iForm_ ? m_pMinorUnitMotion : m_pMotion;
+	CKTDGXSkinAnim*& pXSkinAnimFuture			= 0 != iForm_ ? m_pMinorUnitXSkinAnimFuture : m_pXSkinAnimFuture;
+	CKTDGXSkinAnimPtr& pXSkinAnim				= 0 != iForm_ ? m_pMinorUnitXSkinAnim : m_pXSkinAnim;
+	CKTDGXSkinAfterImage*& pAfterImage			= 0 != iForm_ ? m_pMinorUnitAfterImage : m_pAfterImage;
+
+	CKTDXDeviceXSkinMesh* const pBodyMotion			= pMotion;
+	CKTDXDeviceXSkinMesh* const pBodyMotionFuture	= pMotionFuture;
+	CKTDGXSkinAnim* const pBodyXSkinAnimFuture		= pXSkinAnimFuture;
+	CKTDGXSkinAnimPtr pBodyXSkinAnim				= pXSkinAnim;
+	CKTDGXSkinAfterImage* const pBodyAfterImage		= pAfterImage;
+
+	bool bAfterImageEnabled = false;
+	if ( NULL != pBodyAfterImage )
+	{
+		bAfterImageEnabled = pBodyAfterImage->GetEnable();
+		if ( true == bAfterImageEnabled )
+		{
+			pBodyAfterImage->SetShowAfterImage( false );
+			DisableAfterImage( true, AIB_ACTIVE_UNIT );
+		}
+	}
+
+	pMotion				= transformedSkin_.m_pMotion;
+	pMotionFuture		= transformedSkin_.m_pMotionFuture;
+	pXSkinAnim			= transformedSkin_.m_pXSkinAnim;
+	pXSkinAnimFuture	= transformedSkin_.m_pXSkinAnimFuture;
+	pAfterImage			= transformedSkin_.m_pAfterImage;
+	if ( NULL != pAfterImage && true == bAfterImageEnabled )
+		EnableAfterImage( AIB_ACTIVE_UNIT );
+
+	transformedSkin_.m_pMotion			= pBodyMotion;
+	transformedSkin_.m_pMotionFuture	= pBodyMotionFuture;
+	transformedSkin_.m_pXSkinAnim		= pBodyXSkinAnim;
+	transformedSkin_.m_pXSkinAnimFuture	= pBodyXSkinAnimFuture;
+	transformedSkin_.m_pAfterImage		= pBodyAfterImage;
+	transformedSkin_.m_bSwapped			= !transformedSkin_.m_bSwapped;
+}
+
+// char-luciel CH1a4: June 32b38f30: the form's own skin back, equipment shown, Altar of Evil / Transcendence ended
+void CX2GULuciel::EndTransformedForm( const int iForm_, const bool bByDie_ )
+{
+	const BUFF_TEMPLET_ID eTransformBuffID = 0 != iForm_ ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL;
+
+	if ( true == IsTransformed( iForm_ ) )
+	{
+		SetTransformed( iForm_, false );
+
+		STransformedSkin& transformedSkin = m_aTransformedSkin[0 != iForm_ ? 1 : 0];
+		if ( false == transformedSkin.m_bSwapped )
+			return;	// June quirk: skips the effect-set and buff clears below ( JUNE_BUGS 689 )
+
+		SetFormSkinAnim( iForm_, transformedSkin );
+
+		CKTDGXSkinAnimPtr pXSkinAnim = 0 != iForm_ ? m_pMinorUnitXSkinAnim : m_pXSkinAnim;
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*& pFrameHead = 0 != iForm_ ? m_pFrame_MinorUnit_Bip01_Head : m_pFrame_Bip01_Head;
+		m_CollisionListSet.clear();
+		m_AttackListSet.clear();
+		pFrameHead = pXSkinAnim->GetCloneFrame( L"Bip01_Head" );
+		SetShowViewList( true );
+
+		BOOST_TEST_FOREACH( Weapon*, pWeapon, m_vecpWeapon )
+		{
+			if ( NULL == pWeapon || NULL == pWeapon->m_pUserWeaponEquip )
+				continue;
+
+			for ( int iModel = 0; iModel < CX2Item::MAX_MODEL_COUNT_A_ITEM; ++iModel )
+			{
+				if ( NULL != pWeapon->m_pUserWeaponEquip->GetNormalAnim( iModel ) )
+					pWeapon->m_pUserWeaponEquip->GetNormalAnim( iModel )->SetShowObject( true );
+
+				if ( NULL != pWeapon->m_pUserWeaponEquip->GetHyperAnim( iModel ) )
+					pWeapon->m_pUserWeaponEquip->GetHyperAnim( iModel )->SetShowObject( true );
+			}
+		}
+
+		UpdateEquipCollisionData();
+		UpdateShowViewListByActiveBody();
+
+		if ( true == bByDie_ )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDB_TRANSFORM_END_BY_DIE", this );
+
+		if ( true == IsMyUnit() )
+		{
+			if ( NULL != m_pTransformSkillSlotUI )
+			{
+				// stand-in: CH2d20 adds the window's dialog release ( 31fd03f0 ) before this delete
+				SAFE_DELETE( m_pTransformSkillSlotUI );
+			}
+
+			const int iCombinationPoint = static_cast<int>( static_cast<int>( GetBuffTimeFinalizerDuration( eTransformBuffID ) ) / 6.0 );
+			if ( 0 < iCombinationPoint )
+				UpCombinationPoint( iCombinationPoint );
+		}
+	}
+
+	ClearAltarOfEvilEffectSet();
+	EraseBuffTempletFromGameUnit( eTransformBuffID );
+	g_pX2Game->GetEffectSet()->StopEffectSet( m_hTransformedFormEffectSet );
+}
+
 // char-luciel CH1a: June 32aeaa10: the skill states the slot does not start ( mostly Ciel's ); true when it changed state
 bool CX2GULuciel::StateChangeBySkillID( const CX2SkillTree::SKILL_ID eSkillID_ )
 {

@@ -1743,6 +1743,52 @@ Opus 5.5 high, Ghidra read-only (vtable dump from the exe, `decompile_function`,
   `allow-listed: 242` / `RESULT: PASS`. `enumscan.py --check` (4 files): `0 A/B row(s) remain in 4 file(s) (C 0, D 0, X 1 ignored)`.
 - **Build:** none (no code change). CH1's CH1a3 dependency is met.
 
+### CH1a4 - Done (2026-11-14)
+
+Opus 5.5 high, read-only RE ( `charport_adis.py`, `disasm_range.py`, `dispsweep.py` ). funcmap `grep "(CH1a4)" june2017_re/funcmap.tsv` ( 7 rows );
+JUNE_BUGS 689; `ch0_vtable_all.tsv` slot 0x634 named.
+- **`CX2GUUser` pair ( `TRANSFORM_LINK`, `X2GUUser.h` ):** `struct STransformedSkin { bool m_bSwapped; m_pMotionFuture; m_pMotion; m_pXSkinAnimFuture;
+  CKTDGXSkinAnimPtr m_pXSkinAnim; m_pAfterImage; }` ( 0x18, June's ctor `32073d50` zeroes all six ) and `m_aTransformedSkin[2]` after
+  `m_pTransformSkillSlotUI` ( June `+0x8f70` / `+0x8f74` / `+0x8f8c` ). The user ctor `@32040eb0` / `@32040ec3` = the struct ctor; the user dtor
+  `@3203b530`-`@3203b56a` releases only the two anim refs = the member's own dtor. Nothing else to write in `X2GUUser.cpp`'s ctor / dtor.
+- **Other readers of `+0x8f74`..`+0x8fa0` ( `dispsweep.py`, every hit read ):** in `CX2GUUser` only the ctor, dtor and `RestoreHead` `31fde420`
+  @`31fde67f` / @`31fde69c`; the rest are Lu/Ciel's own ( `32b162e0` LoadTransformedSkinAnim CH1k, `32b13b60` GetSkinAnimByForm CH1l, `32b0e440`
+  vslot 0x6b0 CH1l2, `32b34fe0` StartTransformedForm CH4a: each kickoff amended ) or other classes' unrelated offsets ( `327xxxxx`, `3328xxxx`, `3330xxxx` ).
+  `RestoreHead`'s DU1d2 stand-in is replaced: **`CX2GUUser::RestoreHeadBySkinAnim`** = June `31fdc9d0` ( Face restore + `SetUnitReForm` Bip01_Head /
+  Bip01_Spine1, NULL -> nothing ), called on both sets' anims after the second-body block, unconditionally as June; stand-in kept in `#else`.
+- **`ReleaseTransformedSkinAnim` `32b13d30`:** motion future then motion closed ( `CloseDevice`, only with a device manager, as June ), anim future
+  and after-image `SAFE_DELETE_KTDGOBJECT`, anim ref reset; the byte untouched.
+- **`SetFormSkinAnim( iForm, STransformedSkin& )` `32b13e20` ( declared here ):** form 0 = `m_pMotionFuture` ( `+0x87c8` ) / `m_pMotion` ( `+0x87cc` ) /
+  `m_pXSkinAnimFuture` / `m_pXSkinAnim` / `m_pAfterImage` ( `+0x6754` ), form 1 = DU1's `m_pMinorUnit*` + `m_pMinorUnitAfterImage` ( `+0x6758` ). A
+  body after-image with `m_bEnable` ( `+0x194` ) set is hidden by `CKTDGXSkinAfterImage::SetShowAfterImage( false )` ( June `3322a9c0`, new in
+  `KTDGXSkinAfterImage.h` under `TRANSFORM_LINK` ) and `DisableAfterImage( true, AIB_ACTIVE_UNIT )`; after the swap `EnableAfterImage( AIB_ACTIVE_UNIT )`
+  when the new after-image exists; the old five go into the set; byte = `!byte`.
+- **`EndTransformedForm( iForm, bByDie )` `32b38f30`:** `BTI_BUFF_TRANSCENDENCE` for form 1, else `BTI_BUFF_ALTAR_OF_EVIL`. Transformed: `SetTransformed(
+  false )`; set not swapped -> return ( **June's quirk: the tail is skipped**, JUNE_BUGS 689 ); `SetFormSkinAnim`; `+0x200` / `+0x210` =
+  `m_CollisionListSet` / `m_AttackListSet` clear ( R12b: `UpdateEquipCollisionData`'s sets ); Bip01_Head into `m_pFrame_Bip01_Head` ( `+0x4200` ) /
+  `m_pFrame_MinorUnit_Bip01_Head` ( `+0x4218` ), no NULL test as June; `SetShowViewList( true )` ( vslot 0x63c ); `m_vecpWeapon` ( `+0x3cfc` ): each
+  weapon with `m_pUserWeaponEquip` ( Weapon `+0x1c0` ) shows its `GetNormalAnim` / `GetHyperAnim` ( CX2Eqip `+0x544` / `+0x564`, 8 = `MAX_MODEL_COUNT_A_ITEM` )
+  with `SetShowObject( true )` ( June inlines it ); vslot 0x634 = **`UpdateEquipCollisionData()`** ( base `31fc7a60` calls 0x638 on `m_ViewEqipList`
+  = March `X2GUUser.cpp:5996`; Chung / Ara override it ); `UpdateShowViewListByActiveBody`; `EffectSet_SA_LDB_TRANSFORM_END_BY_DIE` on `this` with
+  every default when `bByDie`; my unit ( vslot 0x198 ): window delete ( CH2d20 stand-in, the dtor's twin ) and `(int)( (int)GetBuffTimeFinalizerDuration(
+  BTI ) / 6.0 )` > 0 -> `UpCombinationPoint`. Tail ( also the not-transformed path ): `ClearAltarOfEvilEffectSet`, `EraseBuffTempletFromGameUnit( BTI )`,
+  `StopEffectSet( m_hTransformedFormEffectSet )`.
+- **Registered ( `JUNE_ENUM_NAMES`, `X2BuffFactor.h` ):** `BTI_BUFF_ALTAR_OF_EVIL = 763`, `BTI_BUFF_TRANSCENDENCE = 764` ( `Enum.src.lua` L12193 / L12966 ).
+- **Offsets cross-check:** Weapon `+0x1c0` and the after-image list `+0x1bc` both sit 4 bytes past March's layout, June's larger `CKTDGObject`.
+- **Routed / amended:** CH2d20 ( second dialog-release site ), CH4a ( the shared sets, JUNE_BUGS 689 reach ), CH1k / CH1l / CH1l2 ( the member name ).
+- **Gates ( `finish.py --files`, 6 files ):** `flagcheck TRANSFORM_LINK` `2 PASS, 1 PASS~, 3 OTHER, 0 FAIL` / `RESULT: PASS`. `junediverge` `RESULT: PASS`.
+  Tool limits, re-run per file: `DUO_BODY` and `JUNE_ENUM_NAMES` report FAIL on `X2GUUser.cpp` ( TRANSFORM_LINK's own lines sitting inside the
+  enclosing `DUO_BODY` / `RESTORE_HEAD` block: not their change; `DUO_BODY` is enclosing only ); `flagcheck JUNE_ENUM_NAMES --worktree --files
+  X2Lib/X2BuffFactor.h`: `1 PASS~` / `RESULT: PASS`. `LUCIEL_CORE` raised Unevaluable on Chung's compound guard in `X2GUUser.cpp:29404`;
+  `--files X2GULuciel.h X2GULuciel.cpp`: `2 PASS` / `RESULT: PASS` ( the 2 deleted lines = the two declaration comments "body in CH1a4", inside the
+  `_CORE`-only file ). `enumscan --check` class files + `KTDGXSkinAfterImage.h`: `0 A/B`; the shared files' only rows in this diff are the two enum
+  definitions themselves ( `X2BuffFactor.h:680` / `:681` ), the rest pre-exist. `stateends` / `skillicons` / `luabind`: not applicable ( no states,
+  skills or scripts ).
+- **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GULuciel.cpp` ( plain and `/D _LIVE` ) and `X2GUUser.cpp`: 0 errors each; `/P` shows all four
+  new bodies compiled in. Full build skipped: no play-test. Header edits ( `X2GUUser.h`, `X2BuffFactor.h`, `KTDGXSkinAfterImage.h` ) sit in the PCH: the
+  next full build must rebuild it ( `--pch force` if in doubt ).
+- **How to see it in game:** nothing yet ( inert until CH1 final; CH2d2 / CH3c2 hand off the transform play-test ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

@@ -65,3 +65,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   const**, flag `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`). Lu/Ciel's `32ae9c00` overrides it with exactly that signature.
 - The transform pair is `IsTransformed( int iDuoType_ )` / `SetTransformed( int, bool )` ( `31fc9d90` / `31fc9d50` ): pass `CX2Unit::DT_*`
   ( 2 = either body, 3 = both ).
+
+## Amended by CH1a4 (2026-11-14)
+
+- `32b13b60` ( GetSkinAnimByForm ) reads the transformed anims `+0x8f84` / `+0x8f9c`: `m_aTransformedSkin[0 / 1].m_pXSkinAnim` ( CH1a4 ).

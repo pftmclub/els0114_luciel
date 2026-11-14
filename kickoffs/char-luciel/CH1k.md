@@ -60,3 +60,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - June's unit vslot 0xf0 ( `UpNowMp` ) is virtual and Lu/Ciel overrides it ( `32aeb160` ); March's `CX2GameUnit::UpNowMp` is not virtual, and
   CH1a0's `ApplyTransformSkillCost` calls it by name. Make the override reachable from base callers the way DU2 made the damage getters virtual.
 - `31fc9f00` is `ApplyTransformSkillCoolTime( float, bool bAdd )`; `31fc9d90` is `IsTransformed( int )`.
+
+## Amended by CH1a4 (2026-11-14)
+
+- `32b162e0` ( LoadTransformedSkinAnim ) fills user `+0x8f74` / `+0x8f8c`: that is `CX2GUUser::m_aTransformedSkin[0 / 1]` ( `STransformedSkin`, CH1a4 ); it starts with `ReleaseTransformedSkinAnim` ( ported ).

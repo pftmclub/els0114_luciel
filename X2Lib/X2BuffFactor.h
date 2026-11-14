@@ -675,6 +675,12 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_TWILIGHT_JUDGEMENT                    = 482,	// June's Enum.lua; Lu/Ciel's Twilight Judgement reattack needs it
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-14 // char-luciel CH1a4
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_ALTAR_OF_EVIL                         = 763,	// June's Enum.lua; Lu's transformed form ( EndTransformedForm erases it )
+	BTI_BUFF_TRANSCENDENCE                         = 764,	// June's Enum.lua; Ciel's transformed form ( EndTransformedForm erases it )
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID

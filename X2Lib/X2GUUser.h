@@ -551,6 +551,19 @@ private:
 	float				m_afCoolTime[TRANSFORM_SKILL_SLOT_NUM];		/// +0x08
 	int					m_iSelectedSlot;							/// +0x14, -1 = none
 };
+
+// char-luciel CH1a4: June user +0x8f74 / +0x8f8c ( 0x18 each, ctor 32073d50 ): the skin set a body swaps with while transformed
+struct STransformedSkin
+{
+	bool					m_bSwapped;				/// +0x00 the body wears this set's skin, the set holds the body's own
+	CKTDXDeviceXSkinMesh*	m_pMotionFuture;		/// +0x04
+	CKTDXDeviceXSkinMesh*	m_pMotion;				/// +0x08
+	CKTDGXSkinAnim*			m_pXSkinAnimFuture;		/// +0x0c
+	CKTDGXSkinAnimPtr		m_pXSkinAnim;			/// +0x10
+	CKTDGXSkinAfterImage*	m_pAfterImage;			/// +0x14
+
+	STransformedSkin() : m_bSwapped( false ), m_pMotionFuture( NULL ), m_pMotion( NULL ), m_pXSkinAnimFuture( NULL ), m_pAfterImage( NULL ) {}
+};
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 class CX2GUUser : public CX2GameUnit
 {
@@ -2417,6 +2430,7 @@ public:
 		bool IsFourthSkillSlotKeyPressedOnce() const;								/// char-luciel CH1a0: June 31fd0440
 		virtual int GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ ) { UNREFERENCED_PARAMETER( eSkillID_ ); return 0; }	/// char-luciel CH1a0: June vslot 0x57c ( base 330f9c30 ); Lu/Ciel's 32ae9c00 is CH1l's
 		CX2TransformSkillSlotUI* GetTransformSkillSlotUI() const { return m_pTransformSkillSlotUI; }
+		void RestoreHeadBySkinAnim( CKTDGXSkinAnimPtr pXSkinAnim_ );				/// char-luciel CH1a4: June 31fdc9d0
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
 
@@ -5063,6 +5077,7 @@ public:
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 		CX2TransformSkillSlotUI*						m_pTransformSkillSlotUI;		/// char-luciel CH1a0: June +0x8f70; the class news and deletes it ( Lu/Ciel 32b43910 / 32b39380 )
+		STransformedSkin								m_aTransformedSkin[2];			/// char-luciel CH1a4: June +0x8f74 first body, +0x8f8c second body
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 		
 

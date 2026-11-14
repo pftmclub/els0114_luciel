@@ -40760,7 +40760,13 @@ void CX2GUUser::RestoreHead()
 		g_pData->SetUnitReForm( m_pMinorUnitXSkinAnim, eUnitType, IsTransformed(), L"Bip01_Head" );
 		g_pData->SetUnitReForm( m_pMinorUnitXSkinAnim, eUnitType, IsTransformed(), L"Bip01_Spine1" );
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+	// char-luciel CH1a4: June @31fde67f / @31fde69c, the transformed sets' anims
+	RestoreHeadBySkinAnim( m_aTransformedSkin[0].m_pXSkinAnim );
+	RestoreHeadBySkinAnim( m_aTransformedSkin[1].m_pXSkinAnim );
+#else SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 	// stand-in: Lu/Ciel transform not ported ( June 31fdc9d0 restores the transformed anims +0x8f84 / +0x8f9c the same way: CH1a0 )
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	// stand-in: Lu/Ciel not ported ( June repeats both on the second body +0x8e88 and, through 31fdc9d0, on +0x8f84 / +0x8f9c )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
@@ -40782,6 +40788,21 @@ void CX2GUUser::RestoreHead()
 	SetUnitReForm();	
 #endif SERV_IRUHADEV_JUNE_DIVERGE_RESTORE_HEAD
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+// char-luciel CH1a4: June 31fdc9d0, RestoreHead's face and reform on one skin anim
+void CX2GUUser::RestoreHeadBySkinAnim( CKTDGXSkinAnimPtr pXSkinAnim_ )
+{
+	if ( pXSkinAnim_ == NULL )
+		return;
+
+	SetFrameScaleRestore( pXSkinAnim_->GetCloneFrame( L"COLLISION_SPHERE1_Face" ) );
+
+	const CX2Unit::UNIT_TYPE eUnitType = ( NULL != m_pUnit && NULL != m_pUnit->GetUnitTemplet() ? m_pUnit->GetUnitTemplet()->m_UnitType : CX2Unit::UT_NONE );
+	g_pData->SetUnitReForm( pXSkinAnim_, eUnitType, IsTransformed(), L"Bip01_Head" );
+	g_pData->SetUnitReForm( pXSkinAnim_, eUnitType, IsTransformed(), L"Bip01_Spine1" );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
 #endif
 

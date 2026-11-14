@@ -396,7 +396,7 @@ slot_off	luciel_target	base_target	in_range	override	member_name	march_member
 0x628	32b14e10	31fd7930	1	Y	CanRidingState	X2GUUser.h:2593 virtual bool CanRidingState();
 0x62c	32b143e0	3208ddc0	1	Y	?	- (name unsettled)
 0x630	32b18220	3201c3a0	1	Y	UpdateNotRenderingOtherEquipList	X2GUUser.h:2648 virtual void UpdateNotRenderingOtherEquipList();
-0x634	31fc7a60	31fc7a60	0		?	- (name unsettled)
+0x634	31fc7a60	31fc7a60	0		UpdateEquipCollisionData	X2GUUser.h virtual void UpdateEquipCollisionData(); ( CH1a4 )
 0x638	31fd8c00	31fd8c00	0		UpdateEquipCollisionData	X2GUUser.h:2654 virtual void UpdateEquipCollisionData( IN vector<CX2EqipPtr>& m_vecEquipList );
 0x63c	31fd5b80	31fd5b80	0		SetShowViewList	X2GUUser.h:2659 virtual void SetShowViewList( bool bShow_ );
 0x640	32ae9f20	31fca010	1	Y	?	- (name unsettled)
