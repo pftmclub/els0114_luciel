@@ -2181,7 +2181,7 @@ BTI 666 `BTI_BUFF_BLOOD_RUNAWAY_PASSIVE` no `BUFF_ICON_TEXTURE_KEY` ( its neighb
 debuff on her ), the Dodge and Slash refund ( base id only ): carried to CH4b's play-test ( kickoff amended ). User owes nothing more for CH4a.
 
 ### CH4b - Done (2026-11-14)
-**Landed.** Commit: see `git log`, "char-elesis Phase CH4b". Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` (on since CH4a; `_PASSIVE_DEBUG` stays on for the CH4c stage review).
+**Landed.** Commit `4353d257`; `flagcheck --range 4353d257^..4353d257`: `files: 2 PASS, 0 PASS~ (blank/marker only), 0 DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR`, 0 deleted, `RESULT: PASS`. Flag `SERV_IRUHADEV_JUNE_CHAR_ELESIS_PASSIVE` (on since CH4a; `_PASSIVE_DEBUG` stays on for the CH4c stage review).
 Files: `X2GUEL.cpp`, `X2GUEl.h`, `X2BuffFactor.h` (`JUNE_ENUM_NAMES`). Read from `charport_adis.py elesis` listings (no Ghidra function for 4 of the 6).
 - **`SetDamageExceptionProcess` 0x2b8 `32b80f20`:** the part up to @`32b81008` = March's Way of the Sword block (Vigor normal force-down x 0.6 / PvP 0.8, Destruction types
   4-6 ignore state defence), kept; June's two parts appended under the flag. Dignity of Grand Master (`m_usDignityOfGrandMasterLevel` > 0) with BTI 326 or 565 on her, on a
