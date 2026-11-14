@@ -2185,6 +2185,8 @@ funcmap row `31c60890 (CH1i2)`; JUNE_BUGS 706; the CH1i2 review ( `kickoffs/char
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH, the real `Always.h` ): `KTDGLineMap.cpp` flag on 0 errors; flag off ( a wrapper that `#undef`s it after `StdAfx.h` ) 0 errors; `X2GULuciel.cpp` plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` 0 errors ( warnings are the usual header noise ).
   Full build skipped: no play-test.
 - **How to see it in game:** March's live callers ( Raven's Giga Prominence flames, Add's nasod armor attack ) use it from the next full build; Elesis's Scarlet Rose fire once char-elesis registers it; the first planned check is CH3c ( Demonio bounding strike ). No play-test in this phase.
+- **Commit** `5d7b09ce`; `finish.py --range 5d7b09ce^..5d7b09ce --skip-flag SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD`: `flagcheck JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER` `1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0, `FINISH RESULT: PASS`.
+- **Next:** `/x2-phase char-luciel CH1i2 review` ( Opus 5.5 high ); the CH1i review is independent.
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
