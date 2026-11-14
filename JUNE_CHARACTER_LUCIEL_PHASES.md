@@ -1444,7 +1444,8 @@ Opus 5.5 high, read-only Ghidra. **Verdict: pass, no code change; one routing fi
 Opus 5.5 high, Ghidra read-only. New class-agnostic flag `SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE` ( `Always.h`, `#error` unless `DIVERGE_GAGE_TALLY`,
 `DUO_BODY`, `FIX_LIMITED_MANA_MANAGEMENT`, `DUNGEON_ITEM` ) plus `_CORE` for the class. Files: `Always.h`, `X2GageData.h`, `X2GageData.cpp`. funcmap:
 `grep "Char Luciel CH1a1" june2017_re/funcmap.tsv` ( 38 rows ). `JUNE_BUGS.md` 675-678. `june_march_divergent.tsv`: 2 rows ( base `OnFrameMove`,
-`UpdateDamageFlushMP` ), both ported.
+`UpdateDamageFlushMP` ), both ported. Commit `88246a05`; flagcheck `--range 88246a05^..88246a05 --with LUCIEL_CORE`: `RESULT: PASS` ( same tallies as
+the worktree run below ).
 - **Slot map** ( vt `3349b2a4` vs base `33487acc`, Chung / Ara / Rena columns identical to the base in 1-12 / 14 / 21 ): 0 dtor, 1 `GetNowMp`,
   2 `SetNowMp`, 3 `UpNowMp`, 4 `GetMaxMp`, 5 `SetMaxMp`, 6 `UpMaxMp`, 7 `SetAddMaxMP`, 8 `GetChangeRateMp`, 9 `SetChangeRateMp`, 10 `UpChangeRateMp`,
   11 `FlushMp`, 12 `DamageFlushMp`, 13 `OnFrameMove`, 14 `DetonationFrameMove`, 15 `UpdateDataFromGameUnit`, 16 `InitWhenGameIsOver`, 17 / 18 the
