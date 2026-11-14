@@ -979,7 +979,8 @@ Opus 5.5 high. Part 7 of DU1, flag `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` (Always.h:
   March's `m_GameStat`. No change.
 - **Gates.** `flagcheck JUNE_CHAR_DUO_BODY --worktree --files` (4 files): 4 PASS (`X2GameUnit.cpp` +83, `X2Unit.cpp` +11, `X2GameUnit.h` +6,
   `Always.h` +3), 0 FAIL, 0 deleted, 0 non-ASCII, RESULT: PASS. `junediverge --check` (4 files): RESULT: PASS. `enumscan --check`: 190
-  older A/B rows in the three files, none in this phase's hunks. No `JUNE_BUGS` row (no quirk kept).
+  older A/B rows in the three files, none in this phase's hunks. No `JUNE_BUGS` row (no quirk kept). Commit `89cfbabd`; `--range
+  89cfbabd^..89cfbabd`: 4 PASS, 0 OTHER, 0 FAIL, 0 deleted, RESULT: PASS.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GameUnit.cpp`, `X2Unit.cpp`, `X2GUChung.cpp`: 0 errors (so the new guard does not
   fire); `cl /P` shows the new function, the virtual and the three `UT_LUCIEL` cases live. Full build skipped: no play-test.
 - **In game:** nothing new. Other classes are never `UT_LUCIEL` and have form 0, so `InitSocketData( 0 )` / `GetEqipStat( false, 0 )` as before.
