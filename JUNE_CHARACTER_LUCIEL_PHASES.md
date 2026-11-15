@@ -1715,6 +1715,43 @@ of viewer `+0xd7c..+0xd82` / `+0xe40` in 44 functions of `31f8f000-31fb2000`.
   probe shows `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` on. Full build skipped: no play-test yet (batched at DU5b2).
 - **Play-test deferred:** section DU5b in `kickoffs/char-luciel/playtest.md`, batch at DU5b2. Review: `DU5b2-review.md` covers DU5b + DU5b2.
 
+### DU5b2 - Done (2026-11-16)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's; no new define, `Always.h` untouched). Files: `X2UnitViewerUI.cpp` (+540),
+`X2UnitViewerUI.h` (+35), `X2Eqip.h` (+3), insert-only. funcmap rows: `grep "(DU5b2)" june2017_re/funcmap.tsv` (12).
+- **Replaced whole (March's bodies in `#else`):** `UpdateEqip` `31fa9e60` (no economical path; fashion / accessory items only for the shown body
+  outside viewer states 4 / 5 / 6 / 10; class test `31ed6500`; usable `328825c0`), `AddEqip` `31f9df40` (Lu/Ciel's normal item also builds Ciel's
+  copy: templet minor id -> `AddEquipByTID( id, false, true, enchant )`, else the item itself when its Lu/Ciel model has a Ciel name; skin and slot
+  by `IsMinorUnitEquipItem`), `AddEquipByTID` `31f9c640` (`( id, bBasic, bMinorUnit, enchant )`), `RemoveEqip` `31f9f560`, `RemoveAllEquips`
+  `31f9c5a0` (= March), `ReplaceEmptyToBasic( pos, id )` `31f9cfd0` (Lu's basic unless Ciel is shown; Ciel's from the basic item's minor id).
+  Four `stage8` divergent rows -> `replace`; new rows `CX2UnitViewerUI::RemoveEqip` (replaced) and `CX2Eqip::SetFixed` (routed, below).
+- **Tables `[ CX2Unit::EP_END ][ 3 ]`** (June `+0x208` / `+0x5b0`): every live site indexes the equip's body (`IsMinorUnitEquip`) at the
+  second-ring position (`GetViewSlotPosition` = June `31fa8ce0 @31fa8f9b`): frame move, render prepare, draw; R14e's two stand-ins in
+  `UpdateEquipSlotVisibility` dropped (the fashion table is the member; the apply loop walks bodies 0-2). `IsFashionItemEquippedAt` /
+  `IsItemEquippedAt` take a body (no live caller). An `#error` in the header: the flag needs `JUNE_VIEWER_EQUIP_VISIBILITY` (the March `#else`
+  of that function reads one body).
+- **R14e's left-arm bullet:** June's `ReplaceEmptyToBasic()` `31f9e930` = March's (same seven positions, Raven `EP_RAVEN_LEFT_ARM` = 0x24 from
+  templet +0x100): no change.
+- **`+0x118c` = `m_bShowFormEquipOnly`** (new): ctor 0 (`@31fab7d2`); June sets 1 only in `CX2SquareUnit::InitViewer` (`323f7380 @323f7417`) and
+  `CX2Room` `31ed46e0` (`@31ed4815` / `@31ed489b`), so field / room viewers add only the shown body's items. Writers routed to DU5c (amended).
+- **Names:** `XS_PVP_ROOM` for June's `g_pMain +0x8c == 8`; viewer states 9 / 10 have no March or June Enum name (numbers with comments, as C9c).
+- **Stand-ins (labelled):** `ApplyCustomize( 2 )` (Stage 12); appearance-templet test `328823d0` (Stage 16); magical closet (UIManager +0xcc,
+  June-only UI); equip position / scale / colour copies `3295b260`, `31f93710` / `31f93820` / `31f93920` (DU5c); `RemoveEqip`'s tail on the
+  unidentified global `33775878`; `+0x9d0` third UID table (unidentified); `InitWeaponTrace` reads Lu's weapon only (June builds trace frames for
+  bodies 0-2: DU5d, amended); June's dummy items live on the stack, March's basic equip owns a heap copy (as DU3c).
+- **Routed (scope rule):** June's `SetFixed` `3295a560` sets `m_bFixed` only, March's also hides the sub-equips; the fixed viewers are the village
+  square units' -> DU5c (divergent row + two allow rows). June now calls it for a skin equip with sub-equips or particles too
+  (`31fac390` = `CX2Eqip::HasSubEquipOrAttachedParticle`, new). The frame move's worn-item enchant lookup keeps March's two-argument call (June
+  passes the body: `32869e10( pos, 0, body )`), DU5c with the back body's frame move.
+- **June bug kept:** JUNE_BUGS 757 (`AddEquipByTID`'s fashion branch clears the fashion slot it just filled when the normal slot is stale).
+- **Gates:** `finish.py --files <3> --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER`: flagcheck PASS (3 PASS, 0 OTHER, 0 FAIL), junediverge PASS (2
+  allow-listed: the routed `SetFixed`), enumscan exit 0; stateends / skillicons / luabind n/a.
+- **Compile:** `/Zs` probes of `X2UnitViewerUI.cpp`, `X2Eqip.cpp`, `X2CashShop.cpp`, `X2UICharInfo.cpp`, `X2Community.cpp`: 0 errors each.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,048,960 B, dated 2026-11-16 04:42:30, md5 1a80748e8721e729af435d220ab3a4bf` (built at main 6cd55496 +
+  7 uncommitted code files, peers' included).
+- **Play-test:** the DU5b batch seam: sections DU5b + DU5b2 of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off
+  assembled. Review: `DU5b2-review.md` covers DU5b + DU5b2.
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;

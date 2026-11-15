@@ -239,8 +239,8 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5b | **play-test batched at DU5b2** (2026-11-16): viewer's second body, shown-body switch, window one body; split: equipment -> DU5b2 | Opus 5.5 / high, Opus review, user play-test | DU5 review | `X2UnitViewerUI.*`, `X2UICharInfo.cpp`, `X2TFieldGame.cpp` | `DU5b.md` |
-| DU5b2 | ready: each body's equipment in the unit viewer (June's UpdateEqip / AddEqip / AddEquipByTID / ReplaceEmptyToBasic, slot tables per body); seam of the DU5b batch | Opus 5.5 / high, Opus review (covers DU5b), user play-test | DU5b | `X2UnitViewerUI.*` | `DU5b2.md` |
+| DU5b | **play-test owed** (2026-11-16, batch with DU5b2): viewer's second body, shown-body switch, window one body; split: equipment -> DU5b2 | Opus 5.5 / high, Opus review, user play-test | DU5 review | `X2UnitViewerUI.*`, `X2UICharInfo.cpp`, `X2TFieldGame.cpp` | `DU5b.md` |
+| DU5b2 | **play-test owed** (2026-11-16): each body's equipment in the viewer, June's 6 equip functions, [ pos ][ 3 ] slots; DEPLOY OK; batch DU5b + DU5b2, then `DU5b2-review.md` | Opus 5.5 / high, Opus review (covers DU5b), user play-test | DU5b | `X2UnitViewerUI.*`, `X2Eqip.h` | `DU5b2.md` |
 | DU5c | blocked (DU5b2 review): both bodies on the create / select screens, the village avatar by form | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2SquareUnit.*` | `DU5c.md` |
 | DU5d | blocked (DU5b2 review): viewer weapon effects case 10, CH0's viewer checklist rows | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2UnitViewerUI.cpp`, `X2SlotItem.cpp` | `DU5d.md` |
 | DU5f | ready: each body's sockets ( type-10 aggregate, HUD second gage, set count, per-body socket record ) | Opus 5.5 / high, Opus review, user play-test | DU5e review | `X2Unit.*`, `X2SocketItem.*`, `X2GUUser.cpp`, `X2UICharInfo.cpp` | `DU5f.md` |

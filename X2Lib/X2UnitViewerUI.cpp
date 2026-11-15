@@ -63,6 +63,7 @@ CX2UnitViewerUI::CX2UnitViewerUI(void)
 	m_bSwitchingView		= false;
 	m_bEnableDuoView		= true;
 	m_bShowDuoBackUnit		= true;
+	m_bShowFormEquipOnly	= false;	// char-luciel DU5b2: June @31fab7d2
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	//m_pXSkinAnim			= NULL;
 	INIT_VECTOR3( m_LightPos, 1000,1000,1000 );
@@ -403,7 +404,14 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
         ASSERT( pX2Eqip->GetItemUID() == value.first );
         CX2Unit::EQIP_POSITION ePos = pItemTemplet->GetEqipPosition();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5b2: June 31fa8ce0 @31fa8f9b-31fa90a0, the slot of the equip's body at its second-ring position
+		const int iViewSlotPosition = GetViewSlotPosition( pX2Eqip.get(), pItemTemplet );
+		const int iViewSlotBody = ( true == pX2Eqip->IsMinorUnitEquip() ) ? 1 : 0;
+		if ( m_ViewEquipFashion[ iViewSlotPosition ][ iViewSlotBody ] == value.first )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         if ( m_ViewEquipFashion[ ePos ] == value.first )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         {
             ASSERT( pItemTemplet->GetFashion() );
 
@@ -441,7 +449,11 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 			//}} kimhc // 실시간 엘소드 중 실시간 내구도 감소
 			
         }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		else if ( m_ViewEquipNormal[ iViewSlotPosition ][ iViewSlotBody ] == value.first )	// char-luciel DU5b2
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         else if ( m_ViewEquipNormal[ ePos ] == value.first )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         {
             ASSERT( !pItemTemplet->GetFashion() );
 		    //// 패션이 아니고, 패션이 이미 장착해있을 경우 제외
@@ -1351,11 +1363,22 @@ RENDER_HINT   CX2UnitViewerUI::OnFrameRender_Prepare()
                 continue;
             ASSERT( pX2Eqip->GetItemUID() == value.first );
             CX2Unit::EQIP_POSITION ePos = pItemTemplet->GetEqipPosition();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+			// char-luciel DU5b2: the slot of the equip's body
+			const int iViewSlotPosition = GetViewSlotPosition( pX2Eqip.get(), pItemTemplet );
+			const int iViewSlotBody = ( true == pX2Eqip->IsMinorUnitEquip() ) ? 1 : 0;
+			if ( m_ViewEquipFashion[ iViewSlotPosition ][ iViewSlotBody ] == value.first )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
             if ( m_ViewEquipFashion[ ePos ] == value.first )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
             {
                 ASSERT( pItemTemplet->GetFashion() );
             }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+			else if ( m_ViewEquipNormal[ iViewSlotPosition ][ iViewSlotBody ] == value.first )	// char-luciel DU5b2
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
             else if ( m_ViewEquipNormal[ ePos ] == value.first )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
             {
                 ASSERT( !pItemTemplet->GetFashion() );
             }
@@ -1857,11 +1880,22 @@ RENDER_HINT   CX2UnitViewerUI::OnRender_PrepareForAvartaScreenCapture()
 				continue;
 			ASSERT( pX2Eqip->GetItemUID() == value.first );
 			CX2Unit::EQIP_POSITION ePos = pItemTemplet->GetEqipPosition();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+			// char-luciel DU5b2: the slot of the equip's body
+			const int iViewSlotPosition = GetViewSlotPosition( pX2Eqip.get(), pItemTemplet );
+			const int iViewSlotBody = ( true == pX2Eqip->IsMinorUnitEquip() ) ? 1 : 0;
+			if ( m_ViewEquipFashion[ iViewSlotPosition ][ iViewSlotBody ] == value.first )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 			if ( m_ViewEquipFashion[ ePos ] == value.first )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 			{
 				ASSERT( pItemTemplet->GetFashion() );
 			}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+			else if ( m_ViewEquipNormal[ iViewSlotPosition ][ iViewSlotBody ] == value.first )	// char-luciel DU5b2
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 			else if ( m_ViewEquipNormal[ ePos ] == value.first )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 			{
 				ASSERT( !pItemTemplet->GetFashion() );
 			}
@@ -3037,6 +3071,420 @@ void CX2UnitViewerUI::AppendToDeviceList( CKTDXDeviceDataList& listInOut_, CX2Un
 	viewEqipList.clear();
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+namespace _CONST_UNITVIEWER_DU5B2_
+{
+	// char-luciel DU5b2: June's unit type 10 test ( 31fac140 )
+	inline bool IsLucielUnit( const CX2Unit* pUnit_ )
+	{
+		return NULL != pUnit_ && NULL != pUnit_->GetUnitTemplet() && CX2Unit::UT_LUCIEL == pUnit_->GetUnitTemplet()->m_UnitType;
+	}
+
+	// char-luciel DU5b2: June @31f9c96d / @31f9e2e2, a skin equip is fixed only when it has sub-equips or attached particles ( 31fac390 )
+	inline bool IsFixedViewEquip( CX2Eqip* pX2Eqip_ )
+	{
+		switch( pX2Eqip_->GetEqipType() )
+		{
+		case CX2Item::UT_SKIN:			return pX2Eqip_->HasSubEquipOrAttachedParticle();
+		case CX2Item::UT_ATTACH_ANIM:
+		case CX2Item::UT_ATTACH_NORMAL:	return true;
+		default:						return false;
+		}
+	}
+
+	// char-luciel DU5b2: June's slot clear ( map find 3252ec60, erase 322008d0, slot = 0 )
+	template < typename VIEW_EQUIP_MAP >
+	inline void ClearViewEquipSlot( VIEW_EQUIP_MAP& mapViewEquip_, UidType& slotUID_ )
+	{
+		if ( 0 == slotUID_ )
+			return;
+		typename VIEW_EQUIP_MAP::iterator iter = mapViewEquip_.find( slotUID_ );
+		if ( iter != mapViewEquip_.end() )
+			mapViewEquip_.erase( iter );
+		slotUID_ = 0;
+	}
+}
+using namespace _CONST_UNITVIEWER_DU5B2_;
+
+// char-luciel DU5b2: June 31fa8ce0 @31fa8f9b-31fa8fac, the slot position of a view equip ( the second ring takes EP_AC_TEMP4 )
+int CX2UnitViewerUI::GetViewSlotPosition( CX2Eqip* pX2Eqip_, const CX2Item::ItemTemplet* pItemTemplet_ ) const
+{
+	int iEquipPosition = pItemTemplet_->GetEqipPosition();
+	if ( NULL != m_pUnit )
+		m_pUnit->AdjustEquipPositionForSecondRing( m_pUnit->GetInventory().GetItem( pX2Eqip_->GetItemUID() ), iEquipPosition );
+	return iEquipPosition;
+}
+
+// char-luciel DU5b2: June 31fa9e60, no economical path; a fashion / accessory item only for the shown body outside the lobby viewers
+void CX2UnitViewerUI::UpdateEqip( bool /*bEconomical*/ )
+{
+	m_bEnableEquipSlotVisibilityUpdate = false;
+	RemoveAllEquips();
+
+	if ( true == m_bShowInvenEquip )
+	{
+		const CX2Inventory& kInventory = m_pUnit->GetInventory();
+		const CX2Unit::UNIT_CLASS eUnitClass = ( NULL != m_pUnit->GetUnitTemplet() ) ? m_pUnit->GetUnitTemplet()->m_UnitClass : CX2Unit::UC_NONE;
+		const bool bLobbyViewer = ( UVS_SELECTUNIT == m_eUnitViewerState || UVS_CLASSCHANGE == m_eUnitViewerState
+			|| UVS_CREATEUNIT == m_eUnitViewerState || 10 == static_cast<int>( m_eUnitViewerState ) );	// 10: a June-only viewer state
+		for ( int i = 0; i < kInventory.GetItemMaxNum( CX2Inventory::ST_E_EQUIP ); i++ )
+		{
+			CX2Item* pItem = kInventory.GetItem( CX2Inventory::ST_E_EQUIP, i );
+			if ( NULL == pItem || NULL == pItem->GetItemTemplet() )
+				continue;
+
+			const CX2Item::ItemTemplet* pItemTemplet = pItem->GetItemTemplet();
+			if ( false == bLobbyViewer
+				&& ( true == pItemTemplet->GetFashion() || CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() )
+				&& CX2Item::UC_ANYONE != pItemTemplet->GetUseCondition()
+				&& pItemTemplet->GetIsForMinorUnit() != m_bSwitchingView )
+				continue;
+
+			if ( CX2Unit::UC_NONE != static_cast<CX2Unit::UNIT_CLASS>( pItemTemplet->GetUnitClass() )
+				&& false == GetX2UnitClassCompatibility( eUnitClass, static_cast<CX2Unit::UNIT_CLASS>( pItemTemplet->GetUnitClass() ) ) )
+				continue;
+
+			// stand-in: June's appearance-templet class test 328823d0 reads item +0x80 / +0x84, no March field ( Stage 16 )
+			if ( true == pItem->IsUsableEquip() )
+				AddEqip( pItem->GetUID() );
+		}
+	}
+
+	ReplaceEmptyToBasic();
+	// stand-in: June's ApplyCustomize( 2 ) ( 31fa89b0 ) is backlog Stage 12
+	m_bEnableEquipSlotVisibilityUpdate = true;
+#ifdef	NOT_RENDERING_OTHER_EQUIP_POS
+	UpdateEquipSlotVisibility();
+#endif	NOT_RENDERING_OTHER_EQUIP_POS
+#ifdef ADD_UPGRADE_WEAPON_PARTICLE
+	DeleteUpgradeWeaponParticle();
+	if ( true == m_bShowInvenEquip )
+		InitUpgradeWeaponParticle();
+#endif ADD_UPGRADE_WEAPON_PARTICLE
+	// stand-in: June's equip position / scale copies by body ( 31f93710 / 31f93820 ) have no March members ( DU5c )
+}
+
+// char-luciel DU5b2: June 31f9f560, the slot of the equip's body; Lu's normal item takes Ciel's copy with it
+void CX2UnitViewerUI::RemoveEqip( UidType itemUID, bool bInNoReplaceEmptyToBasic )
+{
+	ViewEquipMap::iterator iter = m_ViewEquipMap.find( itemUID );
+	if ( iter == m_ViewEquipMap.end() )
+		return;
+	CX2EqipPtr pX2Eqip = iter->second;
+	if ( NULL == pX2Eqip )
+		return;
+
+	const CX2Item::ItemTemplet* pItemTemplet = g_pData->GetItemManager()->GetItemTemplet( pX2Eqip->GetItemID() );
+	if ( NULL == pItemTemplet )
+	{
+		m_ViewEquipMap.erase( iter );
+		return;
+	}
+
+	const int iEquipPosition = GetViewSlotPosition( pX2Eqip.get(), pItemTemplet );
+	const bool bAccessory = ( CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() );
+	const int iBody = ( ( true == pItemTemplet->GetFashion() || true == bAccessory ) && true == pX2Eqip->IsMinorUnitEquip() ) ? 1 : 0;
+	if ( true == pItemTemplet->GetFashion() && m_ViewEquipFashion[iEquipPosition][iBody] == itemUID )
+	{
+		m_ViewEquipFashion[iEquipPosition][iBody] = 0;
+		if ( 0 == m_ViewEquipNormal[iEquipPosition][iBody] )
+		{
+			if ( false == bAccessory && true == m_pUnit->IsNormalEquipInThePosition( static_cast<CX2Unit::EQIP_POSITION>( iEquipPosition ) ) )
+			{
+				CX2Item* pNormalItem = m_pUnit->GetInventory().GetEquippingItemByEquipPos( static_cast<CX2Unit::EQIP_POSITION>( iEquipPosition ), false );
+				if ( NULL != pNormalItem )
+					AddEqip( pNormalItem->GetUID() );
+			}
+		}
+		else
+		{
+			ViewEquipMap::iterator iterNormal = m_ViewEquipMap.find( m_ViewEquipNormal[iEquipPosition][iBody] );
+			if ( iterNormal != m_ViewEquipMap.end() && NULL != iterNormal->second )
+				iterNormal->second->SetShowObject( true );
+		}
+	}
+	else if ( m_ViewEquipNormal[iEquipPosition][iBody] == itemUID )
+	{
+		m_ViewEquipNormal[iEquipPosition][iBody] = 0;
+		if ( NULL != m_pMinorUnitXSkinAnim && false == bAccessory )
+		{
+			m_ViewEquipMap.erase( m_ViewEquipNormal[iEquipPosition][1] );
+			m_ViewEquipNormal[iEquipPosition][1] = 0;
+		}
+	}
+
+	m_ViewEquipMap.erase( itemUID );
+	if ( false == bInNoReplaceEmptyToBasic )
+		ReplaceEmptyToBasic();
+	else
+		InitWeaponTrace();
+#ifdef	NOT_RENDERING_OTHER_EQUIP_POS
+	UpdateEquipSlotVisibility();
+#endif	NOT_RENDERING_OTHER_EQUIP_POS
+	// stand-in: June then calls 31ea1480 on the global 33775878 when its +0x220 item id is this equip's ( unidentified, no March member )
+}
+
+// char-luciel DU5b2: June 31f9c5a0; stand-in: June also clears a third [ pos ][ 3 ] UID table at +0x9d0 ( unidentified, no March member )
+void CX2UnitViewerUI::RemoveAllEquips()
+{
+	m_ViewEquipMap.clear();
+	ZeroMemory( m_ViewEquipNormal, sizeof( m_ViewEquipNormal ) );
+	ZeroMemory( m_ViewEquipFashion, sizeof( m_ViewEquipFashion ) );
+	InitWeaponTrace();
+#ifdef	NOT_RENDERING_OTHER_EQUIP_POS
+	InitEquipVisibility();
+#endif	NOT_RENDERING_OTHER_EQUIP_POS
+}
+
+// char-luciel DU5b2: June 31f9c640, ( item id, basic, Ciel's, enchant ); the skin and slot of the item's body
+void CX2UnitViewerUI::AddEquipByTID( int itemTID, bool bBasicItem, bool bMinorUnit, int iEnchantLevel )
+{
+	if ( itemTID <= 0 )
+		return;
+
+	const CX2Item::ItemTemplet* pItemTemplet = g_pData->GetItemManager()->GetItemTemplet( itemTID );
+	if ( NULL == pItemTemplet )
+		return;
+
+	if ( true == m_bShowFormEquipOnly )
+	{
+		const bool bMinorUnitItem = ( true == bMinorUnit || true == pItemTemplet->GetIsForMinorUnit() );
+		if ( m_bSwitchingView != bMinorUnitItem
+			|| true == m_pUnit->IsFashionEquipInThePosition( static_cast<CX2Unit::EQIP_POSITION>( pItemTemplet->GetEqipPosition() ), ( true == bMinorUnit ) ? 1 : 0 ) )
+			return;
+	}
+
+	int iEquipPosition = pItemTemplet->GetEqipPosition();
+	if ( CX2Unit::EP_END <= iEquipPosition )
+		return;
+
+	CX2Item::ItemData kItemData;
+	kItemData.m_ItemID = itemTID;
+	if ( m_ViewEquipMap.empty() )
+		kItemData.m_ItemUID = -1;
+	else
+		kItemData.m_ItemUID = min( m_ViewEquipMap.begin()->first, -1 ) - 1;
+	kItemData.m_Endurance = 1;
+	if ( false == bBasicItem )
+	{
+		kItemData.m_PeriodType = CX2Item::PT_QUANTITY;
+		kItemData.m_Quantity = 1;
+	}
+
+	// stand-in: June's dummy item lives on the stack; March's basic equip owns and deletes it ( as DU3c )
+	CX2Item* pItem = new CX2Item( kItemData, m_pUnit );
+	m_pUnit->AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+	if ( iEnchantLevel < 0 )
+		iEnchantLevel = pItem->GetEffectiveEnchantLevel();
+
+	const bool bMinorUnitEquip = ( true == bMinorUnit || true == pItemTemplet->GetIsForMinorUnit() );
+	bool bAttachedInDGManagerChain = true;
+	if ( UVS_FIELD == m_eUnitViewerState )
+	{
+		if ( true == IsLucielUnit( m_pUnit ) && bMinorUnitEquip != m_bSwitchingView )
+		{
+			SAFE_DELETE( pItem );
+			return;
+		}
+	}
+	else if ( UVS_CHARINFO == m_eUnitViewerState || UVS_WATCH == m_eUnitViewerState || 9 == static_cast<int>( m_eUnitViewerState ) )	// 9: a June-only viewer state
+	{
+		bAttachedInDGManagerChain = false;
+	}
+
+	const CX2Unit::UNIT_TYPE eUnitType = ( NULL != m_pUnit->GetUnitTemplet() ) ? m_pUnit->GetUnitTemplet()->m_UnitType : CX2Unit::UT_NONE;
+	CX2EqipPtr pX2Eqip;
+	if ( true == bMinorUnitEquip )
+	{
+		if ( NULL != m_pMinorUnitXSkinAnim )
+			pX2Eqip = CX2Eqip::CreateEquip( pItem, m_pMinorUnitXSkinAnim, iEnchantLevel, true, true, eUnitType, true, bAttachedInDGManagerChain );
+	}
+	else
+	{
+		pX2Eqip = CX2Eqip::CreateEquip( pItem, m_pXSkinAnim, iEnchantLevel, true, true, eUnitType, false, bAttachedInDGManagerChain );
+	}
+	if ( NULL == pX2Eqip )
+	{
+		SAFE_DELETE( pItem );
+		return;
+	}
+
+#ifdef NEW_VILLAGE_UI
+	if ( true == m_bFixed && true == IsFixedViewEquip( pX2Eqip.get() ) )
+		pX2Eqip->SetFixed();
+#endif NEW_VILLAGE_UI
+	pX2Eqip->SetManagerObject( this );
+	if ( IsRecursivelyManagedByDGManager() )
+		g_pKTDXApp->GetDGManager()->AddObjectChain( pX2Eqip.get() );
+
+	iEquipPosition = pItemTemplet->GetEqipPosition();
+	m_pUnit->AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+	const int iBody = ( true == bMinorUnitEquip ) ? 1 : 0;
+	const UidType itemUID = pItem->GetUID();
+	if ( false == pItemTemplet->GetFashion() )
+	{
+		ClearViewEquipSlot( m_ViewEquipMap, m_ViewEquipNormal[iEquipPosition][iBody] );
+		m_ViewEquipMap.insert( ViewEquipMap::value_type( itemUID, pX2Eqip ) );
+		m_ViewEquipNormal[iEquipPosition][iBody] = itemUID;
+		if ( NULL != g_pData->GetCashShop() && true == g_pData->GetCashShop()->GetOpen() )
+			ClearViewEquipSlot( m_ViewEquipMap, m_ViewEquipFashion[iEquipPosition][iBody] );
+		// stand-in: June clears the fashion slot the same way while its magical closet ( UIManager +0xcc, a June-only UI ) is open
+		if ( 0 != m_ViewEquipFashion[iEquipPosition][iBody] )
+			pX2Eqip->SetShowObject( false );
+	}
+	else
+	{
+		ClearViewEquipSlot( m_ViewEquipMap, m_ViewEquipFashion[iEquipPosition][iBody] );
+		m_ViewEquipMap.insert( ViewEquipMap::value_type( itemUID, pX2Eqip ) );
+		m_ViewEquipFashion[iEquipPosition][iBody] = itemUID;
+		if ( 0 != m_ViewEquipNormal[iEquipPosition][iBody] )
+		{
+			ViewEquipMap::iterator iterNormal = m_ViewEquipMap.find( m_ViewEquipNormal[iEquipPosition][iBody] );
+			if ( iterNormal == m_ViewEquipMap.end() )
+				m_ViewEquipFashion[iEquipPosition][iBody] = 0;	// June bug kept: clears the fashion slot it just filled, not the normal one ( JUNE_BUGS 757 )
+			else if ( NULL != iterNormal->second )
+				iterNormal->second->SetShowObject( false );
+		}
+	}
+
+	InitWeaponTrace();
+	// stand-in: June copies the viewer's position and scale into the equip ( 3295b260: equip +0x908 / +0x914, no March members, DU5c )
+#ifdef	NOT_RENDERING_OTHER_EQUIP_POS
+	UpdateEquipSlotVisibility();
+#endif	NOT_RENDERING_OTHER_EQUIP_POS
+}
+
+// char-luciel DU5b2: June 31f9df40, Lu/Ciel's normal item also builds Ciel's copy; the skin and slot of the item's body
+void CX2UnitViewerUI::AddEqip( UidType itemUID )
+{
+	if ( itemUID <= 0 )
+		return;
+
+	CX2Item* pItem = m_pUnit->GetInventory().GetItem( itemUID );
+	if ( NULL == pItem || pItem->GetUID() != itemUID )
+		return;
+	if ( NULL != m_pUnit && false == m_pUnit->EqipAbility( pItem ) )
+		return;
+
+	const CX2Item::ItemTemplet* pItemTemplet = pItem->GetItemTemplet();
+	if ( NULL == pItemTemplet )
+		return;
+
+	const bool bLuciel = IsLucielUnit( m_pUnit );
+	const bool bAccessory = ( CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() );
+	if ( true == bLuciel && false == pItemTemplet->GetFashion() && false == bAccessory )
+	{
+		if ( 0 != pItemTemplet->GetItemIDForMinorUnit() )
+		{
+			AddEquipByTID( pItemTemplet->GetItemIDForMinorUnit(), false, true, pItem->GetEffectiveEnchantLevel() );
+		}
+		else
+		{
+			const wchar_t* pMinorUnitModelName = pItemTemplet->GetCommonItemModelName( CX2Unit::UT_LUCIEL, true );
+			if ( NULL != pMinorUnitModelName && 0 != pMinorUnitModelName[0] )
+				AddEquipByTID( pItemTemplet->GetItemID(), false, true, -1 );
+		}
+	}
+
+	if ( true == m_bShowFormEquipOnly )
+	{
+		if ( false == pItemTemplet->GetFashion() && false == bAccessory
+			&& true == m_pUnit->IsFashionEquipInThePosition( static_cast<CX2Unit::EQIP_POSITION>( pItemTemplet->GetEqipPosition() ), ( true == m_bSwitchingView ) ? 1 : 0 ) )
+			return;
+		if ( CX2Main::XS_PVP_ROOM == g_pMain->GetNowStateID() && true == bLuciel && true == pItemTemplet->GetFashion()
+			&& CX2Unit::EP_WEAPON_HAND == pItemTemplet->GetEqipPosition() && pItemTemplet->GetIsForMinorUnit() != m_bSwitchingView )
+			return;
+	}
+
+	if ( m_ViewEquipMap.find( itemUID ) != m_ViewEquipMap.end() )
+		return;
+
+	int iEquipPosition = pItemTemplet->GetEqipPosition();
+	m_pUnit->AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+	const int iEnchantLevel = pItem->GetEffectiveEnchantLevel();
+	const CX2Inventory& kInventory = m_pUnit->GetInventory();
+	bool bAttachedInDGManagerChain = true;
+	if ( UVS_FIELD == m_eUnitViewerState )
+	{
+		if ( true == bLuciel && ( true == pItemTemplet->GetFashion() || true == bAccessory )
+			&& kInventory.IsMinorUnitEquipItem( itemUID ) != m_bSwitchingView )
+			return;
+	}
+	else if ( UVS_CHARINFO == m_eUnitViewerState || UVS_WATCH == m_eUnitViewerState || 9 == static_cast<int>( m_eUnitViewerState ) )	// 9: a June-only viewer state
+	{
+		bAttachedInDGManagerChain = false;
+	}
+
+	const bool bMinorUnitEquip = kInventory.IsMinorUnitEquipItem( itemUID );
+	const CX2Unit::UNIT_TYPE eUnitType = ( NULL != m_pUnit->GetUnitTemplet() ) ? m_pUnit->GetUnitTemplet()->m_UnitType : CX2Unit::UT_NONE;
+	CX2EqipPtr pX2Eqip;
+	if ( true == bMinorUnitEquip )
+	{
+		if ( NULL == m_pMinorUnitXSkinAnim )
+			return;
+		pX2Eqip = CX2Eqip::CreateEquip( pItem, m_pMinorUnitXSkinAnim, iEnchantLevel, false, true, eUnitType, true, bAttachedInDGManagerChain );
+	}
+	else
+	{
+		pX2Eqip = CX2Eqip::CreateEquip( pItem, m_pXSkinAnim, iEnchantLevel, false, true, eUnitType, false, bAttachedInDGManagerChain );
+	}
+	if ( NULL == pX2Eqip )
+		return;
+
+	pX2Eqip->SetManagerObject( this );
+	if ( IsRecursivelyManagedByDGManager() )
+		g_pKTDXApp->GetDGManager()->AddObjectChain( pX2Eqip.get() );
+#ifdef NEW_VILLAGE_UI
+	if ( true == m_bFixed && true == IsFixedViewEquip( pX2Eqip.get() ) )
+		pX2Eqip->SetFixed();
+#endif NEW_VILLAGE_UI
+
+	if ( false == pItemTemplet->GetFashion() )
+	{
+		const int iBody = ( ( true == bAccessory ) ? kInventory.IsMinorUnitEquipItem( itemUID ) : pX2Eqip->IsMinorUnitEquip() ) ? 1 : 0;
+		ClearViewEquipSlot( m_ViewEquipMap, m_ViewEquipNormal[iEquipPosition][iBody] );
+		m_ViewEquipMap.insert( ViewEquipMap::value_type( itemUID, pX2Eqip ) );
+		m_ViewEquipNormal[iEquipPosition][iBody] = itemUID;
+		if ( NULL != g_pData->GetCashShop() && true == g_pData->GetCashShop()->GetOpen() )
+			ClearViewEquipSlot( m_ViewEquipMap, m_ViewEquipFashion[iEquipPosition][iBody] );
+		// stand-in: June clears the fashion slot the same way while its magical closet ( UIManager +0xcc, a June-only UI ) is open
+		if ( 0 != m_ViewEquipFashion[iEquipPosition][iBody] )
+			pX2Eqip->SetShowObject( false );
+	}
+	else
+	{
+		const int iBody = ( true == bMinorUnitEquip ) ? 1 : 0;
+		ClearViewEquipSlot( m_ViewEquipMap, m_ViewEquipFashion[iEquipPosition][iBody] );
+		m_ViewEquipMap.insert( ViewEquipMap::value_type( itemUID, pX2Eqip ) );
+		m_ViewEquipFashion[iEquipPosition][iBody] = itemUID;
+		const UidType normalUID = m_ViewEquipNormal[iEquipPosition][iBody];
+		if ( 0 != normalUID )
+		{
+			ViewEquipMap::iterator iterNormal = m_ViewEquipMap.find( normalUID );
+			if ( iterNormal == m_ViewEquipMap.end() )
+			{
+				m_ViewEquipNormal[iEquipPosition][iBody] = 0;
+			}
+			else if ( true == m_bShowFormEquipOnly || CX2Main::XS_PVP_ROOM == g_pMain->GetNowStateID() )
+			{
+				m_ViewEquipNormal[iEquipPosition][iBody] = 0;
+				m_ViewEquipMap.erase( normalUID );
+			}
+			else if ( NULL != iterNormal->second )
+			{
+				iterNormal->second->SetShowObject( false );
+			}
+		}
+	}
+
+	InitWeaponTrace();
+	// stand-in: June copies the viewer's position and scale into the equip ( 3295b260: equip +0x908 / +0x914, no March members, DU5c )
+#ifdef	NOT_RENDERING_OTHER_EQUIP_POS
+	UpdateEquipSlotVisibility();
+#endif	NOT_RENDERING_OTHER_EQUIP_POS
+	// stand-in: in the cash shop ( back body off ) and the character window June tints the other body's equips ( 31f93920, DU5c )
+}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 void CX2UnitViewerUI::UpdateEqip( bool bEconomical /* = false */ )
 {
 	m_bEnableEquipSlotVisibilityUpdate = false;
@@ -3684,6 +4132,7 @@ void CX2UnitViewerUI::AddEqip( UidType itemUID )
 
 
 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 void CX2UnitViewerUI::ReplaceEmptyToBasic()
 {
 	//빠진 부위가 있으면 기본 아이템으로 대체한다
@@ -3755,11 +4204,15 @@ void CX2UnitViewerUI::UpdateEquipSlotVisibility()
 	bool abVisible[CX2Unit::EP_END][3];
 	memset( abVisible, 1, sizeof( abVisible ) );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	const UidType ( &aFashionUID )[CX2Unit::EP_END][3] = m_ViewEquipFashion;	// char-luciel DU5b2: June +0x5b0, every body's fashion slots
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	// stand-in: March's viewer keeps one body's slot table until char-luciel DU5, so bodies 1 and 2 read no fashion item
 	UidType aFashionUID[CX2Unit::EP_END][3];
 	memset( aFashionUID, 0, sizeof( aFashionUID ) );
 	for( int iPos = 0; iPos < CX2Unit::EP_END; iPos++ )
 		aFashionUID[iPos][0] = m_ViewEquipFashion[iPos];
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 	const bool bLuciel = ( NULL != m_pUnit && NULL != m_pUnit->GetUnitTemplet() && CX2Unit::UT_LUCIEL == m_pUnit->GetType() );
 	const int iBodyCount = ( true == bLuciel ? 2 : 1 );
@@ -4440,6 +4893,49 @@ void CX2UnitViewerUI::UpdateEquipSlotVisibility()
 			abVisible[CX2Unit::EP_AC_TEMP4][ true == it->second->IsMinorUnitEquip() ? 1 : 0 ] = false;
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5b2: June 31f94360's apply loop over bodies 0-2 of the per-body slots
+	for( int iPos = 0; iPos < CX2Unit::EP_END; iPos++ )
+	{
+		for( int iSlotBody = 0; iSlotBody < 3; iSlotBody++ )
+		{
+			CX2EqipPtr pEquipFashion;
+			CX2EqipPtr pEquipNormal;
+
+			if( 0 != m_ViewEquipFashion[iPos][iSlotBody] )
+			{
+				ViewEquipMap::iterator itFind = m_ViewEquipMap.find( m_ViewEquipFashion[iPos][iSlotBody] );
+				if( itFind == m_ViewEquipMap.end() )
+					m_ViewEquipFashion[iPos][iSlotBody] = 0;
+				else
+					pEquipFashion = itFind->second;
+			}
+			if( 0 != m_ViewEquipNormal[iPos][iSlotBody] )
+			{
+				ViewEquipMap::iterator itFind = m_ViewEquipMap.find( m_ViewEquipNormal[iPos][iSlotBody] );
+				if( itFind == m_ViewEquipMap.end() )
+					m_ViewEquipNormal[iPos][iSlotBody] = 0;
+				else
+					pEquipNormal = itFind->second;
+			}
+
+			if( true == abVisible[iPos][iSlotBody] )
+			{
+				if( NULL != pEquipFashion )
+					pEquipFashion->SetShowObject( true );
+				if( NULL != pEquipNormal )
+					pEquipNormal->SetShowObject( NULL == pEquipFashion );
+			}
+			else
+			{
+				if( NULL != pEquipFashion )
+					pEquipFashion->SetShowObject( false );
+				if( NULL != pEquipNormal )
+					pEquipNormal->SetShowObject( false );
+			}
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	// stand-in: June walks bodies 0-2 here; March's viewer has body 0's slot table only ( char-luciel DU5 )
 	for( int iPos = 0; iPos < CX2Unit::EP_END; iPos++ )
 	{
@@ -4478,6 +4974,7 @@ void CX2UnitViewerUI::UpdateEquipSlotVisibility()
 				pEquipNormal->SetShowObject( false );
 		}
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #else SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
 
 	if( false == m_bEnableEquipSlotVisibilityUpdate )
@@ -6254,6 +6751,35 @@ int CX2UnitViewerUI::GetEnchantExtraDamageType()
 
 //{{ robobeg : 2008-10-18
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+// char-luciel DU5b2: June 31f9cfd0, Lu's basic equip unless Ciel is shown, Ciel's from the basic item's minor-unit id when she is
+void CX2UnitViewerUI::ReplaceEmptyToBasic( CX2Unit::EQIP_POSITION eqipPos, int itemID )
+{
+	if ( !( eqipPos >= CX2Unit::EQIP_POSITION( 0 ) && eqipPos < CX2Unit::EP_END ) || 0 == itemID )
+		return;
+
+	if ( UVS_SELECTUNIT == m_eUnitViewerState || 10 == static_cast<int>( m_eUnitViewerState )	// 10: a June-only viewer state
+		|| UVS_CLASSCHANGE == m_eUnitViewerState || UVS_CREATEUNIT == m_eUnitViewerState )
+	{
+		if ( 0 == m_ViewEquipNormal[eqipPos][0] && 0 == m_ViewEquipFashion[eqipPos][0] )
+			AddEquipByTID( itemID, true, false, -1 );
+	}
+	else
+	{
+		if ( false == m_bSwitchingView && 0 == m_ViewEquipNormal[eqipPos][0] && 0 == m_ViewEquipFashion[eqipPos][0] )
+			AddEquipByTID( itemID, true, false, -1 );
+		if ( true != m_bSwitchingView )
+			return;
+	}
+
+	if ( NULL == m_pMinorUnitXSkinAnim )
+		return;
+	const CX2Item::ItemTemplet* pItemTemplet = g_pData->GetItemManager()->GetItemTemplet( itemID );
+	if ( NULL != pItemTemplet && 0 != pItemTemplet->GetItemIDForMinorUnit()
+		&& 0 == m_ViewEquipNormal[eqipPos][1] && 0 == m_ViewEquipFashion[eqipPos][1] )
+		AddEquipByTID( pItemTemplet->GetItemIDForMinorUnit(), true, true, -1 );
+}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 void CX2UnitViewerUI::ReplaceEmptyToBasic( CX2Unit::EQIP_POSITION eqipPos, int itemID )
 {
 	////헤어
@@ -6302,6 +6828,7 @@ void CX2UnitViewerUI::ReplaceEmptyToBasic( CX2Unit::EQIP_POSITION eqipPos, int i
     }//if
 }
 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 //}} robobeg : 2008-10-18
 
 //{{ robobeg : 2008-10-17
@@ -7717,9 +8244,16 @@ void CX2UnitViewerUI::ProcessEnchantWeaponEffectForBow()
 // 실제 weapon trace는 사용하지 않지만, 속성 인챈트 이펙트 위치를 지정하기 위해서 사용된다.
 void CX2UnitViewerUI::InitWeaponTrace()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5b2: stand-in, June 31f9a2a0 builds trace frames for bodies 0-2; Lu's weapon only until DU5d
+	if ( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ][0] != 0 )
+	{
+		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ][0] );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	if ( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ] != 0 )
 	{
 		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ] );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		if ( iter != m_ViewEquipMap.end() )
 		{
 			CX2EqipPtr pX2Eqip = iter->second;
@@ -7776,9 +8310,15 @@ void CX2UnitViewerUI::InitWeaponTrace()
 			}//if
 		}//if
 	}//if
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	else if ( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ][0] != 0 )	// char-luciel DU5b2
+	{
+		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ][0] );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	else if ( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ] != 0 )
 	{
 		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ] );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		if ( iter != m_ViewEquipMap.end() )
 		{
 			CX2EqipPtr pX2Eqip = iter->second;

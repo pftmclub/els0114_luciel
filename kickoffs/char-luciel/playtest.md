@@ -113,3 +113,39 @@ after a swap (the shown body is not created or not animated: say which body, Lu 
 ### Logs
 [JUNE_CHAR] LUCIEL (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`: one `LUCIEL DUO FORM unit 166: form a -> b saved, NOT sent` line per
 village swap in step 3; DU5b adds no lines of its own, so read `ErrorLog.txt` for new errors)
+## DU5b2 - Each body's equipment in the character window ( June's per-body viewer equipment )
+
+### Dev console
+none - testlu1 already wears both bodies' gear: Lu's Promotion set over a Cobo beginner set, Ciel's Promotion set, Ciel's Spa Wear one-piece
+
+### Loadout
+n/a - no skills are tested. The checks are the character window (U), its switch button, a click on the body and drag-unequipping one item.
+
+### Steps
+1. Log in **testlu1** (Lu/Ciel, Duo). Open the character window (U); note which body shows and what it wears.
+2. Press the window's switch button so the other body shows; note what it wears. Click the body to swap back.
+3. Ciel shown: drag **Ciel's Promotion Gloves** from her glove slot to the bag. Look at her hands. Drag them back onto the slot.
+4. Lu shown: drag **Lu's Promotion Gloves** to the bag. Look at Lu's hands. Drag them back.
+5. Close and reopen the window twice, swapping body each time.
+6. Relog onto **jtLordKnight**, then **jtCodeEmpress**: open the character window (U) and look at each; then open the character select screen.
+
+### Expect
+- Lu shown: Lu wears **Lu's Promotion** top / bottom / gloves / shoes and the Promotion dual weapon (the fashion covers the Cobo set); nothing of
+  Ciel's is on Lu.
+- Ciel shown: Ciel wears her own gear, the **Spa Wear - Charming Geyser** one-piece and her Promotion pieces the one-piece leaves visible
+  (gloves, shoes, weapon); she is **not bare** and wears nothing of Lu's.
+- Step 3: without her Promotion gloves Ciel shows the **Ciel copy of the Cobo beginner gloves** (item 200113303, built from Lu's normal Cobo
+  gloves), never bare hands; re-equipping puts the Promotion gloves back.
+- Step 4: Lu shows the Cobo beginner gloves; re-equipping restores the Promotion gloves.
+- Step 5: every reopen and swap shows the same gear per body as steps 1-2.
+- Step 6: both classes' windows and the select screen look exactly as before (one body, own fashion, weapon in hand).
+- No crash, nothing new in `ErrorLog.txt`.
+
+### If not
+Name the step, the body (Lu or Ciel) and the slot: a bare body (the item was built on the other skin or not at all), Lu's piece on Ciel or Ciel's
+on Lu (wrong body slot), both a fashion and the normal piece visible at once (the slot visibility pass missed a body), the gloves not coming back
+after step 3 / 4, a weapon missing, or a crash (send the X2_*.tmp bundle from %TEMP%).
+
+### Logs
+[JUNE_CHAR] LUCIEL (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`: the `LUCIEL DUO FORM` lines of each village swap; DU5b2 adds no lines,
+so `ErrorLog.txt` is read for new errors)

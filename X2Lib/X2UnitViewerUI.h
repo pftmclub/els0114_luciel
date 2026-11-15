@@ -118,9 +118,17 @@
 		//void AddEquipByTID( int itemTID );
 		//void RemoveEquipByTID( int itemTID );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		void AddEquipByTID( int itemTID, bool bBasicItem = false, bool bMinorUnit = false, int iEnchantLevel = -1 );	// char-luciel DU5b2: June 31f9c640
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         void AddEquipByTID( int itemTID, bool bBasicItem = false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 //}} robobeg : 2008-10-17
 		void RemoveAllEquips();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		int GetViewSlotPosition( CX2Eqip* pX2Eqip_, const CX2Item::ItemTemplet* pItemTemplet_ ) const;	// char-luciel DU5b2
+		void SetShowFormEquipOnly( bool bShowFormEquipOnly_ ) { m_bShowFormEquipOnly = bShowFormEquipOnly_; }	// char-luciel DU5b2: June +0x118c
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 #ifdef	NOT_RENDERING_OTHER_EQUIP_POS
 		void InitEquipVisibility();
@@ -196,11 +204,20 @@
 #endif
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5b2: no live caller, June has none; the slot of one body
+		bool    IsFashionItemEquippedAt( CX2Unit::EQIP_POSITION eqipPos, int iBody_ = 0 )
+		{
+			ASSERT( eqipPos >= CX2Unit::EQIP_POSITION( 0 ) && eqipPos < CX2Unit::EP_END );
+			return m_ViewEquipFashion[ eqipPos ][ iBody_ ] != 0;
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		bool    IsFashionItemEquippedAt( CX2Unit::EQIP_POSITION eqipPos )
 		{
 			ASSERT( eqipPos >= CX2Unit::EQIP_POSITION( 0 ) && eqipPos < CX2Unit::EP_END );
 			return m_ViewEquipFashion[ eqipPos ] != 0;
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 #ifdef UNIT_EMOTION
 		void EmotionFrameMove();
@@ -278,11 +295,20 @@
 
 //{{ robobeg : 2008-10-17
 // 현재의 EQUIP_POSITION 의 부품 착용 여부를 알려주는 함수
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5b2: no live caller under the flag ( June's ReplaceEmptyToBasic reads the slots itself ); the slot of one body
+		bool    IsItemEquippedAt( CX2Unit::EQIP_POSITION eqipPos, int iBody_ = 0 )
+		{
+			ASSERT( eqipPos >= CX2Unit::EQIP_POSITION( 0 ) && eqipPos < CX2Unit::EP_END );
+			return m_ViewEquipNormal[ eqipPos ][ iBody_ ] != 0 || m_ViewEquipFashion[ eqipPos ][ iBody_ ] != 0;
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         bool    IsItemEquippedAt( CX2Unit::EQIP_POSITION eqipPos )
         {
             ASSERT( eqipPos >= CX2Unit::EQIP_POSITION( 0 ) && eqipPos < CX2Unit::EP_END );
             return m_ViewEquipNormal[ eqipPos ] != 0 || m_ViewEquipFashion[ eqipPos ] != 0;
         }//IsItemEquippedAt()
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 //}} robobeg : 2008-10-17
 
 #ifdef ELSWORD_SECOND_CLASS_CHANGE
@@ -320,6 +346,7 @@
 		bool					m_bSwitchingView;			// June +0xd80, Ciel is the shown body
 		bool					m_bEnableDuoView;			// June +0xd81, the other body is drawn behind ( ctor true, the character window false )
 		bool					m_bShowDuoBackUnit;			// June +0xd82, the back body's emotion gate ( its writers are DU5c's )
+		bool					m_bShowFormEquipOnly;		// char-luciel DU5b2: June +0x118c, a field / room viewer adds only the shown body's equipment ( writers: DU5c )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		D3DXVECTOR3				m_LightPos;
 
@@ -331,8 +358,16 @@
         typedef std::map<UidType,CX2EqipPtr>    ViewEquipMap;
 
         ViewEquipMap            m_ViewEquipMap;								// ED템, 패션템 모두 들어있음
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+#ifndef SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER needs SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY ( the March slot visibility reads one body )
+#endif
+		UidType					m_ViewEquipNormal[CX2Unit::EP_END][3];		// char-luciel DU5b2: June +0x208, [ pos ][ body ]
+		UidType					m_ViewEquipFashion[CX2Unit::EP_END][3];		// June +0x5b0, [ pos ][ body ]
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         UidType                 m_ViewEquipNormal[CX2Unit::EP_END];
         UidType                 m_ViewEquipFashion[CX2Unit::EP_END];
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #ifdef	NOT_RENDERING_OTHER_EQUIP_POS
 		bool					m_bViewEquipVisible[ CX2Unit::EP_END ];
 #endif	NOT_RENDERING_OTHER_EQUIP_POS

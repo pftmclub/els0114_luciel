@@ -41,3 +41,9 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Amended by char-luciel DU5b2 (2026-11-16): per-body weapon trace
+
+- `InitWeaponTrace` (`31f9a2a0`) loops bodies 0-2 (`+0x5e0 + body x 8` = the fashion weapon slot of each body, then `+0x238 + body x 8` the normal
+  one) and keeps trace frames per body; DU5b2 reads Lu's weapon only (`[ EP_WEAPON_HAND ][0]`, stand-in comment). Port the per-body frames with
+  the viewer weapon effects (case 10).

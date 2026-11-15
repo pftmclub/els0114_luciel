@@ -71,3 +71,17 @@ show both, so these come with this phase:
 - `31f90fb0` (rotate the minor skin: SelectLuciel's `m_fMinorUnitLobbyRotationY`), `31f99f70`'s back-body move (`SetPositionOnScr`);
 - the equips' position / scale / colour copies by body (`31f93710` / `31f93820` / `31f93920`: equip `+0x908`, `+0x914`, `+0x190`, no March
   members; find their June readers first) and `31fa4ec0`'s duo sit sets (customize: Stage 12 unless the table rows need it).
+
+## Amended by char-luciel DU5b2 (2026-11-16): field / room viewers and the fixed equips
+
+- **`m_bShowFormEquipOnly`** (viewer `+0x118c`, DU5b2's member, ctor false): June sets it to 1 in `CX2SquareUnit::InitViewer` (`323f7380 @323f7417`,
+  right after the viewer ctor) and in `CX2Room` `31ed46e0` (`@31ed4815` the room slot's viewer, `@31ed489b` my unit's); call
+  `SetShowFormEquipOnly( true )` there (X2Room.cpp is DU5e's file: coordinate). Its readers (`AddEqip` / `AddEquipByTID`) are ported.
+- **`CX2Eqip::SetFixed`** (`3295a560`): June sets `m_bFixed` only; March also hides the sub-equips (`SUB_EQUIP_TEST`). Find how June draws a fixed
+  equip's sub-equips (village square units), then replace March's under a divergence flag and drop the two `june_diverge_allow.tsv` rows
+  (`AddEquipByTID` / `AddEqip`) and turn the `CX2Eqip::SetFixed` row to ported.
+- **Equip copies:** DU5b2 left three more `3295b260` stand-ins (equip `+0x908` state, `+0x90c` position, `+0x918` scale, set by `AddEqip` /
+  `AddEquipByTID` from the viewer, or from `+0x11b0` in viewer state 9) beside DU5b's `31f93710` / `31f93820` / `31f93920`; `UpdateEqip` ends with the
+  same copies by body.
+- **The frame move's enchant lookup** (`31fa8ce0 @31fa9040`): June asks the worn item on the equip's body (`32869e10( pos, 0, body )`); March's
+  two-argument call stays until the back body's frame move lands here.

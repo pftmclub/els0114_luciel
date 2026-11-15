@@ -195,6 +195,9 @@ class CX2Eqip : public CKTDGObject
 		bool                    IsDummyBasic() const { return m_bDummyBasic; }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool                    IsMinorUnitEquip() const { return m_bMinorUnitEquip; }	// char-luciel DU3: June +0x15d4, the equip is Ciel's
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		bool                    HasSubEquipOrAttachedParticle() const { return false == m_vecpSubEquip.empty() || false == m_AttachedParticleGroup.m_vecpAttachedParticle.empty(); }	// char-luciel DU5b2: June 31fac390 ( +0x8dc / +0x8f0 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		int                     GetEnchantType() const
 		{

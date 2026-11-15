@@ -32,3 +32,5 @@ X2GUUser.cpp	CX2GUUser::CommonFrameMove	CommonFrameMoveFuture_TimedEvent	routed 
 X2GUUser.cpp	CX2GUUser::CommonFrameMove	CommonFrameMove_TimedEvent	routed to backlog Stage 2 by char-luciel DU1d3b: June 31ff27c0's 16 B stop records with the state test; the body reads are ported
 *	*	ResetEqip	routed: char-luciel DU3c ports June's ResetEqip 32355e40 ( conflict skip, templet / use-type tests, 3234da60 ); char-luciel DU3b found it
 X2Eqip.cpp	CX2Eqip::OnFrameMove	LoadAttached	routed: june-engine R14f ports June's LoadAttached 32961c80 whole ( DITT render switches, the DG-chain byte +0x15d5 ); R14d found it
+X2UnitViewerUI.cpp	CX2UnitViewerUI::AddEquipByTID	SetFixed	char-luciel DU5b2: June 31f9c640 @31f9c990 calls SetFixed 3295a560; March's also hides the sub-equips, its replacement is routed to char-luciel DU5c with the village square-unit viewers ( row CX2Eqip::SetFixed )
+X2UnitViewerUI.cpp	CX2UnitViewerUI::AddEqip	SetFixed	char-luciel DU5b2: June 31f9df40 @31f9e305 calls SetFixed 3295a560; March's also hides the sub-equips, its replacement is routed to char-luciel DU5c with the village square-unit viewers ( row CX2Eqip::SetFixed )
