@@ -13889,7 +13889,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-15
 // Description: Short-lived diagnostic for june-engine R9: grep-able "[JUNE_ENGINE] FX small delta ..." lines in ErrorLog.txt, a few per item. Retired by the R9 review.
-#define SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+//#define SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////

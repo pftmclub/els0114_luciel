@@ -1682,6 +1682,33 @@ junediverge RESULT: PASS. **enumscan: FAIL exit 1, not mine:** 3 old `case 104:`
 **Routed, not done:** nothing new. Open question for the user: none.
 **Play-test passed 2026-11-15, logs read (user: all test passed):** effect alpha 0.3 on skin-mesh particles (6 lines, `0.3`), state manager own handler on every device reset (4 lines, Alt+Enter), outline clamp fired 6 lines (1.63 to 1.30 clamped, UI system); 0 EXCEPTION; the 2 UNHANDLED `E_DISABLE_HB_CHECK_REQ` are old. RHW alpha / XET name lines did not fire (no such particle reached). Review owed.
 
+### Phase R9 -- Review
+
+**2026-11-15, Opus 5.5 high. Verdict: PASS, no code change.** Reviewed `8dd0db66` against June (raw capstone, `disasm_range.py`). The only edit is the debug retire:
+`//#define SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG` (`Always.h:13886`).
+
+**Spot-checks (June listing read, not the Done note)**
+- **System kind `+0xdc`:** the ctor id pushed before `31cf88c0` and the kind stored after `31cfd090` (`OpenScriptFile`): id 0 -> 2 (`@31ede2a8` / `31ede2d0`), 1 -> 3
+  (`@31ede36e` / `31ede39c`), 2 -> 0 (`@31ede42e` / `31ede45c`), 3 -> 1 (`@31ede4ee` / `31ede51c`). March's `ResetUIMajor/UIMinor/GameMajor/GameMinor` pass ids 0 / 1 / 2 / 3:
+  `SetSystemKind( 2 / 3 / 0 / 1 )` is right.
+- **Clamp `31cfe050`:** distance <= 700 (`3344cea0`) -> /700, else /1000 (March's rule, kept inline); sequence `+0x1b4` NULL -> width unclamped; kind 2 or 3 -> cap `3344ce94`
+  = 1.2, else `3344ce90` = 999; `max <= width` returns the cap (`test ah, 0x41`), i.e. `ClampOutlineWidth` exactly. The play-test's 1.63 / 1.30 are the logged inputs, not results.
+- **RHW colour order (`31cf62a0`):** `+0x1ac` times colour alpha `@31cf65d0`, then the 0..1 clamp and pack to bytes, then `GetEffectAlpha` (`31be2b00` `@31cf67c0`) on the
+  packed alpha byte: the port's `GetColorWithSequenceAlpha` then `ApplyEffectAlphaToColor`. Vertices 4 / 5 copy the finished 3 / 1.
+- **Skin-mesh draw (`31cf16b0`):** the effect-alpha call `@31cf1888-31cf18d1` follows the last render-param store (tex offsets `+0x4c..+0x60`) and precedes the draw loop, as ported.
+  `31ceefb0`: `+0x6c` = 5 (SRCALPHA); `+0x70` kept if 4 / 7 (INVSRCCOLOR / DESTALPHA), else 6 (INVSRCALPHA); `+0x24` and `+0x34` times alpha, NULL param returns.
+  `outLineColor.a` compounding stays as JUNE_BUGS 750 says.
+- **State manager lost device:** June `31d184f0` sets `+0x2114` = `+0x2118` and `+0x2110` = 0, March's inline `OnLostDevice` (first dirty 0, first clean = count); no
+  `SUCCEEDED` condition in `CKTDXApp::OnLostDevice`, and the renderer returns the effect's result alone. The only other March caller was the renderer (`KTDGManager.cpp:1316`).
+- **XET / close by pointer:** `_UnLoad` `@31d4f42e-31d4f448`: XET non-NULL and device manager (`+0x1f4`) non-NULL -> `31cdd8d0`, then NULL; otherwise the pointer stays, as ported.
+  `rfind( L'.' )` = npos gives `substr( 0, npos )` = the whole id. `DestroyMeshContainer` and the RT_ADD_* parse read from the diff only (no in-game reach for RT_ADD_*).
+
+**Gates:** `finish.py --review --commits 8dd0db66 --with <the 6 flags + _DEBUG>`: flagcheck RESULT PASS for all six (STATE_LOST 2 PASS / 4 OTHER, ADD_TYPES 0 / 6,
+EFFECT_ALPHA_PATHS 1 / 5, OUTLINE_CLAMP 2 / 4, SEQ_ALPHA 1 / 5, SKINMESH_SMALL_LOADS 1 / 5); every OTHER row is a sibling R9 flag in a shared file; the one deleted line is the
+mesh-draw comment inside `JUNE_EFFECT_ALPHA_OPTION` (address corrected to `31cf10c0`, deliberate). junediverge PASS, `--check-all` PASS. **enumscan FAIL, not R9's:** the 3
+unit-class literals `case 104 / 105 / 113` at `X2Data.cpp:3221-3223` come from june-transcend T2 (`4c82e1ff`, 2026-10-23), outside R9's hunks; left to that plan.
+**Build skipped: debug retire only.** Routed: nothing. Open questions: none.
+
 ## Phase R10 - Skin-anim playback sweep
 
 **Run with:** Opus 5.5 high. No code. Added by R0b: the non-render `CKTDGXSkinAnim` functions (`OnFrameMove` `31d2bd80`, `ChangeAnim`
