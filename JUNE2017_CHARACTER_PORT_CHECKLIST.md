@@ -712,7 +712,8 @@ owner and the templet's unit type is not 9 / 0xb: the owner templet's minor-unit
 `basicFoot`, `m_RavenLeftArmItemID`), not minor-unit ones, so this pair exists for **every class**: June's `UpdateEquipCollisionData` (`31fd8c00`,
 Aisha `32cc8d30`) takes a non-Add / non-Rose item's hit lines from the basic item's anim. Not Lu/Ciel-only: it belongs to the engine plan (with its
 `3295a570` ChangeAnim and the equip frame move / delete). Until then D1-3h's sites use the worn item's own anim (stand-in, same lines, worn weapon's reach).
-(Raven: CH4c - the left-arm readers: `3201c3a0` already June's; `CX2GUUser::InitEqip` `32024510` and the viewer `31f94360` differ, routed whole to june-engine R14c.)
+(Raven: CH4c - the left-arm readers: `3201c3a0` already June's; `CX2GUUser::InitEqip` `32024510` and the viewer `31f94360` differ, routed whole to june-engine R14c, then split to R14e.)
+**Ported 2026-11-15 (june-engine R14c, `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM`):** the pair, both minor-unit branches included; collision sites switched.
 
 ### 7ab. Rose weapon attach frames (from June engine R14b)
 

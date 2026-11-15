@@ -579,6 +579,7 @@ class CX2ItemManager
 			DITT_LOOP_ANIM_ITEM_ID					= 72,	// 0x48: the GUUser CommonFrameMove block before CEPE (3295c960, Stage 11)
 			DITT_CONDITION_EQUIP_PLAY_EFFECT_SET	= 81,	// 0x51: the group key hard-coded in 32814da0
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			DITT_ITEM_ID_JIGGLE_TYPE1												= 30,	// june-engine R14c: GetJiggleBone 3295b230
 			DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2_FACE3								= 31,
 			DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2									= 32,
 			DITT_ITEM_ID_NOT_RENDERING_HAIR											= 33,

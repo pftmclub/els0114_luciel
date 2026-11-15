@@ -142,6 +142,9 @@ class CX2Eqip : public CKTDGObject
 		CKTDGXSkinAnim*			GetHyperAnim( int index )			{ return m_pHyperXSkinAnim[index]; }
 		CKTDXDeviceXSkinMesh*	GetNormalModel( int index )			{ return m_pNormalXSkinModel[index]; }
 		CKTDXDeviceXSkinMesh*	GetHyperModel( int index )			{ return m_pHyperXSkinModel[index]; }
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+		CKTDGXSkinAnim*			GetBasicItemAnim( int index )		{ return m_pBasicItemXSkinAnim[index]; }	// june-engine R14c: June reads +0x584 inline ( 31fd8c00 )
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 
 		const WCHAR*			GetModelName( int index ) const			{ return m_ModelName[index].c_str(); }
 		const WCHAR*			GetModelNameHyper( int index ) const	{ return m_ModelNameHyper[index].c_str(); }
@@ -372,6 +375,10 @@ private:
 
 		CKTDXDeviceXSkinMesh*		m_pNormalXSkinModel[ CX2Item::MAX_MODEL_COUNT_A_ITEM ];
 		CKTDXDeviceXSkinMesh*		m_pHyperXSkinModel[ CX2Item::MAX_MODEL_COUNT_A_ITEM ];
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+		CKTDGXSkinAnim*				m_pBasicItemXSkinAnim[ CX2Item::MAX_MODEL_COUNT_A_ITEM ];	// june-engine R14c: June +0x584, the owner's basic item, collision only
+		CKTDXDeviceXSkinMesh*		m_pBasicItemXSkinModel[ CX2Item::MAX_MODEL_COUNT_A_ITEM ];	// june-engine R14c: June +0x5e4
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 
 		CKTDXDeviceXMesh*			m_pNormalXMesh[ CX2Item::MAX_MODEL_COUNT_A_ITEM ];
 		CKTDXDeviceXMesh*			m_pHyperXMesh[ CX2Item::MAX_MODEL_COUNT_A_ITEM ];

@@ -34270,8 +34270,14 @@ void CX2GUArme_VioletMage::UpdateEquipCollisionData( IN vector<CX2EqipPtr>& vecE
 
 		for( int j = 0; j < CX2Item::MAX_MODEL_COUNT_A_ITEM; j++ )
 		{
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+			// june-engine R14c: June 32cc8d30, a Rose / Add item's own anim, any other item's basic-item anim ( as 31fd8c00 )
+			const CX2Unit::UNIT_TYPE eItemUnitType = pEqip->GetItemTemplet()->GetUnitType();
+			CKTDGXSkinAnim* pAnim = ( CX2Unit::UT_ROSE == eItemUnitType || CX2Unit::UT_ADD == eItemUnitType ) ? pEqip->GetNormalAnim( j ) : pEqip->GetBasicItemAnim( j );
+#else SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 			// stand-in: June uses this anim only for Rose / Add items, else the class's basic-item anim +0x584 ( 3295dfa0, 329657d0 ), which March does not build
 			CKTDGXSkinAnim* pAnim = pEqip->GetNormalAnim( j );
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 
 			if( pAnim != NULL )
 			{

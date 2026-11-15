@@ -2032,6 +2032,83 @@ Strings `] EQATTACH item `, `TraceLandPos`, `addslots_skipped` checked in the de
 No open questions. The hyper remap was not exercised in the play-test (Basic Dynamo has no hyper model). It is a two-line index change, the same
 as the normal half's, and needs no extra test.
 
+## Phase R14c - Basic-item collision anim (+0x584 / +0x5e4)
+
+**Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (+ `_DEBUG`). Routed from
+june-march-divergence Phase S fix 2 (2026-10-30). Kickoff `kickoffs/june-engine/R14c.md`; its char-raven CH4c and char-luciel DU3c amendments
+were split out by this phase into **R14d** and **R14e** (below).
+- June's attach-anim init `3295dfa0` @`3295e2a9`-`3295e4de` builds, per model slot of every non-Rose / non-Add attach-anim equip with an owner, a
+  collision-only anim / model pair from the owner's basic item for that position (`329657d0`); `UpdateEquipCollisionData` (`31fd8c00`, Aisha
+  `32cc8d30`) takes such an equip's hit lines from it. Port its life cycle and switch both collision sites off Phase S's stand-in.
+
+### Phase R14c -- Done
+
+**2026-11-15, Opus 5.5 high.** Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` + `_DEBUG` (one `[JUNE_ENGINE] EQBASIC` line per equip that
+built basic-item anims, first 60 then every 100th; the review retires it). 7 funcmap rows `(R14c)`; JUNE_BUGS 734-735; MODS.md entry.
+
+**June life cycle of `+0x584` (anim) / `+0x5e4` (model)**, read in Ghidra (CX2Eqip vtable `334c9b50`):
+- **Init** `3295dfa0` @`3295e2a9`, after the slot's normal model opened (a NULL model skips the slot): owner `+0x1b4` set and templet unit type
+  (`+0xd2`) not `UT_ROSE` / `UT_ADD` -> delete the old anim; `GetItemTemplet( owner->GetBasicItemID( pos ) )`, NULL -> no pair. A worn templet with
+  `m_bIsForMinorUnit` (flags2 bit 2) takes the basic item's `m_ItemIDForMinorUnit` templet instead; else the `UT_ROSE` / `EP_WEAPON_HAND` slot remap
+  4..7 -> 0..3 (dead: the outer test excludes Rose). `GetModelName( i )` -> `OpenXSkinMesh` -> `+0x5e4[i]`; CreateSkinAnim, Set / Add with the
+  normal XETs (bAddCollisionData 1), `ChangeAnim( m_AniName )`, XAP_LOOP, UseDXMatrix, and the `3295b230` jiggle (worn item in DITT 30: 1.5 / 0).
+- **`329657d0`** = `CX2Unit::GetBasicItemID`: EP 2 / 6..11 / 0x24 -> `m_BasicWeapon..FootItemID`, `m_RavenLeftArmItemID` (templet `+0xe4..+0x100`), else 0.
+- **ChangeAnim** `3295a570` = March's plus the basic anim. **Frame move** `32964ae0` (vslot 4) @`32964f22`: with `m_pUnitMatrix[i]`, the basic anim
+  first, with the worn item's matrix, then OnFrameMove. **Not drawn:** the render functions read `+0x544` / `+0x564` only.
+- **Dtor** `329602f0`: removes `+0x5e4[i]` from the unit anim whatever the attachment, deletes `+0x584[i]`, closes `+0x5e4[i]`.
+- **Collision** `31fd8c00` @`31fd8d40` / `32cc8d30` @`32cc8fb6`: templet type `UT_ROSE` / `UT_ADD` -> `+0x544[j]`, else `+0x584[j]`.
+
+**Port** (March functions, June's lines added under the flag): `CX2Unit::GetBasicItemID` (`X2Unit.h`, inline), `CX2Eqip` members
+`m_pBasicItemXSkinAnim` / `m_pBasicItemXSkinModel` + `GetBasicItemAnim`, ctor NULL, `InitAttatchAnim` block, `ChangeAnim`, the `OnFrameMove`
+attach-anim block, dtor; `DITT_ITEM_ID_JIGGLE_TYPE1 = 30` added under `JUNE_ENUM_NAMES` (`X2ItemManager.h`). Both collision walks now pick the anim
+June's way (`#else` = Phase S's stand-in).
+- **Kept as June** (JUNE_BUGS): 734, a minor-unit equip whose basic item has no minor-unit templet still builds an anim on the slot's old model;
+  735, a re-init overwrites `+0x5e4[i]` without closing it.
+- **Partial on purpose:** only the basic anim's lines were added to March's `OnFrameMove` and dtor. June's whole `OnFrameMove` differs elsewhere
+  (TraceLandPos offset per frame, per-body scale / rotate, `3295ce00`, the UT_SKIN id switch, the show gate) and goes to **R14d** with the DG-chain
+  byte readers DU3c routed here. InitEqip `32024510` and the viewer `31f94360` (char-raven CH4c) go to **R14e**. This keeps R14c to one change.
+
+**Gates** (`finish.py --files <7 files> --with ..._BASIC_COLLISION_ANIM ..._DEBUG`, worktree): flagcheck RESULT FAIL, and only on a peer's
+hunk: `X2Unit.h` FAIL comes from june-engine R5's uncommitted `ET_EMOTION_AVATAR26` lines (line 332); `X2GUUser.cpp` / `Always.h` OTHER are R5's
+`CUSTOM_RENDER_STATE` lines; `X2ItemManager.h` OTHER is the `JUNE_ENUM_NAMES` enum line (intended). R14c's own hunks: X2Eqip.cpp PASS +113,
+X2Eqip.h PASS +7, X2GUArme_VioletMage.cpp PASS +6; 0 deleted, 0 non-ASCII. 47 EOL-mismatched lines are the `InitAttatchAnim` block, which took
+the CRLF of its anchor line in a mostly-LF file. junediverge RESULT: PASS; enumscan exit 0. The commit range gate is below.
+**Compile:** one-file `/Zs` probes (X2Lib US_SERVICE flags) of `X2Eqip.cpp`, `X2GUUser.cpp`, `X2GUArme_VioletMage.cpp`: 0 errors each.
+**Build: blocked, not deployed.** `build.py --deploy` (twice) stops in KTDXLIB at `Always.h(13695)`: the `#error` guard of
+`SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS` (char-luciel CH3c20, commit `b4f80375`) fires in the KTDXLIB project. That is not this phase's file to fix;
+the play-test waits for the first build that passes (any session's full build compiles R14c in).
+
+**How to see it** (hand-off in STATUS / the session reply): Aisha `arshu` (56, Cobo Wand + Promotion Wand fashion), Eve `Iivue` (19, Wild Tracker
+Drone +11 + Tassel Drone fashion), Elsword `jtLordKnight` (25, Void Sword +10 + Promotion Sword fashion) land Z combos on monsters; Add
+`LunaticPsykerT` (36) still hits with the dynamos (own anim). Log: `[JUNE_ENGINE] EQBASIC item <worn id> pos 2 basic_item 21 / 41 / 7 ...
+attack_lines N`. With `attack_lines 0`, the basic mesh carries no hit lines and Z hits nothing: a finding for the review (June's mesh vs March's).
+
+## Phase R14d - June's whole CX2Eqip::OnFrameMove and the DG-chain byte readers
+
+**Run with:** Opus 5.5 high (map, then port), Opus review, user play-test. Added by R14c (2026-11-15). Proposed flag
+`SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE`. After R14c; not alongside another session editing `X2Eqip.cpp`.
+- June `CX2Eqip::OnFrameMove` `32964ae0` (vslot 4, 757 disasm lines) against March's: the show gate (`+0xc`, `31fae370`, `+0x172`, game state
+  `0x3f`), the UT_SKIN id switch (`+0x8d0` / `+0x864` writes on the normal / hyper models), the UT_ATTACH_ANIM case (per-frame TraceLandPos offset
+  `32867660` + `329645a0` into `+0x8cc`, per-body scale / rotate `32867710` / `328677c0` with `+0x15d4`, the `+0x2ac` / item-id list `334c9a20`
+  -> `3295ce00` call), and the `LoadAttached` tail. R14c's basic-anim block is replaced by June's whole body.
+- The DG-chain byte `+0x15d5` (`CX2Eqip::m_bAttachedInDGManagerChain`, char-luciel DU3c): `32961c80` (LoadAttached) @`32962094` calls
+  `AddObjectChain` on a new sub-equip only when it is set; `32960ad0` (attached particles) @`32960c7a` / @`32960d33` calls `RemoveObjectChain` on
+  the new sequence and sets its `+0x45a` only when it is clear. Viewer callers pass 0 (`31f9c640`, `31f9df40`, `3280a170`, `32810500`, `32812380`).
+- funcmap rows `32964ae0 (R14c)`, `12046` / `12066` (DU3 / DU3c), `329602f0 (R14c)` (dtor, rest not compared).
+
+## Phase R14e - InitEqip and the character viewer's slot visibility (Raven left arm)
+
+**Run with:** Opus 5.5 high, Opus review, user play-test. Added by R14c (2026-11-15) from the char-raven CH4c and char-luciel DU3c amendments of
+the R14c kickoff. Proposed flag `SERV_IRUHADEV_JUNE_INIT_EQIP` (one per function if the RE splits them).
+- **`CX2GUUser::InitEqip` = June `32024510`** (236 lines): weapon / second-weapon attach objects, then `UpdateNotRenderingOtherEquipList`
+  (`3201c3a0`, already June's), vslot 0x638, a hidden-equip pass. March's one-piece, `IsNoRenderNasodHand` (three ids) and AC-arm passes after
+  that call are not in June. The view-list build `@32024551` (`UpdateEqip( true )`) is done (char-luciel DU3c).
+- **`CX2UnitViewerUI::UpdateEquipSlotVisibility` = June `31f94360`** (likely; confirm the pairing), 1,283 lines: the left arm hides for a view equip
+  in division group 47 (`DITT_ITEM_ID_NOT_RENDERING_NASOD_HAND`, `32807db0` @`31f952c3`); `ReplaceEmptyToBasic( EP_RAVEN_LEFT_ARM, ... )`
+  (`X2UnitViewerUI.cpp:3579`).
+- Rows: `june_march_divergent.tsv` `CX2GUUser::InitEqip`, `CX2UnitViewerUI::UpdateEquipSlotVisibility`; `june2017_re/char_raven/ch0_overheat.tsv`
+  LEFTARM rows; funcmap `(Raven CH4c)`.
+
 
 ## Phase R13 - World object mesh render
 

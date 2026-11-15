@@ -149,6 +149,10 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 
 		m_pNormalXSkinAnim[i] = NULL;
 		m_pHyperXSkinAnim[i] = NULL;
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+		m_pBasicItemXSkinAnim[i] = NULL;	// june-engine R14c
+		m_pBasicItemXSkinModel[i] = NULL;
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 
 		m_pNormalXSkinModel[i] = NULL;
 		m_pHyperXSkinModel[i] = NULL;
@@ -377,6 +381,14 @@ CX2Eqip::~CX2Eqip(void)
 	    }
     }//if
     m_iXSkinModelAttachment = 0;
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+	// june-engine R14c: June 329602f0 also removes each basic-item model from the unit anim, whatever the attachment
+	if( m_pUnitXSkinAnim != NULL )
+	{
+		for( int i=0; i< CX2Item::MAX_MODEL_COUNT_A_ITEM; i++ )
+			m_pUnitXSkinAnim->RemoveModelXSkinMesh( m_pBasicItemXSkinModel[i] );
+	}
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 
 	//m_pUnitXSkinAnim->RemoveModelXSkinMesh( m_pNormalXSkinModel );
 	//m_pUnitXSkinAnim->RemoveModelXSkinMesh( m_pHyperXSkinModel );
@@ -398,9 +410,15 @@ CX2Eqip::~CX2Eqip(void)
 	{
 		SAFE_DELETE_KTDGOBJECT( m_pNormalXSkinAnim[i] );
 		SAFE_DELETE_KTDGOBJECT( m_pHyperXSkinAnim[i] );
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+		SAFE_DELETE_KTDGOBJECT( m_pBasicItemXSkinAnim[i] );	// june-engine R14c: June 329602f0
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 
 		SAFE_CLOSE( m_pNormalXSkinModel[i] );
 		SAFE_CLOSE( m_pHyperXSkinModel[i] );
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+		SAFE_CLOSE( m_pBasicItemXSkinModel[i] );	// june-engine R14c: June 329602f0
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 
 		SAFE_CLOSE( m_pNormalXMesh[i] );
 		SAFE_CLOSE( m_pHyperXMesh[i] );
@@ -1227,6 +1245,33 @@ HRESULT CX2Eqip::OnFrameMove( double fTime, float fElapsedTime )
 			{
 				if( NULL != m_pUnitMatrix[i] )
 				{
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+					// june-engine R14c: June 32964ae0 @32964f22 moves the basic-item anim first, with the worn item's matrix; it is never drawn
+					if( NULL != m_pBasicItemXSkinAnim[i] )
+					{
+						D3DXMATRIX localMove, matTrans, matRot, matScale;
+
+						CX2Unit::UNIT_TYPE unitType = m_pOwnerUnit->GetType();
+#ifdef  X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+						const D3DXVECTOR3& vScale = m_pItemTemplet->GetRenderScale(unitType);
+						const D3DXVECTOR3& vRotate = m_pItemTemplet->GetRenderRotate(unitType);
+						D3DXMatrixScaling(&matScale, vScale.x, vScale.y, vScale.z );
+						D3DXMatrixRotationYawPitchRoll( &matRot, vRotate.y, vRotate.x, vRotate.z );
+#else   //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+						D3DXMatrixScaling(&matScale, m_pItemTemplet->m_RanderScale[unitType].x, m_pItemTemplet->m_RanderScale[unitType].y, m_pItemTemplet->m_RanderScale[unitType].z );
+						D3DXMatrixRotationYawPitchRoll( &matRot, m_pItemTemplet->m_RanderRotate[unitType].y, m_pItemTemplet->m_RanderRotate[unitType].x, m_pItemTemplet->m_RanderRotate[unitType].z );
+#endif  //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+						D3DXMatrixTranslation( &matTrans, m_Offset.x, m_Offset.y, m_Offset.z );
+
+						D3DXMatrixMultiply( &localMove, &matScale, &matRot );
+						D3DXMatrixMultiply( &localMove, &localMove, &matTrans );
+
+						D3DXMATRIX  mWorld;
+						D3DXMatrixMultiply( &mWorld, &localMove, m_pUnitMatrix[i] );
+						m_pBasicItemXSkinAnim[i]->SetDXMatrix( mWorld );
+						m_pBasicItemXSkinAnim[i]->OnFrameMove( fTime, fElapsedTime );
+					}
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 					if( NULL != m_pNormalXSkinAnim[i] )
 					{
 						CKTDGXRenderer::RenderParam* pEqipRenderParam = m_pNormalXSkinAnim[i]->GetRenderParam();
@@ -2574,6 +2619,11 @@ void CX2Eqip::InitAttatchAnim()
 		/// 아이템 장착 위치
 		CX2Unit::EQIP_POSITION	eEquipPosition	= m_pItemTemplet->GetEqipPosition();
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
+		int		iBasicItemID		= 0;	// june-engine R14c: for the one "[JUNE_ENGINE] EQBASIC" line
+		int		iBasicItemAnims		= 0;
+		int		iBasicAttackLines	= 0;
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
 #ifdef SERV_IRUHADEV_JUNE_EQIP_ATTACH_ANIM
 		// June2017 3295dfa0: what this eqip did differently from March, for the one "[JUNE_ENGINE] EQATTACH" line at the end.
 		int		iAddSlotsSkipped	= 0;		// Add owner: weapon slots with no "Weapon0<n>" frame (no model)
@@ -2628,6 +2678,53 @@ void CX2Eqip::InitAttatchAnim()
 				continue;
 			}//if
 
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+			// june-engine R14c: June 3295dfa0 @3295e2a9-3295e4de, the owner's basic item for this position gives a collision-only anim
+			if( NULL != m_pOwnerUnit && CX2Unit::UT_ROSE != m_pItemTemplet->GetUnitType() && CX2Unit::UT_ADD != m_pItemTemplet->GetUnitType() )
+			{
+				SAFE_DELETE_KTDGOBJECT( m_pBasicItemXSkinAnim[i] );
+				const int iOwnerBasicItemID = m_pOwnerUnit->GetBasicItemID( m_pItemTemplet->GetEqipPosition() );
+				const CX2Item::ItemTemplet* pBasicItemTemplet = g_pData->GetItemManager()->GetItemTemplet( iOwnerBasicItemID );
+				if( NULL != pBasicItemTemplet )
+				{
+					int iBasicModelIndex = i;
+					if( true == m_pItemTemplet->GetIsForMinorUnit() )
+					{
+						// a missing minor-unit templet still builds the anim on the slot's old model ( JUNE_BUGS )
+						pBasicItemTemplet = g_pData->GetItemManager()->GetItemTemplet( pBasicItemTemplet->GetItemIDForMinorUnit() );
+						if( NULL != pBasicItemTemplet )
+							m_pBasicItemXSkinModel[i] = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( pBasicItemTemplet->GetModelName( iBasicModelIndex ) );
+					}
+					else
+					{
+						// dead in June: the test above already excludes UT_ROSE
+						if( CX2Unit::UT_ROSE == m_pItemTemplet->GetUnitType() && CX2Unit::EP_WEAPON_HAND == m_pItemTemplet->GetEqipPosition()
+							&& 4 <= iBasicModelIndex && iBasicModelIndex <= 7 )
+							iBasicModelIndex -= 4;
+						m_pBasicItemXSkinModel[i] = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( pBasicItemTemplet->GetModelName( iBasicModelIndex ) );
+					}
+
+					m_pBasicItemXSkinAnim[i] = CKTDGXSkinAnim::CreateSkinAnim();
+					m_pBasicItemXSkinAnim[i]->SetAnimXSkinMesh( m_pBasicItemXSkinModel[i], m_pNormalAniXET );
+					m_pBasicItemXSkinAnim[i]->AddModelXSkinMesh( m_pBasicItemXSkinModel[i], m_pNormalAniXET, m_pNormalMultiTexXET, m_pNormalTexChangeXET, false, true );
+					m_pBasicItemXSkinAnim[i]->ChangeAnim( m_AniName.c_str(), false );
+					m_pBasicItemXSkinAnim[i]->Play( CKTDGXSkinAnim::XAP_LOOP );
+					m_pBasicItemXSkinAnim[i]->UseDXMatrix( true );
+#ifdef JIGGLEBONE_TEST
+					if( true == g_pData->GetItemManager()->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_JIGGLE_TYPE1, m_pItemTemplet->GetItemID() ) )
+					{
+						m_pBasicItemXSkinAnim[i]->SetUnitXSkinAnim( m_pUnitXSkinAnim );
+						m_pBasicItemXSkinAnim[i]->SetJiggleMesh( true, 1.5f, 0 );
+					}
+#endif JIGGLEBONE_TEST
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
+					iBasicItemID = iOwnerBasicItemID;
+					++iBasicItemAnims;
+					iBasicAttackLines += (int)m_pBasicItemXSkinAnim[i]->GetAttackDataList().size();
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
+				}
+			}
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 			ASSERT( m_pNormalXSkinAnim[i] == NULL );
 			SAFE_DELETE_KTDGOBJECT( m_pNormalXSkinAnim[i] );
 			m_pNormalXSkinAnim[i] = CKTDGXSkinAnim::CreateSkinAnim();
@@ -2810,6 +2907,18 @@ void CX2Eqip::InitAttatchAnim()
 	        }//for
 #ifdef SERV_IRUHADEV_JUNE_EQIP_ATTACH_ANIM
 		// Routed (backlog Stage 11): June2017 3295dfa0 @3295edc0-3295ee2a, after the frames: an item in DITT 72
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
+		if( 0 < iBasicItemAnims )
+		{
+			static int s_iEqBasicLines = 0;
+			++s_iEqBasicLines;
+			if( s_iEqBasicLines <= 60 || 0 == s_iEqBasicLines % 100 )
+				KLOG( "ErrorLog.txt" ) << "[JUNE_ENGINE] EQBASIC item " << m_ItemID << " pos " << (int)m_pItemTemplet->GetEqipPosition()
+					<< " basic_item " << iBasicItemID << " minor " << ( m_pItemTemplet->GetIsForMinorUnit() ? 1 : 0 ) << " anims " << iBasicItemAnims
+					<< " attack_lines " << iBasicAttackLines
+					<< " line " << s_iEqBasicLines << fileout;	// june-engine R14c
+		}
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
 		// (DITT_LOOP_ANIM_ITEM_ID, 32809f40) looks up its record in the item manager (32807e00, map +0x2c0), calls 3295a570( record
 		// name, 1 ) = ChangeAnim( name, true ) on every normal / hyper / minor attach anim when +0x1c8 == 2, and sets +0x15f0 = 1.
 		// Group 72 is empty until Stage 11, so the branch is dead here.
@@ -4126,6 +4235,10 @@ void CX2Eqip::ChangeAnim( const WCHAR* pwszAnimName_, const bool bTransition_ )
 
 			if ( m_bCanHyperMode && NULL != m_pHyperXSkinAnim[i] )
 				m_pHyperXSkinAnim[i]->ChangeAnim( pwszAnimName_, bTransition_ );
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+			if ( NULL != m_pBasicItemXSkinAnim[i] )
+				m_pBasicItemXSkinAnim[i]->ChangeAnim( pwszAnimName_, bTransition_ );	// june-engine R14c: June 3295a570
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 		}
 	}
 }

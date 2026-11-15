@@ -767,6 +767,23 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
         CX2Inventory&   AccessInventory()                           { return m_UnitData.m_Inventory;				}
 //}} robobeg : 2013-11-01
 		const UnitTemplet*	GetUnitTemplet() const					{ return m_pUnitTemplet;						}
+#ifdef SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+		int				GetBasicItemID( const EQIP_POSITION eEqipPosition_ ) const	// june-engine R14c: June 329657d0, no templet test
+		{
+			switch( eEqipPosition_ )
+			{
+			case EP_WEAPON_HAND:		return m_pUnitTemplet->m_BasicWeaponItemID;
+			case EP_DEFENCE_HAIR:		return m_pUnitTemplet->m_BasicHairItemID;
+			case EP_DEFENCE_FACE:		return m_pUnitTemplet->m_BasicFaceItemID;
+			case EP_DEFENCE_BODY:		return m_pUnitTemplet->m_BasicBodyItemID;
+			case EP_DEFENCE_LEG:		return m_pUnitTemplet->m_BasicLegItemID;
+			case EP_DEFENCE_HAND:		return m_pUnitTemplet->m_BasicHandItemID;
+			case EP_DEFENCE_FOOT:		return m_pUnitTemplet->m_BasicFootItemID;
+			case EP_RAVEN_LEFT_ARM:		return m_pUnitTemplet->m_RavenLeftArmItemID;
+			}
+			return 0;
+		}
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		bool			IsMinorUnitForm() const						{ return m_bMinorUnitForm; }	// char-luciel DU1: June unit +0xe40, 1 = Ciel; the writer 3234b8c0 is DU5's
 		void			SetMinorUnitForm( const bool bMinorUnitForm_ )	{ m_bMinorUnitForm = bMinorUnitForm_; }	// char-luciel DU1b: June 3234b8c0's store; stand-in: its inventory refresh is DU5's

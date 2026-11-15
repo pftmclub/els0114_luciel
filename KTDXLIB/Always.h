@@ -13695,3 +13695,20 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS needs June's GetLandPosition ( _LINEMAP_LAND_MONSTER_ROAD ), June's weapon-taker walk ( _DIVERGE_FIXED_DISTANCE_WEAPON_TAKER, RAVEN_WEAPON_TAKER ), IsPosAlongLastTouchLine ( _CHAR_ARME_CORE ), GetOwnerGameUnitUID ( DUNGEON_RANK_NEW ) and CreateNPCReq's full argument list, char-luciel CH3c20
 #endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R14c: June's basic-item anim of an attach-anim equip ( CX2Eqip +0x584 / +0x5e4, 3295dfa0 @3295e2a9 ): the owner's
+//              basic item for the equip's position ( CX2Unit::GetBasicItemID, June 329657d0 ) builds a collision-only anim per model slot,
+//              renamed by ChangeAnim, moved each frame, freed in the dtor. UpdateEquipCollisionData ( 31fd8c00, Aisha 32cc8d30 ) takes a
+//              non-Rose / non-Add item's hit lines from it, so hit reach follows the basic weapon. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+#if defined( SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM ) && ( !defined( SERV_IRUHADEV_JUNE_EQIP_ATTACH_ANIM ) || !defined( SERV_IRUHADEV_JUNE_DIVERGE_UPDATE_EQUIP_COLLISION_DATA ) || !defined( SERV_IRUHADEV_JUNE_ITEM_KIM ) || !defined( SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM needs June's attach-anim init ( _JUNE_EQIP_ATTACH_ANIM ), June's collision walk ( _DIVERGE_UPDATE_EQUIP_COLLISION_DATA ), the minor-unit templet fields ( _JUNE_ITEM_KIM ) and DITT_ITEM_ID_JIGGLE_TYPE1 ( _JUNE_EQUIP_EFFECT_SET, _JUNE_ENUM_NAMES ), june-engine R14c
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+// Description: june-engine R14c play-test line "[JUNE_ENGINE] EQBASIC" per equip that built basic-item anims; the R14c review retires it.
+#define SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG ) && !defined( SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM )
+#error SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG needs SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
+#endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
+//////////////////////////////////////////////////////////////////////////
