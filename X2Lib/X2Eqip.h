@@ -308,6 +308,13 @@ class CX2Eqip : public CKTDGObject
 
 			void OnFrameMove( double fTime, float fElapsedTime );
 			void SetShowObject( bool bShow );
+#ifdef SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
+			bool GetOwnerLandPosition( D3DXVECTOR3* pvPos ) const;	// june-engine R14d: June 329645a0
+
+			UidType			m_OwnerUnitUID;		// June group +0x10: the equip's owner ( ctor -1 )
+			D3DXVECTOR3		m_vFixedPosition;	// June group +0x18: read when m_iPositionSource is not 0 / 3 ( ctor 0 )
+			int				m_iPositionSource;	// June group +0x30: 0 / 3 = the owner's land position ( ctor 0, no writer found )
+#endif SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
 		};
 #endif EQUIP_ATTACHED_PARTICLE_TEST
 

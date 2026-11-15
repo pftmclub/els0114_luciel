@@ -112,6 +112,9 @@ public:
 		RPUI_OBERON_CUSTOM_650_ANGEL_HEART = 14,	/// 이브 커스텀 - 엔젤 하트
 
 		RPUI_END,					/// 끝
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		RPUI_RAKSHASA = 63,		// june-engine R14d: June Enum.lua RIDING_PET_UNIT_ID, after RPUI_END so it keeps its value
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 	};
 	#pragma endregion 탈 것 아이디 열거체
 

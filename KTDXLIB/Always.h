@@ -13891,3 +13891,26 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: Short-lived diagnostic for june-engine R9: grep-able "[JUNE_ENGINE] FX small delta ..." lines in ErrorLog.txt, a few per item. Retired by the R9 review.
 #define SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R14d: June's whole CX2Eqip::OnFrameMove ( 32964ae0 ). A hidden attach-anim equip still moves while my
+//              unit rides Rakshasa ( RPUI_RAKSHASA 63 ); the skin switch takes June's alpha ids and drops March's Ara render-param ids;
+//              a TraceLandPos item re-reads its frame offset every frame and moves by the owner's land position ( the particle group's
+//              329645a0, ported with the members it reads ) minus the unit's root frame; attach anims and attach-normal matrices take
+//              the equip's body. Not ported: the attached-particle time sync 3295ce00 and June's group frame move 329646c0 ( R6c ),
+//              the DITT 72 loop anim ( Stage 11 ), June's LoadAttached 32961c80 ( R14f ).
+#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
+// Description: june-engine R14d debug: one "[JUNE_ENGINE] EQTRACE" line per TraceLandPos move ( first 10, then every 600th ); the
+//              review retires it.
+#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE_DEBUG
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R14d: the rest of June's ~CX2Eqip ( 329602f0 ): after the sub-equips it stops the equip's effect set
+//              ( +0x15f8, ReleaseEquipEffectSet( true ) ), which March's destructor left playing. Needs SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET.
+#define SERV_IRUHADEV_JUNE_EQIP_DTOR
+//////////////////////////////////////////////////////////////////////////

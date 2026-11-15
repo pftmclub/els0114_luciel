@@ -2350,6 +2350,58 @@ PASS; junediverge `--check-all` RESULT: PASS; enumscan exit 0; FINISH RESULT: PA
   the new sequence and sets its `+0x45a` only when it is clear. Viewer callers pass 0 (`31f9c640`, `31f9df40`, `3280a170`, `32810500`, `32812380`).
 - funcmap rows `32964ae0 (R14c)`, `12046` / `12066` (DU3 / DU3c), `329602f0 (R14c)` (dtor, rest not compared).
 
+### Phase R14d -- Done
+
+**2026-11-15, Opus 5.5 high.** Flags `SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE` (+ `_DEBUG`: one `[JUNE_ENGINE] EQTRACE` line per TraceLandPos move,
+first 10 then every 600th; the review retires it) and `SERV_IRUHADEV_JUNE_EQIP_DTOR`; `RPUI_RAKSHASA = 63` under `JUNE_ENUM_NAMES`
+(`X2RidingPetManager.h`, after `RPUI_END`). 7 funcmap rows `(R14d)`; JUNE_BUGS 745-746; 3 tsv rows; MODS.md entry.
+
+**Ported** (`X2Eqip.cpp`, `X2Eqip.h`):
+- **`CX2Eqip::OnFrameMove` = June `32964ae0` whole**, March's body (with R14c's basic-anim block) in `#else`. Hidden gate: `!GetShowObject()` returns
+  E_FAIL unless the equip is UT_ATTACH_ANIM and my unit's riding pet (`+0x683c`, id `+0x350`) is Rakshasa. UT_SKIN: face ids -> `SetNoRenderable`,
+  13 alpha ids (202560 / 202610 and June's 276915-276971 / 282812 / 282819) -> `SetAlphaRender( true )`, else false; hyper 202560 / 202610; March's
+  Ara Eun-hair `SetUseRenderParam` ids (41510 / 41640 / 41700 / 41736 / 41743) are gone, as in June. UT_ATTACH_ANIM per slot with a unit matrix: a
+  `TraceLandPos` frame 0 re-reads `GetFrameOffset( type, body )` and adds the owner's land position minus the unit anim's clone-root position; then
+  basic, normal, hyper anims with scale / rotate by `( type, body )`. UT_ATTACH_NORMAL takes the body too. LoadAttached after types 1 and 2.
+- **`AttachedParticleGroup::GetOwnerLandPosition` = June `329645a0`** (new): source not 0 / 3 -> the fixed position; `XS_VILLAGE_MAP` -> the field
+  unit's `GetLandPosition` by owner UID; else the game user's `GetLandPosition`. The members it reads (`m_OwnerUnitUID`, `m_vFixedPosition`,
+  `m_iPositionSource`) and their ctor values (June `3295d8a0`), and the eqip ctor's UID store (@`32961616`). No writer of the source exists in June.
+- **`~CX2Eqip` rest (`329602f0`)**: after the sub-equips, `ReleaseEquipEffectSet( true )` (= `321dafb0( &+0x15f8, 0 )`); the rest was March / R14c.
+
+**Stand-ins and routes** (scope rule):
+- `3295ce00` (attached particles synced to the attach anim's time, rebuilt for item 280322) and June's group frame move `329646c0`
+  (`TraceMatrixLandPos`, owner land pos, group scale) belong to June's reworked attached-particle group `+0x8f0` -> **R6c** (kickoff amended), with
+  `AttachParticle` `32960ad0` (the DG-chain byte's particle reader) and the eqip ctor compare (June stores `+0x190` = 0; no dummy-item delete).
+- `LoadAttached` `32961c80` differs far beyond the DG-chain byte (DITT 0x1d / 0x53 render switches, new ids) -> new phase **R14f**.
+- The `+0x15f0` DITT 72 loop-anim switch @`32965510` -> backlog Stage 11 (bullet extended).
+- R6b's item 1 (this switch) landed here; its kickoff is amended.
+- Divergence rows: `LoadAttached` (replace, routed R14f, allow row for R14d's call), `AttachParticle` (replace, routed R6c),
+  `CX2Eqip::AttachedParticleGroup::OnFrameMove` (verdict `stage2`, routed R6c: a replace row on the bare name would flag every frame move).
+- **Kept as June** (JUNE_BUGS): 745, the TraceLandPos test reads frame 0 for every slot; 746, a TraceLandPos item in the character window is moved
+  by the in-game unit's world land position (the viewer's group also looks the owner up by UID), and in the square (no game, not the village) the
+  land position stays zero.
+
+**Gates** (worktree, `finish.py --files <4 files> --with` the three flags + `JUNE_ENUM_NAMES`): X2Eqip.cpp PASS +233, X2Eqip.h PASS +7,
+X2RidingPetManager.h PASS +3; 0 deleted, 0 non-ASCII, 0 EOL-mismatched. The only ERROR was a peer's uncommitted `Always.h` guard line (line 10175);
+the committed range below is the verdict. junediverge RESULT: PASS (1 allow-listed); enumscan exit 0.
+**Compile:** one-file `/Zs` probe of `X2Eqip.cpp`: 0 errors; probe shows `JUNE_EQIP_FRAME_MOVE`, `_DEBUG`, `JUNE_EQIP_DTOR` on.
+**Build:** `COALESCED` into a peer's full build that started after these edits, then `DEPLOY OK: X2_offline.exe is 27,020,800 B, dated 2026-11-15
+22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3`. `EXESTR OK: 2 of 2 found in X2_offline.exe` (`] EQTRACE item `, ` found `).
+
+**How to see it:** Elsword `jtLordKnight` with 85811 (Miracle Alchemist Light) in village, field, dungeon, hyper on / off: the light sits at the feet
+and follows jumps; `EQTRACE ... found 1`. Ara `arasss` with 41743 (Yama Raja's Enchanted Hair) in awakening: hair may draw without the old
+render-param glow (June's; glow is R6b). Character window: sub-equips still show; 85811's light may sit off the model (JUNE_BUGS 746).
+Play-test owed.
+
+## Phase R14f - June's whole CX2Eqip::LoadAttached
+
+**Run with:** Opus 5.5 high (map, then port), Opus review, user play-test. Added by R14d (2026-11-15). Proposed flag
+`SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED`. After R14d; not alongside another session editing `X2Eqip.cpp`.
+- June `CX2Eqip::LoadAttached` `32961c80` (838 decompiled lines) against March's: the sub-equip loop (`32867540` / `32867560`, `31d38a20`,
+  `3295c130`), per-item render switches read through DITT groups (`32809f40( 0x1d )`, `( 0x53 )`), the new item-id cases, `SetDefaultRenderParam`
+  (R5b), `AddObjectChain` on a new sub-equip only when `+0x15d5` is set (@`32962094`), the attached-particle tail (`32960ad0` goes to R6c).
+- Rows: `june_march_divergent.tsv` `LoadAttached` (and its allow row), funcmap `32961c80 / 32960ad0 (R14d)`.
+
 ## Phase R14e - InitEqip and the character viewer's slot visibility (Raven left arm)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Added by R14c (2026-11-15) from the char-raven CH4c and char-luciel DU3c amendments of

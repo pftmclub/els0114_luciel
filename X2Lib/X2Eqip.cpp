@@ -76,6 +76,9 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 	{
 		m_OwnerUnitUID				= -1;
 	}
+#ifdef SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
+	m_AttachedParticleGroup.m_OwnerUnitUID = m_OwnerUnitUID;	// june-engine R14d: June 32961280 @32961616
+#endif SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
 
 
 	//{{ seojt // 2009-1-12, 16:19
@@ -441,6 +444,9 @@ CX2Eqip::~CX2Eqip(void)
 		SAFE_DELETE_KTDGOBJECT( pSubEquip );
 	}
 	m_vecpSubEquip.clear();
+#ifdef SERV_IRUHADEV_JUNE_EQIP_DTOR
+	ReleaseEquipEffectSet( true );	// june-engine R14d: June 329602f0 stops the equip's effect set ( +0x15f8 ) after the sub-equips
+#endif SERV_IRUHADEV_JUNE_EQIP_DTOR
 
 }//CX2Eqip::~CX2Eqip()
 
@@ -1141,6 +1147,196 @@ void CX2Eqip::SetRenderParamSpecial( CKTDGXRenderer::RenderParam* pEqipRenderPar
 HRESULT CX2Eqip::OnFrameMove( double fTime, float fElapsedTime )
 {
 	KTDXPROFILE();
+#ifdef SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
+	// june-engine R14d: June 32964ae0 ( CX2Eqip vslot 4 ); March's body is in the #else
+	if( m_pItemTemplet == NULL )
+		return E_FAIL;
+
+	if( !GetShowObject() )
+	{
+		// June @32964b52: a hidden attach-anim equip still moves while my unit's riding pet is Rakshasa
+		if( CX2Item::UT_ATTACH_ANIM != m_EqipType || NULL == g_pX2Game || NULL == g_pX2Game->GetMyUnit() )
+			return E_FAIL;
+
+		CX2RidingPetPtr ptrMyRidingPet = g_pX2Game->GetMyUnit()->GetRidingPet();
+		if( NULL == ptrMyRidingPet || CX2RidingPetManager::RPUI_RAKSHASA != ptrMyRidingPet->GetInfo().m_Id )
+			return E_FAIL;
+	}
+
+	switch( m_EqipType )
+	{
+	case CX2Item::UT_SKIN:
+		{
+			for( int i = 0; i < CX2Item::MAX_MODEL_COUNT_A_ITEM; i++ )
+			{
+				if( NULL != m_pNormalXSkinModel[i] )
+				{
+					switch( m_pItemTemplet->GetItemID() )
+					{
+					case 2:		// UnitTemplet.lua BasicFace ids
+					case 9:
+					case 16:
+					case 29:
+					case 36:
+					case 44:
+					case 45:
+					case 50:
+					case 51:
+					case 57:
+					case 41400:
+						m_pNormalXSkinModel[i]->SetNoRenderable( true );
+						break;
+
+					case 202560:	// June drops March's Ara SetUseRenderParam ids ( 41510 / 41640 / 41700 / 41736 / 41743 )
+					case 202610:
+					case 276915:
+					case 276922:
+					case 276929:
+					case 276936:
+					case 276943:
+					case 276950:
+					case 276957:
+					case 276964:
+					case 276971:
+					case 282812:
+					case 282819:
+						m_pNormalXSkinModel[i]->SetAlphaRender( true );
+						break;
+
+					default:
+						m_pNormalXSkinModel[i]->SetAlphaRender( false );
+						break;
+					}
+				}
+
+				if( NULL != m_pHyperXSkinModel[i] && m_bHyperMode == true && m_bCanHyperMode == true )
+				{
+					switch( m_pItemTemplet->GetItemID() )
+					{
+					case 202560:
+					case 202610:
+						m_pHyperXSkinModel[i]->SetAlphaRender( true );
+						break;
+
+					default:
+						m_pHyperXSkinModel[i]->SetAlphaRender( false );
+						break;
+					}
+				}
+			}
+
+			if( false == m_bLoadedAttached )
+				LoadAttached();
+		} break;
+
+	case CX2Item::UT_ATTACH_ANIM:
+		{
+			for( int i = 0; i < CX2Item::MAX_MODEL_COUNT_A_ITEM; i++ )
+			{
+				if( NULL == m_pUnitMatrix[i] )
+					continue;
+
+				// June @32964dbd: every slot tests attach frame 0, kept ( JUNE_BUGS 745 )
+				if( 0 == wcscmp( m_pItemTemplet->GetAttachFrameName( 0 ), L"TraceLandPos" ) && NULL != m_pOwnerUnit )
+				{
+					m_Offset = m_pItemTemplet->GetFrameOffset( m_pOwnerUnit->GetType(), m_bMinorUnitEquip );
+					D3DXVECTOR3 vOwnerLandPos( 0, 0, 0 );
+					const bool bOwnerFound = m_AttachedParticleGroup.GetOwnerLandPosition( &vOwnerLandPos );
+					D3DXVECTOR3 vRootFramePos( 0, 0, 0 );
+					if( NULL != m_pUnitXSkinAnim )
+					{
+						GetFramePos( &vRootFramePos, m_pUnitXSkinAnim->GetCloneFrameRoot() );
+						m_Offset += vOwnerLandPos - vRootFramePos;
+					}
+#ifdef SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE_DEBUG
+					static int s_iEqTraceLines = 0;
+					++s_iEqTraceLines;
+					if( s_iEqTraceLines <= 10 || 0 == s_iEqTraceLines % 600 )
+					{
+						KLOG( "ErrorLog.txt" ) << "[JUNE_ENGINE] EQTRACE item " << m_ItemID << " slot " << i << " found " << ( bOwnerFound ? 1 : 0 )
+							<< " land " << vOwnerLandPos.x << " " << vOwnerLandPos.y << " " << vOwnerLandPos.z
+							<< " root " << vRootFramePos.x << " " << vRootFramePos.y << " " << vRootFramePos.z
+							<< " offset " << m_Offset.x << " " << m_Offset.y << " " << m_Offset.z << " line " << s_iEqTraceLines << fileout;	// june-engine R14d
+					}
+#endif SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE_DEBUG
+				}
+
+				const bool bMoveHyper = ( NULL != m_pHyperXSkinAnim[i] && m_bHyperMode == true && m_bCanHyperMode == true );
+				if( NULL == m_pBasicItemXSkinAnim[i] && NULL == m_pNormalXSkinAnim[i] && false == bMoveHyper )
+					continue;
+
+				// June @32964f35: scale / rotate by the owner type and the equip's body, then the offset, on the attach frame
+				const CX2Unit::UNIT_TYPE eUnitType = m_pOwnerUnit->GetType();
+				const D3DXVECTOR3& vScale = m_pItemTemplet->GetRenderScale( eUnitType, m_bMinorUnitEquip );
+				const D3DXVECTOR3& vRotate = m_pItemTemplet->GetRenderRotate( eUnitType, m_bMinorUnitEquip );
+				D3DXMATRIX matScale, matRot, matTrans, localMove, mWorld;
+				D3DXMatrixScaling( &matScale, vScale.x, vScale.y, vScale.z );
+				D3DXMatrixRotationYawPitchRoll( &matRot, vRotate.y, vRotate.x, vRotate.z );
+				D3DXMatrixTranslation( &matTrans, m_Offset.x, m_Offset.y, m_Offset.z );
+				D3DXMatrixMultiply( &localMove, &matScale, &matRot );
+				D3DXMatrixMultiply( &localMove, &localMove, &matTrans );
+				D3DXMatrixMultiply( &mWorld, &localMove, m_pUnitMatrix[i] );
+
+				if( NULL != m_pBasicItemXSkinAnim[i] )
+				{
+					m_pBasicItemXSkinAnim[i]->SetDXMatrix( mWorld );
+					m_pBasicItemXSkinAnim[i]->OnFrameMove( fTime, fElapsedTime );
+				}
+
+				if( NULL != m_pNormalXSkinAnim[i] )
+				{
+					m_pNormalXSkinAnim[i]->SetDXMatrix( mWorld );
+					m_pNormalXSkinAnim[i]->OnFrameMove( fTime, fElapsedTime );
+					// stand-in: June @329651ad syncs the attached particles to this anim's time ( 3295ce00 ), not ported ( june-engine R6c )
+				}
+
+				if( true == bMoveHyper )
+				{
+					m_pHyperXSkinAnim[i]->SetDXMatrix( mWorld );
+					m_pHyperXSkinAnim[i]->OnFrameMove( fTime, fElapsedTime );
+					// stand-in: June @3296536a, the same particle time sync for the hyper anim ( june-engine R6c )
+				}
+			}
+
+			if( false == m_bLoadedAttached )
+				LoadAttached();
+		} break;
+
+	case CX2Item::UT_ATTACH_NORMAL:
+		{
+			for( int i = 0; i < CX2Item::MAX_MODEL_COUNT_A_ITEM; i++ )
+			{
+				if( NULL != m_pUnitMatrix[i] )
+				{
+					// June @32964c90: as March, with the equip's body
+					const CX2Unit::UNIT_TYPE eUnitType = m_pOwnerUnit->GetType();
+					const D3DXVECTOR3& vScale = m_pItemTemplet->GetRenderScale( eUnitType, m_bMinorUnitEquip );
+					const D3DXVECTOR3& vRotate = m_pItemTemplet->GetRenderRotate( eUnitType, m_bMinorUnitEquip );
+					D3DXMATRIX matScale, matRot, matTrans, localMove;
+					D3DXMatrixScaling( &matScale, vScale.x, vScale.y, vScale.z );
+					D3DXMatrixRotationYawPitchRoll( &matRot, vRotate.y, vRotate.x, vRotate.z );
+					D3DXMatrixTranslation( &matTrans, m_Offset.x, m_Offset.y, m_Offset.z );
+					D3DXMatrixMultiply( &localMove, &matScale, &matRot );
+					D3DXMatrixMultiply( &localMove, &localMove, &matTrans );
+					D3DXMatrixMultiply( &m_mAttachNormalMatrix[i], &localMove, m_pUnitMatrix[i] );
+				}
+			}
+		} break;
+	}
+
+	// stand-in: June @32965510 plays the DITT 72 loop anim by +0x15f0 ( 3295c960 / 32807e00 ), not ported ( backlog Stage 11 )
+
+	for( UINT i = 0; i < m_vecpSubEquip.size(); ++i )
+	{
+		if( NULL != m_vecpSubEquip[i] )
+			m_vecpSubEquip[i]->OnFrameMove( fTime, fElapsedTime );
+	}
+
+	// stand-in: June's group frame move 329646c0 ( TraceMatrixLandPos, owner land pos ) not ported ( june-engine R6c )
+	m_AttachedParticleGroup.OnFrameMove( fTime, fElapsedTime );
+
+	return S_OK;
+#else SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
 
 //{{ robobeg : 2008-10-21
 	if( m_pItemTemplet == NULL )
@@ -1399,6 +1595,7 @@ HRESULT CX2Eqip::OnFrameMove( double fTime, float fElapsedTime )
 
 
 	return S_OK;
+#endif SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
 }
 
 //}} robobeg : 2008-10-17
@@ -4107,9 +4304,45 @@ void CX2Eqip::LoadAttached()
 	//////////////////////////////////////////////////////////////////////////
 	CX2Eqip::AttachedParticleGroup::AttachedParticleGroup()
 	{
+#ifdef SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
+		m_OwnerUnitUID		= -1;	// june-engine R14d: June 3295d8a0, the members 329645a0 reads ( the rest: june-engine R6c )
+		m_vFixedPosition	= D3DXVECTOR3( 0, 0, 0 );
+		m_iPositionSource	= 0;
+#endif SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
 
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
+	// june-engine R14d: June 329645a0; the fixed-position branch returns false as June does
+	bool CX2Eqip::AttachedParticleGroup::GetOwnerLandPosition( D3DXVECTOR3* pvPos ) const
+	{
+		if( 0 != m_iPositionSource && 3 != m_iPositionSource )	// no Enum: June compares the raw source
+		{
+			*pvPos = m_vFixedPosition;
+			return false;
+		}
+
+		if( CX2Main::XS_VILLAGE_MAP == g_pMain->GetNowStateID() )	// June also takes 15 = XS_GUILD_AGIT_GAME, a state March lacks
+		{
+			if( NULL == g_pTFieldGame )
+				return false;
+
+			CX2SquareUnit* pSquareUnit = g_pTFieldGame->GetSquareUnitByUID( m_OwnerUnitUID );
+			if( NULL != pSquareUnit )
+				*pvPos = pSquareUnit->GetLandPosition();
+			return true;
+		}
+
+		if( NULL == g_pX2Game )
+			return false;
+
+		CX2GUUser* pOwnerUser = g_pX2Game->GetUserUnitByUID( m_OwnerUnitUID );
+		if( NULL != pOwnerUser )
+			*pvPos = pOwnerUser->GetLandPosition();
+		return true;
+	}
+
+#endif SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
 	CX2Eqip::AttachedParticleGroup::~AttachedParticleGroup()
 	{
 		for( UINT i=0; i<m_vecpAttachedParticle.size(); i++ )

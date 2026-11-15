@@ -34,3 +34,18 @@ type byte `+0x1c`, and flips the sequence's show flag `+0x172` (calling vslot `0
 3. Close tsv row 263 (`june_march_divergent.tsv`) with this phase's commit; funcmap rows `(R6c)`; `MODS.md`; `JUNE_BUGS.md` rows for June quirks.
 
 No hardcoded enum literals (user, 2026-10-26; CLAUDE.md). No `June` prefix (user, 2026-10-28).
+
+## Amended by june-engine R14d (2026-11-15)
+
+The `+0x8f0` list is `CX2Eqip::m_AttachedParticleGroup` in June (ctor `3295d8a0`, dtor `3295dad0`), a reworked attached-particle group. Port it
+whole here with the enchant entries:
+- the group ctor's remaining members (`+0x24..+0x2c` scale 1.0, `+0x34` unit skin anim ptr, eqip `+0x928` = a ctor byte); R14d ported the owner
+  UID `+0x10`, fixed position `+0x18`, source `+0x30` and `329645a0` (`AttachedParticleGroup::GetOwnerLandPosition`);
+- June's group frame move `329646c0` (empty bone -> the owner's land position, `TraceMatrixLandPos`, `TRACE_MATRIX_RT_ATTACH_FRAME`, the group
+  scale into each sequence) in place of March's `AttachedParticleGroup::OnFrameMove` (tsv row verdict `stage2`; R14d calls March's as a stand-in);
+- `AttachParticle` `32960ad0` whole (June's entry struct; `RemoveObjectChain` + seq `+0x45a` when `+0x15d5` is clear, @`32960c7a` / @`32960d33`);
+  close its tsv replace row;
+- the anim-time sync `3295ce00( bRebuild, fTime )` that R14d's `OnFrameMove` leaves as two stand-in comments (after the normal and the hyper attach
+  anim; rebuild only for item 280322 when anim `+0x2ac` is set): identify anim `+0x2ac` / `+0x218` and sequence `+0x464` first;
+- compare the whole eqip ctor `32961280` while there: June stores `+0x190` = 0 always and its dtor deletes no dummy item (March's `m_bDummyBasic` /
+  `m_pDummyItem`); say whether June dropped the dummy-item path and route it.

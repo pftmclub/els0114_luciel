@@ -47,3 +47,8 @@ C4 merged June's mesh `+0xa2c` into March's `m_bUseRenderParam` (`GetUseRenderPa
 Ara cases in `CX2Eqip` (`X2Eqip.cpp`, items 41510 / 41640 / 41700 / 41736 / 41743, normal and hyper model) set that flag with no `+0x980` param, so
 R6's RenderParam pass draws those weapons a second time with the default `RenderParamData` (RT 0, `RT_REAL_COLOR`, no blend): flat over the
 cartoon pass. June's switch `32964ae0` has no Ara cases and `3295b970` writes the param and the flag together; port both in one go.
+
+## Amended by june-engine R14d (2026-11-15)
+
+Item 1 landed in june-engine R14d (`SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE`, June's whole `OnFrameMove` `32964ae0`, March's Ara cases gone). Here,
+only check that R6's draw reads what `SetNoRenderable` / `SetAlphaRender` write (mesh `+0x8d0` / `+0x864`); then items 2 and 3.
