@@ -8451,7 +8451,11 @@ void CX2GUAra::ReplaceWeapon( CX2EqipPtr pWeaponPtr_ )
 	@param		: CX2Item* pItemToAddInViewList(추가될 장비), CX2Item* const pItemToRemoveInViewList(탈착될 장비)
 	@return		: 함수의 성공 여부
 */
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+/*virtual*/ bool CX2GUAra::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ )	// char-luciel DU3b: June 32bc89e0 ( = March's body + the slot id )
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 /*virtual*/ bool CX2GUAra::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 {
 	CX2EqipPtr pEquipPtrToRemove;
 	int iIndexInViewListForRemove_ = 0;
@@ -8471,7 +8475,11 @@ void CX2GUAra::ReplaceWeapon( CX2EqipPtr pWeaponPtr_ )
 
 	if ( pItemToAddInViewList != NULL )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		AddEquipToViewList( pItemToAddInViewList, sSlotID_, false );	// char-luciel DU3b
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		AddEquipToViewList( pItemToAddInViewList );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	}
 
 	CX2EqipPtr pBerserkEquipToRemove;
@@ -9326,6 +9334,73 @@ void CX2GUAra::ReplaceWeapon( CX2EqipPtr pWeaponPtr_ )
 bool CX2GUAra::GetAddItemAndRemoveItemToViewListBerserk( OUT CX2EqipPtr& pEquipPtrToRemove_, IN OUT CX2Item** ppItemToAddInViewList_,
 	IN CX2Item* const pItemToRemoveInViewList_, OUT int& iIndexInViewListForRemove_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	// char-luciel DU3b: June 32ba6990, the fashion test by the item's minor-unit flag and June's usable test
+	if ( *ppItemToAddInViewList_ != NULL )
+	{
+		const CX2Item::ItemTemplet* pItemTempletForItemToAdd = (*ppItemToAddInViewList_)->GetItemTemplet();
+		if ( pItemTempletForItemToAdd == NULL )
+			return false;
+
+		for ( size_t numViewEquipInUser = 0; numViewEquipInUser < m_vecPromotionEquipList.size(); numViewEquipInUser++ )
+		{
+			if ( pItemTempletForItemToAdd->GetEqipPosition() == m_vecPromotionEquipList[numViewEquipInUser]->GetEqipPos() )
+			{
+				const int iBody = ( true == pItemTempletForItemToAdd->GetIsForMinorUnit() ) ? 1 : 0;
+				if ( pItemTempletForItemToAdd->GetFashion() == false && GetUnit()->IsFashionEquipInThePosition( pItemTempletForItemToAdd->GetEqipPosition(), iBody ) == true )
+					*ppItemToAddInViewList_ = NULL;
+				else
+					pEquipPtrToRemove_ = m_vecPromotionEquipList[numViewEquipInUser];
+
+				iIndexInViewListForRemove_ = numViewEquipInUser;
+				break;
+			}
+		}
+	}
+	else if ( pItemToRemoveInViewList_ != NULL )
+	{
+		const CX2Item::ItemTemplet* pItemTempletForItemToRemove = pItemToRemoveInViewList_->GetItemTemplet();
+		if ( pItemTempletForItemToRemove == NULL )
+			return false;
+
+		for ( size_t numViewEquipInUser = 0; numViewEquipInUser < m_vecPromotionEquipList.size(); numViewEquipInUser++ )
+		{
+			if ( pItemTempletForItemToRemove->GetEqipPosition() == m_vecPromotionEquipList[numViewEquipInUser]->GetEqipPos() )
+			{
+				const CX2Unit::EQIP_POSITION eEquipPosition = pItemTempletForItemToRemove->GetEqipPosition();
+				if ( false == pItemTempletForItemToRemove->GetFashion() )
+				{
+					const int iBody = ( true == pItemTempletForItemToRemove->GetIsForMinorUnit() ) ? 1 : 0;
+					if ( GetUnit()->IsFashionEquipInThePosition( eEquipPosition, iBody ) == false )
+					{
+						pEquipPtrToRemove_		= m_vecPromotionEquipList[numViewEquipInUser];
+						*ppItemToAddInViewList_	= GetUnit()->CreateBasicEquip( eEquipPosition );
+					}
+				}
+				else
+				{
+					pEquipPtrToRemove_ = m_vecPromotionEquipList[numViewEquipInUser];
+					if ( GetUnit()->IsNormalEquipInThePosition( eEquipPosition ) == true )
+					{
+						CX2Item* pNormalEquip = GetUnit()->GetInventory().GetEquippingItemByEquipPos( eEquipPosition, false, false );
+						if ( pNormalEquip == NULL )
+							return false;
+
+						if ( true == pNormalEquip->IsUsableEquip() )
+							*ppItemToAddInViewList_ = pNormalEquip;
+						else
+							*ppItemToAddInViewList_ = GetUnit()->CreateBasicEquip( eEquipPosition );
+					}
+					else
+						*ppItemToAddInViewList_ = GetUnit()->CreateBasicEquip( eEquipPosition );
+				}
+
+				iIndexInViewListForRemove_ = numViewEquipInUser;
+				break;
+			}
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	if (*ppItemToAddInViewList_ != NULL )		// 장착할et 장비가 있는 경우
 	{	
 		const CX2Item::ItemTemplet* pItemTempletForItemToAdd = NULL;
@@ -9419,6 +9494,7 @@ bool CX2GUAra::GetAddItemAndRemoveItemToViewListBerserk( OUT CX2EqipPtr& pEquipP
 		} // for ( size_t numViewEquipInUser = 0; numViewEquipInUser < m_ViewEqipList.size(); numViewEquipInUser++ )
 	}
 
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	return true;
 }
 #pragma endregion
@@ -9439,7 +9515,11 @@ void CX2GUAra::AddBerserkEquipToViewList( CX2Item* const pItem )
 	CX2EqipPtr	pCX2EquipPtr;
 	int			enchantLevel = 0;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	enchantLevel = pItem->GetEffectiveEnchantLevel();	// char-luciel DU3b: June 32bc15d0 reads 32882540
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	enchantLevel = pItem->GetItemData().m_EnchantLevel;
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
     bool bBasicEquip = GetUnit()->IsBasicEquip( pItemTemplet->GetItemID() );
 
 	if( pItemTemplet->GetUseCondition() == CX2Item::UC_ANYONE )

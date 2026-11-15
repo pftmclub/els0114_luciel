@@ -1033,7 +1033,11 @@ class CX2GUArme_VioletMage : public CX2GUUser
 		//{{ Iruha : 2026-10-21 // June character pilot Phase CH1l ( JUNE_CHARACTER_AISHA_PHASES.md )
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
 		virtual void SetShowViewList( bool bShow_ );	/// June vslot 0x63c
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		virtual bool UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ );	/// char-luciel DU3b: June vslot 0x644 ( 32cc9950 )
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		virtual bool UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList );	/// June vslot 0x644
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		using CX2GUUser::UpdateEquipCollisionData;
 		virtual void UpdateEquipCollisionData( IN vector<CX2EqipPtr>& vecEquipList_ );	/// June vslot 0x638
 		virtual void AfterEquipSlotChange();	/// June 32cc8cf0 ( vslot 0x654 )

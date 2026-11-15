@@ -3128,8 +3128,14 @@ public:
 		
 		virtual void		UpdateWeaponEnchantEffectAndExtraDamageType();
 		virtual void		UpdateEquipCollisionData();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		virtual bool		UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ );	// char-luciel DU3b: June vslot 0x644 ( base 3201b930 )
+		void		AddEquipToViewList( CX2Item* const pItem, const short sSlotID_, const bool bForceBasicEquip_ );	// char-luciel DU3b: June 31ffe990
+		bool		IsEquipInViewList( const CX2Unit::EQIP_POSITION eEquipPosition_, const int iBody_ ) const;	// char-luciel DU3b: June 31fd63c0
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		virtual bool		UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList );
 		void		AddEquipToViewList( CX2Item* const pItem );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		void		RemoveEquipFromViewList( CX2EqipPtr pEquipPtrToRemove, int index	);	//optimization
 		//void		RemoveEquipFromViewListByEquipPostion( CX2Unit::EQIP_POSITION equipPosition );
 		void		DeleteEnchantedWeaponEffectAtHand();
@@ -5212,6 +5218,10 @@ public:
 		char											m_cActiveBodyChangeStateNum;	/// char-luciel DU1b: June +0x84de, the Future stateChangeNum at the switch
 		bool											m_bFirstUnitTransformed;		/// char-luciel DU1b: June +0x8f6e, CH1a0's pair ( 31fc9d50 / 31fc9d90 ); UpdateDuo skips the equipment while either is set
 		bool											m_bMinorUnitTransformed;		/// char-luciel DU1b: June +0x8f6f
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		int												m_iMinorUnitEquipOverridePosition;	/// char-luciel DU3b: June +0x9570, written by 31fd7b40 / 3201f8d0 ( DU3c )
+		int												m_iMinorUnitEquipOverrideItemID;	/// char-luciel DU3b: June +0x9574, -1 = none
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		float											m_fApplyAnimMoveMultiply;		/// char-luciel DU1b3: June +0x8f50, APPLY_ANIM_MOVE_MULTIPLY
 		bool											m_bUseNotSelectMotionBeforePos;	/// char-luciel DU1b3: June +0x8f5d, USE_NOT_SELECT_MOTION_BEFORE_POS
 		D3DXVECTOR3										m_vNotSelectMotionBeforePos;	/// char-luciel DU1b3: June +0x8f60, the second body's position kept from the state start

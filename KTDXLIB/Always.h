@@ -13612,8 +13612,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              sub-equip chain byte +0x15d5 ) and reads its per-type item rows with the body; CX2Item gains June's enchant level ( 32882540 )
 //              and usable test ( 328825c0 ); the DU1 / CH1 stand-ins read the equip's body. DU3b / DU3c port the view list and the init build.
 #define SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
-#if defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) && !( defined( SERV_IRUHADEV_JUNE_ITEM_KIM ) && defined( SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) )
-#error SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW needs JUNE_ITEM_KIM ( keyed rows, PvP equip ), JUNE_EQUIP_EFFECT_SET ( IsDivisionItem ) and JUNE_CHAR_DUO_BODY, char-luciel DU3
+#if defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) && !( defined( SERV_IRUHADEV_JUNE_ITEM_KIM ) && defined( SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS ) )
+#error SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW needs JUNE_ITEM_KIM ( keyed rows, PvP equip ), JUNE_EQUIP_EFFECT_SET ( IsDivisionItem ), JUNE_CHAR_DUO_BODY and JUNE_USER_VIRTUAL_HOOKS ( GetSkinAnimByForm, DU3b ), char-luciel DU3
 #endif
 //////////////////////////////////////////////////////////////////////////
 

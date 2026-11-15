@@ -1367,6 +1367,44 @@ the glow cases and the one full build + play-test. One review (`DU3-review.md`) 
 - **Kickoff rows done here:** NU0 `DU3` rows `32882540`, `328825c0`; CH0 §7g L407-409 (accessors were K2's, the body now reaches them); DU1b / DU1b2
   / DU1d3 / CH1l stand-ins. The `Char Chung CH1l0` and `stage8` rows move to DU3b.
 
+### DU3b - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW` (DU3's; its `#error` guard now also needs `JUNE_USER_VIRTUAL_HOOKS` for `GetSkinAnimByForm`).
+June's view list is ported whole for every class; March's bodies stay in each `#else`. Rows: funcmap `(DU3b)` (14), `june_march_divergent.tsv`.
+- **`CX2GUUser`** (`X2GUUser.h/.cpp`): `UpdateEquipViewListInfo( add, remove, short slot )` = June `3201b930` (vslot 0x644 base; no
+  `GetAddItemAndRemoveItemToViewList` call; fashion / `IT_ACCESSORY` items swap the equip at ( pos, slot body ), a normal item removes every equip at
+  pos with no fashion over it on that body; remove shows the usable normal item or `CreateBasicEquip` with bForceBasic; slot 0x29 / 0x2a ->
+  `EP_AC_TEMP4`; tail `SetShowViewList( false )` while either transform flag is set). `AddEquipToViewList( item, slot, bForceBasic )` = June
+  `31ffe990` (enchant from `GetEffectiveEnchantLevel`; `UT_LUCIEL` normal item builds Ciel's copy on body 1 from `GetItemIDForMinorUnit()` or, with
+  none, the item itself when `GetCommonItemModelName( UT_LUCIEL, true )` is set; body 0 when none shown; March's weapon tail per new equip).
+  `GetAddItemAndRemoveItemToViewList` = June `31fd2f00`. New `IsEquipInViewList` (`31fd63c0`); members `m_iMinorUnitEquipOverridePosition` /
+  `ItemID` (`+0x9570` / `+0x9574`, writers to DU3c). vslot 0x570 is CH1o's `GetSkinAnimByForm`.
+- **Overrides:** Chung `32bdc750`, Ara `32bc89e0`, Arme `32cc9950` take the slot (= March + the argument); Ara's berserk
+  `GetAddItemAndRemoveItemToViewListBerserk` = June `32ba6990` (fashion test by the templet's minor-unit flag), `AddBerserkEquipToViewList` reads
+  `GetEffectiveEnchantLevel` (`32bc15d0`). Callers pass June's slot: the packet's `m_sSlotID` (`X2StateMenu.cpp` x2, `X2UIInventory.cpp` equip change),
+  `GetItemSlotID( uid )` (endurance break, expiry: June `3286a310`), Arme's transform replay slot 0 (`@32cdbf08`).
+- **`CX2Inventory`:** `GetItemSlotID` (`3286a310`), `IsMinorUnitEquipItem` (`3286a350`), static `IsMinorUnitEquipSlot` (`32070ef0`; June's table with
+  `GetEquipGroup`'s guard: March's slot 20 = `NESI_ONEPIECE_FASHION` answers false until DU4 renumbers, so no DU4 flag is needed).
+- **`CX2Unit` per-body tables:** `m_FashionEqipPosition[EP_END][3]` (`+0xb7d`), `m_NormalEqipPositionByBody` (`+0xbf2`, `EP_AC_HAIR..EP_AC_TEMP5`),
+  flat `m_NormalEqipPosition` (`+0xc67`); June's `UpdateEqipPosition` `32350070`, `EqipConflict` `32350130`, `IsNormalEquipInThePosition` `31fac260`
+  (active body), the dead `UpdateFashionEqipPosition` / `UpdateNormalEqipPosition` (`3234b540` / `3234b5f0`), `UpdateViewEqip`'s fashion test
+  (`32350230`), `IsFashionEquipInThePosition( pos, body )`. New `AdjustEquipPositionForSecondRing` (`3234fe90`; stand-in: June's unit `+0x294` slot
+  map is unidentified, the inventory's slot id is read; DU4).
+- **Routed:** `ResetEqip` `32355e40` (divergence row + allow), the rest of `UpdateViewEqip`, the per-body view table `3234ff60`, the override writers,
+  and Ciel's stack dummy passed as basic (March's ctor keeps a dangling `m_pDummyItem`; June's ctor never reads the argument): all `DU3c.md`. The second
+  ring and the `+0x294` map: `DU4.md`. The viewer readers stay june-engine R14c.
+- **JUNE_BUGS** 728 (dead `UpdateNormalEqipPosition` drops the body), 729 (add path's fashion test at the templet's ring position), 730 (Ciel's
+  override copy reads a destroyed temp item's UID).
+- **Behaviour today:** March characters run June's scans with body 0; visible changes: a PvP-equip item shows its fixed level, a broken-enchant item
+  under a removed avatar shows the basic model, and an accessory swap shows the latest accessory. Lu/Ciel's copy is built but untested until DU3c.
+- **Gates:** `finish.py --files <15 files> --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`: flagcheck PASS (14 PASS, 1 PASS~, 0 OTHER, 0 FAIL; the 2
+  deleted lines are DU3's `#error` guard pair widened in `Always.h`, the bare `#endif` is that guard's own), junediverge PASS, enumscan exit 1 on 190
+  A/B rows that predate DU3b in these files (0 on DU3b's added lines, intersected with `git diff -U0`); stateends n/a (no skill states registered).
+- **Compile:** `/Zs` probes of the 9 changed `.cpp` files: 9 x 0 errors; break-tests (`-DsSlotID_=@`, `-DGetItemSlotID=@`) fail inside the new blocks of
+  every file. Full build skipped: no play-test yet (DU3c is the seam).
+- **Play-test deferred:** section DU3b in `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), batch at DU3c.
+
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under

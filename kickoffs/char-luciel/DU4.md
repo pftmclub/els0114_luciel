@@ -52,3 +52,13 @@ No other table holds an NESI id (`unit_skill.slot`, `unit_skill_page.slot` and b
 only carry numbers); `IsSuitableSlot` (`X2OfflineInventory.cpp:197-239`) needs the new slot cases. Tools: `elsdb.py` `EQUIP_SLOTS[20]` -> 35;
 `createchar.py` `COSTUME_SLOTS` unchanged. Client stand-in to retire: `X2Inventory.cpp:1284`; slot hide `32e22ce0` (main {0,2,...,19,35,37,39,41}
 hidden in the switching view; Ciel {20..34,36,38,40,42} shown only there).
+
+## Amended by DU3b (2026-11-15)
+
+- **The minor-unit slot test goes live on its own.** `CX2Inventory::IsMinorUnitEquipSlot` (June `32070ef0`; used by the view list, the unit's per-body
+  tables and `IsMinorUnitEquipItem` `3286a350`) answers false for `CX2Unit::NESI_ONEPIECE_FASHION` before June's table, as `GetEquipGroup` does. After the
+  renumber that enum is 35 and slot 20 is Ciel's: no code change needed there, but replace its literal case labels (`0x14..0x22`, `0x24`, `0x26`,
+  `0x28`, `0x2a`) and the `0x29` / `0x2a` second-ring tests (`X2GUUser.cpp` `UpdateEquipViewListInfo`, `X2Unit.cpp` `AdjustEquipPositionForSecondRing`)
+  with the NESI names you register.
+- **Second-ring remap stand-in:** June's `3234fe90` reads unit `+0x294` (a per-UID map whose value starts with the slot id; not identified). DU3b's
+  `CX2Unit::AdjustEquipPositionForSecondRing` reads `GetInventory().GetItemSlotID( uid )` (June `3286a310`) instead: identify `+0x294` and confirm or replace.

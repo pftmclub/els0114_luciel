@@ -701,6 +701,45 @@ CX2Inventory::SORT_TYPE CX2Inventory::GetItemSortType( UidType itemUID ) const
 	return sortType;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+// char-luciel DU3b: June 3286a310, -1 when the UID is not in the inventory
+short CX2Inventory::GetItemSlotID( UidType itemUID ) const
+{
+	map<UidType,InvenSlotData*>::const_iterator iter = m_ItemMapTotal.find( itemUID );
+	if ( iter == m_ItemMapTotal.end() || NULL == iter->second )
+		return -1;
+
+	return static_cast<short>( iter->second->m_SlotID );
+}
+
+// char-luciel DU3b: June 3286a350
+bool CX2Inventory::IsMinorUnitEquipItem( UidType itemUID ) const
+{
+	return IsMinorUnitEquipSlot( GetItemSlotID( itemUID ) );
+}
+
+// char-luciel DU3b: June 32070ef0 ( the same table is inlined in 3286a350, 3201b930 and 31ffe990 )
+/*static*/ bool CX2Inventory::IsMinorUnitEquipSlot( const short sSlotID_ )
+{
+#ifdef SERV_NEW_ONE_PIECE_AVATAR_SLOT
+	// March's NESI_ONEPIECE_FASHION ( 20 ) is June's slot 35; June's 20 is a minor-unit slot ( DU4 renumbers )
+	if ( CX2Unit::NESI_ONEPIECE_FASHION == sSlotID_ )
+		return false;
+#endif SERV_NEW_ONE_PIECE_AVATAR_SLOT
+	switch ( sSlotID_ )
+	{
+	// June NESI_MINORUNIT_DEFENCE_HAIR_FASHION ( 0x14 ) .. NESI_MINORUNIT_AC_WEAPON ( 0x22 )
+	case 0x14: case 0x15: case 0x16: case 0x17: case 0x18: case 0x19: case 0x1a: case 0x1b:
+	case 0x1c: case 0x1d: case 0x1e: case 0x1f: case 0x20: case 0x21: case 0x22:
+	// June NESI_MINORUNIT_ONEPIECE_FASHION / _AC_MINIME / _AC_EARRING / _AC_RING2
+	case 0x24: case 0x26: case 0x28: case 0x2a:
+		return true;
+	}
+
+	return false;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+
 int CX2Inventory::GetUsedSlotNum( CX2Inventory::SORT_TYPE sortType ) const
 {
     if ( false == ( sortType >= SORT_TYPE(0) && sortType < ST_END ) )

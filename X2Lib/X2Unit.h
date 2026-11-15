@@ -946,7 +946,11 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 		//{{ kimhc // 실시간 엘소드 중 장비 및 아바타 교체
 #ifdef REAL_TIME_ELSWORD
 		bool			IsNormalEquipInThePosition( EQIP_POSITION equipPosition ) const;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		bool			IsFashionEquipInThePosition( EQIP_POSITION equipPosition, const int iBody_ ) const;	// char-luciel DU3b: June reads unit +0xb7d [pos][body] inline
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool			IsFashionEquipInThePosition( EQIP_POSITION equipPosition ) const;
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool			IsViewEquipInThePosition( EQIP_POSITION equipPosition ) const;
 		CX2Item*		CreateBasicEquip( CX2Unit::EQIP_POSITION equipPosition );
 #endif REAL_TIME_ELSWORD
@@ -1358,6 +1362,9 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 		void			UpdateEqipPosition( CX2Item* pItem, bool bAdd );
 		
 		bool			EqipConflict( CX2Item* pItem );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		void			AdjustEquipPositionForSecondRing( const CX2Item* pItem_, int& iEquipPosition_ ) const;	// char-luciel DU3b: June 3234fe90
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool			UpdateViewEqip();
 
 		void			AddItemLevel( IN const CX2Item* pEquipItem_ );
@@ -1385,8 +1392,14 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 		int							m_PrevNextBaseLevelEXP;
 
 		bool						m_ViewEqipPosition[EP_END];
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		bool						m_FashionEqipPosition[EP_END][3];			// char-luciel DU3b: June +0xb7d [pos * 3 + body], body 0 ( Lu ) / 1 ( Ciel )
+		bool						m_NormalEqipPositionByBody[EP_END][3];		// char-luciel DU3b: June +0xbf2, read for EP_AC_HAIR..EP_AC_TEMP5
+		bool						m_NormalEqipPosition[EP_END];				// char-luciel DU3b: June +0xc67, the other positions
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool						m_FashionEqipPosition[EP_END];
 		bool						m_NormalEqipPosition[EP_END];
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		
 		vector<UidType>				m_ViewEqipItemUIDList;
 		vector<UidType>				m_FashionEqipItemUIDList;

@@ -139,6 +139,11 @@ private:
 		CX2Item*	GetItem( SORT_TYPE sortType, int slotID ) const;
 
 		SORT_TYPE	GetItemSortType( UidType itemUID ) const;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		short		GetItemSlotID( UidType itemUID ) const;					// char-luciel DU3b: June 3286a310
+		bool		IsMinorUnitEquipItem( UidType itemUID ) const;			// char-luciel DU3b: June 3286a350
+		static bool	IsMinorUnitEquipSlot( const short sSlotID_ );			// char-luciel DU3b: June 32070ef0
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 		void		SetItemMaxNum( SORT_TYPE sortType, int maxNum );
 		// GetItemMaxNum에 인자로 ST_BANK를 전달해주면 슬롯의 사이즈를 알수 있고, 그 값으로 은행 회원 등급을 구분!!

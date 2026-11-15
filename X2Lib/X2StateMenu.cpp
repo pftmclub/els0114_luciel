@@ -4803,7 +4803,11 @@ bool CX2StateMenu::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( HWND hWnd, UINT
 					} // if
 
 					// iventoryItemInfo.m_iItemUID 가 0일때 pItemToAdd는 NULL이 되는데 이 경우엔 장착할 장비가 없는 경우임
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+					if ( pUser->UpdateEquipViewListInfo( pItemToAdd, pItemToRemove, kInventoryItemInfo.m_sSlotID ) == false )	// char-luciel DU3b: June passes the packet's slot id
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 					if ( pUser->UpdateEquipViewListInfo( pItemToAdd, pItemToRemove ) == false )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 					{
 						ASSERT( false );
 						return false;
@@ -4951,7 +4955,11 @@ bool CX2StateMenu::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( HWND hWnd, UINT
 
 				// iventoryItemInfo.m_iItemUID 가 0일때 pItemToAdd는 NULL이 되는데 이 경우엔 장착할 장비가 없는 경우임
 				//if ( pUser->UpdateEquip( &inventoryItemInfo, pItemToAdd ) == false )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+				if ( pUser->UpdateEquipViewListInfo( pItemToAdd, pItemToRemove, kInventoryItemInfo.m_sSlotID ) == false )	// char-luciel DU3b: June passes the packet's slot id
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 				if ( pUser->UpdateEquipViewListInfo( pItemToAdd, pItemToRemove ) == false )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 				{
 					ASSERT( false );
 					return false;
@@ -5060,7 +5068,11 @@ bool CX2StateMenu::Hander_EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT( HWND hWnd, UINT u
 		//kEvent.m_vecInventorySlotInfo[i].m_iItemUID = 0;
 
 		//if ( pUser->UpdateEquip( &kEvent.m_vecInventorySlotInfo[i] ) == false )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		if ( pUser->UpdateEquipViewListInfo( NULL, pItemToRemoveInView, pUser->GetUnit()->GetInventory().GetItemSlotID( pItemToRemoveInView->GetUID() ) ) == false )	// char-luciel DU3b: June @321960d4 ( 3286a310 )
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		if ( pUser->UpdateEquipViewListInfo( NULL, pItemToRemoveInView ) == false )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		{
 			ASSERT( false );
 			return false;

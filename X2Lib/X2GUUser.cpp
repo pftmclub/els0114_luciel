@@ -1074,6 +1074,10 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_cActiveBodyChangeStateNum			= 0;
 	m_bFirstUnitTransformed				= false;
 	m_bMinorUnitTransformed				= false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	m_iMinorUnitEquipOverridePosition	= CX2Unit::EP_NONE;	// char-luciel DU3b: June ctor @32042016
+	m_iMinorUnitEquipOverrideItemID		= -1;
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	m_fApplyAnimMoveMultiply			= 1.f;	// char-luciel DU1b3: June's ctor leaves +0x8f50 to the first state start ( miss 1.0 )
 	m_bUseNotSelectMotionBeforePos		= false;
 	INIT_VECTOR3( m_vNotSelectMotionBeforePos, 0.f, 0.f, 0.f );
@@ -39098,6 +39102,129 @@ CX2EqipPtr	CX2GUUser::GetEquipPtrFromEquipViewListByEquipPosition( const CX2Unit
 	@param :  CX2Item* pItemToAddInViewList(추가될 장비), CX2Item* const pItemToRemoveInViewList(탈착될 장비)
 	@return : 함수의 성공 여부
 */
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+// char-luciel DU3b: June 3201b930 ( vslot 0x644 base ); no GetAddItemAndRemoveItemToViewList call, every equip at the position by body
+bool CX2GUUser::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ )
+{
+	if ( NULL != pItemToAddInViewList )
+	{
+		const CX2Item::ItemTemplet* pItemTempletToAdd = pItemToAddInViewList->GetItemTemplet();
+		if ( NULL == pItemTempletToAdd )
+			return false;
+
+		int iEquipPosition = pItemTempletToAdd->GetEqipPosition();
+		if ( 0x29 == sSlotID_ || 0x2a == sSlotID_ )	// June NESI_AC_RING2 / NESI_MINORUNIT_AC_RING2
+			iEquipPosition = CX2Unit::EP_AC_TEMP4;	// June's EP_AC_RING2
+
+		const bool bFashionOrAccessory = ( true == pItemTempletToAdd->GetFashion() || CX2Item::IT_ACCESSORY == pItemTempletToAdd->GetItemType() );
+		for ( UINT i = 0; i < m_ViewEqipList.size(); )
+		{
+			CX2EqipPtr pViewEquipPtr = m_ViewEqipList[i];
+			if ( iEquipPosition == pViewEquipPtr->GetEqipPos() )
+			{
+				if ( true == bFashionOrAccessory )
+				{
+					if ( CX2Inventory::IsMinorUnitEquipSlot( sSlotID_ ) == pViewEquipPtr->IsMinorUnitEquip() )
+					{
+						RemoveEquipFromViewList( pViewEquipPtr, i );
+						break;
+					}
+				}
+				else if ( false == GetUnit()->IsFashionEquipInThePosition( pItemTempletToAdd->GetEqipPosition(), true == pViewEquipPtr->IsMinorUnitEquip() ? 1 : 0 ) )
+				{
+					RemoveEquipFromViewList( pViewEquipPtr, i );	// June bug: the fashion test reads the templet's position, not the second ring's ( JUNE_BUGS 729 )
+					i = 0;
+					continue;
+				}
+			}
+			++i;
+		}
+
+		AddEquipToViewList( pItemToAddInViewList, sSlotID_, false );
+	}
+	else if ( NULL != pItemToRemoveInViewList )
+	{
+		const CX2Item::ItemTemplet* pItemTempletToRemove = pItemToRemoveInViewList->GetItemTemplet();
+		if ( NULL == pItemTempletToRemove )
+			return false;
+
+		const bool bMinorUnitSlot = CX2Inventory::IsMinorUnitEquipSlot( sSlotID_ );
+		int iEquipPosition = pItemTempletToRemove->GetEqipPosition();
+		if ( 0x29 == sSlotID_ || 0x2a == sSlotID_ )	// June NESI_AC_RING2 / NESI_MINORUNIT_AC_RING2
+			iEquipPosition = CX2Unit::EP_AC_TEMP4;	// June's EP_AC_RING2
+		const CX2Unit::EQIP_POSITION eEquipPosition = static_cast<CX2Unit::EQIP_POSITION>( iEquipPosition );
+
+		const bool bFashionOrAccessory = ( true == pItemTempletToRemove->GetFashion() || CX2Item::IT_ACCESSORY == pItemTempletToRemove->GetItemType() );
+		bool bNormalEquipRemoved = false;
+		CX2Item* pItemToShow = NULL;
+		bool bShowBasicEquip = false;
+		for ( UINT i = 0; i < m_ViewEqipList.size(); )
+		{
+			CX2EqipPtr pViewEquipPtr = m_ViewEqipList[i];
+			if ( iEquipPosition == pViewEquipPtr->GetEqipPos() )
+			{
+				if ( true == bFashionOrAccessory )
+				{
+					if ( bMinorUnitSlot == pViewEquipPtr->IsMinorUnitEquip() )
+					{
+						RemoveEquipFromViewList( pViewEquipPtr, i );
+						if ( CX2Item::IT_ACCESSORY != pItemTempletToRemove->GetItemType() )
+						{
+							if ( true == GetUnit()->IsNormalEquipInThePosition( eEquipPosition ) )
+							{
+								CX2Item* pNormalEquip = GetUnit()->GetInventory().GetEquippingItemByEquipPos( eEquipPosition, false, false );
+								if ( NULL == pNormalEquip )
+									return false;
+
+								if ( true == pNormalEquip->IsUsableEquip() )
+									pItemToShow = pNormalEquip;
+								else
+									bShowBasicEquip = true;
+							}
+							else
+								bShowBasicEquip = true;
+						}
+						break;
+					}
+				}
+				else if ( false == GetUnit()->IsFashionEquipInThePosition( eEquipPosition, true == pViewEquipPtr->IsMinorUnitEquip() ? 1 : 0 ) )
+				{
+					bNormalEquipRemoved = true;
+					RemoveEquipFromViewList( pViewEquipPtr, i );
+					i = 0;
+					continue;
+				}
+			}
+			++i;
+		}
+
+		if ( true == bNormalEquipRemoved )
+			bShowBasicEquip = true;
+
+		if ( NULL != pItemToShow )
+			AddEquipToViewList( pItemToShow, sSlotID_, false );
+		else if ( true == bShowBasicEquip )
+			AddEquipToViewList( GetUnit()->CreateBasicEquip( eEquipPosition ), sSlotID_, true );
+	}
+
+	if ( true == m_bFirstUnitTransformed || true == m_bMinorUnitTransformed )
+		SetShowViewList( false );
+
+	return true;
+}
+
+// char-luciel DU3b: June 31fd63c0
+bool CX2GUUser::IsEquipInViewList( const CX2Unit::EQIP_POSITION eEquipPosition_, const int iBody_ ) const
+{
+	for ( UINT i = 0; i < m_ViewEqipList.size(); ++i )
+	{
+		if ( eEquipPosition_ == m_ViewEqipList[i]->GetEqipPos() && ( 1 == iBody_ ) == m_ViewEqipList[i]->IsMinorUnitEquip() )
+			return true;
+	}
+
+	return false;
+}
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 bool CX2GUUser::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList )
 {
 	{	// kimhc // 이 중괄호는 꼭 있어야 합니다.
@@ -39118,6 +39245,7 @@ bool CX2GUUser::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item*
 	}
 	return true;
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 /** @function : SetShowViewList
 	@brief : ViewList내에 있는 것들으 보여줘야 할지를 지정
@@ -39444,6 +39572,153 @@ bool CX2GUUser::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item*
 #endif ADD_UPGRADE_WEAPON_PARTICLE
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+// char-luciel DU3b: June 31ffe990; Lu/Ciel's normal item also builds Ciel's copy on the second body
+void CX2GUUser::AddEquipToViewList( CX2Item* const pItem, const short sSlotID_, const bool bForceBasicEquip_ )
+{
+	if ( pItem == NULL || pItem->GetItemTemplet() == NULL )
+		return;
+
+	vector<CX2EqipPtr> vecNewEquip;
+	const int iEnchantLevel = pItem->GetEffectiveEnchantLevel();
+	const CX2Item::ItemTemplet* pItemTemplet = pItem->GetItemTemplet();
+	const bool bBasicEquip = ( true == bForceBasicEquip_ || true == GetUnit()->IsBasicEquip( pItemTemplet->GetItemID() ) );
+	const CX2Unit::UNIT_TYPE eUnitType = ( NULL != GetUnit()->GetUnitTemplet() ) ? GetUnit()->GetType() : CX2Unit::UT_NONE;
+	const CX2Unit::EQIP_POSITION eEquipPosition = pItemTemplet->GetEqipPosition();
+
+	if ( false == pItemTemplet->GetFashion() && CX2Item::IT_ACCESSORY != pItemTemplet->GetItemType() )
+	{
+		if ( CX2Unit::UT_LUCIEL == eUnitType && false == IsEquipInViewList( eEquipPosition, 1 ) )
+		{
+			if ( 0 != pItemTemplet->GetItemIDForMinorUnit() )
+			{
+				// June @31ffea94-31ffec61: Ciel's dummy item, or the override item's dummy at the override position
+				UidType iMinorUnitItemUID = pItem->GetUID();
+				int iMinorUnitItemID = pItemTemplet->GetItemIDForMinorUnit();
+				if ( eEquipPosition == m_iMinorUnitEquipOverridePosition && -1 != m_iMinorUnitEquipOverrideItemID )
+				{
+					CX2Item::ItemData kOverrideItemData;
+					kOverrideItemData.m_ItemID		= m_iMinorUnitEquipOverrideItemID;
+					kOverrideItemData.m_Endurance	= 1;
+					CX2Item kOverrideItem( kOverrideItemData, GetUnit() );
+					if ( NULL != kOverrideItem.GetItemTemplet() && 0 != kOverrideItem.GetItemTemplet()->GetItemIDForMinorUnit() )
+						iMinorUnitItemID = kOverrideItem.GetItemTemplet()->GetItemIDForMinorUnit();
+					iMinorUnitItemUID = kOverrideItem.GetUID();	// June reads it after the item's dtor ( JUNE_BUGS 730 )
+				}
+
+				CX2Item::ItemData kMinorUnitItemData;
+				kMinorUnitItemData.m_ItemUID	= iMinorUnitItemUID;
+				kMinorUnitItemData.m_ItemID		= iMinorUnitItemID;
+				kMinorUnitItemData.m_Endurance	= 1;
+				CX2Item kMinorUnitItem( kMinorUnitItemData, GetUnit() );
+				vecNewEquip.push_back( CX2Eqip::CreateEquip( &kMinorUnitItem, GetSkinAnimByForm( 1 ), iEnchantLevel, true, true, eUnitType, true, true ) );
+			}
+			else
+			{
+				const wchar_t* pMinorUnitModelName = pItemTemplet->GetCommonItemModelName( CX2Unit::UT_LUCIEL, true );
+				if ( NULL != pMinorUnitModelName && 0 != pMinorUnitModelName[0] )
+					vecNewEquip.push_back( CX2Eqip::CreateEquip( pItem, GetSkinAnimByForm( 1 ), iEnchantLevel, bBasicEquip, true, eUnitType, true, true ) );
+			}
+		}
+
+		if ( false == IsEquipInViewList( eEquipPosition, 0 ) )
+			vecNewEquip.push_back( CX2Eqip::CreateEquip( pItem, GetSkinAnimByForm( 0 ), iEnchantLevel, bBasicEquip, true, eUnitType, false, true ) );
+	}
+	else
+	{
+		const int iBody = ( true == CX2Inventory::IsMinorUnitEquipSlot( sSlotID_ ) ) ? 1 : 0;
+		vecNewEquip.push_back( CX2Eqip::CreateEquip( pItem, GetSkinAnimByForm( iBody ), iEnchantLevel, bBasicEquip, true, eUnitType, 1 == iBody, true ) );
+	}
+
+	int weaponIndex = 0;
+	switch ( pItemTemplet->GetEqipPosition() )
+	{
+	case CX2Unit::EP_WEAPON_HAND:
+		weaponIndex = 0;
+		break;
+
+	case CX2Unit::EP_WEAPON_SECOND:
+		weaponIndex = 1;
+		break;
+	}
+
+	// June @31ffee45: every new equip joins the view list, and a weapon position builds its Weapon per equip
+	for ( UINT uiNewEquip = 0; uiNewEquip < vecNewEquip.size(); ++uiNewEquip )
+	{
+		CX2EqipPtr pCX2EquipPtr = vecNewEquip[uiNewEquip];
+		pCX2EquipPtr->SetManagerObject( this );
+
+		if ( IsRecursivelyManagedByDGManager() )
+			g_pKTDXApp->GetDGManager()->AddObjectChain( pCX2EquipPtr.get() );
+
+		m_ViewEqipList.push_back( pCX2EquipPtr );
+
+		switch ( pItemTemplet->GetEqipPosition() )
+		{
+		case CX2Unit::EP_WEAPON_HAND:
+		case CX2Unit::EP_WEAPON_SECOND:
+			{
+				Weapon* pWeapon = Weapon::CreateWeapon( *this );
+				ASSERT( pWeapon != NULL );
+
+				pWeapon->m_iWeaponIndex			= weaponIndex;
+				pWeapon->m_pUserWeaponEquip		= pCX2EquipPtr;
+				pWeapon->m_bUseSlashTrace		= true;
+
+#ifdef ITEM_SLASH_TRACE_COLOR_TEST
+#ifdef	X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+				if( NULL != GetUnit() )
+				{
+					pItemTemplet->GetSlashTraceColors( pWeapon->m_coSlashTrace, pWeapon->m_coSlashTraceTip
+						, pWeapon->m_coSlashTraceHyper, pWeapon->m_coSlashTraceTipHyper, GetUnit()->GetType() );
+				}
+#else   //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+				pWeapon->m_coSlashTrace			= pItemTemplet->m_coSlashTrace;
+				pWeapon->m_coSlashTraceHyper	= pItemTemplet->m_coSlashTraceHyper;
+				pWeapon->m_coSlashTraceTip		= pItemTemplet->m_coSlashTraceTip;
+				pWeapon->m_coSlashTraceTipHyper	= pItemTemplet->m_coSlashTraceTipHyper;
+#endif  //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+#endif ITEM_SLASH_TRACE_COLOR_TEST
+
+				if( NULL != g_pX2Game &&
+					NULL != g_pX2Game->GetMajorParticle() )
+				{
+					unsigned uNumParticle = pItemTemplet->GetNumAttachedParticleData();
+					for( size_t numParticle = 0; numParticle < uNumParticle; numParticle++ )
+					{
+						const wchar_t*  pwszParticleName = L"";
+						const wchar_t*  pwszBoneName = L"";
+#ifdef	X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+						pItemTemplet->GetAttachedParticleData( numParticle, &pwszParticleName, &pwszBoneName );
+#else   //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+						const CX2Item::AttachedParticleData& particleData = pItemTemplet->GetAttachedParticleData(numParticle);
+						pwszParticleName = particleData.wstrParticleName.c_str();
+						pwszBoneName = particleData.wstrBoneName.c_str();
+#endif  //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+						CKTDGParticleSystem::CParticleEventSequence* pSeq = g_pX2Game->GetMajorParticle()->CreateSequence( (CKTDGObject*) this, pwszParticleName, D3DXVECTOR3( 0, 0, 0 ) );
+						if( NULL != pSeq )
+						{
+							AttachWeaponParticle( pWeapon->m_iWeaponIndex, true, pwszBoneName, pSeq->GetHandle() );
+						}
+					}
+				}
+
+#ifndef	FIX_SLASH_TRACE
+				if( m_LuaManager.BeginTable( "INIT_COMPONENT" ) == true )
+				{
+					pWeapon->LoadDataForUser( m_LuaManager );
+
+					m_LuaManager.EndTable(); // INIT_COMPONENT
+				}
+#endif	FIX_SLASH_TRACE
+
+				m_vecpWeapon.push_back( pWeapon );
+			}
+			break;
+		}
+	}
+}
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 void CX2GUUser::AddEquipToViewList( CX2Item* const pItem )
 {
 	if ( pItem == NULL || pItem->GetItemTemplet() == NULL )
@@ -39558,6 +39833,7 @@ void CX2GUUser::AddEquipToViewList( CX2Item* const pItem )
 		break;	// switch ( pItemTemplet->GetEqipPosition() )
 	}
 }	
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 void CX2GUUser::RemoveEquipFromViewList( CX2EqipPtr pEquipPtrToRemove, int index )
 {
 	CX2Unit::EQIP_POSITION	equipPosition	= pEquipPtrToRemove->GetEqipPos();
@@ -46056,6 +46332,75 @@ void CX2GUUser::UpdateNotRenderingOtherEquipList()
 */
 bool CX2GUUser::GetAddItemAndRemoveItemToViewList( OUT CX2EqipPtr& pEquipPtrToRemove_, IN OUT CX2Item** ppItemToAddInViewList_, IN CX2Item* const pItemToRemoveInViewList_, OUT int& iIndexInViewListForRemove_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	// char-luciel DU3b: June 31fd2f00, the fashion test by the view equip's body and June's usable test
+	if ( *ppItemToAddInViewList_ != NULL )
+	{
+		const CX2Item::ItemTemplet* pItemTempletForItemToAdd = (*ppItemToAddInViewList_)->GetItemTemplet();
+		if ( pItemTempletForItemToAdd == NULL )
+			return false;
+
+		for ( size_t numViewEquipInUser = 0; numViewEquipInUser < m_ViewEqipList.size(); numViewEquipInUser++ )
+		{
+			if ( pItemTempletForItemToAdd->GetEqipPosition() == m_ViewEqipList[numViewEquipInUser]->GetEqipPos() )
+			{
+				const int iBody = ( true == m_ViewEqipList[numViewEquipInUser]->IsMinorUnitEquip() ) ? 1 : 0;
+				if ( pItemTempletForItemToAdd->GetFashion() == false && GetUnit()->IsFashionEquipInThePosition( pItemTempletForItemToAdd->GetEqipPosition(), iBody ) == true )
+					*ppItemToAddInViewList_ = NULL;
+				else
+					pEquipPtrToRemove_ = m_ViewEqipList[numViewEquipInUser];
+
+				iIndexInViewListForRemove_ = numViewEquipInUser;
+				break;
+			}
+		}
+	}
+	else if ( pItemToRemoveInViewList_ != NULL )
+	{
+		const CX2Item::ItemTemplet* pItemTempletForItemToRemove = pItemToRemoveInViewList_->GetItemTemplet();
+		if ( pItemTempletForItemToRemove == NULL )
+			return false;
+
+		for ( size_t numViewEquipInUser = 0; numViewEquipInUser < m_ViewEqipList.size(); numViewEquipInUser++ )
+		{
+			if ( pItemTempletForItemToRemove->GetEqipPosition() == m_ViewEqipList[numViewEquipInUser]->GetEqipPos() )
+			{
+				const CX2Unit::EQIP_POSITION eEquipPosition = pItemTempletForItemToRemove->GetEqipPosition();
+				if ( false == pItemTempletForItemToRemove->GetFashion() )
+				{
+					const int iBody = ( true == m_ViewEqipList[numViewEquipInUser]->IsMinorUnitEquip() ) ? 1 : 0;
+					if ( GetUnit()->IsFashionEquipInThePosition( eEquipPosition, iBody ) == false )
+					{
+						pEquipPtrToRemove_		= m_ViewEqipList[numViewEquipInUser];
+						*ppItemToAddInViewList_	= GetUnit()->CreateBasicEquip( eEquipPosition );
+					}
+				}
+				else
+				{
+					pEquipPtrToRemove_ = m_ViewEqipList[numViewEquipInUser];
+					if ( GetUnit()->IsNormalEquipInThePosition( eEquipPosition ) == true )
+					{
+						CX2Item* pNormalEquip = GetUnit()->GetInventory().GetEquippingItemByEquipPos( eEquipPosition, false, false );
+						if ( pNormalEquip == NULL )
+							return false;
+
+						if ( true == pNormalEquip->IsUsableEquip() )
+							*ppItemToAddInViewList_ = pNormalEquip;
+						else
+							*ppItemToAddInViewList_ = GetUnit()->CreateBasicEquip( eEquipPosition );
+					}
+					else
+						*ppItemToAddInViewList_ = GetUnit()->CreateBasicEquip( eEquipPosition );
+				}
+
+				iIndexInViewListForRemove_ = numViewEquipInUser;
+				break;
+			}
+		}
+	}
+
+	return true;
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	if (*ppItemToAddInViewList_ != NULL )		// 장착할et 장비가 있는 경우
 	{	
 		const CX2Item::ItemTemplet* pItemTempletForItemToAdd = (*ppItemToAddInViewList_)->GetItemTemplet();
@@ -46144,6 +46489,7 @@ bool CX2GUUser::GetAddItemAndRemoveItemToViewList( OUT CX2EqipPtr& pEquipPtrToRe
 		} // for ( size_t numViewEquipInUser = 0; numViewEquipInUser < m_ViewEqipList.size(); numViewEquipInUser++ )
 	}
 
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	return true;
 
 }

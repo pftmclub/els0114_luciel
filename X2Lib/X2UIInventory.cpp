@@ -3839,7 +3839,11 @@ bool CX2UIInventory::Handler_EGS_CHANGE_INVENTORY_SLOT_ACK(  HWND hWnd, UINT uMs
 						if ( pItemToAdd != NULL )
 							g_pX2Game->SetSpecialAbilityInEquip( pItemToAdd->GetItemTemplet(), pUser );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+						g_pX2Game->GetMyUnit()->UpdateEquipViewListInfo( pItemToAdd, pItemToRemove, kInventoryItemInfo.m_sSlotID );	// char-luciel DU3b: June @324620a0
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 						g_pX2Game->GetMyUnit()->UpdateEquipViewListInfo( pItemToAdd, pItemToRemove );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 						if ( kInventoryItemInfo.m_sSlotID == _CONST_UIINVENTORY_::g_iEquippedNormalWeaponSlotID ||
 							 kInventoryItemInfo.m_sSlotID == _CONST_UIINVENTORY_::g_iEquippedFashionWeaponslotID )
@@ -3997,7 +4001,11 @@ bool CX2UIInventory::Handler_EGS_ITEM_EXPIRATION_NOT( HWND hWnd, UINT uMsg, WPAR
                     ) == true )
 				{
 					g_pX2Game->RemoveSpecialAbilityInEquip( pItem->GetItemTemplet(), pMyUser );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+					pMyUser->UpdateEquipViewListInfo( NULL, pItem, pUnit->GetInventory().GetItemSlotID( itemUID ) );	// char-luciel DU3b: June @32196133 ( 3286a310 )
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 					pMyUser->UpdateEquipViewListInfo( NULL, pItem );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 				}
 			}
 		}

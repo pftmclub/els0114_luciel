@@ -942,7 +942,11 @@ public:
 	virtual void	SetShowViewList( bool bShow_ );	
 	void			SetShowOriginalViewList( bool bShow_ );
 	void			ReplaceWeapon( CX2EqipPtr pWeaponPtr_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	virtual bool	UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ );	// char-luciel DU3b: June 32bc89e0
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	virtual bool	UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	virtual void	UpdateEquipCollisionData();
 	#ifdef FIX_ARA_ONE_PIECE_FOR_BERSERK
 	virtual void UpdateNotRenderingOtherEquipList();

@@ -27140,7 +27140,11 @@ void CX2GUArme_VioletMage::AVSI_SI_A_AV_CIRCLE_FLAME_EndFuture()
 		{
 			CX2Item* pItemToAdd = GetUnit()->GetInventory().GetItem( m_vecEquipViewChange[i].m_iItemUIDToAdd, false );
 			CX2Item* pItemToRemove = GetUnit()->GetInventory().GetItem( m_vecEquipViewChange[i].m_iItemUIDToRemove, false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+			UpdateEquipViewListInfo( pItemToAdd, pItemToRemove, 0 );	// char-luciel DU3b: June @32cdbf08 replays with slot 0 ( the queue keeps no slot id )
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 			UpdateEquipViewListInfo( pItemToAdd, pItemToRemove );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		}
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_OVERRIDE_DEBUG
 		if( false == m_vecEquipViewChange.empty() )
@@ -34309,7 +34313,11 @@ void CX2GUArme_VioletMage::UpdateEquipCollisionData( IN vector<CX2EqipPtr>& vecE
 
 // June 32cc9950 ( vslot 0x644 ): June queues the change while transformed ( 3207b5d0 ); March has no queue, so it is dropped
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+bool CX2GUArme_VioletMage::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList_, CX2Item* const pItemToRemoveInViewList_, const short sSlotID_ )	// char-luciel DU3b: June 32cc9950
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 bool CX2GUArme_VioletMage::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList_, CX2Item* const pItemToRemoveInViewList_ )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 {
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_PASSIVE
 	if( true == IsTransformed() )
@@ -34328,7 +34336,11 @@ bool CX2GUArme_VioletMage::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewLis
 		return true;
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_PASSIVE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	CX2GUUser::UpdateEquipViewListInfo( pItemToAddInViewList_, pItemToRemoveInViewList_, sSlotID_ );	// char-luciel DU3b
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	CX2GUUser::UpdateEquipViewListInfo( pItemToAddInViewList_, pItemToRemoveInViewList_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	return true;
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE

@@ -11713,7 +11713,11 @@ void CX2GUChung::ReplaceWeapon( CX2EqipPtr pWeaponPtr_ )
 	@param : CX2Item* pItemToAddInViewList(추가될 장비), CX2Item* const pItemToRemoveInViewList(탈착될 장비)
 	@return : 함수의 성공 여부
 */
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+/*virtual*/ bool CX2GUChung::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ )	// char-luciel DU3b: June 32bdc750 ( = March's body + the slot id )
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 /*virtual*/ bool CX2GUChung::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 {
 	CX2EqipPtr pEquipPtrToRemove;
 	int iIndexInViewListForRemove_ = 0;
@@ -11727,7 +11731,11 @@ void CX2GUChung::ReplaceWeapon( CX2EqipPtr pWeaponPtr_ )
 
 	if ( pItemToAddInViewList != NULL )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		AddEquipToViewList( pItemToAddInViewList, sSlotID_, false );	// char-luciel DU3b
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		AddEquipToViewList( pItemToAddInViewList );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	}
 
 	// 이곳을 사용하는 루틴에서 UpdateEquipCollisionData()를 호출하기 때문에 

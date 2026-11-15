@@ -75,8 +75,15 @@ void CX2Unit::Init()
 	//}}
 
 	memset( m_ViewEqipPosition,		0, sizeof(bool) * EP_END );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	// char-luciel DU3b: June's per-body tables ( ctor 32363de7 )
+	memset( m_FashionEqipPosition,		0, sizeof( m_FashionEqipPosition ) );
+	memset( m_NormalEqipPositionByBody,	0, sizeof( m_NormalEqipPositionByBody ) );
+	memset( m_NormalEqipPosition,		0, sizeof( m_NormalEqipPosition ) );
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	memset( m_FashionEqipPosition,	0, sizeof(bool) * EP_END );
 	memset( m_NormalEqipPosition,	0, sizeof(bool) * EP_END );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 	ResetEqip();
 
@@ -308,8 +315,15 @@ void CX2Unit::ResetInventory( std::map< int, int >& mapInventorySlotSize, std::m
 void CX2Unit::ResetEqip()
 {
 	memset( m_ViewEqipPosition,		0, sizeof(bool) * EP_END );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	// char-luciel DU3b: June ResetEqip 32355e40's per-body tables ( the rest of June's body is routed to DU3c )
+	memset( m_FashionEqipPosition,		0, sizeof( m_FashionEqipPosition ) );
+	memset( m_NormalEqipPositionByBody,	0, sizeof( m_NormalEqipPositionByBody ) );
+	memset( m_NormalEqipPosition,		0, sizeof( m_NormalEqipPosition ) );
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	memset( m_FashionEqipPosition,	0, sizeof(bool) * EP_END );
 	memset( m_NormalEqipPosition,	0, sizeof(bool) * EP_END );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	
 	m_NormalEqipItemUIDList.resize(0);
 	m_ViewEqipItemUIDList.resize(0);
@@ -617,6 +631,75 @@ bool CX2Unit::UpdateViewEqipPosition()
 	return true;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+// char-luciel DU3b: June 3234b540 ( no caller in June or March )
+bool CX2Unit::UpdateFashionEqipPosition()
+{
+	memset( m_FashionEqipPosition, 0, sizeof( m_FashionEqipPosition ) );
+	for( int i =0; i < (int)m_FashionEqipItemUIDList.size(); i++ )
+	{
+		CX2Item* pEqipItem = GetInventory().GetItem( m_FashionEqipItemUIDList[i] );
+		if( pEqipItem == NULL )
+			return false;
+
+		const int iBody = GetInventory().IsMinorUnitEquipItem( m_FashionEqipItemUIDList[i] ) ? 1 : 0;
+		m_FashionEqipPosition[pEqipItem->GetItemTemplet()->GetEqipPosition()][iBody] = true;
+	}
+
+	return true;
+}
+
+// char-luciel DU3b: June 3234b5f0 ( no caller in June or March )
+bool CX2Unit::UpdateNormalEqipPosition()
+{
+	memset( m_NormalEqipPosition, 0, sizeof( m_NormalEqipPosition ) );
+	memset( m_NormalEqipPositionByBody, 0, sizeof( m_NormalEqipPositionByBody ) );
+	for( int i =0; i < (int)m_NormalEqipItemUIDList.size(); i++ )
+	{
+		CX2Item* pEqipItem = GetInventory().GetItem( m_NormalEqipItemUIDList[i] );
+		if( pEqipItem == NULL || pEqipItem->GetItemTemplet() == NULL )
+			return false;
+
+		const int iEquipPosition = pEqipItem->GetItemTemplet()->GetEqipPosition();
+		if ( EP_AC_HAIR <= iEquipPosition && iEquipPosition <= EP_AC_TEMP5 )
+			GetInventory().IsMinorUnitEquipItem( m_NormalEqipItemUIDList[i] );	// June bug: the body is read and never stored ( JUNE_BUGS 728 )
+		else
+			m_NormalEqipPosition[iEquipPosition] = true;
+	}
+
+	return true;
+}
+
+// char-luciel DU3b: June 32350070
+void CX2Unit::UpdateEqipPosition( CX2Item* pItem, bool bAdd )
+{
+	if ( NULL == pItem || NULL == pItem->GetItemTemplet() )
+		return;
+
+	int iEquipPosition = pItem->GetItemTemplet()->GetEqipPosition();
+	AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+
+	const int iBody = GetInventory().IsMinorUnitEquipItem( pItem->GetUID() ) ? 1 : 0;
+	if( pItem->GetItemTemplet()->GetFashion() == true )
+		m_FashionEqipPosition[iEquipPosition][iBody] = bAdd;
+	else if ( EP_AC_HAIR <= iEquipPosition && iEquipPosition <= EP_AC_TEMP5 )
+		m_NormalEqipPositionByBody[iEquipPosition][iBody] = bAdd;
+	else
+		m_NormalEqipPosition[pItem->GetItemTemplet()->GetEqipPosition()] = bAdd;
+}
+
+// char-luciel DU3b: June 3234fe90
+void CX2Unit::AdjustEquipPositionForSecondRing( const CX2Item* pItem_, int& iEquipPosition_ ) const
+{
+	if ( EP_AC_RING != iEquipPosition_ || NULL == pItem_ )
+		return;
+
+	// stand-in: June reads unit +0x294 ( a per-UID map of slot ids, not identified; DU4 ), the inventory's slot id has the same value
+	const short sSlotID = GetInventory().GetItemSlotID( pItem_->GetUID() );
+	if ( 0x29 == sSlotID || 0x2a == sSlotID )	// June NESI_AC_RING2 / NESI_MINORUNIT_AC_RING2
+		iEquipPosition_ = EP_AC_TEMP4;	// June's EP_AC_RING2
+}
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 bool CX2Unit::UpdateFashionEqipPosition()
 {
 	memset( m_FashionEqipPosition,	0, sizeof(bool) * EP_END );
@@ -658,9 +741,23 @@ void CX2Unit::UpdateEqipPosition( CX2Item* pItem, bool bAdd )
 		m_NormalEqipPosition[pItem->GetItemTemplet()->GetEqipPosition()] = bAdd;
 	}
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 bool CX2Unit::EqipConflict( CX2Item* pItem )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	// char-luciel DU3b: June 32350130
+	int iEquipPosition = pItem->GetItemTemplet()->GetEqipPosition();
+	AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+
+	const int iBody = GetInventory().IsMinorUnitEquipItem( pItem->GetUID() ) ? 1 : 0;
+	if( pItem->GetItemTemplet()->GetFashion() == true )
+		return m_FashionEqipPosition[iEquipPosition][iBody];
+	else if ( EP_AC_HAIR <= iEquipPosition && iEquipPosition <= EP_AC_TEMP5 )
+		return m_NormalEqipPositionByBody[iEquipPosition][iBody];
+
+	return m_NormalEqipPosition[iEquipPosition];
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	if( pItem->GetItemTemplet()->GetFashion() == true )
 	{		
 		if( m_FashionEqipPosition[pItem->GetItemTemplet()->GetEqipPosition()] == true )
@@ -678,6 +775,7 @@ bool CX2Unit::EqipConflict( CX2Item* pItem )
 		}
 	}
 	return false;
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 }
 
 bool CX2Unit::UpdateViewEqip()
@@ -693,6 +791,23 @@ bool CX2Unit::UpdateViewEqip()
 
 		AddItemLevel( pEqipItem );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		// char-luciel DU3b: June 32350230's fashion test ( the rest of June's body is routed to DU3c )
+		if ( NULL == pEqipItem->GetItemTemplet() )
+			continue;
+
+		int iEquipPosition = pEqipItem->GetItemTemplet()->GetEqipPosition();
+		AdjustEquipPositionForSecondRing( pEqipItem, iEquipPosition );
+
+		bool bFashionOver = false;
+		if ( CX2Item::IT_ACCESSORY == pEqipItem->GetItemTemplet()->GetItemType() || UT_LUCIEL != GetType() )
+			bFashionOver = m_FashionEqipPosition[iEquipPosition][GetInventory().IsMinorUnitEquipItem( m_NormalEqipItemUIDList[i] ) ? 1 : 0];
+		else
+			bFashionOver = m_FashionEqipPosition[iEquipPosition][0] && m_FashionEqipPosition[iEquipPosition][1];	// Lu/Ciel: hidden only when both bodies wear fashion there
+
+		if ( true == bFashionOver )
+			continue;
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		if( m_FashionEqipPosition[pEqipItem->GetItemTemplet()->GetEqipPosition()] == true )
 		{
 			//충돌!
@@ -701,6 +816,7 @@ bool CX2Unit::UpdateViewEqip()
 
 			
 
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		m_ViewEqipItemUIDList.push_back( pEqipItem->GetUID() );
 	}
 
@@ -848,6 +964,22 @@ void CX2Unit::UpdateEnchantStatFromPassiveSkill()
 
 //{{ kimhc // 실시간 엘소드 중 실시간 장비 및 아바타 교체
 #ifdef REAL_TIME_ELSWORD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+// char-luciel DU3b: June 31fac260, the active body's row for EP_AC_HAIR..EP_AC_TEMP5
+bool CX2Unit::IsNormalEquipInThePosition( EQIP_POSITION equipPosition ) const
+{
+	if ( EP_AC_HAIR <= equipPosition && equipPosition <= EP_AC_TEMP5 )
+		return m_NormalEqipPositionByBody[equipPosition][true == m_bMinorUnitForm ? 1 : 0];
+
+	return m_NormalEqipPosition[equipPosition];
+}
+
+// char-luciel DU3b: June reads unit +0xb7d [pos * 3 + body] inline ( 31fd2f00, 3201b930, 32350230 )
+bool CX2Unit::IsFashionEquipInThePosition( EQIP_POSITION equipPosition, const int iBody_ ) const
+{
+	return m_FashionEqipPosition[equipPosition][iBody_];
+}
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 bool CX2Unit::IsNormalEquipInThePosition( EQIP_POSITION equipPosition ) const
 {
 	return m_NormalEqipPosition[equipPosition];
@@ -857,6 +989,7 @@ bool CX2Unit::IsFashionEquipInThePosition( EQIP_POSITION equipPosition ) const
 {
 	return m_FashionEqipPosition[equipPosition];
 }
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 bool CX2Unit::IsViewEquipInThePosition( EQIP_POSITION equipPosition ) const
 {

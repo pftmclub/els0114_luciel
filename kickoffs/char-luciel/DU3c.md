@@ -41,3 +41,22 @@ Then `kickoffs/char-luciel/DU3.md` (its "Amended by" blocks DU1b, DU1b2, DU1d3b,
 Then the full build and the play-test: Lu and Ciel each show their own equipment after a swap (Ciel draws a body); three March characters' fashion over
 a broken item and a PvP item look as June's; CH1's owed check: Ciel dies with a buff on (`/invin 0`), the buff is gone after the revive. Write
 `DU3-review.md` if missing.
+
+## Amended by DU3b (2026-11-15)
+
+- **Ciel's dummy is a stack item passed as basic.** June's `AddEquipToViewList` (`31ffe990`, now ported) builds Ciel's copy from a local
+  `CX2Item` with `bDummyBasic = true`; March's `CX2Eqip` ctor then keeps `m_pDummyItem = pItem`, which dangles after the call (`GetItem()` on Ciel's
+  equip). June's ctor `32961280` never reads that argument (`+0x190` is stored 0 @`329614f6`): read June's `GetItem` and its dummy-item use and settle
+  it **before** the play-test. Also check whether `CX2Eqip` keeps any other pointer into the item.
+- **`m_iMinorUnitEquipOverridePosition` / `m_iMinorUnitEquipOverrideItemID`** (user `+0x9570` / `+0x9574`, declared, ctor `EP_NONE` / -1): their writers
+  are the setter `31fd7b40` and the init pass `3201f8d0` (`+0x9570 = 7` = `EP_DEFENCE_FACE`, `+0x9574` = an item id; DU1d2's lead). Port with item 1.
+- **Unit equip lists (routed by DU3b):** `ResetEqip` `32355e40` (divergence row + allow: June skips an item with no templet, a non-equip use type or an
+  `EqipConflict` hit, and ends with `3234da60`); `UpdateViewEqip` `32350230` (its fashion test is ported; compare the item-level arithmetic);
+  `UpdateViewEqipPosition` `3234ff60` (June's `+0xb08` view table is per body, `[pos * 3 + 3286a350]`, ring remap; no reader found). Check
+  `AddEqip` `323574c0` and `RemoveEqip` `323514c0` against March too.
+- DU3's Done note names `31ce9860` AddObjectChain and `31ce9a60` RemoveObjectChain; funcmap rows 2924 / 2925 have them the other way round
+  (`31ce9a60` = AddObjectChain, read in Ghidra by DU3b). Use the funcmap names for item 5.
+- The unit-viewer readers of the per-body fashion table (`31f9c640`, `31f9df40`, `31f94360`) stay with june-engine R14c (`UpdateEquipSlotVisi...`
+  row, open).
+- **Seam hand-off:** DU3b wrote section `DU3b` of `kickoffs/char-luciel/playtest.md` (March characters' view). Write section `DU3c`, run
+  `build.py --deploy`, then hand off `python tools/playtest.py assemble char-luciel DU3b DU3c` in full.

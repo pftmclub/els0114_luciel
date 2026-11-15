@@ -847,7 +847,11 @@ public:
 #endif SERV_IRUHADEV_JUNE_CHAR_CHUNG_LIVE
 	void				SetShowOriginalViewList( bool bShow_ );
 	void				ReplaceWeapon( CX2EqipPtr pWeaponPtr_ );	// 광폭화 모드와 관련하여 무기 변경
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	virtual bool		UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ );	// char-luciel DU3b: June 32bdc750
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	virtual bool		UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	virtual void		UpdateEquipCollisionData();
 	
 	virtual bool		IsFullHyperMode() const { return GetChungGageData()->GetBerserkMode(); }
