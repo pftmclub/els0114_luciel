@@ -1680,6 +1680,7 @@ junediverge RESULT: PASS. **enumscan: FAIL exit 1, not mine:** 3 old `case 104:`
 
 **Play-test** (hand-off in the reply): only items 2 and 5 are visible; 4 and 6 are log-only; items 1 and 3 cannot fire. Review: `kickoffs/june-engine/R9-review.md` (Opus).
 **Routed, not done:** nothing new. Open question for the user: none.
+**Play-test passed 2026-11-15, logs read (user: all test passed):** effect alpha 0.3 on skin-mesh particles (6 lines, `0.3`), state manager own handler on every device reset (4 lines, Alt+Enter), outline clamp fired 6 lines (1.63 to 1.30 clamped, UI system); 0 EXCEPTION; the 2 UNHANDLED `E_DISABLE_HB_CHECK_REQ` are old. RHW alpha / XET name lines did not fire (no such particle reached). Review owed.
 
 ## Phase R10 - Skin-anim playback sweep
 
