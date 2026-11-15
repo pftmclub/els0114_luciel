@@ -3710,6 +3710,25 @@ Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h` ( bytepatch ), `MODS.md`, `func
   page 2 = A slots 0-2 Soul Strike / Shadow / Soul Extortion, B slots 5-8 Soul Shock / Demonic Breath / Fantasie Impromptu / Death Crisis of Marbas ( every skill from an A and a B slot; Soul Extortion's owed B-slot cast included ).
 - **Play-test hand-off:** in the message that closes the session ( dev console first, per key, with the log lines to expect ).
 - **Next:** play-test, then `/x2-phase char-luciel CH2c2 review` on Opus 5.5 high; CH2d waits for that review.
+### CH2d - Done (2026-11-16)
+
+Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( no new define ); `_SKILL_DEBUG` is **on** again for the play-test ( the CH2d2 review retires it ). No review of its own ( CH2d2's covers it ).
+Files: `X2GULuciel.h` / `.cpp`, `X2GUUser.h` / `.cpp` ( one fix, below ), `Always.h` ( the debug line ), `MODS.md`, `funcmap.tsv` ( `grep "(CH2d)"`, 8 rows ), `kickoffs/char-luciel/CH2d2.md` ( amended ).
+- **Written ( 30 functions, every `CH2d` row of `ch0_class_map.tsv`, read with `charport_adis.py`; the thunks are not ):** 10 preloads ( generated from the listings, 153 of 153 loads ), Land Crasher ( event process, landing ), Bloodlust event process,
+  Nightmare / Mortal Fear / Dark Plasma starts, `GetTransformedSkillID`, the Altar of Evil skill and transformed-form event processes ( start, jump up / down / X, combo Z ZZ ZZZ ZZZZ X XX, XXX ready x2, XXX end ).
+- **Deviation ( the one decision, as CH2c ): only Land Crasher ( 30040 / 30054 ) and Bloodlust ( 30041 / 30075 ) get setter cases.** Nightmare ( @32b47d2e ), Altar of Evil ( @32b47de9 ), Abyss Strike ( @32b49cd0 ) and Phantom Rush ( @32b49d69 ) each have a state whose
+  callbacks are CH2d2's ( `ch2c_cases.py` marks them ); registering them now leaves the player stuck. CH2d2's kickoff carries the four cases.
+- **Fix in CH1a0's code ( `TRANSFORM_LINK` ):** June `32030160` returns `bool` ( the `SelectSlot` result, al = 0 on every other exit ); CH1a0 wrote `CheckTransformSkillSlotKey` as `void`. Now `bool`; the combo chains test it.
+- **Bodies of note.** Land Crasher landing and Bloodlust = the CH1g cancel chain ( skill / ground walk / back walk / dash ) with their own head. The transformed form's chain is the same with `SpecialAttackEventProcess` replaced by `CheckTransformSkillSlotKey` + `StateChangeToTransformSkill`
+  ( new file-local macro `TRANSFORM_SKILL_CANCEL_AFTER_` ), then `HYPER_MODE_CANCEL_AFTER_`. Z / ZZ / ZZZ / X / XX tests buff 763 only ( June's literal ), ZZZZ / XXX ready / XXX end / jump X test 763 + minor ( Ciel: 764, end state 504 ). Normalised listings
+  compared with a diff script: five combos share Z's tail exactly, ZZZZ / XXX end differ in register allocation only. `GetTransformedSkillID` +6 on Ciel = `RNSI_SA_LDN_SHADOW_FURY / SHREWD_CUTTER / SILENT_RAGE`.
+- **Stand-ins / open.** States 444 / 445 ( the XXX ready / end tables registered a second time, `32b4829a`-`32b4832b` ) have no June name: 445 is a constant in `_CONST_LUCIEL_CH2D_`, the second ready event process is `..._READY_SECOND_EventProcess`; CH2d2's case registers them. No June bug found.
+- **Debug lines ( `_SKILL_DEBUG` ).** `[JUNE_CHAR] LUCIEL SKILL land crasher landing body L|C`, `land crasher chain body ...`, `bloodlust end body ... foot N`; the `equip` / `use` / `cooldown` lines stay.
+- **Gates ( `finish.py --files X2GULuciel.cpp .h X2GUUser.cpp .h Always.h --with JUNE_CHAR_LUCIEL_SKILL ..._SKILL_DEBUG JUNE_CHAR_TRANSFORM_LINK --state X2GULuciel.cpp Luciel_Demonio --icons 30040-30077 30215-30220` ):** junediverge PASS, enumscan exit 0, stateends PASS, skillicons PASS,
+  `ch1m_regcheck` 340 matched / 0 problems; flagcheck `_SKILL`: `X2GULuciel.cpp` PASS ( +639 ), `X2GUUser.cpp` PASS, the `.h` files OTHER ( `_CORE`, a peer's `_UI` friend line ); FINISH `FAIL` comes only from the tool's unevaluable compound guard at `Always.h` ( `_LIVE` / `TRANSFORM_LINK`, peers' uncommitted hunks beside it ), as CH2d20. `/Zs` probes of `X2GULuciel.cpp` and `X2GUUser.cpp`: 0 errors.
+- **Build:** my `build.py --deploy` waited for a peer's build that already covered every edit ( exe `27,044,864 B, 2026-11-15 23:29:46, md5 1699a8a8ac9bb0b396f56c62533343b0` ); `EXESTR OK: 3 of 3` wide in the built exe. `DEPLOY REFUSED` ( game running ): run `python tools/build.py --deploy-only` after the user closes the game ( `DEPLOY OK` line goes below then ).
+- **Play-test save:** needs the game closed ( `elsdb` refuses writes while it runs ): `LuDbA` ( class 39, level 70, base 30040 / 30041 ) and `LuDbB` ( upgrades 30054 / 30075, base level 0 ), page 1 slots 0 / 1, page 2 slots 5 / 6. Pending: see the hand-off.
+
 
   block reads `CoolTime` with no handle test, the cover branches test it ( `31d41cd0` ), the else branch clears the cover picture then the string: all as ported.
 - **Hook `@32070133`:** after the SIEE 15 call, `+0x8f70` window, `+0x8f6e` / `+0x8f6f` either byte, `fld [user +0x2b0]` ( = `m_fElapsedTime`, funcmap 322722e0 ) ->

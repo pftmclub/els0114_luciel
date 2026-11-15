@@ -60,3 +60,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `SetTransformEndTexture( wstrFile, wstrKey )` ( `31fd4930` ); before every delete `ReleaseDialog()` ( `31fd03f0`, already in the three Lu/Ciel delete sites ).
   The user's wrappers are `HasTransformSkillSlotUI` ( `31fd0380` ), `GetShowTransformSkillSlotUI` ( `31fd03b0` ), `SetShowTransformSkillSlotUI` ( `31fe3c90` ); the UI manager
   menu is `CX2UIManager::UI_TRANSFORM_SKILL_SLOT` ( June 44 ). The per-frame cool-time count, the menu toggles and the training-F6 reset are hooked ( `LUCIEL_LIVE` ): do not add them again.
+
+## Amended by char-luciel CH2d (2026-11-16)
+
+- **Setter cases you write ( CH2d registered only Land Crasher and Bloodlust ):** Nightmare ( `32b47d2e`, ids 30042 / 30076 ), Altar of Evil ( `32b47de9`, 30043 / 30077; 31 states incl. 444 / 445 ), Abyss Strike ( `32b49cd0`, 30215 / 30219; set `m_bSkillState` on 459 ), Phantom Rush ( `32b49d69`, 30216 / 30220 ).
+  Read each with `ch2c_cases.py`; CH2d's callbacks are written ( `grep "(CH2d)" june2017_re/funcmap.tsv` ), CH2d2's are the `CH2d2` rows of `ch0_class_map.tsv`. The Death Touch / Mortal Fear / Dark Plasma EP ( `32b04640` ) and the other transformed states are yours.
+- **Names CH2d chose:** the XXX ready table's two ids use `..._COMBO_XXX_READY_EventProcess` ( 442 ) and `..._READY_SECOND_EventProcess` ( 444 ); `_CONST_LUCIEL_CH2D_::ALTAR_OF_EVIL_COMBO_XXX_END_SECOND_STATE_ID` = 445 ( no June name ). `GetTransformedSkillID( int slot )` exists ( the registrars `32b43910` / `32b43b10` call it ).
+- **Macros in `X2GULuciel.cpp`:** `TRANSFORM_SKILL_CANCEL_AFTER_` ( the transformed form's chain head ) plus CH1f / CH1g's `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_`, `HYPER_MODE_CANCEL_AFTER_`, `WALK / BWALK / DASH_CANCEL_AFTER_ON_LINE_`. `CheckTransformSkillSlotKey` returns bool now ( CH2d fixed CH1a0's void ).
+- `_SKILL_DEBUG` is on for CH2d's play-test; the review of this phase retires it.

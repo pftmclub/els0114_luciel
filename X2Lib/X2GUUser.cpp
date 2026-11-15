@@ -25948,10 +25948,10 @@ void CX2GUUser::ApplyTransformSkillCost()
 }
 
 // char-luciel CH1a0: June 32030160, A S D ( Q W E on the swapped row ) pick a ready window slot, else the MP or cool-time message
-void CX2GUUser::CheckTransformSkillSlotKey()
+bool CX2GUUser::CheckTransformSkillSlotKey()
 {
 	if( NULL == m_pTransformSkillSlotUI || 0 <= m_pTransformSkillSlotUI->GetSelectedSlot() || ( false == m_bFirstUnitTransformed && false == m_bMinorUnitTransformed ) )
-		return;
+		return false;
 
 	int iSlot = -1;
 	if( NULL != g_pData->GetUIManager() && NULL != g_pData->GetUIManager()->GetUISkillTree() && true == g_pData->GetUIManager()->GetUISkillTree()->GetSkillSlotSwap() )
@@ -25973,14 +25973,13 @@ void CX2GUUser::CheckTransformSkillSlotKey()
 			iSlot = 2;
 	}
 	if( 0 > iSlot )
-		return;
+		return false;
 
 	if( m_pTransformSkillSlotUI->GetCoolTime( iSlot ) <= 0.f )
 	{
 		if( true == m_pTransformSkillSlotUI->CanUseSlot( iSlot ) )
 		{
-			m_pTransformSkillSlotUI->SelectSlot( iSlot );
-			return;
+			return m_pTransformSkillSlotUI->SelectSlot( iSlot );	// char-luciel CH2d: June 32030160 leaves SelectSlot's result in al
 		}
 		g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_2549 ), D3DXCOLOR(1,1,1,1),
 			D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
@@ -25990,6 +25989,7 @@ void CX2GUUser::CheckTransformSkillSlotKey()
 		g_pX2Game->GetInfoTextManager().PushText( XUF_DODUM_20_BOLD, GET_STRING( STR_ID_226 ), D3DXCOLOR(1,1,1,1),
 			D3DXCOLOR(0,0,0,1), DT_CENTER, 1.f, 1.f );
 	}
+	return false;
 }
 
 // char-luciel CH1a0: June 32039dc0

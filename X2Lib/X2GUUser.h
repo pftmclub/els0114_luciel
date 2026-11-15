@@ -2589,7 +2589,7 @@ public:
 		bool IsTransformed( const int iDuoType_ ) const;							/// char-luciel CH1a0: June 31fc9d90
 		void ApplyTransformSkillCoolTime( const float fValue_, const bool bAdd_ );	/// char-luciel CH1a0: June 31fc9f00
 		void ApplyTransformSkillCost();												/// char-luciel CH1a0: June 31fd0490
-		void CheckTransformSkillSlotKey();											/// char-luciel CH1a0: June 32030160
+		bool CheckTransformSkillSlotKey();											/// char-luciel CH1a0: June 32030160; CH2d: returns SelectSlot's result, false on every other path
 		void StateChangeToTransformSkill();											/// char-luciel CH1a0: June 32039dc0
 		bool IsFourthSkillSlotKeyPressedOnce() const;								/// char-luciel CH1a0: June 31fd0440
 		virtual int GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ ) { UNREFERENCED_PARAMETER( eSkillID_ ); return 0; }	/// char-luciel CH1a0: June vslot 0x57c ( base 330f9c30 ); Lu/Ciel's 32ae9c00 is CH1l's

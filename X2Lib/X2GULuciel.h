@@ -1315,6 +1315,38 @@ protected:
 	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
 	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
 	void				CreateChaserOfDarknessDamageEffect( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b1f800: body in CH1l3
+	// char-luciel CH2d: Diablura ( 39 ) skills part 1; the setter cases of Nightmare, Altar of Evil, Abyss Strike and Phantom Rush wait for CH2d2
+	void				LSI_SA_LDB_LAND_CRASHER_Init();	// June 32ae87b0
+	void				LSI_SA_LDB_LAND_CRASHER_EventProcess();	// June 32b02840
+	void				LSI_SA_LDB_LAND_CRASHER_LANDING_EventProcess();	// June 32b02890
+	void				LSI_SA_LDB_BLOODLUST_Init();	// June 32ae88a0
+	void				LSI_SA_LDB_BLOODLUST_EventProcess();	// June 32b02b00
+	void				LSI_SA_LDB_NIGHTMARE_Init();	// June 32ae88f0
+	void				LSI_SA_LDB_NIGHTMARE_StateStart();	// June 32ae89c0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_Init();	// June 32ae89e0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_EventProcess();	// June 32b02d80
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_EventProcess();	// June 32b02dd0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP_EventProcess();	// June 32ae8b60
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN_EventProcess();	// June 32b02e10
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X_EventProcess();	// June 32b02e60
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z_EventProcess();	// June 32b02f10
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZ_EventProcess();	// June 32b03250
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZ_EventProcess();	// June 32b03590
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZZ_EventProcess();	// June 32b038d0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X_EventProcess();	// June 32b03bb0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XX_EventProcess();	// June 32b03ef0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_EventProcess();	// June 32b04230
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_SECOND_EventProcess();	// June 32b045b0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END_EventProcess();	// June 32b042d0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_Init();	// June 32ae8bb0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR_Init();	// June 32ae8c50
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR_StateStart();	// June 32ae8cf0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA_Init();	// June 32ae8d10
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA_StateStart();	// June 32ae8e00
+	void				LSI_A_LDB_F_ABYSS_STRIKE_Init();	// June 32ae8f50, also the male state's
+	void				LSI_A_LDB_F_PHANTOM_RUSH_Init();	// June 32ae8ff0
+	void				LSI_A_LDB_M_PHANTOM_RUSH_Init();	// June 32ae90b0
+	CX2SkillTree::SKILL_ID	GetTransformedSkillID( const int iSlotIndex_ ) const;	// June 32ae9c90: the linked skill of slot 0-2
 	void				ProcessPhantomRushHit( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b347f0: body in CH1l3
 	void				PlayPunisherEffectSet( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b34c70: body in CH1l3
 	void				RegisterDesperadoTarget( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b18060: body in CH1l3

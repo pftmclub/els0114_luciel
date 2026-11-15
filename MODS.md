@@ -7183,6 +7183,15 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ), `SERV_IRUHADEV_JUNE_ENU
 - **Damage.** The numerical tables of June's `Luciel_Duo.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The save `LuRgA` / `LuRgB` skill rows are back in `db_backup/els_db_20261115_220809_pre_sql.sql`.
 
+## Stage 8 Lu/Ciel, CH2d: Diablura skills part 1 (char-luciel CH2d, 2026-11-16)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ) and the temporary `..._SKILL_DEBUG` ( on for the play-test; the CH2d2 review retires it ). Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH2d - Done"; log lines `[JUNE_CHAR] LUCIEL SKILL ...`.
+- **What changes in game.** Land Crasher ( 30040 / 30054 ) and Bloodlust ( 30041 / 30075 ) get their states and callbacks in `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex`. The rest of this phase's Diablura functions ( Nightmare, Altar of Evil and its transformed form's combo / jump event processes, the Abyss Strike and Phantom Rush preloads ) are compiled and wait for CH2d2, which owns the callbacks those skills still lack.
+  `CX2GUUser::CheckTransformSkillSlotKey` now returns June's bool ( the selected slot's result ).
+- **Differs from March.** None to compare ( Lu/Ciel is new ).
+- **Damage.** The numerical tables of June's `Luciel_Demonio.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ## Engine R14c: the basic-item anim behind every attach-anim weapon's hits (june-engine R14c, 2026-11-15)
 
 Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (`Always.h`; `#error` without `..._JUNE_EQIP_ATTACH_ANIM`, `..._DIVERGE_UPDATE_EQUIP_COLLISION_DATA`, `..._JUNE_ITEM_KIM`, `..._JUNE_EQUIP_EFFECT_SET` and `..._JUNE_ENUM_NAMES`) and the temporary `..._DEBUG` (`[JUNE_ENGINE] EQBASIC` lines; the R14c review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.
