@@ -1406,6 +1406,42 @@ June's view list is ported whole for every class; March's bodies stay in each `#
   every file. Full build skipped: no play-test yet (DU3c is the seam).
 - **Play-test deferred:** section DU3b in `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), batch at DU3c.
 
+### DU3c - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW` (DU3's; no new define, `Always.h` untouched). Rows: funcmap `(DU3c)` (7). The seam of DU3 / DU3b / DU3c.
+- **Ciel's look at init** (`X2GUUser.cpp`): `InitEqip` calls the new `CX2GUUser::UpdateEqip( true )` (June `31fe4210`, `32024510 @32024551`) in place of
+  `CX2ItemManager::UpdateEqip` (`#else`). Per view equip: `IsUsableEquip`, `GetEffectiveEnchantLevel`; a normal item builds Lu's equip unless a fashion
+  sits at ( pos, body 0 ), and for Lu/Ciel without a fashion at ( pos, body 1 ) Ciel's: the templet's minor-unit dummy, or the item itself when its Lu/Ciel
+  model has a Ciel name; fashion / accessory items go to the body of their slot. `ReplaceEmptyToBasic( bLoad )` (`31fe3e30`) and
+  `ReplaceEmptyToBasic( table, pos, id, bLoad )` (`31fe2fb0`) fill the free ( pos, body ) cells from the unit templet's basics, the second body from the
+  basic item's minor-unit id. Every equip passes June's last argument 1.
+- **Dummy items (DU3b's open question, settled):** June's ctor `32961280` never reads the dummy argument and keeps no item pointer (`+0x190` = 0); March's
+  basic equip stores the item and deletes it in its dtor, so DU3b's stack `CX2Item` would have been freed from the stack. Stand-in (labelled): every
+  dummy June builds on the stack is a `new CX2Item` the equip owns; DU3b's Ciel copy of a basic item gets its own copy (two equips never share one).
+  `CX2Eqip` keeps no other pointer into the item (templet, UID, owner unit only).
+- **Socket options by body:** `InitSocketData` skips a Lu/Ciel equip whose `CX2Inventory::GetEquipDuoType` (new, `3286a4b0`: weapon / armour slots
+  `DT_BOTH`, minor-unit slots `DT_MINOR`, the rest `DT_MAJOR`) is not both and not the active body (`@3206dc6a`).
+- **Hide-equip-by-body:** `NOT_SHOW_UNIT_BY_DUOTYPE` read in `CommonStateStart` (`@320618a8-3206194c`, new members `m_fHideEquipStartAnimTime` /
+  `m_fHideEquipEndAnimTime` = `+0x8fac` / `+0x8fb0`); `UpdateHideEquipByBody` (`3204e4a0`) runs after the before-anim-time update in `CommonFrameMove`
+  (`@320661f9`): outside the window the restore is `UpdateDuo( true )` (= `3204df80( 1 )`), inside it hides that body's equips once. JUNE_BUGS 673 stays
+  what to watch (Lu/Ciel's `LSI_LDB_WIN` uses `{ 1, 5, 0 }`).
+- **`_UpdateSkin`** (`X2Eqip.cpp`, inside `JUNE_EQIP_SKIN`'s `bAllModels`): Lu's equip (body byte clear) with `m_pNormalXSkinModel[1]` set attaches
+  every model (`3295ae20`).
+- **The chain byte `+0x15d5`:** `31ce9860` is `RemoveObjectChain`, `31ce9a60` `AddObjectChain`. Set (every June in-game caller) keeps March's behaviour
+  (particles chained, sub-equips added); clear (the viewer callers only) unchains. So there is no asymmetry and no June bug. Renamed
+  `m_bAttachedInDGManagerChain`, default `true` (= March for unported callers); readers `32960ad0` / `32961c80` routed to june-engine R14c with the callers.
+- **Identified, routed:** `CommonFrameMove @320659e9-32065ae1` = the equip render param under the custom render state (june-engine R5, funcmap 2608's
+  second consumer); the attach-anim basic-item pair `3295dfa0 @3295e2cf-3295e4f6` with its Ciel branch (june-engine R14c owns the pair); the per-body
+  socket record `3271a060` (DU5); the face override writer `3201f8d0` (customize, Stage 12; `31fd7b40` is not a function start). Kickoffs amended.
+- **Already done before DU3c:** glow type 10 (`32299730` / `32292610`, DU1c2; hand sparks `31ff8510` case 10, DU1d3); `31fd9200` / `31fda280` are the
+  `MAJOR:` / `MINOR:` bone lookups (DU1d2), not an equip dump. No code.
+- **Save:** testlu1 (unit 166) raised to level 15 for the play-test weapon (`elsdb.py setchar`, backed up).
+- **Gates:** `finish.py --files <6 files> --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`: flagcheck PASS (6 PASS, 0 OTHER, 0 FAIL; the 10 deleted lines are
+  DU3's chain-byte lines renamed and DU3b's two dummy lines replaced, all inside the flag), junediverge PASS, enumscan PASS; FINISH RESULT: PASS.
+- **Compile:** `/Zs` probes of `X2GUUser.cpp`, `X2Eqip.cpp`, `X2Inventory.cpp`: 3 x 0 errors; break-tests on the new names fail inside the new blocks.
+- **Build:** DEPLOY_LINE
+- **Play-test:** sections DU3b + DU3c of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off assembled.
+
 
 ## Phase CH1 - Deploy unit: the class core
 
@@ -3188,8 +3224,8 @@ No review of its own ( the CH2b review covers it; the debug define stays on unti
 - **Build:** `DEPLOY OK: X2_offline.exe is 26,931,712 B, dated 2026-11-15 17:13:47, md5 e78cb1701f58da334b312146c4bd1fc4, equal to X2/US_SERVICE/x2.exe`. `EXESTR OK: 3 of 3 found in X2_offline.exe` ( the equip, heavy hit and soul infest lines ) and 2 of 2 state names. The build also took in peers' uncommitted files.
 - **Play-test save ( `elsdb`, backups `db_backup/*pre_createchar*` ):** `LuSkillA` ( bases at level 1, upgrades level 0 ) and `LuSkillB` ( upgrades level 1, bases level 0 ), class 200 level 70,
   3 skill pages each. Ciel has no body until DU3 ( judged by effects / sounds / log lines ).
-- **Owes:** the user's play-test ( hand-off in the session ), then "check logs".
-- **Next:** `/x2-phase char-luciel CH2b` ( Chiliarch 37; its review also covers this phase ).
+- **Play-test 1 (2026-11-15, failed):** the user saw the wrong skill cast on both characters ( Nether Shredder played Soul Infest, Soul Infest Evil Claw, Hunting Prey Nether Shredder; it changed every time ) and cool times not kept. The logs show the setter cases and the equip pairs right and `ownerState` matching the key for the casts they pair, so the cause is not found; use-time lines are missing. **Routed: `CH2a2` ( Opus, `kickoffs/char-luciel/CH2a2.md` ), CH2b waits for it.**
+- **Next:** `/x2-phase char-luciel CH2a2` on Opus 5.5 high.
 
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 
