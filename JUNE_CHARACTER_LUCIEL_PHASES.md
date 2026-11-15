@@ -2949,7 +2949,15 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` (`Always.h`, `
   prove the play-test; no `_DEBUG` flag.
 - **Found, routed:** Ara 34 / 124, Elesis 35 / 125 and Add 33 / 36 / 123 / 126 have no seed rows either (their tickets land in the bag): one
   bullet in `kickoffs/char-add/CHNb.md` (the next class-path phase on the same file). `SetDungeonClearTexture` for 37-39 / 127-129: CH6 walk.
-- **Play-test:** owed (hand-off in the CHN commit's session). Review kickoff `kickoffs/char-luciel/CHN-review.md` written.
+- **Play-test 1 (2026-11-15 16:25-16:37, logs read):** all six `CLASS CHANGE` (180-182: 200 -> 37 / 38 / 39; 183-185: 37 -> 127, 38 -> 128,
+  39 -> 129), `CLASS GUIDE 1st` x3 and `2nd` x3 (lines 1 / 2 / 3 -> 127 / 128 / 129, 4 skill icons, 3 command rows), every `/qdone` NetError 0,
+  relog kept all six (user), 0 EXCEPTION. **Found:** (1) 12 textures missing (guide portraits `DLG_CU_LUCIEL_1_*` / `_2_*`, popup panels
+  `DLG_CC_LUCIEL_1ST_*` / `_2ND_*`); CH0b's name staging missed them. Fix: the 21 textures the 10 dialogs name, `kom.py stage-june`: 15 new
+  (+ `DLG_CC_Guide_LUCIEL_ver2` / `_1`, `Class_Change_Cash_Item_2nd_Pop05`), 6 identical, 0 replaced; `PACK OK` / `COPY OK` data052 (md5 `83336ade`),
+  data151 (`272e8aaa`), data215 (`d6c07e6f`), datai020 (`0a590f9f`). (2) Promotion cubes 109999 / 110850 refuse (NetError 285,
+  `CUBE refused - item 110850 lists no item group for class 128 / 129`): the packed `RandomItemTable.lua` is the March-era US server table, with no
+  row for any June class (Lu/Ciel, Ara 34 / 124, Elesis 35 / 125, Add); June's server table is not in the repo. Decision with the user.
+- **Play-test 2:** owed (textures). Review kickoff `kickoffs/char-luciel/CHN-review.md` written.
 
 ## Phase TU - Tutorial
 

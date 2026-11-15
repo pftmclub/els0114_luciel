@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel CHN review` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | Phase CHN done and play-tested (its Done note and commits) |
+| Depends on | Phase CHN and CHN2 done and play-tested (their Done notes and commits) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` |
 | Log tag | `QUEST complete <id> CLASS CHANGE`, `CLASS GUIDE`, `[JUNE_CHAR] LUCIEL DATA` (`python tools/logs.py --grep "CLASS CHANGE\|CLASS GUIDE\|LUCIEL DATA"`) |
 
@@ -24,6 +24,7 @@ Review CHN's commit(s):
 - `X2OfflineLuaEnumSeed.h`: 7 names, values = June `Enum.src.lua`.
 - data036 `LevelUpEvent.lua`: the two `TYPE9` blocks byte-equal to June `LevelUpEvent.src.lua:154-170` / `:377-395` (BOM, CRLF), ledger / core PASS.
 - The play-test logs: `CLASS CHANGE` 200 -> 37 / 38 / 39 and 37 -> 127, 38 -> 128, 39 -> 129, kept after relog; 0 EXCEPTION.
+- CHN2 (promotion cube stand-in rows in `KncWX2Server/ServerResource/US/RandomItemTable.lua`): every row against `item.kim` and March's row shape; the 5-piece decision in its Done note.
 
 Hygiene is one command: `python tools/finish.py --review --commits <CHN's commits> --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`.
 Paste its block; explain every OTHER row and deleted line (`-v`). No `_DEBUG` flag to retire. A review with no code change runs no build.
