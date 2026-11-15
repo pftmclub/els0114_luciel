@@ -2455,7 +2455,7 @@ No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. 
 
 ### CH1n - Done (2026-11-15)
 
-Opus 5.5 high. `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex` ( June `32b46580`, vslot 0x7b4, uncarved: read from `ghidra/disasm_32b46580_SetEquippedSkillFunc_capstone.txt` ) written under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( inert, `_LIVE` stays `//#define` ). Code commit: see `git log --grep "char-luciel Phase CH1n"`.
+Opus 5.5 high. `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex` ( June `32b46580`, vslot 0x7b4, uncarved: read from `ghidra/disasm_32b46580_SetEquippedSkillFunc_capstone.txt` ) written under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( inert, `_LIVE` stays `//#define` ). Commit `cfe12590` ( code, note, kickoffs ).
 No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. funcmap row `32b46580 (CH1n)`. `JUNE_BUGS.md` 722.
 - **Case count: 64 cases, 112 skill ids** ( `ch0_skill.tsv`, re-read in the listing ). **4 written** ( every callback a base one ), **60 left to the phase that writes their state functions**, one row each in `june2017_re/char_luciel/ch1n_skill_cases.tsv` ( new: entry, path, ids, slot table, extra states, owner ):
   CH2a 8, CH2b 5, CH2c 7, CH2d 6, CH3a 12 ( incl. the memo branch ), CH3b 9, CH3c 10, CH3d 3. The skill phases' kickoffs are amended with their rows. Writing those cases now would reference ~400 bodies that do not exist ( link error ) or leave table-only, stuck states ( `stateends` ).
@@ -2470,7 +2470,7 @@ No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. 
 - **Routed:** to CH1o ( the state-id seam it owns ): the engine's slot tables are March's 49-68 ( `SnapshotBeforeSlotRebind`, `IsSkillSlotState`, `IsBlankSlotSkillState` / `LogNoStateSkill`, the skill-use `StateChange` ), so Lu's slot states 50-69 are missed until the seam lands; June's byte `+0x11` on non-slot states ( 265 here; 344 in CH2c's Soul Shock ) has no March member.
   To CH3c: the Transcendence case ( @`32b487cf` ) ends with `m_ptrShrewdCutterLockOn = CreateLockOnSystem()` ( `32b4cf30` / `32b4ce90` @`32b490e0`-`32b49108` ), after CH3c20 moves `SLockOnSystem` out of `CX2GUAra`.
 - **Gates:** `finish.py --files X2GULuciel.cpp X2GULuciel.h --state X2GULuciel.cpp Luciel_Duo --state X2GULuciel.cpp Luciel_Demonio`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` / `RESULT: PASS`; `flagcheck JUNE_ENUM_NAMES` `0 PASS, 2 OTHER` ( the class files are `_CORE`'s ) / `RESULT: PASS`;
-  `junediverge` PASS, `enumscan` exit 0, `stateends` PASS both; skillicons / luabind not run ( no skill added, no script staged ). `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`. 0 deleted lines.
+  `junediverge` PASS, `enumscan` exit 0, `stateends` PASS both; skillicons / luabind not run ( no skill added, no script staged ). `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`. 0 deleted lines. Range gate `finish.py --range cfe12590^..cfe12590 ...`: identical, `FINISH RESULT: PASS`.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp` plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings in the class. Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Next:** `/x2-phase char-luciel CH1o` ( Opus 5.5 high; its review covers CH1m, CH1n, CH1o ).
