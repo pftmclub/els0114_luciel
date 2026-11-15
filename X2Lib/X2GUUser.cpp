@@ -29445,6 +29445,10 @@ bool CX2GUUser::CommonSpecialAttackEventProcess( IN const CX2UserSkillTree& cUse
 #else SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 	// char-ara CH1p: stand-in: Elesis, Add not ported: they read March's pressed index ( B 4-7 ) and have no F / T slot
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+	// char-luciel CH2a2: stand-in: Add not ported: Add reads March's pressed index ( B 4-7 ) and has no F / T slot
+	const bool bMarchSlotIndex = ( NULL != GetUnit() && CX2Unit::UT_EVE != GetUnit()->GetType() && CX2Unit::UT_ARME != GetUnit()->GetType() && CX2Unit::UT_CHUNG != GetUnit()->GetType() && CX2Unit::UT_ELSWORD != GetUnit()->GetType() && CX2Unit::UT_RAVEN != GetUnit()->GetType() && CX2Unit::UT_LIRE != GetUnit()->GetType() && CX2Unit::UT_ARA != GetUnit()->GetType() && CX2Unit::UT_ELESIS != GetUnit()->GetType() && CX2Unit::UT_LUCIEL != GetUnit()->GetType() );
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	const bool bMarchSlotIndex = ( NULL != GetUnit() && CX2Unit::UT_EVE != GetUnit()->GetType() && CX2Unit::UT_ARME != GetUnit()->GetType() && CX2Unit::UT_CHUNG != GetUnit()->GetType() && CX2Unit::UT_ELSWORD != GetUnit()->GetType() && CX2Unit::UT_RAVEN != GetUnit()->GetType() && CX2Unit::UT_LIRE != GetUnit()->GetType() && CX2Unit::UT_ARA != GetUnit()->GetType() );
 #else SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
@@ -29477,6 +29481,7 @@ bool CX2GUUser::CommonSpecialAttackEventProcess( IN const CX2UserSkillTree& cUse
 	{
 		if( true == abKeyA[i] )
 		{
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 			if( true == bMarchSlotIndex && 4 == i )
 				return true;
 

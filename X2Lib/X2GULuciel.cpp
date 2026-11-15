@@ -10505,6 +10505,9 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 	if ( false == StateChangeBySkillID( pSkillTemplet->m_eID ) )
 		StateChangeBySkillSlot( m_iChosenSkillSlotIndex );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL use skill %d slot %d body %c state %d", static_cast<int>( pSkillTemplet->m_eID ), m_iChosenSkillSlotIndex, ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( m_FrameDataFuture.syncData.nowState ) );	// char-luciel CH2a2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 	m_bSpecialAttackEventProcessedAtThisFrame = true;
 }
 
@@ -10829,6 +10832,9 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 	UpCombinationPoint( -GetSkillCombinationPointCost( static_cast<CX2SkillTree::SKILL_ID>( iSkillID_ ), iSkillLevel ) );
 
 	const float fCoolTime = GetActualCoolTime( pSkillTemplet, iSkillLevel );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL cooldown skill %d slot %d state %d cool %.2f", static_cast<int>( pSkillTemplet->m_eID ), m_iChosenSkillSlotIndex, GetNowStateID(), fCoolTime );	// char-luciel CH2a2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 	if ( false == ( fabs( -1.f - fCoolTime ) <= FLT_EPSILON ) )	// June 31c7b640: a cool time of -1 is not stored
 	{
 		GetUnit()->AccessUnitData().m_UserSkillTree.SetSkillCoolTimeLeft( pSkillTemplet->m_eID, fCoolTime, true );
@@ -11131,6 +11137,9 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 		const float fCoolTimeLeft = ShownSkillCoolTime( pSkillSlotData->m_fCoolTimeLeft, pSkillTemplet->m_eID );
 		if ( 0.f < fCoolTimeLeft )
 		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL refused skill %d slot %d cool left %.2f", static_cast<int>( pSkillTemplet->m_eID ), iPressedSkillSlotIndex, fCoolTimeLeft );	// char-luciel CH2a2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 			PushInfoText( GET_STRING( STR_ID_226 ) );
 			return false;
 		}

@@ -3229,6 +3229,31 @@ No review of its own ( the CH2b review covers it; the debug define stays on unti
 - **Play-test 1 (2026-11-15, failed):** the user saw the wrong skill cast on both characters ( Nether Shredder played Soul Infest, Soul Infest Evil Claw, Hunting Prey Nether Shredder; it changed every time ) and cool times not kept. The logs show the setter cases and the equip pairs right and `ownerState` matching the key for the casts they pair, so the cause is not found; use-time lines are missing. **Routed: `CH2a2` ( Opus, `kickoffs/char-luciel/CH2a2.md` ), CH2b waits for it.**
 - **Next:** `/x2-phase char-luciel CH2a2` on Opus 5.5 high.
 
+### CH2a2 - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's, no new define ); 3 new lines under `_SKILL_DEBUG`. Files: `X2GUUser.cpp`, `X2GULuciel.cpp`.
+No review of its own ( the CH2b review covers it; the debug define stays on ). Commit: see git log `char-luciel Phase CH2a2`.
+- **Cause ( both symptoms ):** `CX2GUUser::CommonSpecialAttackEventProcess` ( June `31fcadd0` ) hands a class June's pressed-slot numbering ( A 0-3, F 4, B 5-8, T 9 )
+  only when its unit type is on the stand-in list `bMarchSlotIndex` ( Eve ... Elesis ); `UT_LUCIEL` was not on it, so Lu got March's ( B 4-7 ). Lu's
+  `CanUseSpecialAttack` keeps that index and `StateChangeBySkillSlot` ( June `31fd32e0` ) reads it as June's: Q -> 4 = `USI_SPECIAL_ATTACK_5` ( bank A's F slot ),
+  W -> 5 = Q's state, E -> 6 = W's, R -> 7 = E's. That is the user's list exactly ( `LuSkillB` page 1: Q Evil Claw, W Soul Infest, E Nether Shredder, R Haunting
+  Beat ). It "changed every time" because the pages swap the banks. Cool time: `ReservedSkillStart` pays with `GetNowStateSkillID()`, so the cool time went
+  to the skill of the state entered ( the left neighbour, or nothing for `USI_SPECIAL_ATTACK_5` ), never to the key pressed, so a second press was not refused.
+  Bank A ( 0-3 ) was never wrong; CH2a's `ownerState` pairing in play-test 1 was a mis-pairing.
+- **Fix ( `X2GUUser.cpp` ):** a new outermost arm of the stand-in chain under `_SKILL`: the list with `UT_LUCIEL` added, the earlier arms in `#else`. Lu now
+  also reaches the F / T slots ( index 4 / 9 ), which the setter already handles. No other `bMarchSlotIndex` site exists ( grep ).
+- **Debug lines ( `_SKILL_DEBUG`, `X2GULuciel.cpp` ):** `[JUNE_CHAR] LUCIEL SKILL use skill <id> slot <0-9> body L|C state <id>` ( `SpecialAttackUse`, after the
+  state change ), `... cooldown skill <id> slot <n> state <id> cool <s>` ( `SpecialAttackCooldown` ), `... refused skill <id> slot <n> cool left <s>`
+  ( `CanUseSpecialAttack`, the cool-time refusal ). A healthy use is one `use` line and one `cooldown` line with the same skill id.
+- **Not changed:** CH2a's setter cases and state functions ( correct, as its logs showed ). No June bug; no `JUNE_BUGS` row.
+- **Gates:** `finish.py --files X2GULuciel.cpp X2GUUser.cpp --with JUNE_CHAR_LUCIEL_SKILL JUNE_CHAR_LUCIEL_SKILL_DEBUG`: flagcheck `0 FAIL, 2 OTHER` ( my lines sit
+  inside `_CORE` in `.cpp`; the worktree rows also held peers' uncommitted CH2d20 / CH3c20 hunks, whose 3 + 3 deleted lines are theirs ), junediverge PASS, enumscan exit 0,
+  `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`. Skipped: stateends ( no state registered ), skillicons ( no skill added ), luabind ( no script staged ).
+- **Build: blocked by a peer.** `build.py --deploy` ( 17:44 ): `BUILD FAILED (KTDXLIB)`, `Always.h(13695): fatal error C1189` = char-luciel CH3c20's `#error` guard for
+  `SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS` ( committed `b4f80375` ); it tests macros the KTDXLIB project does not see ( the X2Lib `cl /P` passes ). Not this phase's
+  to fix ( shared-builds rule 4 ); the rebuild runs once CH3c20 fixes it, then the deploy and `EXESTR` lines are added here.
+- **Play-test:** owed after that build ( same saves as CH2a ). After it passes: CH2b ( Sonnet ) then its review.
+
 ### CH2d20 - Done (2026-11-15)
 
 Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`, `Always.h`. Flags: `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`
