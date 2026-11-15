@@ -36,3 +36,6 @@ OTHER row. Write "DU3 - Review" into the plan doc, set DU3 / DU3b / DU3c done an
   `@3206dc6a`, `NOT_SHOW_UNIT_BY_DUOTYPE` `@320618a8-3206194c`, `UpdateHideEquipByBody` = `3204e4a0` (its loop is an inlined `SetShowObject( false )`),
   the `_UpdateSkin` term `3295ae20`.
 - Judge the dummy-item stand-in (heap items the equip owns, where June's equip keeps no item pointer) and the chain-byte rename / default `true`.
+- **Fix owed (found after DU3c):** DU3c's `CX2Inventory::GetEquipDuoType` duplicates skill S7k's `CX2Inventory::GetEquipGroup` (also June `3286a4b0`,
+  `X2Inventory.cpp`, used by `X2Unit.cpp` / `X2UICharInfo.cpp`). Point `InitSocketData`'s skip at `GetEquipGroup`, delete `GetEquipDuoType`, fix the
+  funcmap `3286a4b0 (DU3c)` row. Behaviour is the same (both read the slot id); `/Zs` probe after.

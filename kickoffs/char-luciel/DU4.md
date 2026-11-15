@@ -62,3 +62,22 @@ hidden in the switching view; Ciel {20..34,36,38,40,42} shown only there).
   with the NESI names you register.
 - **Second-ring remap stand-in:** June's `3234fe90` reads unit `+0x294` (a per-UID map whose value starts with the slot id; not identified). DU3b's
   `CX2Unit::AdjustEquipPositionForSecondRing` reads `GetInventory().GetItemSlotID( uid )` (June `3286a310`) instead: identify `+0x294` and confirm or replace.
+
+## Amended after DU3c (user report, 2026-11-15)
+
+- **User report:** with Lu active, right-clicking a Ciel costume puts it on Lu; in the live game it goes into Ciel's slots without switching. Cause here:
+  March's equipped bag has no Ciel slots until this phase, and the inventory right-click (`CX2UIInventory::OnRClickedItem`, `X2UIInventory.cpp`
+  equip loop over the character window's slots, March :6255) has no body test. Port June's test with the renumber, so the play-test covers it.
+- **June's rule** (`OnRClickedItem 321aa5d0`, raw disassembly only: the chunk @`321ae867-321aec39` is outside every Ghidra function, read it with
+  `june2017_re/disasm_range.py 0x321ae800 0x321aeea0`). Target body, before the slot loop (`[esp+0x28]`):
+  1. not fashion (templet `+4` bit 0) and not `IT_ACCESSORY` (`+6 & 0xf` = 3) -> body 0;
+  2. fashion / accessory, use condition not `UC_ANYONE` (`+4 & 0xf000` != 0x1000) -> the templet's `m_bIsForMinorUnit` (flags2 bit 2): **a Ciel costume
+     always targets Ciel's slots, whoever is active**;
+  3. `UC_ANYONE`: the item's `+0x80` id > 0 with a templet of unit type 10 -> that templet's flag (identify `+0x80`); else the unit's active body
+     (`+0xe40`), or the character window's shown body (`+0x25a`) while it is shown (`+0x1e5`).
+  Per character-window slot (`[esp+0x14]`): slot id `+0x40` == `321693b0( pos, &out )` (DU5's slot picker; port or stand in), for a non-accessory slot
+  fashion `+0x3c` == templet fashion, and slot `IS_FOR_MINOR_UNIT` `+0x44` (March `CX2SlotItem::m_bIsForMinorUnit`, already parsed) == the target body.
+  Slot 0x26 (`NESI_MINORUNIT_AC_MINIME`) with a `UC_ANYONE` item takes the active / shown body instead of the slot flag (@`321aeb5e-321aebe0`).
+  CharInfo C4 already ported the same flag test for a drop onto the window (`32918410`, `X2UICharInfo.cpp` `IsMinorUnitItem`).
+- The emulator's `IsSuitableSlot` (`X2OfflineInventory.cpp`) must accept a Ciel item in the Ciel slots and refuse it in Lu's. Play-test addition: with Lu
+  active, right-click Ciel's Promotion Top Piece (41901, in testlu1's bag): it lands on Ciel, Lu keeps Lu's Promotion top; right-click Lu's: Lu.
