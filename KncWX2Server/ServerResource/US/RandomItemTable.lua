@@ -2618,6 +2618,98 @@ g_pRandomItemManager:AddRandomItemTemplet
               m_cUnitClass = UNIT_CLASS["UC_ARA_YAMA_RAJA"],
               m_iItemGroupID = 16855,
        },
+       
+       -- stand-in ( char-luciel CHN2 ): June's server table not in the repo; item.kim promotion set
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_PSYCHIC_TRACER"],
+              m_iItemGroupID = 5000083,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_ARC_TRACER"],
+              m_iItemGroupID = 5000084,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ARA_LITTLE_SPECTER"],
+              m_iItemGroupID = 5000085,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ELESIS_DARK_KNIGHT"],
+              m_iItemGroupID = 5000086,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_TIME_TRACER"],
+              m_iItemGroupID = 5000087,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_CHILIARCH"],
+              m_iItemGroupID = 5000088,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_ROYAL_GUARD"],
+              m_iItemGroupID = 5000089,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_DIABLURA"],
+              m_iItemGroupID = 5000090,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ELESIS_GRAND_MASTER"],
+              m_iItemGroupID = 16823,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ELESIS_BLAZING_HEART"],
+              m_iItemGroupID = 16824,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_LUNATIC_PSYKER"],
+              m_iItemGroupID = 5000083,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_MASTERMIND"],
+              m_iItemGroupID = 5000084,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ARA_ASURA"],
+              m_iItemGroupID = 5000085,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ELESIS_CRIMSON_AVENGER"],
+              m_iItemGroupID = 5000086,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_DIABOLIC_ESPER"],
+              m_iItemGroupID = 5000087,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_DREAD_LORD"],
+              m_iItemGroupID = 5000088,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_NOBLESSE"],
+              m_iItemGroupID = 5000089,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_DEMONIO"],
+              m_iItemGroupID = 5000090,
+       },
 }
 
 g_pRandomItemManager:AddRandomItemTemplet
@@ -2760,6 +2852,58 @@ g_pRandomItemManager:AddRandomItemTemplet
        {
               m_cUnitClass = UNIT_CLASS["UC_ARA_YAMA_RAJA"],
               m_iItemGroupID = 16856,
+       },
+       
+       -- stand-in ( char-luciel CHN2 ): June's server table not in the repo; item.kim promotion set
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ELESIS_GRAND_MASTER"],
+              m_iItemGroupID = 16953,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ELESIS_BLAZING_HEART"],
+              m_iItemGroupID = 16954,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_LUNATIC_PSYKER"],
+              m_iItemGroupID = 5000091,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_MASTERMIND"],
+              m_iItemGroupID = 5000092,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ARA_ASURA"],
+              m_iItemGroupID = 5000093,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ELESIS_CRIMSON_AVENGER"],
+              m_iItemGroupID = 5000094,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_ADD_DIABOLIC_ESPER"],
+              m_iItemGroupID = 5000095,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_DREAD_LORD"],
+              m_iItemGroupID = 5000096,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_NOBLESSE"],
+              m_iItemGroupID = 5000097,
+       },
+       
+       {
+              m_cUnitClass = UNIT_CLASS["UC_LUCIEL_DEMONIO"],
+              m_iItemGroupID = 5000098,
        },
 }
 
@@ -182920,3 +183064,85 @@ g_pRandomItemManager:AddRandomItemGroup( 1300060, 153000091, 12.5, 0, 1 )
 g_pRandomItemManager:AddRandomItemGroup( 1300061, 153000092, 12.5, 0, 1 )
 g_pRandomItemManager:AddRandomItemGroup( 1300062, 130529, 100, 3, 1 )
 g_pRandomItemManager:AddRandomItemGroup( 5000082, 129951, 100, 30, 1 )
+-- stand-in ( char-luciel CHN2 ): June's server table not in the repo; item.kim promotion set
+g_pRandomItemManager:AddRandomItemGroup( 5000083, 41762, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000083, 41763, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000083, 41764, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000083, 41765, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000083, 41766, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000084, 41780, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000084, 41781, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000084, 41782, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000084, 41783, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000084, 41784, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000085, 41788, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000085, 41789, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000085, 41790, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000085, 41791, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000085, 41792, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000086, 41815, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000086, 41816, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000086, 41817, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000086, 41818, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000086, 41819, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000087, 41829, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000087, 41830, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000087, 41831, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000087, 41832, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000087, 41833, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000088, 135623, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000088, 135624, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000088, 135625, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000088, 135626, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000088, 135627, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000089, 135629, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000089, 135630, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000089, 135631, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000089, 135632, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000089, 135633, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000090, 42103, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000090, 42104, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000090, 42105, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000090, 42106, 20, 10, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000090, 42107, 20, 10, 1 )
+-- stand-in ( char-luciel CHN2 ): June's server table not in the repo; item.kim promotion set
+g_pRandomItemManager:AddRandomItemGroup( 5000091, 41768, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000091, 41769, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000091, 41770, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000091, 41771, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000091, 41772, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000092, 41774, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000092, 41775, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000092, 41776, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000092, 41777, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000092, 41778, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000093, 41797, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000093, 41798, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000093, 41799, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000093, 41800, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000093, 41801, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000094, 41821, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000094, 41822, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000094, 41823, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000094, 41824, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000094, 41825, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000095, 41835, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000095, 41836, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000095, 41837, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000095, 41838, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000095, 41839, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000096, 135637, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000096, 135638, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000096, 135639, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000096, 135640, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000096, 135641, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000097, 135643, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000097, 135644, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000097, 135645, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000097, 135646, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000097, 135647, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000098, 42111, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000098, 42112, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000098, 42113, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000098, 42114, 20, 15, 1 )
+g_pRandomItemManager:AddRandomItemGroup( 5000098, 42115, 20, 15, 1 )

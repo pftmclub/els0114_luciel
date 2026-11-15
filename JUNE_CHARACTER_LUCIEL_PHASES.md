@@ -2964,6 +2964,37 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` (`Always.h`, `
   `CLASS CHANGE` 189 200 -> 39, 190 38 -> 128; ErrorLog 0 lines for the Lu/Ciel dialog textures, 0 EXCEPTION. CHN passed; promotion cubes go to
   CHN2; review kickoff `kickoffs/char-luciel/CHN-review.md` (covers CHN + CHN2).
 
+### CHN2 - Done (2026-11-15)
+
+Sonnet 5.5 high. Server Lua only: no flag, no client change, **no build** (the exe is unchanged; the CHN deploy stands). File:
+`KncWX2Server/ServerResource/US/RandomItemTable.lua` (BOM + CRLF kept, 226 lines inserted, 0 deleted): **the user packs it** (XOR + data036).
+- **Shape = March's rows.** One `{ m_cUnitClass, m_iItemGroupID }` per class in cube 109999 (1st job) and 110850 (2nd job), one `AddRandomItemGroup(
+  group, item, 20, period, 1 )` per piece: rate 20, quantity 1, period 10 for a 1st-job set and 15 for a 2nd-job set (copied from March's Elesis /
+  Ara / Sheath Knight groups, not invented). Each added block (2 row runs, 2 group runs) carries the one-line `stand-in ( char-luciel CHN2 )` comment.
+- **Sets, from `item.kim` by name** (all five pieces share the class's `unit_class`; weapon, top, bottom, gloves, shoes): Psychic Tracer 32 =
+  41762-41766, Arc Tracer 33 = 41780-41784, Little Specter 34 = 41788-41792, Dark Knight 35 = 41815-41819, Time Tracer 36 = 41829-41833, Chiliarch 37 =
+  135623-135627, Royal Guard 38 = 135629-135633, Diablura 39 = 42103-42107; Lunatic Psyker 122 = 41768-41772, Mastermind 123 = 41774-41778, Asura 124 =
+  41797-41801, Crimson Avenger 125 = 41821-41825, Diabolic Esper 126 = 41835-41839, Dread Lord 127 = 135637-135641, Noblesse 128 = 135643-135647,
+  Demonio 129 = 42111-42115. A script checked every group: 5 items, classes match, positions weapon / body / leg / hand / foot.
+- **New group ids (16):** 1st job 5000083 (32), 5000084 (33), 5000085 (34), 5000086 (35), 5000087 (36), 5000088 (37), 5000089 (38), 5000090 (39); 2nd job
+  5000091 (122), 5000092 (123), 5000093 (124), 5000094 (125), 5000095 (126), 5000096 (127), 5000097 (128), 5000098 (129). Next free after the file's highest
+  group (5000082); none of them appears anywhere else in the file.
+- **Elesis 120 / 121 reuse March's own groups 16953 (Grand Master 41745-41749) / 16954 (Blazing Heart 41750-41754):** already in the file, period 15,
+  referenced by no cube. In 110850 they are the rows for 120 / 121; no new ids.
+- **109999 also lists the 2nd-job classes, as March does** (Lord Knight -> the Knight set 11740, Yama Raja -> Little Devil 16855): each added 2nd job
+  points at its parent's 1st-job group (120 -> 16823, 121 -> 16824, 122 -> 5000083, 123 -> 5000084, 124 -> 5000085, 125 -> 5000086, 126 -> 5000087,
+  127 -> 5000088, 128 -> 5000089, 129 -> 5000090). 109999 therefore opens on all 18 June jobs, 110850 on the 10 second jobs.
+- **Decisions.** **5 pieces:** `item.kim` shows the same five-piece reading for every class, and March's groups drop the hair / face / helm pieces
+  where they exist (Chung's helm 40050, Infinity Sword's hair 41250), so Diabla's 42108, Demonio's 42116 and the Ara / Elesis / Add hair and face pieces
+  are not in the groups. **No Ciel copy:** every promotion piece has `item_id_for_minor_unit` 0. **No row, said once:** Rose 40-43 / 130-133, Ain 44-46 /
+  134-136 (no unit type in the client; their sets are not looked up) and the base classes 1 / 9 / 8 / 7 / 10 (no job cube). Elesis 29 / 30 and Ara 28 / 118 /
+  31 / 119 already had rows.
+- **Names resolve:** all 16 `UC_*` names are in data036 `Enum.lua` (`:317-:386`) with values equal to `X2Unit.h`'s enum; the emulator's UNIT_CLASS table is
+  `Enum.lua`'s (the seed only fills missing names), so no seed edit. The loader's own refusal lines will show any row that does not resolve.
+- **Not proven until the pack:** the file is not loaded by the game today. After the user's pack, `python tools/logs.py --grep "CUBE"` must show
+  `CUBE     opened item 109999 ...` / `110850 ...` per cube, and no `lists no item group for class`.
+- **Revert:** `git revert` the CHN2 commit (pure insertion) and pack again.
+
 ## Phase TU - Tutorial
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL`, sub-tag `TUTORIAL`. Add the

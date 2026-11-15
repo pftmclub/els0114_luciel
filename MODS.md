@@ -7135,3 +7135,7 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_
   `SOUL_COLLECTOR_MAX_COUNT` -> `DAMAGE_TIME` (4), Elsword `FORCE_DOWN` -> `FORCE_DOWN_VALUE` (9), Eve `CRITICAL_RATE` -> `CRITICAL_RATE_INHERIT` (20; plain
   `CRITICAL_RATE` is tag 5). Tags 3 / 6 / 7 / 8 / 18 / 21 / 22 stay unnamed and unported; 13 / 14 / 17 / 23 are named but have no `case` yet. No behaviour change.
 - **Flag:** `SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM` in `KTDXLIB/Always.h` (needs `SERV_IRUHADEV_JUNE_CHAR_EFFECTSET_MODIFIER`). **Revert:** comment out the `#define`.
+
+## Stage 8 Lu/Ciel, CHN2: promotion cube rows for the June jobs (char-luciel CHN2, 2026-11-15)
+- **What changes.** `KncWX2Server/ServerResource/US/RandomItemTable.lua` (server Lua, the user packs it): cubes 109999 and 110850 gain a labelled stand-in row for each June job (32-39, 120-129) and 16 five-piece groups (ids 5000083-5000098) from `item.kim`; Elesis 120 / 121 reuse March's groups 16953 / 16954. No flag, no exe change.
+- **Revert:** `git revert` the commit and pack data036 again.
