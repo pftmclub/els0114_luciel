@@ -1749,6 +1749,11 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's; no new define,
 - **Compile:** `/Zs` probes of `X2UnitViewerUI.cpp`, `X2Eqip.cpp`, `X2CashShop.cpp`, `X2UICharInfo.cpp`, `X2Community.cpp`: 0 errors each.
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,048,960 B, dated 2026-11-16 04:42:30, md5 1a80748e8721e729af435d220ab3a4bf` (built at main 6cd55496 +
   7 uncommitted code files, peers' included).
+- **Play-test fix (2026-11-16, run 1):** the character window drew Ciel at the untransformed world position (top right of the village) with no
+  window model: March's `OnFrameMove` moves the skin only for a non-fixed viewer, and the window viewer is fixed (`SetPositionOnScr` placed
+  Lu's skin once, before Ciel became the shown body). June's frame move (`31fa8ce0 @31fa8e29-31fa8ee7`) moves the shown body every frame,
+  fixed or not: added under the flag (3 lines). Equipment was right (Ciel wore her Spa Wear).
+  `DEPLOY OK: X2_offline.exe is 27,075,072 B, dated 2026-11-16 05:15:39, md5 06e712e076c2288a3104d1310b06a867` (main 95f548ff + peers' files).
 - **Play-test:** the DU5b batch seam: sections DU5b + DU5b2 of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off
   assembled. Review: `DU5b2-review.md` covers DU5b + DU5b2.
 

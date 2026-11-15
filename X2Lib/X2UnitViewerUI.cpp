@@ -384,6 +384,9 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 	
 	m_pXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() );
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	m_pXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() );	// char-luciel DU5b2 fix: June 31fa8ce0 @31fa8e29-31fa8ee7 moves the shown body every frame, fixed or not
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	m_pXSkinAnim->GetMatrix().Rotate( GetMatrix().GetRotate() );
 	m_pXSkinAnim->GetMatrix().Scale( GetMatrix().GetScale() );
 
