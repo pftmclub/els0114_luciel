@@ -3454,7 +3454,13 @@ No review of its own ( the CH2c2 review covers it ). Commit: see git log `char-l
 - **Build:** `BUILD OK: X2/US_SERVICE/x2.exe 26,977,280 B, 2026-11-15 21:18:58, md5 768c6745b5e058a3278872d45e585f57` ( KTDXLIB 61 s, X2Lib 556 s, X2 23 s; built at main 244c652c + peers' uncommitted code files, among them DU4's `NESI_RENUMBER` ). **`DEPLOY REFUSED`: `X2_offline.exe` was running ( pid 46592 ), so the exe is built but not in the game directory: `python tools/build.py --deploy-only` once the user closes the game.** `EXESTR OK: 4 of 4` wide ( the debug line, preload strings ) and `2 of 2` narrow ( `LSI_SA_LCG_SOUL_EXTORTION`, `LSI_SA_LCG_ESCHATON` ) in the built exe ( `--exe build` ). The save is already schema v24 ( DU4's play-test ran the game ), so this exe needs no further migration.
 - **Play-test save ( `elsdb`, backups `db_backup/*pre_createchar*` ):** `LuRgA` ( unit 198, class 38, level 70: Soul Extortion base 30019 level 1, upgrade 30039 level 0 ) and `LuRgB` ( unit 199: 30039 level 1, base 0 ). Page 1: 30019 / 30039 on
   slot 0 ( key A ), page 2: on slot 5 ( key Q ); no other Royal Guard skill is slotted ( their cases wait for CH2c2 ).
-- **Next:** play-test Soul Extortion ( below ), then `/x2-phase char-luciel CH2c2` on Sonnet 5.5 high.
+- **Commit `075874fc`, range gate:** `finish.py --range 075874fc^..075874fc --with ...`: flagcheck `_SKILL` PASS ( 2 PASS, 1 DEFINE = the debug define back on, 0 FAIL; 1 deleted line = that `//#define` ), junediverge PASS, enumscan exit 0.
+- **Play-test hand-off ( Soul Extortion, 30019 / 30039; after the user closes the game and `build.py --deploy-only` prints `DEPLOY OK` ):** no dev-console line needed ( both units are level 70 ).
+  Select `LuRgA` ( base ), enter a dungeon or the training room with enemies in front, and with page 1 active press key A ( slot 0 ); then switch to page 2 and press key Q ( slot 5 ); repeat with `LuRgB` ( the upgrade ).
+  Expect: Lu plays her `Out` animation and Ciel casts ( June: `DUO_TYPE` minor ): other units stop for about 0.7 s, an effect set at 0.01 s ( the cross ), the first attack set at 0.32 s and the second at 0.92 s hit the enemies in front; you can walk
+  after it ends. Not expected yet: the soul drain at the end ( the `StateEnd` is CH2c2's ). If you are stuck after the skill, or Lu / Ciel cast the wrong skill, say which key. Logs to read: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`:
+  `equip skill 30019 slot 0 bank A state <id>` and `... slot 5 bank B ...` ( 30039 on `LuRgB` ), one `use skill 30019 slot 0|5 body L|C` + one `cooldown` line per cast, one `soul extortion start skill <id> anim rate <r> speed <s>` per cast ( rate 1.00 unless the upgrade's `SA_ANI_SPEED` is set ).
+- **Next:** play-test Soul Extortion ( above ), then `/x2-phase char-luciel CH2c2` on Sonnet 5.5 high.
 
 ### CH2d20 - Done (2026-11-15)
 
