@@ -1044,6 +1044,50 @@ monsters (Plingchu G / R 2129 / 2130, Pyurita 2131, Pimpim 2134), not the Altera
   `GetCalcPerDamage` table as poison and fire. Ticks on the player still have no reliable source: review / D6.
 **Play-test: passed** (poison, fire and the resisted tick by log; cold is unreachable through a socket in June as well).
 
+### Phase D5 review - Done (2026-11-15)
+
+**Opus 5.5 / high. Covers D5 (`a93c5420`; doc-only follow-ups `ddaf8568`, `29896225`, `3584941e`, `d8a8f35a`). Verdict: pass, no code change.**
+No transcription error found.
+
+**Re-read against `unpacked_x2.exe`** (`disasm_range.py`):
+- NPC `LevelCorrectionExtraDamage` `32760210`: the tree @327602ed-3276044e decodes to 14 ids: 32500-32502 (`cmp 0x7ef4` / `0x7ef6`), 38300-38302
+  (`0x959c` / `0x959e`), 38400 (`0x9600`), 39500 / 39510 (`sub 0x9a4c`, `sub 0xa`), 39520 (`0x9a60`), 39530 / 39540 (`sub 0x9a6a`, `sub 0xa`), 39550
+  (`0x9a7e`), 41280 (`0xa140`). No 38100, no 38401. The port's 14 case labels resolve to exactly these values (`CASE_DEFENCE_DUNGEON` = the three
+  elder defence ids). The kickoff's "15" was a miscount. Guard kept: `g_pData` `33775860`, room `+0x70`, party manager `+0x5c`, party data (`+8`).
+- NPC `GetEnchantResist` `32757c50`: 150.0 is the double at `334748c8` (read: 150.0), one per `+0x8bd8` vector entry. The jump table `32757cf4` maps types
+  1-6 in order to NPC stat `+0xb0`..`+0xc4` (Red / Blue / Green / Wind / Light / Dark ints = March's switch). `ecx` is never rewritten before the base call
+  @32757cdc (= this), and the base is added after the NPC terms = the port.
+- NPC `UpNowHp` `32784200`: `+0x75bc` == 1, then game slot `0x10c` == 2 (`GT_DUNGEON`), then `fldz; fcomp [delta]; test ah,1; je return`: delta <= 0
+  returns, NaN sets C0 and passes. Then the base (gage `+0xc04` -> `+0x20`). The port's order and NaN behaviour match. It adds a `g_pX2Game` null
+  test June lacks (June would crash there; harmless).
+- **Debug tail: routing to Stage 40 is right.** The map write (`322e28e0`) changes no gameplay value. The address-0 write runs only after the chat command
+  (`31ec2921`) sets `+0xba4`, and the command is not ported. Porting the trap alone would be dead code. That is not a June bug the play can reach.
+  The backlog bullet (D5 commit) keeps the command, the map and the trap together.
+- `GetCalcPerDamage` `32622300`: byte table `326224a8` maps EDT 1 / 3 / 8 / 18 to cases 0-3 (floats 80 / 145 / 60 / 82 at `33457df4` / `3346bf18` /
+  `33458fa0` / `334af19c`) and EDT 151 / 156 to case 4 (return `+0x18`). Every other type falls to default (0). The level rule (own level, else
+  unit + add level, minus 1, < 0 returns `+0x18`) = March. Constants are 0.2 / 0.1 (doubles of the float literals) and 500.0. The test is
+  `322cc1a0` (PvP or PvE). Channel classes 9 / 11 / 10 = `PCC_FREE` / `PCC_PLAY` / `PCC_TOURNAMENT` (ClientPacket.h), March's three.
+- **Tick application (map row 60, was `unknown`, now `June`):** NPC `CommonFrameMoveHost_ExtraDamage` `3276b400` (caller `3277eb13`) = March's body.
+  The immune byte `+0x4104` returns. Enchant poison / enchant blaze tick once a second. Poison / fire / lightning / cold / frozen each call
+  `UpNowHp( -own DPS x elapsed )` then `SetNowHp( 1 )` if HP fell below 1, and curse calls `FlushMp`. Frozen reads its own DPS (`+0x173c`).
+  The user twin is `31fd1020` (one caller, `CommonFrameMoveFuture` @32062fa8), = March's `CommonFrameMoveFuture_ExtraDamage`. It has six blocks, each
+  gated on HP > 0, with the gage crash UI after fire / lightning / cold / frozen. **Its frozen block subtracts `m_Fire`'s DPS (`+0xf78`) in June too.**
+  So March's quirk is June's behaviour: kept, no code. It is March's own, so it gets no `JUNE_BUGS` row (that file's rules).
+  `REFACTORING_BY_TOOL_TEAM` is off (`KTDX.h:185` comments out its parent), so March's NPC poison block is the same `UpNowHp` + `SetNowHp( 1 )` form.
+- `X2GUUser.cpp` +80: debug lines only (`EDT def=user`, `EDTTICK`), all inside `_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE`.
+
+**Play-test log** (on disk: a 22:53-22:56 retest after the deploy, md5 49fa44dc; run 1's lines were overwritten, and D5's note recorded them): 3 `EDT`
+lines (NPC 2130 / 2132, poison, lv 99, resist 350). Each `perSec` = 80 x (1 + 0.2 x 98) x (1 - 350 / 500) = 494.40 (script check, 0 mismatches). 11 `EDTTICK`
+lines on NPC 1000033: the first second includes the hit (130310.4); the other 10 read 493.9 x 8, 487.0 and 500.7 (one frame either side of 494.40 / s).
+No fire or cold lines in this run. D5's run 1 has fire 2688.30 / s against median 2688.8.
+
+**Gates.** `finish.py --review --commits a93c5420 --with SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE -v`: flagcheck 4 PASS, 1 DEFINE, 1 OTHER (`DungeonEnum.h`,
+`JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL -> `RESULT: PASS`; junediverge `RESULT: PASS`; `--check-all` `RESULT: PASS`; enumscan exit 0;
+stateends / skillicons / luabind skipped (no skill state, skill or script). `FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped)`. No later commit touches the flag (`git log -S`).
+**Build.** Full build skipped: no play-test (no code change). `_STATCALC_DEBUG` stays on (the D6 review retires it).
+
+**D6.** Ready. The kickoff gains one line: the tick sites are proved = June, so a player-side tick check is optional.
+
 ## Phase D6 - Damage smoke on every ported character, track review
 
 **Scope.** No new code. One play-test sheet per ported character (a geared level-99 unit with sockets and one without): normal, command,
