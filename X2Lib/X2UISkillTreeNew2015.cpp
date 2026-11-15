@@ -1215,7 +1215,11 @@ void CX2UISkillTreeNew::InitSkillTreeUI()
 	{
 		/// @328edaca: +0x8c = ( unit +0xe40 == 1 ), Luciel's form flag ( the minor command group ). March's CX2Unit has no such flag and no
 		/// Luciel: group 0. The flag is character material ( checklist )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+		m_iCommandGroup = ( true == g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() ) ? 1 : 0;	/// char-luciel CH5: June @328edaca, unit +0xe40 == 1
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 		m_iCommandGroup = 0;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 		CX2Unit* pUnit = g_pData->GetMyUser()->GetSelectUnit();
 		m_pUserSkillTree = &pUnit->GetUnitData().m_UserSkillTree;
 		CreateSkillTree( pUnit->GetUnitTemplet()->m_UnitClass, IsMyUnitTranscended() );
@@ -1519,6 +1523,12 @@ void CX2UISkillTreeNew::CreateSkillTreePortrait( CX2Unit::UNIT_CLASS eUnitClass,
 		if ( true == CX2Data::GetCharacterImageName( wstrFileName, wstrPieceName, eUnitClass, CX2Data::CIT_160by160 ) && NULL != pStatic->GetPicture( 1 ) )
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_CHANGE
 			pStatic->GetPicture( 1 )->SetTex( wstrFileName.c_str(), wstrPieceName.c_str() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+		/// char-luciel CH5: June @328e8f31-328e8f75 draws Lu/Ciel's portrait ( 328dcba0 ) in place of the class picture above
+		if ( NULL != g_pData->GetMyUser() && NULL != g_pData->GetMyUser()->GetSelectUnit() &&
+			 CX2Unit::UT_LUCIEL == g_pData->GetMyUser()->GetSelectUnit()->GetType() )
+			UpdateCharacterPortraitByForm();
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 
 		if ( NULL != g_pData->GetUnitManager() )
 		{
@@ -1789,6 +1799,85 @@ void CX2UISkillTreeNew::SetCommandGroup( const int iGroup_ )
 	}
 	UpdateTabUI();
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+/// char-luciel CH5: June 328db7a0, the portrait file and piece of Lu/Ciel's classes; a transcended unit's third job takes its transcended piece
+void CX2UISkillTreeNew::GetCharacterPortraitByForm( OUT wstring& wstrFileName_, OUT wstring& wstrPieceName_, const CX2Unit::UNIT_CLASS eUnitClass_, const bool bTranscended_ )
+{
+	switch ( eUnitClass_ )
+	{
+	case CX2Unit::UC_LUCIEL_CHILIARCH:
+	case CX2Unit::UC_LUCIEL_DIABLURA:
+		wstrFileName_ = L"DLG_UI_Common_Texture91_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_CIEL_LARGE_SOLO";
+		return;
+	case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+		wstrFileName_ = L"DLG_UI_Common_Texture91_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_LU_LARGE_SOLO";
+		return;
+	default:
+		wstrFileName_ = L"DLG_UI_Common_Texture91_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_CIELFACE_LARGE";
+		break;
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+		wstrFileName_ = L"DLG_UI_Common_Texture89_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_CHILIARCH_LARGE";
+		if ( true == bTranscended_ )
+		{
+			wstrFileName_ = L"DLG_UI_Common_Texture103_NEW.tga";
+			wstrPieceName_ = L"TR_D_LORD_2";
+		}
+		break;
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+		wstrFileName_ = L"DLG_UI_Common_Texture89_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_ROYAL_GUARD_LARGE";
+		if ( true == bTranscended_ )
+		{
+			wstrFileName_ = L"DLG_UI_Common_Texture103_NEW.tga";
+			wstrPieceName_ = L"TR_N_OBLESSE_1";
+		}
+		break;
+	case CX2Unit::UC_LUCIEL_DEMONIO:
+		wstrFileName_ = L"DLG_UI_Common_Texture96_NEW.tga";
+		wstrPieceName_ = L"LUCIEL_LDB_LARGE";
+		if ( true == bTranscended_ )
+		{
+			wstrFileName_ = L"DLG_UI_Common_Texture103_NEW.tga";
+			wstrPieceName_ = L"TR_D_EMONIO_2";
+		}
+		break;
+	}
+}
+
+/// char-luciel CH5: June 328dcba0, my unit's class picks the picture; the command group ( the form ) swaps it for the other body's, except for
+/// the Royal Guard, Dread Lord and Demonio rows ( the form shows the named piece when it is 0 ); a miss shows the class's 160 x 160 row
+void CX2UISkillTreeNew::UpdateCharacterPortraitByForm()
+{
+	if ( NULL == m_pDLGUISkillTree || NULL == g_pData || NULL == g_pData->GetMyUser() || NULL == g_pData->GetMyUser()->GetSelectUnit() )
+		return;
+
+	const CX2Unit::UnitTemplet* pUnitTemplet = g_pData->GetMyUser()->GetSelectUnit()->GetUnitTemplet();
+	const CX2Unit::UNIT_CLASS eUnitClass = ( NULL != pUnitTemplet ) ? pUnitTemplet->m_UnitClass : CX2Unit::UC_NONE;
+
+	CKTDGUIStatic* pStatic = static_cast<CKTDGUIStatic*>( m_pDLGUISkillTree->GetControl( L"SkillTree_Character" ) );
+	if ( NULL == pStatic || NULL == pStatic->GetPicture( 1 ) )
+		return;
+
+	bool bNamedPiece = ( 1 == m_iCommandGroup );
+	if ( CX2Unit::UC_LUCIEL_ROYAL_GUARD == eUnitClass || CX2Unit::UC_LUCIEL_DREAD_LORD == eUnitClass || CX2Unit::UC_LUCIEL_DEMONIO == eUnitClass )
+		bNamedPiece = !bNamedPiece;
+
+	const bool bTranscended = IsMyUnitTranscended();
+	wstring wstrFileName = L"";
+	wstring wstrPieceName = L"";
+	if ( true == bNamedPiece )
+		GetCharacterPortraitByForm( wstrFileName, wstrPieceName, eUnitClass, bTranscended );
+	else
+		CX2Data::GetCharacterImageName( wstrFileName, wstrPieceName, eUnitClass, CX2Data::CIT_160by160, bTranscended );
+
+	pStatic->GetPicture( 1 )->SetTex( wstrFileName.c_str(), wstrPieceName.c_str() );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 
 /// June 328df060( static ): string 0 is line-broken to 0x13b with font 1 ( 31d43ef0 ). When that changed it: the lines are counted
 /// ( "\r\n" and " \n" ), a line break right before a "#Crrggbb#CX" block becomes a space ( one line less ); 6+ lines lose the

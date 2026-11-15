@@ -13689,6 +13689,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 //////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH5: Lu/Ciel UI and data. The skill slot greys while the combination gauge is short ( CX2Game::UpdateSkillCoolTime ),
+//              Ciel's dungeon-clear pictures, the ENDING_SPEECH LUCIEL set ( { LU, CIEL } rows ), the ending balloon name and dungeon-map icon,
+//              Lu's / Ciel's quest-complete voice, and the skill window's Lu/Ciel portrait and form flag. Revert: comment out the #define ( JUNE_CHAR_LUCIEL_UI ).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_CREATE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) || !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH ) || !defined( SERV_IRUHADEV_JUNE_SKILL_TREE_PANELS ) || !defined( SERV_IRUHADEV_JUNE_TRANSCEND_CHANGE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE, _CHAR_CREATE ( the clear-picture rows ), _CHAR_DUO_BODY ( IsMinorUnitForm ), _CHAR_DUO_WIN_SPEECH ( GetWinSpeechForm ), SERV_IRUHADEV_JUNE_SKILL_TREE_PANELS ( m_iCommandGroup ) and SERV_IRUHADEV_JUNE_TRANSCEND_CHANGE ( GetCharacterImageName's flag ), char-luciel CH5
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15

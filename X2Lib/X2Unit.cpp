@@ -6303,7 +6303,11 @@ void CX2Unit::SetMinorUnitForm( const bool bMinorUnitForm_ )
 	if( NULL == g_pData || NULL == g_pData->GetUIManager() )
 		return;
 	CX2UIInventory* pUIInventory = g_pData->GetUIManager()->GetUIInventory();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+	pUISkillTree->UpdateCharacterPortraitByForm();	// char-luciel CH5: June 3234d930 @3234d9a0 calls 328dcba0 with my unit's +0x3c
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 	if( NULL != pUIInventory && true == pUIInventory->GetShow() )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 		pUIInventory->SetShow( true );
 }
 

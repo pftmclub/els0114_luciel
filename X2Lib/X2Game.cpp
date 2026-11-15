@@ -15390,6 +15390,17 @@ void CX2Game::UpdateSkillCoolTime( float fElapsedTime )
 							pStaticCoolTime->SetString( iSlotIndex, L"" );	
 						}
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+						// char-luciel CH5: June 322e07e0 @322e1840-322e1885, the slot skill's combination point cost above the gauge greys the slot ( fade @322e1be1 )
+						else if ( CX2Unit::UT_LUCIEL == GetMyUnit()->GetUnit()->GetType() &&
+								  static_cast< CX2GULuciel* >( GetMyUnit() )->GetSkillCombinationPointCost( pSlotData->m_eID, pSlotData->m_iSkillLevel ) > static_cast< CX2GULuciel* >( GetMyUnit() )->GetNowCombinationPoint() )
+						{
+							if (pStatic_Skill_Cool_Time_Fade->GetPicture(iSlotIndex) != NULL )
+								pStatic_Skill_Cool_Time_Fade->GetPicture(iSlotIndex)->bShow = true;
+
+							pStaticCoolTime->SetString( iSlotIndex, L"" );
+						}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 						else
 						{
 							if ( pStatic_Skill_Cool_Time_Fade->GetPicture(iSlotIndex) != NULL )

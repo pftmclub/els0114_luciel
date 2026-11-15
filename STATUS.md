@@ -254,7 +254,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH4a | blocked (CH2d2 review): passive state, delegate lists (9 of InitState's 10), flag `_PASSIVE` | Opus 5.5 / high, no review of its own (CH4b review covers it), user play-test | CH2d2 review | `X2GULuciel.*` | `CH4a.md` |
 | CH4b | blocked (CH4a): damage exception + overrides | Opus 5.5 / high, Opus review (also covers CH4a), user play-test | CH4a | `X2GULuciel.*`, `X2GUUser.*` | `CH4b.md` |
 | CH4c | blocked (CH4b review): memo and item readers (`MemoConditionLuciel`) | Opus 5.5 / high, Opus review, user play-test | CH4b review | `X2GULuciel.*`, `X2BuffTemplet.cpp`, `X2Game.cpp` | `CH4c.md` |
-| CH5 | ready: two-body cut-ins, HUD portraits, bounding-key dialog, combination-point UI | Sonnet 5.5 / high, Opus review, user play-test | CH1 review, DU5 review | `X2GULuciel.cpp`, UI koms | `CH5.md` |
+| CH5 | coded + built 2026-11-16 (slot grey arm, Ciel clear pictures, ENDING_SPEECH LUCIEL, skill-window portrait, 4 dialogs + Texture103 packed); copy + deploy owed while the game runs; user play-test, then `CH5-review.md` | Sonnet 5.5 / high, Opus review, user play-test | CH1 review, DU5 review | `X2Game.cpp`, `X2StateDungeonGame.cpp`, `X2UISkillTreeNew2015.*`, data034 / data057 | `CH5.md`, review `CH5-review.md` |
 | CH6 | blocked: scans rerun + user walk incl. creation, tutorial, job change and the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH3d, CH4c, CH5, TU reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, "Template for Stage 8", `stage8-plan` -> `char-rose` | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
 

@@ -597,6 +597,38 @@ bool CX2DungeonManager::AddDungeonData_LUA()
 			luaManager.EndTable();
 		}
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+		if( true == luaManager.BeginTable( "LUCIEL" ) )
+		{
+			// char-luciel CH5: June 327e0040, a row is { LU = id, CIEL = id } read as { Lu's line, Ciel's line }; a row missing a key ends the set
+			CX2Dungeon::DungeonData::EndingSpeechSet endingSpeechSet;
+
+			int iRowIndex = 1;
+			while( true == luaManager.BeginTable( iRowIndex ) )
+			{
+				int iLuStringIndex = -1;
+				int iCielStringIndex = -1;
+				luaManager.GetValue( "LU", iLuStringIndex );
+				luaManager.GetValue( "CIEL", iCielStringIndex );
+				if( -1 == iLuStringIndex || -1 == iCielStringIndex )
+				{
+					luaManager.EndTable(); // iRowIndex
+					break;
+				}
+
+				CX2Dungeon::DungeonData::EndingSpeech endingSpeech;
+				endingSpeech.push_back( GET_STRING( iLuStringIndex ) );
+				endingSpeech.push_back( GET_STRING( iCielStringIndex ) );
+				endingSpeechSet.push_back( endingSpeech );
+
+				luaManager.EndTable(); // iRowIndex
+				iRowIndex++;
+			}
+
+			endingSpeechSetMap[ CX2Unit::UT_LUCIEL ] = endingSpeechSet;
+			luaManager.EndTable(); // LUCIEL
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 		pDungeonData->m_vecEndingSpeechSetMap.push_back( endingSpeechSetMap );
 
 		luaManager.EndTable(); // ENDING_SPEECH (iEndSpeechTableIndex)

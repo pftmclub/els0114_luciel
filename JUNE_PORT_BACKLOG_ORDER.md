@@ -560,6 +560,7 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
   (1, 2, 3 / 0x17, 0xc, 0xd) prefix the item name (format `3342f1d0`). It comes with the inventory / shop / enchant UI sweep and a June `CX2Cursor` enum. Also June's skill-tree window owns a unit viewer (`+0xbc`)
   that `SetNowDragItemReturn` refreshes (`328eea70`); March's `CX2UISkillTree` has none.
 
+- **From char-luciel CH5 (2026-11-16), Lu/Ciel UI pieces left out.** (1) `CX2ChatBox::PlayEmotionSound` (`31ea6ce0`): Lu/Ciel's voice prefix `Lu_` / `Ciel_` comes from the unit form (`CX2Unit +0xe40`) and, in the village / field / room states `g_pMain state +0x8c` = 9 / 0xb / 0x15 / 0x17 / 0x1a / 0xe / 0xf / 0x10 / 0x16, from the square or room unit the sound is for; the files `Ciel_Emotion_Angry|Hello|No|Sad|Smile.ogg` are staged (data163). Offline reach: the emotion keys. (2) `CX2UIManufacture` "usable by" line (`32e02890`) for unit-type-restricted items, and the PvP loading picture (`3251e730` / `3251db10`, six more `LUI_*` pictures; PvP is unreachable offline). (3) `EmotionData.lua` (June only; an emotion effect-set system, see `CX2GUUser` @8214 / @39320).
 - **Two June-only unit emblems found by char-chung CH1k0 (2026-11-01).** June's `CX2GUUser::NotifyShowObjectChanged` (`31ff1950`) also shows
   or hides two UI-major sequences March has no members for. Both are absent here, so March's body stays:
   - a second title emblem at user `+0x8808` (particle `+0x880c`), made by `31fd54b0` from a June-only string at title templet `+0x60`

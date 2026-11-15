@@ -248,6 +248,10 @@ public:
 	/// June 328e8cd0: the command group shown ( +0x8c ) and Command_Description's text for it. June's only caller is the Luciel form
 	/// change on the unit ( 3234d930 ), character material ( checklist )
 	void SetCommandGroup( const int iGroup_ );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+	void UpdateCharacterPortraitByForm();					/// char-luciel CH5: June 328dcba0, Lu/Ciel's portrait by the command group
+	static void GetCharacterPortraitByForm( OUT wstring& wstrFileName_, OUT wstring& wstrPieceName_, const CX2Unit::UNIT_CLASS eUnitClass_, const bool bTranscended_ );	/// char-luciel CH5: June 328db7a0
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 #endif SERV_IRUHADEV_JUNE_SKILL_TREE_PANELS
 
 private:

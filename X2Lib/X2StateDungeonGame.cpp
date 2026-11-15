@@ -5609,6 +5609,12 @@ void CX2StateDungeonGame::DungeonMapUI::CreateDungeonMapUI()
 				pUserPicture->SetTex( L"DLG_UI_Common_Texture80_NEW.tga", L"ADD_MapSD" );
 			} break;
 	#endif //SERV_9TH_NEW_CHARACTER
+	#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+		case CX2Unit::UT_LUCIEL:	// char-luciel CH5: June 324c99d0 @324ca329, one emblem for both bodies
+			{
+				pUserPicture->SetTex( L"DLG_UI_Common_Texture88_NEW.tga", L"LUCIEL_MAPSD" );
+			} break;
+	#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 		}
 		pUserPicture->SetPoint();
 
@@ -6151,6 +6157,14 @@ void CX2StateDungeonGame::DungeonEndingEvent::OnFrameMove( double fTime, float f
 						pStatic_Character_Name->GetString(0)->msg = GET_STRING( STR_ID_29422 );
 					} break;
 		#endif //SERV_9TH_NEW_CHARACTER
+		#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+				case CX2Unit::UT_LUCIEL:	// char-luciel CH5: June 324d08a0 reads the class templet's description ( UnitTemplet.lua ), no per-type switch
+					{
+						const CX2Unit::UnitTemplet* pClassTemplet = g_pData->GetUnitManager()->GetUnitTemplet( g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass );
+						if ( NULL != pClassTemplet )
+							pStatic_Character_Name->GetString(0)->msg = pClassTemplet->m_Description;
+					} break;
+		#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 
 				}
 			}
@@ -6600,6 +6614,43 @@ void CX2StateDungeonGame::DungeonEndingEvent::SetDungeonClearTexture( CKTDGUISta
 				CX2Data::GetCharacterImageName( fileName, pieceName, g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass, CX2Data::CIT_DungeonClear );
 		} break;
 #endif //SERV_ARA_CHANGE_CLASS_SECOND
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+	// char-luciel CH5: June 324ce260 @324ce347-324ce3f1, the speech body ( game +0xb54 ) 1 shows Ciel's picture, 0 the class row
+	case CX2Unit::UC_LUCIEL_DUO:
+	case CX2Unit::UC_LUCIEL_CHILIARCH:
+	case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+	case CX2Unit::UC_LUCIEL_DIABLURA:
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+	case CX2Unit::UC_LUCIEL_DEMONIO:
+		{
+			if ( g_pX2Game->GetWinSpeechForm() > 0 )
+			{
+				switch ( pMyUser->GetUnitClass() )
+				{
+				case CX2Unit::UC_LUCIEL_DUO:
+				case CX2Unit::UC_LUCIEL_CHILIARCH:
+					fileName = L"HQ_Dungeon_Clear_Ciel.TGA";
+					break;
+				case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+				case CX2Unit::UC_LUCIEL_NOBLESSE:
+					fileName = L"HQ_Dungeon_Clear_LUCIEL_ROYAL_GUARD.TGA";
+					break;
+				case CX2Unit::UC_LUCIEL_DIABLURA:
+					fileName = L"HQ_Dungeon_Clear_Ciel.tga";
+					break;
+				case CX2Unit::UC_LUCIEL_DREAD_LORD:
+					fileName = L"HQ_Dungeon_Clear_LUCIEL_DREADLORD.tga";
+					break;
+				case CX2Unit::UC_LUCIEL_DEMONIO:
+					fileName = L"HQ_Dungeon_Clear_LUCIEL_DEMONIO.tga";
+					break;
+				}
+			}
+			else
+				CX2Data::GetCharacterImageName( fileName, pieceName, g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass, CX2Data::CIT_DungeonClear );
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
 	case CX2Unit::UC_ARA_LITTLE_SPECTER:	// char-ara CH6: awakened end-of-dungeon picture, as the other Ara jobs
 		{

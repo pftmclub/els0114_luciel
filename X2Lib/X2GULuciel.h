@@ -766,6 +766,10 @@ private:
 		int iFrameBufferNum_, IN CX2Unit* pUnit_ );
 	virtual ~CX2GULuciel();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+	friend class CX2Game;	// char-luciel CH5: June's UpdateSkillCoolTime reads the combination point cost and gauge ( 32b14f70 / 32b0fa00 )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+
 protected:
 	void				InitializeLucielMajorParticleArray();
 	void				InitializeLucielMinorParticleArray();
