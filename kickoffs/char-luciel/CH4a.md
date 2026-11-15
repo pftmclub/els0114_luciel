@@ -59,3 +59,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - `+0x9678` is the Aura of Fear stack count: `m_ucAuraOfFearStackCount` ( UCHAR, was `m_bAuraOfFearActive` ); `FrameMoveAuraOfFear` ( `32b15780` ) pays it ( 10 at most ) and resets it. `+0x97c4` ( `m_fRapidImpactRange`, ctor 9999.0 ) is counted down every frame by
   `UpdateInvasionOfDarkEnergyTargetTime` ( `32b16760` ): rename it with its readers here ( it is a timer, not a range ). `IsOpenMindConditionMet` ( `32b4c7f0` ) is true while the combination points are at or below the threshold ( JUNE_BUGS 719 ).
+
+## Amended by char-luciel CH1m (2026-11-15)
+
+- The ten delegate callbacks ( checklist 7am ) are pushed by `InitPassiveSkillState` `32b45820` itself, not InitState: Ghidra data references to their thunks sit at `32b4584d` ( `32b14bc0` ), `32b4592a`, `32b459b5`, `32b45eeb`, `32b45f1d`, `32b461c6`, `32b462da`, `32b463fc`, all inside `32b45820`-`32b46580`. CH1m's InitState only calls vslot 0x690, so they are written with `InitPassiveSkillState`.

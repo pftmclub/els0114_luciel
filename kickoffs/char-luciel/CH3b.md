@@ -50,3 +50,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - `+0x969c` is the Twilight Judgement buff's stack count: `m_ucTwilightJudgementStackCount` ( UCHAR, was `m_bTwilightJudgementReattack` ); `+0x9690` is the Shadow Bolt spear NPC's UID: `m_iShadowBoltNpcUID` ( was `m_iShadowBoltControlIndex` ).
   `FrameMoveTwilightJudgementMp` ( `32aebb60` ) and `FrameMoveShadowBoltSpear` ( `32b20780` ) exist.
+
+## Amended by char-luciel CH1m (2026-11-15)
+
+- `CX2GULuciel::InitStateCommon` registers `LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT` ( 364; Init, FrameMove, EventProcess ) in June ( `32b3e8b0`, `ch0_reg.tsv` ), but every callback is this phase's, so CH1m left a `// June 32b3e8b0 @<row> <table> ( id N ): registered by CH3b with its callbacks` marker at the end of the function. Replace the marker with the full registration ( table, June id, each slot as the `ch0_reg.tsv` row ), then `python june2017_re/char_luciel/ch1m_regcheck.py` must print 0 problems.

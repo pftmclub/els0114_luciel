@@ -2429,6 +2429,30 @@ Opus 5.5 high. Covers CH1l ( `f82df8f5` ), CH1l2 ( `12df5212` ), CH1l3 ( `bc8eef
 - **Compile:** `/Zs` probes of `X2GULuciel.cpp` plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors. Full build skipped: no play-test. No debug define to retire.
 - **Next:** `/x2-phase char-luciel CH1m` ( Opus 5.5 high ).
 
+### CH1m - Done (2026-11-15)
+
+Opus 5.5 high. `CX2GULuciel::InitState` ( `32b43d10` ) and `InitStateCommon` ( `32b3e8b0` ) written under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( `X2GULuciel.cpp` +2476, `.h` +11; inert, `_LIVE` stays `//#define` ). Code commit `a2312de2`.
+No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. funcmap: `grep "(CH1m)" june2017_re/funcmap.tsv` ( 7 rows ). `JUNE_BUGS.md` 721.
+- **How it was built:** generated from `ch0_reg.tsv` ( `ch0c_listing_check.py` 364 / 364 ) by resolving each callback through the class-map thunks to the CH1b-CH1l definitions ( their `June <va>` comments ), `CX2GUUser` bodies / funcmap rows, and the vslot thunks ( bounding 0x5d4-0x5e4, hyper 0x600 / 0x604, riding hyper 0x608 ).
+  Re-checked by `june2017_re/char_luciel/ch1m_regcheck.py` ( new, committed ): **337 registrations, 0 problems** ( a mutation test of a callback, an id, a left-out and a deferred marker each fails it ). Listing order re-read from `disasm_32b3e8b0.txt`: same 294. Spot-check in the raw listing: `LSI_LU_DASH_END` ( 0x14, thunks `32b4aa90` / `32b4aaa0` / `32b4cbe0` / `32b4de50` ).
+- **InitState:** cut-in index ( `SetSkillCutInSetIndexByUnitClass` ), `m_ChargeMpState` / `m_CommonState.m_Wait` = `LSI_LU_WAIT` ( +0x7d04 / +0x4088 = 0xd ), `m_CommonState.m_Thrown` = `LSI_LU_DAMAGE_AIR_FLY_FRONT` ( +0x408c = 0x28; `GRAPPLING_TEST` is off ), `InitStateCommon`, `InitStateCommonRandom` ( = `3202b110` + `31fe22d0` ), START / WIN / LOSE,
+  `LSI_WAIT_STATE_CHANGE`, then the Diablura / Demonio ( 39 / 129 ) test with 42 bounding-target and 19 LDB dash-combo rows, vslots 0x690 / 0x684 ( `false` ), `CX2GUUser::InitState`. The `[JUNE_CHAR] LUCIEL DATA` line is CH1 final's.
+- **InitStateCommon:** 294 rows, no class test: 272 registered, 18 left out with a one-line comment as Elesis / Ara ( phoenix run 123-126 / 571-574: PvP amusement; dance 127-129 / 590-592: Stage 10; riding 93-96: Stage 17 ), and 4 skill states left to the phase that owns every callback
+  ( Dark Crescent 298 / Ruinous Impact 299: CH2b; Eschaton 363: CH2c / CH2c2; Fantasie Impromptu 2nd Movement 364: CH3b ) with a `registered by CHxx` marker: registered now they would be table-only, stuck and invincible ( `stateends` flagged them ). Hyper 23 / 204 take `GetHyperModeTableName( false / true )` ( @`32b3fae6` / @`32b40fdd` ).
+  Empty on purpose ( one-line comment each ): die `StateEnd` `3202a7d0` ( runs in `StateChange` ), DASH_END `StateStart` `31fc7fc0` ( = `CommonStateStart`, which an empty slot runs ), riding attack X frame `32002f70` ( Stage 17 ).
+- **Ids are June's** ( `LUCIEL_STATE_ID` ), as the CH1b-CH1l bodies use them; `USI_START` / `WIN` / `LOSE` / `HYPER_MODE` ( equal below 24 ). Lu's bounding states ( 120-122 ) and `LSI_WAIT_STATE_CHANGE` ( 130 ) are registered inline at June's ids, **not** through `InitBoundingStates` / `InitWaitStateChange`:
+  `enumprobe.py` shows March's ids are 102-104 / 105, and `GetStateIDByForm` maps 120 -> 417 for Ciel only by June number. Two numbers: 327 is registered twice ( June, JUNE_BUGS 721 ); 338 stays a number ( JUNE_BUGS 695 ).
+- **Seven `CX2GUUser` bodies only Lu / Ciel register** ( DU1d routed them here ), written in the class as CH1b did `DieFrontStart`: `DieFrontStartFuture` / `DieBackStartFuture` ( `31fcd0f0` / `31fcd1b0`: CommonStateStartFuture, Future anim `SetPlaySpeed( 0.5 )` inlined ), `DieFrontFrameMove` / `DieBackFrameMove`
+  ( `320008f0` / `32000910`, uncarved: `DieFrameMove( 0.19, 1.12 )` ), `DieFrontEventProcess` / `DieBackEventProcess` ( `31fcd160` / `31fcd220`: `GetShowObject()` inlined, Future anim end -> `GUSI_DIE`, no CommonEventProcess ), `DashEndStartFuture` ( `31fd2680`, uncarved: `GetDashSpeed()` ).
+- **Where CH0 was wrong:** the ten delegates are pushed by `InitPassiveSkillState` `32b45820` ( data refs `32b4584d`-`32b463fc` ), not InitState: routed to CH4a. `32b4ce90` / `32b4cf30` are called by the uncarved skill setter ( @`32b490e8` / @`32b490f7` ): routed to CH1n. CH1m declares neither.
+- **Found, routed to CH1o ( the plan's subject, needed before CH1 final ):** March's `CX2GUUser` state ids are June - 1 from 24 ( riding 71 vs 72 ), and further apart for the event kit ( 93-98 vs 111-116 ), bounding ( 102 vs 120 ) and the wait change ( 105 vs 130 ). Every engine `StateChange( USI_* )` at 24 or above lands on the wrong Lu state;
+  DU2's getters cover only the damage states, and `StateChange` cannot translate ( the two numberings share 24-105 ). Also `InitEventStates` ( inside `InitStateCommonRandom` ) overwrites `LSI_RIDING_SPECIAL_MOVE` ( 92 ), and RT_BOUNDING stays off ( `m_bBoundingStatesReady` ) until the seam lands. CH1o's amendment lists the options.
+- **Gates:** `finish.py --files X2GULuciel.cpp X2GULuciel.h --state X2GULuciel.cpp Luciel_Duo --state X2GULuciel.cpp Luciel_Demonio`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` / `RESULT: PASS`, `junediverge` PASS, `enumscan` exit 0, `stateends` PASS both
+  ( Duo: 0 STUCK after the deferral ); skillicons / luabind not run ( no skill added, no script staged: CH1 final adopts the scripts ). 0 deleted lines. Range gate `finish.py --range a2312de2^..a2312de2 ...`: identical, `FINISH RESULT: PASS`.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp` plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings in the class. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1n` ( Opus 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

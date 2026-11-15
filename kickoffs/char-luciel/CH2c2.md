@@ -47,3 +47,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - `322a7000` is `CX2GameUnit::AddAllBuffTimeFinalizerDuration( float )` (flag `SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS`): every non-debuff buff's Time
   finalizers gain the value, and the awakening clock follows for BTI 5 / 822. Call it by name.
+
+## Amended by char-luciel CH1m (2026-11-15)
+
+- `CX2GULuciel::InitStateCommon` registers `LSI_SA_LCG_ESCHATON` ( 363; its FrameMove `32b2cfc0` is yours, Init / EventProcess are CH2c's: make sure the registration carries all three ) in June ( `32b3e8b0`, `ch0_reg.tsv` ), but every callback is this phase's, so CH1m left a `// June 32b3e8b0 @<row> <table> ( id N ): registered by CH2c / CH2c2 with its callbacks` marker at the end of the function. Replace the marker with the full registration ( table, June id, each slot as the `ch0_reg.tsv` row ), then `python june2017_re/char_luciel/ch1m_regcheck.py` must print 0 problems.
