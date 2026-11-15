@@ -2395,7 +2395,14 @@ FINISH RESULT: PASS.
 **How to see it:** Elsword `jtLordKnight` with 85811 (Miracle Alchemist Light) in village, field, dungeon, hyper on / off: the light sits at the feet
 and follows jumps; `EQTRACE ... found 1`. Ara `arasss` with 41743 (Yama Raja's Enchanted Hair) in awakening: hair may draw without the old
 render-param glow (June's; glow is R6b). Character window: sub-equips still show; 85811's light may sit off the model (JUNE_BUGS 746).
-Play-test owed.
+
+**Play-test 2026-11-15: passed, one item routed** (user: checks 2-5 pass; the Miracle Alchemist Light 85811 does not show). Log (exe md5 49fa44dc,
+22:36-22:42): `EQTRACE item 85811 slot 0 found 1` in village / field / dungeon with land == root (offset 0 0 0: the item sits at the feet, the
+TraceLandPos math is right); one character-window line `root -285 46 200 offset 7337.53 2119 5817.62` (JUNE_BUGS 746, reached); ten `found 0` lines
+before the field loaded. **Why the light is missing:** 85811's visible part is its six attached particles (`AC_ES_Lowbody_Event28_P01..P06`,
+`UIMajorParticle.txt`, present), all on bone `TraceLandPos`. June's `AttachParticle` keeps such an entry with no frame (`32960d65` compares the bone
+with `TraceLandPos`, 334c9a84) and June's group frame move puts it at the owner's land position (`3296479f` -> `329645a0`). March's `AttachParticle`
+looks the bone up in the item mesh, finds none and deletes the particle. Both functions are R6c's (kickoff amended: 85811 is its proof).
 
 ## Phase R14f - June's whole CX2Eqip::LoadAttached
 

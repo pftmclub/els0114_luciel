@@ -49,3 +49,6 @@ whole here with the enchant entries:
   anim; rebuild only for item 280322 when anim `+0x2ac` is set): identify anim `+0x2ac` / `+0x218` and sequence `+0x464` first;
 - compare the whole eqip ctor `32961280` while there: June stores `+0x190` = 0 always and its dtor deletes no dummy item (March's `m_bDummyBasic` /
   `m_pDummyItem`); say whether June dropped the dummy-item path and route it.
+- **Proof item (R14d play-test, 2026-11-15):** Elsword's Miracle Alchemist Light 85811 shows nothing in March: its six particles sit on bone
+  `TraceLandPos`, which March's `AttachParticle` cannot find in the item mesh and deletes. June keeps the entry frameless (`32960d65`) and the group
+  frame move draws it at the owner's land position (`3296479f` -> `329645a0`, already ported by R14d). The R6c play-test must show this light at the feet.
