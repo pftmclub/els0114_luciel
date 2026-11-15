@@ -3037,6 +3037,8 @@ Sonnet 5.5 high. Server Lua only: no flag, no client change, **no build** (the e
   `Enum.lua`'s (the seed only fills missing names), so no seed edit. The loader's own refusal lines will show any row that does not resolve.
 - **Not proven until the play-test:** `python tools/logs.py --grep "CUBE"` must show `CUBE     opened item 109999 ...` / `110850 ...` per cube, and no
   `lists no item group for class`.
+- **Play-test (2026-11-15 17:01-17:03, user: passed; logs read):** `CUBE loaded: 2870 cube(s) ... 10060 group(s)`; `CUBE opened item 110850 (give-all): 5 item kind(s)` x1 and `109999` x2;
+  0 `CUBE refused`, 0 EXCEPTION, ErrorLog 0 lines. The 11 / 13 "cannot pay out" cubes are other cubes (studio holes), not 109999 / 110850.
 - **Revert:** `git revert` the CHN2 commit (pure insertion), then `kom.py stage-server RandomItemTable.lua`, pack, copy.
 
 ## Phase TU - Tutorial
