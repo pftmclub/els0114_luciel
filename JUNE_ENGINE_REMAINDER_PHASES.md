@@ -2472,7 +2472,7 @@ disk). `EXESTR OK: 1 of 1 absent` (`] EQTRACE item `: the debug line is gone). S
 `_DEBUG` retire (`Always.h`, R9 review `b068aeb4`), JUNE_BUGS 102 and the funcmap ids (`b8d17bd8` / `4ecb6f3d`).
 Commit `154ad7e9`; `finish.py --range 154ad7e9^..154ad7e9`: both flags PASS (1 PASS each), junediverge PASS, enumscan exit 0, FINISH PASS.
 **Play-test of the fix:** Elsword `jtLordKnight`, `/additem 275891 1` (Elsword's SeeU costume gloves), equip, village: the gloves draw with June's
-alpha blend (soft edges, no opaque or black fringe). When it passes, R14d moves to Done.
+alpha blend (soft edges, no opaque or black fringe). **Passed 2026-11-15** (user: as expected); R14d is Done.
 
 ## Phase R14f - June's whole CX2Eqip::LoadAttached
 
