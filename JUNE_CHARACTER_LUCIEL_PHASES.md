@@ -2990,6 +2990,37 @@ A new Lu/Ciel's first select now enters June's tutorial dungeon 41240 (it fell t
   Open for the user: none.
 - **Commit / play-test.** `f9da0f89`. Play-test passed 2026-11-15 (user): a fresh Lu/Ciel played the tutorial to the village. Logs: `[JUNE_CHAR] LUCIEL TUTORIAL room 1001 dungeon 41240 for unit 186`, `ROOM tutorial room 1001 ... dungeonID=41240`, ErrorLog 0 lines, lua 0 unbound, 0 EXCEPTION (the 5 `E_DISABLE_HB_CHECK_REQ` UNHANDLED are old noise). Range gate `f9da0f89^..f9da0f89`: flagcheck 0 FAIL (3 PASS, 1 PASS~, the `#error` guard row), junediverge / enumscan PASS.
 
+## Stage 8 Lu/Ciel, TU -- Review (char-luciel TU review, 2026-11-15, Opus 5.5 high)
+
+**Verdict: pass, no code change.** Reviewed commit `f9da0f89` against June in Ghidra (read-only) and the live koms.
+- **Room switch.** Ghidra `325622e0`: the unit type at `[[[33775860+0x68]+0x90]+0xaf0]` switches; case 10 -> `0xa118` = 41240, default `0xa0be` (Elsword).
+  The new `case UT_LUCIEL` (`UT_LUCIEL` = 10) sits in C3y-2's live `#ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON` branch of
+  `CX2StateServerSelect::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ` (`X2StateServerSelect.cpp:7580`); the rest of the body is unchanged; the
+  `X2StateBeginning.cpp` copy is the same case in compiled-out code. Emulator: `IsQuestTutorialDungeon` case (`X2OfflineQuest.cpp:923`) and the
+  `Handlers_Room.cpp` log line, both behind the flag.
+- **Data = June verbatim.** Live `DungeonEnum.lua:348` = `DungeonEnum.src.lua:101`; live `Enum.lua:2546` (`WORLD_ID`) and `:5060-5063` (`NPC_UNIT_ID`) =
+  `Enum.src.lua:2357 / 4006 / 4890 / 4918 / 5825`. No collision inside a table: 633 is also `NUI_TUTORIAL_MARS` (`NPC_UNIT_ID`) and `BFI_DEBUFF_ENCHANT_HAND`,
+  2044 / 2045 / 2047 / 2067 also `SOUCM_*`: other tables. Whole-row diffs (whitespace-normalised) identical: the `DungeonData.lua` 41240 row (19 lines),
+  the `WorldData.lua` 633 row, the four `NPCTemplet.lua` rows.
+- **Scripts.** `luabind.py check` Dungeon_Tutorial_Luciel + Tutorial_Luciel_boss_karis / _icoos / _object + Tutotial_Luciel_Dp1: RESULT PASS (0 unbound,
+  ENUM 0 missing). `adopt-june --dry-run` on those 5 + Tutorial_Luciel_Stage0 / _LineMap: 7 identical (June's bytes already live).
+- **Assets / koms.** data160 88 + data161 78 files (new koms), data164 43 `Tutorial_Luciel_Stage0*`, data081 1 = 210 + 4 reused = the 214 named. `kom.py status`
+  data035 / 036 / 037 / 040 / 081 / 160 / 161 / 164: all in sync with the live koms. The `--force` data036 copy is superseded: CHN repacked data036 at 16:08
+  (after its `LevelUpEvent.lua` edit at 16:05), and that kom still holds TU's rows (in sync with the dir). The data036 "stale .src.lua" warning is 23 sidecars
+  from 2026-10-10, not TU's.
+- **Not ported, confirmed.** `DI_BATTLE_FIELD_TUTORIAL_LUCIEL` 39609: June has no `DungeonData` row (39609 elsewhere in June is `STR_ID_39609`).
+  `NUI_TUTORIAL_ERIS_SUMMON` 2046: only `Enum` / `NPCTemplet` / `NewNPCStat` rows in June, no script or dungeon names it.
+- **Play-test.** One check, passed (user, 2026-11-15): fresh Lu/Ciel played 41240 to the village = June's end. Elsword's case is untouched (default branch).
+- **MINOR, not fixed (routed):** the stand-in comment after the new case still reads "Lu/Ciel, Rose, Ain not ported ( 10 / 11 / 12 -> ... )" in both files.
+  Old comments are not rewritten; char-rose's TU replaces that line when it adds case 11.
+- **Gates.** `finish.py --review --commits f9da0f89 --with JUNE_CHAR_LUCIEL_TUTORIAL JUNE_ENUM_NAMES --skip-flag JUNE_CLASS_TUTORIAL_DUNGEON`:
+  junediverge PASS, junediverge `--check-all` PASS, enumscan exit 0. flagcheck `_TUTORIAL` 3 PASS, 1 PASS~ (`Handlers_Room.cpp`, one blank line), 1 OTHER
+  (`DungeonEnum.h` = the partner `JUNE_ENUM_NAMES` line), 0 FAIL, 0 deleted / non-ASCII / EOL lines; `JUNE_ENUM_NAMES` 1 PASS (`DungeonEnum.h`), 4 OTHER
+  (the `_TUTORIAL` sites). Both RESULT lines read FAIL only for the one ERROR row, `Always.h:10175`: `#error` when `JUNE_USER_SKILL_USE_HELPERS` is on without
+  `JUNE_ENUM_NAMES`; flagcheck's flag-off pass undefines `JUNE_ENUM_NAMES` and that guard fires as designed (same precedent as TU's own guard). Not a defect.
+  `JUNE_CLASS_TUTORIAL_DUNGEON` SKIPPED: C3y-2's flag, target of TU's `#error`.
+- **Build.** None: no code change.
+
 ## Phase CH2 - Skills: base and first jobs (200, 37, 38, 39)
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, sub-tags `SKILL`, `NUM`. A skill's
