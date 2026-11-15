@@ -251,6 +251,11 @@ Content tools are separate executables, mostly with their own solutions. C++ wor
 
 ### Rule: server-side Lua the client needs is the user's to pack — never band-aid around it
 
+**Amended 2026-11-15 (user): Claude now stages, packs and copies server-only Lua itself.** `python tools/kom.py stage-server X.lua` compiles
+`KncWX2Server/ServerResource/US/X.lua` to luajit bytecode into `data036_kom/` (the way StatTable and RandomItemTable ship; the kom's algo-2 pack is the
+XOR), then `kom.py pack data036` and `kom.py copy data036`. Every "the user does that step" / "the user packs" below is history: read it as "you do it".
+What stays: implement the whole feature in one pass, load the shipped way, degrade visibly, no loose copy in the game dir.
+
 Some data only ever existed on the server: per-level stat tables, drop tables,
 field tuning. When client-side code needs one of those files, it has to be
 XOR-encrypted and packed into `data036.kom` alongside every other client script,

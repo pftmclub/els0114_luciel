@@ -68,8 +68,8 @@ A new edit may also start from a sidecar: put `X.src.lua` beside `X.lua`, and `k
 | ledger `text differs from the ledger sha1` | X.lua was edited after conversion: `refresh` records it. |
 | ledger `BOM text with no ledger row` | A hand-made text file: add a row via `convert`, or ask what produced it. |
 
-Manifest-`"0"` `.lua` (server Lua the user packs by hand) only **warns** in the gate, never refuses; the CLAUDE.md server-Lua rule is
-unchanged (name the file, never pack it yourself with kom.py). The two oddities (`data014 UI_NPC_KELAINO.lua`, `data036 PvPDropTable.lua`)
+Manifest-`"0"` `.lua` only **warns** in the gate, never refuses. Server-only Lua (`ServerResource/US/X.lua`, manifest `"2"`) is staged with
+`python tools/kom.py stage-server X.lua` and then packed and copied by you (user, 2026-11-15; CLAUDE.md server-Lua rule). The two oddities (`data014 UI_NPC_KELAINO.lua`, `data036 PvPDropTable.lua`)
 are ledger exceptions (tier `EXC`).
 
 ## Files

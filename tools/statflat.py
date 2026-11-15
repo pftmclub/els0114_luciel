@@ -11,7 +11,7 @@ Curve (June CalculatePhysicalAndMagicalStat / CalculateHPStat, CharacterStatTabl
 Level 99 = 1202 / 1202 / 301 / 301 / 157000 (the cobodex.eu calculator's bare base stat of a level-99 character).
 
 Only lines that start with "StatTable:SetUnitStat(" change; BOM, CRLF, comments and ReserveMemory lines stay byte-exact.
-Server Lua: the user XORs and packs the result into data036.kom.
+Server Lua: stage it with `python tools/kom.py stage-server StatTable.lua`, then kom.py pack / copy data036 (user, 2026-11-15).
 """
 import math
 import os

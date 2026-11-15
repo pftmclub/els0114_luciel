@@ -42,7 +42,7 @@ user only asked for the pack. When *you* need a kom packed for a play-test, run 
 - **REFUSED: Lua gate** - before packing, every `.lua` must be March bytecode (`1B 4B 4C 81`), BOM + text that parses under the
   vendored luajit, or a ledger exception (`tools/data/lua_source_ledger.tsv`, tier EXC). It refuses BOM-less text, June `0x82`
   bytecode, other headers and parse errors, naming the file and the parser's message; nothing is written. Manifest-`"0"` `.lua`
-  (the user's hand-packed server Lua) only warns. See the `x2-lua` skill for the fix per message.
+  only warns. Server-only Lua: `python tools/kom.py stage-server X.lua` first (compiles `ServerResource/US/X.lua` into the kom dir), then pack and copy as usual (user, 2026-11-15). See the `x2-lua` skill for the fix per message.
 - **vs live kom: +added -removed ~changed** - confirms the change you made is actually in the pack
   (a pack that shows `~0 changed` after you edited something means the edit is not in the dir or the
   manifest). `-removed` entries mean the dir is out of step with the live archive (data101 is);

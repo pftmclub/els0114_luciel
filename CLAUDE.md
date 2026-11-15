@@ -123,13 +123,14 @@ unifdef script, or read a plan doc "in full".
 | Save DB / items / characters | `tools/elsdb.py`, `tools/kim.py`, `tools/createchar.py` | x2-db, x2-kim, x2-create-char |
 | Pack a March kom | `python tools/kom.py pack dataNNN` | `/elstools pack dataNNN` |
 | Deploy a packed kom | `python tools/kom.py copy dataNNN` | `/x2-kom-packed copy dataNNN` |
+| Stage a server-only Lua (`ServerResource/US/X.lua`) into data036 | `python tools/kom.py stage-server X.lua`, then `pack` + `copy` | `/elstools` |
 | Convert / edit / prove a March `.lua` as BOM source | `python tools/luasrc.py convert dataNNN X.lua` (and `restore`, `refresh`, `ledger`, `check`, `t2`) | `/x2-lua` |
 | Adopt June `.lua` / the core list | `python tools/luasrc.py adopt-june ...` ; `luasrc.py core --check` | `/x2-adopt-june` |
 
 - **You pack koms** (`/elstools pack`) **and copy them** (`/x2-kom-packed copy`) **without asking (user, 2026-11-10;** it was ask-first
   before). The tool backs the live kom up and refuses while the game runs: then ask the user to close it, never kill it. Plan docs and
-  kickoffs that say "ask first" before a copy mean "copy now". Report `PACK OK` / `COPY OK` in the hand-off. Exception: server-only Lua stays
-  the user's to pack (rule below).
+  kickoffs that say "ask first" before a copy mean "copy now". Report `PACK OK` / `COPY OK` in the hand-off. Server-only Lua too (user,
+  2026-11-15): you stage, pack and copy it (rule below).
 - **Every phase and review finishes the same way** (x2-phase "Finish"): `flagcheck --worktree` passes; `python tools/junediverge.py --check
   <changed files>` prints `RESULT: PASS`; `build.py --deploy` with `DEPLOY OK` (play-test phases only, see the shared-builds rule)
   in the Done note; a Done note of at most ~60 lines; the `STATUS.md` row updated in the same commit (one line, evidence in the note); the
@@ -180,16 +181,20 @@ desync**. The emulator shares the exe, so keep its handlers and the `X2OfflineDB
 end of `ServerDefine.h`, both toggled together, and added to `SECOND_HOMES` in `tools/flagcheck.py` (first one:
 `SERV_IRUHADEV_JUNE_BUFF_FACTOR_WIRE`). Headers included after `KTDX.h` (`Enum.h`, `DungeonEnum.h`) are unaffected.
 
-## Rule: server-side Lua the client needs is the user's to pack — never band-aid around it
+## Rule: server-side Lua the client needs is staged, packed and copied by you — never band-aid around it (user, 2026-11-15)
 
-Some data existed only on the server (stat tables, drop tables, field tuning). When client code needs such a file, it must be XOR-encrypted
-and packed into `data036.kom`, and **the user does that step**. Don't wait for it.
+Some data existed only on the server (stat tables, drop tables, field tuning). When client code needs such a file, it must be packed into
+`data036.kom` (the kom's algo-2 pack is the XOR) **and you do that step, without asking** (the user lifted the "user packs" rule 2026-11-15):
+`python tools/kom.py stage-server X.lua` (compiles `KncWX2Server/ServerResource/US/X.lua` to luajit bytecode into `data036_kom/`, backs the old
+staged file up), then `kom.py pack data036` and `kom.py copy data036` (refuses while the game runs: ask the user to close it). Prove the
+compiled old source equals the staged bytecode first when the file was never staged from this repo (T0, as for any March `.lua`). Plan docs
+and kickoffs that say "the user packs" mean "you pack now".
 1. **Implement the whole feature in one pass:** loader, consumer and degrade path, even if a plan frames "refuse and log" as a stopping point.
 2. **Load it the shipped way:** `GetMassFileManager()->LoadDataFile( name )`, then `GetLuaBinder()->DoMemory( ... )`, with a logged
    `DoMemoryNotEncript( ... )` fallback. Copy `X2Lib/Offline/X2OfflineStatTable.cpp` / `X2OfflineDropTable.cpp` / `X2OfflineBattleField.cpp`.
 3. **Degrade visibly:** file missing -> feature off, log which file and what to do.
-4. **Name the file when reporting done** (`KncWX2Server/ServerResource/US/<name>.lua`, needs XOR + packing into `data036.kom`), and confirm
-   from the loader's "loaded N row(s)" log line if it is already packed.
+4. **Name the file when reporting done** (`KncWX2Server/ServerResource/US/<name>.lua`) with the `PACK OK` / `COPY OK` lines, and confirm from the
+   loader's "loaded N row(s)" log line after the play-test.
 
 Never write a loose copy into the game directory (a loose file beats the kom under this build, since `MASS_FILE_FIRST` is undefined, and it
 masks a failed repack). Never hardcode a table, invent a curve or approximate a function for an unpacked file. Never edit studio `.lua` to

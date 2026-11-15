@@ -2967,7 +2967,11 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` (`Always.h`, `
 ### CHN2 - Done (2026-11-15)
 
 Sonnet 5.5 high. Server Lua only: no flag, no client change, **no build** (the exe is unchanged; the CHN deploy stands). File:
-`KncWX2Server/ServerResource/US/RandomItemTable.lua` (BOM + CRLF kept, 226 lines inserted, 0 deleted): **the user packs it** (XOR + data036).
+`KncWX2Server/ServerResource/US/RandomItemTable.lua` (BOM + CRLF kept, 226 lines inserted, 0 deleted).
+- **Packed by Claude (user grant 2026-11-15, rule amended in CLAUDE.md):** the old repo source compiled with luajit equals the staged bytecode byte for
+  byte (T0, 4,660,654 B); the new source compiles to 4,665,840 B (md5 `426c6809`), staged by `kom.py stage-server RandomItemTable.lua` (new command;
+  backup `kom_backup_tools/RandomItemTable.lua.20261115_165818.bytecode`). `PACK OK data036` (vs live: ~1 changed, RandomItemTable.lua),
+  `COPY OK data036` md5 `a480299e789e974635b93cd1c097644b` (backup `kom_backup_tools/data036.kom.20261115_165832`).
 - **Shape = March's rows.** One `{ m_cUnitClass, m_iItemGroupID }` per class in cube 109999 (1st job) and 110850 (2nd job), one `AddRandomItemGroup(
   group, item, 20, period, 1 )` per piece: rate 20, quantity 1, period 10 for a 1st-job set and 15 for a 2nd-job set (copied from March's Elesis /
   Ara / Sheath Knight groups, not invented). Each added block (2 row runs, 2 group runs) carries the one-line `stand-in ( char-luciel CHN2 )` comment.
@@ -2991,9 +2995,9 @@ Sonnet 5.5 high. Server Lua only: no flag, no client change, **no build** (the e
   31 / 119 already had rows.
 - **Names resolve:** all 16 `UC_*` names are in data036 `Enum.lua` (`:317-:386`) with values equal to `X2Unit.h`'s enum; the emulator's UNIT_CLASS table is
   `Enum.lua`'s (the seed only fills missing names), so no seed edit. The loader's own refusal lines will show any row that does not resolve.
-- **Not proven until the pack:** the file is not loaded by the game today. After the user's pack, `python tools/logs.py --grep "CUBE"` must show
-  `CUBE     opened item 109999 ...` / `110850 ...` per cube, and no `lists no item group for class`.
-- **Revert:** `git revert` the CHN2 commit (pure insertion) and pack again.
+- **Not proven until the play-test:** `python tools/logs.py --grep "CUBE"` must show `CUBE     opened item 109999 ...` / `110850 ...` per cube, and no
+  `lists no item group for class`.
+- **Revert:** `git revert` the CHN2 commit (pure insertion), then `kom.py stage-server RandomItemTable.lua`, pack, copy.
 
 ## Phase TU - Tutorial
 

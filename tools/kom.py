@@ -9,6 +9,7 @@
     python tools/kom.py status                  # recently touched archives that need a pack / a copy
     python tools/kom.py status data036          # one archive in detail (entry diff vs the live kom)
     python tools/kom.py stage-june <name|list-file> [--dry-run]   # June's exact file -> kom_contents/dataNNN_kom/ + manifest
+    python tools/kom.py stage-server X.lua [Y.lua ...] [--kom data036]   # KncWX2Server/ServerResource/US/X.lua -> luajit bytecode in the kom dir
 
 pack  : runs `elstools pack -i <dir> -o <packed> -v mar-2014`. NOTE (measured 2026-10-06): the pack is
         DIRECTORY-driven, not manifest-driven - it packs every file in the dir except *.src.lua and
@@ -44,6 +45,11 @@ stage-june: for each name (or each line / `name` column of a list file) finds Ju
         several koms, a name over 59 characters (unless --long-names, for after X4), a name not in June. A replaced
         staged file is backed up to <kom_contents>/../kom_backup_stage_june/<stamp>/. --dry-run writes nothing;
         --plan-out F writes the per-file plan as TSV. Never writes into June's tree or the game dir.
+
+stage-server (user, 2026-11-15: server-only Lua is packed by Claude, no longer by hand): compiles the BOM source
+        KncWX2Server/ServerResource/US/X.lua with luajit (stripped, like the shipped files; the manifest key must already be "2"),
+        backs the staged file up to <kom_contents>/../kom_backup_tools/X.lua.<stamp>.bytecode, writes the bytecode into the kom dir.
+        Then `pack` and `copy` as for any kom. A repo source that does not compile is refused; nothing is written.
 
 Exit codes: 0 ok, 1 failed, 2 usage, 3 game running, 4 refused (stale pack / dropped entries /
 manifest mismatch).  Paths can be overridden with X2_GAME_DIR, X2_KOM_CONTENTS.
@@ -710,6 +716,41 @@ def cmd_stage_june(args, dry, long_names, jobs, plan_out, transform=None, only_k
                 backup=os.path.join(STAGE_BACKUP_ROOT, stamp))
 
 
+def cmd_stage_server(names, kom):
+    ls = _luasrc()
+    d = paths(norm(kom))["dir"]
+    man = os.path.join(d, "_manifest.json")
+    if not os.path.isfile(man):
+        die(2, "no manifest in %s" % d)
+    with open(man, "rb") as f:
+        keys = json.loads(f.read().decode("utf-8-sig"))
+    src_dir = os.path.join(TRUNK, "KncWX2Server", "ServerResource", "US")
+    p("== stage-server -> %s" % d)
+    for n in names:
+        src = os.path.join(src_dir, n)
+        dst = os.path.join(d, n)
+        if not os.path.isfile(src):
+            die(2, "STAGE-SERVER REFUSED %s: no source at %s" % (n, src))
+        if keys.get(n) != "2":
+            die(4, "STAGE-SERVER REFUSED %s: manifest key is %r, not \"2\" (add it first)" % (n, keys.get(n)))
+        with open(src, "rb") as f:
+            text = f.read()
+        if not text.startswith(b"\xef\xbb\xbf"):
+            die(4, "STAGE-SERVER REFUSED %s: source has no UTF-8 BOM" % n)
+        bc, err = ls.compile_text(text[3:])
+        if not bc:
+            die(4, "STAGE-SERVER REFUSED %s: does not compile: %s" % (n, err))
+        if os.path.isfile(dst):
+            os.makedirs(BACKUP_ROOT, exist_ok=True)
+            bk = os.path.join(BACKUP_ROOT, "%s.%s.bytecode" % (n, time.strftime("%Y%m%d_%H%M%S")))
+            shutil.copy2(dst, bk)
+            p("  backup: %s" % bk)
+        with open(dst, "wb") as f:
+            f.write(bc)
+        p("  staged %s: %d bytes, md5 %s" % (n, len(bc), hashlib.md5(bc).hexdigest()))
+    p("STAGE-SERVER OK. Next: kom.py pack %s, then kom.py copy %s" % (norm(kom), norm(kom)))
+
+
 def cmd_status(names, days):
     detail = bool(names)
     if not names:
@@ -756,8 +797,12 @@ def cmd_status(names, days):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for c in ("pack", "compile", "copy", "status", "stage-june"):
+    for c in ("pack", "compile", "copy", "status", "stage-june", "stage-server"):
         s = sub.add_parser(c)
+        if c == "stage-server":
+            s.add_argument("names", nargs="+", help="server Lua file names under KncWX2Server/ServerResource/US/, e.g. RandomItemTable.lua")
+            s.add_argument("--kom", default="data036", help="target kom (default data036)")
+            continue
         if c == "stage-june":
             s.add_argument("koms", nargs="+", help="a file name, or a list file (one name per line, or a TSV with a `name` column)")
             s.add_argument("--dry-run", action="store_true", help="print the plan, write nothing")
@@ -776,6 +821,9 @@ def main():
         if c == "pack":
             s.add_argument("--allow-unlisted", action="store_true", help="pack files the manifest does not list (they get algo 2)")
     a = ap.parse_args()
+    if a.cmd == "stage-server":
+        cmd_stage_server(a.names, a.kom)
+        return
     if a.cmd == "stage-june":
         cmd_stage_june(a.koms, a.dry_run, a.long_names, a.jobs, a.plan_out)
         return
