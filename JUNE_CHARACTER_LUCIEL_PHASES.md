@@ -2807,6 +2807,7 @@ rows, ported ).
   expected ( proves the flag's code is compiled ).
 - **Gates:** `finish.py --files <3>`: flagcheck `2 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` / PASS, 0 deleted; junediverge PASS; enumscan
   exit 0; stateends / skillicons / luabind SKIPPED ( no states, skills or scripts ). `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+  Commit `16997120`; `finish.py --range 16997120^..16997120 --with JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER`: same tallies, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 - **Build:** `DEPLOY OK: X2_offline.exe is 26,905,600 B, dated 2026-11-15 14:56:53, md5 a6ff3e3a12d0b5fc78f45dae3a813885, equal to X2/US_SERVICE/x2.exe`.
   No exestr line: the phase adds no string.
 - **Play-test:** CH1's, resumed from the field entry ( hand-off in the session; the CH1 review covers this commit ).
