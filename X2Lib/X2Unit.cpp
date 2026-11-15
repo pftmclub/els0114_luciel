@@ -1380,10 +1380,25 @@ struct CX2Unit::SocketAggregate
 		float	m_fSummonNpcCoolTime;	/// socket +0x248
 	};
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	CX2SocketItem::SocketData_DuoUnit	m_kSocketData;	// char-luciel DU5f: June +0xe1c is a SocketData_DuoUnit ( 32091730 ) for unit type 10; the pairs are read for UT_LUCIEL only
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	CX2SocketItem::SocketData	m_kSocketData;			/// +0xe1c
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	std::vector<SummonNpc>		m_vecSummonNpcSocket;	/// +0xe20: June never clears it ( Init, the fill and the sum leave it ): JUNE_BUGS
 	std::vector<int>			m_vecTitleSocketOption;	/// +0xe30: the title's options, copied in before they are summed ( 32853ff0 )
 };
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+namespace _CONST_UNIT_DU5F_
+{
+	// char-luciel DU5f: June 32363ca0 picks the type-10 aggregate at Init; March tests the unit type where the aggregate is read
+	bool IsDuoUnitSocketAggregate( const CX2Unit& kUnit_ )
+	{
+		return NULL != kUnit_.GetUnitTemplet() && CX2Unit::UT_LUCIEL == kUnit_.GetUnitTemplet()->m_UnitType;
+	}
+}
+using namespace _CONST_UNIT_DU5F_;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 
 CX2Unit::SocketAggregateHolder::SocketAggregateHolder()
 	: m_p( NULL )
@@ -1418,7 +1433,11 @@ void CX2Unit::SocketAggregateHolder::Recreate()
 	if ( NULL == m_p )
 		m_p = new SocketAggregate;
 	else
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		m_p->m_kSocketData = CX2SocketItem::SocketData_DuoUnit();	// char-luciel DU5f
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		m_p->m_kSocketData = CX2SocketItem::SocketData();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 }
 
 /** @function : JuneSumSocketOption
@@ -1605,6 +1624,30 @@ void CX2Unit::SumSetItemSocketOption( const int iMode_ )
 	if ( NULL == g_pData || NULL == g_pData->GetItemManager() )
 		return;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	// char-luciel DU5f: June 323652b0, Lu's sets ( 32350cb0( 0 ) ) summed in modes 0 / 2, Ciel's ( group 1 ) only with the type-10 aggregate in modes 1 / 2; it records both
+	CX2SocketItem::SocketData_DuoUnit* pDuoUnitSocketData = ( NULL != m_kSocketAggregate.m_p && true == IsDuoUnitSocketAggregate( *this ) ) ? &m_kSocketAggregate.m_p->m_kSocketData : NULL;
+	for ( int iEquipGroup = CX2Unit::DT_MAJOR; iEquipGroup <= CX2Unit::DT_MINOR; ++iEquipGroup )
+	{
+		if ( CX2Unit::DT_MINOR == iEquipGroup && NULL == pDuoUnitSocketData )
+			break;
+
+		map<int,int> mapSetIDNParts;
+		GetSetIDNPartsNum( mapSetIDNParts, iEquipGroup );
+		for ( map<int,int>::const_iterator mItr = mapSetIDNParts.begin(); mItr != mapSetIDNParts.end(); ++mItr )
+		{
+			vector<int> vecOptions;
+			const int iMaxLevel = g_pData->GetItemManager()->GetSetItemOptions( mItr->first, mItr->second, vecOptions );
+			if ( true == vecOptions.empty() )
+				continue;
+
+			if ( NULL != pDuoUnitSocketData )
+				pDuoUnitSocketData->AddMPStatOfBody( vecOptions, iEquipGroup );
+			if ( CX2Unit::DT_BOTH == iMode_ || iEquipGroup == iMode_ )
+				SumSocketOption( vecOptions, 1.f, ( 0 < iMaxLevel ) ? iMaxLevel : static_cast<int>( m_UnitData.m_Level ) );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	map<int,int> mapSetIDNParts;
 	GetSetIDNPartsNum( mapSetIDNParts );
 
@@ -1618,6 +1661,7 @@ void CX2Unit::SumSetItemSocketOption( const int iMode_ )
 		if ( 0 == iMode_ || 2 == iMode_ )
 			SumSocketOption( vecOptions, 1.f, ( 0 < iMaxLevel ) ? iMaxLevel : static_cast<int>( m_UnitData.m_Level ) );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 }
 
 /** @function : JuneInitSocketData
@@ -1633,7 +1677,12 @@ void CX2Unit::InitSocketData( const int iMode_ )
 
 	SocketAggregate& kSocketAggregate = *m_kSocketAggregate.m_p;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	kSocketAggregate.m_kSocketData = CX2SocketItem::SocketData_DuoUnit();	// char-luciel DU5f: June's type-10 ReInit 32092450 also clears both bodies' pairs
+	CX2SocketItem::SocketData_DuoUnit* pDuoUnitSocketData = ( true == IsDuoUnitSocketAggregate( *this ) ) ? &kSocketAggregate.m_kSocketData : NULL;	// char-luciel DU5f: June @32365d63
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	kSocketAggregate.m_kSocketData = CX2SocketItem::SocketData();	/// aggregate vslot 2 = ReInit 320922a0
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	ClearSocketCoolTimeCut();								/// 31d06e90 on +0xe78 @32365d95
 
 	/// @32365d9a: the equipped list ( +0x284 ); an item 3286a230( uid ) with a templet that is usable ( 328825c0 ) and, when it names a
@@ -1666,6 +1715,16 @@ void CX2Unit::InitSocketData( const int iMode_ )
 		/// @32365ec1: the templet's use level ( +0xd1 ) when it has one, else this unit's level ( +0xb4 )
 		const int iSocketLevel = ( 0 < pItem->GetItemTemplet()->GetUseLevel() ) ? pItem->GetItemTemplet()->GetUseLevel() : static_cast<int>( m_UnitData.m_Level );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		if ( NULL != pDuoUnitSocketData )	// char-luciel DU5f: June @32365eed-3236607d, the equip's MP sockets recorded for its body, then a mode other than 2 skips the other body's equips
+		{
+			const int iEquipGroup = GetInventory().GetEquipGroup( pItem->GetUID() );
+			pDuoUnitSocketData->AddMPStatOfBody( vecSocketOptions, iEquipGroup );
+			pDuoUnitSocketData->AddMPStatOfBody( pItem->GetItemData().m_SocketOption, iEquipGroup );
+			if ( CX2Unit::DT_BOTH != iMode_ && CX2Unit::DT_BOTH != iEquipGroup && iMode_ != iEquipGroup )
+				continue;
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		SumSocketOption( vecSocketOptions, fAtkMagic, iSocketLevel );						/// @323660c3
 		SumSocketOption( pItem->GetItemData().m_SocketOption, fAtkMagic, iSocketLevel );	/// @323660d7 ( item +0x5c )
 		/// @323660ee / @32366105 ( item +0x8c / +0x9c ) and @323661ad ( item +0xac when its set is complete: 32883300 / 3286a6b0 ): June-only
@@ -1703,8 +1762,17 @@ void CX2Unit::InitSocketData( const int iMode_ )
 			static_cast<UINT>( pPetInfo->m_cEvolutionStep ) < pPetTemplet->m_vecPetStatus.size() )	/// March safety: June indexes unchecked
 		{
 			const int iStep = pPetTemplet->m_vecPetStatus[ pPetInfo->m_cEvolutionStep ];
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+			for ( int i = 0; i < iStep && i < static_cast<int>( ARRAY_SIZE( pPetTemplet->m_vecAuraSkillOption ) ); ++i )	// char-luciel DU5f: June @32366488, each aura step recorded for both bodies, then summed
+			{
+				if ( NULL != pDuoUnitSocketData )
+					pDuoUnitSocketData->AddMPStatOfBody( pPetTemplet->m_vecAuraSkillOption[ i ], CX2Unit::DT_BOTH );
+				SumSocketOption( pPetTemplet->m_vecAuraSkillOption[ i ], 1.f, static_cast<int>( m_UnitData.m_Level ) );
+			}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 			for ( int i = 0; i < iStep && i < static_cast<int>( ARRAY_SIZE( pPetTemplet->m_vecAuraSkillOption ) ); ++i )	/// March safety
 				SumSocketOption( pPetTemplet->m_vecAuraSkillOption[ i ], 1.f, static_cast<int>( m_UnitData.m_Level ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		}
 	}
 #endif PET_AURA_SKILL
@@ -1971,12 +2039,35 @@ void CX2Unit::ResetHudMaxHpMp()
 
 	const float fResetMaxMp = ResetMaxMp( 300.f, 0 );
 	const float fAbilityRate = 0.f;		/// 32358970( 5 ) x 0.01: June's per-unit ability map, 0 in March ( Buff Phase 16, S7j )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	// char-luciel DU5f: June @3235a22f-3235a24f, vslots 0xc / 0x10 ( true ): the type-10 aggregate gives Lu's own socket MP rate and add
+	const CX2SocketItem::SocketData_DuoUnit& kDuoUnitSocketData = m_kSocketAggregate.m_p->m_kSocketData;
+	const bool bDuoUnit = IsDuoUnitSocketAggregate( *this );
+	const float fMpRate = ( true == bDuoUnit ? kDuoUnitSocketData.GetIncreaseMPRate( true ) : kAggregate.m_Stat.m_ExtraStat.m_fIncreaseMPRate ) + fAbilityRate;
+	const float fAddMp = ( true == bDuoUnit ) ? kDuoUnitSocketData.GetAddMPValue( true ) : static_cast<float>( kAggregate.m_iAddMPValue );
+	const float fMaxMp = fResetMaxMp + fResetMaxMp * fMpRate + fAddMp;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	const float fMpRate = kAggregate.m_Stat.m_ExtraStat.m_fIncreaseMPRate + fAbilityRate;
 	const float fMaxMp = fResetMaxMp + fResetMaxMp * fMpRate + static_cast<float>( kAggregate.m_iAddMPValue );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	pGageManager->SetMaxMp( GetUID(), fMaxMp );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	if ( true == bDuoUnit )	// char-luciel DU5f: June @3235a29e-3235a339, Ciel's gauge ( index 1 ) from her own socket MP rate and add ( vslots 0xc / 0x10 ( false ) )
+	{
+		const float fMinorUnitResetMaxMp = ResetMaxMp( 300.f, CX2Unit::DT_MINOR );
+		const float fMinorUnitMpRate = kDuoUnitSocketData.GetIncreaseMPRate( false ) + fAbilityRate;
+		const float fMinorUnitMaxMp = fMinorUnitResetMaxMp + fMinorUnitResetMaxMp * fMinorUnitMpRate + kDuoUnitSocketData.GetAddMPValue( false );
+		pGageManager->SetMaxMp( GetUID(), fMinorUnitMaxMp, 1 );	// gauge index 1, the minor unit's
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO SOCKET HUD unit %I64d: Lu max MP %.1f ( rate %.3f add %.0f ), Ciel max MP %.1f ( base %.1f rate %.3f add %.0f )",
+			GetUID(), fMaxMp, fMpRate, fAddMp, fMinorUnitMaxMp, fMinorUnitResetMaxMp, fMinorUnitMpRate, kDuoUnitSocketData.GetAddMPValue( false ) );	// char-luciel DU5f
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	// stand-in: June @3235a29e-3235a339, UT_LUCIEL's second gage MP from the type-10 socket aggregate, is DU5's
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 
 	float fSumBaseHP = 0.f;
 	fSumBaseHP = GetUnitStat().m_fBaseHP + fSumBaseHP;
@@ -3034,6 +3125,9 @@ UidType CX2Unit::GetBlackListUnitUID( const WCHAR* wszNickName )
 void CX2Unit::GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum )
 {
 	const CX2Inventory& kInventory = GetUnitData().m_Inventory;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	const bool bMinorUnitForm = IsMyShownMinorUnitForm();	// char-luciel DU5f: June 32350b80 reads my shown form ( 3234d8d0 ) for every unit it counts
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	{
 		for ( int i = 0;  i < kInventory.GetItemMaxNum( CX2Inventory::ST_E_EQUIP ); i++ )
 		{
@@ -3049,6 +3143,13 @@ void CX2Unit::GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum )
 #endif REAL_TIME_ELSWORD
 				//}} kimhc // 실시간 엘소드 중 실시간 내구도 감소
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+				if ( CX2Unit::UC_NONE != pItem->GetItemTemplet()->GetUnitClass() &&
+					false == GetX2UnitClassCompatibility( m_UnitData.m_UnitClass, pItem->GetItemTemplet()->GetUnitClass() ) )
+					continue;	// char-luciel DU5f: June 32350b80's class test ( 31ed6500 ); 328823d0 ( appearance templet ) is Stage 16
+				if ( false == kInventory.IsEquipInForm( pItem->GetUID(), bMinorUnitForm ) )
+					continue;	// char-luciel DU5f: June 3286a3e0, only the shown body's parts and the shared ones
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
                 int setID = pItem->GetItemTemplet()->GetSetID();
 				if ( setID != 0 )
 				{
@@ -3071,6 +3172,47 @@ void CX2Unit::GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum )
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+// char-luciel DU5f: June 32350cb0, March's set count with June's usable ( endurance ) and class tests and one body's equips ( group 2 or the body ); 328823d0 is Stage 16
+void CX2Unit::GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum, const int iEquipGroup_ )
+{
+	const CX2Inventory& kInventory = GetUnitData().m_Inventory;
+	for ( int i = 0; i < kInventory.GetItemMaxNum( CX2Inventory::ST_E_EQUIP ); ++i )
+	{
+		CX2Item* pItem = kInventory.GetItem( CX2Inventory::ST_E_EQUIP, i );
+		if ( NULL == pItem || NULL == pItem->GetItemTemplet() )
+			continue;
+#ifdef REAL_TIME_ELSWORD
+		if ( pItem->GetItemData().m_PeriodType == CX2Item::PT_ENDURANCE && pItem->GetItemData().m_Endurance <= 0 )
+			continue;
+#endif REAL_TIME_ELSWORD
+		if ( CX2Unit::UC_NONE != pItem->GetItemTemplet()->GetUnitClass() &&
+			false == GetX2UnitClassCompatibility( m_UnitData.m_UnitClass, pItem->GetItemTemplet()->GetUnitClass() ) )
+			continue;
+
+		const int iGroup = kInventory.GetEquipGroup( pItem->GetUID() );
+		if ( CX2Unit::DT_BOTH != iGroup && iEquipGroup_ != iGroup )
+			continue;
+
+		const int iSetID = pItem->GetItemTemplet()->GetSetID();
+		if ( 0 != iSetID )
+			mapSetIDNPartsNum[ iSetID ] += 1;
+	}
+}
+
+// char-luciel DU5f: June 3234d8d0, my unit's form, or the character window's shown body while the window is open ( 32912cc0 )
+/*static*/ bool CX2Unit::IsMyShownMinorUnitForm()
+{
+	bool bMinorUnitForm = false;
+	if ( NULL != g_pData && NULL != g_pData->GetMyUser() && NULL != g_pData->GetMyUser()->GetSelectUnit() )
+		bMinorUnitForm = g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm();
+
+	CX2UICharInfo* pUICharInfo = ( NULL != g_pData && NULL != g_pData->GetUIManager() ) ? g_pData->GetUIManager()->GetUICharInfo() : NULL;
+	if ( NULL != pUICharInfo && true == pUICharInfo->GetShow() && NULL != pUICharInfo->GetUnitViewerUI() )
+		bMinorUnitForm = pUICharInfo->GetUnitViewerUI()->GetSwitchingView();
+	return bMinorUnitForm;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 // 내 캐릭터가 사용할 수 있는 아이템인가? 
 /*static*/ bool CX2Unit::CanUse( int itemID, CX2Unit* pUnit, int iUnitLevel /*= -1*/ )
 {

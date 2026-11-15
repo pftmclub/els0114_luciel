@@ -1645,6 +1645,35 @@ class CX2SocketItem
 		};
 	public:
 		CX2SocketItem(void);
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		// char-luciel DU5f: June SocketData_DuoUnit 32091730 ( 0x488, vt 33478ab0 ), Lu/Ciel's socket data: each body's socket MP rate and MP add beside the sum
+		struct SocketData_DuoUnit : public SocketData
+		{
+			float	m_afIncreaseMPRateOfBody[2];	// June +0x468 / +0x478: [0] Lu and the shared slots, [1] Ciel and the shared slots
+			float	m_afAddMPValueOfBody[2];		// June +0x46c / +0x47c ( the second float of each pair )
+
+			SocketData_DuoUnit() : SocketData()
+			{
+				ResetMPStatOfBody();
+			}
+			void	ReInit()	// June 32092450: SocketData's ReInit, then both pairs to 0
+			{
+				SocketData::ReInit();
+				ResetMPStatOfBody();
+			}
+			void	ResetMPStatOfBody()
+			{
+				for ( int i = 0; i < 2; ++i )
+				{
+					m_afIncreaseMPRateOfBody[i]	= 0.f;
+					m_afAddMPValueOfBody[i]		= 0.f;
+				}
+			}
+			float	GetIncreaseMPRate( const bool bMajorUnit_ ) const { return m_afIncreaseMPRateOfBody[ true == bMajorUnit_ ? 0 : 1 ]; }	// June 32091b10 ( vslot 0xc )
+			float	GetAddMPValue( const bool bMajorUnit_ ) const { return m_afAddMPValueOfBody[ true == bMajorUnit_ ? 0 : 1 ]; }	// June 32091b60 ( vslot 0x10 )
+			void	AddMPStatOfBody( const std::vector<int>& vecSocketOption_, const int iEquipGroup_ );	// June 3271a060
+		};
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		~CX2SocketItem(void);
 
 		//{{ kimhc // 2011-07-05 // 옵션데이타 수치화 작업

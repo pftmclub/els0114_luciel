@@ -189,6 +189,10 @@ private:
 #ifdef SERV_IRUHADEV_JUNE_SKILL_STAT_GETTERS
 		int			GetEquipGroup( const UidType itemUID_ ) const;    /// June 3286a4b0
 #endif SERV_IRUHADEV_JUNE_SKILL_STAT_GETTERS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		bool		IsEquipInForm( const UidType itemUID_, const bool bMinorUnitForm_ ) const;	// char-luciel DU5f: June 3286a3e0
+		int			GetEquippedSetPartsCount( const int iSetID_, const int iEquipGroup_ ) const;	// char-luciel DU5f: June 3286a6b0
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		//}} kimhc // 2009-10-19 // 최대 MP 증가 값 얻어오기
 
 		//{{ kimhc // 2009-08-07 // 캐릭터별 은행

@@ -3649,7 +3649,24 @@ CX2SocketItem::SocketData CX2UICharInfo::GetMyEquippedSocketData( const int iEqu
 				SumSocketOption( vecOptions, SocketDataRetVal, ( 0 < iMaxLevel ) ? iMaxLevel : iUnitLevel );
 		}
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	if ( CX2Unit::DT_BOTH == iEquipGroup_ && NULL != pUnit->GetUnitTemplet() && CX2Unit::UT_LUCIEL == pUnit->GetUnitTemplet()->m_UnitType && NULL != g_pData->GetItemManager() )	// char-luciel DU5f: June @3291bf2d-3291c1a5, the other body's sets summed into a local June then drops ( JUNE_BUGS )
+	{
+		const int iOtherEquipGroup = ( true == CX2Unit::IsMyShownMinorUnitForm() ) ? CX2Unit::DT_MAJOR : CX2Unit::DT_MINOR;
+		CX2SocketItem::SocketData kOtherFormSocketData;
+		map<int,int> mapOtherFormSetIDNParts;
+		pUnit->GetSetIDNPartsNum( mapOtherFormSetIDNParts, iOtherEquipGroup );
+		for ( map<int,int>::const_iterator mItr = mapOtherFormSetIDNParts.begin(); mItr != mapOtherFormSetIDNParts.end(); ++mItr )
+		{
+			vector<int> vecOptions;
+			const int iMaxLevel = g_pData->GetItemManager()->GetSetItemOptions( mItr->first, mItr->second, vecOptions );
+			if ( false == vecOptions.empty() )
+				SumSocketOption( vecOptions, kOtherFormSocketData, ( 0 < iMaxLevel ) ? iMaxLevel : iUnitLevel );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	// June @3291bf2d: group 2 of a unit type 10 also sums the other form's sets: stand-in: Lu/Ciel not ported
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 
 #ifdef RIDING_SYSTEM
 	if ( NULL != CX2RidingPetManager::GetInstance() )

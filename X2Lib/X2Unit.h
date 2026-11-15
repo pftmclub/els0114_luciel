@@ -1112,6 +1112,10 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 		void SetGuestUserMovingToCharacterSelect(bool val) { m_bGuestUserMovingToCharacterSelect = val; }
 
 		void GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		void GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum, const int iEquipGroup_ );	// char-luciel DU5f: June 32350cb0, the sets of one body's equips
+		static bool IsMyShownMinorUnitForm();	// char-luciel DU5f: June 3234d8d0
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 
 //#ifdef TITLE_SYSTEM
         int GetTitleId() { return m_UnitData.m_iTitleId; }

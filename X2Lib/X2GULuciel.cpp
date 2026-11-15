@@ -10535,13 +10535,22 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 	{
 		const float fResultMaxMp = GetUnit()->ResetMaxMp( fBaseMaxMp, iForm );
 		const float fAbilityRate = 0.f;	// June 32358970( 5 ) x 0.01: June's per-unit ability map, 0 in March ( the base's stand-in )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		const float fRate = fAbilityRate + m_SocketData.GetIncreaseMPRate( 0 == iForm );	// char-luciel DU5f: June 32b0fa90 reads user +0x87b4 vslots 0xc / 0x10, true for Lu's gauge, false for Ciel's
+		const float fMaxMpWithSocket = fResultMaxMp + ( fResultMaxMp * fRate + m_SocketData.GetAddMPValue( 0 == iForm ) );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		const float fRate = fAbilityRate + m_SocketData.m_Stat.m_ExtraStat.m_fIncreaseMPRate;
 		const float fMaxMpWithSocket = fResultMaxMp + ( fResultMaxMp * fRate + m_SocketData.m_iAddMPValue );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 
 		m_AdditionalMaxMp.SetOptionValue( fMaxMpWithSocket - fBaseMaxMp );
 		m_AdditionalMaxMp.CheckAndUpdateResultValue();
 
 		GetGageData()->SetMaxMp( m_AdditionalMaxMp.GetResultValue(), iForm );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO SOCKET GAME unit %I64d gauge %d: base %.1f, socket rate %.3f add %.0f -> max MP %.1f",
+			GetUnit()->GetUID(), iForm, fResultMaxMp, fRate, m_SocketData.GetAddMPValue( 0 == iForm ), m_AdditionalMaxMp.GetResultValue() );	// char-luciel DU5f
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG
 	}
 }
 

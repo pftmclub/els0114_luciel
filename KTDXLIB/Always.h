@@ -13962,3 +13962,20 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_STAT needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( m_MinorUnitGameStat ), _TRANSFORM_LINK ( IsTransformed ), _EQUIP_VIEW and _NESI_RENUMBER ( the slot bodies )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel DU5f: each Lu/Ciel body's own sockets. June's SocketData_DuoUnit ( 32091730 ) keeps a socket MP rate /
+//              MP add per body ( 3271a060, filled from every equip, the pet aura and the sets of each body, unit and user side );
+//              Lu's MP gauge reads body 0, Ciel's gauge body 1 ( HUD 3235a160 with CX2GageManager::SetMaxMp's gauge index, in game
+//              32b0fa90 ). The unit's socket fill takes June's mode / body filter, the sets count per body ( 32350cb0 ) and
+//              GetSetIDNPartsNum keeps only the shown body's parts ( 32350b80 / 3286a3e0 / 3234d8d0: the window follows its view ).
+//              Set-socket count 3286a6b0 ported, unreferenced ( its readers gate the item +0xac list, Stage 16 ).
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET ) && !( defined( SERV_IRUHADEV_JUNE_SKILL_UNIT_SOCKET ) && defined( SERV_IRUHADEV_JUNE_SKILL_HUD_MAXHPMP ) && defined( SERV_IRUHADEV_JUNE_SKILL_STAT_GETTERS ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHAR_FORM_MP_GAGE ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET needs SERV_IRUHADEV_JUNE_SKILL_UNIT_SOCKET / _HUD_MAXHPMP / _STAT_GETTERS ( aggregate, HUD, GetEquipGroup ), _CHAR_DUO_BODY, _EQUIP_VIEW, _FORM_MP_GAGE ( gauge index ) and _DUO_VIEWER ( the window's view ), char-luciel DU5f
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+// Description: char-luciel DU5f debug: one "[JUNE_CHAR] LUCIEL DUO SOCKET" line per HUD / in-game max MP reset of a Lu/Ciel unit; the review retires it.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG
+//////////////////////////////////////////////////////////////////////////

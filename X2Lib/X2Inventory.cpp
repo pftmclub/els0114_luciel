@@ -1448,6 +1448,39 @@ int CX2Inventory::GetEquipGroup( const UidType itemUID_ ) const
 #endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 }
 #endif SERV_IRUHADEV_JUNE_SKILL_STAT_GETTERS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+// char-luciel DU5f: June 3286a3e0, a shared slot is in both forms, Ciel's slots in hers, the rest ( and an item not equipped ) in Lu's
+bool CX2Inventory::IsEquipInForm( const UidType itemUID_, const bool bMinorUnitForm_ ) const
+{
+	switch ( GetEquipGroup( itemUID_ ) )
+	{
+	case CX2Unit::DT_BOTH:
+		return true;
+	case CX2Unit::DT_MINOR:
+		return bMinorUnitForm_;
+	default:
+		return false == bMinorUnitForm_;
+	}
+}
+
+// char-luciel DU5f: June 3286a6b0, the equipped parts of a set that a body wears ( its own slots and the shared ones )
+int CX2Inventory::GetEquippedSetPartsCount( const int iSetID_, const int iEquipGroup_ ) const
+{
+	int iCount = 0;
+	map< int, InvenSlotData* >::const_iterator mItr;
+	for( mItr = m_ItemMap[ST_E_EQUIP].begin(); mItr != m_ItemMap[ST_E_EQUIP].end(); ++mItr )
+	{
+		const InvenSlotData* pInvenSlotData = mItr->second;
+		if ( NULL == pInvenSlotData || NULL == pInvenSlotData->m_pItem || NULL == pInvenSlotData->m_pItem->GetItemTemplet() )
+			continue;
+
+		const int iGroup = GetEquipGroup( pInvenSlotData->m_pItem->GetUID() );
+		if ( ( CX2Unit::DT_BOTH == iGroup || iEquipGroup_ == iGroup ) && iSetID_ == pInvenSlotData->m_pItem->GetItemTemplet()->GetSetID() )
+			++iCount;
+	}
+	return iCount;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 //}} kimhc // 2009-10-19 // 최대 MP 증가 값 얻어오기
 
 //{{ kimhc // 2010-01-04 // 기존의 EGS_SELECT_UNIT_ACK에 인벤정보가 포함되어 오던 것 분할

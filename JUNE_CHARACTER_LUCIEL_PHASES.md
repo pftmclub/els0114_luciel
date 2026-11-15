@@ -1836,6 +1836,38 @@ Opus 5.5 high. Reviewed `9286ce8d` against June (`disasm_range.py`, read-only). 
   Ciel's own sum differing from Lu's (atk 6911 vs 6881).
 - **Next:** `/x2-phase char-luciel DU5f` (Opus 5.5 high).
 
+### DU5f - Done (2026-11-16)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET` (new, `Always.h` only: no packet field) + `_DEBUG` (one `LUCIEL DUO SOCKET` line per max-MP reset;
+the review retires it). Commit: see git log `char-luciel Phase DU5f`. Funcmap: 13 `(DU5f)` rows. JUNE_BUGS 762-765.
+
+- **`SocketData_DuoUnit` (June `32091730`):** `CX2SocketItem::SocketData` plus each body's socket MP rate / MP add (`+0x468` Lu and shared, `+0x478`
+  Ciel and shared; getters = vslots 3 / 4 `32091b10` / `32091b60`, ReInit `32092450`), filled by `AddMPStatOfBody` (`3271a060`: the option's own
+  `m_fIncreaseMPRate` / `m_iAddMPValue`, raw). `CX2GameUnit::m_SocketData` and `CX2Unit`'s aggregate take the type; the pairs are read for `UT_LUCIEL`
+  only (June picks the class at Init; March tests the unit type where it reads).
+- **The record, every June caller:** user `InitSocketData` (each equip's vectors before DU3c's active-body skip, the pet aura with group 2),
+  `InitSetItemOptions` (`32050230`, user vslot +0x798: mode = active body; Lu's sets in modes 0 / 2, Ciel's only for Lu/Ciel in modes 1 / 2), unit
+  `InitSocketData( mode )` (record, then June's mode skip: S7k's "every source summed" is gone for Lu/Ciel), unit `SumSetItemSocketOption` (same groups).
+  Item +0x8c / +0x9c / +0xac stay Stage 16.
+- **HUD (`3235a160`):** gauge 0 reads Lu's pair, and for `UT_LUCIEL` gauge 1 = `ResetMaxMp( 300, 1 )` x ( 1 + Ciel's rate + ability ) + Ciel's add, sent with
+  `CX2GageManager::SetMaxMp( uid, mp, 1 )` (June `3248a800`: the gauge index now reaches the gage data). DU1c2's stand-in comment replaced.
+- **In game (`32b0fa90`):** `CX2GULuciel::ResetMaxMP` reads each gauge's own pair (CH1l2 read the shared sum for both).
+- **Set counts:** `GetSetIDNPartsNum( map, group )` (June `32350cb0`, new overload) feeds the per-body set sums; March's `GetSetIDNPartsNum` takes June's
+  `32350b80` filter (class test + `CX2Inventory::IsEquipInForm` `3286a3e0` with `CX2Unit::IsMyShownMinorUnitForm` `3234d8d0`): the window's set count
+  follows its shown body. `june_march_divergent.tsv` row `GetSetIDNPartsNum` -> `replace`, ported; `statcalc_map.tsv` row -> `partial` (328823d0 left).
+- **`CX2Inventory::GetEquippedSetPartsCount` (`3286a6b0`):** ported, unreferenced: its readers gate item +0xac (Stage 16), or are routed (funcmap row).
+- **Window `@3291bf2d`:** ported verbatim; June sums the other body's sets into a local and drops it (JUNE_BUGS 764).
+- **Not here:** other players' form bytes stay DU5c's (DU5c.md). Emulator `KGamePlayStatus` max MP stays the flat `ONE_CHARGE * 3` stand-in for both
+  gauges (no June server); the client's resets above size the gauges.
+- **Gates (`finish.py --files <13 files> --with ..._DUO_SOCKET ..._DUO_SOCKET_DEBUG`):** flagcheck `DUO_SOCKET` 9 PASS, 1 PASS~ (`X2SocketItem.cpp` blank line), 2 OTHER (the `_DEBUG` partner's
+  files), 1 FAIL = `X2Unit.cpp` flag-off differs only at a peer's uncommitted `LUCIEL_UI` hunk (its 4 deleted lines; mine are insert-only, the committed
+  range run is clean: see below); junediverge PASS; enumscan exit 1 on the 190 pre-existing `X2Unit.cpp` `SI_*` rows, 0 on DU5f's lines (`git diff -U0`
+  intersect); stateends / skillicons / luabind not applicable (no skill states, skills or scripts). Syntax probe (`cl /Zs`) of the 7 changed .cpp: 0 errors.
+- **Build:** COALESCED into peer build `95f548ff` (started after my last edit), then `DEPLOY OK: X2_offline.exe is 27,075,072 B, dated 2026-11-16 05:15:39,
+  md5 06e712e076c2288a3104d1310b06a867`; `EXESTR OK: 2 of 2` (`LUCIEL DUO SOCKET HUD unit`, `... GAME unit`, wide).
+- **Play-test:** owed: testlu1 (unit 166), Energy Fusion Ring 188833 (socket 60405 = +30 MP) on Ciel's ring slot 32, then on Lu's 17; read
+  `LUCIEL DUO SOCKET` lines.
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under

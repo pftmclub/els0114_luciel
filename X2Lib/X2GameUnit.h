@@ -4811,7 +4811,11 @@ protected:
 // 		vector<CX2BuffFactorPtr>						m_vecPetBuffFactorToMePtr;				/// 펫에 의해서 자신한테 걸수있는 버프요소
 		
 		ExtraDamagePack									m_ExtraDamagePack;	/// ExtraDamage 구조체.. 감당이..
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		CX2SocketItem::SocketData_DuoUnit				m_SocketData;		// char-luciel DU5f: June's user +0x87b4 is a SocketData_DuoUnit for unit type 10; the pairs are read for UT_LUCIEL only
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		CX2SocketItem::SocketData						m_SocketData;		/// 소켓 옵션, NPC는 이거 왜 가지고 있니..
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		map< CX2EnchantItem::ENCHANT_TYPE, int >		m_mapDefenceEnchantData;	/// 방어관련 EnchantData
 #ifdef PET_AURA_SKILL
 		map< CX2EnchantItem::ENCHANT_TYPE, float >		m_mapAttackEnchantData;		/// 일단 NPC에게는 필요 없어 보이는데.. 휴..

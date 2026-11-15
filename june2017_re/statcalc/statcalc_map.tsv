@@ -36,7 +36,7 @@ stat	ResetMaxHP / ResetMaxMP	31fd2810	X2GUUser.cpp:ResetMaxHP / ResetMaxMP	unkno
 stat	Stat [9] / [10] attack spread	unknown	none	absent	-	character window min / max; variance roll	S1	CharInfo C3: the window prints min = max until it exists
 stat	GetEqipStat	3234e210	X2Unit.cpp:GetEqipStat	March	STAT_GETTERS	stat sheet	S2	june_march_divergent.tsv stage33 row: two equip lists, mode filter
 stat	CX2Item::GetStat	328842f0	X2Item.cpp:GetStat	March	-	stat sheet, item tooltip	S2	june_march_divergent.tsv stage33 row: owner unit type / class
-stat	GetSetIDNPartsNum	32350cb0	X2Unit.cpp:GetSetIDNPartsNum	March	-	set item options	S2	june_march_divergent.tsv stage33 row: usable / class / appearance / slot-group filters
+stat	GetSetIDNPartsNum	32350cb0	X2Unit.cpp:GetSetIDNPartsNum	partial	SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET	set item options	S2	june_march_divergent.tsv stage33 row: usable / class / appearance / slot-group filters; char-luciel DU5f ported the class / group / form filters ( 32350cb0 overload, 32350b80 in March's body ); 328823d0 ( appearance templet, Stage 16 ) left
 stat	GetEnchantStat group argument	32358df0	X2Unit.cpp:GetEnchantStat	unknown	-	stat sheet	S2	CharInfo C3: form 0 = March
 stat	CheckAndUpdateResultValueWithOptionData	320839e0	X2GameUnit / CX2AdditionalStatByBuff	March	-	every option-data stat member	S3	june_march_divergent.tsv stage33 row: June rewrite not ported (buff 5c); the user approved porting it 2026-11-12 (plan Decisions)
 stat	SumSocketOption	3204f190	X2GUUser.cpp:SumSocketOption + a June-named twin in CX2Unit	mixed	SERV_IRUHADEV_JUNE_SOCKET_PARITY	socket data	S3	june_march_divergent.tsv stage33 row: June body in the twin

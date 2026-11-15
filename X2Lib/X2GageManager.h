@@ -68,11 +68,19 @@ public:
 				m_pGageData->SetNowHp( fNowHp_ );
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		void SetMaxMp( const float fMaxMp_, const int iMpGageIndex_ = 0 )	// char-luciel DU5f: June 3248a800 passes the gauge index to the gage data's vslot 0x14
+		{
+			if ( NULL != m_pGageData )
+				m_pGageData->SetMaxMp( fMaxMp_, iMpGageIndex_ );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		void SetMaxMp( const float fMaxMp_ )
 		{
 			if ( NULL != m_pGageData )
 				m_pGageData->SetMaxMp( fMaxMp_ );
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 
 		void SetNowMp( const float fNowMp_ )
 		{
@@ -221,7 +229,11 @@ public:
 	void SetMaxHp( const UidType uid_, const float fMaxHp_ );
 	void SetNowHp( const UidType uid_, const float fNowHp_ );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	void SetMaxMp( const UidType uid_, const float fMaxMp_, const int iMpGageIndex_ = 0 );	// char-luciel DU5f: June 3248a800 ( uid, mp, gauge index )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	void SetMaxMp( const UidType uid_, const float fMaxMp_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	void SetNowMp( const UidType uid_, const float fNowMp_ );
 
 	void SetMaxSoul( const UidType uid_, const float fMaxSoul_ );

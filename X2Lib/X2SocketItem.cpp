@@ -190,6 +190,35 @@ const CX2SocketItem::SocketData* CX2SocketItem::GetSocketData( int key ) const
 #endif  X2OPTIMIZE_REMOVE_UNNECESSARY_PTR
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+// char-luciel DU5f: June 3271a060, each option's MP rate ( +0x2f4 ) and MP add ( +0x22c ) into its body's pair, shared into both; no PvP / dungeon-only skip
+void CX2SocketItem::SocketData_DuoUnit::AddMPStatOfBody( const std::vector<int>& vecSocketOption_, const int iEquipGroup_ )
+{
+	if ( NULL == g_pData || NULL == g_pData->GetSocketItem() )
+		return;
+
+	for ( UINT i = 0; i < vecSocketOption_.size(); ++i )
+	{
+		const SocketData* pSocketData = g_pData->GetSocketItem()->GetSocketData( vecSocketOption_[i] );
+		if ( NULL == pSocketData )
+			continue;
+
+		const float fIncreaseMPRate	= pSocketData->m_Stat.m_ExtraStat.m_fIncreaseMPRate;
+		const float fAddMPValue		= static_cast<float>( pSocketData->m_iAddMPValue );
+		if ( CX2Unit::DT_MAJOR == iEquipGroup_ || CX2Unit::DT_BOTH == iEquipGroup_ )
+		{
+			m_afIncreaseMPRateOfBody[0]	+= fIncreaseMPRate;
+			m_afAddMPValueOfBody[0]		+= fAddMPValue;
+		}
+		if ( CX2Unit::DT_MINOR == iEquipGroup_ || CX2Unit::DT_BOTH == iEquipGroup_ )
+		{
+			m_afIncreaseMPRateOfBody[1]	+= fIncreaseMPRate;
+			m_afAddMPValueOfBody[1]		+= fAddMPValue;
+		}
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+
 #ifdef SERV_IRUHADEV_JUNE_SOCKET_PARITY
 namespace
 {

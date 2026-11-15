@@ -3347,6 +3347,9 @@ void CX2GUUser::InitSocketData()
 	/// first SumSocketOption
 	GetUnit()->ClearSocketCoolTimeCut();
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	CX2SocketItem::SocketData_DuoUnit* pDuoUnitSocketData = ( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType ) ? &m_SocketData : NULL;	// char-luciel DU5f: June @3206d834, the argument only for unit type 10
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	for( int i = 0; i < (int)GetUnit()->GetUnitData().m_NowEqipItemUIDList.size(); i++ )
 	{
 		UidType eqipUID = GetUnit()->GetUnitData().m_NowEqipItemUIDList[i];
@@ -3364,6 +3367,18 @@ void CX2GUUser::InitSocketData()
 		if ( pItem->GetItemData().m_PeriodType == CX2Item::PT_ENDURANCE && pItem->GetItemData().m_Endurance <= 0 )
 			continue;
 #endif REAL_TIME_ELSWORD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		if ( NULL != pDuoUnitSocketData )	// char-luciel DU5f: June @3206dbd3-3206dc65, each equip's MP sockets recorded for its body before the active-body skip
+		{
+			const int iEquipGroup = GetUnit()->GetInventory().GetEquipGroup( eqipUID );
+			std::vector<int> vecRecordSocketOption( pItem->GetItemData().m_vecRandomSocket.begin(), pItem->GetItemData().m_vecRandomSocket.end() );
+			std::vector<int> vecTempletSocketOption;
+			pItem->GetItemTemplet()->GetSocketOptions( vecTempletSocketOption );
+			vecRecordSocketOption.insert( vecRecordSocketOption.end(), vecTempletSocketOption.begin(), vecTempletSocketOption.end() );
+			pDuoUnitSocketData->AddMPStatOfBody( vecRecordSocketOption, iEquipGroup );
+			pDuoUnitSocketData->AddMPStatOfBody( pItem->GetItemData().m_SocketOption, iEquipGroup );
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		// char-luciel DU3c: June 3206d770 @3206dc6a, Lu/Ciel sum only the active body's equips and the shared ones ( 3286a4b0 )
 		if ( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
@@ -3508,6 +3523,10 @@ void CX2GUUser::InitSocketData()
 								{
 									//{{ kimhc // 2011-07-05 // 옵션데이타 수치화 작업
 									// 펫 기운스킬은 소켓 레벨을 유저의 레벨로 전달
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+									if ( NULL != pDuoUnitSocketData )	// char-luciel DU5f: June @3206e5f6, each aura step recorded for both bodies
+										pDuoUnitSocketData->AddMPStatOfBody( pPetTemplet->m_vecAuraSkillOption[ i ], CX2Unit::DT_BOTH );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 									SumSocketOption( pPetTemplet->m_vecAuraSkillOption[ i ], 1.f, GetUnitLevel() );
 									//}} kimhc // 2011-07-05 // 옵션데이타 수치화 작업							 
 								}	// for
@@ -3963,6 +3982,34 @@ void CX2GUUser::InitSetItemOptions()
 	m_vecSetItemOptions.resize(0);
 
 	// first: 세트ID, second: 세트를 이루는 장비의 갯수
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+	// char-luciel DU5f: June 32050230, mode = the active body; Lu's sets ( 32350cb0( 0 ) ) summed in modes 0 / 2, Ciel's only for unit type 10 in modes 1 / 2, both recorded
+	CX2SocketItem::SocketData_DuoUnit* pDuoUnitSocketData = ( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType ) ? &m_SocketData : NULL;
+	const int iMode = ( true == m_bMinorUnitActive ) ? CX2Unit::DT_MINOR : CX2Unit::DT_MAJOR;
+	for ( int iEquipGroup = CX2Unit::DT_MAJOR; iEquipGroup <= CX2Unit::DT_MINOR; ++iEquipGroup )
+	{
+		if ( CX2Unit::DT_MINOR == iEquipGroup && NULL == pDuoUnitSocketData )
+			break;
+
+		map<int,int> mapSetIDNParts;
+		GetUnit()->GetSetIDNPartsNum( mapSetIDNParts, iEquipGroup );
+		for ( map<int,int>::const_iterator mItr = mapSetIDNParts.begin(); mItr != mapSetIDNParts.end(); ++mItr )
+		{
+			vector<int> vecOptions;
+			const int iMaxLevel = g_pData->GetItemManager()->GetSetItemOptions( mItr->first, mItr->second, vecOptions );
+			if ( true == vecOptions.empty() )
+				continue;
+
+			if ( NULL != pDuoUnitSocketData )
+				pDuoUnitSocketData->AddMPStatOfBody( vecOptions, iEquipGroup );
+			if ( CX2Unit::DT_BOTH != iMode && iEquipGroup != iMode )
+				continue;
+
+			SumSocketOption( vecOptions, 1.f, ( 0 < iMaxLevel ) ? iMaxLevel : static_cast<int>( GetUnit()->GetUnitData().m_Level ) );
+			m_vecSetItemOptions.insert( m_vecSetItemOptions.end(), vecOptions.begin(), vecOptions.end() );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	map<int,int> mapSetIDNParts;
 	GetUnit()->GetSetIDNPartsNum( mapSetIDNParts );
 	
@@ -3993,6 +4040,7 @@ void CX2GUUser::InitSetItemOptions()
 			++mItr;
 		}		
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	//}} kimhc // 2011-07-05 // 옵션데이타 수치화 작업
 }
 

@@ -842,17 +842,29 @@ void CX2GageManager::SetNowHp( const UidType uid_, const float fNowHp_ )
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+void CX2GageManager::SetMaxMp( const UidType uid_, const float fMaxMp_, const int iMpGageIndex_ /*= 0*/ )	// char-luciel DU5f: June 3248a800, the gauge index goes to the unit's gage set
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 void CX2GageManager::SetMaxMp( const UidType uid_, const float fMaxMp_ )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 {
 	if ( NULL != m_ptrMyGageSet && uid_ == m_ptrMyGageSet->GetUid() )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+		m_ptrMyGageSet->SetMaxMp( fMaxMp_, iMpGageIndex_ );	// char-luciel DU5f
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		m_ptrMyGageSet->SetMaxMp( fMaxMp_ );	
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	else
 	{
 		BOOST_FOREACH( CX2GageSetPtr ptrGageSet,m_vecGageSetPartyMember )
 		{
 			if ( uid_ == ptrGageSet->GetUid() )
 			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
+				ptrGageSet->SetMaxMp( fMaxMp_, iMpGageIndex_ );	// char-luciel DU5f: June 3248a800
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 				ptrGageSet->SetMaxMp( fMaxMp_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 				break;
 			}
 		}
