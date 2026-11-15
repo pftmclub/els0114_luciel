@@ -9,6 +9,7 @@ CX2GULuciel definition ( its `// char-luciel ...: June <va>` comment ), a CX2GUU
 table below. Rows of 32b43d10 after LSI_WAIT_STATE_CHANGE must sit inside the Diablura / Demonio test. Left-out ids ( phoenix, dance,
 riding 93-96 ) need their one-line comment; a later-phase callback needs `body in CHxx`, a state whose every callback is a later
 phase's needs `registered by CHxx` instead of a registration. 3202b110 is InitStateCommonRandom's.
+An `InitBoundingStates( "prefix" )` / `InitWaitStateChange( "table" )` call stands for the rows that CX2GUUser helper registers (june-state-ids S2).
 """
 import collections, os, re, sys
 sys.stdout.reconfigure(encoding='utf-8')
@@ -58,6 +59,13 @@ LEFT = {123, 124, 125, 126, 127, 128, 129, 571, 572, 573, 574, 590, 591, 592, 93
 SLOT = {'StateInit': 'Init', 'StateStartFuture': 'StartFuture', 'StateStart': 'Start', 'OnFrameMoveFuture': 'FrameMoveFuture',
         'OnFrameMove': 'FrameMove', 'OnCameraMove': 'CameraMove', 'OnEventProcess': 'EventProcess', 'StateEndFuture': 'EndFuture', 'StateEnd': 'End'}
 USI = {'USI_START': 9, 'USI_WIN': 11, 'USI_LOSE': 12, 'USI_HYPER_MODE': 23}   # March value = June value below 24
+# june-state-ids S2: equal to June since S1 ( enumprobe ); Lu registers them through the CX2GUUser helpers below
+USI.update({'USI_BOUNDING_DOWN': 120, 'USI_BOUNDING_LANDCRASH': 121, 'USI_BOUNDING_UP': 122, 'USI_WAIT_STATE_CHANGE': 130})
+# what CX2GUUser::InitBoundingStates( prefix ) / InitWaitStateChange( table ) register ( X2GUUser.cpp ), as ( id, table suffix, callbacks )
+HELPER_BOUNDING = (('USI_BOUNDING_DOWN', 'DAMAGE_BOUNDING_DOWN', {'EventProcess': 'BoundingDownEventProcess'}),
+                   ('USI_BOUNDING_LANDCRASH', 'DAMAGE_BOUNDING_LANDCRASH', {'EventProcess': 'BoundingLandCrashEventProcess'}),
+                   ('USI_BOUNDING_UP', 'DAMAGE_BOUNDING_UP', {'StartFuture': 'BoundingUpStateStartFuture', 'Start': 'BoundingUpStateStart',
+                                                             'EventProcess': 'BoundingUpEventProcess'}))
 VAL = {}
 inenum = False
 for l in rd('X2Lib/X2GULuciel.h'):
@@ -108,6 +116,13 @@ def parse(name):
             depth_if = True
         elif s == '}' and l.startswith('\t}'):
             depth_if = False
+        elif re.match(r'InitBoundingStates\(\s*"\w+"\s*\);', s):
+            pre = re.match(r'InitBoundingStates\(\s*"(\w+)"', s).group(1)
+            for sid, suf, cbs in HELPER_BOUNDING:
+                regs.append({'id': sid, 'table': pre + suf, 'cb': dict(cbs), 'later': [], 'empty': [], 'gated': depth_if})
+        elif re.match(r'InitWaitStateChange\(\s*"\w+"\s*\);', s):
+            regs.append({'id': 'USI_WAIT_STATE_CHANGE', 'table': re.match(r'InitWaitStateChange\(\s*"(\w+)"', s).group(1),
+                         'cb': {'EventProcess': 'WaitStateChangeEventProcess'}, 'later': [], 'empty': [], 'gated': depth_if})
         elif s.startswith('stateData.Init()'):
             cur = {'id': None, 'table': None, 'cb': {}, 'later': [], 'empty': [], 'gated': depth_if}
         elif cur is not None and re.match(r'stateData\.stateID\s*=', s):

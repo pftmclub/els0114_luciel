@@ -13526,6 +13526,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS ) && !defined( SERV_IRUHADEV_JUNE_RESERVED_STATE_IDS )
 #error SERV_IRUHADEV_JUNE_USER_STATE_IDS needs SERV_IRUHADEV_JUNE_RESERVED_STATE_IDS ( USI_WAIT_STATE_CHANGE sits between the inserted runs )
 #endif
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) && !defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE needs SERV_IRUHADEV_JUNE_USER_STATE_IDS ( Lu's LUCIEL_STATE_ID and USI_ names share June's numbers; june-state-ids S2 )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////

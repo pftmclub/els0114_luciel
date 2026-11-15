@@ -11832,12 +11832,7 @@ void CX2GULuciel::DashEndStartFuture()
 	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LOSE_StateStart );
 	m_StateList[stateData.stateID] = stateData;
 
-	// checklist 7h at June's id 130, not InitWaitStateChange's March 105: CH1o routes the engine here
-	stateData.Init();
-	stateData.stateID			= LSI_WAIT_STATE_CHANGE;
-	m_LuaManager.MakeTableReference( "LSI_WAIT_STATE_CHANGE", stateData.stateID );
-	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, WaitStateChangeEventProcess );
-	m_StateList[stateData.stateID] = stateData;
+	InitWaitStateChange( "LSI_WAIT_STATE_CHANGE" );	// june-state-ids S2: June @32b44174 ( id 0x82 = USI_WAIT_STATE_CHANGE, thunk 329cb720, checklist 7h )
 
 	// June tests the class: only Diablura and Demonio register the bounding target commands and dash combos
 	const CX2Unit::UNIT_CLASS eUnitClass = GetUnit()->GetClass();
@@ -12298,26 +12293,7 @@ void CX2GULuciel::InitStateCommon()
 
 	// June 32b3e8b0 @586 LSI_LU_DANCE_WAIT ( id 129 ) left out: dance state, Stage 10
 
-	// Lu's bounding states at June's ids, not InitBoundingStates' March ones: RT_BOUNDING stays off until CH1o routes the engine here
-	stateData.Init();
-	stateData.stateID			= LSI_LU_DAMAGE_BOUNDING_DOWN;
-	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BOUNDING_DOWN", stateData.stateID );
-	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingDownEventProcess );
-	m_StateList[stateData.stateID] = stateData;
-
-	stateData.Init();
-	stateData.stateID			= LSI_LU_DAMAGE_BOUNDING_LANDCRASH;
-	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BOUNDING_LANDCRASH", stateData.stateID );
-	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingLandCrashEventProcess );
-	m_StateList[stateData.stateID] = stateData;
-
-	stateData.Init();
-	stateData.stateID			= LSI_LU_DAMAGE_BOUNDING_UP;
-	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BOUNDING_UP", stateData.stateID );
-	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, BoundingUpStateStartFuture );
-	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, BoundingUpStateStart );
-	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingUpEventProcess );
-	m_StateList[stateData.stateID] = stateData;
+	InitBoundingStates( "LSI_LU_" );	// june-state-ids S2: June @32b3f302 / @32b3f381 / @32b3f41b ( ids 0x78-0x7a = USI_BOUNDING_*, vslots 0x5d4-0x5e4 ); sets m_bBoundingStatesReady
 
 	stateData.Init();
 	stateData.stateID			= LSI_CIEL_DAMAGE_BOUNDING_DOWN;

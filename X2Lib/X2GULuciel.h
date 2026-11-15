@@ -7,7 +7,7 @@ class CX2GULuciel : public CX2GUUser
 {
 public:
 
-	// June state ids ( char-luciel CH0 ch0_reg.tsv / ch0_state_skill.tsv ); June inserts a state at 24, so 7-130 are not March's USI_ values
+	// june-state-ids S2: June state ids ( char-luciel CH0 ch0_reg.tsv / ch0_state_skill.tsv ); 7-130 equal CX2GUUser's USI_ ( June's LSI_ names kept )
 	enum LUCIEL_STATE_ID
 	{
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
@@ -87,27 +87,7 @@ public:
 		LSI_LU_PEPPER_RUN_END                                     = 47,
 		LSI_LU_PEPPER_RUN_JUMP_UP                                 = 48,
 		LSI_LU_PEPPER_RUN_JUMP_DOWN                               = 49,
-		// char-luciel CH1n: June's slot states ( Enum.lua USER_STATE_ID, GUSI_END + 45 to + 64 ); CX2GUUser's March values are one lower
-		USI_SPECIAL_ATTACK_1                                      = 50,
-		USI_SPECIAL_ATTACK_HYPER_1                                = 51,
-		USI_SPECIAL_ATTACK_2                                      = 52,
-		USI_SPECIAL_ATTACK_HYPER_2                                = 53,
-		USI_SPECIAL_ATTACK_3                                      = 54,
-		USI_SPECIAL_ATTACK_HYPER_3                                = 55,
-		USI_SPECIAL_ATTACK_4                                      = 56,
-		USI_SPECIAL_ATTACK_HYPER_4                                = 57,
-		USI_SPECIAL_ATTACK_5                                      = 58,
-		USI_SPECIAL_ATTACK_HYPER_5                                = 59,
-		USI_SPECIAL_ATTACK_SLOTB_1                                = 60,
-		USI_SPECIAL_ATTACK_SLOTB_HYPER_1                          = 61,
-		USI_SPECIAL_ATTACK_SLOTB_2                                = 62,
-		USI_SPECIAL_ATTACK_SLOTB_HYPER_2                          = 63,
-		USI_SPECIAL_ATTACK_SLOTB_3                                = 64,
-		USI_SPECIAL_ATTACK_SLOTB_HYPER_3                          = 65,
-		USI_SPECIAL_ATTACK_SLOTB_4                                = 66,
-		USI_SPECIAL_ATTACK_SLOTB_HYPER_4                          = 67,
-		USI_SPECIAL_ATTACK_SLOTB_5                                = 68,
-		USI_SPECIAL_ATTACK_SLOTB_HYPER_5                          = 69,
+		// june-state-ids S2: June's slot states 50-69 are CX2GUUser's USI_SPECIAL_ATTACK_* ( the CH1n shadow copies are dropped )
 		LSI_LU_THROW_ITEM                                         = 70,
 		LSI_RIDING_START                                          = 72,
 		LSI_RIDING_ON                                             = 73,
