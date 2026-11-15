@@ -3312,6 +3312,8 @@ Inert for play: nothing in Lu/Ciel calls them until CH3c2 (Garden of Haures, Shr
 - **Gates (worktree):** `finish.py --with JUNE_CHAR_LOCKON_SYSTEM JUNE_CHAR_NPC_LUA_BINDS --lua ...`: flagcheck PASS / PASS (0 FAIL, 0 deleted lines;
   the OTHER rows are peers' uncommitted hunks in `Always.h`, `X2GUUser.*`, `X2Game.cpp`), junediverge PASS, enumscan PASS, luabind PASS; stateends
   not applicable (no state registered). Commit staged from HEAD + this phase's hunks only.
+- **Commit** `b4f80375`. Range gate `b4f80375^..b4f80375`: flagcheck `_LOCKON_SYSTEM` PASS ( 4 PASS, 1 PASS~, 1 DEFINE, 0 FAIL ), `_NPC_LUA_BINDS`
+  PASS ( 3 PASS, 2 PASS~, 1 DEFINE, 0 FAIL ); OTHER rows = the partner flag's files; junediverge, enumscan, luabind PASS.
 - **funcmap:** 5 rows `(CH3c20)`. **Review:** `kickoffs/char-luciel/CH3c20-review.md` (Opus); CH3c2 waits on it.
 
 ## Phase CH4 - Passives and class mechanics
