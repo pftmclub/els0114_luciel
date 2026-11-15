@@ -10076,12 +10076,82 @@ void CX2GUAdd::ANSI_HA_ALP_DOOMS_DAY_StateEnd()
 #endif //MODIFY_SET_DAMAGE_DATA
 
 #ifdef MODIFY_RIDING_PET_AWAKE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+namespace _CONST_ADD_CH1C_
+{
+	// char-add CH1c: June 31fd66b0 / 32011f50 ( the awakening effect-set test and play ); stand-in: not ported ( Stage 12 ), June's empty-name default
+	bool AddAwakeningEffectSetPresent()			{ return false; }
+	void AddAwakeningEffectPlay()				{}
+
+	// char-add CH1c: June 31febf50 ( the Dark Dragon hyper-mode item effect, June-only ); stand-in: no such item offline ( backlog Stage 6 )
+	void AddHyperModeItemEffect()				{}
+}
+using namespace _CONST_ADD_CH1C_;
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 void CX2GUAdd::RidingHyperModeFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1c: June 32a01b20, the riding hyper mode passes bSound_ = false ( JUNE_BUGS 752 )
+	CommonHyperModeFrameMove( 0.f, 0.1f, false );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	CommonHyperModeFrameMove( 0.f, 0.1f, true );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::CommonHyperModeFrameMove( float fTime1_, float fTime2_, bool bSound_ /*= false*/ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1c: June 329f5490, two independent timers; the shock waves and the trace only without the awakening set
+	g_pX2Game->GetWorld()->SetWorldColor( 0xff222222 );
+
+	if( true == m_pXSkinAnim->EventTimerOneshot( fTime1_ ) )
+	{
+		ShowMinorParticleHyperModeChange( L"Bip01_Spine1" );
+	}
+
+	if( true == m_pXSkinAnim->EventTimerOneshot( fTime2_ ) )
+	{
+		if( true == AddAwakeningEffectSetPresent() )
+		{
+			AddAwakeningEffectPlay();
+		}
+		else if( NULL != g_pX2Game->GetMinorParticle() )
+		{
+			const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01_Spine1" );
+
+			CKTDGParticleSystem::CParticleEventSequence* pSeqGroundShockWave = g_pX2Game->GetMinorParticle()->GetInstanceSequence( GetHandleCommonMinorParticleByEnum( COMMON_MINOR_PII_GROUND_SHOCK_WAVE ) );
+			PlaySequenceByTriggerCount( pSeqGroundShockWave, m_FrameDataNow.unitCondition.landPosition.x, m_FrameDataNow.unitCondition.landPosition.y + 5.0f, m_FrameDataNow.unitCondition.landPosition.z, 5, 10, 3 );
+
+			CKTDGParticleSystem::CParticleEventSequence* pSeqWhiteShockWave = g_pX2Game->GetMinorParticle()->GetInstanceSequence( GetHandleCommonMinorParticleByEnum( COMMON_MINOR_PII_WHITE_SHOCK_WAVE ) );
+			PlaySequenceByTriggerCount( pSeqWhiteShockWave, vBonePos, 10, 10, 1 );
+
+			CKTDGParticleSystem::CParticleEventSequence* pSeqImpactTick = g_pX2Game->GetMinorParticle()->GetInstanceSequence( GetHandleCommonMinorParticleByEnum( COMMON_MINOR_PII_IMPACT_TICK ) );
+			PlaySequenceByTriggerCount( pSeqImpactTick, vBonePos, 200, 200, 30 );
+		}
+
+		SetEffectSoundParticle( GetBonePos( L"Bip01" ), L"ADD_STR_ToKang" );
+
+		AddHyperModeItemEffect();
+
+		UpDownCrashCamera( 30.0f, 0.4f );
+		g_pKTDXApp->GetDGManager()->ClearScreen();
+
+		if( false == AddAwakeningEffectSetPresent() )
+		{
+			ShowMinorParticleHyperModeTrace();
+		}
+
+		ApplyHyperModeBuff();
+
+		if( true == bSound_ )
+		{
+			PlaySound( L"Energy.ogg" );
+			PlaySound( L"Break.ogg" );
+			PlaySound( L"Change.ogg" );
+		}
+	}
+
+	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	g_pX2Game->GetWorld()->SetWorldColor( 0xff222222 );
 
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -10138,6 +10208,7 @@ void CX2GUAdd::CommonHyperModeFrameMove( float fTime1_, float fTime2_, bool bSou
 		}
 	}
 	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 #endif //MODIFY_RIDING_PET_AWAKE
 

@@ -612,6 +612,27 @@ All 28 class-map rows of phase CH1b are handled: 26 `inside` rows written (June'
 
 **Nothing to play-test.** Review: `kickoffs/char-add/CH1b-review.md` (Opus 5.5 high, covers CH1a-CH1b; no `_DEBUG` define here). Next: `/x2-phase char-add CH1b review`.
 
+### CH1c - Done (2026-11-15)
+
+Both class-map rows of phase CH1c are written, both `inside` (June's body in March's own `CX2GUAdd` function under `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`, March's in `#else`, tag `// char-add CH1c`); both listing-only (`charport_adis.py add 32a01b20 329f5490`, `329f5490` also read in the Ghidra decompile). None needed "this needs Opus". The riding (27), pepper-run (5) and dance (3) states have no class function of their own: they use shared callbacks that CH1m registers.
+
+| June | `CX2GUAdd::` | Note |
+|---|---|---|
+| `32a01b20` | `RidingHyperModeFrameMove` | `CommonHyperModeFrameMove( 0.f, 0.1f, false )`: June pushes `0` as `bSound_`, March passes `true` ( JUNE_BUGS 752 ) |
+| `329f5490` | `CommonHyperModeFrameMove` | CH0 marked it `new`; March already has the function with the same signature, so it is `inside`; also `HyperModeFrameMove` `329ffe90` ( CH1i ) calls it with ( 0.05, 0.46 ) |
+
+**Where June's `329f5490` differs from March's** ( the other lines are March's text; each checked against the listing ):
+- The two timers are independent oneshots ( `EventTimerOneshot`, the `+0x24c` guard + `31d28e10` inlined ), the first calls `ShowMinorParticleHyperModeChange( L"Bip01_Spine1" )` as March.
+- The shock block runs the awakening test `31fd66b0`: set present -> play `32011f50`; **else** (and a minor particle system exists) the three shock waves at the body bone: ground ( land.x, land.y + 5, land.z; 5 / 10; 3 ), white ( bone; 10 / 10; 1 ), impact tick ( bone; 200 / 200; 30 ) = March's `SERV_ADD_LUNATIC_PSYKER` block through `PlaySequenceByTriggerCount` ( land = pos.y ). The ToKang sound `SetEffectSoundParticle( bone Bip01, L"ADD_STR_ToKang" )` runs on both paths.
+- New after it: `31febf50` ( the Dark Dragon hyper-mode item effect ), then `UpDownCrashCamera( 30, 0.4 )`, `ClearScreen`, the trace only when the awakening set is absent, `ApplyHyperModeBuff` ( vslot 0xc0 ), the three sounds if `bSound_`, `CommonFrameMove` ( vslot 0x7cc ). Add's June body has **no** `32011d20` begin call ( Elesis / Eve have one ).
+- **Stand-ins** ( namespace `_CONST_ADD_CH1C_` under `_LIVE`, the same as Elesis CH1c and Eve CH1k ): `AddAwakeningEffectSetPresent()` false and `AddAwakeningEffectPlay()` empty ( June's empty-name default, Stage 12 ); `AddHyperModeItemEffect()` empty ( June-only item test, no such item offline; backlog Stage 6 already carries it ).
+
+**Gates.** `finish.py --files X2Lib/X2GUAdd.cpp --with JUNE_CHAR_ADD_LIVE JUNE_CHAR_ADD_CORE`: CORE PASS ( `files: 1 PASS` ), LIVE INERT ( `//#define`; `files: 1 PASS`, 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 `#else`/`#endif` without the token ), `junediverge` PASS, `enumscan` PASS; `stateends` / `skillicons` / `luabind` skipped ( no skill state, skill or script ). `git diff --numstat`: `X2GUAdd.cpp` 71 / 0.
+- One-file `/Zs` probe of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`. `/P` hits off / on: riding call `( 0.f, 0.1f, true )` 1 / 0 and `( ..., false )` 0 / 1, `AddHyperModeItemEffect` 0 / 2, `AddAwakeningEffectSetPresent` 0 / 3, `ADD_STR_ToKang` 1 / 1 ( March's lunatic branch / June's ).
+- Full build skipped: no play-test ( `_LIVE` is off; nothing registers a June body ), so no `DEPLOY OK` / `exestr` line. New: 2 funcmap rows `Char Add CH1c`, JUNE_BUGS 752.
+
+**Nothing to play-test.** No review of its own ( the CH1d2 review covers CH1c-CH1d2; no `_DEBUG` define here ). Next: `/x2-phase char-add CH1d0` ( Opus 5.5 high ).
+
 ### CH1b - Review (2026-11-15, covers CH1a-CH1b)
 
 **Verdict: pass, no code change.** Commits reviewed: `d1d3f460` (CH1a), `6b5c8bb5` (CH1b). Ghidra read-only; listings from `charport_adis.py add`.
