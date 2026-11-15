@@ -32,8 +32,9 @@ Review the two phases' commits:
 - **Checklist rows:** L260 / L263 / L977 verdicts in the note match `32b3a310`.
 
 Hygiene is one command: `python tools/finish.py --review --commits 4cd0f5c2 8b026393 --with SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
-SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS --state X2Lib/X2GULuciel.cpp Luciel_Duo --state X2Lib/X2GULuciel.cpp Luciel_Demonio`. Paste its block;
-explain every OTHER row and deleted line with `-v`.
+SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS --state X2Lib/X2GULuciel.cpp Luciel_Duo --state X2Lib/X2GULuciel.cpp Luciel_Demonio`, and `_CORE` on its own:
+`python tools/flagcheck.py SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE --commits 4cd0f5c2 8b026393 --files X2Lib/X2EffectSet.cpp X2Lib/X2GULuciel.cpp X2Lib/X2GULuciel.h` ( with `_CORE` as a `--with`
+partner flagcheck stops on CH1a's unevaluable `#if` at `Always.h:13430`, see the CH1o3 note ). Paste the blocks; explain every OTHER row and deleted line with `-v`.
 
 No play-test, no full build (`/Zs` probes, plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`). Fix clear transcription errors under the same flag; hand design decisions
 to the user. Write "CH1o3 - Review" into the plan doc, update STATUS, check `CH1p.md`, commit.
