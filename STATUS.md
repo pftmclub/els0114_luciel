@@ -284,7 +284,7 @@ Plan `JUNE_STATE_IDS_PHASES.md` - branch `main` - log tag `[STATE_IDS]` - flag `
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| S1 | done 2026-11-15, built + deployed, kom copied; user play-test + "check logs" owed; then Opus review (`S1-review.md`, retires `_DEBUG`) | Sonnet 5.5 / high; review Opus 5.5 / high | - (alone in `X2GUUser.*`) | `X2GUUser.h`, `X2TrainingGameUI.cpp`, Always.h, data036 `Enum.lua`, `tools/stateids.py` | `S1.md`, `S1-review.md` |
+| S1 | done 2026-11-15, play-test passed (Add win-pose stuck: her port is open, ignored); Opus review next (`S1-review.md`, retires `_DEBUG`) | Sonnet 5.5 / high; review Opus 5.5 / high | - (alone in `X2GUUser.*`) | `X2GUUser.h`, `X2TrainingGameUI.cpp`, Always.h, data036 `Enum.lua`, `tools/stateids.py` | `S1.md`, `S1-review.md` |
 | S2 | blocked (S1 review): Lu/Ciel on the shared numbers (shadow names, bounding / wait-change helpers), inert, probe build | Opus 5.5 / high; covered by char-luciel CH1 review | S1 review | `X2GULuciel.*`, Always.h | `S2.md` |
 | Z | blocked (S2): close | Sonnet 5.5 / medium | S2 | `MODS.md`, backlog, checklist, STATUS archive | `Z.md` |
 
