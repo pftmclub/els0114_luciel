@@ -3381,6 +3381,9 @@ Opus 5.5 high. Covers CH2a ( `fe073ac8` ), CH2a2 ( `7997ac26`, `18808960` ) and 
   `stateends.py check X2GULuciel.cpp Luciel_Duo`: 370 tables, 0 STUCK, PASS. This review: `finish.py --files X2Lib/X2GULuciel.cpp --with ..._SKILL`: flagcheck PASS
   ( 1 PASS ), junediverge PASS, enumscan exit 0, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 - **Build:** `/Zs` probes of `X2GULuciel.cpp` and `X2GUUser.cpp`: exit 0, 0 errors. Full build skipped: no play-test ( the fix's skill is CH2c's ); the next play-test build takes it.
+- **Commit `7135cd45`, range gate:** `finish.py --range 7135cd45^..7135cd45` reports 1 ERROR on `Always.h` ( the `_SKILL` run cannot unifdef the retired `_SKILL_DEBUG` guard line
+  13673; a tool limit when a retire and a fix share a commit, not a defect ). Per file: `flagcheck _SKILL --range ... --files X2Lib/X2GULuciel.cpp` 1 PASS, 0 FAIL, `RESULT: PASS`;
+  `flagcheck _SKILL_DEBUG --range ... --files KTDXLIB/Always.h` 1 DEFINE, 0 FAIL, 0 ERROR ( only the retire's "not #defined" ); junediverge PASS, enumscan exit 0.
 - **Next:** `/x2-phase char-luciel CH2c` on Sonnet 5.5 high.
 
 ### CH2d20 - Done (2026-11-15)
