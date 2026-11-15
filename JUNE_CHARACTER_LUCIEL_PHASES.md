@@ -3426,6 +3426,31 @@ Opus 5.5 high. Covers CH2a ( `fe073ac8` ), CH2a2 ( `7997ac26`, `18808960` ) and 
   `flagcheck _SKILL_DEBUG --range ... --files KTDXLIB/Always.h` 1 DEFINE, 0 FAIL, 0 ERROR ( only the retire's "not #defined" ); junediverge PASS, enumscan exit 0.
 - **Next:** `/x2-phase char-luciel CH2c` on Sonnet 5.5 high.
 
+### CH2c - Done (2026-11-15)
+
+Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's, no new define ); the temporary `_SKILL_DEBUG` is **back on** ( un-commented in `Always.h` for the play-test; the CH2c2 review retires it again ).
+Files: `X2GULuciel.h` / `.cpp`, `Always.h` ( that one line ), `MODS.md`, `funcmap.tsv` ( `grep "(CH2c)"`, 7 rows ), `june2017_re/char_luciel/ch2c_cases.py` ( new ), `kickoffs/char-luciel/CH2c2.md` ( amended ).
+No review of its own ( the CH2c2 review covers it ). Commit: see git log `char-luciel Phase CH2c`.
+- **35 functions** ( every `CH2c` row of `ch0_class_map.tsv`, read with `charport_adis.py`; the thunks are not written ): 8 preloads ( 130 reads, no other call in any of them ), Soul Extortion 5,
+  Demonic Breath 4, Fantasie Impromptu 10, Death Crisis of Marbas 8, Eschaton EventProcess. Two event processes are the shared cancel chain ( normalised listings equal to Power of Oriax's `32affcf0`:
+  Soul Extortion, Marbas end ), three are that chain with a different animation-end head ( Cantabile ready -> 350, Marbas big fire -> 358 / 362 by the charge, Eschaton -> wait / jump-down by foot and body ).
+- **Deviation from the kickoff ( the one decision ): only Soul Extortion's setter case is written; the other six wait for CH2c2.** Each of Soul Shock, Demonic Breath, Fantasie Impromptu, Death Crisis of Marbas, Soul Strike
+  and Shadow has a state whose EventProcess ( or the FrameMove that carries its hits ) is a CH2c2 function ( `ch0_class_map.tsv` col 6 ), so registering them now would register states with no EventProcess: `stateends.py`
+  fails them and a cast would leave the player stuck and invincible. CH2c2's kickoff is amended with the six entries and `ch2c_cases.py` ( annotated listing of a case, each callback marked with its phase ).
+  Eschaton ( 363 ) is registered in `InitStateCommon` with Init + EventProcess ( no stuck risk ); its FrameMove is CH2c2's ( marker for `ch1m_regcheck.py`: **0 problems, 340 matched** ).
+- **Bodies of note.** Soul Extortion: both starts multiply the animation speed ( +0x8900 future / +0x88fc now ) by the upgrade's `SA_ANI_SPEED` ( 30039, memo swap off ) and call `ResetAnimSpeed`.
+  Fantasie movement states: June's jump chains on left / right / facing reduce to bool tests ( worked out per branch; both bodies of the 2nd movement are the same listing with other ids ); the wait time ( +0x9628 ) at 2.0 hands
+  over. Demonic Breath fire: five presses of the key ( `IsKeyPressedOnce`, the Ruinous Impact pattern ) cast Eschaton through `TryUseSkillWithCombinationPoint` ( the upgrade swap of 30020; ground 1 / air 2 ), a refusal resets the count.
+  Death Crisis ready start: camera override 550 / 220 for the own unit ( new stand-in member `m_fSkillCameraOverrideSecondValue`, +0x8d94, as Rena's ), min / max charge = 1 - `SA_MP_CONSUME_REL` / `SA_MP_CONSUMPTION` ( upgraded skill only, fsubrp read as Intel `st1 = st0 - st1` ).
+- **Stand-ins / not written.** Soul Extortion's `StateEnd` ( 32b3dd80 ) and Eschaton's `FrameMove` ( 32b2cfc0 ): CH2c2. No June bug found; no `JUNE_BUGS` row.
+- **Debug line ( `_SKILL_DEBUG` ).** `[JUNE_CHAR] LUCIEL SKILL soul extortion start skill <id> anim rate <r> speed <s>` ( the now-side start ). The `equip` / `use` / `cooldown` lines of CH2a / CH2a2 are on again.
+- **Gates:** `finish.py --files X2GULuciel.cpp X2GULuciel.h Always.h --with JUNE_CHAR_LUCIEL_SKILL JUNE_CHAR_LUCIEL_SKILL_DEBUG --state X2GULuciel.cpp Luciel_Duo --icons 30001-30310`: flagcheck `_SKILL` PASS ( 2 PASS, 1 OTHER = the
+  `_CORE` enclosure, 0 FAIL ), junediverge PASS, enumscan exit 0, stateends PASS, skillicons PASS, `FINISH RESULT: PASS (6 gates, 0 failed, 1 skipped)` ( luabind: no script staged ). `/Zs` probe of `X2GULuciel.cpp`: exit 0.
+- **Build:** `BUILD OK: X2/US_SERVICE/x2.exe 26,977,280 B, 2026-11-15 21:18:58, md5 768c6745b5e058a3278872d45e585f57` ( KTDXLIB 61 s, X2Lib 556 s, X2 23 s; built at main 244c652c + peers' uncommitted code files, among them DU4's `NESI_RENUMBER` ). **`DEPLOY REFUSED`: `X2_offline.exe` was running ( pid 46592 ), so the exe is built but not in the game directory: `python tools/build.py --deploy-only` once the user closes the game.** `EXESTR OK: 4 of 4` wide ( the debug line, preload strings ) and `2 of 2` narrow ( `LSI_SA_LCG_SOUL_EXTORTION`, `LSI_SA_LCG_ESCHATON` ) in the built exe ( `--exe build` ). The save is already schema v24 ( DU4's play-test ran the game ), so this exe needs no further migration.
+- **Play-test save ( `elsdb`, backups `db_backup/*pre_createchar*` ):** `LuRgA` ( unit 198, class 38, level 70: Soul Extortion base 30019 level 1, upgrade 30039 level 0 ) and `LuRgB` ( unit 199: 30039 level 1, base 0 ). Page 1: 30019 / 30039 on
+  slot 0 ( key A ), page 2: on slot 5 ( key Q ); no other Royal Guard skill is slotted ( their cases wait for CH2c2 ).
+- **Next:** play-test Soul Extortion ( below ), then `/x2-phase char-luciel CH2c2` on Sonnet 5.5 high.
+
 ### CH2d20 - Done (2026-11-15)
 
 Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`, `Always.h`. Flags: `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`

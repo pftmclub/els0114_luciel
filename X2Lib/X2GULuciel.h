@@ -1232,6 +1232,42 @@ protected:
 	void				LSI_A_LLC_F_BLASTING_FEAR_EventProcess();	// June 32b01050, also the male body's
 	void				LSI_A_LLC_F_BACKSTAB_Init();	// June 32ae7980
 	void				LSI_A_LLC_F_BACKSTAB_EventProcess();	// June 32b01250, also the male body's
+	// char-luciel CH2c: Royal Guard ( 38 ) skills part 1 ( June 32ae6e10 - 32b00e10 ); the setter cases other than Soul Extortion wait for CH2c2's callbacks
+	void				LSI_SA_LCG_SOUL_EXTORTION_Init();	// June 32ae6e10
+	void				LSI_SA_LCG_SOUL_EXTORTION_FrameMove();	// June 32ae6eb0
+	void				LSI_SA_LCG_SOUL_EXTORTION_StateStartFuture();	// June 32ae6ec0
+	void				LSI_SA_LCG_SOUL_EXTORTION_StateStart();	// June 32ae6f30
+	void				LSI_SA_LCG_SOUL_EXTORTION_EventProcess();	// June 32b002f0
+	void				LSI_SA_LCG_DEMONIC_BREATH_START_Init();	// June 32ae6fa0
+	void				LSI_SA_LCG_DEMONIC_BREATH_CHARGING_StateStart();	// June 32b004f0
+	void				LSI_SA_LCG_DEMONIC_BREATH_FIRE_StateStartFuture();	// June 32ae70f0
+	void				LSI_SA_LCG_DEMONIC_BREATH_FIRE_FrameMoveFuture();	// June 32ae7110
+	void				LSI_SA_LCG_DEMONIC_BREATH_FIRE_EventProcess();	// June 32b00510
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_Init();	// June 32ae7150
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_StateStart();	// June 32ae7280
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_EventProcess();	// June 32b005f0
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_EventProcess();	// June 32ae72c0
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE_EventProcess();	// June 32ae7350
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE_EventProcess();	// June 32ae73e0
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY_StateStart();	// June 32ae7470
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY_EventProcess();	// June 32b00800
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_EventProcess();	// June 32ae7490
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE_EventProcess();	// June 32ae7520
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE_EventProcess();	// June 32ae75b0
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_Init();	// June 32ae7640
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart();	// June 32b00840
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_EventProcess();	// June 32b00920
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_StateEndFuture();	// June 32ae7700
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_StateStartFuture();	// June 32b00960
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_StateStartFuture();	// June 32b009a0
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_EventProcess();	// June 32b009e0
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END_StateStart();	// June 32ae7720
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END_EventProcess();	// June 32b00c10
+	void				LSI_SA_LCG_ESCHATON_Init();	// June 32ae7730
+	void				LSI_SA_LCG_ESCHATON_EventProcess();	// June 32b00e10
+	void				LSI_A_LCG_F_SOUL_SHOCK_Init();	// June 32ae79f0
+	void				LSI_A_LCG_F_SOUL_STRIKE_READY_Init();	// June 32ae7a80
+	void				LSI_A_LCN_F_SHADOW_Init();	// June 32ae84a0
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
 	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
@@ -1377,6 +1413,9 @@ protected:
 	std::vector<SDamageEffectHitCount>	m_vecDamageEffectHitCount;			// +0x9890
 	bool								m_bSkillCameraOverride;				// +0x8d90 ( CX2GUUser's camera group ): stand-in, the reader is Stage 9's camera pair; CommonStateStart clears it
 	float								m_fSkillCameraOverrideValue;		// +0x8da4 ( CX2GUUser's camera group ): stand-in, as above
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+	float								m_fSkillCameraOverrideSecondValue;	// +0x8d94 ( CX2GUUser's camera group, ctor 0 ): char-luciel CH2c: stand-in as above, Death Crisis of Marbas sets it to 220.0 ( June 32b00840 )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	CX2SkillTree::SKILL_ID				m_eStateStartSkillID;				// +0x9444 ( CX2GUUser ): char-luciel CH2b: the skill of the state that last ran CommonStateStart ( June 32057b80 @32060cd9 )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL

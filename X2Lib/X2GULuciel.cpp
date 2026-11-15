@@ -148,6 +148,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fSkillCameraOverrideValue( 0.f )
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 , m_eStateStartSkillID( CX2SkillTree::SI_NONE )
+, m_fSkillCameraOverrideSecondValue( 0.f )	// char-luciel CH2c
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 {
 	m_afSeizedByFearValue[0] = m_afSeizedByFearValue[1] = 1.f;
@@ -14406,7 +14407,17 @@ void CX2GULuciel::InitStateCommon()
 	// June 32b3e8b0 @1910 LSI_SA_LLC_RUINOUS_IMPACT ( id 299 ): registered by CH2b with its callbacks
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+	stateData.Init();
+	stateData.stateID			= LSI_SA_LCG_ESCHATON;
+	m_LuaManager.MakeTableReference( "LSI_SA_LCG_ESCHATON", stateData.stateID );
+	stateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_ESCHATON_Init );	// char-luciel CH2c: June 32b4ae40
+	// June 32b2cfc0 ( OnFrameMove ): LSI_SA_LCG_ESCHATON_FrameMove, body in CH2c2
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_ESCHATON_EventProcess );	// June 32b4c190
+	m_StateList[stateData.stateID] = stateData;
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	// June 32b3e8b0 @1916 LSI_SA_LCG_ESCHATON ( id 363 ): registered by CH2c / CH2c2 with its callbacks
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 	// June 32b3e8b0 @1922 LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT ( id 364 ): registered by CH3b with its callbacks
 }
@@ -15507,6 +15518,572 @@ void CX2GULuciel::LSI_A_LLC_F_BACKSTAB_EventProcess()
 
 	CommonEventProcess();
 }
+
+// char-luciel CH2c: Royal Guard ( 38 ) skills part 1 ( Soul Extortion, Demonic Breath, Fantasie Impromptu, Death Crisis of Marbas, Eschaton, the preloads of Soul Shock / Soul Strike / Shadow )
+namespace _CONST_LUCIEL_CH2C_
+{
+	const float		FANTASIE_IMPROMPTU_MOVEMENT_END_TIME		= 2.f;		// June 32ae72c0 ( 334ed39c ): the wait time at which a movement state hands over to the next
+	const USHORT	DEMONIC_BREATH_KEY_LOOP_LIMIT				= 5;		// June 32ae7110 / 32b00510: the presses counted, then Eschaton is cast
+	const float		DEATH_CRISIS_CAMERA_VALUE					= 550.f;	// June 32b00840 ( 334ed408 )
+	const float		DEATH_CRISIS_CAMERA_SECOND_VALUE			= 220.f;	// June 32b00840 ( 334ed40c )
+	const double	DEATH_CRISIS_SMALL_FIRE_CHARGE_RATE			= 9.0;		// June 32b00960 ( 334577d8 )
+	const double	DEATH_CRISIS_BIG_FIRE_CHARGE_RATE			= 30.0;		// June 32b009a0 ( 33439c68 )
+	const double	DEATH_CRISIS_END_CHARGE_LIMIT				= 200.0;	// June 32b009e0 ( 3346ef50 ): a charge below it ends in the wait state, else in the end state
+}
+using namespace _CONST_LUCIEL_CH2C_;
+
+// char-luciel CH2c: June 32ae6e10, the preload of Soul Extortion ( thunk 32b4afc0 )
+void CX2GULuciel::LSI_SA_LCG_SOUL_EXTORTION_Init()
+{
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam02.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam04.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_Attack.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_CrossY.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"Darkcloud_AttackBox01_New.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon.X" );
+}
+
+// char-luciel CH2c: June 32ae6eb0 ( thunk 32b4aff0 )
+void CX2GULuciel::LSI_SA_LCG_SOUL_EXTORTION_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2c: June 32ae6ec0 ( thunk 32b4afd0 ): the upgraded skill's animation speed
+void CX2GULuciel::LSI_SA_LCG_SOUL_EXTORTION_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	float fAnimSpeedRate = 1.f;
+	if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_ANI_SPEED, CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION_UPGRADE, false, fAnimSpeedRate ) )
+	{
+		m_fAnimSpeedFuture *= fAnimSpeedRate;
+		ResetAnimSpeed( m_fAnimSpeedFuture, true, true );
+	}
+}
+
+// char-luciel CH2c: June 32ae6f30 ( thunk 32b4afe0 ): the same on the now side
+void CX2GULuciel::LSI_SA_LCG_SOUL_EXTORTION_StateStart()
+{
+	CommonStateStart();
+
+	float fAnimSpeedRate = 1.f;
+	if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_ANI_SPEED, CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION_UPGRADE, false, fAnimSpeedRate ) )
+	{
+		m_fAnimSpeed *= fAnimSpeedRate;
+		ResetAnimSpeed( m_fAnimSpeed, true, false );
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL soul extortion start skill %d anim rate %.2f speed %.2f", static_cast<int>( GetNowStateSkillID() ), fAnimSpeedRate, m_fAnimSpeed );	// char-luciel CH2c
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+}
+
+// char-luciel CH2c: June 32b002f0 ( thunk 32b4c260 )
+void CX2GULuciel::LSI_SA_LCG_SOUL_EXTORTION_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae6fa0, the preload of Demonic Breath ( thunk 32b4b000 )
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_START_Init()
+{
+	TextureReadyInBackground( L"DRYAD_Fire01.dds" );
+	TextureReadyInBackground( L"KA_EvilFace01.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XSkinMeshReadyInBackground( L"Darkcloud_AttackBox01_New.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LCG_Demonic_Breath_Dummy01.X" );
+	TextureReadyInBackground( L"KA_EvilFace01.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam01.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam02.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam04.Y" );
+	XMeshReadyInBackground( L"LLG_EvilFace_M01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LCG_DEMONIC_BREATH_Dummy.x" );
+	XSkinMeshReadyInBackground( L"LCG_Demonic_Breath_TraceDummy01.X" );
+}
+
+// char-luciel CH2c: June 32b004f0 ( thunk 32b4c270 )
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_CHARGING_StateStart()
+{
+	CommonStateStart();
+	m_hDemonicBreathChargeEffectSet = INVALID_EFFECTSET_HANDLE;
+}
+
+// char-luciel CH2c: June 32ae70f0 ( thunk 32b4b010 )
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_FIRE_StateStartFuture()
+{
+	CommonStateStartFuture();
+	m_usStateLoopCount = 0;
+}
+
+// char-luciel CH2c: June 32ae7110 ( thunk 32b4b020 ): each press of the key counts, up to the limit
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_FIRE_FrameMoveFuture()
+{
+	if ( true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) && m_usStateLoopCount < DEMONIC_BREATH_KEY_LOOP_LIMIT )
+		++m_usStateLoopCount;
+
+	CommonFrameMoveFuture();
+}
+
+// char-luciel CH2c: June 32b00510 ( thunk 32b4c280 ): at the end, with enough presses, Eschaton is cast ( the swapped id of the upgrade ); a refused cast resets the count
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_FIRE_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() || m_fEventTime[0].stateChange <= GetXSkinAnimFuture()->GetNowAnimationTime() )
+	{
+		if ( DEMONIC_BREATH_KEY_LOOP_LIMIT <= m_usStateLoopCount )
+		{
+			const CX2SkillTree::SKILL_ID eEschatonSkillID = GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_SA_LCG_ESCHATON );
+			const CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eUseCondition = ( true == m_FrameDataFuture.unitCondition.bFootOnLine ? CX2SkillTree::ASUT_GROUND : CX2SkillTree::ASUT_AIR );
+			if ( false == TryUseSkillWithCombinationPoint( eEschatonSkillID, eUseCondition ) )
+				m_usStateLoopCount = 0;
+		}
+		else if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( LSI_LU_DASH_JUMP_LANDING );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7150, the preload of Fantasie Impromptu ( thunk 32b4b030 )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_Init()
+{
+	TextureReadyInBackground( L"eve_A_blink_light.dds" );
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam01.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_Attack.Y" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LCG_M_FI_FuriosoDummy01.X" );
+	XSkinMeshReadyInBackground( L"LCG_M_FI_FuriosoPathWeapon01.X" );
+	XSkinMeshReadyInBackground( L"LCG_M_FI_FuriosoWeapon01.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon_Cross.X" );
+	XSkinMeshReadyInBackground( L"LD_Attack_Cross01.X" );
+	XSkinMeshReadyInBackground( L"LLC_DARK_CRESCENT_M01.X" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+}
+
+// char-luciel CH2c: June 32ae7280 ( thunk 32b4b040 ): the slot key that started the skill is the one watched for its release
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_StateStart()
+{
+	CommonStateStart();
+	m_fFantasieImpromptuWaitTime = 0.f;
+	m_usStateLoopCount = 0;
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+}
+
+// char-luciel CH2c: June 32b005f0 ( thunk 32b4c290 ): the cancel chain, but the animation end goes to the wait state
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae72c0 ( thunk 32b4b050 ): after the wait time the next movement starts, else the held direction picks the front or back move state
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_EventProcess()
+{
+	if ( FANTASIE_IMPROMPTU_MOVEMENT_END_TIME <= m_fFantasieImpromptuWaitTime )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY );
+	}
+	else
+	{
+		const bool bLeft = m_InputData.pureLeft;
+		const bool bRight = m_InputData.pureRight;
+		const bool bFacingRight = m_FrameDataFuture.syncData.bIsRight;
+		if ( ( true == bRight && true == bFacingRight ) || ( true == bLeft && false == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE );
+		else if ( ( true == bRight && false == bFacingRight ) || ( true == bLeft && true == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7350 ( thunk 32b4b060 ): the opposite direction turns into the back move, no direction into the wait state
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE_EventProcess()
+{
+	if ( FANTASIE_IMPROMPTU_MOVEMENT_END_TIME <= m_fFantasieImpromptuWaitTime )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY );
+	}
+	else
+	{
+		const bool bLeft = m_InputData.pureLeft;
+		const bool bRight = m_InputData.pureRight;
+		const bool bFacingRight = m_FrameDataFuture.syncData.bIsRight;
+		if ( ( false == bLeft && true == bRight && false == bFacingRight ) || ( false == bRight && true == bLeft && true == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE );
+		else if ( false == bLeft && false == bRight )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae73e0 ( thunk 32b4b070 ): the mirror of the front move
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE_EventProcess()
+{
+	if ( FANTASIE_IMPROMPTU_MOVEMENT_END_TIME <= m_fFantasieImpromptuWaitTime )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY );
+	}
+	else
+	{
+		const bool bLeft = m_InputData.pureLeft;
+		const bool bRight = m_InputData.pureRight;
+		const bool bFacingRight = m_FrameDataFuture.syncData.bIsRight;
+		if ( ( false == bLeft && true == bRight && true == bFacingRight ) || ( false == bRight && true == bLeft && false == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE );
+		else if ( false == bLeft && false == bRight )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7470 ( thunk 32b4b080 )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY_StateStart()
+{
+	m_fFantasieImpromptuWaitTime = 0.f;
+	CommonStateStart();
+}
+
+// char-luciel CH2c: June 32b00800 ( thunk 32b4c2a0 )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7490 ( thunk 32b4b090 ): the 2nd movement's copy of the cantabile wait, handing over to the end state
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_EventProcess()
+{
+	if ( FANTASIE_IMPROMPTU_MOVEMENT_END_TIME <= m_fFantasieImpromptuWaitTime )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END );
+	}
+	else
+	{
+		const bool bLeft = m_InputData.pureLeft;
+		const bool bRight = m_InputData.pureRight;
+		const bool bFacingRight = m_FrameDataFuture.syncData.bIsRight;
+		if ( ( true == bRight && true == bFacingRight ) || ( true == bLeft && false == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE );
+		else if ( ( true == bRight && false == bFacingRight ) || ( true == bLeft && true == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7520 ( thunk 32b4b0a0 )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE_EventProcess()
+{
+	if ( FANTASIE_IMPROMPTU_MOVEMENT_END_TIME <= m_fFantasieImpromptuWaitTime )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END );
+	}
+	else
+	{
+		const bool bLeft = m_InputData.pureLeft;
+		const bool bRight = m_InputData.pureRight;
+		const bool bFacingRight = m_FrameDataFuture.syncData.bIsRight;
+		if ( ( false == bLeft && true == bRight && false == bFacingRight ) || ( false == bRight && true == bLeft && true == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE );
+		else if ( false == bLeft && false == bRight )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae75b0 ( thunk 32b4b0b0 )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE_EventProcess()
+{
+	if ( FANTASIE_IMPROMPTU_MOVEMENT_END_TIME <= m_fFantasieImpromptuWaitTime )
+	{
+		StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END );
+	}
+	else
+	{
+		const bool bLeft = m_InputData.pureLeft;
+		const bool bRight = m_InputData.pureRight;
+		const bool bFacingRight = m_FrameDataFuture.syncData.bIsRight;
+		if ( ( false == bLeft && true == bRight && true == bFacingRight ) || ( false == bRight && true == bLeft && false == bFacingRight ) )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE );
+		else if ( false == bLeft && false == bRight )
+			StateChange( LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7640, the preload of Death Crisis of Marbas ( thunk 32b4b0c0 )
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_Init()
+{
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam01.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam02.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam04.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_CrossY.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_Marbas_Attack.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"LCG_Marbas_AimingLine.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon_Cross.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon_MARBAS.X" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+}
+
+// char-luciel CH2c: June 32b00840 ( thunk 32b4c2b0 ): charge and wait times reset, the camera pulled back for the own unit, the upgraded skill's min / max charge scaled by its abilities
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart()
+{
+	CommonStateStart();
+
+	m_fDeathCrisisOfMarbasChargeTime = 0.f;
+	m_fLeftHandRotateDegree = 0.f;
+	m_fDeathCrisisOfMarbasWaitTime = 0.f;
+
+	if ( true == IsMyUnit() )
+	{
+		m_bSkillCameraOverride = true;
+		m_fSkillCameraOverrideValue = DEATH_CRISIS_CAMERA_VALUE;
+		m_fSkillCameraOverrideSecondValue = DEATH_CRISIS_CAMERA_SECOND_VALUE;
+	}
+
+	m_fDeathCrisisOfMarbasMinChargeTime = 1.f;
+	m_fDeathCrisisOfMarbasMaxChargeTime = 1.f;
+
+	const CX2SkillTree::SkillTemplet* pNowStateSkillTemplet = GetEquippedActiveSkillTemplet( GetNowStateSkillID(), true );
+	if ( NULL != pNowStateSkillTemplet && 0 != pNowStateSkillTemplet->m_iDeleteSkillIDByUpgrade )
+	{
+		if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_MP_CONSUME_REL, GetNowStateSkillID(), false, m_fDeathCrisisOfMarbasMinChargeTime ) )
+			m_fDeathCrisisOfMarbasMinChargeTime = 1.f - m_fDeathCrisisOfMarbasMinChargeTime;
+
+		if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_MP_CONSUMPTION, GetNowStateSkillID(), false, m_fDeathCrisisOfMarbasMaxChargeTime ) )
+			m_fDeathCrisisOfMarbasMaxChargeTime = 1.f - m_fDeathCrisisOfMarbasMaxChargeTime;
+	}
+}
+
+// char-luciel CH2c: June 32b00920 ( thunk 32b4c2c0 )
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7700 ( thunk 32b4b0d0 )
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_StateEndFuture()
+{
+	m_fChargeTime = 0.f;
+	CommonStateEndFuture();
+}
+
+// char-luciel CH2c: June 32b00960 ( thunk 32b4c2d0 ): the small fire adds the max charge x 9 to the charge time
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	const float fAddedChargeTime = static_cast<float>( m_fDeathCrisisOfMarbasMaxChargeTime * DEATH_CRISIS_SMALL_FIRE_CHARGE_RATE );
+	m_fDeathCrisisOfMarbasChargeTime += fAddedChargeTime;
+	m_fDeathCrisisOfMarbasWaitTime = 0.f;
+}
+
+// char-luciel CH2c: June 32b009a0 ( thunk 32b4c2e0 ): the big fire adds the max charge x 30
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	const float fAddedChargeTime = static_cast<float>( m_fDeathCrisisOfMarbasMaxChargeTime * DEATH_CRISIS_BIG_FIRE_CHARGE_RATE );
+	m_fDeathCrisisOfMarbasChargeTime += fAddedChargeTime;
+	m_fDeathCrisisOfMarbasWaitTime = 0.f;
+}
+
+// char-luciel CH2c: June 32b009e0 ( thunk 32b4c2f0 ): the cancel chain, but the animation end goes back to the wait state while the charge is under the limit, else to the end state
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( false == ( DEATH_CRISIS_END_CHARGE_LIMIT <= m_fDeathCrisisOfMarbasChargeTime ) )
+			StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT );
+		else
+			StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7720 ( thunk 32b4b0e0 )
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END_StateStart()
+{
+	CommonStateStart();
+}
+
+// char-luciel CH2c: June 32b00c10 ( thunk 32b4c300 )
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae7730, the preload of Eschaton ( thunk 32b4ae40 )
+void CX2GULuciel::LSI_SA_LCG_ESCHATON_Init()
+{
+	TextureReadyInBackground( L"KA_EvilFace01.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam01.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam02.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam04.Y" );
+	XMeshReadyInBackground( L"LLG_EvilFace_M01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LCG_DEMONIC_BREATH_Dummy.x" );
+	XSkinMeshReadyInBackground( L"LCG_Demonic_Breath_TraceDummy01.X" );
+}
+
+// char-luciel CH2c: June 32b00e10 ( thunk 32b4c190 ): the animation end lands on the ground, or falls into Ciel's or Lu's no-attack jump-down state
+void CX2GULuciel::LSI_SA_LCG_ESCHATON_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( USI_WAIT );
+		else
+			StateChange( true == IsMinorUnitActive() ? LSI_CIEL_JUMP_DOWN_NO_ATTACK : LSI_LU_JUMP_DOWN_NO_ATTACK );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c: June 32ae79f0, the preload of Soul Shock ( thunk 32b4b440 )
+void CX2GULuciel::LSI_A_LCG_F_SOUL_SHOCK_Init()
+{
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	XMeshReadyInBackground( L"AAS_NINE_TAILED_FOX_P02.Y" );
+	XMeshReadyInBackground( L"LLG_EvilFace_M01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+}
+
+// char-luciel CH2c: June 32ae7a80, the preload of Soul Strike ( thunk 32b4b450 )
+void CX2GULuciel::LSI_A_LCG_F_SOUL_STRIKE_READY_Init()
+{
+	TextureReadyInBackground( L"DRYAD_Fire01.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam04.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LCG_SoulStrike_Projectile_AttackBox.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon_Cross.X" );
+}
+
+// char-luciel CH2c: June 32ae84a0, the preload of Shadow ( thunk 32b4b4a0 )
+void CX2GULuciel::LSI_A_LCN_F_SHADOW_Init()
+{
+	TextureReadyInBackground( L"Curse02.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare07.dds" );
+	XSkinMeshReadyInBackground( L"Rena_NF_DUMMY01.X" );
+	TextureReadyInBackground( L"cube_light_P02.dds" );
+	TextureReadyInBackground( L"rana_C_explosionArrow_boom_circle.dds" );
+	XSkinMeshReadyInBackground( L"BREAKING_FIST_Attack_Box.X" );
+	XSkinMeshReadyInBackground( L"LCN_F_SHADOW.X" );
+	XMeshReadyInBackground( L"LCN_F_SHADOW_Wait.Y" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning02.Y" );
+	XSkinMeshReadyInBackground( L"LCN_M_SHADOW.X" );
+	XMeshReadyInBackground( L"LCN_M_SHADOW_Wait.Y" );
+}
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
@@ -15855,6 +16432,20 @@ void CX2GULuciel::LSI_A_LLC_F_BACKSTAB_EventProcess()
 				stateData.m_bSkillState		= true;	// June @32b49821 byte +0x11
 				stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_A_LLC_F_BACKSTAB_EventProcess );	// June 32b4c6f0: the male body's state shares it
 				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION:	// char-luciel CH2c: June @32b46fdf ( ids 30019 / 30039 ); the other six Royal Guard cases wait for CH2c2's callbacks
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_SOUL_EXTORTION", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_Init );	// June 32b4afc0
+				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_StateStartFuture );	// June 32b4afd0
+				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_StateStart );	// June 32b4afe0
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_FrameMove );	// June 32b4aff0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_EventProcess );	// June 32b4c260
+				// June 32b3dd80 ( StateEnd ): LSI_SA_LCG_SOUL_EXTORTION_StateEnd, body in CH2c2 ( thunk 32b4e6e0 )
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_SOUL_EXTORTION", hyperStateData.stateID );
+				CopyStateCallbacks( hyperStateData, normalStateData );	// June 329cc2c0: the hyper state takes all nine
 			} break;
 
 		default:

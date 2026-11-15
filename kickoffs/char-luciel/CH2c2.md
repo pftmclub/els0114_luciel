@@ -51,3 +51,18 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1m (2026-11-15)
 
 - `CX2GULuciel::InitStateCommon` registers `LSI_SA_LCG_ESCHATON` ( 363; its FrameMove `32b2cfc0` is yours, Init / EventProcess are CH2c's: make sure the registration carries all three ) in June ( `32b3e8b0`, `ch0_reg.tsv` ), but every callback is this phase's, so CH1m left a `// June 32b3e8b0 @<row> <table> ( id N ): registered by CH2c / CH2c2 with its callbacks` marker at the end of the function. Replace the marker with the full registration ( table, June id, each slot as the `ch0_reg.tsv` row ), then `python june2017_re/char_luciel/ch1m_regcheck.py` must print 0 problems.
+
+## Amended by char-luciel CH2c (2026-11-15)
+
+- **The six Royal Guard setter cases are yours.** CH2c wrote only Soul Extortion's ( `RNSI_SA_LCG_SOUL_EXTORTION`, 30019 / 30039 ) and registered Eschaton ( 363 ) in `InitStateCommon`
+  with Init + EventProcess. Every other case needs a callback of this phase ( an EventProcess or a FrameMove ), and `stateends.py` fails a state registered without its
+  EventProcess ( stuck, invincible player ), so CH2c wrote its 35 functions ( the preloads, the Demonic Breath / Fantasie Impromptu / Death Crisis of Marbas bodies, Eschaton's
+  EventProcess ) but not those cases. Write them now at the `RNSI_SA_LCG_SOUL_EXTORTION` case's neighbour inside the same `switch ( iBaseSkillID )`, from
+  `python june2017_re/char_luciel/ch2c_cases.py <entry_va>` ( annotated listing, each callback marked with the phase that owns it ): Soul Shock 10205 @32b46a1f ( + male 344, skill-state byte ),
+  Demonic Breath 30017 / 30068 @32b47056 ( + 348 / 349 ), Fantasie Impromptu 30021 / 30069 @32b47150 ( + 350-357 ), Death Crisis of Marbas 30018 / 30037 @32b473e5 ( + 358-362 ),
+  Soul Strike 30207 / 30214 @32b49842 ( + 342 / 343 / 345 / 346 / 347, skill-state byte on 345 ), Shadow 30209 / 30310 @32b49c24 ( + 403, skill-state byte ). Read the listing's hyper copies
+  ( Demonic Breath copies only +0x1c / +0x20 / +0x44 / +0x48; Soul Extortion and others call `CopyStateCallbacks` ) and each extra state's `m_eSkillID` store before writing.
+- **Also yours from CH2c:** Soul Extortion's `StateEnd` ( 32b3dd80; CH2c left `// June 32b3dd80 ( StateEnd ): ..., body in CH2c2` in its case ) and Eschaton's `FrameMove` ( 32b2cfc0; the
+  marker in `InitStateCommon` ); replace both, `ch1m_regcheck.py` must print 0 problems.
+- **Debug define:** `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` is back on ( CH2c's play-test ); this phase's review retires it again.
+- **Play-test:** CH2c's hand-off covered Soul Extortion alone ( save units `LuRgA` / `LuRgB` ); this phase's covers the other Royal Guard ids ( and the Eschaton chain: five presses of the key during Demonic Breath ).

@@ -13669,7 +13669,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-15
 // Description: char-luciel CH2a: temporary [JUNE_CHAR] LUCIEL SKILL lines ( one per equipped skill, and one per effect a Duo skill plays ) for the play-test; the CH2b review retires it.
 //              Revert: comment out the #define ( JUNE_CHAR_LUCIEL_SKILL_DEBUG ).
-//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG	// retired by the char-luciel CH2b review ( 2026-11-15 )
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG	// char-luciel CH2c: back on for the Soul Extortion play-test, the CH2c2 review retires it
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG

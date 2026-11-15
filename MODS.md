@@ -7158,6 +7158,14 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ) and its temporary `..._SK
 - **Damage.** The numerical tables of June's `Luciel_Duo.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 8 Lu/Ciel, CH2c: Royal Guard skills part 1 (char-luciel CH2c, 2026-11-15)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ) and its temporary `..._SKILL_DEBUG` ( back on for the play-test; the CH2c2 review retires it ). Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH2c - Done"; log lines `[JUNE_CHAR] LUCIEL SKILL ...`.
+- **What changes in game.** Soul Extortion ( 30019 / 30039 ) gets its states and callbacks in `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex` ( the upgrade multiplies the animation speed by its SA_ANI_SPEED ); Eschaton ( 363 ) is registered in `InitStateCommon` with its preload and event process. The other 29 Royal Guard functions of this phase ( Demonic Breath, Fantasie Impromptu, Death Crisis of Marbas, the Soul Shock / Soul Strike / Shadow preloads ) are compiled and wait for CH2c2: each of those skills needs a CH2c2 callback ( event process or frame move ), and a state registered without its event process would leave the player stuck and invincible ( `stateends.py` ), so their setter cases are written in CH2c2.
+- **Differs from March.** None to compare ( Lu/Ciel is new ). Stand-ins: Soul Extortion's `StateEnd` ( 32b3dd80 ) and Eschaton's `FrameMove` ( 32b2cfc0 ) are CH2c2's; `m_fSkillCameraOverrideSecondValue` ( +0x8d94 ) is stored but its reader is Stage 9's camera pair, as Rena's.
+- **Damage.** The numerical tables of June's `Luciel_Duo.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ## Engine R14c: the basic-item anim behind every attach-anim weapon's hits (june-engine R14c, 2026-11-15)
 
 Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (`Always.h`; `#error` without `..._JUNE_EQIP_ATTACH_ANIM`, `..._DIVERGE_UPDATE_EQUIP_COLLISION_DATA`, `..._JUNE_ITEM_KIM`, `..._JUNE_EQUIP_EFFECT_SET` and `..._JUNE_ENUM_NAMES`) and the temporary `..._DEBUG` (`[JUNE_ENGINE] EQBASIC` lines; the R14c review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.
