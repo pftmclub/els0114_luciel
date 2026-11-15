@@ -3256,7 +3256,11 @@ Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateM
 - **JUNE_BUGS** 731 ( the pet inventory open test counts a shown window as an open menu ), 732 ( training F6 resets only Demonio, not Diablura ).
 - **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GUUser.cpp`, `X2UIManager.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`: 5 x 0 errors; `cl /P` shows every
   new block live ( both cases, the wrappers, the frame hook, the F6 line ). Full build skipped: no play-test.
-- **Gates:** see the range block below ( the worktree run was polluted by two peers' uncommitted hunks in `Always.h` / `X2GUUser.*` ).
+- **Gates ( `finish.py --range 47c478ef^..47c478ef --with JUNE_CHAR_TRANSFORM_LINK JUNE_CHAR_LUCIEL_LIVE -v` ):** junediverge `RESULT: PASS`, enumscan exit 0;
+  flagcheck `_LIVE` `5 PASS, 2 OTHER, 0 FAIL, 1 ERROR`, `TRANSFORM_LINK` `3 PASS, 4 OTHER, 0 FAIL, 1 ERROR`, both `0 deleted line(s)` in the flag's files. The ERROR is the
+  tool's unevaluable compound guard ( `Always.h:13652` `LUCIEL_TUTORIAL && ... !LIVE`; precedent CH1a / CH1a1 ): resolved by hand, the commit's `Always.h` hunk is only the new
+  3-line `_LIVE needs TRANSFORM_LINK` guard, and the probes compile with `_LIVE` on, so the guard holds. OTHER rows: each flag's run lists the other flag's blocks, plus
+  `X2GULuciel.cpp`'s 3 replaced stand-in comments inside `_CORE` ( its 3 deleted lines ). stateends / skillicons / luabind skipped: no skill states, skills or scripts.
 
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 
