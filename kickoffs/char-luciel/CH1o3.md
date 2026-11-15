@@ -36,7 +36,8 @@ and from `kickoffs/char-luciel/CH1o.md` the sections "Amended by CH0 (2026-11-02
    `ShownSkillCoolTime` 0x6a8 overrides, the skill-use call @`32b3a6ba` ): confirm or wire.
 
 The engine state-id seam is **not** this phase's: the user chose ( 2026-11-15 ) to shift March's `USER_STATE_ID` to June's numbers ( plan `june-state-ids`,
-brief `kickoffs/june-backlog/stage41-plan.md` ); CH1 final waits for it.
+brief `kickoffs/june-backlog/stage41-plan.md` ); CH1 final waits for it. **Closed by june-state-ids S2 (2026-11-15, `857b18cd`):** Lu runs on the shared numbers;
+nothing of the seam is left here.
 
 Gates: `finish.py --files <changed> --state X2Lib/X2GULuciel.cpp Luciel_Duo --state X2Lib/X2GULuciel.cpp Luciel_Demonio`; `/Zs` probes plain and with
 `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`; full build skipped: no play-test. Write the Done note, STATUS, `CH1o3-review.md`, and check `CH1p.md`.

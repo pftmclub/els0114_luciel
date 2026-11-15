@@ -248,7 +248,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH1o2 | blocked (CH1o review): engine readers of the wait / walk / dash / jump / die getters ( 84 sites ) | Opus 5.5 / high, no review of its own (CH1o3 review covers it) | CH1o review | `X2GUUser.cpp`, engine readers | `CH1o2.md` |
 | CH1o3 | blocked (CH1o2): effect-set tags 4 / 10 / 11, checklist hooks, `+0x11` skill-state byte, Lu `ReservedSkillStart` | Opus 5.5 / high, Opus review (also covers CH1o2) | CH1o2 | `X2GULuciel.*`, `X2EffectSet.cpp`, `X2GUUser.*` | `CH1o3.md` |
 | CH1p | blocked (CH1o3 review; DU1 review, DU2 done): in-class duo switch, `DT_BOTH` / `DT_KEEP`, combination points, flag `_DUO` | Opus 5.5 / high, Opus review | CH1o3, DU1 reviews (DU2 done) | `X2GULuciel.*`, `Enum.lua` | `CH1p.md` |
-| CH1 | blocked (CH1p review; `june-state-ids` S2; NU4, CH1a2, CH1a3, CH1a4 reviews done, CH0b): `_LIVE` defined, factory cases, both scripts adopted, play-test | Opus 5.5 / high, Opus review, user play-test | CH1p review, NU4 review, CH0b, june-state-ids S2 | `X2GULuciel.*`, `X2Game.cpp`, Always.h, data036 | `CH1.md` |
+| CH1 | blocked (CH1p review; `june-state-ids` S2 done; NU4, CH1a2, CH1a3, CH1a4 reviews done, CH0b): `_LIVE` defined, factory cases, both scripts adopted, play-test | Opus 5.5 / high, Opus review, user play-test | CH1p review, NU4 review, CH0b, june-state-ids S2 | `X2GULuciel.*`, `X2Game.cpp`, Always.h, data036 | `CH1.md` |
 | DU3 | blocked (CH1 review): June's equip-view rewrite (every class) + item-templet minor-unit fields | Opus 5.5 / high, Opus review, user play-test | CH1 review | `X2GUUser.*`, `X2Eqip.*`, `X2Item*`, class overrides | `DU3.md` |
 | DU4 | blocked (DU3 review): NESI renumber + forward-only save migration (user yes 2026-11-02) | Opus 5.5 / xhigh, Opus review, user play-test | DU3 review | `X2Item.h`, `X2OfflineDB.*`, `X2UICharInfo.cpp`, save | `DU4.md` |
 | DU5 | blocked (DU4 review): two bodies in the character window / unit viewer, form packets `0x4d9` / `0x4da` | Opus 5.5 / high, Opus review, user play-test | DU4 review | `X2UICharInfo.*`, `X2UnitViewerUI.*`, `Handlers_*` | `DU5.md` |
@@ -282,12 +282,11 @@ Plan `JUNE_STATE_IDS_PHASES.md` - branch `main` - log tag `[STATE_IDS]` - flag `
 
 **Scope:** June's 46 missing `USER_STATE_ID` members inserted at June's values (`USI_END` 106 -> 152, every class enum +46), `Enum.lua` in the same pack, one regression play-test over every live class; then Lu/Ciel drops its shadow names. S1 runs alone in `X2GUUser.*`, S2 alone in `X2GULuciel.*` (both shared with char-luciel). char-luciel CH1 waits for S2.
 
-Done: S1 (+ review, 2026-11-15).
+Done: S1 (+ review, 2026-11-15), S2 (2026-11-15, `857b18cd`; covered by char-luciel CH1's review).
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| S2 | **ready** (S1 review done 2026-11-15, debug retired): Lu/Ciel on the shared numbers (shadow names, bounding / wait-change helpers), inert, probe build | Opus 5.5 / high; covered by char-luciel CH1 review | S1 review | `X2GULuciel.*`, Always.h | `S2.md` |
-| Z | blocked (S2): close | Sonnet 5.5 / medium | S2 | `MODS.md`, backlog, checklist, STATUS archive | `Z.md` |
+| Z | **ready** (S2 done 2026-11-15): close | Sonnet 5.5 / medium | S2 | `MODS.md`, backlog, checklist, STATUS archive | `Z.md` |
 
 ## field-rewards - offline EXP / ED / drop rows for June-only dungeons and fields (stand-in)
 Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]` (`offline_server.log`) - flags `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` (+ `_DEBUG`) - kickoffs `kickoffs/field-rewards/` - backlog Stage 23 - created 2026-11-12 (user: drop table from item.kim + the dungeon entry lists, fair rates).

@@ -153,6 +153,45 @@ Full build + deploy. One regression play-test over every live class (see the kic
 **Done gate.** `finish.py --files X2GULuciel.cpp X2GULuciel.h --state ...` PASS; `/Zs` probe of `X2GULuciel.cpp` plain and with
 `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, 0 errors. Full build skipped: no play-test (Lu goes live in CH1).
 
+### S2 - Done (2026-11-15)
+
+Opus 5.5 high. Code commit `857b18cd` (inert `_CORE`; `_LIVE` stays `//#define`). No debug define. No review of its own: char-luciel CH1's review covers it.
+- **Item 1, shadows:** the 20 `USI_SPECIAL_ATTACK_*` members CH1n put in `LUCIEL_STATE_ID` are dropped (`X2GULuciel.h`, one comment line in their place).
+  `enumprobe.py`: `CX2GUUser::USI_SPECIAL_ATTACK_1` .. `_SLOTB_HYPER_5` = 50 .. 69, the dropped values. No other `LUCIEL_STATE_ID` member re-declared a base name.
+  In-class readers (the setter's four slot tables, `X2GULuciel.cpp:14200`) now resolve to `CX2GUUser::`; the `/Zs` probes prove it.
+- **Item 2, LSI_ members equal to base:** every Lu member from 25 to 130 now equals a `USI_*`: damage 25-42, `LSI_RIDING_HYPER_MODE` 44, pepper run 45-49,
+  `LSI_LU_THROW_ITEM` 70, riding 72-96, bounding 120-122, phoenix 123 / 126, dance 127-129, `LSI_WAIT_STATE_CHANGE` 130 (census tsv by value; probed:
+  `USI_THROW_ITEM` 70, `USI_RIDING_START` 72, `_ATTACK_X_END` 96, `USI_BOUNDING_*` 120-122, `USI_DANCE_WAIT` 129, `USI_WAIT_STATE_CHANGE` 130). June's `LSI_`
+  names kept; the enum's one-line head comment says so. Lu has no members for 24, 43, 71, 97-119, 124-125, 131-151 (June's Lu table has none).
+- **Item 3, helpers (Ghidra listings `june2017_re/char_luciel/ghidra/`):** June's Lu registers bounding at `32b3e8b0` @`32b3f302` / @`32b3f381` / @`32b3f41b`
+  (ids 0x78-0x7a, tables `LSI_LU_DAMAGE_BOUNDING_*`) through thunks `329cc0b0` / `329cc150` / `329cc1e0` + `329cc050` + `329cc0c0` = vslots 0x5d4-0x5e4, the
+  same thunks every class uses (funcmap: Eve CH1b rows), which March's `InitBoundingStates` registers by name. Wait change: `32b43d10` @`32b44174`, id 0x82,
+  thunk `329cb720` -> `31fc8620` = `WaitStateChangeEventProcess`, as `InitWaitStateChange`. **Same: no divergent row.** Lu now calls
+  `InitBoundingStates( "LSI_LU_" )` and `InitWaitStateChange( "LSI_WAIT_STATE_CHANGE" )`; the first sets `m_bBoundingStatesReady` once Lu's three tables load,
+  so `RT_BOUNDING` works for Lu (June has no such flag; it is March's guard, as for the nine classes). Ciel's 417-419 stay inline (`GetStateIDByForm` maps them).
+  Kept on purpose (all classes): the helpers register nothing and log once when a table is missing (June registers anyway).
+  `ch1m_regcheck.py` now expands the two calls into the rows the helpers register: `matched 337 registrations, 0 problems` (unchanged).
+- **Item 4:** the setter's slot tables now name the same `CX2GUUser::USI_SPECIAL_ATTACK_*` members as the engine's (`X2GUUser.h:6034-6044`); 50-69 on both sides.
+  `StateChange( 263 )` / `( 268 )` are class-range ids above `USI_END`, untouched by S1. `InitEventStates` registers 110-118 (probed), so it no longer
+  overwrites `LSI_RIDING_SPECIAL_MOVE` 92 (CH1m's finding closed).
+- **Item 5:** `Always.h` guard `#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE needs SERV_IRUHADEV_JUNE_USER_STATE_IDS`, placed after S1's define (13530). Proved by the
+  `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` probe passing it.
+- **Item 6:** char-luciel `CH1.md` and `CH1o3.md` amended (seam closed); `CH1o2.md` does not name it. STATUS CH1 row: the `june-state-ids S2` dependency is done.
+- **Gates (worktree):** `finish.py --files X2GULuciel.cpp X2GULuciel.h --state ... Luciel_Duo --state ... Luciel_Demonio`: flagcheck JUNE_CHAR_LUCIEL_CORE PASS
+  (2 PASS, 0 OTHER, 0 FAIL, 48 deleted lines = the 20 shadows + 2 comment lines in `.h`, the 6-line wait-change and 20-line bounding rows in `.cpp`, all inside the
+  `_CORE`-only file), flagcheck JUNE_ENUM_NAMES PASS (2 OTHER = `_CORE`'s), junediverge PASS, enumscan PASS, stateends PASS both: `FINISH RESULT: PASS (8 gates,
+  0 failed, 2 skipped)`. `finish.py --files KTDXLIB/Always.h --skip-flag JUNE_USER_STATE_IDS "guard target"`: JUNE_CHAR_LUCIEL_LIVE INERT (1 PASS), junediverge /
+  enumscan PASS: `FINISH RESULT: PASS (7 gates, 0 failed, 4 skipped)`.
+  Why two runs: flagcheck cannot evaluate an existing `Always.h` guard `#if defined( A ) && !defined( F )` when F is the flag checked (A unknown), so with
+  `Always.h` in the set `_CORE` (guard at 13430) and `_ENUM_NAMES` (10175) read ERROR on lines this phase did not touch.
+- **Gates (range `857b18cd^..857b18cd`, same split):** flagcheck `_CORE` PASS (2 PASS, 48 deleted), `_ENUM_NAMES` PASS (2 OTHER), `_LIVE` 1 PASS, not defined (INERT);
+  `finish.py --range` junediverge / enumscan / stateends PASS.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2GULuciel.cpp` plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: exit 0, 0 errors, 0 class warnings.
+  **Full build skipped: no play-test.**
+- **How to see it in game:** nothing yet (inert until char-luciel CH1). CH1's play-test can show it: Lu returns from the win pose after a dungeon result
+  (`USI_WAIT_STATE_CHANGE`; Add stays in it until char-add), and `offline_server.log` has `JUNE_FX C3d-3 bounding states registered for LSI_LU_`.
+- **Next:** `/x2-phase june-state-ids Z` (Sonnet 5.5 medium).
+
 ## Z - Close
 
 **Scope.** `MODS.md` row (flag, the `Enum.lua` coupling, how to revert); backlog Stage 41 closed; `STATUS.md` block to `STATUS_ARCHIVE.md` plus a

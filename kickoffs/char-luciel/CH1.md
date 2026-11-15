@@ -78,5 +78,9 @@ Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_
   `Enum.lua` with it ) and S2 does the Lu/Ciel part ( shadow `USI_SPECIAL_ATTACK_*` dropped, `InitBoundingStates` / `InitWaitStateChange` or a
   replacement, `m_bBoundingStatesReady` ); S2 has no review of its own, so this phase's review covers S2's diff. Read S2's Done note
   ( `python tools/docsection.py JUNE_STATE_IDS_PHASES.md "S2 - Done"` ) before the task.
+  **Amended by june-state-ids S2 (2026-11-15): the seam is closed; nothing is left for the engine state-id seam.** Lu calls `InitBoundingStates( "LSI_LU_" )`
+  ( sets `m_bBoundingStatesReady` ) and `InitWaitStateChange( "LSI_WAIT_STATE_CHANGE" )`; the shadow `USI_SPECIAL_ATTACK_*` are gone; `InitEventStates` (110-118)
+  no longer overwrites 92; `Always.h` guards `_LIVE` on `SERV_IRUHADEV_JUNE_USER_STATE_IDS`. The review covers S2's commit `857b18cd`. The play-test adds: Lu
+  returns from the win pose after a dungeon result ( wait change ), and `offline_server.log` shows `JUNE_FX C3d-3 bounding states registered for LSI_LU_`.
 - `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( CH1o, defined ) is live for every class from CH1o on: the regression part of this play-test walks one other class
   ( emotion, a skill, a dash, a jump, a death ) to show nothing changed.
