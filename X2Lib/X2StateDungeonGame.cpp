@@ -6649,6 +6649,9 @@ void CX2StateDungeonGame::DungeonEndingEvent::SetDungeonClearTexture( CKTDGUISta
 			}
 			else
 				CX2Data::GetCharacterImageName( fileName, pieceName, g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass, CX2Data::CIT_DungeonClear );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL UI clear picture: speech body %d, class %d, file %s", g_pX2Game->GetWinSpeechForm(), static_cast<int>( pMyUser->GetUnitClass() ), fileName.c_str() );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI_DEBUG
 		} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_CLASS
