@@ -7174,6 +7174,15 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ) and its temporary `..._SK
 - **Damage.** The numerical tables of June's `Luciel_Duo.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 8 Lu/Ciel, CH2c2: Royal Guard skills part 2 (char-luciel CH2c2, 2026-11-15)
+
+Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ), `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( six buff names ) and the temporary `..._SKILL_DEBUG` ( on for the play-test; the CH2c2 review retires it ). Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH2c2 - Done"; log lines `[JUNE_CHAR] LUCIEL SKILL ...`.
+- **What changes in game.** The Royal Guard skills are usable: Soul Shock ( 10205 ), Demonic Breath ( 30017 / 30068 ), Fantasie Impromptu ( 30021 / 30069 ), Death Crisis of Marbas ( 30018 / 30037 ), Soul Strike ( 30207 / 30214 ) and Shadow ( 30209 / 30310 ) get their states and callbacks in `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex`;
+  Soul Extortion gains its state end ( the Soul Collector stacks ) and Eschaton its frame move ( the effect set grows with the stacks ). New `X2BuffFactor.h` names: `BTI_BUFF_SHADOW_LU` / `_CIEL`, `BFI_BUFF_SOUL_COLLECTOR`, `BFI_BUFF_NOBLE_BEING`, `BFI_BUFF_SHADOW_LU` / `_CIEL`.
+- **Differs from March.** None to compare ( Lu/Ciel is new ). Stand-ins: June's memo getter is a stub, so no memo effect set plays; the Soul Shock damage effect's extra damage ( `m_ExtraDamage.m_Damage`, June CEffect +0x2a4 ) is rescaled by the target rate over the power rate ( fixed by the CH2c2 review ).
+- **Damage.** The numerical tables of June's `Luciel_Duo.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The save `LuRgA` / `LuRgB` skill rows are back in `db_backup/els_db_20261115_220809_pre_sql.sql`.
+
 ## Engine R14c: the basic-item anim behind every attach-anim weapon's hits (june-engine R14c, 2026-11-15)
 
 Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (`Always.h`; `#error` without `..._JUNE_EQIP_ATTACH_ANIM`, `..._DIVERGE_UPDATE_EQUIP_COLLISION_DATA`, `..._JUNE_ITEM_KIM`, `..._JUNE_EQUIP_EFFECT_SET` and `..._JUNE_ENUM_NAMES`) and the temporary `..._DEBUG` (`[JUNE_ENGINE] EQBASIC` lines; the R14c review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.

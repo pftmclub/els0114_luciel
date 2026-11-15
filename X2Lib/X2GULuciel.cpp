@@ -89,7 +89,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fAuraOfFearDuration( 0.f )
 , m_fEnhancedSpecterRate( 1.f )
 , m_fEnhancedSpecterRange( 1.f )
-, m_fSoulStrikeChargeTime( 0.f )
+, m_fShadowShieldAmount( 0.f )
 , m_iShadowBoltNpcUID( -1 )
 , m_fShadowBoltTime( 0.f )
 , m_fShadowBoltDuration( 0.f )
@@ -16148,7 +16148,7 @@ void CX2GULuciel::LSI_A_LCG_F_SOUL_SHOCK_EventProcess()
 	CommonEventProcess();
 }
 
-// char-luciel CH2c2: June 32b2db60 / 32b2e080: the Soul Collector stacks raise the attack, the size and the damage effect's rate; the stacks are spent unless the memo is equipped ( June's memo getter is a stub )
+// char-luciel CH2c2: June 32b2db60 / 32b2e080: the Soul Collector stacks raise the attack, the size and the damage effect's extra damage; the stacks are spent unless the memo is equipped ( June's memo getter is a stub )
 void CX2GULuciel::LSI_A_LCG_SOUL_SHOCK_PlayEffects( const WCHAR* pwszEffectSetName_ )
 {
 	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SOUL_SHOCK_EFFECT_TIME ) )
@@ -16185,10 +16185,11 @@ void CX2GULuciel::LSI_A_LCG_SOUL_SHOCK_PlayEffects( const WCHAR* pwszEffectSetNa
 
 		if ( CX2DamageEffect::CEffect* pDamageEffect = g_pX2Game->GetDamageEffect()->GetInstance( m_hSoulShockDamageEffect, true ) )
 		{
-			const float fEffectRate = pDamageEffect->GetPowerRate();
-			const float fScaledRate = fEffectRate * ( fTargetRate / fPowerRate );
-			if ( fScaledRate != fEffectRate )
-				pDamageEffect->SetPowerRate( fScaledRate );
+			// char-luciel CH2c2 review: June CEffect +0x2a4 = DamageData ( +0x200 ) +0xa4 = m_ExtraDamage.m_Damage, not the power rate ( +0x1d8 )
+			const float fExtraDamage = pDamageEffect->GetDamageData().m_ExtraDamage.m_Damage;
+			const float fScaledExtraDamage = fExtraDamage * ( fTargetRate / fPowerRate );
+			if ( fScaledExtraDamage != fExtraDamage )
+				pDamageEffect->GetDamageData().m_ExtraDamage.m_Damage = fScaledExtraDamage;
 		}
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
@@ -16687,7 +16688,7 @@ void CX2GULuciel::ApplyShadowBuff()
 
 	// 322cc1a0: the PvP-or-PvE test
 	const CX2SkillTree::SKILL_ABILITY_TYPE eMaxHpAbility = ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ? CX2SkillTree::SA_MAX_HP_REL_PVP : CX2SkillTree::SA_MAX_HP_REL );
-	m_fSoulStrikeChargeTime = static_cast<float>( GetMaxHp() * static_cast<double>( pSkillTemplet->GetSkillAbilityValue( eMaxHpAbility, iSkillLevel ) ) );
+	m_fShadowShieldAmount = static_cast<float>( GetMaxHp() * static_cast<double>( pSkillTemplet->GetSkillAbilityValue( eMaxHpAbility, iSkillLevel ) ) );
 }
 
 // char-luciel CH2c2: June 32b30bc0 / 32b30d40 ( identical, one per body ): outside the Wait animation the Shadow buffs of both bodies end at 0.01 s and the buff is applied at 0.1 s

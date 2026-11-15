@@ -53,3 +53,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1o3 (2026-11-15)
 
 - **Skill-state byte:** June marks some extra states as skill states ( byte `+0x11`, now `UserUnitStateData::m_bSkillState`, flag `SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE` ). In your cases set `stateData.m_bSkillState = true;` on: 459@32b49d48 ( `ch1n_skill_cases.tsv` column `skill_state_extra`, state id @ June store ). The slot states already get it from CH1n's head.
+
+## Amended by the char-luciel CH2c2 review (2026-11-15)
+
+- `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` is retired ( `//#define` ); turn it back on for this play-test as CH2c did ( the CH2d2 review retires it ).
+- The review fixed Soul Shock ( 10205 ): its damage effect's extra damage is rescaled, not its power rate. Your build is the first to carry it: the hand-off adds one Soul Shock cast on `LuRgA` ( the `soul shock` debug line, no crash ).
+- A protected float on a June damage effect: CEffect `+0x1d8` is the power rate and DamageData starts at `+0x200` ( `+0x2a4` = `m_ExtraDamage.m_Damage` ); map an offset there before calling it a CEffect member.

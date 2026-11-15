@@ -3620,6 +3620,33 @@ Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h` ( bytepatch ), `MODS.md`, `func
   **Not in the logs:** the female Soul Strike ( 30207 from Lu ), the Eschaton chain ( no 5-press cast ), Accelerando / big fire ( no debug line ); the user reports them passed by sight. The review can re-test those three if it wants a log line.
 - **Next:** `/x2-phase char-luciel CH2c2 review` on Opus 5.5 high; CH2d waits for that review.
 
+### CH2c2 - Review (2026-11-15)
+
+Opus 5.5 high. Reviewed CH2c ( `075874fc` ) and CH2c2 ( `833d1d53` ) against June in Ghidra ( read-only ). **Verdict: pass after one fix and one rename**; `_SKILL_DEBUG` retired.
+Files: `X2GULuciel.cpp` / `.h`, `Always.h` ( the debug line ), `ch1_offsets.tsv`, `funcmap.tsv` ( the 8 CH2c2 rows, left uncommitted by CH2c2, + 2 corrected ), `MODS.md` ( CH2c2's section, also left uncommitted, + 1 corrected line ), `kickoffs/char-luciel/CH2d.md`.
+- **Fix ( `_SKILL`, Soul Shock `32b2db60` / `32b2e080` ):** June's protected float at damage effect `+0x2a4` is not the power rate: `+0x1d8` is ( June's CEffect ctor `31f7aab0` @31f7aea1 stores the power-rate argument
+  there and passes it to `32632390` with `&DamageData` = `+0x200` ); `+0x2a4` = DamageData `+0xa4` = `m_ExtraDamage.m_Damage` ( proved by CH1l3's review, Raven Megadrill reader `32c5ce40` ). CH2c2 rescaled the power
+  rate through `CEffect::SetPowerRate`; it now rescales `GetDamageData().m_ExtraDamage.m_Damage` by target rate / power rate, written only when it changes, as June. One-line tag `char-luciel CH2c2 review`.
+- **Rename ( CH1a's provisional name ):** `+0x968c` `m_fSoulStrikeChargeTime` -> `m_fShadowShieldAmount`. Its only June users are Shadow's `32b20670` ( writes max HP x `SA_MAX_HP_REL` / `_PVP` ) and `32aebaf0`
+  ( the user DamageReact absorb: drains it, erases BTI 478 / 479 at <= 0; checklist 7j, CH4b ) and the ctor ( `dispsweep.py 968c` ). No behaviour change.
+- **Spot-checked = June ( decompile + listing ):** `AddSoulCollectorStack` `32b3db80` ( BTI 0x1ce = 462, missing-templet limit 9999, `limit - 1 <= count` unsigned, Tribute 0x76c9 -> BFI 0x21c = 540,
+  `count != 0 && cool <= 0` ( NaN skips ), `vslot 0xac < 3` -> soul `SA 0xaa`, buff time `0xa9`, cool `0x94`, BFI 0x20b = 523 at `+0x9608` ); Soul Extortion end `32b3dd80` ( roll > 0.5, default 5, UCHAR loop, `vslot 0x7dc` );
+  Soul Strike end `32b3dea0` ( erase, the inlined stack body per loop above 5, reset to 5 ); Shadow `32b20670` ( templet 0x7601 with the upgrade flag, `+0x867c` unit, level floor 1, `vslot 0x260` -> 0x221 / 0x222 = 545 / 546,
+  `322cc1a0` -> `0xab` else `0x14` ); Soul Shock ( ids 0x27dd, SA 6 / 0x20 / 0x51, scale `+0x70..+0x78` + `+0x7c` = `SetEffectScale( v, true )` ); Demonic Breath charge `32b1d490` ( `0.3 < t || 9 < n` -> 349, MP
+  `32007b10( 0x8f, future skill )` into `vslot 0xe4` with the minor flag, count + 1, `+0x95e8` = 0 ); Accelerando end `32b1d5f0` ( loop count `+0x95da > 4` -> `vslot 0x884( 31fcf430( 0x7547 ), 1 )`, refusal -> state 13, else short = 5 );
+  `SetLeftHandRotateBone` `32b15680` ( `+0x9630 += elapsed x class float`, clamp 45 ); female shot `32b2e5a0` ( `( r % 3 ) x 50 - 25` ). Enum values re-counted from `X2SkillTree.h` ( `HP_CONSUME_REL` has no `SA_` prefix: 148 / 169 / 170 / 171 hold ).
+  One failure in nine, and it was the item CH2c2 itself left to this review, so the rest of the phase was not re-read line by line.
+- **Setter cases:** `ch1m_regcheck.py` 340 matched / 0 problems and `stateends.py` PASS ( CH2c2's range gate below ); not re-derived.
+- **Hygiene ( `finish.py --review --commits 075874fc 833d1d53 --with JUNE_CHAR_LUCIEL_SKILL JUNE_ENUM_NAMES JUNE_CHAR_LUCIEL_SKILL_DEBUG -v` ):** junediverge PASS, `--check-all` PASS, enumscan exit 0; flagcheck `_SKILL` and
+  `JUNE_ENUM_NAMES` each 1 ERROR, both on `075874fc` `Always.h` line 10175 ( `#if defined( ..._USER_SKILL_USE_HELPERS ) && !defined( ..._JUNE_ENUM_NAMES )`, which flagcheck cannot resolve once `JUNE_ENUM_NAMES` is a partner ),
+  not a code defect: run per commit with that commit's own flags both pass, `075874fc` ( `_SKILL` + `_DEBUG` ): `FINISH RESULT: PASS (6 gates)`, `833d1d53` ( + `JUNE_ENUM_NAMES`, `--state`; stateends PASS ): `FINISH RESULT: PASS (7 gates)`.
+  OTHER rows: `X2BuffFactor.h` under `_SKILL` = the `JUNE_ENUM_NAMES` names ( PASS there ), `X2GULuciel.cpp` under `JUNE_ENUM_NAMES` = the `_CORE` / `_SKILL` blocks. Deleted lines: `075874fc` 1 = the `//#define` turned on,
+  `833d1d53` 3 = CH2c's "body in CH2c2" markers. `833d1d53` also carried a racing peer's deletion of `kickoffs/june-stat-calc/D5-review.md`; its owner restored it ( `ddaf8568` ).
+- **This review's gates:** `/Zs` probe of `X2GULuciel.cpp`: exit 0, 0 errors. Worktree `finish.py --files X2GULuciel.cpp X2GULuciel.h Always.h --with _SKILL _CORE _SKILL_DEBUG`: both class files PASS, junediverge PASS, enumscan 0,
+  `_SKILL_DEBUG` retired; the `Always.h` ERROR is a peer's uncommitted `Always.h` hunks ( char-add ) plus the `_LIVE` / `_CORE` guard pairing. Range gate after the commit: below.
+- **Build:** full build skipped: no play-test ( the fix changes one number on Soul Shock's damage effect; CH2d's build carries it, and its hand-off re-casts Soul Shock once ).
+- **Next:** `/x2-phase char-luciel CH2d` on Sonnet 5.5 high.
+
 
 Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`, `Always.h`. Flags: `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`
 ( the window, the user wrappers, the `UI_MENU` member ) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ( the hooks inside March functions; new `Always.h` guard: `_LIVE` needs

@@ -198,7 +198,7 @@ offset	kind	name	note
 0x9680	field	m_fAuraOfFearDuration	CX2GULuciel float; provisional name ( from its users ); users: 32b15780 ? ( CH1l3 ), 32b3d380 ? ( CH4a ) ( CH1a )
 0x9684	field	m_fEnhancedSpecterRate	CX2GULuciel float; provisional name ( from its users ); users: 32b2e5a0 LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b2ec50 LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
 0x9688	field	m_fEnhancedSpecterRange	CX2GULuciel float; provisional name ( from its users ); users: 32b2e5a0 LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b2ec50 LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove ( CH2c2 ), 32b45820 InitPassiveSkillState ( CH4a ) ( CH1a )
-0x968c	field	m_fSoulStrikeChargeTime	CX2GULuciel float; provisional name ( from its users ); users: 32aebaf0 not-luciel/n ( a ), 32b20670 ? ( CH2c2 ) ( CH1a )
+0x968c	field	m_fShadowShieldAmount	CX2GULuciel float; Shadow's absorb pool: 32b20670 writes max HP x SA_MAX_HP_REL ( _PVP ), 32aebaf0 drains it and erases BTI 478 / 479 at <= 0 ( renamed by the CH2c2 review ) ( CH1a )
 0x9690	field	m_iShadowBoltControlIndex	CX2GULuciel int; provisional name ( from its users ); users: 32b20780 ? ( CH1l3 ), 32b2ff50 LSI_SA_LCN_SHADOW_BOLT_START_EventProcess ( CH3b ), 32b30000 LSI_SA_LCN_SHADOW_BOLT_END_StateEndFuture ( CH3b ), 32b30090 LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess ( CH3b ) +9 ( CH1a )
 0x9694	field	m_fShadowBoltTime	CX2GULuciel float; provisional name ( from its users ); users: 32b20780 ? ( CH1l3 ), 32b2fba0 LSI_SA_LCN_SHADOW_BOLT_START_FrameMove ( CH3b ) ( CH1a )
 0x9698	field	m_fShadowBoltDuration	CX2GULuciel float; provisional name ( from its users ); users: 32b20780 ? ( CH1l3 ), 32b2fba0 LSI_SA_LCN_SHADOW_BOLT_START_FrameMove ( CH3b ) ( CH1a )

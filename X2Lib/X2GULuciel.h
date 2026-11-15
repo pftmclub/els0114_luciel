@@ -1374,7 +1374,7 @@ protected:
 	float								m_fAuraOfFearDuration;				// +0x9680
 	float								m_fEnhancedSpecterRate;				// +0x9684
 	float								m_fEnhancedSpecterRange;			// +0x9688
-	float								m_fSoulStrikeChargeTime;			// +0x968c
+	float								m_fShadowShieldAmount;				// char-luciel CH2c2 review: +0x968c, Shadow's absorb pool ( max HP x rate ), drained by June 32aebaf0
 	int									m_iShadowBoltNpcUID;				// +0x9690: char-luciel CH1l3: the Shadow Bolt spear's NPC UID ( June 32b20780 looks it up by UID ), CH1a named it an index
 	float								m_fShadowBoltTime;					// +0x9694
 	float								m_fShadowBoltDuration;				// +0x9698
