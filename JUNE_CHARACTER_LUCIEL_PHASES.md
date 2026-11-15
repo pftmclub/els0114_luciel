@@ -1534,6 +1534,41 @@ the retired `JUNE_CHARINFO_EQUIP_GROUP`, whose define is commented out). Rows: f
   onepiece shows merged with the costume top / bottom in the U window only, March's viewer `UpdateEquipSlotVisibility` id lists; in play it is right.
   Routed to june-engine R14e (kickoff amended, `8b5d3e7c` / `5218e482`).
 
+### DU4 - Review (2026-11-15)
+
+Opus 5.5. **Pass, no code change.** Reviewed `31a27331` against June in Ghidra and the Done note. Only bookkeeping changed: funcmap row `32358ad0 (DU4)` gains
+the slot-0 caller `3291d9f0`.
+- **Enum:** `X2Unit.h` `NOW_EQIP_SLOT_ID` and the live data036 `Enum.lua` both equal June's `Enum.src.lua:6653-6696` (44 of 44 name / value pairs,
+  script compare); March's 0-19 keep their order and values, and `NESI_END` = 43.
+- **Slot hide** `IsEquippedSlotShown` = `32e22ce0`. Lu's list {0, 2, 4, 6, 8, 10-19, 35, 37, 39, 41} shows when not switched, Ciel's {20-34, 36, 38, 40,
+  42} shows when switched, and any other id always shows. **Window fill** `ResetNowEquipUI` = `329146d0`: position from templet `+0xd5`, remapped by
+  `3234fe90` on my unit; accessory or fashion match; `3286a350( uid )` == the slot's `+0x44`; then reset or create.
+- **`GetEquippingItemByEquipPos`** = `32869e10`: at `@32869e9f`, `ECX` = `g_pData +0x68 +0x90` (my unit, null-checked as ported). At
+  `@32869ed1-32869ef4`, the slot-id class must equal the third argument. The head (positions 2-14 not fashion -> 0) is D2b's and unchanged.
+  `GetEquipGroup` = `3286a4b0` (1 / 3 / 5 / 7 / 9 -> 2, minor -> 1, else 0, missing UID -> 0). `GetAddMaxMPValue` = `32869f80`. `IsMinorUnitEquipSlot` = `32070ef0`.
+- **Right-click** (`disasm_range.py 0x321ae800 0x321aeea0`): target body at `@321ae867`. Not fashion and not accessory -> 0. Not `UC_ANYONE`
+  (`+4 & 0xf000 != 0x1000`, `UC_ANYONE` = 1 in `XSLItem.h` and June) -> templet flags `+8` bit 2. Anyone -> unit `+0xe40` (= `m_bMinorUnitForm`), or
+  the char window's `+0x25a` (`m_bSwitchingView`) when its `+0x1e5` (`m_bShow`) is set. The `+0x80` look-templet branch is the labelled stand-in.
+  Slot test `@321aeb5a`: `cmp [slot+0x40], 0x26` is the slot's equip position (`EP_ONEPIECE_FASHION` = 38 under `SERV_NEW_ONE_PIECE_AVATAR_SLOT`).
+  The anyone test re-reads the same templet (`item +8`). The match `@321aec2c-321aec39` = the port's early `continue` plus March's position / fashion
+  test (the `continue` leaves only that slot). `321693b0` (target position adjust) is still DU5's, as noted. JUNE_BUGS 741 holds: both onepiece
+  slots pass for an anyone item, and Lu's comes first.
+- **Unit `+0x294`:** `323574c0` overwrites only when the slot is not 0 and inserts a new UID. Callers through `32358ad0` are as the funcmap lists, plus
+  `3291d9f0` (`CX2UICharInfo::SetNowDragItemReturn`, slot 0). That one re-adds an item that is already worn, so its entry keeps the real slot. The
+  stand-in (inventory slot, `3286a310`) still equals June's map offline; JUNE_BUGS 742 is unreachable offline.
+- **Save:** the v24 rung is two UPDATEs in one `BEGIN` / `COMMIT`, the same as every other rung in `Migrate()`, and logs its line. The live save reads
+  `user_version` 24: worn slots >= 20 are 21-25 (1 each), 35 (3) and 36 (1), and all 59 worn bags are 43. `elsdb.py` `EQUIP_SLOTS` / `MINOR_SLOTS`
+  match June's ids and the emulator's slot rows. **Emulator stand-in**
+  (`IsSuitableSlot`): the body rule = the right-click rule for non-anyone items. Minime / earring / second ring = `EP_AC_TEMP2` / `_TEMP3` / ring, and
+  June's `EP_AC_MINIME` 26, `EP_AC_EARRING` 27 and `EP_AC_RING2` 28 agree. Ciel's starter costume goes to `NESI_MINORUNIT_*` in `COSTUME_SLOT`'s order.
+- **Flag-off = March:** `cl /P` (census `cl_cmd`) of `X2Inventory.cpp`, `X2UICharInfo.cpp` and `X2UIInventory.cpp` with the flag on, and again with it
+  off through a scratchpad shadow `KTDX.h` / `Always.h` (`/I` first; the shared `Always.h` was not touched). All six runs exit 0. With
+  `__FILE__` / `#line` path noise removed, on and off differ only in the `X2Unit.h` enum block and the flag's own blocks in each file.
+- **Gates:** `finish.py --review --commits 31a27331 --with SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER`: flagcheck PASS (8 PASS, 1 PASS~, 1 OTHER =
+  `Always.h`'s retired `CHARINFO_EQUIP_GROUP` define line, 0 FAIL); junediverge PASS; `--check-all` PASS; enumscan exit 1 on 190 rows, **0 on DU4's
+  330 added lines** (`git diff -U0` intersect). stateends / skillicons / luabind are n/a (no skill states, skills or June script).
+- Full build skipped: no play-test (no code change).
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under
