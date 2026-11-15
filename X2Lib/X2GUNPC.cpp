@@ -28749,6 +28749,17 @@ void CX2GUNPC::DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageD
 		pOwner->DoProcessWhenDamageDataDestroyed( pDamageData_ );
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+// char-luciel CH1o: June 3275a410, as char-ara CH1o wrote it
+void CX2GUNPC::DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ )
+{
+	CX2GameUnit* pOwner = GetOwnerGameUnit();
+	if ( NULL != pOwner )
+		pOwner->DoProcessWhenDamageDataDestroyed( pDamageData_ );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 float CX2GUNPC::GetActionSpeedUpValue()
 {
 	float fActionSpeedUpValue = 0.0f;

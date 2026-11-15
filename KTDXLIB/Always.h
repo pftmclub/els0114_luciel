@@ -13495,3 +13495,19 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL needs JUNE_CHAR_FORM_MP_GAGE and JUNE_DIVERGE_GAGE_TALLY, char-luciel CH1k
 #endif SERV_IRUHADEV_JUNE_CHAR_UNIT_MP_VIRTUAL
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH1o - June's CX2GUUser / CX2GameUnit virtual slots that Lu/Ciel overrides and March lacks or has non-virtual:
+//              the wait / walk / dash / jump / die state getters ( user vslots 0x438-0x464 ), StateChangeDashIfPossible ( 0x668 ), ResetMaxMP
+//              ( 0x664 ), the emotion gate ( 0x574 ), hand-equip show ( 0x62c ), stored MP ( 0x650 ), future MP sync ( 0x64c ), the body-change
+//              hooks ( 0x648, 0x848 ), the skin by form ( 0x570 ) and the damage-data reset hook ( unit vslot 0x2e4, DamageData::SimpleInit ).
+//              Base bodies are June's bases, which equal March's behaviour, and the engine sites March shares with June call them. No March
+//              class overrides any of them, so nothing changes until Lu/Ciel is live. Needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( the second skin ).
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+#if defined( SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS ) && !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY )
+#error SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY, char-luciel CH1o
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+//////////////////////////////////////////////////////////////////////////

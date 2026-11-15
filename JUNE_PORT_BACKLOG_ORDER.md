@@ -1694,6 +1694,18 @@ be placed by address.
   but only for ids in the `g_pData +0x28c` set ( `326f8210` ); it is read by `323179c0` from `322f0020` beside `m_nDamageCount`, possibly a play report. Funcmap rows `StatCalc S33 D4b`.
 - **Depends on:** june-census Z. Start: `/x2-phase new-plan june-triage` (Opus 5.5 high), brief `kickoffs/june-backlog/stage40-plan.md`.
 
+### Stage 41: March's user state ids take June's numbers (char-luciel CH1o, 2026-11-15)
+
+March's `CX2GUUser::USER_STATE_ID` equals June's below 24 and falls behind from there (June has more members: `USI_SPECIAL_ATTACK_1` 49 vs 50,
+riding 71 vs 72, the event kit 93 vs 111, bounding 102 vs 120, `USI_WAIT_STATE_CHANGE` 105 vs 130). Lu/Ciel registers at June's ids, so every engine
+`StateChange( USI_* )` at 24 or above sends Lu to the wrong state. **User, 2026-11-15:** shift March's enum to June's numbers (June's members
+inserted at June's values; every class enum and the core-list `Enum.lua` follow), not a getter per engine site.
+- Census of the missing members, every reader that treats a state id as a number, `Enum.lua` in the same phase, one regression play-test over
+  every live class (riding, a skill slot, an event state, the wait change after a win).
+- **Gates:** char-luciel CH1 final (the Lu/Ciel play-test) waits for this plan's last code phase.
+- **Depends on:** nothing. Start: `/x2-phase new-plan june-state-ids` (Opus 5.5 high), brief `kickoffs/june-backlog/stage41-plan.md`.
+  Touches `X2GUUser.h` and every class header's state enum: one at a time with a char-port phase in `X2GUUser.*`.
+
 ## Open decisions that gate stages
 
 | Decision | Gates | How to settle |

@@ -40,3 +40,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **States:** the ones whose callbacks are listed above (the state table's col 8 keeps the unsplit `CH3a`).
 - **Moved from CH2a0** (CH0): the first spawn is Dread Lord's (`ch0_summons.tsv`). One spawn rule for the class (CreateNPCReq from a state FrameMove); the Garden NPC's own Lua spawns are CH3c20's.
 - Scope: June's `NPCTemplet.lua` rows (core list) for 1906 `NUI_SI_SA_LLD_SUMMON_DARKNESS`, 1937 `_PVP`, 1908 `NUI_SI_SA_LCN_SHADOW_BOLT`, 2269 `NUI_SA_LDN_GARDEN_OF_HAURES`, 2270 `NUI_SA_LDN_GARDEN_OF_HAURES_ADD`; their `NPC_UNIT_ID` names in the live `Enum.lua` (core list) and 2270 in `X2UnitManager.h` (2269 is CH1a's); their motions / meshes are in CH0b's list. 1907 `NUI_SI_A_LCN_SHADOW` gets nothing (June ships no script and nothing spawns it). `luabind.py check` PASS for 1906 / 1937 / 1908 / 2270.
+
+## Amended by char-luciel CH1o (2026-11-15)
+
+- **The summons' hits reach Lu ( vslot 0x300 ).** June calls `AdjustDamageDataBeforeDamageReact` on every attacker unit ( `X2DamageManager.cpp`, the three
+  `char-raven CH1o` sites test `GUT_USER` only ), and an ally NPC hands it to its owner ( `CX2GUNPC` `32778fe0`: the `+0x7c98` owner record, dynamic cast, unit by uid,
+  then the owner's vslot 0x300 ). Port both with the summons ( class-agnostic flag: every class's summons then reach their owner, so the play-test covers one
+  other class with a summon ). Lu's override `32b1e720` is already written ( CH1k ).

@@ -1512,6 +1512,9 @@ class CX2DamageManager
 #endif SERV_IRUHADEV_JUNE_BUFF_REACT_APPLY
 			void SimpleInit()
 			{
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+				NotifyAttackerWhenReset();	// char-luciel CH1o: June SimpleInit 31f8ee50 calls 32610da0 first
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 				damageType			= DT_PHYSIC;
 				attackerType		= AT_UNIT;
 				attackType			= AT_NORMAL;
@@ -1835,11 +1838,24 @@ class CX2DamageManager
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 			void NotifyAttackerWhenDestroyed() const;	// char-ara CH1o: June 32610d50 ( the attacker unit's vslot 0x2fc )
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+			void NotifyAttackerWhenDestroyed() const;	// char-luciel CH1o: June 32610d50 ( the attacker unit's vslot 0x2fc )
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+			void NotifyAttackerWhenReset() const;	// char-luciel CH1o: June 32610da0 ( the old attacker unit's vslot 0x2e4 )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 			~DamageData()
 			{
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 				NotifyAttackerWhenDestroyed();	// char-ara CH1o: June ~DamageData 31e9bb70 calls 32610d50 first
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+				NotifyAttackerWhenDestroyed();	// char-luciel CH1o: June ~DamageData 31e9bb70 calls 32610d50 first
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 				hitUnitList.clear();
 			}
 

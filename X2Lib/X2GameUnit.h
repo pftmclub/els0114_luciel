@@ -4098,6 +4098,14 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 		virtual void DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ ) {}	// char-ara CH1o: June unit vslot 0x2fc ( base 3208ddc0, empty ), called on the attacker by ~DamageData
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+		virtual void DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ ) {}	// char-luciel CH1o: June unit vslot 0x2fc ( base 3208ddc0, empty )
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		virtual void DoProcessWhenDamageDataReset( const CX2DamageManager::DamageData* pDamageData_ ) {}	// char-luciel CH1o: June unit vslot 0x2e4 ( base 3208ddc0, empty ), called on the old attacker by DamageData::SimpleInit
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		virtual void		ApplyWorldLightColor( OUT CKTDGXRenderer::RenderParam* pRenderParam_ ){}
 
 //-------------------------------------------------------------------------------------------------------

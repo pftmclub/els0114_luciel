@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel CH1` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | CH1p review, CH1a2 review, CH1a3 review, NU4 review, CH0b |
+| Depends on | CH1p review, CH1a2 review, CH1a3 review, NU4 review, CH0b, **plan `june-state-ids`'s last code phase** ( user, 2026-11-15 ) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO` defined |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL CORE` / `DATA`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | kickoffs/char-luciel/CH1-review.md (Opus 5.5 high; the phase writes it when done) |
@@ -68,3 +68,11 @@ Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_
   ( `luabind.py check` ) or the HUD shows no Combination Point row until CH5; also confirm the particle `LD_Arousal_UI_01` ( full points ) loads.
   The play-test then checks: the point row fills one picture per point, the full mark and effect at 10, the portrait swaps to Ciel's face on a body
   swap, and the resting body's MP shows on the unselected info bar.
+
+## Amended by char-luciel CH1o (2026-11-15)
+
+- **Waits for plan `june-state-ids`** ( user, 2026-11-15 ): March's `USER_STATE_ID` shifts to June's numbers, so the engine's riding / slot / event / bounding /
+  wait-change state changes land on Lu's June-numbered states. After it, set `m_bBoundingStatesReady` for Lu / Ciel ( CH1m registers bounding inline ) and check
+  that `InitEventStates` no longer overwrites `LSI_RIDING_SPECIAL_MOVE`.
+- `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( CH1o, defined ) is live for every class from CH1o on: the regression part of this play-test walks one other class
+  ( emotion, a skill, a dash, a jump, a death ) to show nothing changed.

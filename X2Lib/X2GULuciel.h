@@ -633,7 +633,7 @@ public:
 							const CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ );	// own virtual 0x884, June 32b3acf0
 	virtual void		PreloadAuraAccelResources();	// own virtual 0x888, June 32ae6130
 
-	// char-luciel CH1k: overrides band 1 part 1 ( June 32ae4080 - 32b1e8e0 ); bases in X2GUUser.h / X2GameUnit.h, the three marked ( + ) wait for CH1o's base declarations
+	// char-luciel CH1k: overrides band 1 part 1 ( June 32ae4080 - 32b1e8e0 ); bases in X2GUUser.h / X2GameUnit.h
 	virtual void		Init( bool bUseTeamPos_, int iStartPosIndex_ );	// June 32b1e8e0 ( vslot 0x40 )
 	virtual void		InitComponent();	// June 32b0f080 ( vslot 0x3c )
 	virtual void		InitEffect();	// June 32ae4f30 ( vslot 0x48 )
@@ -652,30 +652,30 @@ public:
 	virtual void		SetDamageExceptionProcess( CX2DamageManager::DamageData* pDamageData_, float& fPowerRate_ );	// June 32aea530 ( vslot 0x2b8 )
 	virtual float		GetReduceDebuffDurationRate( BUFF_TEMPLET_ID eBuffTempletID_ );	// June 32ae5480 ( vslot 0x29c )
 	virtual int			GetDamageEffectIndex() const;	// June 32b0efe0 ( vslot 0x2e0 )
-	virtual void		DoProcessWhenDamageDataCreated( const CX2DamageManager::DamageData* pDamageData_ );	// + June 32b17660 ( vslot 0x2e4, base 3208ddc0 )
-	virtual void		DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ );	// + June 32b17680 ( vslot 0x2fc ), base: char-ara CH1o
-	virtual void		AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData_ );	// + June 32b1e720 ( vslot 0x300 ), base: char-raven CH1o
+	virtual void		DoProcessWhenDamageDataReset( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b17660 ( vslot 0x2e4 ), base: CH1o
+	virtual void		DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b17680 ( vslot 0x2fc ), base: char-ara CH1o
+	virtual void		AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData_ );	// June 32b1e720 ( vslot 0x300 ), base: char-raven CH1o
 	virtual void		DoProcessWhenKillEnemy( const CX2GameUnit* pDefender_ );	// June 32b0e3f0 ( vslot 0x318 )
 	virtual void		ChangeMaxCharacterAddResource( const float fRate_ );	// June 32b14cd0 ( vslot 0x324 )
 
-	// char-luciel CH1k2: overrides band 1 part 2 ( June 32b1f0a0 - 32b4db90 ); ( + ) = the base is not virtual or not declared in March, CH1o declares it virtual
+	// char-luciel CH1k2: overrides band 1 part 2 ( June 32b1f0a0 - 32b4db90 )
 	virtual void		DeleteMinorParticle();	// June 32b1f0a0 ( vslot 0x4c )
 	virtual void		HyperModeBuffEffectStart();	// June 32b1f0b0 ( vslot 0xc4 )
 	virtual void		ReInit( bool bUseTeamPos_ = true, int iStartPosIndex_ = -1 );	// June 32b373e0 ( vslot 0x44 )
 	virtual CX2GageData*	CreateGageData();	// June 32b37c70 ( vslot 0xd0 )
 	virtual bool		StateChange( int iState_, bool bDirectChange_ = false );	// June 32b4db90 ( vslot 0x5c ): the state id goes through GetStateIDByForm
 	virtual bool		StateChange( int iState_, int iSubState_, bool bDirectChange_ = false );	// June 32b4dbb0 ( vslot 0x434 )
-	virtual int			GetWaitStateID();	// + June 32b4d3c0 ( vslot 0x438 )
-	virtual int			GetWalkStateID();	// + June 32b4d3f0 ( vslot 0x43c )
-	virtual int			GetDashStateID();	// + June 32b4d430 ( vslot 0x440 )
-	virtual int			GetDashEndStateID();	// + June 32b4d470 ( vslot 0x444 )
-	virtual int			GetDashJumpStateID();	// + June 32b4d4b0 ( vslot 0x448 )
-	virtual int			GetDashJumpLandingStateID();	// + June 32b4d4f0 ( vslot 0x44c )
-	virtual int			GetJumpReadyStateID();	// + June 32b4d530 ( vslot 0x450 )
-	virtual int			GetJumpUpStateID();	// + June 32b4d570 ( vslot 0x454 )
-	virtual int			GetJumpLandingStateID();	// + June 32b4d610 ( vslot 0x45c )
-	virtual int			GetDieFrontStateID();	// + June 32b4d650 ( vslot 0x460 )
-	virtual int			GetDieBackStateID();	// + June 32b4d690 ( vslot 0x464 )
+	virtual int			GetWaitStateID();	// June 32b4d3c0 ( vslot 0x438 ) ( base: char-luciel CH1o )
+	virtual int			GetWalkStateID();	// June 32b4d3f0 ( vslot 0x43c ) ( base: char-luciel CH1o )
+	virtual int			GetDashStateID();	// June 32b4d430 ( vslot 0x440 ) ( base: char-luciel CH1o )
+	virtual int			GetDashEndStateID();	// June 32b4d470 ( vslot 0x444 ) ( base: char-luciel CH1o )
+	virtual int			GetDashJumpStateID();	// June 32b4d4b0 ( vslot 0x448 ) ( base: char-luciel CH1o )
+	virtual int			GetDashJumpLandingStateID();	// June 32b4d4f0 ( vslot 0x44c ) ( base: char-luciel CH1o )
+	virtual int			GetJumpReadyStateID();	// June 32b4d530 ( vslot 0x450 ) ( base: char-luciel CH1o )
+	virtual int			GetJumpUpStateID();	// June 32b4d570 ( vslot 0x454 ) ( base: char-luciel CH1o )
+	virtual int			GetJumpLandingStateID();	// June 32b4d610 ( vslot 0x45c ) ( base: char-luciel CH1o )
+	virtual int			GetDieFrontStateID();	// June 32b4d650 ( vslot 0x460 ) ( base: char-luciel CH1o )
+	virtual int			GetDieBackStateID();	// June 32b4d690 ( vslot 0x464 ) ( base: char-luciel CH1o )
 	virtual int			GetDamageGroggyStateID() const;	// June 32b4d6d0 ( vslot 0x468 ), base: DU2
 	virtual int			GetDamageSmallFrontStateID() const;	// June 32b4d710 ( vslot 0x46c )
 	virtual int			GetDamageSmallBackStateID() const;	// June 32b4d750 ( vslot 0x470 )
@@ -687,25 +687,25 @@ public:
 	virtual int			GetDamageAirDownStateID() const;	// June 32b4d950 ( vslot 0x488 )
 	virtual int			GetDamageAirUpStateID() const;	// June 32b4da50 ( vslot 0x498 )
 
-	// char-luciel CH1l: overrides band 2 part 1 ( June 32ae9bf0 - 32b4dbe0 ); ( + ) = the base is not declared in March, CH1o declares it virtual
-	virtual bool		CanPlayEmotion( const CX2Unit::EMOTION_TYPE eEmotionType_ );	// + June 32ae9bf0 ( vslot 0x574 ), base 32ec5990 returns true
+	// char-luciel CH1l: overrides band 2 part 1 ( June 32ae9bf0 - 32b4dbe0 )
+	virtual bool		CanPlayEmotion( const CX2Unit::EMOTION_TYPE eEmotionType_ );	// June 32ae9bf0 ( vslot 0x574 ), base 32ec5990 returns true ( base: char-luciel CH1o )
 	virtual int			GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ );	// June 32ae9c00 ( vslot 0x57c ), base: CH1a0
-	virtual bool		IsTransformSkillState();	// + June 32ae9de0 ( vslot 0x580 ), base 31e4c550 returns false
-	virtual void		SetShowViewListAndUpdate( const bool bShow_ );	// + June 32ae9f20 ( vslot 0x640 ), base 31fca010: SetShowViewList( b ), then UpdateNotRenderingOtherEquipList() when b
+	virtual bool		IsTransformSkillState();	// June 32ae9de0 ( vslot 0x580 ), base 31e4c550 returns false; no March engine caller: CommonStateStart @32061976 stores it in +0x94c0, which nothing reads
+	virtual void		SetShowViewListAndUpdate( const bool bShow_ );	// June 32ae9f20 ( vslot 0x640 ), base 31fca010: SetShowViewList( b ), then UpdateNotRenderingOtherEquipList() when b ( base: char-luciel CH1o )
 	virtual void		InitEnchantWeaponEffectUnitSpecific();	// June 32aea690 ( vslot 0x54c )
-	virtual void		SetNowMpFromStoredValue();	// + June 32aeb2c0 ( vslot 0x650 ), base 31fceed0
-	virtual void		DoProcessWhenActiveBodyChangeApplied( const int iDuoType_, const int iSkillID_ );	// + June 32b0fa20 ( vslot 0x648 ), base 33093ad0 is empty
+	virtual void		SetNowMpFromStoredValue();	// June 32aeb2c0 ( vslot 0x650 ), base 31fceed0 ( base: char-luciel CH1o )
+	virtual void		DoProcessWhenActiveBodyChangeApplied( const int iDuoType_, const int iCpAmount_ );	// June 32b0fa20 ( vslot 0x648 ), base 33093ad0 is empty ( base: char-luciel CH1o )
 	virtual void		COMMON_BUFF_FrameMove();	// June 32b12fd0 ( vslot 0x5f0 )
-	virtual CKTDGXSkinAnimPtr	GetSkinAnimByForm( const int iForm_ );	// + June 32b13b60 ( vslot 0x570 ), base 31fd48a0
-	virtual void		SetHandEquipShow( const bool bShow_ );	// + June 32b143e0 ( vslot 0x62c ), base 3208ddc0 is empty
+	virtual CKTDGXSkinAnimPtr	GetSkinAnimByForm( const int iForm_ );	// June 32b13b60 ( vslot 0x570 ), base 31fd48a0 ( base: char-luciel CH1o )
+	virtual void		SetHandEquipShow( const bool bShow_ );	// June 32b143e0 ( vslot 0x62c ), base 3208ddc0 is empty ( base: char-luciel CH1o )
 	virtual bool		CanRidingState();	// June 32b14e10 ( vslot 0x628 )
 	virtual bool		IsClassCommonMoveState();	// June 32b15340 ( vslot 0x578 )
 	virtual void		CreateMajorParticleArray();	// June 32b154f0 ( vslot 0x540 )
-	virtual void		GetSkillIconTexture( CKTDGUISlot* pSlot_, const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	// + June 32b15900 ( vslot 0x504 ), base 31fdb990
+	virtual void		GetSkillIconTexture( CKTDGUISlot* pSlot_, const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	// June 32b15900 ( vslot 0x504 ), base 31fdb990; no caller in June's exe
 	virtual void		SkillIconOverride( const int iSkillID_, wstring& wstrIconTexName_, wstring& wstrIconTexKey_ );	// June 32b16220 ( vslot 0x56c )
 	virtual void		UpdateNotRenderingOtherEquipList();	// June 32b18220 ( vslot 0x630 )
-	virtual void		SyncFutureMpFromGage();	// + June 32b1c960 ( vslot 0x64c ), base 31fe9da0
-	virtual bool		CheckBoundingTarget();	// + June 32b34680 ( vslot 0x568 ), base 31e4c550 returns false
+	virtual void		SyncFutureMpFromGage();	// June 32b1c960 ( vslot 0x64c ), base 31fe9da0 ( base: char-luciel CH1o )
+	virtual bool		CheckBoundingTarget();	// June 32b34680 ( vslot 0x568 ), base 31e4c550 returns false; no March engine caller: the bounding states call it
 	virtual void		AttackResultByType( CX2DamageManager::DamageData& pDamageData_ );	// June 32b37730 ( vslot 0x4e0 )
 	virtual void		CreateMinorParticleArray();	// June 32b37780 ( vslot 0x548 )
 	virtual void		HyperModeFrameMove();	// June 32b38080 ( vslot 0x600 )
@@ -718,40 +718,40 @@ public:
 	virtual int			GetDamageAirFlyFrontStateID() const;	// June 32b4da90 ( vslot 0x49c )
 	virtual int			GetDamageAirFlyBackStateID() const;	// June 32b4dad0 ( vslot 0x4a0 )
 	virtual int			GetDamageRevengeStateID() const;	// June 32b4db10 ( vslot 0x4a4 )
-	virtual int			GetDanceWaitStateID();	// + June 32b4db50 ( vslot 0x5c4 ), base 3208e140 returns the dance wait state
+	virtual int			GetDanceWaitStateID();	// June 32b4db50 ( vslot 0x5c4 ), base 3208e140 returns the dance wait state; no March engine caller: June 323c5310 is the dance system ( Stage 10 )
 	virtual bool		IsHyperModeState() const;	// June 32b4dbe0 ( vslot 0x51c )
-	virtual void		SetSDOnePieceAvatar( const int iForm_, const bool bSDOnePieceAvatar_ );	// + June 32b172b0 ( vslot 0x87c ), base 3208e280 stores m_bSDOnePieceAvatar
+	virtual void		SetSDOnePieceAvatar( const int iForm_, const bool bSDOnePieceAvatar_ );	// June 32b172b0 ( vslot 0x87c ), base 3208e280 stores m_bSDOnePieceAvatar; no March engine caller: the class calls it
 
-	// char-luciel CH1l2: overrides band 2 part 2 ( June 32ae40c0 - 32b3a310 ); ( + ) = the base is not declared virtual in March, CH1o declares it virtual
+	// char-luciel CH1l2: overrides band 2 part 2 ( June 32ae40c0 - 32b3a310 )
 	virtual void		SetEquippedSkillLevel( const CX2SkillTree::SKILL_ID eSkillID_, const bool bChangeAll_ );	// June 32ae40c0 ( vslot 0x7b8 )
 	virtual void		CommonStateStartFuture();	// June 32ae4f60 ( vslot 0x7c0 ): a jump to the base
 	virtual void		CommonStateEndFuture();	// June 32ae4f70 ( vslot 0x7d8 ): a jump to the base
 	virtual void		CommonStateEnd();	// June 32ae4f80 ( vslot 0x7dc ): a jump to the base
 	virtual RENDER_HINT	CommonRender_Prepare();	// June 32ae4f90 ( vslot 0x7e8 ): the base
 	virtual bool		SpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ = CX2SkillTree::ASUT_GROUND );	// June 32ae4fb0 ( vslot 0x7f4 )
-	virtual void		StateChangeDashIfPossible();	// + June 32ae5400 ( vslot 0x668 ), base 31fc85b0
-	virtual bool		IsSkillChainReady( const int iSkillID_, const int iUnused_ );	// + June 32ae9bd0 ( vslot 0x658 ), base 330fb7d0 is a stub: the Phantom Rush chain is ready
+	virtual void		StateChangeDashIfPossible();	// June 32ae5400 ( vslot 0x668 ), base 31fc85b0 ( base: char-luciel CH1o )
+	virtual bool		IsSkillChainReady( const int iSkillID_, const int iUnused_ );	// June 32ae9bd0 ( vslot 0x658 ), base 330fb7d0 is a stub: the Phantom Rush chain is ready; no March engine caller: June 322cc480 forwards a float second argument
 	virtual float		ShownSkillCoolTime( const float fCoolTime_, const int iSkillID_ );	// June 32aea8c0 ( vslot 0x6a8 )
-	virtual void		StoreGageSnapshot();	// + June 32aeb410 ( vslot 0x740 ), base 32009780
-	virtual void		RestoreGageSnapshot();	// + June 32aeb430 ( vslot 0x744 ), base 3204da60
+	virtual void		StoreGageSnapshot();	// June 32aeb410 ( vslot 0x740 ), base 32009780; no March engine caller: Crest of Time ( char-add )
+	virtual void		RestoreGageSnapshot();	// June 32aeb430 ( vslot 0x744 ), base 3204da60; no March engine caller: Crest of Time ( char-add )
 	virtual void		UpdateAfterImageEquip( const AFTER_IMAGE_BODY eBody_ = AIB_FIRST_UNIT );	// June 32b0e440 ( vslot 0x6b0 )
 	virtual void		SumSocketOptionAfterSlots( CX2SocketItem::SocketData& kAggregate_, const CX2SocketItem::SocketData& kSocketData_ );	// June 32b0e670 ( vslot 0x794 )
-	virtual void		SpecialAttackUse( const int iSkillID_, const bool bUnused_ );	// + June 32b0f940 ( vslot 0x7fc )
-	virtual void		ResetMaxMP();	// + June 32b0fa90 ( vslot 0x664 ), base 31fd2810
+	virtual void		SpecialAttackUse( const int iSkillID_, const bool bUnused_ );	// June 32b0f940 ( vslot 0x7fc ); class-own: each class calls its own
+	virtual void		ResetMaxMP();	// June 32b0fa90 ( vslot 0x664 ), base 31fd2810 ( base: char-luciel CH1o )
 	virtual float		GetActualMPConsume( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ ) const;	// June 32b14640 ( vslot 0x6a0 )
 	virtual float		GetActualCoolTime( IN const CX2SkillTree::SkillTemplet* pSkillTemplet_, IN int iSkillLevel_ ) const;	// June 32b15050 ( vslot 0x6a4 )
 	virtual bool		IsNotCommonMoveState();	// June 32b15220 ( vslot 0x828 )
 	virtual void		AfterImageFrameMove();	// June 32b15430 ( vslot 0x850 )
 	virtual void		ShowActiveSkillCutInAndLightByScript( float fTimeToShow_, bool bOnlyLight_ );	// June 32b16c80 ( vslot 0x834 )
 	virtual void		ScaleHead( float fHeadScale_, float fFaceScale_ );	// June 32b171c0 ( vslot 0x66c )
-	virtual void		RegisterDamageEffectHitCountEntry();	// + June 32b18170 ( vslot 0x848 ), base 31f3f070 is empty
+	virtual void		RegisterDamageEffectHitCountEntry();	// June 32b18170 ( vslot 0x848 ), base 31f3f070 is empty ( base: char-luciel CH1o )
 	virtual bool		SpecialAttackNoStageChange( const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	// June 32b1c880 ( vslot 0x810 )
 	virtual void		CommonFrameMoveFuture();	// June 32b1edd0 ( vslot 0x7c8 )
-	virtual void		SpecialAttackCooldown( const int iSkillID_, const float fMpConsume_ );	// + June 32b1eef0 ( vslot 0x800 )
+	virtual void		SpecialAttackCooldown( const int iSkillID_, const float fMpConsume_ );	// June 32b1eef0 ( vslot 0x800 ); class-own: the engine reaches it through ReservedSkillStart ( CH1o3 )
 	virtual void		CommonStateStart();	// June 32b37910 ( vslot 0x7c4 )
 	virtual void		NoStateChangeActionFrameMove();	// June 32b37c40 ( vslot 0x80c )
 	virtual void		CommonFrameMove();	// June 32b397a0 ( vslot 0x7cc )
-	virtual bool		CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ = CX2SkillTree::ASUT_GROUND );	// + June 32b3a310 ( vslot 0x7f8 )
+	virtual bool		CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ = CX2SkillTree::ASUT_GROUND );	// June 32b3a310 ( vslot 0x7f8 ); class-own: each class calls its own
 
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,

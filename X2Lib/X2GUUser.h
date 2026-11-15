@@ -1678,6 +1678,13 @@ public:
 	virtual void AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData ){};	/// June vslot 0x300 ( base 3208ddc0, empty )
 #endif ADD_RENA_SYSTEM
 #endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef ADD_RENA_SYSTEM
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+	virtual void AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData ){};	// char-luciel CH1o: June vslot 0x300 ( base 3208ddc0, empty )
+#endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#endif ADD_RENA_SYSTEM
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 
 #ifdef NEXON_QA_CHEAT_REQ
 	bool	m_bIsInvincibleAndNoMpConsume;
@@ -1739,9 +1746,22 @@ public:
 		virtual bool				StateChange( int state, int subState, bool bDirectChange = false );
         int							GetStartStateID(){ return USI_START; }
 		int							GetStartIntrudeStateID(){ return USI_START_INTRUDE; }
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		virtual int					GetWalkStateID(){ return USI_WALK; }	// char-luciel CH1o: June user vslot 0x43c ( base 31b052e0 )
+		virtual int					GetDashStateID(){ return USI_DASH; }	// char-luciel CH1o: June user vslot 0x440 ( base 3208ddf0 )
+		virtual int					GetDashEndStateID(){ return USI_DASH_END; }	// char-luciel CH1o: June user vslot 0x444 ( base 330dcd70 )
+		virtual int					GetDashJumpStateID(){ return USI_DASH_JUMP; }	// char-luciel CH1o: June user vslot 0x448 ( base 330ddfe0 )
+		virtual int					GetDashJumpLandingStateID(){ return USI_DASH_JUMP_LANDING; }	// char-luciel CH1o: June user vslot 0x44c ( base 3208de00 )
+		virtual int					GetJumpReadyStateID(){ return USI_JUMP_READY; }	// char-luciel CH1o: June user vslot 0x450 ( base 31afa8f0 )
+		virtual int					GetJumpUpStateID(){ return USI_JUMP_UP; }	// char-luciel CH1o: June user vslot 0x454 ( base 3225b3a0 )
+		virtual int					GetJumpLandingStateID(){ return USI_JUMP_LANDING; }	// char-luciel CH1o: June user vslot 0x45c ( base 330de0a0 )
+		virtual int					GetDieFrontStateID(){ return USI_DIE_FRONT; }	// char-luciel CH1o: June user vslot 0x460 ( base 3208de30 )
+		virtual int					GetDieBackStateID(){ return USI_DIE_BACK; }	// char-luciel CH1o: June user vslot 0x464 ( base 33069eb0 )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		int							GetWalkStateID(){ return USI_WALK; }
 		int							GetDashStateID(){ return USI_DASH; }
 		int							GetDashEndStateID(){ return USI_DASH_END; }
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		int							GetChargeMpStateID() { return m_ChargeMpState; }
 #ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		virtual int					GetDamageGroggyStateID() const { return USI_DAMAGE_GROGGY; }		/// char-luciel DU2: June user vslot 0x468 ( base 3208de40 )
@@ -1756,7 +1776,11 @@ public:
 
 #ifdef RIDING_SYSTEM
 		// 오현빈 // 코드 정리를 위해 스테이트 얻는 함수 추가
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		virtual int	 GetWaitStateID() { if (true == GetRidingOn()) return USI_RIDING_WAIT; return m_CommonState.m_Wait; }	// char-luciel CH1o: June user vslot 0x438 ( base 3208ddd0 )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		int			 GetWaitStateID() { if (true == GetRidingOn()) return USI_RIDING_WAIT; return m_CommonState.m_Wait; }
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 #ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		virtual int	  GetJumpDownStateID() { if( true == GetRidingOn()) return USI_RIDING_JUMP_DOWN; return USI_JUMP_DOWN; }	/// char-luciel DU2: June user vslot 0x458 ( base 3208de10 )
 #else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
@@ -1765,7 +1789,11 @@ public:
 		USER_STATE_ID GetWinStateID() { if (true == GetRidingOn()) return USI_RIDING_WAIT_HABIT; return USI_WIN; }
 		USER_STATE_ID GetLoseStateID() { if (true == GetRidingOn()) return USI_RIDING_WAIT; return USI_LOSE; }
 #else
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		virtual int	  GetWaitStateID(){ return m_CommonState.m_Wait; }	// char-luciel CH1o: June user vslot 0x438
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		int			  GetWaitStateID(){ return m_CommonState.m_Wait; }
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 #ifdef SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
 		virtual int	  GetJumpDownStateID() { return USI_JUMP_DOWN; }	/// char-luciel DU2: June user vslot 0x458
 #else SERV_IRUHADEV_JUNE_USER_DAMAGE_STATE_GETTERS
@@ -3075,7 +3103,11 @@ public:
 
 
 		void ResetMaxHP();
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		virtual void ResetMaxMP();	// char-luciel CH1o: June user vslot 0x664 ( base 31fd2810 )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		void ResetMaxMP();
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		void ResetMPChangeRate( float fMPChangeRate );
 
 		
@@ -3094,7 +3126,11 @@ public:
 #endif
 
 		virtual void SetEnableDash( bool bEnableDash, ENABLE_DASH_STATE eState = EDS_END );
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		virtual void StateChangeDashIfPossible();	// char-luciel CH1o: June user vslot 0x668 ( base 31fc85b0 )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		void StateChangeDashIfPossible();
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 
 //{{ robobeg : 2012-11-16
 		static CX2DamageManager::EXTRA_DAMAGE_TYPE	CalcWeaponEnchantExtraDamageType( CX2Unit* pX2Unit_ );
@@ -3940,6 +3976,35 @@ public:
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_CHUNG_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+		virtual void ReservedSkillStart( const CX2SkillTree::SkillTemplet* pSkillTemplet_ ) {}	// char-luciel CH1o: June 32057b80 @32057c4c
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_CHUNG_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		virtual bool CanPlayEmotion( const CX2Unit::EMOTION_TYPE eEmotionType_ ) { return true; }	// char-luciel CH1o: June user vslot 0x574 ( base 32ec5990 )
+		virtual void SetHandEquipShow( const bool bShow_ ) {}	// char-luciel CH1o: June user vslot 0x62c ( base 3208ddc0, empty )
+		virtual void SetShowViewListAndUpdate( const bool bShow_ ) { SetShowViewList( bShow_ ); if ( true == bShow_ ) UpdateNotRenderingOtherEquipList(); }	// char-luciel CH1o: June user vslot 0x640 ( base 31fca010 )
+		virtual void DoProcessWhenActiveBodyChangeApplied( const int iDuoType_, const int iCpAmount_ ) {}	// char-luciel CH1o: June user vslot 0x648 ( base 33093ad0, empty ): DUO_TYPE, CP_AMOUNT
+		virtual void SyncFutureMpFromGage() { const float fNowMp = GetNowMp(); if ( fNowMp != m_FrameDataFuture.syncData.fNowMP ) m_FrameDataFuture.syncData.fNowMP = fNowMp; }	// char-luciel CH1o: June user vslot 0x64c ( base 31fe9da0 )
+		virtual void SetNowMpFromStoredValue() { SetNowMp( m_FrameDataNow.syncData.fNowMP ); }	// char-luciel CH1o: June user vslot 0x650 ( base 31fceed0 )
+		virtual CKTDGXSkinAnimPtr GetSkinAnimByForm( const int iForm_ ) { return 1 == iForm_ ? m_pMinorUnitXSkinAnim : m_pXSkinAnim; }	// char-luciel CH1o: June user vslot 0x570 ( base 31fd48a0 )
+		virtual void RegisterDamageEffectHitCountEntry() {}	// char-luciel CH1o: June user vslot 0x848 ( base 31f3f070, empty )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 #ifdef SERV_IRUHADEV_JUNE_USER_SKILL_ICON_OVERRIDE
 		virtual void SkillIconOverride( const int iSkillID_, wstring& wstrIconTexName_, wstring& wstrIconTexKey_ ) {}	/// June user vslot 0x56c ( base 33108560, empty )
 #endif SERV_IRUHADEV_JUNE_USER_SKILL_ICON_OVERRIDE
@@ -4759,6 +4824,11 @@ public:
 		/// Ara ( 32bd85f0: or 0x9b = ASI_BERSERK_MODE ) and Luciel ( 32b4dbe0 ) override it ( checklist 7t ).
 		virtual bool IsHyperModeState() const { return USI_HYPER_MODE == GetNowStateID(); }
 #endif SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME
+		virtual bool IsHyperModeState() const { return USI_HYPER_MODE == GetNowStateID(); }	// char-luciel CH1o: June user vslot 0x51c ( base 3208e6d0 )
+#endif SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 #ifdef SERV_IRUHADEV_ELYSION_SCRIPT_B
 	public:	// Atlas E7: this part of the class is protected; the setter is bound to Lua and read by CX2SmallGageUI
 		void SetShowHpSmallGage( bool bShow_ ) { m_bShowHpSmallGage = bShow_; }	/// Atlas E7: June 31e4d150 ( +0x9528 )

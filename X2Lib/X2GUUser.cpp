@@ -2349,7 +2349,11 @@ void CX2GUUser::ReInit( bool bUseTeamPos, int startPosIndex )
 		GetGageData()->SetEnable( true );
 
 		m_FrameDataFuture.syncData.fNowHP				= GetNowHp();
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		SyncFutureMpFromGage();	// char-luciel CH1o: June ReInit @32023c24 ( user vslot 0x64c )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		m_FrameDataFuture.syncData.fNowMP				= GetNowMp();
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 
 		if ( m_pAfterImage != NULL )
 		{
@@ -4527,7 +4531,11 @@ void CX2GUUser::InitComponent()
 		GetGageData()->SetEnable( true );
 
 		m_FrameDataFuture.syncData.fNowHP				= GetNowHp();
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		SyncFutureMpFromGage();	// char-luciel CH1o: June InitComponent @31fee873 ( user vslot 0x64c )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		m_FrameDataFuture.syncData.fNowMP				= GetNowMp();
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		
 
 		AccessStat().AccessAddOnStat().Init();
@@ -9408,6 +9416,9 @@ bool CX2GUUser::StateChange( int state, bool bDirectChange )
 #endif FIX_FORCE_DOWN_AND_DETONATION_BUG
 #endif SERV_IRUHADEV_JUNE_FORCE_DOWN_FLUSH
 
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	SetHandEquipShow( false );	// char-luciel CH1o: June StateChange @320349cb ( user vslot 0x62c ), before the local-unit test
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 	if( IsLocalUnit() == false )
 		return false;
 
@@ -17147,6 +17158,11 @@ void CX2GUUser::CommonStateStartFuture()
 	int iDuoType = CX2Unit::DT_KEEP;	// char-luciel DU1 review: June's names
 	LUA_GET_VALUE( m_LuaManager, "DUO_TYPE", iDuoType, CX2Unit::DT_KEEP );
 	ApplyDuoTypeAtStateStart( iDuoType, false == animName.empty(), false == wstrMinorUnitAnimName.empty(), m_FrameDataFuture.stateParam.bEventFlagList );
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	int iCpAmount = 0;	// char-luciel CH1o: June CommonStateStartFuture @32050f60-32051063, CP_AMOUNT then user vslot 0x648
+	LUA_GET_VALUE( m_LuaManager, "CP_AMOUNT", iCpAmount, 0 );
+	DoProcessWhenActiveBodyChangeApplied( iDuoType, iCpAmount );
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef SERV_9TH_NEW_CHARACTER // ±èÅÂÈ¯
@@ -18026,7 +18042,14 @@ void CX2GUUser::CommonStateStart()
 	if( false == IsMyUnit() )
 		ApplyDuoTypeAtStateStart( iDuoType, false == animName.empty(), false == wstrMinorUnitAnimName.empty(), m_FrameDataNow.stateParam.bEventFlagList );
 	if( true == IsActiveBodyChangeReached() )
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	{
+		RegisterDamageEffectHitCountEntry();	// char-luciel CH1o: June CommonStateStart @32059b81 ( user vslot 0x848 )
+		m_bActiveBodyChangeWaitNow = false;
+	}
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		m_bActiveBodyChangeWaitNow = false;	// stand-in: June first calls user vslot 0x848 ( empty base, Lu/Ciel's 32b18170 ); CH1o declares it
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
 #ifdef SERV_9TH_NEW_CHARACTER // ±èÅÂÈ¯
@@ -19643,7 +19666,11 @@ void CX2GUUser::CommonFrameMoveFuture()
 //	m_FrameDataFuture.syncData.dwFrameMoveCount		= GetFrameMoveCountFuture();
 //#endif  SERV_KTDX_OPTIMIZE_UDP_PACKET_PACK
 	m_FrameDataFuture.syncData.fNowHP				= GetNowHp();
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	SyncFutureMpFromGage();	// char-luciel CH1o: June CommonFrameMoveFuture @32062f78 ( user vslot 0x64c )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 	m_FrameDataFuture.syncData.fNowMP				= GetNowMp();
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 
 	m_FrameDataFuture.syncData.ucHitCount			= GetHitCount();
 	m_FrameDataFuture.syncData.ucHittedCount		= GetHittedCount();
@@ -22562,7 +22589,11 @@ void CX2GUUser::CommonFrameMove()
 	if( IsMyUnit() == false )
 	{
 		SetNowHp( m_FrameDataNow.syncData.fNowHP );
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		SetNowMpFromStoredValue();	// char-luciel CH1o: June CommonFrameMove @3206c1e6 ( user vslot 0x650 )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		SetNowMp( m_FrameDataNow.syncData.fNowMP );
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 
 //#ifndef SERV_KTDX_OPTIMIZE_UDP_PACKET_PACK
 //		SetFrameMoveCountNow( m_FrameDataNow.syncData.dwFrameMoveCount );
@@ -38281,6 +38312,10 @@ bool CX2GUUser::CanShowWeaponEffect()
 #endif SERV_IRUHADEV_JUNE_DIVERGE_UPGRADE_WEAPON_PARTICLE
 bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmotionType)
 {
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	if( false == CanPlayEmotion( eEmotionId ) )	// char-luciel CH1o: June PlayEmotion @320433d7 ( user vslot 0x574 )
+		return false;
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 	if( CX2Unit::IsAvatarEmotion( eEmotionId ) )
 	{		
 		wstring wstrEmotionName = L"";
@@ -38608,6 +38643,9 @@ bool CX2GUUser::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wstrEmoti
 				g_pChatBox->PlayEmotionSound( GetUnit()->GetType(), eEmotionId, GetPos(), true );
 			}
 		}
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		SetHandEquipShow( true );	// char-luciel CH1o: June PlayEmotion @320447e9 ( user vslot 0x62c ), after the emotion sound
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		if ( eEmotionId == CX2Unit::ET_EMOTION_AVATAR4 )
 		{
 			D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01_Head" );
@@ -47435,6 +47473,25 @@ void CX2GUUser::CountReservedSkillUse()
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_CHUNG_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+	ReservedSkillStart( pSkillTemplet );	// char-luciel CH1o: June @32057c4c-cb2
+#endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_CHUNG_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_EVE_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_ARME_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL
 	m_fSkillStartMpConsumed = fNowMpBeforeSkillStart - GetNowMp();	// char-elesis CH2b: June @32057cc0-ce2
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SKILL

@@ -8086,8 +8086,8 @@ void CX2GULuciel::EraseDamageEffectIndexEntry( const CX2DamageManager::DamageDat
 		m_vecDamageEffectHitCount.erase( vit );
 }
 
-// char-luciel CH1k: June 32b17660 ( vslot 0x2e4, base 3208ddc0 ); called on the attacker when a damage data is made
-/*virtual*/ void CX2GULuciel::DoProcessWhenDamageDataCreated( const CX2DamageManager::DamageData* pDamageData_ )
+// char-luciel CH1o: June 32b17660 ( vslot 0x2e4, base 3208ddc0 ); called on the old attacker when a damage data is reset ( SimpleInit )
+/*virtual*/ void CX2GULuciel::DoProcessWhenDamageDataReset( const CX2DamageManager::DamageData* pDamageData_ )
 {
 	if ( NULL != pDamageData_ )
 		EraseDamageEffectIndexEntry( pDamageData_ );
@@ -8900,8 +8900,8 @@ using namespace _CONST_LUCIEL_CH1L_;
 	SetGageNowMp( m_FrameDataNow.syncData.fMinorUnitNowMP, false, 1 );
 }
 
-// char-luciel CH1l: June 32b0fa20 ( vslot 0x648 ); the first state start after the active body changed
-/*virtual*/ void CX2GULuciel::DoProcessWhenActiveBodyChangeApplied( const int iDuoType_, const int iSkillID_ )
+// char-luciel CH1o: June 32b0fa20 ( vslot 0x648 ); the first state start after the active body changed ( DUO_TYPE, CP_AMOUNT )
+/*virtual*/ void CX2GULuciel::DoProcessWhenActiveBodyChangeApplied( const int iDuoType_, const int iCpAmount_ )
 {
 	UNREFERENCED_PARAMETER( iDuoType_ );
 
@@ -8917,7 +8917,7 @@ using namespace _CONST_LUCIEL_CH1L_;
 			m_iDamageEffectIndex = 0;
 
 		if ( NULL == pSkillTemplet )
-			m_iLastUsedSkillID = iSkillID_;
+			m_iLastUsedSkillID = iCpAmount_;	// char-luciel CH1o: June stores the state's CP_AMOUNT here ( JUNE_BUGS 723 )
 	}
 }
 

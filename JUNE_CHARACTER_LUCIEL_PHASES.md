@@ -2475,6 +2475,43 @@ No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. 
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Next:** `/x2-phase char-luciel CH1o` ( Opus 5.5 high; its review covers CH1m, CH1n, CH1o ).
 
+### CH1o - Done (2026-11-15)
+
+Opus 5.5 high. New class-agnostic flag `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( **defined**; `#error` without `JUNE_CHAR_DUO_BODY` ) plus `_LIVE` widenings. Commit: see `git log --grep "char-luciel Phase CH1o:"`.
+No debug define. Review: `CH1o-review.md` covers CH1m, CH1n, CH1o. funcmap: `grep "(CH1o)" june2017_re/funcmap.tsv` ( 10 rows ). `JUNE_BUGS.md` 723.
+- **Split ( scope ):** the kickoff's amendments came to ~200 engine call sites ( `june2017_re/char_luciel/ch1o_vcall_sites.tsv`, scan `ch1o_vcall_scan.py`: June's
+  `mov r,[vtable+slot]; call r` pairs ). CH1o does the bases and the hook sites; **CH1o2** the 84 readers of the state getters; **CH1o3** effect-set tags 4 / 10 / 11,
+  the checklist hooks, the `+0x11` skill-state byte and Lu's `ReservedSkillStart`. Kickoffs written; CH1p now waits for the CH1o3 review.
+- **State-id seam: user decision ( 2026-11-15 ):** shift March's `USER_STATE_ID` to June's numbers ( not getters per site, not renumbering Lu ). New backlog
+  Stage 41, plan key `june-state-ids`, brief `kickoffs/june-backlog/stage41-plan.md`; **CH1 final waits for it** ( `CH1.md` amended ). It also solves CH1n's slot-id seam.
+- **Bases ( June's base bodies = March's behaviour; no March class declares any of the names, grep ):** `X2GUUser.h`: `GetWaitStateID` ( 0x438, both `RIDING_SYSTEM`
+  branches ), `GetWalkStateID` / `GetDashStateID` / `GetDashEndStateID` made virtual, 7 new getters 0x448-0x464 ( June bases return 21 / 22 / 15 / 16 / 18 / 7 / 8 = March's
+  `USI_*`, equal below 24 ), `ResetMaxMP` ( 0x664 ) and `StateChangeDashIfPossible` ( 0x668 ) virtual, `CanPlayEmotion` 0x574, `SetHandEquipShow` 0x62c, `SetShowViewListAndUpdate`
+  0x640, `DoProcessWhenActiveBodyChangeApplied` 0x648, `SyncFutureMpFromGage` 0x64c, `SetNowMpFromStoredValue` 0x650, `GetSkinAnimByForm` 0x570, `RegisterDamageEffectHitCountEntry` 0x848;
+  `X2GameUnit.h`: `DoProcessWhenDamageDataReset` ( unit 0x2e4 ).
+- **Engine sites routed ( June address = March line ):** `SyncFutureMpFromGage` replaces `fNowMP = GetNowMp()` in InitComponent @31fee873, ReInit @32023c24, CommonFrameMoveFuture
+  @32062f78; `SetNowMpFromStoredValue` replaces `SetNowMp( Now fNowMP )` in CommonFrameMove @3206c1e6; `SetHandEquipShow( false )` in StateChange @320349cb ( before the local-unit
+  test ) and `( true )` at PlayEmotion's end @320447e9; `CanPlayEmotion` gate at PlayEmotion's top @320433d7; CommonStateStartFuture reads `CP_AMOUNT` ( XOR key decoded at 3379d38c,
+  int, default 0 ) and calls 0x648( `DUO_TYPE`, `CP_AMOUNT` ) @32051059; CommonStateStart calls 0x848 before clearing the body-change wait @32059b81 ( DU1b's stand-in gone );
+  `DamageData::SimpleInit` calls `NotifyAttackerWhenReset` first ( June 32610da0, twin of Ara's 32610d50 ). Automatic through the virtual: every March `ResetMaxMP` / `StateChangeDashIfPossible`
+  / `GetWaitStateID` caller.
+- **Named on purpose:** CH1k's `DoProcessWhenDamageDataCreated` is `DoProcessWhenDamageDataReset` ( June calls it at the top of SimpleInit with the old attacker ); 0x648's second
+  argument is `CP_AMOUNT`, not a skill id: Lu stores it as the last used skill id when the state has no templet ( JUNE_BUGS 723, verbatim ).
+- **No base on purpose ( no March engine caller; Lu's comment says so ):** 0x580 ( writes `+0x94c0`, which nothing reads ), 0x504 ( no caller in June's exe ), 0x568 / 0x87c ( class ),
+  0x5c4 ( dance, Stage 10 ), 0x658 ( `322cc480` forwarder ), 0x740 / 0x744 ( Crest of Time, char-add ), 0x7f8 / 0x7fc / 0x800 ( each class's own; 0x800 is reached through `ReservedSkillStart`, CH1o3 ).
+  0x640's only June caller ( `31fe4030`, riding-off ) is Stage 17's.
+- **`_LIVE` widenings ( kickoff ):** Ara's 0x2fc base / `NotifyAttackerWhenDestroyed` / NPC forwarder, Raven's 0x300 base and its three DamageManager sites, `IsHyperModeState` ( 0x51c ),
+  and Lu's link in the `ReservedSkillStart` chain ( `X2GUUser.h` / `.cpp` ). `CX2GUNPC` `32778fe0` ( 0x300 to the owner, every attacker unit ) moves to CH3a0 with the summons.
+- **Gates:** `finish.py --files <10 code files> --state X2GULuciel.cpp Luciel_Duo / Luciel_Demonio`: `junediverge` PASS, `stateends` PASS both, `enumscan` exit 1 on 6 old rows only
+  ( `X2GUUser.cpp:28408-28417` NUI_BEE*, `X2GUUser.h:2943-2944`; none in this diff ). Its flagcheck cannot pass a second phase flag as `--with` ( only `_DEBUG` ), and its `_CORE` run
+  crashes on a peer's `#if` ( `X2GUUser.cpp:29435`, Unevaluable ), so flagcheck ran directly: `JUNE_USER_VIRTUAL_HOOKS --with JUNE_CHAR_LUCIEL_LIVE` `5 PASS, 1 DEFINE, 2 OTHER ( X2GUNPC: _LIVE ),
+  0 FAIL` / `RESULT: PASS`; `JUNE_CHAR_LUCIEL_LIVE --with JUNE_USER_VIRTUAL_HOOKS` `7 PASS, 1 DEFINE, 0 FAIL`, only 'not #defined' ( `//#define` until CH1 final: INERT ); `JUNE_CHAR_LUCIEL_CORE`
+  ( the two class files ) `2 PASS` / `RESULT: PASS`, 44 deleted lines = the class header's comment updates and the 0x2e4 / 0x648 renames. Engine files: 0 deleted, 0 non-ASCII.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ): `X2GUUser.cpp`, `X2GULuciel.cpp` plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, `X2DamageManager.cpp`, `X2GUNPC.cpp`,
+  `X2GUChung.cpp`: 0 errors, 0 warnings in the touched files. Full build skipped: no play-test ( CH1 final's play-test walks one other class as the regression check, `CH1.md` ).
+- **How to see it in game:** nothing ( every base equals March; Lu/Ciel is not live ).
+- **Next:** `/x2-phase char-luciel CH1o review` ( Opus 5.5 high ), then `CH1o2`.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

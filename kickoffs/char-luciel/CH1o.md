@@ -99,3 +99,13 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - **Slot states join the state-id seam.** CH1n's setter binds Lu / Ciel's skill slots at June's ids 50-69 ( `LUCIEL_STATE_ID` now has June's `USI_SPECIAL_ATTACK_1` ... `USI_SPECIAL_ATTACK_SLOTB_HYPER_5`, shadowing `CX2GUUser`'s inside the class ), but the engine reads March's tables `_CONST_GUUSER_::aNormalSkillStateID` / `aHyperSkillStateID` / `...SlotB` ( 49-68 ): `SnapshotBeforeSlotRebind` ( snapshots state 49 = `LSI_LU_PEPPER_RUN_JUMP_DOWN` ), `IsSkillSlotState`, `IsBlankSlotSkillState` / `LogNoStateSkill`, `ReservedSkillStart`-style readers and the skill-use `StateChange` to the slot state. List and route them with the other seam sites.
 - **June's byte `+0x11` on non-slot states:** the setter marks some extra states as skill states ( 265 Punishing Accel M, written by CH1n with a one-line note; 344 Soul Shock M in CH2c; the skill phases note theirs ). March's `UserUnitStateData` has no such byte and its readers test the slot tables only: decide the representation ( e.g. a class set consulted by Lu's readers of June's `3208e430` ) so the skill phases can apply it.
+
+## Split by CH1o (2026-11-15)
+
+- CH1o did the virtual bases ( flag `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ), the hook call sites March shares with June, and the `_LIVE` widenings.
+- **CH1o2:** the engine readers of the wait / walk / dash / jump / die getters ( 84 sites, `ch1o_vcall_sites.tsv` ).
+- **CH1o3:** effect-set tags 4 / 10 / 11 ( + tag 9 ), the checklist hooks, June's `+0x11` skill-state byte and Lu's `ReservedSkillStart`.
+- **Engine state-id seam:** the user chose to shift March's `USER_STATE_ID` to June's numbers: plan `june-state-ids` ( `kickoffs/june-backlog/stage41-plan.md` ); CH1 final waits for it.
+  The slot-state seam ( CH1n's amendment ) is solved by the same shift.
+- The `IsDamageState` getters ( char-elesis amendment ): DU2 already made the base ask them ( DU2 Done note ); nothing left.
+- `CX2GUNPC` `32778fe0` ( 0x300 to the owner ): CH3a0, with the summons.

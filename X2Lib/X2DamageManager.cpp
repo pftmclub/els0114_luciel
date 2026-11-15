@@ -2258,6 +2258,15 @@ bool CX2DamageManager::UnitToUnit( DamageData* pDamageData, bool bAttackOnlyThis
 					static_cast<CX2GUUser*>( pAttacker )->AdjustDamageDataBeforeDamageReact( pDamageData );
 #endif ADD_RENA_SYSTEM
 #endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef ADD_RENA_SYSTEM
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+				// char-luciel CH1o: June @3262546d, as char-raven CH1o wrote it
+				if ( pAttacker->GetGameUnitType() == CX2GameUnit::GUT_USER )
+					static_cast<CX2GUUser*>( pAttacker )->AdjustDamageDataBeforeDamageReact( pDamageData );
+#endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#endif ADD_RENA_SYSTEM
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 				pDefender->DamageReact( pDamageData );
 			}
 #else
@@ -2824,6 +2833,24 @@ void CX2DamageManager::DamageData::NotifyAttackerWhenDestroyed() const
 		optrAttackerGameUnit->DoProcessWhenDamageDataDestroyed( this );
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+// char-luciel CH1o: June 32610d50, as char-ara CH1o wrote it
+void CX2DamageManager::DamageData::NotifyAttackerWhenDestroyed() const
+{
+	if ( null != optrAttackerGameUnit )
+		optrAttackerGameUnit->DoProcessWhenDamageDataDestroyed( this );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+// char-luciel CH1o: June 32610da0 ( the first call of SimpleInit 31f8ee50 ): the attacker unit still held sees the damage data reset
+void CX2DamageManager::DamageData::NotifyAttackerWhenReset() const
+{
+	if ( null != optrAttackerGameUnit )
+		optrAttackerGameUnit->DoProcessWhenDamageDataReset( this );
+}
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 bool CX2DamageManager::EffectToUnit( DamageData* pDamageData )
 {
 	bool			retval = false;
@@ -3134,6 +3161,15 @@ bool CX2DamageManager::EffectToUnit( DamageData* pDamageData )
 					static_cast<CX2GUUser*>( pAttackerGameUnit )->AdjustDamageDataBeforeDamageReact( pDamageData );
 #endif ADD_RENA_SYSTEM
 #endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef ADD_RENA_SYSTEM
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+				// char-luciel CH1o: June @3262f1e6, as char-raven CH1o wrote it
+				if ( pAttackerGameUnit->GetGameUnitType() == CX2GameUnit::GUT_USER )
+					static_cast<CX2GUUser*>( pAttackerGameUnit )->AdjustDamageDataBeforeDamageReact( pDamageData );
+#endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#endif ADD_RENA_SYSTEM
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 				pDefender->DamageReact( pDamageData );
 			}
 #else
@@ -3605,6 +3641,15 @@ bool CX2DamageManager::MeshToUnit( DamageData* pDamageData )
 					static_cast<CX2GUUser*>( pAttacker )->AdjustDamageDataBeforeDamageReact( pDamageData );
 #endif ADD_RENA_SYSTEM
 #endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef ADD_RENA_SYSTEM
+#ifndef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+				// char-luciel CH1o: June @32628652, as char-raven CH1o wrote it
+				if ( pAttacker->GetGameUnitType() == CX2GameUnit::GUT_USER )
+					static_cast<CX2GUUser*>( pAttacker )->AdjustDamageDataBeforeDamageReact( pDamageData );
+#endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
+#endif ADD_RENA_SYSTEM
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 				pDefender->DamageReact( pDamageData );
 			}
 #else

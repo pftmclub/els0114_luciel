@@ -3563,6 +3563,11 @@ class CX2GUNPC : public CX2GameUnit
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 		virtual void				DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ );	// char-ara CH1o: June 3275a410 ( unit vslot 0x2fc: the owner's )
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+		virtual void				DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ );	// char-luciel CH1o: June 3275a410 ( unit vslot 0x2fc: the owner's )
+#endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 		
 		float						GetActionSpeedUpValue();
 		bool						GetIsAlwaysSuperArmor();
