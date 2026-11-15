@@ -794,6 +794,17 @@ protected:
 	void				DieFrontStart();	// char-luciel CH1b: June 31fd2d60 ( CX2GUUser's shared body )
 	void				DieBackStart();	// char-luciel CH1b: June 31fd2e30 ( CX2GUUser's shared body )
 
+	// char-luciel CH1m: registration, and the CX2GUUser bodies only Lu / Ciel register
+	virtual void		InitState();	// June 32b43d10 ( vslot 0x7a4 )
+	void				InitStateCommon();	// June 32b3e8b0
+	void				DieFrontStartFuture();	// June 31fcd0f0
+	void				DieFrontFrameMove();	// June 320008f0
+	void				DieFrontEventProcess();	// June 31fcd160
+	void				DieBackStartFuture();	// June 31fcd1b0
+	void				DieBackFrameMove();	// June 32000910
+	void				DieBackEventProcess();	// June 31fcd220
+	void				DashEndStartFuture();	// June 31fd2680
+
 	// char-luciel CH1b: Lu's common states ( June 32ae5540 - 32b3a270 )
 	void				LSI_LU_JUMP_UP_EventProcess();	// June 32ae5540
 	void				LSI_LU_DASH_JUMP_POWER_LANDING_StateStartFuture();	// June 32ae55e0

@@ -11739,5 +11739,2481 @@ void CX2GULuciel::PlayBluffEffectSet( const CX2DamageManager::DamageData* pDamag
 	g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName, this, NULL, false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
 }
 
+
+namespace _CONST_LUCIEL_CH1M_
+{
+	const float		DIE_STEP_DUST_TIME						= 0.19f;	// June 33475a18
+	const float		DIE_SACRIFICE_OF_HERO_TIME				= 1.12f;	// June 33475a1c
+}
+using namespace _CONST_LUCIEL_CH1M_;
+
+// char-luciel CH1m: June 31fcd0f0 ( a CX2GUUser body only Lu / Ciel register )
+void CX2GULuciel::DieFrontStartFuture()
+{
+	CommonStateStartFuture();
+	GetXSkinAnimFuture()->SetPlaySpeed( DIE_PLAY_SPEED );
+}
+
+// char-luciel CH1m: June 320008f0
+void CX2GULuciel::DieFrontFrameMove()
+{
+	DieFrameMove( DIE_STEP_DUST_TIME, DIE_SACRIFICE_OF_HERO_TIME );
+}
+
+// char-luciel CH1m: June 31fcd160 ( no CommonEventProcess, as June )
+void CX2GULuciel::DieFrontEventProcess()
+{
+	if( false == GetShowObject() && true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		StateChange( GUSI_DIE, false );
+}
+
+// char-luciel CH1m: June 31fcd1b0 ( identical to 31fcd0f0 )
+void CX2GULuciel::DieBackStartFuture()
+{
+	CommonStateStartFuture();
+	GetXSkinAnimFuture()->SetPlaySpeed( DIE_PLAY_SPEED );
+}
+
+// char-luciel CH1m: June 32000910 ( identical to 320008f0 )
+void CX2GULuciel::DieBackFrameMove()
+{
+	DieFrameMove( DIE_STEP_DUST_TIME, DIE_SACRIFICE_OF_HERO_TIME );
+}
+
+// char-luciel CH1m: June 31fcd220 ( identical to 31fcd160 )
+void CX2GULuciel::DieBackEventProcess()
+{
+	if( false == GetShowObject() && true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		StateChange( GUSI_DIE, false );
+}
+
+// char-luciel CH1m: June 31fd2680 ( a CX2GUUser body only Lu / Ciel register )
+void CX2GULuciel::DashEndStartFuture()
+{
+	CommonStateStartFuture();
+	m_PhysicParam.nowSpeed.x = GetDashSpeed();
+}
+
+// char-luciel CH1m: June 32b43d10 ( vslot 0x7a4 )
+/*virtual*/ void CX2GULuciel::InitState()
+{
+	SetSkillCutInSetIndexByUnitClass();	// June @32b43d52-@32b43d9f
+	m_ChargeMpState				= LSI_LU_WAIT;	// June +0x7d04 = 0xd
+	m_CommonState.m_Wait		= LSI_LU_WAIT;	// June +0x4088 = 0xd
+	m_CommonState.m_Thrown		= LSI_LU_DAMAGE_AIR_FLY_FRONT;	// June +0x408c = 0x28
+
+	InitStateCommon();			// June 32b3e8b0
+
+	std::string strStartTableNameUTF8;
+	std::string strWinTableNameUTF8;
+	std::string strLoseTableNameUTF8;
+	InitStateCommonRandom( strStartTableNameUTF8, strWinTableNameUTF8, strLoseTableNameUTF8 );	// June 3202b110 then 31fe22d0
+
+	UserUnitStateData stateData;
+
+	stateData.Init();
+	stateData.stateID			= USI_START;
+	m_LuaManager.MakeTableReference( strStartTableNameUTF8.c_str(), stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, StartStateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, StartEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, StartEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= USI_WIN;
+	m_LuaManager.MakeTableReference( strWinTableNameUTF8.c_str(), stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_WIN_StateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RandomLoseEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= USI_LOSE;
+	m_LuaManager.MakeTableReference( strLoseTableNameUTF8.c_str(), stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LOSE_StateStart );
+	m_StateList[stateData.stateID] = stateData;
+
+	// checklist 7h at June's id 130, not InitWaitStateChange's March 105: CH1o routes the engine here
+	stateData.Init();
+	stateData.stateID			= LSI_WAIT_STATE_CHANGE;
+	m_LuaManager.MakeTableReference( "LSI_WAIT_STATE_CHANGE", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, WaitStateChangeEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	// June tests the class: only Diablura and Demonio register the bounding target commands and dash combos
+	const CX2Unit::UNIT_CLASS eUnitClass = GetUnit()->GetClass();
+	if( CX2Unit::UC_LUCIEL_DIABLURA == eUnitClass || CX2Unit::UC_LUCIEL_DEMONIO == eUnitClass )
+	{
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_START;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_START", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_START_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LOOP;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LOOP", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LOOP_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LANDING;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LANDING", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LANDING_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZ;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_START;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_START", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_LOOP;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_LOOP", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LOOP_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_END;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_Z_END", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_LANDING_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZ;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZ;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_ZZZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_ZZZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_X;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_X", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_X_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_START;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_START", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_START_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_LOOP;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_LOOP", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LOOP_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_LANDING;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XX_LANDING", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XX_LANDING_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XXZ;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XXZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XXZX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX_XXZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_XXZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_STRIKER;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_STRIKER", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_STRIKER_EventProcess );
+		stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_STRIKER;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_STRIKER", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_STRIKER_EventProcess );
+		stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_X;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_X", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_X;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_X", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_X_LU_STRIKER;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_X_LU_STRIKER", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX;
+		m_LuaManager.MakeTableReference( "LSI_BOUNDING_TARGET_CIEL_COMMAND_XXXXXXX", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_COMBO_Z;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_COMBO_Z", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_Z_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_COMBO_ZX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_COMBO_ZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_COMBO_ZXX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_COMBO_ZXX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_COMBO_ZXXX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_COMBO_ZXXX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_COMBO_ZXXXX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_COMBO_ZXXXX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_COMBO_ZXXXXZ;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_COMBO_ZXXXXZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXXXXZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_COMBO_ZX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_COMBO_ZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_COMBO_ZXX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_COMBO_ZXX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_COMBO_ZXXX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_COMBO_ZXXX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_COMBO_ZXXXX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_COMBO_ZXXXX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXXXX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_COMBO_ZXXXXZ;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_COMBO_ZXXXXZ", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_COMBO_ZXXXXZ_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_JUMP_COMBO_XZ_START;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_JUMP_COMBO_XZ_START", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_JUMP_COMBO_XZ_START_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_ATTACK;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_ATTACK", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_ATTACK_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_F_DASH_JUMP_COMBO_XZX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_F_DASH_JUMP_COMBO_XZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_JUMP_COMBO_XZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_JUMP_COMBO_XZ_START;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_JUMP_COMBO_XZ_START", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_JUMP_COMBO_XZ_START_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING", stateData.stateID );
+		stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_F_DASH_JUMP_COMBO_XZ_LANDING_StateStartFuture );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_ATTACK;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_ATTACK", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_M_DASH_JUMP_COMBO_XZ_LANDING_ATTACK_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+
+		stateData.Init();
+		stateData.stateID			= LSI_LDB_M_DASH_JUMP_COMBO_XZX;
+		m_LuaManager.MakeTableReference( "LSI_LDB_M_DASH_JUMP_COMBO_XZX", stateData.stateID );
+		stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LDB_M_DASH_JUMP_COMBO_XZX_EventProcess );
+		m_StateList[stateData.stateID] = stateData;
+	}
+
+	InitPassiveSkillState();					// June vslot 0x690 ( 32b45820, CH4a )
+	InitEquippedActiveSkillState( false );		// June vslot 0x684
+	CX2GUUser::InitState();						// June 31fd8f00
+}
+
+// char-luciel CH1m: June 32b3e8b0 ( 294 registrations, no class test )
+void CX2GULuciel::InitStateCommon()
+{
+	UserUnitStateData stateData;
+	const std::string strLuHyperModeTable = GetHyperModeTableName( false );	// June 31fdd490( ..., 0 ) @32b3fae6
+	const std::string strCielHyperModeTable = GetHyperModeTableName( true );	// June 31fdd490( ..., 1 ) @32b40fdd
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_PEPPER_RUN_READY;
+	m_LuaManager.MakeTableReference( "LSI_LU_PEPPER_RUN_READY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_PEPPER_RUN;
+	m_LuaManager.MakeTableReference( "LSI_LU_PEPPER_RUN", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_PEPPER_RUN_END;
+	m_LuaManager.MakeTableReference( "LSI_LU_PEPPER_RUN_END", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_PEPPER_RUN_JUMP_UP;
+	m_LuaManager.MakeTableReference( "LSI_LU_PEPPER_RUN_JUMP_UP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_UP_StateStartFuture );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_UP_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_PEPPER_RUN_JUMP_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LU_PEPPER_RUN_JUMP_DOWN", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_DOWN_StateStartFuture );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_DOWN_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	// June 32b3e8b0 @351 LSI_LU_AMUSEMENT_ITEM_PHOENIX_RUN ( id 123 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @397 LSI_LU_AMUSEMENT_ITEM_PHOENIX_RUN_END ( id 126 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @444 LSI_LU_AMUSEMENT_ITEM_PHOENIX_RUN ( id 124 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @491 LSI_LU_AMUSEMENT_ITEM_PHOENIX_RUN ( id 125 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @536 LSI_LU_DANCE_Z ( id 127 ) left out: dance state, Stage 10
+
+	// June 32b3e8b0 @561 LSI_LU_DANCE_X ( id 128 ) left out: dance state, Stage 10
+
+	// June 32b3e8b0 @586 LSI_LU_DANCE_WAIT ( id 129 ) left out: dance state, Stage 10
+
+	// Lu's bounding states at June's ids, not InitBoundingStates' March ones: RT_BOUNDING stays off until CH1o routes the engine here
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_BOUNDING_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BOUNDING_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingDownEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_BOUNDING_LANDCRASH;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BOUNDING_LANDCRASH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingLandCrashEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_BOUNDING_UP;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BOUNDING_UP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, BoundingUpStateStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, BoundingUpStateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingUpEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_BOUNDING_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_BOUNDING_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingDownEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_BOUNDING_LANDCRASH;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_BOUNDING_LANDCRASH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingLandCrashEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_BOUNDING_UP;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_BOUNDING_UP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, BoundingUpStateStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, BoundingUpStateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, BoundingUpEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_THROW_ITEM;
+	m_LuaManager.MakeTableReference( "LSI_LU_THROW_ITEM", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMoveFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMove );
+	stateData.OnCameraMove		= SET_CB_FUNC( CX2GUUser, THROW_ITEM_CameraMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, THROW_ITEM_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DIE_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_DIE_FRONT", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, DieFrontStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DIE_FRONT_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, DieFrontFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, DieFrontEventProcess );
+	// June 3202a7d0 ( StateEnd ): runs in CX2GUUser::StateChange for the die states
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DIE_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_DIE_BACK", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, DieBackStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DIE_BACK_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, DieBackFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, DieBackEventProcess );
+	// June 3202a7d0 ( StateEnd ): runs in CX2GUUser::StateChange for the die states
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_START_INTRUDE;
+	m_LuaManager.MakeTableReference( "LSI_START_INTRUDE", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, StartIntrudeStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, StartIntrudeFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, StartIntrudeEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_WAIT;
+	m_LuaManager.MakeTableReference( "LSI_LU_WAIT", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_WAIT_StateStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LU_WAIT_StateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_WAIT_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_WALK;
+	m_LuaManager.MakeTableReference( "LSI_LU_WALK", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, WalkFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_WALK_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_JUMP_READY;
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_READY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_JUMP_UP;
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_UP", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_JUMP_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_DOWN", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_JUMP_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_LANDING", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, JumpLandingStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DashStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, DashFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_END;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_END", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, DashEndStartFuture );
+	// June 31fc7fc0 ( StateStart ): = CommonStateStart, which an empty slot runs
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashJumpStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DashJumpStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, DashJumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_EventProcess );
+	stateData.StateEndFuture	= SET_CB_FUNC( CX2GUUser, DashJumpEndFuture );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_LANDING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashJumpLandingStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, JumpLandingStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_POWER_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_POWER_LANDING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_POWER_LANDING_StateStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_POWER_LANDING_StateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_POWER_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= USI_HYPER_MODE;
+	m_LuaManager.MakeTableReference( strLuHyperModeTable.c_str(), stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, HyperModeStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, HyperModeStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, HyperModeFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, HyperModeEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, HyperModeEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_GROGGY;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_GROGGY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DAMAGE_GROGGY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_SMALL_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_SMALL_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageSmallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_SMALL_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_SMALL_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageSmallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_BIG_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BIG_FRONT", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageBigStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageBigEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_BIG_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_BIG_BACK", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageBigStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageBigEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_DOWN_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_DOWN_FRONT", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DAMAGE_DOWN_FRONT_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DAMAGE_DOWN_FRONT_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_DOWN_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_DOWN_BACK", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DAMAGE_DOWN_BACK_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DAMAGE_DOWN_BACK_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_STANDUP_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_STANDUP_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageStandUpEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, DamageStandUpEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_STANDUP_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_STANDUP_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageStandUpEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, DamageStandUpEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ROLLING_FRONT_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ROLLING_FRONT_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_FRONT_FRONT_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_FRONT_FRONT_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ROLLING_FRONT_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ROLLING_FRONT_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_FRONT_BACK_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_FRONT_BACK_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ROLLING_BACK_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ROLLING_BACK_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_BACK_FRONT_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_BACK_FRONT_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ROLLING_BACK_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ROLLING_BACK_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_BACK_BACK_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ROLLING_BACK_BACK_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ATTACK_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ATTACK_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_FRONT_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_FRONT_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ATTACK_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ATTACK_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_BACK_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_BACK_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_FRONT_NO_DOWN_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_STANDUP_ATTACK_BACK_NO_DOWN_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_SMALL;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_SMALL", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DamageAirSmallStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirSmallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirDownEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_DOWN_INVINCIBLE;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_DOWN_INVINCIBLE", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirDownInvincibleEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_DOWN_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_DOWN_LANDING", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageAirDownLandingStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, DamageAirDownLandingFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DAMAGE_DOWN_FRONT_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_FALL;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_FALL", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirFallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_UP;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_UP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirUpEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_FLY_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_FLY_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirFlyEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_AIR_FLY_BACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_AIR_FLY_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirFlyEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DAMAGE_REVENGE;
+	m_LuaManager.MakeTableReference( "LSI_LU_DAMAGE_REVENGE", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageRevengeStart );
+	stateData.OnCameraMove		= SET_CB_FUNC( CX2GUUser, DamageRevengeCameraMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageRevengeEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_SWITCHING;
+	m_LuaManager.MakeTableReference( "LSI_LU_SWITCHING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_SWITCHING_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, GenericGroundComboEndEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_ZZ;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_ZZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_ZZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_ZZZ;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_ZZZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_ZZZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_ZZZZ;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_ZZZZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_ZZZZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_ZZZZX;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_ZZZZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_ZZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_X;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_X", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XX;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XXX;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XXXX;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XXXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XXXZ_READY;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XXXZ_READY", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZ_READY_StateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZ_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XXXZ_CHARGE;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XXXZ_CHARGE", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZ_CHARGE_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZ_CHARGE_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XXXZ_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XXXZ_LOOP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZ_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XXXZ_END;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XXXZ_END", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZ_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_COMBO_XXXZX;
+	m_LuaManager.MakeTableReference( "LSI_LU_COMBO_XXXZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_COMBO_XXXZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_COMBO_X_START;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_COMBO_X_START", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_COMBO_X_START_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_COMBO_X_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_COMBO_X_LANDING", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_COMBO_X_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_JUMP_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_COMBO_Z", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_COMBO_Z_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_JUMP_COMBO_X;
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_COMBO_X", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_COMBO_X_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_COMBO_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_ZX;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_ZX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_ZX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_ZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_X;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_X", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_XX_START;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_XX_START", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_XX_START_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_XX_START_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_XX_END;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_XX_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_XX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_XXX;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_XXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_XXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_XXXX;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_XXXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_XXXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_DASH_JUMP_COMBO_XXXXZ;
+	m_LuaManager.MakeTableReference( "LSI_LU_DASH_JUMP_COMBO_XXXXZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_COMBO_XXXXZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_COMBO_ZZZX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_COMBO_ZZZX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LLC_COMBO_ZZZX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_DASH_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_LLC_DASH_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_DASH_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_DASH_COMBO_ZX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_DASH_COMBO_ZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_DASH_COMBO_ZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_DASH_COMBO_ZXX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_DASH_COMBO_ZXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_DASH_COMBO_ZXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_DASH_COMBO_XX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_DASH_COMBO_XX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_DASH_COMBO_XX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_UP;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_UP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_JUMP_COMBO_Z_DASH_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_JUMP_COMBO_X_DASH;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_JUMP_COMBO_X_DASH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_UP;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_UP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_JUMP_COMBO_X_DASH_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LU_JUMP_DOWN_NO_ATTACK;
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_DOWN_NO_ATTACK", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_DOWN_NO_ATTACK_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_DOWN_NO_ATTACK_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_COMBO_ZZZXZ;
+	m_LuaManager.MakeTableReference( "LSI_LLD_COMBO_ZZZXZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_COMBO_ZZZXZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_COMBO_XX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LLD_COMBO_XX_DOWN_X", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_COMBO_XX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_COMBO_XX_DOWN_XX_READY;
+	m_LuaManager.MakeTableReference( "LSI_LLD_COMBO_XX_DOWN_XX_READY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_COMBO_XX_DOWN_XX_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_COMBO_XX_DOWN_XX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LLD_COMBO_XX_DOWN_XX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_COMBO_XX_DOWN_XX_LOOP_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_COMBO_XX_DOWN_XX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_COMBO_XX_DOWN_XX_LOOP_X;
+	m_LuaManager.MakeTableReference( "LSI_LLD_COMBO_XX_DOWN_XX_LOOP_X", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_COMBO_XX_DOWN_XX_LOOP_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_PEPPER_RUN_READY;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_PEPPER_RUN_READY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_PEPPER_RUN;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_PEPPER_RUN", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_PEPPER_RUN_END;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_PEPPER_RUN_END", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_PEPPER_RUN_JUMP_UP;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_PEPPER_RUN_JUMP_UP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_UP_StateStartFuture );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_UP_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_PEPPER_RUN_JUMP_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_PEPPER_RUN_JUMP_DOWN", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_DOWN_StateStartFuture );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_DOWN_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, PEPPER_RUN_JUMP_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	// June 32b3e8b0 @1129 LSI_CIEL_AMUSEMENT_ITEM_PHOENIX_RUN ( id 571 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @1133 LSI_CIEL_AMUSEMENT_ITEM_PHOENIX_RUN_END ( id 574 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @1138 LSI_CIEL_AMUSEMENT_ITEM_PHOENIX_RUN ( id 572 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @1143 LSI_CIEL_AMUSEMENT_ITEM_PHOENIX_RUN ( id 573 ) left out: PvP amusement mode, no PvP offline
+
+	// June 32b3e8b0 @1146 LSI_CIEL_DANCE_Z ( id 590 ) left out: dance state, Stage 10
+
+	// June 32b3e8b0 @1149 LSI_CIEL_DANCE_X ( id 591 ) left out: dance state, Stage 10
+
+	// June 32b3e8b0 @1152 LSI_CIEL_DANCE_WAIT ( id 592 ) left out: dance state, Stage 10
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_THROW_ITEM;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_THROW_ITEM", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMoveFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMove );
+	stateData.OnCameraMove		= SET_CB_FUNC( CX2GUUser, THROW_ITEM_CameraMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, THROW_ITEM_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DIE_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DIE_FRONT", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, DieFrontStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, DieFrontStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, DieFrontFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, DieFrontEventProcess );
+	// June 3202a7d0 ( StateEnd ): runs in CX2GUUser::StateChange for the die states
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DIE_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DIE_BACK", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, DieBackStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, DieBackStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, DieBackFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, DieBackEventProcess );
+	// June 3202a7d0 ( StateEnd ): runs in CX2GUUser::StateChange for the die states
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_WAIT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_WAIT", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_WAIT_StateStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LU_WAIT_StateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_WAIT_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_WALK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_WALK", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, WalkFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_WALK_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_JUMP_READY;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_JUMP_READY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_JUMP_UP;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_JUMP_UP", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_JUMP_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_JUMP_DOWN", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_JUMP_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_JUMP_LANDING", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, JumpLandingStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DashStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, DashFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_END;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_END", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, DashEndStartFuture );
+	// June 31fc7fc0 ( StateStart ): = CommonStateStart, which an empty slot runs
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashJumpStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DashJumpStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, DashJumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_EventProcess );
+	stateData.StateEndFuture	= SET_CB_FUNC( CX2GUUser, DashJumpEndFuture );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_LANDING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashJumpLandingStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, JumpLandingStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_POWER_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_POWER_LANDING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_POWER_LANDING_StateStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_JUMP_POWER_LANDING_StateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_POWER_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_HYPER_MODE;
+	m_LuaManager.MakeTableReference( strCielHyperModeTable.c_str(), stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, HyperModeStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, HyperModeStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, HyperModeFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, HyperModeEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, HyperModeEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_GROGGY;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_GROGGY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DAMAGE_GROGGY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_SMALL_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_SMALL_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageSmallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_SMALL_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_SMALL_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageSmallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_BIG_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_BIG_FRONT", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageBigStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageBigEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_BIG_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_BIG_BACK", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageBigStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageBigEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_DOWN_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_DOWN_FRONT", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DAMAGE_DOWN_FRONT_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DAMAGE_DOWN_FRONT_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_DOWN_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_DOWN_BACK", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DAMAGE_DOWN_BACK_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DAMAGE_DOWN_BACK_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_STANDUP_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_STANDUP_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageStandUpEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, DamageStandUpEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_STANDUP_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_STANDUP_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageStandUpEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, DamageStandUpEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_STANDUP_ROLLING_FRONT_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_STANDUP_ROLLING_FRONT_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_FRONT_FRONT_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_FRONT_FRONT_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_STANDUP_ROLLING_FRONT_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_STANDUP_ROLLING_FRONT_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_FRONT_BACK_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_FRONT_BACK_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_STANDUP_ROLLING_BACK_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_STANDUP_ROLLING_BACK_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_BACK_FRONT_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_BACK_FRONT_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_STANDUP_ROLLING_BACK_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_STANDUP_ROLLING_BACK_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_BACK_BACK_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ROLLING_BACK_BACK_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_STANDUP_ATTACK_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_STANDUP_ATTACK_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ATTACK_FRONT_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ATTACK_FRONT_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_STANDUP_ATTACK_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_STANDUP_ATTACK_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ATTACK_BACK_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_STANDUP_ATTACK_BACK_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_SMALL;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_SMALL", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DamageAirSmallStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirSmallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirDownEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_DOWN_INVINCIBLE;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_DOWN_INVINCIBLE", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirDownInvincibleEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_DOWN_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_DOWN_LANDING", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageAirDownLandingStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, DamageAirDownLandingFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DAMAGE_DOWN_FRONT_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_FALL;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_FALL", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirFallEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_UP;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_UP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirUpEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_FLY_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_FLY_FRONT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirFlyEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_AIR_FLY_BACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_AIR_FLY_BACK", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageAirFlyEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DAMAGE_REVENGE;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DAMAGE_REVENGE", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, DamageRevengeStart );
+	stateData.OnCameraMove		= SET_CB_FUNC( CX2GUUser, DamageRevengeCameraMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, DamageRevengeEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_SWITCHING;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_SWITCHING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_SWITCHING_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, GenericGroundComboEndEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_ZZ;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_ZZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_ZZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_ZZZ;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_ZZZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_ZZZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_ZZZZ;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_ZZZZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_ZZZZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_ZZZZX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_ZZZZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_ZZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_X;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_XX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_XX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_XXX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_XXX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_XXXX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_XXXX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_XXXZ_START;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_XXXZ_START", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXZ_START_StateStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXZ_START_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_XXXZ_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_XXXZ_LOOP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXZ_LOOP_EventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXZ_LOOP_StateEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_XXXZ_END;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_XXXZ_END", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXZ_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_COMBO_XXXZX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_COMBO_XXXZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_COMBO_XXXZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_COMBO_X;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_COMBO_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_COMBO_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_COMBO_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_JUMP_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_JUMP_COMBO_Z", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_COMBO_Z_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_JUMP_COMBO_X;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_JUMP_COMBO_X", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_COMBO_X_FrameMoveFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_COMBO_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_COMBO_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_ZX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_ZX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_ZX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_ZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_X;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_X", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_XX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_XX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_XXX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_XXX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XXX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_XXXX;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_XXXX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XXXX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XXXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_XXXXZ;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_XXXXZ", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_LANDING", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_DASH_JUMP_COMBO_XXXXZ_LANDING_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_UP;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_UP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_JUMP_COMBO_Z_DASH_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_JUMP_COMBO_X_DASH;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_JUMP_COMBO_X_DASH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_UP;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_UP", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_UP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_DOWN", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_JUMP_COMBO_X_DASH_DOWN_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_CIEL_JUMP_DOWN_NO_ATTACK;
+	m_LuaManager.MakeTableReference( "LSI_CIEL_JUMP_DOWN_NO_ATTACK", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_DOWN_NO_ATTACK_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_CIEL_JUMP_DOWN_NO_ATTACK_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_COMBO_ZZZX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_COMBO_ZZZX", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_ZZZX_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_COMBO_XXXX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_COMBO_XXXX", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_ZZZX_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_DASH_COMBO_ZX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_DASH_COMBO_ZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_DASH_COMBO_ZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_DASH_COMBO_ZXX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_DASH_COMBO_ZXX", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_ZZZX_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_COMBO_SNIPING_READY;
+	m_LuaManager.MakeTableReference( "LSI_LCG_COMBO_SNIPING_READY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_COMBO_SNIPING_Z;
+	m_LuaManager.MakeTableReference( "LSI_LCG_COMBO_SNIPING_Z", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_Z_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_Z_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_COMBO_SNIPING_Z_FINISH;
+	m_LuaManager.MakeTableReference( "LSI_LCG_COMBO_SNIPING_Z_FINISH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_Z_FINISH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_COMBO_SNIPING_X_CHARGE;
+	m_LuaManager.MakeTableReference( "LSI_LCG_COMBO_SNIPING_X_CHARGE", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_X_CHARGE_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_X_CHARGE_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_X_CHARGE_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_COMBO_SNIPING_X_FIRE;
+	m_LuaManager.MakeTableReference( "LSI_LCG_COMBO_SNIPING_X_FIRE", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_X_FIRE_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_X_FIRE_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_COMBO_SNIPING_X_FIRE_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_DASH_JUMP_COMBO_SNIPING_START;
+	m_LuaManager.MakeTableReference( "LSI_LCG_DASH_JUMP_COMBO_SNIPING_START", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_DASH_JUMP_COMBO_SNIPING_START_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_DASH_JUMP_COMBO_SNIPING_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_DASH_JUMP_COMBO_SNIPING_FINISH;
+	m_LuaManager.MakeTableReference( "LSI_LCG_DASH_JUMP_COMBO_SNIPING_FINISH", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_DASH_JUMP_COMBO_SNIPING_FINISH_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_DASH_COMBO_ZX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_DASH_COMBO_ZX_DOWN_X", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_DASH_COMBO_ZX_DOWN_X_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_DASH_COMBO_ZX_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_DASH_COMBO_ZX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_DASH_COMBO_ZX_DOWN_XX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_DASH_COMBO_ZX_DOWN_XX_END;
+	m_LuaManager.MakeTableReference( "LSI_LCN_DASH_COMBO_ZX_DOWN_XX_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_DASH_COMBO_ZX_DOWN_XX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_SNIPING_COMBO_UP_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_SNIPING_COMBO_UP_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_SNIPING_COMBO_UP_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_SNIPING_COMBO_UP_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_SNIPING_COMBO_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_SNIPING_COMBO_DOWN_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_SNIPING_COMBO_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_SNIPING_COMBO_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_COMBO_ZXXX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_COMBO_ZXXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_COMBO_ZXXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_F_DASH_COMBO_XXX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_F_DASH_COMBO_XXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_F_DASH_COMBO_XXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_COMBO_ZZZX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_COMBO_ZZZX", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_COMBO_ZZZX_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_COMBO_ZX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_COMBO_ZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_COMBO_ZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_COMBO_ZXX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_COMBO_ZXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_COMBO_ZXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_COMBO_ZXXX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_COMBO_ZXXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_COMBO_ZXXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_COMBO_XX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_COMBO_XX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_COMBO_XX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLC_M_DASH_COMBO_XXX;
+	m_LuaManager.MakeTableReference( "LSI_LLC_M_DASH_COMBO_XXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLC_M_DASH_COMBO_XXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_ZZZX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_ZZZX", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_ZZZX_WAIT;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_ZZZX_WAIT", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_WAIT_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_ZZZXX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_ZZZXX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_ZZZXX_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_ZZZXX_END", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_ZZZXZ_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_ZZZXZ_LOOP", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_ZZZXZ_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_ZZZXZ_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_XXXX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_XXXX", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_XXXXX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_XXXXX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_XXXXX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_XXXXX_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_XXXXX_END", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_XXXXZ_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_XXXXZ_LOOP", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_COMBO_XXXXZ_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_COMBO_XXXXZ_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_Z;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_Z", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_COMBO_Z_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_ZX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_ZX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_COMBO_ZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_ZXX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_ZXX", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_ZXXZ_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_ZXXZ_LOOP", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_ZXXZ_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_ZXXZ_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_ZXXX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_ZXXX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_COMBO_ZXXX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_ZXXX_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_ZXXX_END", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_XX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_XX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_COMBO_XX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_XXX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_XXX", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_ZXXZ_END;	// June registers table LSI_LCG_F_DASH_COMBO_XXXZ_END at this id
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_XXXZ_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_XXXX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_XXXX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_COMBO_XXXX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_XXXX_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_XXXX_END", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_XXXZ_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_XXXZ_LOOP", stateData.stateID );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_StateStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_COMBO_XXXZ_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_COMBO_XXXZ_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_COMBO_ZZZXZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_JUMP_COMBO_ZXX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_JUMP_COMBO_ZXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_JUMP_COMBO_ZXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_M_DASH_JUMP_COMBO_ZXX;
+	m_LuaManager.MakeTableReference( "LSI_LCG_M_DASH_JUMP_COMBO_ZXX", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_M_DASH_JUMP_COMBO_ZXX_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= 338;	// no name: June registers table LSI_LU_JUMP_COMBO_Z again
+	m_LuaManager.MakeTableReference( "LSI_LU_JUMP_COMBO_Z", stateData.stateID );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_COMBO_Z_SECOND_FrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LU_JUMP_COMBO_Z_SECOND_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_JUMP_COMBO_XZZ_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_JUMP_COMBO_XZZ_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCG_F_DASH_JUMP_COMBO_XZZ_END;
+	m_LuaManager.MakeTableReference( "LSI_LCG_F_DASH_JUMP_COMBO_XZZ_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCG_F_DASH_JUMP_COMBO_XZZ_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_M_COMBO_ZZZXZ;
+	m_LuaManager.MakeTableReference( "LSI_LLD_M_COMBO_ZZZXZ", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_M_COMBO_ZZZXZ_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_M_COMBO_XX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LLD_M_COMBO_XX_DOWN_X", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_M_COMBO_XX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_M_COMBO_XX_DOWN_XX_READY;
+	m_LuaManager.MakeTableReference( "LSI_LLD_M_COMBO_XX_DOWN_XX_READY", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_M_COMBO_XX_DOWN_XX_READY_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_StateStartFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_M_COMBO_XX_DOWN_XX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LLD_M_COMBO_XX_DOWN_XX_END;
+	m_LuaManager.MakeTableReference( "LSI_LLD_M_COMBO_XX_DOWN_XX_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LLD_M_COMBO_XX_DOWN_XX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_COMBO_ZZZX_UP_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_COMBO_ZZZX_UP_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_UP_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_UP_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_COMBO_ZZZX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_COMBO_ZZZX_DOWN_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_COMBO_XXXX_UP_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_COMBO_XXXX_UP_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_UP_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_XXXX_UP_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_COMBO_XXXX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_COMBO_XXXX_DOWN_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_XXXX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_ZXX_UP_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_ZXX_UP_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_UP_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZXX_UP_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_ZXX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_ZXX_DOWN_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZXX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_XXX_UP_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_XXX_UP_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_UP_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XXX_UP_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_XXX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_XXX_DOWN_X", stateData.stateID );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_COMBO_ZZZX_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XXX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_ZX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_ZX_DOWN_X", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_END;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_ZX_DOWN_XX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_XX_DOWN_X;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_XX_DOWN_X", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XX_DOWN_X_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XX_DOWN_X_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XX_DOWN_X_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_StateStartFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_LOOP_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_END;
+	m_LuaManager.MakeTableReference( "LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_END", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_LCN_F_DASH_COMBO_XX_DOWN_XX_END_EventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_START;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_START", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingStartStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingStartStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingStartEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, StartEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_ON;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_ON", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingOnStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingOnStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingOnEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_OFF;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_OFF", stateData.stateID );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingOffEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, RidingOffEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_WAIT_HABIT;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_WAIT_HABIT", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingWaitHabitStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingWaitHabitStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingWaitHabitEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_WAIT;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_WAIT", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingWaitStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingWaitStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingWaitEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_WALK;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_WALK", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingWalkStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingWalkStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, WalkFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingWalkEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_JUMP_UP;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_JUMP_UP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingJumpUpStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingJumpUpStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingJumpUpEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_JUMP_DOWN;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_JUMP_DOWN", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingJumpDownStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingJumpDownStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingJumpDownEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_JUMP_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_JUMP_LANDING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingJumpLandingStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingJumpLandingStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingJumpLandingEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_DASH;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_DASH", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingDashStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, DashFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingDashEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_DASH_END;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_DASH_END", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingDashEndStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingDashEndStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, RidingDashEndFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingDashEndEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_DASH_JUMP;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_DASH_JUMP", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingDashJumpStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingDashJumpStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, RidingDashJumpFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingDashJumpEventProcess );
+	stateData.StateEndFuture	= SET_CB_FUNC( CX2GUUser, RidingDashJumpEndFuture );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_DASH_JUMP_LANDING;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_DASH_JUMP_LANDING", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, DashJumpLandingStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingDashJumpLandingStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingDashJumpLandingEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_DAMAGE_FRONT;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_DAMAGE_FRONT", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingDamageBackStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingDamageFrontStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingDamageFrontEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_DAMAGE_BACK;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_DAMAGE_BACK", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingDamageBackStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingDamageBackStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingDamageBackEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_DIE;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_DIE", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, DieFrontStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, DieFrontStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, DieFrontFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, DieFrontEventProcess );
+	// June 3202a7d0 ( StateEnd ): runs in CX2GUUser::StateChange for the die states
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_ATTACK_Z;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_ATTACK_Z", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingAttackZStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingAttackZStart );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingAttackZEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_JUMP_ATTACK_Z;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_JUMP_ATTACK_Z", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingJumpAttackZStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingJumpAttackZStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, RidingJumpAttackZFrameMoveFuture );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingJumpAttackZEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_ATTACK_X;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_ATTACK_X", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingAttackXStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingAttackXStart );
+	// June 32002f70 ( OnFrameMove ): none in March, riding Stage 17
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingAttackXEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_ATTACK_SPECIAL;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_ATTACK_SPECIAL", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingSpecialAttackStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingSpecialAttackStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, RidingSpecialAttackFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingSpecialAttackEventProcess );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_SPECIAL_MOVE;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_SPECIAL_MOVE", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingSpecialMoveStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingSpecialMoveStart );
+	stateData.OnFrameMoveFuture	= SET_CB_FUNC( CX2GUUser, RidingSpecialMoveFrameMoveFuture );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, RidingSpecialMoveFrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingSpecialMoveEventProcess );
+	stateData.StateEndFuture	= SET_CB_FUNC( CX2GUUser, RidingSpecialMoveEndFutrue );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, RidingSpecialMoveEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	stateData.Init();
+	stateData.stateID			= LSI_RIDING_HYPER_MODE;
+	m_LuaManager.MakeTableReference( "LSI_RIDING_HYPER_MODE", stateData.stateID );
+	stateData.StateStartFuture	= SET_CB_FUNC( CX2GUUser, RidingHyperModeStartFuture );
+	stateData.StateStart		= SET_CB_FUNC( CX2GUUser, RidingHyperModeStart );
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_RIDING_HYPER_MODE_FrameMove );
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, RidingHyperModeEventProcess );
+	stateData.StateEnd			= SET_CB_FUNC( CX2GUUser, RidingHyperModeEnd );
+	m_StateList[stateData.stateID] = stateData;
+
+	// June 32b3e8b0 @1878 LSI_RIDING_SPECIFIC ( id 93 ) left out: riding, Stage 17
+
+	// June 32b3e8b0 @1883 LSI_RIDING_ATTACK_X_READY ( id 94 ) left out: riding, Stage 17
+
+	// June 32b3e8b0 @1888 LSI_RIDING_ATTACK_X_READY_2 ( id 95 ) left out: riding, Stage 17
+
+	// June 32b3e8b0 @1893 LSI_RIDING_ATTACK_X_END ( id 96 ) left out: riding, Stage 17
+
+	// June 32b3e8b0 @1902 LSI_SA_LLC_DARK_CRESCENT ( id 298 ): registered by CH2b with its callbacks
+
+	// June 32b3e8b0 @1910 LSI_SA_LLC_RUINOUS_IMPACT ( id 299 ): registered by CH2b with its callbacks
+
+	// June 32b3e8b0 @1916 LSI_SA_LCG_ESCHATON ( id 363 ): registered by CH2c / CH2c2 with its callbacks
+
+	// June 32b3e8b0 @1922 LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT ( id 364 ): registered by CH3b with its callbacks
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}
