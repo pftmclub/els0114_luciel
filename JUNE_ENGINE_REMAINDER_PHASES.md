@@ -2136,6 +2136,7 @@ deleted, 0 non-ASCII); junediverge RESULT: PASS; enumscan exit 0; FINISH RESULT:
 **Build: blocked, not deployed.** `build.py --deploy` (twice) stops in KTDXLIB at `Always.h(13695)`: the `#error` guard of
 `SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS` (char-luciel CH3c20, commit `b4f80375`) fires in the KTDXLIB project. That is not this phase's file to fix;
 the play-test waits for the first build that passes (any session's full build compiles R14c in).
+**Deployed later the same day by a peer's build** (HEAD `18808960`): `EXESTR OK: 2 of 2 found in X2_offline.exe, 26948608 B, dated 2026-11-15 18:31:09, md5 df9afaf486b60758f01f2f05bc28f749` (`] EQBASIC item `, ` attack_lines `).
 
 **How to see it** (hand-off in STATUS / the session reply): Aisha `arshu` (56, Cobo Wand + Promotion Wand fashion), Eve `Iivue` (19, Wild Tracker
 Drone +11 + Tassel Drone fashion), Elsword `jtLordKnight` (25, Void Sword +10 + Promotion Sword fashion) land Z combos on monsters; Add
