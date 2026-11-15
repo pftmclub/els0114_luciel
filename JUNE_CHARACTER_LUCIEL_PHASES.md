@@ -2654,7 +2654,7 @@ Opus 5.5 high. Reviewed CH1o2 `4cd0f5c2` and CH1o3 `8b026393`. **Verdict: pass a
 ### CH1p - Done (2026-11-15)
 
 Opus 5.5 high. New flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO`, **`//#define`** like `_LIVE` ( CH1 final defines both; `#error`s without `_CORE` ); class code under `_CORE`;
-one enum-name line under `JUNE_CHAR_DUO_BODY`. No debug define. funcmap: `grep "(CH1p)" june2017_re/funcmap.tsv` ( 5 rows ). `JUNE_BUGS.md` 723 withdrawn, 726, 727. `MODS.md` section.
+one enum-name line under `JUNE_CHAR_DUO_BODY`. No debug define. Commit `b3ddeef9`. funcmap: `grep "(CH1p)" june2017_re/funcmap.tsv` ( 5 rows ). `JUNE_BUGS.md` 723 withdrawn, 726, 727. `MODS.md` section.
 - **Already done before this phase ( checked, no change ):** `DUO_TYPE` at state start ( DU1b, `ApplyDuoTypeAtStateStart`, DU1 review's `CX2Unit::DT_*` ), `MINOR_UNIT_ANIM_NAME`
   ( DU1b ), `MINOR_UNIT_SPEED_TIME0-4` / `_ULTIMATE` and `MINOR_UNIT_PASSIVE_SPEED_*` ( DU1b4 ), `CP_AMOUNT` into vslot 0x648 ( CH1o ), the switch itself
   ( `DoProcessWhenActiveBodyChangeApplied`, CH1o ), the bounding key dialog's load ( CH1k ) and hide timer ( CH1l3 ), `CUSTOM_RENDER_STATE` in `Enum.lua` ( char-ara CH1 ).
@@ -2689,6 +2689,8 @@ one enum-name line under `JUNE_CHAR_DUO_BODY`. No debug define. funcmap: `grep "
   `_DUO --worktree` ( Always.h, X2GUUser, X2GUNPC, X2DamageManager, X2GULuciel ): `3 PASS, 1 DEFINE, 1 OTHER ( _CORE's file ), 0 FAIL, 0 ERROR`, 0 deleted, only complaint "not #defined"
   ( deferred like `_LIVE`; finish.py's INERT test keys on `_LIVE` names ); `DUO_BODY --files X2UnitManager.cpp`: `1 PASS` / PASS ( with Always.h it ERRORs on DIVERGE_PLAY_SOUND_REVIVE's
   `#if defined && !defined` guard ); `_CORE --with _DUO --files X2GULuciel.cpp X2GULuciel.h`: `2 PASS, 0 FAIL` / PASS, 14 deleted = the renamed lines and two rewritten comments, all inside `_CORE`.
+  Range ( `--range b3ddeef9^..b3ddeef9`, same file sets ): `_DUO` `3 PASS, 1 DEFINE, 1 OTHER, 0 FAIL, 0 ERROR` ( not #defined only ), `DUO_BODY` `1 PASS` / PASS,
+  `_CORE --with _DUO` `2 PASS` / PASS ( 14 deleted ), junediverge `--check` of the 6 files PASS.
 - **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GULuciel.cpp`, `X2GUUser.cpp`, `X2GUNPC.cpp`, `X2DamageManager.cpp`, `X2UnitManager.cpp`: plain 5 x 0 errors; with `-D_DUO -D_LIVE`
   5 x 0 errors ( the first run caught `CX2OfflineLog` missing in `X2GULuciel.cpp`: include added under `_DUO` ). Full build skipped: no play-test.
 - **How to see it in game:** nothing yet ( `_DUO` / `_LIVE` off ). From CH1: a body swap logs `LUCIEL DUO switch`; from CH4a: points on combo hits and the V key over a bounced enemy.
