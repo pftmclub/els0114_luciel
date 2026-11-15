@@ -3241,11 +3241,26 @@ void CX2GUAdd::DieBackEventProcess()
 //ANSI_WAIT
 void CX2GUAdd::WaitStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329e5970
 	CommonStateStartFuture();
 	PlayAnimationWaitStartByAdd( m_pXSkinAnimFuture, m_FrameDataFuture );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStartFuture();
+	PlayAnimationWaitStartByAdd( m_pXSkinAnimFuture, m_FrameDataFuture );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::WaitStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329e59a0: helper 329e4d00 = PlayAnimationWaitStartByAdd
+	CommonStateStart();
+	PlayAnimationWaitStartByAdd( m_pXSkinAnim.get(), m_FrameDataNow );
+
+	m_CommonState.m_Wait = USI_WAIT;
+
+	m_NasodArmorAttackTargetData.ResetTargetData();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	CommonStateStart();
 	PlayAnimationWaitStartByAdd( m_pXSkinAnim.get(), m_FrameDataNow );
 
@@ -3253,9 +3268,71 @@ void CX2GUAdd::WaitStart()
 
 	/// 나소드 아머 콤보 타겟 정보 초기화
 	m_NasodArmorAttackTargetData.ResetTargetData();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::WaitEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329eaa40: June TryHyperModeStateChange
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( m_InputData.oneZ == true )
+	{
+		StateChange( ANSI_COMBO_Z );
+	}
+	else if( m_InputData.oneX == true )
+	{
+		StateChange( ANSI_COMBO_X );
+	}
+	else if( true == SpecialAttackEventProcess() )
+	{
+	}
+	else if( m_InputData.pureDoubleRight == true || m_InputData.pureDoubleLeft == true )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( m_InputData.pureRight == true || m_InputData.pureLeft == true )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( m_InputData.pureUp == true )
+	{
+		StateChange( USI_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( USI_HYPER_MODE )
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_CHANGE_FORMATION_MODE( USI_HYPER_MODE )
+	ELSE_IF_CAN_RELEASE_FORMATION_MODE
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+				LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+				&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if ( true == GetIsFormationMode() )
+	{
+		StateChange( ANSI_HYPER_WAIT );
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -3312,24 +3389,103 @@ void CX2GUAdd::WaitEventProcess()
 	}
 #endif //RIDING_SYSTEM
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_HYPER_WAIT
 void CX2GUAdd::HyperWaitStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1c90
 	CommonStateStartFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStartFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::HyperWaitStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d53a0
+	CommonStateStart();
+
+	m_NasodArmorAttackTargetData.ResetTargetData();
+
+	m_CommonState.m_Wait = ANSI_HYPER_WAIT;
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	CommonStateStart();
 
 	/// 나소드 아머 콤보 타겟 정보 초기화
 	m_NasodArmorAttackTargetData.ResetTargetData();
 
 	m_CommonState.m_Wait = ANSI_HYPER_WAIT;
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::HyperWaitEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329eacc0: June formation release
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( m_InputData.oneZ == true )
+	{
+		StateChange( ANSI_COMBO_Z );
+	}
+	else if( m_InputData.oneX == true )
+	{
+		StateChange( ANSI_COMBO_X );
+	}
+	else if( true == SpecialAttackEventProcess() )
+	{
+	}
+	else if( m_InputData.pureDoubleRight == true || m_InputData.pureDoubleLeft == true )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( m_InputData.pureRight == true || m_InputData.pureLeft == true )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( m_InputData.pureUp == true )
+	{
+		StateChange( USI_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	else if( true == m_InputData.oneLCtr && true == GetIsFormationMode() )
+	{
+		m_FrameDataFuture.syncData.nowAction = UAI_RELEASE_FORMATION_MODE;
+		SetIsFormationMode( false );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_RELEASE_FORMATION_MODE
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if ( false == GetIsFormationMode() )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -3385,11 +3541,66 @@ void CX2GUAdd::HyperWaitEventProcess()
 	}
 #endif //RIDING_SYSTEM
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_WALK
 void CX2GUAdd::WalkEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329eafe0: June TryHyperModeStateChange
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( m_InputData.oneZ == true )
+	{
+		StateChange( ANSI_COMBO_Z );
+	}
+	else if( m_InputData.oneX == true )
+	{
+		StateChange( ANSI_COMBO_X );
+	}
+	else if( SpecialAttackEventProcess() == true )
+	{
+	}
+	else if( m_InputData.pureRight == false && m_InputData.pureLeft == false )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if( m_InputData.pureUp == true )
+	{
+		StateChange( USI_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( USI_HYPER_MODE )
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_CHANGE_FORMATION_MODE( USI_HYPER_MODE )
+	ELSE_IF_CAN_RELEASE_FORMATION_MODE
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -3439,11 +3650,14 @@ void CX2GUAdd::WalkEventProcess()
 #endif //RIDING_SYSTEM
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_JUMP_READY
 void CX2GUAdd::JumpReadyEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329e43d0
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -3460,11 +3674,64 @@ void CX2GUAdd::JumpReadyEventProcess()
 	}
 
 	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( SpecialAttackEventProcess() == true )
+	{
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() || true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( USI_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+
+	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_JUMP_UP
 void CX2GUAdd::JumpUpEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1ca0
+	if( ( m_InputData.oneDoubleRight == true || m_InputData.oneDoubleLeft == true ) &&
+		true == m_bEnableAirDash )
+	{
+		StateChange( ANSI_AIR_DASH );
+		m_bEnableAirDash = false;
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( ( m_InputData.oneUp || true == m_InputData.oneDoubleUp ) && true == m_bEnableLevitationWait )
+	{
+		StateChange( ANSI_LEVITATION_WAIT );
+		m_bEnableLevitationWait = false;
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( ANSI_JUMP_ATTACK_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( ANSI_JUMP_ATTACK_X );
+	}
+	else if( 0.0f >= m_PhysicParam.nowSpeed.y )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( ( m_InputData.oneDoubleRight == true || m_InputData.oneDoubleLeft == true ) &&
 		true == m_bEnableAirDash )
 	{
@@ -3499,11 +3766,51 @@ void CX2GUAdd::JumpUpEventProcess()
 #endif //RIDING_SYSTEM
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_JUMP_DOWN
 void CX2GUAdd::JumpDownEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d53d0
+	if( ( m_InputData.oneDoubleRight == true || m_InputData.oneDoubleLeft == true ) &&
+		true == m_bEnableAirDash )
+	{
+		StateChange( ANSI_AIR_DASH );
+		m_bEnableAirDash = false;
+	}
+	else if ( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( ( m_InputData.oneUp || true == m_InputData.oneDoubleUp ) && true == m_bEnableLevitationWait )
+	{
+		StateChange( ANSI_LEVITATION_WAIT );
+		m_bEnableLevitationWait = false;
+	}
+	else if ( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_LANDING );
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( ANSI_JUMP_ATTACK_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( ANSI_JUMP_ATTACK_X );
+	}
+	else if ( 0.0f <= m_PhysicParam.nowSpeed.y )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( ( m_InputData.oneDoubleRight == true || m_InputData.oneDoubleLeft == true ) &&
 		true == m_bEnableAirDash )
 	{
@@ -3542,15 +3849,91 @@ void CX2GUAdd::JumpDownEventProcess()
 #endif //RIDING_SYSTEM
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_JUMP_LANDING
 void CX2GUAdd::JumpLandingStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1d90
 	CommonStateStartFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStartFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::JumpLandingEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329eb210: no second dash test; June TryHyperModeStateChange
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.oneRight && true == m_FrameDataFuture.syncData.bIsRight )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( true == m_InputData.oneLeft && false == m_FrameDataFuture.syncData.bIsRight )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if( SpecialAttackEventProcess() == true )
+	{
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( ANSI_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( ANSI_COMBO_X );
+	}
+	else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( true == m_InputData.pureUp )
+	{
+		StateChange( USI_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( USI_HYPER_MODE )
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_CHANGE_FORMATION_MODE( USI_HYPER_MODE )
+	ELSE_IF_CAN_RELEASE_FORMATION_MODE
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	ELSE_IF_KEY_PRESSED_AT_SKIP_POINT_ZXCAS
+	{
+		StateChange( USI_WAIT, false );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -3618,11 +4001,86 @@ void CX2GUAdd::JumpLandingEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DASH
 void CX2GUAdd::DashEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329eb560: June TryHyperModeStateChange
+	if( false == IsOnSomethingFuture() )
+	{
+		if( true == m_bEnableAirDash && ( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
+		{
+			StateChange( ANSI_AIR_DASH );
+
+			m_bEnableAirDash = false;
+		}
+		else
+		{
+			StateChange( USI_DASH_JUMP );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if( m_InputData.oneZ == true )
+	{
+		StateChange( ANSI_DASH_COMBO_Z );
+	}
+	else if( m_InputData.oneX == true )
+	{
+		StateChange( ANSI_DASH_COMBO_X );
+	}
+	else if ( true == SpecialAttackEventProcess() )
+	{
+	}
+	else if( true == m_InputData.oneUp )
+	{
+		StateChange( USI_DASH_JUMP );
+		m_PhysicParam.nowSpeed.y = GetDashJumpSpeed();
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( USI_HYPER_MODE )
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_CHANGE_FORMATION_MODE( USI_HYPER_MODE )
+	ELSE_IF_CAN_RELEASE_FORMATION_MODE
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	else if( false == m_InputData.pureRight && false == m_InputData.pureLeft )
+	{
+		StateChange( USI_DASH_END );
+	}
+	else if( m_InputData.pureRight == true && m_InputData.pureLeft == true )
+	{
+		StateChange( USI_DASH_END );
+	}
+	else if( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == false )
+	{
+		StateChange( USI_DASH_END );
+	}
+	else if( m_InputData.pureLeft == true && m_FrameDataFuture.syncData.bIsRight == true )
+	{
+		StateChange( USI_DASH_END );
+	}
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_DASH_JUMP );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		if( true == m_bEnableAirDash && ( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
@@ -3692,11 +4150,71 @@ void CX2GUAdd::DashEventProcess()
 #endif //RIDING_SYSTEM
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_AIR_DASH
 void CX2GUAdd::AirDashEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329eb7e0
+	if( 0.45 < m_FrameDataFuture.unitCondition.fStateTime )
+	{
+		StateChange( USI_DASH_JUMP );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( m_InputData.oneZ == true )
+	{
+		StateChange( ANSI_DASH_JUMP_COMBO_Z );
+	}
+	else if( m_InputData.oneX == true )
+	{
+		StateChange( ANSI_DASH_JUMP_COMBO_X );
+	}
+	else if ( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( true == m_InputData.oneUp )
+	{
+		StateChange( USI_DASH_JUMP );
+		m_PhysicParam.nowSpeed.y = GetDashJumpSpeed();
+	}
+	else if( false == m_InputData.pureRight && false == m_InputData.pureLeft )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	else if( m_InputData.pureRight == true && m_InputData.pureLeft == true )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	else if( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == false )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	else if( m_InputData.pureLeft == true && m_FrameDataFuture.syncData.bIsRight == true )
+	{
+		StateChange( USI_JUMP_DOWN );
+	}
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_DASH_JUMP );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( 0.45 < m_FrameDataFuture.unitCondition.fStateTime )
 	{
 		StateChange( USI_DASH_JUMP );
@@ -3755,32 +4273,125 @@ void CX2GUAdd::AirDashEventProcess()
 #endif //RIDING_SYSTEM
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::AirDashStateEndFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1da0
 	if ( 800.f < m_PhysicParam.nowSpeed.x )
 		m_PhysicParam.nowSpeed.x = 800.f;
 
 	CommonStateEndFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if ( 800.f < m_PhysicParam.nowSpeed.x )
+		m_PhysicParam.nowSpeed.x = 800.f;
+
+	CommonStateEndFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DASH_END
 void CX2GUAdd::DashEndStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329e4480
 	CommonStateStartFuture();
 	m_PhysicParam.nowSpeed.x = GetDashSpeed();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStartFuture();
+	m_PhysicParam.nowSpeed.x = GetDashSpeed();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::DashEndFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d5510
 	if( m_pXSkinAnim->EventTimer( 0.4f ) == true )
 		CreateStepDust();
 
 	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if( m_pXSkinAnim->EventTimer( 0.4f ) == true )
+		CreateStepDust();
+
+	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DashEndEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329eba20: June TryHyperModeStateChange
+	const float TRIGGER_TIME_FACTOR_DASH_ATTACK = 0.3f;
+
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( m_InputData.oneZ == true )
+	{
+		StateChange( ANSI_COMBO_Z );
+	}
+	else if( m_InputData.oneX == true )
+	{
+		StateChange( ANSI_COMBO_X );
+	}
+	else if( SpecialAttackEventProcess() == true)
+	{
+	}
+	else if( m_InputData.pureDoubleRight == true || m_InputData.pureDoubleLeft == true )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( m_InputData.oneRight == true && m_FrameDataFuture.syncData.bIsRight == true )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( m_InputData.oneLeft == true && m_FrameDataFuture.syncData.bIsRight == false )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( m_InputData.pureRight == true || m_InputData.pureLeft == true )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if( m_InputData.oneUp == true )
+	{
+		StateChange( USI_JUMP_READY );
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( USI_HYPER_MODE )
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	ELSE_IF_CAN_CHANGE_FORMATION_MODE( USI_HYPER_MODE )
+	ELSE_IF_CAN_RELEASE_FORMATION_MODE
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{	
+		StateChange( USI_WAIT );
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	// DashEnd에서 공격 키를 눌렀을 때 대시 공격인지, 일반 공격인지를 정하기 위한 const 값. 
 	const float TRIGGER_TIME_FACTOR_DASH_ATTACK = 0.3f;
 
@@ -3847,6 +4458,7 @@ void CX2GUAdd::DashEndEventProcess()
 #endif //RIDING_SYSTEM
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DASH_JUMP
@@ -3884,6 +4496,111 @@ void CX2GUAdd::DashJumpFrameMoveFuture()
 }
 void CX2GUAdd::DashJumpEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329e44c0: both direction keys held turn the dash jump round
+	bool &bCanDashJump = m_FrameDataFuture.stateParam.bEventFlagList[0];
+
+	if( true == IsOnSomethingFuture() )
+	{
+		
+		if ( true == m_bDownForce )
+		{
+			StateChange( ANSI_DASH_JUMP_POWER_LANDING );
+			m_bDownForce = false;
+		} // if
+		else
+		{
+			if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			{
+				StateChangeDashIfPossible();
+			}
+			else
+				StateChange( USI_DASH_JUMP_LANDING );
+
+			m_bDownForce = false;
+		}
+	}
+	else if( m_InputData.oneUp && true == m_bEnableAirDash )
+	{
+		StateChange( ANSI_AIR_DASH );
+		m_bEnableAirDash = false;
+	}
+	else if( true == m_FrameDataFuture.unitCondition.bFootOnWall &&
+		( true == m_InputData.oneUp || true == m_InputData.oneDoubleUp ) )
+	{
+		StateChange( ANSI_WALL_LANDING );
+		m_bDisableGravity = true;
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( ANSI_DASH_JUMP_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( ANSI_DASH_JUMP_COMBO_X );
+	}
+	else if( true == m_InputData.pureRight && true == m_InputData.pureLeft )
+	{
+		if( ( true == m_InputData.oneRight && false == m_FrameDataFuture.syncData.bIsRight ) ||
+			( true == m_InputData.oneLeft && true == m_FrameDataFuture.syncData.bIsRight ) )
+		{
+			if( GetJumpSpeed() < m_PhysicParam.nowSpeed.y )
+				m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+
+			if( 0.0f < m_PhysicParam.nowSpeed.y )
+				StateChange( USI_JUMP_UP );
+			else
+				StateChange( USI_JUMP_DOWN );
+		}
+	}
+	else if( true == m_InputData.pureRight )
+	{
+		if( false == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( GetJumpSpeed() < m_PhysicParam.nowSpeed.y )
+				m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+
+			if( 0.0f < m_PhysicParam.nowSpeed.y )
+				StateChange( USI_JUMP_UP );
+			else
+				StateChange( USI_JUMP_DOWN );
+		}
+	}
+	else if( true == m_InputData.pureLeft )
+	{
+		if( true == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( GetJumpSpeed() < m_PhysicParam.nowSpeed.y )
+				m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+
+			if( 0.0f < m_PhysicParam.nowSpeed.y )
+				StateChange( USI_JUMP_UP );
+			else
+				StateChange( USI_JUMP_DOWN );
+		}
+	}
+	else if ( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+	else if ( ( m_InputData.oneDoubleRight == true || m_InputData.oneDoubleLeft == true ) &&
+			  true == m_bEnableAirDash )
+	{
+		StateChange( ANSI_AIR_DASH );
+		m_bEnableAirDash = false;
+	}
+	else if( true == m_InputData.oneDown )
+	{
+		m_PhysicParam.nowSpeed.y = m_PhysicParam.fMaxGSpeed * 2;
+		m_bDownForce = true;
+		bCanDashJump = false;
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	bool &bCanDashJump = m_FrameDataFuture.stateParam.bEventFlagList[0];
 
 	if( true == IsOnSomethingFuture() )
@@ -3974,6 +4691,7 @@ void CX2GUAdd::DashJumpEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DashJumpEndFuture()
 {
@@ -3984,6 +4702,8 @@ void CX2GUAdd::DashJumpEndFuture()
 //ANSI_DASH_JUMP_LANDING
 void CX2GUAdd::DashJumpLandingEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329ebca0
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -4039,25 +4759,98 @@ void CX2GUAdd::DashJumpLandingEventProcess()
 	}
 
 	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( ANSI_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( ANSI_COMBO_X );
+	}
+	else if( SpecialAttackEventProcess() == true )
+	{
+	}
+	else if( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.oneRight && true == m_FrameDataFuture.syncData.bIsRight )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.oneLeft && false == m_FrameDataFuture.syncData.bIsRight )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( USI_DASH);
+	}
+	else if( true == m_InputData.pureUp )
+	{
+		StateChange( USI_JUMP_READY );
+	}
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+
+	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DashJumpLandingStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1dd0
 	CX2GUUser::DashJumpLandingStartFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CX2GUUser::DashJumpLandingStartFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_LEVITATION_WAIT
 void CX2GUAdd::LevitationWaitFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1de0
+	const float fConsumeMP = _CONST_ADD_::LEVITATION_CONSUME_MP_PER_SECOND * m_fElapsedTime * m_FrameDataNow.unitCondition.fStateTime;
+
+	FlushMp( fConsumeMP );
+
+	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	/// 소비량 = 초당 MP 2 * 스테이트 유지시간
 	const float fConsumeMP = _CONST_ADD_::LEVITATION_CONSUME_MP_PER_SECOND * m_fElapsedTime * m_FrameDataNow.unitCondition.fStateTime;
 
 	FlushMp( fConsumeMP );
 
 	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::LevitationWaitEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329ebf10
 	if( true == m_InputData.oneDown || 1.f > GetNowMp() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -4114,6 +4907,64 @@ void CX2GUAdd::LevitationWaitEventProcess()
 	}
 
 	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if( true == m_InputData.oneDown || 1.f > GetNowMp() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( 0.f >= GetNowHp() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_LANDING );
+	}
+	else if( m_InputData.oneZ == true )
+	{
+		StateChange( ANSI_JUMP_ATTACK_Z );
+	}
+	else if( m_InputData.oneX == true )
+	{
+		StateChange( ANSI_JUMP_ATTACK_X );
+	}
+	else if( true == SpecialAttackEventProcess( CX2SkillTree::ASUT_AIR ) )
+	{
+	}
+	else if( ( m_InputData.oneDoubleRight == true || m_InputData.oneDoubleLeft == true ) &&
+			 true == m_bEnableAirDash )
+	{
+		StateChange( ANSI_AIR_DASH );
+		m_bEnableAirDash = false;
+	}
+	else if( m_InputData.oneRight == true || m_InputData.oneLeft == true )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( m_InputData.oneUp == true )
+	{
+		StateChange( USI_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if( m_InputData.oneDown == true )
+	{
+		if( NULL != g_pX2Game && 
+			NULL != g_pX2Game->GetWorld() &&
+			NULL != g_pX2Game->GetWorld()->GetLineMap() &&
+			true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+	}
+
+	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DAMAGE_SMALL_FRONT
@@ -4589,16 +5440,30 @@ void CX2GUAdd::StandUpAttackBackStateEndFuture()
 //ANSI_DASH_JUMP_POWER_LANDING
 void CX2GUAdd::DashJumpPowerLandingStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1fc0
 	CommonStateStartFuture();
 	m_PhysicParam.nowSpeed.x /= 2.0f;
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStartFuture();
+	m_PhysicParam.nowSpeed.x /= 2.0f;
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DashJumpPowerLandingStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d1ff0
 	CommonStateStart();
 	CreateStepDust();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStart();
+	CreateStepDust();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DashJumpPowerLandingEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329ec1c0
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -4651,6 +5516,60 @@ void CX2GUAdd::DashJumpPowerLandingEventProcess()
 	}
 
 	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( m_InputData.oneRight == true || m_InputData.oneLeft == true )
+	{
+		StateChange( USI_WALK );
+	}
+	else if( m_pXSkinAnimFuture->GetNowAnimationTime() > m_pXSkinAnimFuture->GetMaxAnimationTime() / 6.0f )
+	{
+		if( m_InputData.oneZ == true )
+		{
+			StateChange( ANSI_COMBO_Z );
+		}
+		else if( m_InputData.oneX == true )
+		{
+			StateChange( ANSI_COMBO_X );
+		}
+		else if( SpecialAttackEventProcess() == true )
+		{
+		}
+		else if( m_InputData.pureDoubleRight == true || m_InputData.pureDoubleLeft == true )
+		{
+			StateChangeDashIfPossible();
+		}
+		else if( m_InputData.pureRight == true || m_InputData.pureLeft == true )
+		{
+			StateChangeDashIfPossible();
+		}
+		else if( m_InputData.pureUp == true )
+		{
+			StateChange( USI_JUMP_READY );
+		}
+		//ELSE_IF_CAN_USE_SPECIAL_ABILITY_THEN_STATE_CHANGE( 10.f, ESSI_REVENGE_WAIT )
+		else if( m_InputData.oneDown == true 
+			&& g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, 
+			LINE_RADIUS, 
+			&m_FrameDataFuture.unitCondition.landPosition, 
+			&m_FrameDataFuture.syncData.lastTouchLineIndex ) == true )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+
+		else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+		{
+			StateChange( USI_WAIT );
+		}
+	}
+
+	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 
@@ -5045,6 +5964,8 @@ void CX2GUAdd::ComboXXZZFinishEventProcess()
 /// ANSI_JUMP_ATTACK_Z
 void CX2GUAdd::JumpComboZEventMoveFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329e4840
 	if( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == true )
 	{
 		m_PhysicParam.nowSpeed.x = GetWalkSpeed();
@@ -5061,10 +5982,52 @@ void CX2GUAdd::JumpComboZEventMoveFuture()
 	}
 
 	CommonFrameMoveFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if( m_InputData.pureRight == true && m_FrameDataFuture.syncData.bIsRight == true )
+	{
+		m_PhysicParam.nowSpeed.x = GetWalkSpeed();
+	}
+	else if( m_InputData.pureLeft == true && m_FrameDataFuture.syncData.bIsRight == false )
+	{
+		m_PhysicParam.nowSpeed.x = GetWalkSpeed();
+	}
+
+	if( m_InputData.pureDown == true && m_InputData.pureUp == false )
+	{
+		m_PhysicParam.nowSpeed.y -= m_PhysicParam.fGAccel * m_fElapsedTime;
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+
+	CommonFrameMoveFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::JumpComboZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d7220: USEFUL_VALUE0 ends the attack; walk / dash cancel need the foot on a line
+	if ( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_LANDING );
+	}
+	else if( GetUsefulValueFuture( 0, 0 ) <= m_FrameDataFuture.unitCondition.fStateTime )
+	{
+		StateChange( ANSI_CAN_NOT_ATTACK_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	else if( 0.f <= m_fWalkCancelAfter && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fWalkCancelAfter &&
+		true == IsOnSomethingFuture() && ( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if( 0.f <= m_fDashCancelAfter && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fDashCancelAfter &&
+		true == IsOnSomethingFuture() && ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) )
+	{
+		StateChangeDashIfPossible();
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( true == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_LANDING );
@@ -5078,11 +6041,33 @@ void CX2GUAdd::JumpComboZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_JUMP_ATTACK_X
 void CX2GUAdd::JumpComboXEventMoveFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d73e0: walk / dash cancel need the foot on a line
+	if( m_InputData.pureDown == true && m_InputData.pureUp == false )
+	{
+		m_PhysicParam.nowSpeed.y -= m_PhysicParam.fGAccel * m_fElapsedTime;
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	else if( 0.f <= m_fWalkCancelAfter && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fWalkCancelAfter &&
+		true == IsOnSomethingFuture() && ( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if( 0.f <= m_fDashCancelAfter && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fDashCancelAfter &&
+		true == IsOnSomethingFuture() && ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) )
+	{
+		StateChangeDashIfPossible();
+	}
+
+	CommonFrameMoveFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( m_InputData.pureDown == true && m_InputData.pureUp == false )
 	{
 		m_PhysicParam.nowSpeed.y -= m_PhysicParam.fGAccel * m_fElapsedTime;
@@ -5097,10 +6082,31 @@ void CX2GUAdd::JumpComboXEventMoveFuture()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonFrameMoveFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::JumpComboXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1a: June 329d7590: foot on a line lands ( March waits at the animation end ); walk / dash cancel need the foot on a line
+	if ( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_LANDING );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	else if( 0.f <= m_fWalkCancelAfter && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fWalkCancelAfter &&
+		true == IsOnSomethingFuture() && ( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if( 0.f <= m_fDashCancelAfter && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fDashCancelAfter &&
+		true == IsOnSomethingFuture() && ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft ) )
+	{
+		StateChangeDashIfPossible();
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
 	{
 		StateChange( USI_WAIT );
@@ -5114,8 +6120,26 @@ void CX2GUAdd::JumpComboXEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+/// ANSI_CAN_NOT_ATTACK_JUMP_DOWN
+void CX2GUAdd::ANSI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess()
+{
+	// char-add CH1a: June 329d54d0
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_LANDING );
+	}
+	else if( true == GetRidingOn() )
+	{
+		StateChange( USI_RIDING_ON );
+	}
+
+	CommonEventProcess();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// ANSI_DASH_COMBO_Z
 void CX2GUAdd::DashComboZFrameMoveFuture()
 {

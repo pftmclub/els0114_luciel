@@ -12140,3 +12140,35 @@ CX2GUUser +0x9444 (CH2b)	CX2GULuciel::m_eStateStartSkillID	PORTED (_SKILL)	Char 
 31f94360 (R14e)	CX2UnitViewerUI::UpdateEquipSlotVisibility	PORTED	Engine R14e: pairing confirmed ( +0xe70 m_bEnableEquipSlotVisibilityUpdate, +0x1fc m_ViewEquipMap, +0x208 / +0x5b0 normal / fashion UIDs [39][3], +0x958 visible [39][3] by body = equip +0x15d4 ); SET1/SET2 walk, one-piece run ( DITT 1002 34 95 94 35 36 37 38 39 98 74 40 41 1001 64 106, count limit 2 for UT_LUCIEL ), nasod hand DITT 47 @31f952c3 ( body from 3286a350 ), hand DITT 44, hair / face run ( 31 32 33 42 43 65 ), face1 / face2 slot flags, per-body passes ( body 1 for type 10 ), second ring 3234fe90 -> slot 28 hidden, apply loop; bodies 1-2 = stand-in until char-luciel DU5 ( SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY ); JUNE_BUGS 743
 3295bc90 (R14e)	CX2Eqip: appearance item's own templet( out templet* ) -> bool	confirmed	Engine R14e: +0x15dc flag and +0x15d8 original id >= 0 -> out = GetItemTemplet 325bb740( +0x15d8 ) when found, returns true; else false. Used by InitEqip 32024510 @32024ab8 before UseItemSpecialAbility. No appearance items in March's CX2Eqip: stand-in
 3286a230 (R14e)	CX2Inventory::GetItem( UidType, bool bIncludeBankType )	confirmed	Engine R14e: map find 3252ec60; sort types 8 / 16 skipped unless the bool is set = March X2Inventory.h:138. Caller in the viewer 31f94360 @31f95e3f ( false )
+329e5970	CX2GUAdd::WaitStartFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; CommonStateStartFuture + PlayAnimationWaitStartByAdd( future ); = March
+329e59a0	CX2GUAdd::WaitStart	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; CommonStateStart + PlayAnimationWaitStartByAdd( now ), m_Wait = USI_WAIT, nasod armor target reset; = March
+329e4d00	CX2GUAdd::PlayAnimationWaitStartByAdd	PORTED	Char Add CH1a: NOT new ( class map said new ): = March PlayAnimationWaitStartByAdd ( PLAY_TYPE, TRANSITION, Fatal at 0.25 of max HP ); both WaitStart bodies call it
+329eaa40	CX2GUAdd::WaitEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; combo Z / X, skill, dash, walk, jump, key test = TryHyperModeStateChange under _DP ( March: change + release macros ), down-jump, formation wait, riding; = March otherwise
+329d1c90	CX2GUAdd::HyperWaitStartFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; jmp CommonStateStartFuture; = March
+329d53a0	CX2GUAdd::HyperWaitStart	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; CommonStateStart, nasod target reset, m_Wait = ANSI_HYPER_WAIT; = March
+329eacc0	CX2GUAdd::HyperWaitEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; release arm under _DP: oneLCtr + GetIsFormationMode -> nowAction UAI_RELEASE_FORMATION_MODE + SetIsFormationMode( false ); else = March
+329eafe0	CX2GUAdd::WalkEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; key test = TryHyperModeStateChange under _DP; = March otherwise
+329e43d0	CX2GUAdd::JumpReadyEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d1ca0	CX2GUAdd::JumpUpEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d53d0	CX2GUAdd::JumpDownEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d1d90	CX2GUAdd::JumpLandingStartFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; jmp CommonStateStartFuture; = March
+329eb210	CX2GUAdd::JumpLandingEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; no second pureDouble -> dash test ( March has a dead copy ); key test under _DP
+329eb560	CX2GUAdd::DashEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; key test = TryHyperModeStateChange under _DP; = March otherwise
+329eb7e0	CX2GUAdd::AirDashEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d1da0	CX2GUAdd::AirDashStateEndFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; nowSpeed.x clamped to 800; = March
+329e4480	CX2GUAdd::DashEndStartFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d5510	CX2GUAdd::DashEndFrameMove	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329eba20	CX2GUAdd::DashEndEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; key test = TryHyperModeStateChange under _DP; = March otherwise
+329e44c0	CX2GUAdd::DashJumpEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; both direction keys held: ( oneRight && facing left ) || ( oneLeft && facing right ) clamps nowSpeed.y to GetJumpSpeed() and goes to JUMP_UP / JUMP_DOWN, otherwise nothing ( later arms skipped ); as Elesis 32b6e660
+329d1dd0	CX2GUAdd::DashJumpLandingStartFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; jmp CX2GUUser::DashJumpLandingStartFuture 31fcbe40; = March
+329ebca0	CX2GUAdd::DashJumpLandingEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d1de0	CX2GUAdd::LevitationWaitFrameMove	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; FlushMp( 2 * dt * state time ), CommonFrameMove; = March
+329ebf10	CX2GUAdd::LevitationWaitEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d1fc0	CX2GUAdd::DashJumpPowerLandingStartFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; nowSpeed.x halved; = March
+329d1ff0	CX2GUAdd::DashJumpPowerLandingStart	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; CommonStateStart + CreateStepDust; = March
+329ec1c0	CX2GUAdd::DashJumpPowerLandingEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329e4840	CX2GUAdd::JumpComboZEventMoveFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; = March
+329d7220	CX2GUAdd::JumpComboZEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; differs from March: USEFUL_VALUE0[0] <= state time -> ANSI_CAN_NOT_ATTACK_JUMP_DOWN ( 194 ); cancels = ONLY_ADD skill macro + walk / dash with the foot-on-line test
+329d73e0	CX2GUAdd::JumpComboXEventMoveFuture	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; walk / dash cancel carry the foot-on-line test; = March otherwise
+329d7590	CX2GUAdd::JumpComboXEventProcess	PORTED	Char Add CH1a: inside, June body under JUNE_CHAR_ADD_LIVE; differs from March: foot on a line -> USI_JUMP_LANDING ( March: anim end -> USI_WAIT ); cancels as 329d73e0
+329d54d0	CX2GUAdd::ANSI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess	PORTED	Char Add CH1a: new under JUNE_CHAR_ADD_CORE ( state name added to the enum ); foot -> JUMP_LANDING, riding -> RIDING_ON, CommonEventProcess; registered by CH1m

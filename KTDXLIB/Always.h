@@ -13772,3 +13772,32 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              hair / face accessories, the Raven left arm for a nasod hand ( DITT 47 ), the second ring. Revert: comment out.
 #define SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: June character port ( Add ) Phase CH1a - June-only class-core pieces March's CX2GUAdd lacks ( the state name ANSI_CAN_NOT_ATTACK_JUMP_DOWN and its
+//              EventProcess ), compiled in every build and referenced by nothing until CH1m. Revert: comment out the #define ( JUNE_CHAR_ADD_CORE ).
+#define SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: June character port ( Add ) Phase CH1a - June's bodies of CX2GUAdd's movement and slot-head states ( CH1a-CH1k2 add the rest ), inside March's own
+//              functions with March's in the #else. Inert until CH1 defines it. Revert: comment out the #define ( JUNE_CHAR_ADD_LIVE ).
+//#define SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ADD_CORE )
+#error SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ADD_CORE ( the June state name and EventProcess its bodies use )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: June character port ( Add ) Phase CH1a - the DP / formation-mode lines inside the _LIVE bodies ( June's TryHyperModeStateChange key test and the
+//              formation release ) that need CH1q's pieces ( CanHyperMode, the formation hooks ). March's live DP calls stay in the #else. Only with _LIVE.
+//              Revert: comment out the #define ( JUNE_CHAR_ADD_DP ).
+//              Needs _LIVE and SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK ( ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE ); CH1q adds the #error guards when it defines it.
+//#define SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+//////////////////////////////////////////////////////////////////////////

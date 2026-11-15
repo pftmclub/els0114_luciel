@@ -478,6 +478,9 @@ public:
 		/// Ω∫∆Ûº» æ◊∆º∫Í
 		ANSI_SA_ALP_PSYCHIC_STORM_LOOP,		/// ªÁ¿Ã≈± Ω∫≈Ë π›∫π
 		ANSI_SA_ALP_PSYCHIC_STORM_FINISH,	/// ªÁ¿Ã≈± Ω∫≈Ë ∏∂¡ˆ∏∑ ≈∏∞›
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+		ANSI_CAN_NOT_ATTACK_JUMP_DOWN,		/// char-add CH1a: June script id 194 ( CH1m maps; CH1a owns the state )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 	};
 
 
@@ -795,6 +798,9 @@ protected:
 	/// ANSI_JUMP_ATTACK_Z
 	void JumpComboZEventMoveFuture();
 	void JumpComboZEventProcess();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+	void ANSI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess();	/// char-add CH1a: June 329d54d0, registered by CH1m
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 	/// ANSI_JUMP_ATTACK_X
 	void JumpComboXEventMoveFuture();

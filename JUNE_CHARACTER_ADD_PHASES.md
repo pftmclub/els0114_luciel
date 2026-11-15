@@ -555,6 +555,33 @@ Add_NasodRuler` PASS; no new `KEM_ERROR` / `Motion Error` / missing-animation li
 June's animations; DP fills, spends and shows on his gauge as June; formation mode enters, costs DP and ends as June; the nasod armor combo follows a
 June hit; each skill cast twice shows its cool time and spends MP or DP; `charport_scan.py` / `charport_keys.py Add_NasodRuler` show nothing new.
 
+### CH1a - Done (2026-11-15)
+
+All 32 class-map rows of phase CH1a are handled: 30 `inside` rows written (June's body in March's own `CX2GUAdd` function under `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`, March's in `#else`, tag `// char-add CH1a: June <va>`), 1 `new` row written (`ANSI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess` under `_CORE`, plus the enum member `ANSI_CAN_NOT_ATTACK_JUMP_DOWN`, June script id 194, CH1m maps it), and 1 row that is **not new**: `329e4d00`, the helper both WaitStart bodies call, is March's `PlayAnimationWaitStartByAdd` (same `PLAY_TYPE` / `TRANSITION` keys, `Fatal` at 0.25 of max HP, `ChangeAnim` + `Play`), so nothing is written for it. 17 rows were carved (Ghidra decompile), 15 listing-only (`charport_adis.py add --phase CH1a`); none needed "this needs Opus". New: `june2017_re/char_add/ch1_offsets.tsv` (Elesis's class-agnostic rows below 0x95d0 plus Add's `+0x95a4` / `+0x95a5` / `+0x96d8` / `+0x96e0`), 32 funcmap rows `Char Add CH1a`, checklist §7h row (`ANSI_WAIT_STATE_CHANGE`: base delegate `31fc8620` only, CH1m registers), JUNE_BUGS 747.
+
+| June | `CX2GUAdd::` | June | `CX2GUAdd::` |
+|---|---|---|---|
+| `329e5970` `329e59a0` `329eaa40` | Wait StartFuture / Start / EventProcess | `329d1c90` `329d53a0` `329eacc0` | HyperWait StartFuture / Start / EventProcess |
+| `329eafe0` `329e43d0` `329d1ca0` `329d53d0` | Walk / JumpReady / JumpUp / JumpDown EventProcess | `329d1d90` `329eb210` | JumpLanding StartFuture / EventProcess |
+| `329eb560` `329eb7e0` `329d1da0` | Dash / AirDash EventProcess, AirDash StateEndFuture | `329e4480` `329d5510` `329eba20` | DashEnd StartFuture / FrameMove / EventProcess |
+| `329e44c0` `329d1dd0` `329ebca0` | DashJump EventProcess, DashJumpLanding StartFuture / EventProcess | `329d1de0` `329ebf10` | LevitationWait FrameMove / EventProcess |
+| `329d1fc0` `329d1ff0` `329ec1c0` | DashJumpPowerLanding StartFuture / Start / EventProcess | `329e4840` `329d7220` `329d73e0` `329d7590` | JumpComboZ FrameMoveFuture / EventProcess, JumpComboX FrameMoveFuture / EventProcess |
+| `329d54d0` | `ANSI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess` (new) | `329e4d00` | = March `PlayAnimationWaitStartByAdd` |
+
+**Where June differs from March** (10 of the 30 `inside` rows differ; the other 20 are March's text written out, each checked against the raw listing or decompile):
+- **DP / formation, under `_DP`** (an `#ifdef` inside the `_LIVE` body, March's two macros in its `#else`): Wait / Walk / JumpLanding / Dash / DashEnd EventProcess call `TryHyperModeStateChange( USI_HYPER_MODE )` (`ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE`) and have no release arm; HyperWait's release arm is `oneLCtr && GetIsFormationMode()` -> `nowAction = UAI_RELEASE_FORMATION_MODE` + `SetIsFormationMode( false )`. `_DP` is `//#define` until CH1q (needs `_LIVE` and `BUFF_AWAKE_LOCK`; CH1q adds the `#error` guards: flagcheck cannot evaluate a guard on an undefined flag). No nasod line in these 32.
+- **JumpLanding EventProcess:** no second `pureDouble` -> `StateChangeDashIfPossible` test (March's copy is dead code).
+- **DashJump EventProcess:** the both-direction-keys arm before the single-key ones (as Elesis `32b6e660`); the arms after it, riding included, are skipped.
+- **JumpComboZ EventProcess `329d7220`:** `GetUsefulValueFuture( 0, 0 ) <= fStateTime` -> `ANSI_CAN_NOT_ATTACK_JUMP_DOWN` first, then `SKILL_CANCEL_AFTER_ONLY_ADD` (June's expansion = March's macro; `GetPossibleChangeFormationMode( 1 )` is March's default argument), then a walk and a dash cancel that also test `bFootOnLine` (no macro matches, written out; JUNE_BUGS 747).
+- **JumpComboX EventProcess `329d7590`:** foot on a line -> `USI_JUMP_LANDING` where March waits for the animation end -> `USI_WAIT`; same cancels. **FrameMoveFuture `329d73e0`:** the walk / dash cancels carry the foot test, the rest = March.
+- Not in the CH1a range: `ANSI_WAIT_STATE_CHANGE`, `ANSI_COMMON_BUFF`, `ANSI_THROW_ITEM` and the four hyper tables use base callbacks (nothing to write, CH1m registers).
+
+**Gates.** `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h KTDXLIB/Always.h --with ..._ADD_LIVE ..._ADD_CORE --skip-flag ..._ADD_DP`: `JUNE_CHAR_ADD_CORE` PASS (`files: 2 PASS, 0 FAIL, 0 ERROR`; its one OTHER is a peer's uncommitted Always.h text); `JUNE_CHAR_ADD_LIVE` INERT (`//#define`; `files: 1 PASS`, 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 `#else`/`#endif` without the token); `_DP` skipped (inert, its lines sit inside the `_LIVE` bodies); `junediverge` PASS; `enumscan` PASS; `stateends` skipped (no skill state registered); `skillicons` / `luabind` not requested (no skill, no script). `+1,024` lines in `X2GUAdd.cpp`, 0 deleted.
+- One-file `/Zs` probe of `X2GUAdd.cpp` (`census.cl_cmd`, no PCH, three runs): 0 errors with `_LIVE` off, with `_LIVE`, and with `_LIVE` + `_DP`. `/P` hits: `GetUsefulValueFuture( 0, 0 )` 0 / 1 / 1, both-keys arm 0 / 1 / 1, `TryHyperModeStateChange( USI_HYPER_MODE )` 0 / 0 / 5, release arm 0 / 0 / 1.
+- Full build skipped: no play-test (`_LIVE` is off; nothing registers a June body).
+
+**Nothing to play-test.** Review: none of its own, the CH1b review covers CH1a-CH1b (no `_DEBUG` define here). Next: `/x2-phase char-add CH1b` (Sonnet 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.
