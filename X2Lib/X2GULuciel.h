@@ -1168,6 +1168,42 @@ protected:
 	void				LSI_BOUNDING_TARGET_LU_COMMAND_X_CIEL_STRIKER_StateStartFuture();	// June 32b35fd0
 	void				LSI_RIDING_HYPER_MODE_FrameMove();	// June 32b39e70
 	void				CommonHyperModeFrameMove( const float fChangeTime_, const float fShockTime_, const bool bSound_ );	// June 32b37d80 ( shared by the Lu / Ciel hyper mode states )
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+	// char-luciel CH2a: Duo ( 200 ) skills ( June 32ae61b0 - 32b29fb0 )
+	void				LSI_SA_LD_TRIPLE_SHOT_Init();	// June 32ae61b0
+	void				LSI_SA_LD_TRIPLE_SHOT_FrameMove();	// June 32ae6240
+	void				LSI_SA_LD_TRIPLE_SHOT_EventProcess();	// June 32afdff0
+	void				LSI_SA_LD_STOMP_START_Init();	// June 32ae6250
+	void				LSI_SA_LD_STOMP_START_FrameMove();	// June 32ae62e0
+	void				LSI_SA_LD_STOMP_START_EventProcess();	// June 32afe1f0
+	void				LSI_SA_LD_STOMP_LANDING_FrameMove();	// June 32ae62f0
+	void				LSI_SA_LD_STOMP_LANDING_EventProcess();	// June 32afe250
+	void				LSI_SA_LD_FLICK_SHOT_Init();	// June 32ae6300
+	void				LSI_SA_LD_FLICK_SHOT_FrameMove();	// June 32b29780
+	void				LSI_SA_LD_FLICK_SHOT_EventProcess();	// June 32afe450
+	void				LSI_SA_LD_EVIL_CLAW_Init();	// June 32ae63c0
+	void				LSI_SA_LD_EVIL_CLAW_FrameMove();	// June 32b29af0
+	void				LSI_SA_LD_EVIL_CLAW_EventProcess();	// June 32afe650
+	void				LSI_SA_LD_SOUL_INFEST_Init();	// June 32ae6480
+	void				LSI_SA_LD_SOUL_INFEST_FrameMove();	// June 32b29fb0
+	void				LSI_SA_LD_SOUL_INFEST_EventProcess();	// June 32afe850
+	void				LSI_SA_LD_NETHER_SHREDDER_Init();	// June 32ae65a0
+	void				LSI_SA_LD_NETHER_SHREDDER_FrameMove();	// June 32ae66a0
+	void				LSI_SA_LD_NETHER_SHREDDER_EventProcess();	// June 32afea50
+	void				LSI_A_LD_F_HEAVY_HIT_Init();	// June 32ae66c0
+	void				LSI_A_LD_F_HEAVY_HIT_StateStart();	// June 32b1cf90
+	void				LSI_A_LD_F_HEAVY_HIT_FrameMove();	// June 32ae6780
+	void				LSI_A_LD_F_HEAVY_HIT_EventProcess();	// June 32afee50
+	void				LSI_A_LD_M_HEAVY_HIT_StateStart();	// June 32b1cd20
+	void				LSI_A_LD_M_HEAVY_HIT_FrameMove();	// June 32ae66b0
+	void				LSI_A_LD_M_HEAVY_HIT_EventProcess();	// June 32afec50
+	void				LSI_A_LD_F_HAUNTING_BEAT_Init();	// June 32ae67a0
+	void				LSI_A_LD_F_HAUNTING_BEAT_FrameMove();	// June 32ae6870
+	void				LSI_A_LD_F_HAUNTING_BEAT_EventProcess();	// June 32aff250
+	void				LSI_A_LD_M_HAUNTING_BEAT_FrameMove();	// June 32ae6790
+	void				LSI_A_LD_M_HAUNTING_BEAT_EventProcess();	// June 32aff050
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
 	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
 	void				CreateChaserOfDarknessDamageEffect( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b1f800: body in CH1l3
@@ -1239,7 +1275,7 @@ protected:
 	float								m_fSoulStrikeCoolTime;				// +0x96a4
 	float								m_fCombinationPointOnHitCoolTime;	// +0x96a8
 	CX2EffectSet::Handle				m_hDarkCrescentEffectSet;			// +0x96ac
-	int									m_iEvilClawHitCount;				// +0x96b0
+	int									m_iEvilClawMemoVariant;				// +0x96b0: char-luciel CH2a: the Evil Claw skill-memo set index ( 0 base, 1 / 2 the memo sets ), CH1a named it a hit count
 	float								m_fSwitchingCoolTime;				// +0x96b4
 	int									m_iSkillUseMpForm;					// +0x96b8: the form that pays a skill's MP ( SpecialAttackUse stores 0 for Lu, 1 for Ciel )
 	int									m_iPendingCombinationPoint;			// +0x96bc: char-luciel CH1p: a state's CP_AMOUNT, paid at the next SpecialAttackCooldown ( CH1a named it the last used skill id )

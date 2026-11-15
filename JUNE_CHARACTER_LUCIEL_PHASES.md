@@ -3041,6 +3041,36 @@ Sonnet 5.5 high. Server Lua only: no flag, no client change, **no build** (the e
   0 `CUBE refused`, 0 EXCEPTION, ErrorLog 0 lines. The 11 / 13 "cannot pay out" cubes are other cubes (studio holes), not 109999 / 110850.
 - **Revert:** `git revert` the CHN2 commit (pure insertion), then `kom.py stage-server RandomItemTable.lua`, pack, copy.
 
+### CHN - Review (2026-11-15)
+
+Opus 5.5 high. **Verdict: pass, no code change** (covers CHN `9f5bf8fe` and CHN2 `cb29dbf6`; the other CHN / CHN2 commits are docs, tools and kom
+packs). No `_DEBUG` flag to retire; no build (review with no code change).
+- **`GetX2UnitClassCompatibility` (`X2Unit.h`) = June `31ed6500` in Ghidra:** case 200 tests 200 only; 0x25 / 0x26 / 0x27 accept 200 or self;
+  0x7f / 0x80 / 0x81 accept 200, the parent (0x25 / 0x26 / 0x27) or self. All seven arms match.
+- **`PARENT_ROWS` = June's class tree:** `3234b390` reads `337a1660 [type][tier][line]`, filled at `3234b244-3234b2df`. Type 10: tier 0 lines 1-2 = 200;
+  tier 1 = 0x25 / 0x26 / 0x27; tier 2 = 0x7f / 0x80 / 0x81. So 37 -> 127, 38 -> 128, 39 -> 129, all from 200. Tier 0 line 3 is 0 in June, which fits
+  Diablura being the later third branch (the `SIDE_STEP_CLASSES` stand-in, labelled; it only lets a re-pick ticket cross to 39, like March's 22-27).
+- **14 seed rows vs June `item.kim`:** every job-advance item carries the parent class (242371 / 242372 / 277105 = 200, 242373 = 37, 242374 = 38,
+  277107 = 39), every ticket the target itself (276955 37, 276956 38, 135824 / 277104 39, 276957 127, 276958 128, 135825 / 277106 129); all `IT_SPECIAL`.
+  Gates in `Handlers_Shop.cpp`: job advance needs the current class = `ClassChangeParentOf( target )` (`:729-745`). A re-pick is refused at tier 0
+  (`:747-787`), and 200's self-parent row makes it tier 0, so a ticket used on a Duo is refused.
+- **`X2OfflineLuaEnumSeed.h`:** the 7 names are June `Enum.src.lua:354-421` values (37 / 38 / 39 / 127 / 128 / 129 / 200) = `X2Unit.h:184-208`.
+- **data036 `LevelUpEvent.lua`:** BOM + CRLF (510 lines). The 1st block (March `:154-170`) and the 2nd block (March `:338-356` = June `:377-395`) equal
+  June byte for byte except the closing `}` has no trailing `,`. That is because Lu/Ciel's TYPE9 is our last entry, where June's is followed by Rose's
+  TYPE10; the parsed data is the same. `luasrc.py ledger --check` and `core --check` print PASS, 0 FAIL, 0 WARN.
+- **CHN2 `RandomItemTable.lua`:** a script checked all 80 added group lines against `item.kim`: 90 of 90 ids found, 0 bad. Each group has 5 items of
+  the group's class, positions weapon / body / leg / hand / foot, rate 20, qty 1, period 10 (5000083-5000090) or 15 (5000091-5000098). The cube rows
+  have March's `{ m_cUnitClass, m_iItemGroupID }` shape. The Elesis reuse checks out: 120 -> 16823 (Saber Knight set) and 121 -> 16824 (Pyro Knight
+  set) in 109999. 16953 / 16954 were already defined at March `:124161`, so CHN2 added cube rows only. None of 5000083-5000098 existed before; BOM +
+  pure CRLF kept. Accepted: the 5-piece decision (March's groups drop hair / face / helm), and the base Duo 200 has no cube row.
+- **Logs:** the current logs are CHN2's run (17:01-17:03): `CUBE opened item 110850` x1, `109999` x2, 0 `CUBE refused`, 0 EXCEPTION. CHN's
+  `CLASS CHANGE` lines (16:25-16:51) were overwritten by later runs; they stand on the CHN Done note's log read and the user's relog check.
+- **Gate (`finish.py --review --commits 9f5bf8fe --with SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE -v`):** flagcheck PASS (2 PASS, 1 PASS~,
+  1 DEFINE, 0 OTHER, 0 deleted lines). The PASS~ is one blank line in `X2Unit.h` between `#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` and
+  the switch's `}`; it changes nothing. junediverge PASS, `--check-all` PASS, enumscan PASS. FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped:
+  no states, skills or June script). INFO: `JUNE_ENUM_NAMES` and `OFFLINE` are outer flags.
+- **Next:** CH2b now waits only on CH2a.
+
 ## Phase TU - Tutorial
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL`, sub-tag `TUTORIAL`. Add the
@@ -3129,6 +3159,37 @@ numerical-only tables), and its effect closure. Upgrade ids reach their base thr
 lines are logged, and March has no Lu/Ciel to compare against: `MODS.md` lists June's damage per skill. **Done gate:** every class 200 / 37 / 38 /
 39 id in CH0's S3 baseline has a state (except passives); each skill cast from an A and a B slot plays June's state, motion and effect and deals
 damage; both bodies' skills are tested.
+
+### CH2a - Done (2026-11-15)
+
+Sonnet 5.5 high. **`SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` and the temporary `_SKILL_DEBUG` defined** ( `Always.h` ). Files: `Always.h`, `X2GULuciel.h` / `.cpp`, `MODS.md`.
+No review of its own ( the CH2b review covers it; the debug define stays on until then ). Commit: see git log `char-luciel Phase CH2a`.
+- **32 functions** ( every `CH2a` row of `ch0_class_map.tsv`; June reads uncarved, so by capstone `funcdis.py` / `disasm_range.py`, the 5 carved ones by Ghidra ):
+  8 preloads ( `_Init` ), 11 `_FrameMove` ( 8 are June's `jmp [vtable+0x7cc]` = `CommonFrameMove()`; Flick Shot, Evil Claw, Soul Infest have a body ), 11 `_EventProcess`,
+  2 Heavy Hit `_StateStart`. Ten of the eleven EventProcess are one chain ( animation end -> `USI_WAIT`, `SKILL_CANCEL_AFTER( m_fSkillCancelAfter )`, `WALK_CANCEL_AFTER`,
+  `DASH_CANCEL_AFTER`, `CommonEventProcess()`; the 10 normalised instruction streams hash equal, June has no BWALK step ); Stomp's start state changes to the landing state
+  ( 191 ) once the foot is on a line and the animation passed 0.4 s.
+- **8 setter cases** in `SetEquippedSkillFuncBySkillSlotIndex` on `iBaseSkillID` ( `ch1n_skill_cases.tsv` CH2a rows ): callbacks as June's listing; the hyper state copies only
+  what June copies ( FrameMove + EventProcess; Heavy Hit also StateStart; never the Init ); extra states Stomp landing 191 ( `m_eSkillID` = `m_iChosenSkillID`, June +0x8ea0 ),
+  male Heavy Hit 266 ( skill-state byte, no skill id ), male Haunting Beat 267 ( raw skill id, skill-state byte ); Soul Infest and Nether Shredder store the raw skill id on both slot states.
+- **Bodies of note.** Flick Shot ( 0.5 s ): 2 effect sets, 3 when `GetRandomFloat( 0 ) <= 0.5`, `_Trans` set when the skill is an upgrade. Evil Claw: FX3 set at 1.0 s, attack set at 1.05 s
+  ( `_Trans` upgraded ). Soul Infest: 20 shells at 0.5-1.13 s and 10 `_Fly` shells at 1.16-1.46 s from `MAJOR:Bip01`, angle = rotate + random ( x * 360, y / z * 120 - 60 ),
+  `SetLockOn( LOT_UID_VECTOR, 30 )`; the flying ones replace y / z with the random alone ( decoded from the listing, the decompile merged two random calls ). Heavy Hit start:
+  `CommonStateStart`, chance = skill ability `SA_EFFECTIVE_RATE` ( 0.33 default ), then `m_fNowStatePowerRate`, `damage.fPhysic` / `fMagic` x `SA_DAMAGE_REL` ( 2.0 default ) and the
+  `EFFECTSET_DEBUFF_POWERFUL_BOWSTRING` set at scale 1.5 ( June reads the ability of the base id 30201 for both ids ).
+- **Stand-ins / renames.** Evil Claw's memo sets never play ( June 31fca9e0 memo stub answers 0; not written, as the CH1l3 precedent ). `m_iEvilClawHitCount` ( CH1a's provisional
+  name, only user: this function ) is now `m_iEvilClawMemoVariant`. 208 and 30301 / 30302 are CH1n's ( base callbacks only ): tested here, not rewritten.
+- **Not June bugs found**; no `JUNE_BUGS` row.
+- **Debug lines ( `_SKILL_DEBUG` ):** `[JUNE_CHAR] LUCIEL SKILL equip skill <id> slot <n> bank A|B state <id>` ( every equip ), `flick shot sets <n>`, `evil claw fx3` / `evil claw attack set`,
+  `soul infest shell` / `soul infest fly shell`, `heavy hit strong rate .. chance .. body F|M`. Damage numbers: `[JUNE_SKILL] NUM use` ( engine line ).
+- **Gates:** `finish.py --files X2GULuciel.cpp X2GULuciel.h Always.h --with LUCIEL_SKILL LUCIEL_SKILL_DEBUG --state X2GULuciel.cpp Luciel_Duo --icons 30001-30302`:
+  flagcheck `3 OTHER ( CORE enclosure; Always.h also holds DU3's uncommitted guard hunk ), 0 FAIL`, junediverge PASS, enumscan exit 0, stateends PASS, skillicons PASS,
+  `FINISH RESULT: PASS (6 gates, 0 failed, 1 skipped)` ( luabind: no script staged ). The 1 deleted line in `.cpp` / `.h` each = the member rename.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,931,712 B, dated 2026-11-15 17:13:47, md5 e78cb1701f58da334b312146c4bd1fc4, equal to X2/US_SERVICE/x2.exe`. `EXESTR OK: 3 of 3 found in X2_offline.exe` ( the equip, heavy hit and soul infest lines ) and 2 of 2 state names. The build also took in peers' uncommitted files.
+- **Play-test save ( `elsdb`, backups `db_backup/*pre_createchar*` ):** `LuSkillA` ( bases at level 1, upgrades level 0 ) and `LuSkillB` ( upgrades level 1, bases level 0 ), class 200 level 70,
+  3 skill pages each. Ciel has no body until DU3 ( judged by effects / sounds / log lines ).
+- **Owes:** the user's play-test ( hand-off in the session ), then "check logs".
+- **Next:** `/x2-phase char-luciel CH2b` ( Chiliarch 37; its review also covers this phase ).
 
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 

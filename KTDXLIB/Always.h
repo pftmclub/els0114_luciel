@@ -13650,3 +13650,24 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL needs SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON ( the room switch, DI_DUNGEON_TUTORIAL_* ) and SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ( UT_LUCIEL units )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH2a: Duo ( 200 ) skills. June's state functions ( Triple Shot, Stomp, Flick Shot, Evil Claw, Soul Infest, Nether Shredder,
+//              Heavy Hit, Haunting Beat ) and their cases in CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex. Revert: comment out the #define ( JUNE_CHAR_LUCIEL_SKILL ).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) || !defined( SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE, SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE and SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS ( m_iChosenSkillID ), char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH2a: temporary [JUNE_CHAR] LUCIEL SKILL lines ( one per equipped skill, and one per effect a Duo skill plays ) for the play-test; the CH2b review retires it.
+//              Revert: comment out the #define ( JUNE_CHAR_LUCIEL_SKILL_DEBUG ).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+//////////////////////////////////////////////////////////////////////////

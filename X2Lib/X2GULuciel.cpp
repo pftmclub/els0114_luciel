@@ -98,7 +98,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fSoulStrikeCoolTime( 0.f )
 , m_fCombinationPointOnHitCoolTime( 0.f )
 , m_hDarkCrescentEffectSet( INVALID_EFFECTSET_HANDLE )
-, m_iEvilClawHitCount( 0 )
+, m_iEvilClawMemoVariant( 0 )
 , m_fSwitchingCoolTime( 0.f )
 , m_iSkillUseMpForm( 3 )
 , m_iPendingCombinationPoint( 0 )
@@ -14363,6 +14363,579 @@ void CX2GULuciel::InitStateCommon()
 	// June 32b3e8b0 @1922 LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT ( id 364 ): registered by CH3b with its callbacks
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+// char-luciel CH2a: Duo ( 200 ) skills ( Triple Shot, Stomp, Flick Shot, Evil Claw, Soul Infest, Nether Shredder, Heavy Hit, Haunting Beat )
+namespace _CONST_LUCIEL_CH2A_
+{
+	const float		STOMP_LANDING_TIME							= 0.4f;		// June 32afe1f0 ( read as a double )
+	const float		FLICK_SHOT_EFFECT_TIME						= 0.5f;		// June 32b29780 ( 334ed42c )
+	const float		FLICK_SHOT_TRIPLE_RANDOM_LIMIT				= 0.5f;		// June 32b29780: a random up to it plays three sets, else two
+	const int		FLICK_SHOT_EFFECT_COUNT						= 2;
+	const int		FLICK_SHOT_EFFECT_COUNT_LUCKY				= 3;
+	const float		EVIL_CLAW_FX3_TIME							= 1.f;		// June 32b29af0
+	const float		EVIL_CLAW_ATTACK_TIME						= 1.05f;	// June 32b29af0 ( 33439b24 )
+	const float		HEAVY_HIT_DEFAULT_EFFECTIVE_RATE			= 0.33f;	// June 32b1cd20 / 32b1cf90 ( 33483504 ): the chance when the skill templet has no value
+	const float		HEAVY_HIT_DEFAULT_DAMAGE_RATE				= 2.f;		// 334ed39c
+	const float		HEAVY_HIT_EFFECT_SCALE						= 1.5f;		// 33471a1c
+	const float		SOUL_INFEST_ROTATE_X_RANGE_DEGREE			= 360.f;	// June 32b29fb0 ( 33438268, a double )
+	const float		SOUL_INFEST_ROTATE_RANGE_DEGREE				= 120.f;	// 33439d10: y and z are random * range - base
+	const float		SOUL_INFEST_ROTATE_BASE_DEGREE				= 60.f;		// 33457f50
+	const float		SOUL_INFEST_RANDOM_OFFSET_TIME_BASE			= 0.6f;		// 3343bd80: the random table offset = ( anim time - base ) / step + 0.5
+	const float		SOUL_INFEST_RANDOM_OFFSET_TIME_STEP			= 0.03333f;	// 334f1f10
+	const float		SOUL_INFEST_RANDOM_OFFSET_ROUND				= 0.5f;		// 3342ebc8
+	const int		SOUL_INFEST_LOCK_ON_MODULUS_FACTOR			= 30;		// June pushes 0x1e to SetLockOn ( 31ff6ec0 )
+
+	// June 32b29fb0 @32b29fdb-32b2a2b4: the burst of Soul Infest's shells, any of these times fires one
+	const float		SOUL_INFEST_SHELL_TIMES[]					=
+	{
+		0.5f, 0.53f, 0.57f, 0.6f, 0.63f, 0.67f, 0.7f, 0.73f, 0.77f, 0.8f,
+		0.83f, 0.87f, 0.9f, 0.93f, 0.97f, 1.f, 1.03f, 1.07f, 1.1f, 1.13f,
+	};
+	// June 32b29fb0 @32b2a469-32b2a604: the flying shells
+	const float		SOUL_INFEST_FLY_SHELL_TIMES[]				=
+	{
+		1.16f, 1.2f, 1.23f, 1.26f, 1.3f, 1.33f, 1.36f, 1.4f, 1.43f, 1.46f,
+	};
+}
+using namespace _CONST_LUCIEL_CH2A_;
+
+// char-luciel CH2a: June 32ae61b0 ( thunk 32b4aea0 ), the preload of Triple Shot
+void CX2GULuciel::LSI_SA_LD_TRIPLE_SHOT_Init()
+{
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare04_S.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare05.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+}
+
+// char-luciel CH2a: June 32ae6240 ( thunk 32b4aeb0 )
+void CX2GULuciel::LSI_SA_LD_TRIPLE_SHOT_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afdff0 ( thunk 32b4c1b0 ), the cancel chain every skill of this phase shares
+void CX2GULuciel::LSI_SA_LD_TRIPLE_SHOT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae6250 ( thunk 32b4aec0 ), the preload of Stomp
+void CX2GULuciel::LSI_SA_LD_STOMP_START_Init()
+{
+	TextureReadyInBackground( L"LD_STOMP_Bottom_Broken01.dds" );
+	TextureReadyInBackground( L"LD_STR_KuaAng.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"ADD_DOOMS_DAY_Grow01.Y" );
+	XMeshReadyInBackground( L"ADD_Effect_Ground_Explosion_01.Y" );
+	XMeshReadyInBackground( L"ADD_Ground_Explosion_02.Y" );
+	XMeshReadyInBackground( L"ALS_VERITABLE_PANDEMONIUM_P02.Y" );
+	XSkinMeshReadyInBackground( L"Bat_StandUpAttack.X" );
+	XSkinMeshReadyInBackground( L"Darkcloud_AttackBox01.X" );
+	XSkinMeshReadyInBackground( L"LD_STOMP_M01.X" );
+}
+
+// char-luciel CH2a: June 32ae62e0 ( thunk 32b4aed0 )
+void CX2GULuciel::LSI_SA_LD_STOMP_START_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afe1f0 ( thunk 32b4c1c0 ): the jump up lands into the landing state after a moment
+void CX2GULuciel::LSI_SA_LD_STOMP_START_EventProcess()
+{
+	if ( true == m_FrameDataFuture.unitCondition.bFootOnLine && GetXSkinAnimFuture()->GetNowAnimationTime() > STOMP_LANDING_TIME )
+	{
+		StateChange( LSI_SA_LD_STOMP_LANDING );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae62f0 ( thunk 32b4aee0 )
+void CX2GULuciel::LSI_SA_LD_STOMP_LANDING_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afe250 ( thunk 32b4c1d0 )
+void CX2GULuciel::LSI_SA_LD_STOMP_LANDING_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae6300 ( thunk 32b4aef0 ), the preload of Flick Shot
+void CX2GULuciel::LSI_SA_LD_FLICK_SHOT_Init()
+{
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare02.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare03.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"LD_Slicer_trace_01.dds" );
+	TextureReadyInBackground( L"LD_STR_TaAng.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"SA_AYR_ORB_KI_Baram.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+}
+
+// char-luciel CH2a: June 32b29780 ( thunk 32b4e0e0 ): two sets ( three on a random up to the limit ) at one moment, the upgraded skill plays the Trans set
+void CX2GULuciel::LSI_SA_LD_FLICK_SHOT_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( FLICK_SHOT_EFFECT_TIME ) )
+	{
+		int iEffectCount = FLICK_SHOT_EFFECT_COUNT;
+		if ( GetRandomFloat( 0 ) <= FLICK_SHOT_TRIPLE_RANDOM_LIMIT )
+			iEffectCount = FLICK_SHOT_EFFECT_COUNT_LUCKY;
+
+		for ( int iEffect = 0; iEffect < iEffectCount; ++iEffect )
+		{
+			const WCHAR* pwszEffectSetName = L"EffectSet_SA_LD_FLICK_SHOT_Attack";
+			if ( true == g_pData->GetSkillTree()->IsUpgradedSkill( GetNowStateSkillID() ) )
+				pwszEffectSetName = L"EffectSet_SA_LD_FLICK_SHOT_Attack_Trans";
+
+			g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName, this, NULL, false, GetPowerRate() );
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL flick shot sets %d skill %d", iEffectCount, static_cast<int>( GetNowStateSkillID() ) );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afe450 ( thunk 32b4c1e0 )
+void CX2GULuciel::LSI_SA_LD_FLICK_SHOT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae63c0 ( thunk 32b4af00 ), the preload of Evil Claw
+void CX2GULuciel::LSI_SA_LD_EVIL_CLAW_Init()
+{
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece02.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare02.dds" );
+	TextureReadyInBackground( L"LD_STR_Koakoang.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XSkinMeshReadyInBackground( L"Darkcloud_AttackBox01.x" );
+	XSkinMeshReadyInBackground( L"EVIL_CLAW_HAND.X" );
+	XSkinMeshReadyInBackground( L"LD_STOMP_M01.X" );
+}
+
+// char-luciel CH2a: June 32b29af0 ( thunk 32b4e0f0 ): the FX3 set at one moment, the attack set at the next
+void CX2GULuciel::LSI_SA_LD_EVIL_CLAW_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( EVIL_CLAW_FX3_TIME ) )
+	{
+		// stand-in: June 31fca9e0 ( the skill memo stub ) answers 0, so the variant is always 0 and the MEMO1 / MEMO2 sets never play
+		m_iEvilClawMemoVariant = 0;
+
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LD_EVIL_CLAW_FX3", this, NULL, false, GetPowerRate() );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL evil claw fx3 skill %d", static_cast<int>( GetNowStateSkillID() ) );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+	else if ( true == GetXSkinAnimPtr()->EventTimerOneshot( EVIL_CLAW_ATTACK_TIME ) )
+	{
+		wstring wstrEffectSetName = L"EffectSet_SA_LD_EVIL_CLAW_ATTACK";
+		if ( NULL != g_pData->GetSkillTree() && true == g_pData->GetSkillTree()->IsUpgradedSkill( GetNowStateSkillID() ) )
+			wstrEffectSetName += L"_Trans";
+
+		g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetName, this, NULL, false, GetPowerRate() );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL evil claw attack set %s", wstrEffectSetName.c_str() );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afe650 ( thunk 32b4c1f0 )
+void CX2GULuciel::LSI_SA_LD_EVIL_CLAW_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae6480 ( thunk 32b4af10 ), the preload of Soul Infest
+void CX2GULuciel::LSI_SA_LD_SOUL_INFEST_Init()
+{
+	TextureReadyInBackground( L"Arme_Critical.dds" );
+	TextureReadyInBackground( L"Arme_Damage_Center.dds" );
+	TextureReadyInBackground( L"Arme_Damage_Ring.dds" );
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare02.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"PulseWave01.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"star2.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"AA_SUPPRESSION_SPECTER_P01.Y" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XSkinMeshReadyInBackground( L"elsword_SA_rageCutter_attackSphere.X" );
+	XSkinMeshReadyInBackground( L"F_SOUL_INFEST_StartDummy01.X" );
+	XSkinMeshReadyInBackground( L"LD_Attack_Cross01.X" );
+	XSkinMeshReadyInBackground( L"LD_M_Grenade_Mesh.X" );
+	XSkinMeshReadyInBackground( L"M_SOUL_INFEST_StartDummy01.X" );
+}
+
+// char-luciel CH2a: June 32b29fb0 ( thunk 32b4e100 ): a shell from MAJOR:Bip01 at each of the burst times, then the flying shells; each leans a random angle and locks on
+void CX2GULuciel::LSI_SA_LD_SOUL_INFEST_FrameMove()
+{
+	bool bFireShell = false;
+	for ( int iTime = 0; iTime < static_cast<int>( _countof( SOUL_INFEST_SHELL_TIMES ) ); ++iTime )
+	{
+		if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SOUL_INFEST_SHELL_TIMES[iTime] ) )
+		{
+			bFireShell = true;
+			break;
+		}
+	}
+
+	if ( true == bFireShell )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"MAJOR:Bip01" );
+		D3DXVECTOR3 vRotateDegree = GetRotateDegree();
+		const int iRandomOffset = static_cast<int>( ( GetXSkinAnimPtr()->GetNowAnimationTime() - static_cast<double>( SOUL_INFEST_RANDOM_OFFSET_TIME_BASE ) )
+			/ static_cast<double>( SOUL_INFEST_RANDOM_OFFSET_TIME_STEP ) + static_cast<double>( SOUL_INFEST_RANDOM_OFFSET_ROUND ) );
+
+		vRotateDegree.x = static_cast<float>( GetRandomFloat( iRandomOffset ) * static_cast<double>( SOUL_INFEST_ROTATE_X_RANGE_DEGREE ) + vRotateDegree.x );
+		vRotateDegree.y = static_cast<float>( GetRandomFloat( iRandomOffset ) * static_cast<double>( SOUL_INFEST_ROTATE_RANGE_DEGREE ) - static_cast<double>( SOUL_INFEST_ROTATE_BASE_DEGREE ) + vRotateDegree.y );
+		vRotateDegree.z = static_cast<float>( GetRandomFloat( iRandomOffset ) * static_cast<double>( SOUL_INFEST_ROTATE_RANGE_DEGREE ) - static_cast<double>( SOUL_INFEST_ROTATE_BASE_DEGREE ) + vRotateDegree.z );
+
+		CX2DamageEffect::CEffect* pShell = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_LD_F_SOUL_INFEST_Projectile", GetPowerRate(), vBonePos, vRotateDegree, vRotateDegree,
+			m_FrameDataNow.unitCondition.landPosition.y, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+		if ( NULL != pShell )
+			SetLockOn( pShell, iRandomOffset, CX2DamageEffect::LOT_UID_VECTOR, SOUL_INFEST_LOCK_ON_MODULUS_FACTOR );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL soul infest shell time %.2f made %d", GetXSkinAnimPtr()->GetNowAnimationTime(), static_cast<int>( NULL != pShell ) );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	bool bFireFlyShell = false;
+	for ( int iTime = 0; iTime < static_cast<int>( _countof( SOUL_INFEST_FLY_SHELL_TIMES ) ); ++iTime )
+	{
+		if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SOUL_INFEST_FLY_SHELL_TIMES[iTime] ) )
+		{
+			bFireFlyShell = true;
+			break;
+		}
+	}
+
+	if ( true == bFireFlyShell )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"MAJOR:Bip01" );
+		D3DXVECTOR3 vRotateDegree = GetRotateDegree();
+		const int iRandomOffset = static_cast<int>( ( GetXSkinAnimPtr()->GetNowAnimationTime() - static_cast<double>( SOUL_INFEST_RANDOM_OFFSET_TIME_BASE ) )
+			/ static_cast<double>( SOUL_INFEST_RANDOM_OFFSET_TIME_STEP ) + static_cast<double>( SOUL_INFEST_RANDOM_OFFSET_ROUND ) );
+
+		// June keeps the x degree and replaces y and z with the random alone
+		vRotateDegree.y = static_cast<float>( GetRandomFloat( iRandomOffset ) * static_cast<double>( SOUL_INFEST_ROTATE_RANGE_DEGREE ) - static_cast<double>( SOUL_INFEST_ROTATE_BASE_DEGREE ) );
+		vRotateDegree.z = static_cast<float>( GetRandomFloat( iRandomOffset ) * static_cast<double>( SOUL_INFEST_ROTATE_RANGE_DEGREE ) - static_cast<double>( SOUL_INFEST_ROTATE_BASE_DEGREE ) );
+
+		CX2DamageEffect::CEffect* pShell = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_LD_F_SOUL_INFEST_Projectile_Fly", GetPowerRate(), vBonePos, vRotateDegree, vRotateDegree,
+			m_FrameDataNow.unitCondition.landPosition.y, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+		if ( NULL != pShell )
+			SetLockOn( pShell, iRandomOffset, CX2DamageEffect::LOT_UID_VECTOR, SOUL_INFEST_LOCK_ON_MODULUS_FACTOR );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL soul infest fly shell time %.2f made %d", GetXSkinAnimPtr()->GetNowAnimationTime(), static_cast<int>( NULL != pShell ) );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afe850 ( thunk 32b4c200 )
+void CX2GULuciel::LSI_SA_LD_SOUL_INFEST_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae65a0 ( thunk 32b4af20 ), the preload of Nether Shredder
+void CX2GULuciel::LSI_SA_LD_NETHER_SHREDDER_Init()
+{
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece02.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare03_Big.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare05.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"Darkcloud_AttackBox01.x" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"NETHER_SHREDDER_HAND.X" );
+}
+
+// char-luciel CH2a: June 32ae66a0 ( thunk 32b4af30 )
+void CX2GULuciel::LSI_SA_LD_NETHER_SHREDDER_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afea50 ( thunk 32b4c210 )
+void CX2GULuciel::LSI_SA_LD_NETHER_SHREDDER_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae66c0 ( thunk 32b4b3c0 ), the preload of the female Heavy Hit
+void CX2GULuciel::LSI_A_LD_F_HEAVY_HIT_Init()
+{
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare05.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	TextureReadyInBackground( L"WhitePoint.dds" );
+	XMeshReadyInBackground( L"ADE_FORCE_NOVA_P01.Y" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_PE02.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LD_HEAVY_HIT_M01.X" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+}
+
+// char-luciel CH2a: June 32b1cf90 ( thunk 32b4dd00 ); a chance to hit harder: the state's power rate and damage grow and a set plays ( the male copy 32b1cd20 is the same )
+void CX2GULuciel::LSI_A_LD_F_HEAVY_HIT_StateStart()
+{
+	CommonStateStart();
+
+	float fAbilityValue = 1.f;
+	const float fEffectiveRate = ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_EFFECTIVE_RATE, CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT, true, fAbilityValue ) ? fAbilityValue : HEAVY_HIT_DEFAULT_EFFECTIVE_RATE );
+
+	if ( GetRandomFloat( 0 ) <= fEffectiveRate )
+	{
+		const float fDamageRate = ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_DAMAGE_REL, CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT, true, fAbilityValue ) ? fAbilityValue : HEAVY_HIT_DEFAULT_DAMAGE_RATE );
+
+		m_fNowStatePowerRate *= fDamageRate;
+		m_DamageData.damage.fPhysic *= fDamageRate;
+		m_DamageData.damage.fMagic *= fDamageRate;
+
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EFFECTSET_DEBUFF_POWERFUL_BOWSTRING", this, NULL, false, -1.f, -1.f, D3DXVECTOR3( HEAVY_HIT_EFFECT_SCALE, HEAVY_HIT_EFFECT_SCALE, HEAVY_HIT_EFFECT_SCALE ) );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL heavy hit strong rate %.2f chance %.2f body F", fDamageRate, fEffectiveRate );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+}
+
+// char-luciel CH2a: June 32ae6780 ( thunk 32b4b3d0 )
+void CX2GULuciel::LSI_A_LD_F_HEAVY_HIT_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afee50 ( thunk 32b4c6a0 )
+void CX2GULuciel::LSI_A_LD_F_HEAVY_HIT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32b1cd20 ( thunk 32b4dd10 ), the male body's Heavy Hit start ( the female copy 32b1cf90 is the same )
+void CX2GULuciel::LSI_A_LD_M_HEAVY_HIT_StateStart()
+{
+	CommonStateStart();
+
+	float fAbilityValue = 1.f;
+	const float fEffectiveRate = ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_EFFECTIVE_RATE, CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT, true, fAbilityValue ) ? fAbilityValue : HEAVY_HIT_DEFAULT_EFFECTIVE_RATE );
+
+	if ( GetRandomFloat( 0 ) <= fEffectiveRate )
+	{
+		const float fDamageRate = ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_DAMAGE_REL, CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT, true, fAbilityValue ) ? fAbilityValue : HEAVY_HIT_DEFAULT_DAMAGE_RATE );
+
+		m_fNowStatePowerRate *= fDamageRate;
+		m_DamageData.damage.fPhysic *= fDamageRate;
+		m_DamageData.damage.fMagic *= fDamageRate;
+
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EFFECTSET_DEBUFF_POWERFUL_BOWSTRING", this, NULL, false, -1.f, -1.f, D3DXVECTOR3( HEAVY_HIT_EFFECT_SCALE, HEAVY_HIT_EFFECT_SCALE, HEAVY_HIT_EFFECT_SCALE ) );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL heavy hit strong rate %.2f chance %.2f body M", fDamageRate, fEffectiveRate );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+}
+
+// char-luciel CH2a: June 32ae66b0 ( thunk 32b4b3e0 )
+void CX2GULuciel::LSI_A_LD_M_HEAVY_HIT_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32afec50 ( thunk 32b4c6b0 )
+void CX2GULuciel::LSI_A_LD_M_HEAVY_HIT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae67a0 ( thunk 32b4b3f0 ), the preload of the female Haunting Beat
+void CX2GULuciel::LSI_A_LD_F_HAUNTING_BEAT_Init()
+{
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare05.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"LD_Slicer_trace_01.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"SA_AYR_ORB_KI_Baram.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XSkinMeshReadyInBackground( L"BREAKING_FIST_Attack_Box.x" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LD_HEAVY_HIT_M01.X" );
+}
+
+// char-luciel CH2a: June 32ae6870 ( thunk 32b4b400 )
+void CX2GULuciel::LSI_A_LD_F_HAUNTING_BEAT_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32aff250 ( thunk 32b4c6c0 )
+void CX2GULuciel::LSI_A_LD_F_HAUNTING_BEAT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2a: June 32ae6790 ( thunk 32b4b410 )
+void CX2GULuciel::LSI_A_LD_M_HAUNTING_BEAT_FrameMove()
+{
+	CommonFrameMove();
+}
+
+// char-luciel CH2a: June 32aff050 ( thunk 32b4c6d0 )
+void CX2GULuciel::LSI_A_LD_M_HAUNTING_BEAT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
 /*virtual*/ void CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex( const CX2SkillTree::SKILL_ID eSkillID_, const int iSlotIndex_, const bool bSlotB_ )
 {
@@ -14486,6 +15059,154 @@ void CX2GULuciel::InitStateCommon()
 	case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_2:
 	case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_3:
 		// June @32b469d6: the 59 skill-id cases on iBaseSkillID, each written by its skill phase ( june2017_re/char_luciel/ch1n_skill_cases.tsv )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL equip skill %d slot %d bank %c state %d", static_cast<int>( eSkillID_ ), iSlotIndex_, ( false == bSlotB_ ? L'A' : L'B' ), iNormalStateID );	// char-luciel CH2a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		switch ( iBaseSkillID )
+		{
+		case CX2SkillTree::RNSI_SA_LUCIEL_TRIPLE_SHOT:	// char-luciel CH2a: June @32b46bc9 ( ids 30001 / 30025 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_TRIPLE_SHOT", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_TRIPLE_SHOT_Init );	// June 32b4aea0
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_TRIPLE_SHOT_FrameMove );	// June 32b4aeb0
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_TRIPLE_SHOT_EventProcess );	// June 32b4c1b0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_TRIPLE_SHOT", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LUCIEL_STOMP:	// char-luciel CH2a: June @32b46c33 ( ids 30002 / 30026 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_STOMP_START", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_STOMP_START_Init );	// June 32b4aec0
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_STOMP_START_FrameMove );	// June 32b4aed0
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_STOMP_START_EventProcess );	// June 32b4c1c0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_STOMP_START", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID			= LSI_SA_LD_STOMP_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_STOMP_LANDING", stateData.stateID );
+				stateData.m_eSkillID		= static_cast<CX2SkillTree::SKILL_ID>( m_iChosenSkillID );	// June @32b46ca2 reads +0x8ea0
+				stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_STOMP_LANDING_FrameMove );	// June 32b4aee0
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_STOMP_LANDING_EventProcess );	// June 32b4c1d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LUCIEL_FLICK_SHOT:	// char-luciel CH2a: June @32b46ce4 ( ids 30003 / 30027 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_FLICK_SHOT", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_FLICK_SHOT_Init );	// June 32b4aef0
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_FLICK_SHOT_FrameMove );	// June 32b4e0e0
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_FLICK_SHOT_EventProcess );	// June 32b4c1e0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_FLICK_SHOT", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LUCIEL_EVIL_CLAW:	// char-luciel CH2a: June @32b46d52 ( ids 30005 / 30029 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_EVIL_CLAW", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_EVIL_CLAW_Init );	// June 32b4af00
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_EVIL_CLAW_FrameMove );	// June 32b4e0f0
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_EVIL_CLAW_EventProcess );	// June 32b4c1f0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_EVIL_CLAW", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LUCIEL_SOUL_INFEST:	// char-luciel CH2a: June @32b46d8f ( ids 30006 / 30030 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_SOUL_INFEST", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_SOUL_INFEST_Init );	// June 32b4af10
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_SOUL_INFEST_FrameMove );	// June 32b4e100
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_SOUL_INFEST_EventProcess );	// June 32b4c200
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_SOUL_INFEST", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+				normalStateData.m_eSkillID		= eSkillID_;	// June @32b46de2: the raw id on both states
+				hyperStateData.m_eSkillID		= eSkillID_;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LUCIEL_NETHER_SHREDDER:	// char-luciel CH2a: June @32b46e0a ( ids 30004 / 30028 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_NETHER_SHREDDER", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_NETHER_SHREDDER_Init );	// June 32b4af20
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_NETHER_SHREDDER_FrameMove );	// June 32b4af30
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LD_NETHER_SHREDDER_EventProcess );	// June 32b4c210
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LD_NETHER_SHREDDER", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+				normalStateData.m_eSkillID		= eSkillID_;	// June @32b46de2 ( shared tail ): the raw id on both states
+				hyperStateData.m_eSkillID		= eSkillID_;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT:	// char-luciel CH2a: June @32b495ab ( ids 30201 / 30212 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LD_F_HEAVY_HIT", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_F_HEAVY_HIT_Init );	// June 32b4b3c0
+				normalStateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_F_HEAVY_HIT_StateStart );	// June 32b4dd00
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_F_HEAVY_HIT_FrameMove );	// June 32b4b3d0
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_F_HEAVY_HIT_EventProcess );	// June 32b4c6a0
+
+				m_LuaManager.MakeTableReference( "LSI_A_LD_F_HEAVY_HIT", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.StateStart		= normalStateData.StateStart;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID			= LSI_A_LD_M_HEAVY_HIT;
+				m_LuaManager.MakeTableReference( "LSI_A_LD_M_HEAVY_HIT", stateData.stateID );
+				stateData.m_bSkillState		= true;	// June @32b49656 byte +0x11
+				stateData.StateStart		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_M_HEAVY_HIT_StateStart );	// June 32b4dd10
+				stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_M_HEAVY_HIT_FrameMove );	// June 32b4b3e0
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_M_HEAVY_HIT_EventProcess );	// June 32b4c6b0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LUCIEL_HAUNTING_BEAT:	// char-luciel CH2a: June @32b49677 ( ids 30202 / 30211 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LD_F_HAUNTING_BEAT", normalStateData.stateID );
+				normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_F_HAUNTING_BEAT_Init );	// June 32b4b3f0
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_F_HAUNTING_BEAT_FrameMove );	// June 32b4b400
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_F_HAUNTING_BEAT_EventProcess );	// June 32b4c6c0
+
+				m_LuaManager.MakeTableReference( "LSI_A_LD_F_HAUNTING_BEAT", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID			= LSI_A_LD_M_HAUNTING_BEAT;
+				m_LuaManager.MakeTableReference( "LSI_A_LD_M_HAUNTING_BEAT", stateData.stateID );
+				stateData.m_eSkillID		= eSkillID_;	// June @32b496e6: the raw id
+				stateData.m_bSkillState		= true;	// June @32b49709 byte +0x11
+				stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_M_HAUNTING_BEAT_FrameMove );	// June 32b4b410
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_A_LD_M_HAUNTING_BEAT_EventProcess );	// June 32b4c6d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		default:
+			break;
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 		return;
 
 	case CX2SkillTree::ST_RELATIONSHIP_SKILL:
