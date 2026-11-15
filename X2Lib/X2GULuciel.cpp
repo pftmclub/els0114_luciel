@@ -10537,7 +10537,7 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 		const float fAbilityRate = 0.f;	// June 32358970( 5 ) x 0.01: June's per-unit ability map, 0 in March ( the base's stand-in )
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		const float fRate = fAbilityRate + m_SocketData.GetIncreaseMPRate( 0 == iForm );	// char-luciel DU5f: June 32b0fa90 reads user +0x87b4 vslots 0xc / 0x10, true for Lu's gauge, false for Ciel's
-		const float fMaxMpWithSocket = fResultMaxMp + ( fResultMaxMp * fRate + m_SocketData.GetAddMPValue( 0 == iForm ) );
+		const float fMaxMpWithSocket = fResultMaxMp + fResultMaxMp * fRate + m_SocketData.GetAddMPValue( 0 == iForm );	// char-luciel DU5f review: June 32b0fa90 adds max x rate to max first, then the add
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 		const float fRate = fAbilityRate + m_SocketData.m_Stat.m_ExtraStat.m_fIncreaseMPRate;
 		const float fMaxMpWithSocket = fResultMaxMp + ( fResultMaxMp * fRate + m_SocketData.m_iAddMPValue );

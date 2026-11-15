@@ -1873,6 +1873,50 @@ the review retires it). Commit: see git log `char-luciel Phase DU5f`. Funcmap: 1
   and `gauge 0 ... add 30 -> 330.0` / `gauge 1 -> 300.0`. Set count by the window's view: user-confirmed (soft check, no log line).
 - **Next:** `/x2-phase char-luciel DU5f review` (Opus 5.5 high; retires `_DEBUG`).
 
+### DU5f - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed `15a08390` against June (`disasm_range.py`, read-only). **Verdict: pass after 2 fixes**, both under `SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET`;
+`_DEBUG` retired. Commit: see git log `char-luciel Phase DU5f review`.
+- **Fix 1, window (`3291ba40` @`3291c120`):** June does not drop the other body's local. After the set loop it adds the local's `+0x2f0` (the window's
+  accumulators are `SocketDataTemplet`s, `32738cc0`: raw stat, index 0 = `m_fIncreaseHPRate`; main at esp+0xd4, local at esp+0x468) into the window's
+  result, then destroys the local. The port now adds `kOtherFormSocketData`'s HP rate when the other body's set map is not empty (June skips the block
+  on an empty map @`3291c017`). JUNE_BUGS 764 and funcmap row `3291ba40 @3291bf2d` corrected: only the HP rate is kept.
+- **Fix 2, in game (`32b0fa90`):** June computes `( max + max x rate ) + add` (`fmulp` / `faddp`, then `fadd` the add); DU5f kept CH1l2's
+  `max + ( max x rate + add )`, which rounds differently. Now June's order. The HUD (`3235a160`) already had it.
+- **`SocketData_DuoUnit`:** vslots `32091b10` / `32091b60`: argument true reads the pair at `+0x468` (values `+0x470` / `+0x474`), false `+0x478`; ReInit
+  `32092450` = base `320922a0` + both pairs 0. `3271a060`: map value `+0x10` is the option's `SocketDataTemplet` (raw stat at `+0x2f0`, so `+0x2f4` =
+  `m_fIncreaseMPRate`; funcmap 942), `+0x22c` = `m_iAddMPValue` (`fild`); group 0 / 2 -> `+0x468`, 1 / 2 -> `+0x478`; no PvP / dungeon-only test. = port.
+- **Callers:** user `3206d770`: argument only for type 10 (@`3206d846`), the record (random + templet vector, `+0x5c`; `+0x8c` / `+0x9c` / `+0xac`
+  Stage 16) before the skip @`3206dc6a`, both skipped when the argument is null (@`3206dbb3`); mode = `+0x8e90 == 1` (@`3206d8f7`) = `m_bMinorUnitActive`;
+  aura `push 2` @`3206e5fa` per step before the sum. `32050230`: group 0 recorded with the pointer, summed in modes 0 / 2; group 1 only with the pointer,
+  summed in 1 / 2; empty option lists skipped; level = max level or the unit's. Unit `32365d30` / `323652b0`: the same, mode skip only inside the
+  record branch (@`32365eed` -> `323660b3`). All = port.
+- **Gauges:** HUD: gauge 0 vslots ( 1 ), gauge 1 for type 10 vslots ( 0 ) and `ResetMaxMp( 300, 1 )`, both `( R + R x rate ) + add`, `3248a800( uid, mp,
+  index )` -> gage data vslot 0x14 ( mp, index ) = `CX2GageData::SetMaxMp( mp, index )`. Lu/Ciel `ResetMaxMP` gauge 0 ( 1 ), gauge 1 ( 0 ). = port.
+- **Form filter:** `3286a3e0` slot tables = `GetEquipGroup` `3286a4b0`'s (odd 1-9 -> both, Ciel slots 20-42 bar 35 / 37 / 39 / 41 -> form, rest and an
+  unequipped item -> not form). `3234d8d0` / `32912cc0`: my unit `+0xe40`, overridden by the viewer's `+0xd80` only while the window's `+0x1e5` is set and
+  the viewer (`+0x1b4`) exists. `32350b80`: usable, class (`31e4c380` = templet class, `31ed6500`), `328823d0` (Stage 16), form, set id. `32350cb0`:
+  the same with `group == 2 || == arg`. = port.
+- **Callers of `32350b80`** (7): party `31ed40c0`, `GetEnchantStat` `32358df0`, `GetRepairDiscountRate` `32363f00`, skill level by socket `32357a70`,
+  window `3291ba40`, plus `31fa6980` and `320200b0` (no March caller; `320200b0` routed DU1d3b). March's live one-argument callers are exactly the first
+  five; `X2UICharInfo.cpp:3901` is in `CHARINFO_STATS`' `#else`. **`32350cb0`** (5): all ported.
+- **Not ported, routed:** June's user `+0x94a0`, a second option vector filled beside `+0x893c` (`320503bb`, `320505a6`, `3206dd52`-`3206de11`) for every
+  class. Not this phase's subject: a bullet in `kickoffs/june-stat-calc/S3.md` (sockets and options).
+- **Flag-off = March:** `cl /P` (census `cl_cmd`) of `X2Unit.cpp` / `X2GUUser.cpp` / `X2UICharInfo.cpp` on a `git archive 15a08390` tree, flag on vs
+  `//#define`: 23 / 16 / 8 hunks, ON-only 118 / 61 / 47 lines all DU5f `+` lines, OFF-only 11 / 18 / 4 all pre-DU5f text, 0 unmatched.
+- **Gates on DU5f (`finish.py --review --commits 15a08390 --with ..._DUO_SOCKET ..._DUO_SOCKET_DEBUG -v`):**
+  ```
+  flagcheck JUNE_CHAR_DUO_SOCKET     PASS     files: 11 PASS, 1 PASS~ (blank/marker only), 1 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR
+  junediverge                        PASS     RESULT: PASS
+  junediverge --check-all            PASS     RESULT: PASS
+  enumscan                           FAIL     exit 1: 190 A/B row(s) remain in 13 file(s)
+  FINISH RESULT: FAIL (7 gates, 1 failed, 3 skipped)
+  ```
+  enumscan: the pre-existing `X2Unit.cpp` `SI_*` rows (lines 6348+), none on DU5f's lines. 0 deleted lines; PASS~ = one blank line in `X2SocketItem.cpp`.
+  stateends / skillicons / luabind not applicable (no states, skills or scripts).
+- **Build:** `/Zs` probes of `X2UICharInfo.cpp` and `X2GULuciel.cpp`: 0 errors. Full build skipped: no play-test (the HP-rate carry shows only with a
+  set on the hidden body, the order fix is a last-bit rounding); both ride the next play-test build.
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under

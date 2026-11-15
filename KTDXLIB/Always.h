@@ -13977,5 +13977,5 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET needs SERV_IRUHADEV_JUNE_SKILL_UNIT_SOCKET / _HUD_MAXHPMP / _STAT_GETTERS ( aggregate, HUD, GetEquipGroup ), _CHAR_DUO_BODY, _EQUIP_VIEW, _FORM_MP_GAGE ( gauge index ) and _DUO_VIEWER ( the window's view ), char-luciel DU5f
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 // Description: char-luciel DU5f debug: one "[JUNE_CHAR] LUCIEL DUO SOCKET" line per HUD / in-game max MP reset of a Lu/Ciel unit; the review retires it.
-#define SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG	// retired by the DU5f review 2026-11-16
 //////////////////////////////////////////////////////////////////////////

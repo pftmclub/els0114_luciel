@@ -3650,7 +3650,7 @@ CX2SocketItem::SocketData CX2UICharInfo::GetMyEquippedSocketData( const int iEqu
 		}
 	}
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
-	if ( CX2Unit::DT_BOTH == iEquipGroup_ && NULL != pUnit->GetUnitTemplet() && CX2Unit::UT_LUCIEL == pUnit->GetUnitTemplet()->m_UnitType && NULL != g_pData->GetItemManager() )	// char-luciel DU5f: June @3291bf2d-3291c1a5, the other body's sets summed into a local June then drops ( JUNE_BUGS )
+	if ( CX2Unit::DT_BOTH == iEquipGroup_ && NULL != pUnit->GetUnitTemplet() && CX2Unit::UT_LUCIEL == pUnit->GetUnitTemplet()->m_UnitType && NULL != g_pData->GetItemManager() )	// char-luciel DU5f: June @3291bf2d-3291c1a5, the other body's sets summed into a local; June keeps only its HP rate ( JUNE_BUGS )
 	{
 		const int iOtherEquipGroup = ( true == CX2Unit::IsMyShownMinorUnitForm() ) ? CX2Unit::DT_MAJOR : CX2Unit::DT_MINOR;
 		CX2SocketItem::SocketData kOtherFormSocketData;
@@ -3663,6 +3663,8 @@ CX2SocketItem::SocketData CX2UICharInfo::GetMyEquippedSocketData( const int iEqu
 			if ( false == vecOptions.empty() )
 				SumSocketOption( vecOptions, kOtherFormSocketData, ( 0 < iMaxLevel ) ? iMaxLevel : iUnitLevel );
 		}
+		if ( false == mapOtherFormSetIDNParts.empty() )	// char-luciel DU5f review: June @3291c120 adds the local's HP rate ( +0x2f0 ) to the window's, the rest is dropped
+			SocketDataRetVal.m_Stat.m_ExtraStat.m_fIncreaseHPRate += kOtherFormSocketData.m_Stat.m_ExtraStat.m_fIncreaseHPRate;
 	}
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
 	// June @3291bf2d: group 2 of a unit type 10 also sums the other form's sets: stand-in: Lu/Ciel not ported
