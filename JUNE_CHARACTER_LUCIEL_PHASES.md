@@ -1519,7 +1519,9 @@ the retired `JUNE_CHARINFO_EQUIP_GROUP`, whose define is commented out). Rows: f
 - **Tools:** `elsdb.py` `EQUIP_SLOTS` on June's ids + `MINOR_SLOTS` body filter for `--equip`.
 - **Gates:** `finish.py --files <10 files> --with SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER`: flagcheck PASS (8 PASS, 1 PASS~ = one blank line in
   `X2OfflineInventory.cpp`, 1 OTHER = `Always.h`, the retired `CHARINFO_EQUIP_GROUP` define line, 0 FAIL), junediverge PASS, enumscan exit 1 on 190
-  rows, **0 on DU4 lines** (intersected with `git diff -U0`); luasrc `core --check` / `ledger --check` PASS. Range gate: see the line below the commit.
+  rows, **0 on DU4 lines** (intersected with `git diff -U0`); luasrc `core --check` / `ledger --check` PASS; stateends n/a (no skill states).
+  Commit `31a27331`; `finish.py --range 31a27331^..31a27331 --with ...`: the same (flagcheck PASS 8 / 1 PASS~ / 1 OTHER / 0 FAIL, junediverge PASS,
+  enumscan the same 190 pre-existing rows).
 - **Compile:** `/Zs` probes of the 8 changed `.cpp`: 8 x 0 errors; break-tests fail inside the new blocks.
 - **Build:** `DEPLOY OK: X2_offline.exe is 26,973,696 B, dated 2026-11-15 21:08:20, md5 439247b2c3e968db8ef23b6b032f44cc` (built at `244c652c` + the
   DU4 files + CH2c's uncommitted `X2GULuciel.*`); `EXESTR OK: 1 of 1` (`[JUNE_CHAR] LUCIEL DUO DB MIG v24 done`, wide) and `1 of 1` (the size UPDATE).
