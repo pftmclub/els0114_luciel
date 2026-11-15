@@ -919,6 +919,9 @@ int CX2OfflineQuest::GetCompleteCount( int iQuestID ) const
 	case SEnum::DI_DUNGEON_TUTORIAL_ADD:
 	case SEnum::DI_DUNGEON_TUTORIAL_CHUNG:
 #endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
+	case SEnum::DI_DUNGEON_TUTORIAL_LUCIEL:	// char-luciel TU
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
 		return true;
 
 	default:

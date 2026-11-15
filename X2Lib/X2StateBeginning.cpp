@@ -4099,6 +4099,11 @@ void CX2StateBeginning::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ()
 	case CX2Unit::UT_ADD:
 		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_ADD;
 		break;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
+	case CX2Unit::UT_LUCIEL:	// char-luciel TU: June 325622e0 unit type 10 -> 41240 ( compiled-out copy )
+		kEGS_CREATE_ROOM_REQ.m_RoomInfo.m_iDungeonID	= SEnum::DI_DUNGEON_TUTORIAL_LUCIEL;
+		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
 	// stand-in: Lu/Ciel, Rose, Ain not ported ( June unit types 10 / 11 / 12 -> 41240 / 41250 / 41420 )
 	}
 #else SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON

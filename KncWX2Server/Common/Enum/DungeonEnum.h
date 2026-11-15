@@ -490,6 +490,7 @@ namespace SEnum
 		DI_DUNGEON_TUTORIAL_EL					= 41220,
 		DI_DUNGEON_TUTORIAL_ADD					= 41230,
 		DI_DUNGEON_TUTORIAL_CHUNG				= 41290,
+		DI_DUNGEON_TUTORIAL_LUCIEL				= 41240,	// char-luciel TU: June DungeonEnum.lua:101
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 	//}}
 		// 해외팀 이벤트 비던

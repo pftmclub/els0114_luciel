@@ -2920,6 +2920,36 @@ job, and a level-35 one reaches each second job, by quest or item. The tree, the
 `Dungeon_Tutorial_Luciel.lua` with `luabind.py`, and port June's first-entry route for a new Lu/Ciel (NU0 item 8). **Done gate:** a new Lu/Ciel
 plays the tutorial to its end and lands where June lands him.
 
+## Stage 8 Lu/Ciel, TU - Done (char-luciel TU, 2026-11-15)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL` (`Always.h`, `#error` without `JUNE_CLASS_TUTORIAL_DUNGEON` and `JUNE_CHAR_LUCIEL_LIVE`), sub-tag `TUTORIAL`.
+A new Lu/Ciel's first select now enters June's tutorial dungeon 41240 (it fell to Elsword's 41150 before: CH1's play-test).
+- **Code.** `X2StateServerSelect.cpp` / `X2StateBeginning.cpp` (compiled-out copy): `case UT_LUCIEL` -> `DI_DUNGEON_TUTORIAL_LUCIEL` in C3y-2's switch
+  (June `325622e0`, type 10 -> `0xa118`). `DungeonEnum.h` (`JUNE_ENUM_NAMES`): `DI_DUNGEON_TUTORIAL_LUCIEL = 41240`. Emulator: `IsQuestTutorialDungeon`
+  learns the id (`X2OfflineQuest.cpp`); `Handlers_Room.cpp` logs `[JUNE_CHAR] LUCIEL TUTORIAL room <uid> dungeon 41240 for unit <uid>`.
+  Add's case (9 -> 41230) is char-add TU's; Rose / Ain keep the stand-in comment.
+- **Data (June's rows verbatim, core-list sources, ledger refreshed).** data036 `DungeonEnum.lua` `DI_DUNGEON_TUTORIAL_LUCIEL` 41240 (`DungeonEnum.src.lua:101`);
+  data036 `Enum.lua` `WI_TUTORIAL_LUCIEL_STAGE0` 633 and `NUI_TUTORIAL_RUCIEL_OBJECT` 2044 / `ICOOS` 2045 / `BOSS_KARIS` 2047 / `LUCIEL_DP1` 2067 (no collision with a
+  live `NUI_`/`WI_` value; the `SOUCM_*` hits on those numbers are another table); data035 `DungeonData.lua` the 41240 row (`DungeonData.src.lua:29877`);
+  data040 `WorldData.lua` the 633 row; data037 `NPCTemplet.lua` the four NPC rows. `NewNPCStat` rows were already live.
+- **Assets.** 214 names by `kom.py stage-june` (data081 1, data160 88 and data161 78 = new koms: `Tuto_Ciel_*.ogg` / world sounds, data164 43 = `Tutorial_Luciel_Stage0_*`
+  meshes and textures; data126 / data165 identical). The 7 Lu/Ciel tutorial `.lua` (dungeon, 3 NPC scripts, Dp1, Stage0, LineMap) were already June's bytes
+  (`adopt-june --dry-run`: 7 identical), so nothing was adopted. NU0's "HQ_Loading_TUTORIAL_LUCIEL not found" was wrong: data126, already staged.
+- **Not done, on purpose.** `DI_BATTLE_FIELD_TUTORIAL_LUCIEL` 39609 (already in live `DungeonEnum.lua`; June has no data row and no reader);
+  `NUI_TUTORIAL_ERIS_SUMMON` / `Tutorial_Luciel_eris.lua` (a June `NPCTemplet` row whose script June does not ship; no dungeon names it);
+  `ImpossibleAgainDungeon` (no live file).
+- **Pack / copy.** PACK OK data035 / 036 / 037 / 040 / 081 / 160 / 161 / 164. COPY OK all (data035 md5 470c9aaa, data037 3eb5423e, data040 80630812, data081 fa477aad,
+  data160 3500830c, data161 37392457, data164 9770a0bc). **data036 was copied with `--force` (md5 533396c2)**: a peer (char-luciel CHN) edited `LevelUpEvent.lua`
+  a minute after my pack, so the live data036.kom carries my rows and not that edit; the next `pack data036` carries both.
+- **Gates.** `finish.py` (the code files, `--with TUTORIAL ENUM_NAMES`, `--lua` the 5 scripts): `luabind.py check` Dungeon_Tutorial_Luciel + 4 NPC scripts RESULT PASS
+  (before the data: 5 + 1 ENUM MISSING), `junediverge` PASS, `enumscan` exit 0, flagcheck: sites PASS (4 PASS + 1 PASS~ for the 6-line log block), the one ERROR
+  per flag is Always.h's `#error` guards (precedent). `ledger --check` PASS, `core --check` PASS.
+- **Build.** DEPLOY OK: X2_offline.exe is 26,907,648 B, dated 2026-11-15 16:19:28, md5 17cf42ad3caa06c5489edb86b88d42b2 (built at main f238da7b + 10 uncommitted code
+  files of peers). EXESTR OK: 1 of 1 (wide `[JUNE_CHAR] LUCIEL TUTORIAL room`).
+- **Revert.** Comment out the `#define`: Lu/Ciel falls back to Elsword's tutorial. The data rows are inert.
+- **Play-test hand-off.** See the commit's hand-off: create a fresh Lu/Ciel, play the tutorial to its end; `logs.py --grep "JUNE_CHAR\] LUCIEL TUTORIAL"`.
+  Open for the user: none.
+
 ## Phase CH2 - Skills: base and first jobs (200, 37, 38, 39)
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, sub-tags `SKILL`, `NUM`. A skill's

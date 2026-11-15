@@ -13627,3 +13627,14 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM needs SERV_IRUHADEV_JUNE_CHAR_EFFECTSET_MODIFIER ( the modifier list )
 #endif
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel TU - a new Lu/Ciel enters June's tutorial dungeon DI_DUNGEON_TUTORIAL_LUCIEL 41240 ( 325622e0 unit type 10 ) in place of
+//              the Elsword default, in CX2StateServerSelect and the compiled-out CX2StateBeginning copy; the emulator's tutorial-dungeon list learns the id.
+//              Data ( enum, DungeonData, WorldData, NPCs, assets ) is in the koms. Revert: comment out the #define ( JUNE_CHAR_LUCIEL_TUTORIAL ).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL ) && ( !defined( SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON ) || !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL needs SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON ( the room switch, DI_DUNGEON_TUTORIAL_* ) and SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ( UT_LUCIEL units )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
+//////////////////////////////////////////////////////////////////////////

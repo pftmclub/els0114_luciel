@@ -609,6 +609,12 @@ bool CX2OfflineServer::Handler_EGS_CREATE_TUTORIAL_ROOM_REQ( KOfflineSession& kS
 		(__int64)m_kRoom.m_kInfo.m_RoomUID, (__int64)kRow.m_nUnitUID,
 		m_kRoom.m_kInfo.m_iDungeonID );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
+	if( SEnum::DI_DUNGEON_TUTORIAL_LUCIEL == m_kRoom.m_kInfo.m_iDungeonID )	// char-luciel TU
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL TUTORIAL room %I64d dungeon %d for unit %I64d",
+			(__int64)m_kRoom.m_kInfo.m_RoomUID, m_kRoom.m_kInfo.m_iDungeonID, (__int64)kRow.m_nUnitUID );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL
+
 	return Reply( kSes, EGS_CREATE_TUTORIAL_ROOM_ACK, kAck );
 }
 
