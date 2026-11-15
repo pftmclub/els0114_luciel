@@ -1169,3 +1169,16 @@ Done: CH0 (2026-11-12; maps + asset list, 5 splits, no code). CH1a (2026-11-12; 
 Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for 35 / 120 / 121 / 125 follow Ara's rule (CHNa writes, user packs); CH0: moot, the flat StatTable (e37c9211) already has their rows.
 
 Done (closing): CH6 (2026-11-14; walk passed), Z (2026-11-14; docs only, plan closed)
+
+## june-state-ids - March's user state ids take June's numbers
+Plan `JUNE_STATE_IDS_PHASES.md` - branch `main` - log tag `[STATE_IDS]` - flag `SERV_IRUHADEV_JUNE_USER_STATE_IDS` (+ `_DEBUG`, S1 only) - kickoffs `kickoffs/june-state-ids/` - census `tools/data/june_user_state_ids.tsv` - backlog Stage 41 - created 2026-11-15 (user, char-luciel CH1o).
+
+**Scope:** June's 46 missing `USER_STATE_ID` members inserted at June's values (`USI_END` 106 -> 152, every class enum +46), `Enum.lua` in the same pack, one regression play-test over every live class; then Lu/Ciel drops its shadow names. S1 runs alone in `X2GUUser.*`, S2 alone in `X2GULuciel.*` (both shared with char-luciel). char-luciel CH1 waits for S2.
+
+Done: S1 (+ review, 2026-11-15), S2 (2026-11-15, `857b18cd`; covered by char-luciel CH1's review).
+
+| Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
+|---|---|---|---|---|---|
+| Z | done 2026-11-15: closed | Sonnet 5.5 / medium | S2 | `MODS.md`, backlog, checklist, STATUS archive | `Z.md` |
+
+Done (closing): Z (2026-11-15; docs only, plan closed; `junebinary.py --check` and `v2_exclusions.py` RESULT: PASS)

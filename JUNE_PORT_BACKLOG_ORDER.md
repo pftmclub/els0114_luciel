@@ -77,7 +77,7 @@ The user's remaining backlog, in the order they listed it:
 | 38 | June village / field game core *(added 2026-11-09, june-census V2)* | - (found by the census) | Not a backlog item but unowned June code: `CX2TFieldGame` (121 functions) and `CX2SquareUnit` (47) beyond the entrance lists Atlas and Stage 24 touched. Brief `kickoffs/june-backlog/stage38-plan.md`. |
 | 39 | June game-event systems *(added 2026-11-09, june-census V2)* | - (found by the census) | Not a backlog item but unowned June systems: `CX2CustomEventManager` + `CX2CustomEventItemSlotManager`, `CX2LVUpEventMgr`, `CX2RandomMission` (148 functions); date windows switch on from the save DB. Brief `kickoffs/june-backlog/stage39-plan.md`. |
 | 40 | Triage of the June code no address can place *(added 2026-11-09, june-census V2)* | - (found by the census) | 191 address gaps (9,641 functions) lie between source files of different systems, plus the boss raid class (9); a read-only Opus triage names their classes and routes each run to a stage, a new stage or an exclusion. Runs first among 38-40, with anything. Brief `kickoffs/june-backlog/stage40-plan.md`. |
-| 41 | March's user state ids take June's numbers *(added 2026-11-15, user: char-luciel CH1o)* | - (found by char-luciel CH1m) | `USER_STATE_ID` gets June's 46 missing members at June's values; every class enum and `Enum.lua` follow; Lu/Ciel drops its shadow names. **Planned 2026-11-15:** plan `june-state-ids` (`JUNE_STATE_IDS_PHASES.md`). |
+| 41 | March's user state ids take June's numbers *(added 2026-11-15, user: char-luciel CH1o)* | - (found by char-luciel CH1m) | `USER_STATE_ID` gets June's 46 missing members at June's values; every class enum and `Enum.lua` follow; Lu/Ciel drops its shadow names. **Planned 2026-11-15:** plan `june-state-ids` (`JUNE_STATE_IDS_PHASES.md`). **CLOSED 2026-11-15** (S1, S2, Z). |
 
 **Concurrency.** There is one working tree and one branch, `main` (user, 2026-10-16). Every stage's code sessions commit onto it with explicit pathspecs; no stage creates a branch or a worktree, and nothing is merged.
 
@@ -1702,7 +1702,7 @@ be placed by address.
   but only for ids in the `g_pData +0x28c` set ( `326f8210` ); it is read by `323179c0` from `322f0020` beside `m_nDamageCount`, possibly a play report. Funcmap rows `StatCalc S33 D4b`.
 - **Depends on:** june-census Z. Start: `/x2-phase new-plan june-triage` (Opus 5.5 high), brief `kickoffs/june-backlog/stage40-plan.md`.
 
-### Stage 41: March's user state ids take June's numbers (char-luciel CH1o, 2026-11-15)
+### Stage 41: March's user state ids take June's numbers (char-luciel CH1o, 2026-11-15) - CLOSED 2026-11-15 (plan `june-state-ids`)
 
 March's `CX2GUUser::USER_STATE_ID` equals June's below 24 and falls behind from there (June has more members: `USI_SPECIAL_ATTACK_1` 49 vs 50,
 riding 71 vs 72, the event kit 93 vs 111, bounding 102 vs 120, `USI_WAIT_STATE_CHANGE` 105 vs 130). Lu/Ciel registers at June's ids, so every engine

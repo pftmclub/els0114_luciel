@@ -198,3 +198,11 @@ Opus 5.5 high. Code commit `857b18cd` (inert `_CORE`; `_LIVE` stays `//#define`)
 *Closed plans* row; `tools/README.md` row for `stateids.py`; checklist row in `JUNE2017_CHARACTER_PORT_CHECKLIST.md` (new characters register at June's
 ids with no shadow names; run `stateids.py check`). Stage-end census (`junebinary.py --check`, `v2_exclusions.py`).
 **Run with.** Sonnet 5.5 / medium. **Done gate.** Both census tools `RESULT: PASS`; STATUS archived.
+
+### Z - Done (2026-11-15)
+
+Docs only; no code, no build ("full build skipped: no play-test").
+- `MODS.md`: S1 block gains the S2 line, the exe + `data036.kom` ship-together note and the new-character rule (revert steps were already there).
+- `JUNE2017_CHARACTER_PORT_CHECKLIST.md`: new row (Rose, Ain at June's ids, base `USI_*` names, `stateids.py check`). `tools/README.md` row for `stateids.py` was added by S1.
+- `JUNE_PORT_BACKLOG_ORDER.md`: Stage 41 marked closed. `STATUS.md` block moved to `STATUS_ARCHIVE.md`, one *Closed plans* row.
+- Census: `junebinary.py --check` RESULT: PASS (55556 functions); `v2_exclusions.py` RESULT: PASS (groups 577, functions 18161, unowned studio in coverage.tsv 18161). The script's rewrite of `exclusions.tsv` was reverted (not this plan's).
