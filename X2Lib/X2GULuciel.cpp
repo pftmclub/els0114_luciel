@@ -14412,7 +14412,7 @@ void CX2GULuciel::InitStateCommon()
 	stateData.stateID			= LSI_SA_LCG_ESCHATON;
 	m_LuaManager.MakeTableReference( "LSI_SA_LCG_ESCHATON", stateData.stateID );
 	stateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_ESCHATON_Init );	// char-luciel CH2c: June 32b4ae40
-	// June 32b2cfc0 ( OnFrameMove ): LSI_SA_LCG_ESCHATON_FrameMove, body in CH2c2
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_ESCHATON_FrameMove );	// char-luciel CH2c2: June 32b4e0c0
 	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_ESCHATON_EventProcess );	// June 32b4c190
 	m_StateList[stateData.stateID] = stateData;
 #else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
@@ -16084,6 +16084,839 @@ void CX2GULuciel::LSI_A_LCN_F_SHADOW_Init()
 	XSkinMeshReadyInBackground( L"LCN_M_SHADOW.X" );
 	XMeshReadyInBackground( L"LCN_M_SHADOW_Wait.Y" );
 }
+
+// char-luciel CH2c2: Royal Guard ( 38 ) skills part 2
+namespace _CONST_LUCIEL_CH2C2_
+{
+	const float		SOUL_SHOCK_EFFECT_TIME						= 0.3f;		// June 32b2db60 ( 3345993c )
+	const double	STACK_ABILITY_BIAS							= 5.000000058430487e-08;	// June 32b2db60 ( 3346ed68 ): added to ( ability - 1 ) before it scales with the stacks
+	const double	SOUL_COLLECTOR_STACK_TARGET_RATE_STEP		= 0.1;		// June 32b2db60 ( 334395e8 )
+	const USHORT	DEMONIC_BREATH_PRESS_COUNT_LIMIT			= 10;		// June 32b1d350 ( cmp cx, 0xa ): presses of the key counted in the class sync short
+	const float		DEMONIC_BREATH_CHARGE_END_TIME				= 0.3f;		// June 32b1d490 ( 3345993c )
+	const float		DEMONIC_BREATH_FIRE_EFFECT_TIME				= 0.1f;		// June 32b2ba70 ( 334395e0 )
+	const USHORT	DEMONIC_BREATH_FIRE_FX3_COUNT				= 8;		// June 32b2ba70: the presses at which the third fire effect set plays
+	const USHORT	DEMONIC_BREATH_FIRE_FX2_COUNT				= 4;		// June 32b2ba70: the second
+	const double	DEMONIC_BREATH_FIRE_POWER_STEP				= 0.07;		// June 32b2ba70 ( 334f20d0 ): power rate x ( 1 + presses x step )
+	const double	DEMONIC_BREATH_FIRE_SCALE_STEP				= 0.04;		// June 32b2ba70 ( 33479370 ): effect scale 1 + presses x step
+	const float		ESCHATON_EFFECT_TIME						= 0.9f;		// June 32b2cfc0 ( 3343b244 )
+	const double	ESCHATON_STACK_STEP							= 0.03;		// June 32b2cfc0 ( 3344f248 ): per Soul Collector stack, the effect set's scale and life time grow by it
+	const float		SOUL_EXTORTION_DRAIN_RANDOM_LIMIT			= 0.5f;		// June 32b3dd80 ( 334ed42c ): the state end drains the stacks when the roll is above it
+	const UCHAR		SOUL_COLLECTOR_DEFAULT_MAX_COUNT			= 5;		// June 32b3dd80: the stack limit when the buff templet is missing
+	const UINT		SOUL_COLLECTOR_MISSING_TEMPLET_LIMIT		= 9999;		// June 32b3db80 ( 0x270f ): the same stand-in in the stack helper
+	const USHORT	FANTASIE_IMPROMPTU_KEY_PRESS_LIMIT			= 5;		// June 32b13260 / 32b1d5f0: the presses counted in the state loop count
+	const double	FANTASIE_IMPROMPTU_BACKWARD_SPEED_RATE		= 0.8;		// June 32b13260 ( 33449128 ): moving against the facing
+	const double	FANTASIE_IMPROMPTU_MOVE_SPEED_RATE			= 1.5;		// June 32b13260 ( 334396c8 )
+	const double	CANTABILE_BEAT_TIME							= 0.14800000190734863;	// June 32b2bf20 ( 334f2280 ): a projectile at each beat of the wait time
+	const double	ACCELERANDO_BEAT_TIME						= 0.08299999684095383;	// June 32b2c270 ( 334f2300 )
+	const double	ACCELERANDO_RANDOM_ROTATE_RANGE				= 4.0;		// June 32b2c270 ( 33437838 ): the projectile's roll is a random value in -2 .. +2 degrees
+	const double	ACCELERANDO_RANDOM_ROTATE_OFFSET			= 2.0;		// June 32b2c270 ( 33437820 )
+	const float		DEATH_CRISIS_LEFT_HAND_ROTATE_LIMIT			= 45.f;		// June 32b15680 ( 334ed400 / 33491dc8 ): the left hand bone turns within -45 .. +45 degrees
+	const float		DEATH_CRISIS_EFFECT_TIME					= 0.01f;	// June 32b2c5e0 / 32b2cd70 ( 33437810 )
+	const float		DEATH_CRISIS_AIM_VALUE						= 50.f;		// June 32b1d970 ( 334ed404 / 3347d92c ): up sets the aim value to +50, down to -50, else 0
+	const double	DEATH_CRISIS_WAIT_MP_RATE					= 10.0;		// June 32b1d970 ( 33438088 ): the min charge x 10 is spent each second
+	const float		DEATH_CRISIS_BIG_CHARGE_END_TIME			= 1.f;		// June 32b1dc50: the charge of the big fire ends at 1.0 ( it runs at twice the speed )
+	const float		DEATH_CRISIS_SMALL_FIRE_EFFECT_TIME_1		= 0.05f;	// June 32b2c7d0 ( 33436704 )
+	const float		DEATH_CRISIS_SMALL_FIRE_EFFECT_TIME_2		= 0.15f;	// June 32b2c7d0 ( 33457f04 )
+	const float		DEATH_CRISIS_SMALL_FIRE_EFFECT_TIME_3		= 0.25f;	// June 32b2c7d0 ( 33437818 )
+	const USHORT	SOUL_STRIKE_LOOP_COUNT_BASE					= 3;		// June 32b1e490: the loop count is the Soul Collector stacks + 3
+	const USHORT	SOUL_STRIKE_LOOP_COUNT_RESTART				= 5;		// June 32b3dea0: the loop count restarts at 5, every loop above it adds a stack back
+	const float		SHADOW_BUFF_END_TIME						= 0.01f;	// June 32b30bc0 ( 33437810 ): the Shadow buffs end
+	const float		SHADOW_BUFF_APPLY_TIME						= 0.1f;		// June 32b30bc0 ( 334395e0 ): the Shadow buff of the active body starts
+	const float		SOUL_STRIKE_EFFECT_TIME						= 0.01f;	// June 32b2e5a0 / 32b2ec50 ( 33437810 )
+	const int		SOUL_STRIKE_RANDOM_STEP_COUNT				= 3;		// June 32b2e5a0: the female shot starts at one of three steps along the facing
+	const int		SOUL_STRIKE_RANDOM_STEP_LENGTH				= 50;		// June 32b2e5a0
+	const double	SOUL_STRIKE_RANDOM_STEP_OFFSET				= 25.0;		// June 32b2e5a0 ( 33474890 ): the steps are -25 / 25 / 75
+	const int		SOUL_STRIKE_HALF_TURN_DEGREE				= 180;		// June 32b2e5a0: a coin flip adds a half turn to the x rotation
+	const USHORT	SOUL_STRIKE_ENHANCED_SPECTER_MIN_LOOP		= 3;		// June 32b2e5a0 / 32b2ec50: Enhanced Specter fires from the third loop on
+	const double	ENHANCED_SPECTER_RANDOM_DEGREE				= 100.0;	// June 32b2e5a0 ( 3342f360 )
+	const double	ENHANCED_SPECTER_LOOP_DEGREE				= 120.0;	// June 32b2e5a0 ( 33439d10 )
+	const double	ENHANCED_SPECTER_DEGREE_OFFSET				= 140.0;	// June 32b2e5a0 ( 334bac38 )
+}
+using namespace _CONST_LUCIEL_CH2C2_;
+
+// char-luciel CH2c2: June 32b01450 ( thunk 32b4c700 ), the male body registers the same function: the cancel chain, but the animation end goes to Lu's wait state
+void CX2GULuciel::LSI_A_LCG_F_SOUL_SHOCK_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b2db60 / 32b2e080: the Soul Collector stacks raise the attack, the size and the damage effect's rate; the stacks are spent unless the memo is equipped ( June's memo getter is a stub )
+void CX2GULuciel::LSI_A_LCG_SOUL_SHOCK_PlayEffects( const WCHAR* pwszEffectSetName_ )
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SOUL_SHOCK_EFFECT_TIME ) )
+	{
+		float fTargetRate = 1.f;
+		float fSizeRate = 1.f;
+		float fPowerRate = GetPowerRate();
+
+		const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::SI_A_LCG_SOUL_SHOCK, false, 0, true );
+		if ( 0 < iSkillLevel )
+		{
+			const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::SI_A_LCG_SOUL_SHOCK );
+			if ( NULL != pSkillTemplet )
+			{
+				const UCHAR ucStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR );
+
+				const float fAttackStep = static_cast<float>( ( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel ) - 1.f ) + STACK_ABILITY_BIAS );
+				fPowerRate = static_cast<float>( ( ucStackCount * fAttackStep + 1.0 ) * fPowerRate );
+
+				const float fSizeStep = static_cast<float>( ( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_SIZE, iSkillLevel ) - 1.f ) + STACK_ABILITY_BIAS );
+				fSizeRate = static_cast<float>( ucStackCount * fSizeStep + 1.0 );
+
+				const double dTargetRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_TARGET_MANA_REL, iSkillLevel );
+				fTargetRate = static_cast<float>( ( ucStackCount * SOUL_COLLECTOR_STACK_TARGET_RATE_STEP + 1.0 ) * dTargetRate );
+			}
+		}
+
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName_, this );
+		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
+			pEffectSetInstance->SetEffectScale( D3DXVECTOR3( fSizeRate, fSizeRate, fSizeRate ), true );
+
+		m_hSoulShockDamageEffect = g_pX2Game->GetDamageEffect()->CreateInstanceHandle( this, L"DamageEffect_LCG_Soul_Shock_Attack", fPowerRate,
+			GetPos(), GetRotateDegree(), GetRotateDegree(), m_FrameDataNow.unitCondition.landPosition.y );
+
+		if ( CX2DamageEffect::CEffect* pDamageEffect = g_pX2Game->GetDamageEffect()->GetInstance( m_hSoulShockDamageEffect, true ) )
+		{
+			const float fEffectRate = pDamageEffect->GetPowerRate();
+			const float fScaledRate = fEffectRate * ( fTargetRate / fPowerRate );
+			if ( fScaledRate != fEffectRate )
+				pDamageEffect->SetPowerRate( fScaledRate );
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL soul shock skill %d level %d power %.3f size %.3f target %.3f", static_cast<int>( GetNowStateSkillID() ), iSkillLevel, fPowerRate, fSizeRate, fTargetRate );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		EraseBuffTempletFromGameUnit( BTI_BUFF_SOUL_COLLECTOR );	// June 3229e160, skipped when 31fca9e0( 0x94ee8 ) answers true; that is June's stub ( always 0 ): the stacks are always spent
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b2db60 ( thunk 32b4e3e0 )
+void CX2GULuciel::LSI_A_LCG_F_SOUL_SHOCK_FrameMove()
+{
+	LSI_A_LCG_SOUL_SHOCK_PlayEffects( L"EffectSet_A_LCG_F_SOUL_SHOCK" );
+}
+
+// char-luciel CH2c2: June 32b2e080 ( thunk 32b4e3f0 )
+void CX2GULuciel::LSI_A_LCG_M_SOUL_SHOCK_FrameMove()
+{
+	LSI_A_LCG_SOUL_SHOCK_PlayEffects( L"EffectSet_A_LCG_M_SOUL_SHOCK" );
+}
+
+// char-luciel CH2c2: June 32b01650 ( thunk 32b4c710 )
+void CX2GULuciel::LSI_A_LCG_F_SOUL_STRIKE_READY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_A_LCG_F_SOUL_STRIKE_LOOP );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b01890 ( thunk 32b4c730 )
+void CX2GULuciel::LSI_A_LCG_M_SOUL_STRIKE_READY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_A_LCG_M_SOUL_STRIKE_LOOP );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b01690 ( thunk 32b4c720 ), the male end state registers the same function: the same chain as Soul Shock's
+void CX2GULuciel::LSI_A_LCG_F_SOUL_STRIKE_END_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b1d2a0 ( thunk 32b4dc80 ): the key that started the skill is the one watched, the press count and the charge restart
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_START_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	if ( 0 != m_FrameDataFuture.syncData.sClassSyncShort )
+		m_FrameDataFuture.syncData.sClassSyncShort = 0;
+
+	m_fChargeTime = 0.f;
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+}
+
+// char-luciel CH2c2: June 32b1d350 / 32b1d490 ( inlined in both ): a press of the key spends MP and counts, up to the limit
+bool CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_CountKeyPress()
+{
+	if ( false == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) )
+		return false;
+
+	const USHORT usPressCount = m_FrameDataFuture.syncData.sClassSyncShort;
+	if ( DEMONIC_BREATH_PRESS_COUNT_LIMIT <= usPressCount )
+		return false;
+
+	if ( false == FlushMp( GetLearnedSkillAbilityValue( CX2SkillTree::SA_MP_CONSUMPTION, GetFutureStateSkillID() ), ( true == IsMinorUnitActive() ? 1 : 0 ) ) )
+		return false;
+
+	m_FrameDataFuture.syncData.sClassSyncShort = static_cast<short>( usPressCount + 1 );
+	return true;
+}
+
+// char-luciel CH2c2: June 32b1d350 ( thunk 32b4dc90 )
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_START_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_SA_LCG_DEMONIC_BREATH_CHARGING );
+	}
+
+	LSI_SA_LCG_DEMONIC_BREATH_CountKeyPress();
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b1d490 ( thunk 32b4dca0 ): the charge runs up to 0.3 s ( or the press limit ) before the fire state; a counted press restarts it
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_CHARGING_EventProcess()
+{
+	m_fChargeTime = m_fElapsedTime + m_fChargeTime;
+	if ( m_fChargeTime > DEMONIC_BREATH_CHARGE_END_TIME || DEMONIC_BREATH_PRESS_COUNT_LIMIT <= static_cast<USHORT>( m_FrameDataFuture.syncData.sClassSyncShort ) )
+	{
+		StateChange( LSI_SA_LCG_DEMONIC_BREATH_FIRE );
+	}
+
+	if ( true == LSI_SA_LCG_DEMONIC_BREATH_CountKeyPress() )
+		m_fChargeTime = 0.f;
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b2ba70 ( thunk 32b4e130 ): at 0.1 s the fire effect set by the presses ( 1 / 4 / 8 ), its power and scale grow with them; the memo set never plays ( June's memo getter is a stub )
+void CX2GULuciel::LSI_SA_LCG_DEMONIC_BREATH_FIRE_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( DEMONIC_BREATH_FIRE_EFFECT_TIME ) )
+	{
+		const USHORT usPressCount = static_cast<USHORT>( m_FrameDataNow.syncData.sClassSyncShort );
+		const WCHAR* pwszEffectSetName = L"EffectSet_SA_LCG_DEMONIC_BREATH_FireFX1";
+		if ( DEMONIC_BREATH_FIRE_FX3_COUNT <= usPressCount )
+			pwszEffectSetName = L"EffectSet_SA_LCG_DEMONIC_BREATH_FireFX3";
+		else if ( DEMONIC_BREATH_FIRE_FX2_COUNT <= usPressCount )
+			pwszEffectSetName = L"EffectSet_SA_LCG_DEMONIC_BREATH_FireFX2";
+
+		const float fPowerRate = static_cast<float>( ( usPressCount * DEMONIC_BREATH_FIRE_POWER_STEP + 1.0 ) * GetPowerRate() );
+		const float fScale = static_cast<float>( usPressCount * DEMONIC_BREATH_FIRE_SCALE_STEP + 1.0 );
+		const D3DXVECTOR3 vScale( fScale, fScale, fScale );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL demonic breath fire presses %d power %.3f scale %.3f", static_cast<int>( usPressCount ), fPowerRate, fScale );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName, this, NULL, false, fPowerRate, -1.f, vScale );
+		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
+			pEffectSetInstance->SetEffectScale( vScale, true );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b13260 ( thunk 32b4cdd0 ): each press of the key counts, and the held direction moves the unit: along the facing x1.5, against it x0.8 x1.5 backwards
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture()
+{
+	if ( true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) && m_usStateLoopCount < FANTASIE_IMPROMPTU_KEY_PRESS_LIMIT )
+		++m_usStateLoopCount;
+
+	const bool bFacingRight = m_FrameDataFuture.syncData.bIsRight;
+	float fSpeedX = 0.f;
+	if ( ( true == m_InputData.pureRight && false == bFacingRight ) || ( true == m_InputData.pureLeft && true == bFacingRight ) )
+		fSpeedX = static_cast<float>( -GetWalkSpeed() * FANTASIE_IMPROMPTU_BACKWARD_SPEED_RATE * FANTASIE_IMPROMPTU_MOVE_SPEED_RATE );
+	else if ( ( true == m_InputData.pureRight && true == bFacingRight ) || ( true == m_InputData.pureLeft && false == bFacingRight ) )
+		fSpeedX = static_cast<float>( GetWalkSpeed() * FANTASIE_IMPROMPTU_MOVE_SPEED_RATE );
+
+	m_PhysicParam.nowSpeed.x = fSpeedX;
+
+	CommonFrameMoveFuture();
+}
+
+// char-luciel CH2c2: June 32b2bf20 ( thunk 32b4e140 ): a projectile each time the wait time passes a beat; the memo set never plays ( June's memo getter is a stub )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMove()
+{
+	const USHORT usBeatBefore = static_cast<USHORT>( static_cast<int>( m_fFantasieImpromptuWaitTime / CANTABILE_BEAT_TIME ) );
+	const USHORT usBeatNow = static_cast<USHORT>( static_cast<int>( ( m_fFantasieImpromptuWaitTime + m_fElapsedTime ) / CANTABILE_BEAT_TIME ) );
+	if ( usBeatBefore < usBeatNow )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL fantasie impromptu cantabile beat %d state %d", static_cast<int>( usBeatNow ), GetNowStateID() );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_Cantabile_Projectile", this );
+		PlaySound( L"Ciel_Shot01.ogg", true, false );
+	}
+
+	m_fFantasieImpromptuWaitTime = m_fFantasieImpromptuWaitTime + m_fElapsedTime;
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b2c270 ( thunk 32b4e150 ): the same with a faster beat; the projectile is rolled by a random angle and its damage time grows by the stack limit
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_FrameMove()
+{
+	const USHORT usBeatBefore = static_cast<USHORT>( static_cast<int>( m_fFantasieImpromptuWaitTime / ACCELERANDO_BEAT_TIME ) );
+	const USHORT usBeatNow = static_cast<USHORT>( static_cast<int>( ( m_fFantasieImpromptuWaitTime + m_fElapsedTime ) / ACCELERANDO_BEAT_TIME ) );
+	if ( usBeatBefore < usBeatNow )
+	{
+		const float fRollDegree = static_cast<float>( GetRandomFloat( 0 ) * ACCELERANDO_RANDOM_ROTATE_RANGE - ACCELERANDO_RANDOM_ROTATE_OFFSET );
+
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_Accelerando_Projectile", this );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
+			pEffectSetInstance->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, fRollDegree ) );
+
+		PlaySound( L"Ciel_GunShot01.ogg", true, false );
+	}
+
+	m_fFantasieImpromptuWaitTime = m_fFantasieImpromptuWaitTime + m_fElapsedTime;
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b1d5f0 ( thunk 32b4dcb0 ): the animation end ( or the table's time ) with enough presses casts the 2nd movement ( the swapped id of the upgrade ), else the wait state
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() || m_fEventTime[0].stateChange <= GetXSkinAnimFuture()->GetNowAnimationTime() )
+	{
+		if ( m_usStateLoopCount < FANTASIE_IMPROMPTU_KEY_PRESS_LIMIT )
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+		else if ( false == TryUseSkillWithCombinationPoint( GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_SA_LCN_FANTASIE_IMPROMPTU_2ND_MOVEMENT ), CX2SkillTree::ASUT_GROUND ) )
+		{
+			StateChange( LSI_LU_WAIT );
+		}
+		else if ( FANTASIE_IMPROMPTU_KEY_PRESS_LIMIT != m_FrameDataFuture.syncData.sClassSyncShort )
+		{
+			m_FrameDataFuture.syncData.sClassSyncShort = FANTASIE_IMPROMPTU_KEY_PRESS_LIMIT;
+		}
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b15680 ( no thunk ): the left hand bone turns by the unit's class float each frame, clamped to 45 degrees
+void CX2GULuciel::SetLeftHandRotateBone()
+{
+	m_fLeftHandRotateDegree = m_fElapsedTime * m_FrameDataNow.syncData.fClassSkillFloat + m_fLeftHandRotateDegree;
+	if ( m_fLeftHandRotateDegree > DEATH_CRISIS_LEFT_HAND_ROTATE_LIMIT )
+		m_fLeftHandRotateDegree = DEATH_CRISIS_LEFT_HAND_ROTATE_LIMIT;
+	else if ( m_fLeftHandRotateDegree < -DEATH_CRISIS_LEFT_HAND_ROTATE_LIMIT )
+		m_fLeftHandRotateDegree = -DEATH_CRISIS_LEFT_HAND_ROTATE_LIMIT;
+
+	SetRotateBone( true, L"Dummy2_Lhand", D3DXVECTOR3( 0.f, 0.f, -1.f ), D3DXVECTOR3( 0.f, 0.f, m_fLeftHandRotateDegree ) );
+}
+
+// char-luciel CH2c2: June 32b16200 ( thunk 32b4d130 ), the end state registers the same function
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_FrameMove()
+{
+	SetLeftHandRotateBone();
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b1d8d0 ( thunk 32b4dcc0 ): the aim value starts at 0
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	if ( 0.f != m_FrameDataFuture.syncData.fClassSkillFloat )
+		m_FrameDataFuture.syncData.fClassSkillFloat = 0.f;
+}
+
+// char-luciel CH2c2: June 32b1d970 / 32b1dc50 / 32b1de10 ( the tail of each event process ): up aims at +50, down at -50, else 0
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_UpdateAimValue()
+{
+	float fAimValue = 0.f;
+	if ( true == m_InputData.pureUp )
+		fAimValue = DEATH_CRISIS_AIM_VALUE;
+	else if ( true == m_InputData.pureDown )
+		fAimValue = -DEATH_CRISIS_AIM_VALUE;
+
+	if ( fAimValue != m_FrameDataFuture.syncData.fClassSkillFloat )
+		m_FrameDataFuture.syncData.fClassSkillFloat = fAimValue;
+}
+
+// char-luciel CH2c2: June 32b1d970 / 32b1de10: the MP of a fire or of the charge, spent from the active body's gauge
+bool CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_FlushMpByCharge( const double dChargeRate_ )
+{
+	return FlushMp( static_cast<float>( m_fDeathCrisisOfMarbasMaxChargeTime * dChargeRate_ ), ( true == IsMinorUnitActive() ? 1 : 0 ) );
+}
+
+// char-luciel CH2c2: June 32b1d970 ( thunk 32b4dcd0 ): a second of waiting spends the min charge x 10 and adds it to the charge ( the end state when it cannot be paid or the charge is full ); Z fires small, X charges the big fire
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_EventProcess()
+{
+	m_fDeathCrisisOfMarbasWaitTime += m_fElapsedTime;
+
+	if ( DEATH_CRISIS_END_CHARGE_LIMIT <= m_fDeathCrisisOfMarbasChargeTime )
+	{
+		StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END );
+	}
+	else if ( static_cast<USHORT>( static_cast<int>( m_fDeathCrisisOfMarbasWaitTime ) ) < static_cast<USHORT>( static_cast<int>( m_fDeathCrisisOfMarbasWaitTime + m_fElapsedTime ) ) )
+	{
+		const float fWaitMp = static_cast<float>( m_fDeathCrisisOfMarbasMinChargeTime * DEATH_CRISIS_WAIT_MP_RATE );
+		if ( true == FlushMp( fWaitMp, ( true == IsMinorUnitActive() ? 1 : 0 ) ) )
+			m_fDeathCrisisOfMarbasChargeTime += fWaitMp;
+		else
+			StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END );
+	}
+	else
+	{
+		bool bFireStarted = false;
+		if ( false == m_FrameDataFuture.stateParam.bEventFlagList[0] && true == m_InputData.oneZ && true == LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_FlushMpByCharge( DEATH_CRISIS_SMALL_FIRE_CHARGE_RATE ) )
+		{
+			m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+			StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE );
+			bFireStarted = true;
+		}
+		else if ( false == m_FrameDataFuture.stateParam.bEventFlagList[0] && true == m_InputData.oneX && true == LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_FlushMpByCharge( DEATH_CRISIS_BIG_FIRE_CHARGE_RATE ) )
+		{
+			m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+			StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE );
+			bFireStarted = true;
+		}
+
+		if ( false == bFireStarted && ( true == m_InputData.pureRight || true == m_InputData.pureLeft ) )
+			StateChange( LSI_LU_WAIT );
+	}
+
+	LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_UpdateAimValue();
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b1dc50 ( thunk 32b4dce0 ): the big fire charges at twice the speed and fires at 1.0
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE_EventProcess()
+{
+	m_fChargeTime = m_fElapsedTime * 2.f + m_fChargeTime;
+	if ( DEATH_CRISIS_BIG_CHARGE_END_TIME <= m_fChargeTime )
+	{
+		StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE );
+	}
+
+	LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_UpdateAimValue();
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b1de10 ( thunk 32b4dcf0 ): a full charge ends the skill, the animation end goes on firing ( with the flag ) or back to waiting, Z adds one more small fire
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_EventProcess()
+{
+	if ( DEATH_CRISIS_END_CHARGE_LIMIT <= m_fDeathCrisisOfMarbasChargeTime )
+	{
+		StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END );
+	}
+	else
+	{
+		if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		{
+			if ( false == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+				StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT );
+			else
+				StateChange( LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE );
+		}
+		else if ( false == m_FrameDataFuture.stateParam.bEventFlagList[0] && true == m_InputData.oneZ && true == LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_FlushMpByCharge( DEATH_CRISIS_SMALL_FIRE_CHARGE_RATE ) )
+		{
+			m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+		}
+		SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+		WALK_CANCEL_AFTER( m_fWalkCancelAfter )
+		DASH_CANCEL_AFTER( m_fDashCancelAfter )
+	}
+
+	LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_UpdateAimValue();
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b2c5e0 ( thunk 32b4e160 ): the charge effect set at 0.01 s, deleted with the state
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE_FrameMove()
+{
+	SetLeftHandRotateBone();
+
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( DEATH_CRISIS_EFFECT_TIME ) )
+	{
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LCG_DEATH_CRISIS_OF_MARBAS_Charge", this );
+		m_vecEffectSetToDeleteOnStateEnd.push_back( hEffectSet );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b2c7d0 ( thunk 32b4e170 ): at 0.05 / 0.15 / 0.25 s a projectile and the gun fire effect set, both rolled by the hand angle ( the projectile by a random +- 2 more ); the memo set never plays
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( DEATH_CRISIS_SMALL_FIRE_EFFECT_TIME_1 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( DEATH_CRISIS_SMALL_FIRE_EFFECT_TIME_2 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( DEATH_CRISIS_SMALL_FIRE_EFFECT_TIME_3 ) )
+	{
+		const float fProjectileRoll = static_cast<float>( GetRandomFloat( 0 ) * ACCELERANDO_RANDOM_ROTATE_RANGE + m_fLeftHandRotateDegree - ACCELERANDO_RANDOM_ROTATE_OFFSET );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL death crisis small fire roll %.2f hand %.2f charge %.2f", fProjectileRoll, m_fLeftHandRotateDegree, m_fDeathCrisisOfMarbasChargeTime );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+		const CX2EffectSet::Handle hProjectileEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_M_Marbas_Z_Projectile", this );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hProjectileEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+		if ( CX2EffectSet::EffectSetInstance* pProjectileInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hProjectileEffectSet ) )
+			pProjectileInstance->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, fProjectileRoll ) );
+
+		const CX2EffectSet::Handle hGunFireEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LCG_DEATH_CRISIS_OF_MARBAS_GunFire", this );
+		if ( CX2EffectSet::EffectSetInstance* pGunFireInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hGunFireEffectSet ) )
+			pGunFireInstance->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, fProjectileRoll ) );
+
+		m_vecEffectSetToDeleteOnSkillStateEnd.push_back( std::make_pair( hGunFireEffectSet, static_cast<int>( GetNowStateSkillID() ) ) );
+	}
+
+	SetLeftHandRotateBone();
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b2cd70 ( thunk 32b4e180 ): the big fire's projectile at 0.01 s, rolled by the hand angle
+void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( DEATH_CRISIS_EFFECT_TIME ) )
+	{
+		const float fHandRoll = m_fLeftHandRotateDegree;
+
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_M_Marbas_X_Projectile", this );
+		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
+			pEffectSetInstance->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, fHandRoll ) );
+	}
+
+	SetLeftHandRotateBone();
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b1e490 ( thunk 32b4dd20 ), the male ready state registers the same function: the loop count is the Soul Collector stacks + 3
+void CX2GULuciel::LSI_A_LCG_F_SOUL_STRIKE_READY_StateEndFuture()
+{
+	if ( 0 != m_FrameDataFuture.syncData.sClassSyncShort )
+		m_FrameDataFuture.syncData.sClassSyncShort = 0;
+
+	m_usSoulStrikeLoopCount = static_cast<USHORT>( GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR ) + SOUL_STRIKE_LOOP_COUNT_BASE );
+
+	CommonStateEndFuture();
+}
+
+// char-luciel CH2c2: June 32b1e540 / 32b1e630 ( inlined in both ): at each animation end the count goes up, the loop state repeats until the count reaches the loop count
+void CX2GULuciel::LSI_A_LCG_SOUL_STRIKE_LOOP_ProcessAnimationEnd( const int iLoopStateID_, const int iEndStateID_ )
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		const USHORT usNextCount = static_cast<USHORT>( m_FrameDataFuture.syncData.sClassSyncShort + 1 );
+		if ( static_cast<USHORT>( m_FrameDataFuture.syncData.sClassSyncShort ) != usNextCount )
+			m_FrameDataFuture.syncData.sClassSyncShort = static_cast<short>( usNextCount );
+
+		if ( static_cast<USHORT>( m_FrameDataFuture.syncData.sClassSyncShort ) < m_usSoulStrikeLoopCount )
+			StateChange( iLoopStateID_ );
+		else
+			StateChange( iEndStateID_ );
+	}
+}
+
+// char-luciel CH2c2: June 32b1e540 ( thunk 32b4dd30 )
+void CX2GULuciel::LSI_A_LCG_F_SOUL_STRIKE_LOOP_EventProcess()
+{
+	LSI_A_LCG_SOUL_STRIKE_LOOP_ProcessAnimationEnd( LSI_A_LCG_F_SOUL_STRIKE_LOOP, LSI_A_LCG_F_SOUL_STRIKE_END );
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b1e630 ( thunk 32b4dd40 )
+void CX2GULuciel::LSI_A_LCG_M_SOUL_STRIKE_LOOP_EventProcess()
+{
+	LSI_A_LCG_SOUL_STRIKE_LOOP_ProcessAnimationEnd( LSI_A_LCG_M_SOUL_STRIKE_LOOP, LSI_A_LCG_M_SOUL_STRIKE_END );
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2c2: June 32b3dea0 ( thunk 32b4e700 ), the male ready state registers the same function: the stacks are spent, every loop above 5 adds one back, the loop count restarts at 5
+void CX2GULuciel::LSI_A_LCG_F_SOUL_STRIKE_READY_StateEnd()
+{
+	EraseBuffTempletFromGameUnit( BTI_BUFF_SOUL_COLLECTOR );
+
+	if ( m_usSoulStrikeLoopCount > SOUL_STRIKE_LOOP_COUNT_RESTART )
+	{
+		for ( int iStack = 0; iStack < m_usSoulStrikeLoopCount - SOUL_STRIKE_LOOP_COUNT_RESTART; ++iStack )
+			AddSoulCollectorStack();
+
+		m_usSoulStrikeLoopCount = SOUL_STRIKE_LOOP_COUNT_RESTART;
+	}
+
+	CommonStateEnd();
+}
+
+// char-luciel CH2c2: June 32b20670 ( no thunk ): Shadow's buff of the active body at the learned level ( at least 1 ), and the charge value from the max HP
+void CX2GULuciel::ApplyShadowBuff()
+{
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LCG_SHADOW, true );
+	if ( NULL == pSkillTemplet || NULL == GetUnit() )
+		return;
+
+	int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true );
+	if ( iSkillLevel < 1 )
+		iSkillLevel = 1;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL shadow buff level %d body %s", iSkillLevel, ( true == IsMinorUnitActive() ? L"C" : L"L" ) );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	SetBuffFactorToGameUnitByBuffFactorID( ( true == IsMinorUnitActive() ? BFI_BUFF_SHADOW_CIEL : BFI_BUFF_SHADOW_LU ), iSkillLevel, NULL, 0, false );	// 7ai arguments
+
+	// 322cc1a0: the PvP-or-PvE test
+	const CX2SkillTree::SKILL_ABILITY_TYPE eMaxHpAbility = ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ? CX2SkillTree::SA_MAX_HP_REL_PVP : CX2SkillTree::SA_MAX_HP_REL );
+	m_fSoulStrikeChargeTime = static_cast<float>( GetMaxHp() * static_cast<double>( pSkillTemplet->GetSkillAbilityValue( eMaxHpAbility, iSkillLevel ) ) );
+}
+
+// char-luciel CH2c2: June 32b30bc0 / 32b30d40 ( identical, one per body ): outside the Wait animation the Shadow buffs of both bodies end at 0.01 s and the buff is applied at 0.1 s
+void CX2GULuciel::LSI_A_LCN_SHADOW_FrameMoveBody()
+{
+	if ( L"Wait" != GetXSkinAnimPtr()->GetNowAnimName() )
+	{
+		if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SHADOW_BUFF_END_TIME ) )
+		{
+			EraseBuffTempletFromGameUnit( BTI_BUFF_SHADOW_LU );
+			EraseBuffTempletFromGameUnit( BTI_BUFF_SHADOW_CIEL );
+		}
+
+		if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SHADOW_BUFF_APPLY_TIME ) )
+			ApplyShadowBuff();
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b30bc0 ( thunk 32b4e430 )
+void CX2GULuciel::LSI_A_LCN_F_SHADOW_FrameMove()
+{
+	LSI_A_LCN_SHADOW_FrameMoveBody();
+}
+
+// char-luciel CH2c2: June 32b30d40 ( thunk 32b4e440 )
+void CX2GULuciel::LSI_A_LCN_M_SHADOW_FrameMove()
+{
+	LSI_A_LCN_SHADOW_FrameMoveBody();
+}
+
+// char-luciel CH2c2: June 32b2e5a0 / 32b2ec50 ( inlined in both ): the move speed, the speed rate and the effect size follow the Soul Collector stacks; returns the size rate
+float CX2GULuciel::LSI_A_LCG_SOUL_STRIKE_LOOP_ApplyStackRates()
+{
+	m_fSoulStrikeMoveSpeed = GetPowerRate();
+	m_fSoulStrikeSpeedRate = 1.f;
+
+	float fRangeRate = 1.f;
+
+	const CX2SkillTree::SKILL_ID eSkillID = GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_A_LCG_SOUL_STRIKE );
+	const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID, false, 0, true );
+	if ( 0 < iSkillLevel )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( eSkillID );
+		if ( NULL != pSkillTemplet )
+		{
+			const UCHAR ucStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR );
+
+			const float fAttackStep = static_cast<float>( ( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel ) - 1.f ) + STACK_ABILITY_BIAS );
+			m_fSoulStrikeMoveSpeed = static_cast<float>( ( m_fEnhancedSpecterRate + ucStackCount * fAttackStep ) * m_fSoulStrikeMoveSpeed );
+
+			const float fSizeStep = static_cast<float>( ( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_SIZE, iSkillLevel ) - 1.f ) + STACK_ABILITY_BIAS );
+			fRangeRate = static_cast<float>( m_fEnhancedSpecterRange + ucStackCount * fSizeStep );
+
+			const double dTargetRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_TARGET_MANA_REL, iSkillLevel );
+			m_fSoulStrikeSpeedRate = static_cast<float>( ( ( ucStackCount * SOUL_COLLECTOR_STACK_TARGET_RATE_STEP + 1.0 ) * dTargetRate ) * m_fSoulStrikeSpeedRate );
+		}
+	}
+
+	return fRangeRate;
+}
+
+// char-luciel CH2c2: June 32b2e5a0 ( thunk 32b4e400 ): at 0.01 s the shot leaves the bone at a random step along the facing and a random half turn; Enhanced Specter adds a damage effect from the third loop on
+void CX2GULuciel::LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SOUL_STRIKE_EFFECT_TIME ) )
+	{
+		D3DXVECTOR3 vPosition = GetBonePos( L"Bip01" );
+		const D3DXVECTOR3 vDirection = GetDirVector();
+		const float fStep = static_cast<float>( ( GetRandomInt( 0 ) % SOUL_STRIKE_RANDOM_STEP_COUNT ) * SOUL_STRIKE_RANDOM_STEP_LENGTH - SOUL_STRIKE_RANDOM_STEP_OFFSET );
+		if ( true == GetIsRight() )
+		{
+			vPosition.x += vDirection.x * fStep;
+			vPosition.y += vDirection.y * fStep;
+			vPosition.z += vDirection.z * fStep;
+		}
+		else
+		{
+			vPosition.x -= vDirection.x * fStep;
+			vPosition.y -= vDirection.y * fStep;
+			vPosition.z -= vDirection.z * fStep;
+		}
+
+		D3DXVECTOR3 vRotation = GetRotateDegree();
+		vRotation.x += static_cast<float>( ( GetRandomInt( 2 ) % 2 ) * SOUL_STRIKE_HALF_TURN_DEGREE );
+
+		const float fRangeRate = LSI_A_LCG_SOUL_STRIKE_LOOP_ApplyStackRates();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL soul strike female shot loop %d count %d move speed %.3f size %.3f", static_cast<int>( m_usSoulStrikeLoopCount ), static_cast<int>( m_FrameDataNow.syncData.sClassSyncShort ), m_fSoulStrikeMoveSpeed, fRangeRate );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+		if ( 1.f < m_fEnhancedSpecterRate && SOUL_STRIKE_ENHANCED_SPECTER_MIN_LOOP <= static_cast<USHORT>( m_FrameDataNow.syncData.sClassSyncShort )
+			&& 0 < GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LCN_ENHANCED_SPECTER, false, 0, true )
+			&& NULL != g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_LCN_ENHANCED_SPECTER ) )
+		{
+			D3DXVECTOR3 vSpecterRotation = GetRotateDegree();
+			vSpecterRotation.z = static_cast<float>( GetRandomFloat( 0 ) * ENHANCED_SPECTER_RANDOM_DEGREE + ( static_cast<USHORT>( m_FrameDataNow.syncData.sClassSyncShort ) - SOUL_STRIKE_ENHANCED_SPECTER_MIN_LOOP ) * ENHANCED_SPECTER_LOOP_DEGREE - ENHANCED_SPECTER_DEGREE_OFFSET ) + vSpecterRotation.z;
+
+			const float fSpecterPowerRate = static_cast<float>( GetPowerRate() * GetLearnedSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, GetNowStateSkillID() ) );
+			g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SI_P_LCN_ENHANCED_SPECTER", fSpecterPowerRate, GetBonePos( L"Bip01" ), vSpecterRotation, vSpecterRotation,
+				m_FrameDataNow.unitCondition.landPosition.y );
+		}
+
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LCG_F_SOUL_STRIKE", this, NULL, IsHyperState(), m_fSoulStrikeMoveSpeed, -1.f,
+			D3DXVECTOR3( 1.f, 1.f, 1.f ), true, vPosition, vRotation, D3DXVECTOR3( 0.f, 0.f, 0.f ) );
+		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
+			pEffectSetInstance->SetEffectScale( D3DXVECTOR3( fRangeRate, fRangeRate, fRangeRate ), true );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b2ec50 ( thunk 32b4e410 ): the male body's shot has no random step, plays its projectile effect set and counts the loop
+void CX2GULuciel::LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SOUL_STRIKE_EFFECT_TIME ) )
+	{
+		const float fRangeRate = LSI_A_LCG_SOUL_STRIKE_LOOP_ApplyStackRates();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL soul strike male shot loop %d move speed %.3f size %.3f", static_cast<int>( m_usStateLoopCount ), m_fSoulStrikeMoveSpeed, fRangeRate );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+		if ( 1.f < m_fEnhancedSpecterRate && SOUL_STRIKE_ENHANCED_SPECTER_MIN_LOOP <= static_cast<USHORT>( m_FrameDataNow.syncData.sClassSyncShort ) )
+		{
+			const int iSpecterLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LCN_ENHANCED_SPECTER, false, 0, true );
+			const CX2SkillTree::SkillTemplet* pSpecterTemplet = ( 0 < iSpecterLevel ? g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_LCN_ENHANCED_SPECTER ) : NULL );
+			if ( NULL != pSpecterTemplet )
+			{
+				D3DXVECTOR3 vSpecterRotation = GetRotateDegree();
+				vSpecterRotation.z = static_cast<float>( GetRandomFloat( 0 ) * ENHANCED_SPECTER_RANDOM_DEGREE + ( static_cast<USHORT>( m_FrameDataNow.syncData.sClassSyncShort ) - SOUL_STRIKE_ENHANCED_SPECTER_MIN_LOOP ) * ENHANCED_SPECTER_LOOP_DEGREE - ENHANCED_SPECTER_DEGREE_OFFSET ) + vSpecterRotation.z;
+
+				const float fSpecterPowerRate = static_cast<float>( GetPowerRate() * static_cast<double>( pSpecterTemplet->GetSkillPowerRateValue( iSpecterLevel ) ) );
+				g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SI_P_LCN_ENHANCED_SPECTER", fSpecterPowerRate, GetBonePos( L"Bip01" ), vSpecterRotation, vSpecterRotation,
+					m_FrameDataNow.unitCondition.landPosition.y );
+			}
+		}
+
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LCG_M_SOUL_STRIKE_Projectile", this, NULL, IsHyperState(), m_fSoulStrikeMoveSpeed );
+		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
+			pEffectSetInstance->SetEffectScale( D3DXVECTOR3( fRangeRate, fRangeRate, fRangeRate ), true );
+
+		++m_usStateLoopCount;
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b2cfc0 ( thunk 32b4e0c0 ): at 0.9 s the Eschaton effect set grows with the Soul Collector stacks, then the stacks are spent
+void CX2GULuciel::LSI_SA_LCG_ESCHATON_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( ESCHATON_EFFECT_TIME ) )
+	{
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LCG_ESCHATON", this );
+		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
+		{
+			const UCHAR ucStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR );
+			const float fStackRate = static_cast<float>( ucStackCount * ESCHATON_STACK_STEP );
+			const float fScaleRate = static_cast<float>( fStackRate + 1.0 );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL eschaton stacks %d scale rate %.3f", static_cast<int>( ucStackCount ), fScaleRate );	// char-luciel CH2c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			pEffectSetInstance->SetEffectScale( pEffectSetInstance->m_vScale * fScaleRate, true );
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME, fStackRate, true );
+			EraseBuffTempletFromGameUnit( BTI_BUFF_SOUL_COLLECTOR );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2c2: June 32b3db80 ( no thunk, a plain function ): one more Soul Collector stack; at the stack limit Tribute ( 30409 ) adds its buff, and with Tribute learned the awakening orbs, the buff times and the Soul Strike cool time follow
+void CX2GULuciel::AddSoulCollectorStack()
+{
+	const CX2BuffTempletPtr ptrSoulCollector = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( BTI_BUFF_SOUL_COLLECTOR );
+	UINT uiStackLimit = SOUL_COLLECTOR_MISSING_TEMPLET_LIMIT;
+	if ( NULL != ptrSoulCollector )
+		uiStackLimit = ptrSoulCollector->GetAccumulationLimit();
+
+	const UCHAR ucStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR );
+	if ( ucStackCount >= uiStackLimit - 1 )
+	{
+		const int iTributeLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LCN_TRIBUTE, false, 0, true );
+		if ( 0 < iTributeLevel )
+			SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_NOBLE_BEING, iTributeLevel, NULL, 0, false );	// 7ai arguments
+	}
+
+	if ( 0 != ucStackCount && m_fSoulStrikeCoolTime <= 0.f )
+	{
+		const int iTributeLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LCN_TRIBUTE, false, 0, true );
+		if ( 0 < iTributeLevel )
+		{
+			const CX2SkillTree::SkillTemplet* pTributeTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_LCN_TRIBUTE );
+			if ( NULL != pTributeTemplet )
+			{
+				if ( GetHyperModeCount() < 3 )
+					UpNowSoul( pTributeTemplet->GetSkillAbilityValue( CX2SkillTree::SA_SOUL_ABS, iTributeLevel ) );
+
+				AddAllBuffTimeFinalizerDuration( pTributeTemplet->GetSkillAbilityValue( CX2SkillTree::SA_TIME_ABS, iTributeLevel ) );
+				m_fSoulStrikeCoolTime = pTributeTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_1, iTributeLevel );
+			}
+		}
+	}
+
+	SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_SOUL_COLLECTOR, m_iSoulCollectorSkillLevel, NULL, 0, false );	// 7ai arguments
+}
+
+// char-luciel CH2c2: June 32b3dd80 ( thunk 32b4e6e0 ): half of the time the state end tops the Soul Collector stacks up to their limit
+void CX2GULuciel::LSI_SA_LCG_SOUL_EXTORTION_StateEnd()
+{
+	if ( SOUL_EXTORTION_DRAIN_RANDOM_LIMIT < GetRandomFloat( 0 ) )
+	{
+		UCHAR ucStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR );
+
+		UINT uiStackLimit = SOUL_COLLECTOR_DEFAULT_MAX_COUNT;
+		const CX2BuffTempletPtr ptrSoulCollector = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( BTI_BUFF_SOUL_COLLECTOR );
+		if ( NULL != ptrSoulCollector )
+			uiStackLimit = ptrSoulCollector->GetAccumulationLimit();
+
+		while ( ucStackCount < uiStackLimit )
+		{
+			AddSoulCollectorStack();
+			++ucStackCount;
+		}
+	}
+
+	CommonStateEnd();
+}
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
@@ -16434,7 +17267,7 @@ void CX2GULuciel::LSI_A_LCN_F_SHADOW_Init()
 				m_StateList[stateData.stateID] = stateData;
 			} break;
 
-		case CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION:	// char-luciel CH2c: June @32b46fdf ( ids 30019 / 30039 ); the other six Royal Guard cases wait for CH2c2's callbacks
+		case CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION:	// char-luciel CH2c: June @32b46fdf ( ids 30019 / 30039 )
 			{
 				m_LuaManager.MakeTableReference( "LSI_SA_LCG_SOUL_EXTORTION", normalStateData.stateID );
 				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_Init );	// June 32b4afc0
@@ -16442,10 +17275,263 @@ void CX2GULuciel::LSI_A_LCN_F_SHADOW_Init()
 				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_StateStart );	// June 32b4afe0
 				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_FrameMove );	// June 32b4aff0
 				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_EventProcess );	// June 32b4c260
-				// June 32b3dd80 ( StateEnd ): LSI_SA_LCG_SOUL_EXTORTION_StateEnd, body in CH2c2 ( thunk 32b4e6e0 )
+				normalStateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_SOUL_EXTORTION_StateEnd );	// char-luciel CH2c2: June 32b4e6e0
 
 				m_LuaManager.MakeTableReference( "LSI_SA_LCG_SOUL_EXTORTION", hyperStateData.stateID );
 				CopyStateCallbacks( hyperStateData, normalStateData );	// June 329cc2c0: the hyper state takes all nine
+			} break;
+
+		case CX2SkillTree::RNSI_A_LCG_SOUL_STRIKE:	// char-luciel CH2c2: June @32b49842 ( ids 30207 / 30214 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_F_SOUL_STRIKE_READY", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_READY_Init );	// June 32b4b450
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_READY_EventProcess );	// June 32b4c710
+				normalStateData.StateEndFuture		= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_READY_StateEndFuture );	// June 32b4dd20
+				normalStateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_READY_StateEnd );	// June 32b4e700
+
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_F_SOUL_STRIKE_READY", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+				hyperStateData.StateEndFuture		= normalStateData.StateEndFuture;
+				hyperStateData.StateEnd				= normalStateData.StateEnd;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCG_F_SOUL_STRIKE_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_F_SOUL_STRIKE_LOOP", stateData.stateID );
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove );	// June 32b4e400
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_LOOP_EventProcess );	// June 32b4dd30
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCG_F_SOUL_STRIKE_END;
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_F_SOUL_STRIKE_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_END_EventProcess );	// June 32b4c720
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCG_M_SOUL_STRIKE_READY;
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_M_SOUL_STRIKE_READY", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b4995e byte +0x11
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_M_SOUL_STRIKE_READY_EventProcess );	// June 32b4c730
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_READY_StateEndFuture );	// June 32b4dd20: the female body's
+				stateData.StateEnd					= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_READY_StateEnd );	// June 32b4e700
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCG_M_SOUL_STRIKE_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_M_SOUL_STRIKE_LOOP", stateData.stateID );
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove );	// June 32b4e410
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_M_SOUL_STRIKE_LOOP_EventProcess );	// June 32b4dd40
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCG_M_SOUL_STRIKE_END;
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_M_SOUL_STRIKE_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_STRIKE_END_EventProcess );	// June 32b4c720: the female body's
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LCG_SHADOW:	// char-luciel CH2c2: June @32b49c24 ( ids 30209 / 30310 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_F_SHADOW", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_F_SHADOW_Init );	// June 32b4b4a0
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_F_SHADOW_FrameMove );	// June 32b4e430
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_F_SHADOW", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCN_M_SHADOW;
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_M_SHADOW", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b49caf byte +0x11
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_M_SHADOW_FrameMove );	// June 32b4e440
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::SI_A_LCG_SOUL_SHOCK:	// char-luciel CH2c2: June @32b46a1f ( id 10205 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_F_SOUL_SHOCK", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_SHOCK_Init );	// June 32b4b440
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_SHOCK_FrameMove );	// June 32b4e3e0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_SHOCK_EventProcess );	// June 32b4c700
+
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_F_SOUL_SHOCK", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCG_M_SOUL_SHOCK;
+				m_LuaManager.MakeTableReference( "LSI_A_LCG_M_SOUL_SHOCK", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b46aa6 byte +0x11
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_M_SOUL_SHOCK_FrameMove );	// June 32b4e3f0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCG_F_SOUL_SHOCK_EventProcess );	// June 32b4c700: the male body's state shares it
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCG_DEMONIC_BREATH:	// char-luciel CH2c2: June @32b47056 ( ids 30017 / 30068 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEMONIC_BREATH_START", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_START_Init );	// June 32b4b000
+				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_START_StateStartFuture );	// June 32b4dc80
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_START_EventProcess );	// June 32b4dc90
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEMONIC_BREATH_START", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_DEMONIC_BREATH_CHARGING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEMONIC_BREATH_CHARGING", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_CHARGING_StateStart );	// June 32b4c270
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_CHARGING_EventProcess );	// June 32b4dca0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_DEMONIC_BREATH_FIRE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEMONIC_BREATH_FIRE", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_FIRE_StateStartFuture );	// June 32b4b010
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_FIRE_FrameMoveFuture );	// June 32b4b020
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_FIRE_FrameMove );	// June 32b4e130
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEMONIC_BREATH_FIRE_EventProcess );	// June 32b4c280
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCG_FANTASIE_IMPROMPTU_1ST_MOVEMENT:	// char-luciel CH2c2: June @32b47150 ( ids 30021 / 30069 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_Init );	// June 32b4b030
+				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_StateStart );	// June 32b4b040
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY_EventProcess );	// June 32b4c290
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_READY", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateStart			= normalStateData.StateStart;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture );	// June 32b4cdd0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMove );	// June 32b4e140
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_EventProcess );	// June 32b4b050
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture );	// June 32b4cdd0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMove );	// June 32b4e140
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_FRONT_MOVE_EventProcess );	// June 32b4b060
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture );	// June 32b4cdd0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMove );	// June 32b4e140
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_BACK_MOVE_EventProcess );	// June 32b4b070
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY_StateStart );	// June 32b4b080
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLC_DEAD_HANDS_FrameMoveFuture );	// June 32b4af60: the common future frame move
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_READY_EventProcess );	// June 32b4c2a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture );	// June 32b4cdd0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_FrameMove );	// June 32b4e150
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_EventProcess );	// June 32b4b090
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture );	// June 32b4cdd0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_FrameMove );	// June 32b4e150
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_FRONT_MOVE_EventProcess );	// June 32b4b0a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture );	// June 32b4cdd0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_FrameMove );	// June 32b4e150
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_BACK_MOVE_EventProcess );	// June 32b4b0b0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLC_DEAD_HANDS_FrameMoveFuture );	// June 32b4af60: the common future frame move
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END_EventProcess );	// June 32b4dcb0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCG_DEATH_CRISIS_OF_MARBAS:	// char-luciel CH2c2: June @32b473e5 ( ids 30018 / 30037 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY", normalStateData.stateID );
+				normalStateData.m_eSkillID			= eSkillID_;	// June @32b47411: the state keeps the id it was equipped as ( the upgrade's charge reads it )
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_Init );	// June 32b4b0c0
+				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStartFuture );	// June 32b4dcc0
+				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStart );	// June 32b4c2b0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_EventProcess );	// June 32b4c2c0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.m_eSkillID			= eSkillID_;	// June @32b47466
+				hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+				hyperStateData.StateStart			= normalStateData.StateStart;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT", stateData.stateID );
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_StateEndFuture );	// June 32b4b0d0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_FrameMove );	// June 32b4d130
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_EventProcess );	// June 32b4dcd0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE", stateData.stateID );
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE_FrameMove );	// June 32b4e160
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE_EventProcess );	// June 32b4dce0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_StateStartFuture );	// June 32b4c2d0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_FrameMove );	// June 32b4e170
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_EventProcess );	// June 32b4dcf0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_StateStartFuture );	// June 32b4c2e0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_FrameMove );	// June 32b4e180
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_EventProcess );	// June 32b4c2f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END_StateStart );	// June 32b4b0e0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_FrameMove );	// June 32b4d130: the wait state's
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_END_EventProcess );	// June 32b4c300
+				m_StateList[stateData.stateID] = stateData;
 			} break;
 
 		default:

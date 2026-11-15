@@ -1268,6 +1268,49 @@ protected:
 	void				LSI_A_LCG_F_SOUL_SHOCK_Init();	// June 32ae79f0
 	void				LSI_A_LCG_F_SOUL_STRIKE_READY_Init();	// June 32ae7a80
 	void				LSI_A_LCN_F_SHADOW_Init();	// June 32ae84a0
+	// char-luciel CH2c2: Royal Guard ( 38 ) skills part 2, the event processes / frame moves / state ends the CH2c states still lacked
+	void				LSI_A_LCG_F_SOUL_SHOCK_EventProcess();	// June 32b01450, also the male body's
+	void				LSI_A_LCG_F_SOUL_SHOCK_FrameMove();	// June 32b2db60
+	void				LSI_A_LCG_M_SOUL_SHOCK_FrameMove();	// June 32b2e080
+	void				LSI_A_LCG_SOUL_SHOCK_PlayEffects( const WCHAR* pwszEffectSetName_ );	// June 32b2db60 / 32b2e080: the two bodies differ only in the effect set name
+	void				LSI_A_LCG_F_SOUL_STRIKE_READY_EventProcess();	// June 32b01650
+	void				LSI_A_LCG_M_SOUL_STRIKE_READY_EventProcess();	// June 32b01890
+	void				LSI_A_LCG_F_SOUL_STRIKE_END_EventProcess();	// June 32b01690, also the male body's
+	void				LSI_SA_LCG_DEMONIC_BREATH_START_StateStartFuture();	// June 32b1d2a0
+	void				LSI_SA_LCG_DEMONIC_BREATH_START_EventProcess();	// June 32b1d350
+	void				LSI_SA_LCG_DEMONIC_BREATH_CHARGING_EventProcess();	// June 32b1d490
+	void				LSI_SA_LCG_DEMONIC_BREATH_FIRE_FrameMove();	// June 32b2ba70
+	bool				LSI_SA_LCG_DEMONIC_BREATH_CountKeyPress();	// June 32b1d350 / 32b1d490: the same inlined block, one press spends MP and counts
+	void				LSI_SA_LCG_ESCHATON_FrameMove();	// June 32b2cfc0
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMoveFuture();	// June 32b13260, also the front / back move and the 2nd movement's three states
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_CANTABILE_WAIT_FrameMove();	// June 32b2bf20, also the front / back move
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_FrameMove();	// June 32b2c270, also the front / back move
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_END_EventProcess();	// June 32b1d5f0
+	void				SetLeftHandRotateBone();	// June 32b15680: Death Crisis of Marbas turns the left hand bone with the unit's aim value
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_FrameMove();	// June 32b16200, also the end state's
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_READY_StateStartFuture();	// June 32b1d8d0
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_WAIT_EventProcess();	// June 32b1d970
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE_EventProcess();	// June 32b1dc50
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_EventProcess();	// June 32b1de10
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_CHARGE_FrameMove();	// June 32b2c5e0
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_FrameMove();	// June 32b2c7d0
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_BIG_FIRE_FrameMove();	// June 32b2cd70
+	void				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_UpdateAimValue();	// June 32b1d970 / 32b1dc50 / 32b1de10: the same inlined tail of the three event processes
+	bool				LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_FlushMpByCharge( const double dChargeRate_ );	// June 32b1d970 / 32b1de10: the MP of a fire or the charge, inlined at every site
+	void				LSI_A_LCG_F_SOUL_STRIKE_READY_StateEndFuture();	// June 32b1e490, also the male ready state's
+	void				LSI_A_LCG_SOUL_STRIKE_LOOP_ProcessAnimationEnd( const int iLoopStateID_, const int iEndStateID_ );	// June 32b1e540 / 32b1e630: the same inlined block
+	void				LSI_A_LCG_F_SOUL_STRIKE_LOOP_EventProcess();	// June 32b1e540
+	void				LSI_A_LCG_M_SOUL_STRIKE_LOOP_EventProcess();	// June 32b1e630
+	void				LSI_A_LCG_F_SOUL_STRIKE_READY_StateEnd();	// June 32b3dea0, also the male ready state's
+	float				LSI_A_LCG_SOUL_STRIKE_LOOP_ApplyStackRates();	// June 32b2e5a0 / 32b2ec50: the same inlined block, returns the size rate
+	void				LSI_A_LCG_F_SOUL_STRIKE_LOOP_FrameMove();	// June 32b2e5a0
+	void				LSI_A_LCG_M_SOUL_STRIKE_LOOP_FrameMove();	// June 32b2ec50
+	void				ApplyShadowBuff();	// June 32b20670: Shadow's buff of the active body and the charge value from the max HP
+	void				LSI_A_LCN_SHADOW_FrameMoveBody();	// June 32b30bc0 / 32b30d40: the two bodies' frame moves are the same listing
+	void				LSI_A_LCN_F_SHADOW_FrameMove();	// June 32b30bc0
+	void				LSI_A_LCN_M_SHADOW_FrameMove();	// June 32b30d40
+	void				LSI_SA_LCG_SOUL_EXTORTION_StateEnd();	// June 32b3dd80
+	void				AddSoulCollectorStack();	// June 32b3db80: one more Soul Collector stack, the Tribute / Soul Strike side effects ride with it ( four callers, two in CH2c2 )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
 	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3

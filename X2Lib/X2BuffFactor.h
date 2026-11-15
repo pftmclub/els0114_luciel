@@ -681,6 +681,12 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_TWILIGHT_JUDGEMENT                    = 482,	// June's Enum.lua; Lu/Ciel's Twilight Judgement reattack needs it
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-15 // char-luciel CH2c2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_SHADOW_LU                             = 478,	// June's Enum.lua; Shadow's buff on Lu
+	BTI_BUFF_SHADOW_CIEL                           = 479,	// June's Enum.lua; Shadow's buff on Ciel
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-14 // char-luciel CH1a4
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	BTI_BUFF_ALTAR_OF_EVIL                         = 763,	// June's Enum.lua; Lu's transformed form ( EndTransformedForm erases it )
@@ -1022,6 +1028,14 @@ enum BUFF_FACTOR_ID
 //{{ Iruha : 2026-11-15 // char-luciel CH2b
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	BFI_BUFF_DEAD_HANDS                   = 524,	// June's Enum.lua; Dead Hands' buff
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-15 // char-luciel CH2c2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_BUFF_SOUL_COLLECTOR               = 523,	// June's Enum.lua; Lu/Ciel's Soul Collector stack
+	BFI_BUFF_NOBLE_BEING                  = 540,	// June's Enum.lua; applied by Tribute ( 30409 ) once the Soul Collector stack is full
+	BFI_BUFF_SHADOW_LU                    = 545,	// June's Enum.lua; Shadow's factor on Lu
+	BFI_BUFF_SHADOW_CIEL                  = 546,	// June's Enum.lua; Shadow's factor on Ciel
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };
