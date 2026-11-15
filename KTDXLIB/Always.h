@@ -13979,3 +13979,12 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: char-luciel DU5f debug: one "[JUNE_CHAR] LUCIEL DUO SOCKET" line per HUD / in-game max MP reset of a Lu/Ciel unit; the review retires it.
 //#define SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET_DEBUG	// retired by the DU5f review 2026-11-16
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel DU6 - June's CX2GameUnit::HyperModeBuffEffectOnFrameMove ( 32291060 ) places the four awakening-fire particles
+//              by bone name through GetBonePos ( vslot 0x84 ), which takes a user's active body, so Ciel's fire follows Ciel. March read
+//              the unit's cached first-body frames. Other classes and NPCs: the same bones of their one body. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT
+//////////////////////////////////////////////////////////////////////////

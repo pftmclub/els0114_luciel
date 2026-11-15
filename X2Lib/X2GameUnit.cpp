@@ -18202,6 +18202,23 @@ void CX2GameUnit::EraseAllBuffAndExtraDamage()
 			pSeq_LArm ->SetEmitRate( emit );
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT
+		// char-luciel DU6: June 32291060 @32291266, each bone by name through GetBonePos ( vslot 0x84 ), which takes a user's active body
+		if( GetIsRight() == true )
+		{
+			pSeq_RFoot->SetPosition( GetBonePos( L"Bip01_R_Foot" ) );
+			pSeq_LFoot->SetPosition( GetBonePos( L"Bip01_L_Foot" ) );
+			pSeq_RArm->SetPosition( GetBonePos( L"Bip01_R_UpperArm" ) );
+			pSeq_LArm->SetPosition( GetBonePos( L"Bip01_L_UpperArm" ) );
+		}
+		else
+		{
+			pSeq_RFoot->SetPosition( GetBonePos( L"Bip01_L_Foot" ) );
+			pSeq_LFoot->SetPosition( GetBonePos( L"Bip01_R_Foot" ) );
+			pSeq_RArm->SetPosition( GetBonePos( L"Bip01_L_UpperArm" ) );
+			pSeq_LArm->SetPosition( GetBonePos( L"Bip01_R_UpperArm" ) );
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT
 		if( GetIsRight() == true )
 		{
 			D3DXVECTOR3 pos;
@@ -18227,6 +18244,7 @@ void CX2GameUnit::EraseAllBuffAndExtraDamage()
 			pSeq_LArm->SetPosition( pos );
 		}	
 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT
 		pSeq_RFoot->SetTrace( true );
 		pSeq_LFoot->SetTrace( true );
 		pSeq_RArm ->SetTrace( true );

@@ -1925,6 +1925,29 @@ Opus 5.5 high. Reviewed `15a08390` against June (`disasm_range.py`, read-only). 
   the `_DEBUG` retire in `Always.h`, 0 FAIL; the 2 deleted lines are DU5f's own lines inside its `#ifdef`: the window comment and the max-MP expression);
   `_DEBUG` retired (nothing to check); junediverge PASS; enumscan PASS. FINISH RESULT: PASS.
 
+### DU6 - Done (2026-11-16)
+
+Opus 5.5 high. New flag `SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT` (defined, no debug define). Files: `X2Lib/X2GameUnit.cpp`, `KTDXLIB/Always.h`.
+Found by the user in the DU5b2 play-test: awakening with Ciel active left the fire where Lu stood.
+- **The effect:** the four hyper-boost particles (`HyperBoostRight_Luciel` / `HyperBoostLeft_Luciel`, created by Lu's `HyperModeBuffEffectStart` `32b1f0b0`,
+  skipped for a transcended unit or one with an awakening effect set). Each frame `CX2GameUnit::HyperModeBuffEffectOnFrameMove` puts them on the feet
+  and upper arms. March read the cached frames `m_pFrame_Bip01_R_Foot` ... (first body = Lu, which stands still while Ciel is active).
+- **June `32291060 @32291266-322913ef`:** the same emit-rate tiers, then each position from vslot 0x84 `GetBonePos( L"Bip01_R_Foot" )` / `_L_Foot` /
+  `_R_UpperArm` / `_L_UpperArm` (left-facing swaps the pairs as March). A user's slot 0x84 is `31fda280`: no prefix -> `32071d80`, the active body
+  ( `+0x8e90` ? `+0x8e88` : `+0x87d4` ) = March's `CX2GUUser::GetBonePos` under `JUNE_CHAR_DUO_BODY` (DU1d2). No re-bind on a body switch is needed:
+  the position is read every frame. The D0c-1 funcmap row ("same as March") missed the bone source; corrected.
+- **Landed:** June's positions inside March's `HyperModeBuffEffectOnFrameMove` under the flag, March's `GetFramePos` block in `#else`. Other classes: the
+  same bones of their one skin (user `GetBonePos` without a body = `m_pXSkinAnim`); NPCs: `CX2GUNPC::GetBonePos` = `m_pXSkinAnim`, the frames March cached.
+  A missing bone gives a zero position (June) where March's `GetFramePos` left the vector unset.
+- **Rows:** `funcmap.tsv` `32291060` -> PORTED (DU6 text); `june_march_divergent.tsv` new `HyperModeBuffEffectOnFrameMove` replace row, ported.
+- **Gates:** `finish.py --files X2Lib/X2GameUnit.cpp KTDXLIB/Always.h --with SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT`: `FINISH RESULT: PASS (8 gates,
+  0 failed, 5 skipped)`; flagcheck `1 PASS, 1 OTHER, 0 FAIL` (the OTHER is `Always.h`, a peer's uncommitted lines); `junediverge` PASS; `enumscan` exit 0;
+  two `retired` (peer debug defines), stateends / skillicons / luabind not requested (nothing registered or staged). Range gate: after the commit, its line goes in with the play-test note.
+- **Build:** `COALESCED` (peer full build started 06:08:28, after these edits), then `DEPLOY OK: X2_offline.exe is 27,077,120 B, dated 2026-11-16 06:18:49, md5 383991cd4b67a71ea6192b711738a34f, equal to X2/US_SERVICE/x2.exe`.
+- **How to see it in game:** LuDbA (202): awaken with Ciel active, the fire stays on Ciel's feet and arms while she walks and dashes; switch body while
+  awake, it moves to Lu. Elsword / Aisha awakening unchanged.
+- **Next:** play-test, then `/x2-phase char-luciel DU6 review` (Opus 5.5 high).
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under
