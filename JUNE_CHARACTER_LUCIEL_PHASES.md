@@ -1754,6 +1754,11 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's; no new define,
   Lu's skin once, before Ciel became the shown body). June's frame move (`31fa8ce0 @31fa8e29-31fa8ee7`) moves the shown body every frame,
   fixed or not: added under the flag (3 lines). Equipment was right (Ciel wore her Spa Wear).
   `DEPLOY OK: X2_offline.exe is 27,075,072 B, dated 2026-11-16 05:15:39, md5 06e712e076c2288a3104d1310b06a867` (main 95f548ff + peers' files).
+- **Play-test fix (2026-11-16, run 2):** the village character was invisible whenever Ciel was the saved form (village entry and back from a
+  field): the square unit calls `PlayAnim` with three arguments, so DU5b's default body `UVPB_MAJOR_UNIT` animated Lu's skin only and Ciel's
+  (the shown one) never played. Every June caller outside the viewer passes 2 (`323fad80` x27, dungeon result `32513d30` / `325182a0`, create
+  `32552860`.., pet `328f3550` / `328f74e0`): the default is `UVPB_BOTH` now (one header line, DU5b's flagged declaration).
+  `DEPLOY OK: X2_offline.exe is 27,077,632 B, dated 2026-11-16 06:08:24, md5 2c919c742b8639ca0aaab3c4e1c28ef0` (main adffeace + peers' files).
 - **Play-test:** the DU5b batch seam: sections DU5b + DU5b2 of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off
   assembled. Review: `DU5b2-review.md` covers DU5b + DU5b2.
 

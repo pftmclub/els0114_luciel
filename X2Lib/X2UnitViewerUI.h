@@ -94,7 +94,7 @@
 			UVPB_MINOR_UNIT	= 1,
 			UVPB_BOTH		= 2,
 		};
-		void PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE playType = CKTDGXSkinAnim::XAP_LOOP, bool bTransition = false, const int iPlayBody_ = UVPB_MAJOR_UNIT );
+		void PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE playType = CKTDGXSkinAnim::XAP_LOOP, bool bTransition = false, const int iPlayBody_ = UVPB_BOTH );	// char-luciel DU5b2 fix: every June caller outside the viewer passes 2 ( square unit 323fad80, result, create, pet )
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		void PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE playType = CKTDGXSkinAnim::XAP_LOOP, bool bTransition = false );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
