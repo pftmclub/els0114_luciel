@@ -9260,7 +9260,7 @@ D3DXVECTOR3 CX2Game::GetPosCheckDistStandardNPC( D3DXVECTOR3 vPos, bool bIsRight
 
 				const D3DXVECTOR3 vGap = vPosOnLine - vLandPos;
 				const float fDistance = sqrtf( vGap.x * vGap.x + vGap.y * vGap.y + vGap.z * vGap.z );
-				if ( false == ( fNearestDistance < fDistance ) )	// June keeps the later line on a tie
+				if ( fDistance <= fNearestDistance )	// char-luciel CH3c20 review: June 322f2d14, a tie keeps the later line, a NaN distance is skipped
 				{
 					fNearestDistance = fDistance;
 					iNearestLineIndex = i;

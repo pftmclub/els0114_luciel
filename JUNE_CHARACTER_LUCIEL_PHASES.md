@@ -3369,6 +3369,33 @@ Inert for play: nothing in Lu/Ciel calls them until CH3c2 (Garden of Haures, Shr
   PASS ( 3 PASS, 2 PASS~, 1 DEFINE, 0 FAIL ); OTHER rows = the partner flag's files; junediverge, enumscan, luabind PASS.
 - **funcmap:** 5 rows `(CH3c20)`. **Review:** `kickoffs/char-luciel/CH3c20-review.md` (Opus); CH3c2 waits on it.
 
+### CH3c20 - Review (2026-11-15)
+
+Opus 5.5 high. Reviewed commit `b4f80375` against June's listing (`disasm_range.py`, exe bytes) and Ghidra (read-only). **Verdict: pass after one fix.**
+- **Fix ( `_NPC_LUA_BINDS`, `X2Game.cpp:9263` ):** `GetPosCheckDistStandardNPC`'s nearest-line test. June `@322f2d10`: `fld best; fcomp dist; test ah, 1; jne skip`
+  = update only when `dist <= best` ( a tie keeps the later line, a NaN distance is skipped ). The port's `!( best < dist )` took a NaN distance; now
+  `fDistance <= fNearestDistance`. funcmap row `322f27e0 (CH3c20)` still reads "tie = later line" ( true ); `funcmap.tsv` holds a peer's uncommitted edit, so not touched.
+- **Hoist:** `X2GUUser.cpp` `ProcessLockOn` body = Ara's `_ARA_LOCKON` branch ( `X2GUAra.cpp` 9675-9788 at `b4f80375` ) byte for byte, 112 lines, only the first
+  comment differs. `X2GUUser.h` struct = Ara's with `X2OPTIMIZE_REMOVE_UNNECESSARY_SHARED_PTR` and `_ARA_LOCKON` resolved on: every member, default ( 99999.0 ),
+  accessor, AddRef / Release. No `CX2GUAra::SLockOnSystem` / `sLockOnSystemPtr` user is left outside the `#else` blocks; `X2GULuciel.h` +0x9830 is the base type.
+- **`322f27e0`:** ret 0x28; args from the frame: hidden return `+4`, vPos `+8`, bIsRight `+0x14`, fDist `+0x18`, vDir `+0x1c`, NPC `+0x28` = the port. Weapon-taker
+  call `( &vPos, fDist, bIsRight, &out = vPos )`, `cmp al, 1`; probe `bIsRight == 1 ? + : -`; `31c7bb00( probe, 0, 30.0 ( 33441b9c ), &idx = -1 )` = `LINE_RADIUS`;
+  best 9999999.0 ( `3344915c` ). Line skips `[+8] == 0`, `[+4] == 7 / 1` ( March `LineData`: `bEnable` +8, `lineType` +4, `startPos` +0x24, `endPos` +0x30 ).
+  Projection `y*y + x*x + z*z` order, `test ah, 0x41; jp` = start when `proj <= 0` ( NaN goes on ); length `<= proj` ( qword ) -> end, NaN interpolates; length and
+  distance sum `( x² + y² ) + z²` = the port. Index `< 0` keeps vPos. Tail ( all paths, `@322f2d8f` ): NPC set and `32293b80( result ) != bIsRight` -> vPos.
+- **`327799c0`:** ret 0x40 = 16 dwords = the 9 Lua args. The 19 pushes of `322e67c0`: id, level, bActive, vPos, bRight, `.x` delay, bNoDrop, `ftol( .y )` key,
+  `ftol` team / AI ( arg 8 `.x` / `.y` ), ally UID ( arg 9 ), 0 elite, `ftol( .z )` ally team, 0 create type, 0 my-unit byte, templet id: March's 14 = June's first 14
+  ( C9h-4h's extra-arg reading ); the game-pointer gate = `g_pX2Game` test. **`3275b0f0`:** NULL -> 0; each owner = observer `+0x8d5c` -> vslot 0x54 or -1, both
+  `>= 0` ( 64-bit sign test ) and equal = the port.
+- **Ghidra spot-checks:** `32293b80` decompiles to the last-touch-line test ( row 1189, March `IsPosAlongLastTouchLine` ); `31c60890` is the function CH1i2 ported;
+  bind `@31e0ccbe` sits in the `CX2GUNPC` class_def run. **JUNE_BUGS 733** stands: `327799c0` calls the core directly, no push list ( June's, not a port gap ).
+- **Gates** ( `finish.py --review --commits b4f80375 --with JUNE_CHAR_LOCKON_SYSTEM JUNE_CHAR_NPC_LUA_BINDS --lua SA_LDN_GARDEN_OF_HAURES SA_LDN_GARDEN_OF_HAURES_ADD -v` ):
+  `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`; flagcheck `_LOCKON_SYSTEM` 4 PASS, 1 PASS~, 1 DEFINE, 5 OTHER, 0 FAIL; `_NPC_LUA_BINDS` 3 PASS, 2 PASS~, 1 DEFINE,
+  5 OTHER, 0 FAIL; both 0 deleted lines; every OTHER row = the partner flag's file. junediverge + `--check-all` PASS, enumscan exit 0, luabind PASS; stateends /
+  skillicons skipped ( no state, no skill ). Fix worktree: `finish.py --files X2Lib/X2Game.cpp --with JUNE_CHAR_NPC_LUA_BINDS` PASS ( 1 PASS, the 1 deleted line = the
+  replaced line inside the flag's own block ).
+- **Build:** `/Zs` probe of `X2Game.cpp`: 0 errors. Full build skipped: no play-test ( CH3c2 plays it ). CH3c2's kickoff checked: its CH3c20 amendment stands; it waits only on CH3c.
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, Opus review, user play-test.
