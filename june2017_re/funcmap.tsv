@@ -12216,3 +12216,31 @@ CX2GUUser +0x9444 (CH2b)	CX2GULuciel::m_eStateStartSkillID	PORTED (_SKILL)	Char 
 3295ce00 (R14d)	CX2Eqip attached-particle anim-time sync( bool bRebuild, float fTime ) (none in March)	routed	Engine R14d: walks the group list +0x8f0; per entry the sequence (major / minor by +0x1c, handle +0x2c): bRebuild -> CreateSequence by the old one's name (+0x1c4), destroy the old (31cefbc0), new +0x464 = fTime, handle = new; else seq +0x464 = fTime. Called by OnFrameMove after the normal / hyper attach anim -> june-engine R6c
 329646c0 (R14d)	CX2Eqip::AttachedParticleGroup::OnFrameMove (June)	routed	Engine R14d: differs from March's ( empty bone -> 329645a0 owner land pos; TraceMatrixLandPos; TRACE_MATRIX_RT_ATTACH_FRAME with +0x34; group scale +0x24 into seq +0x3f8 ) -> june-engine R6c; tsv row verdict stage2
 32961c80 / 32960ad0 (R14d)	CX2Eqip::LoadAttached / AttachParticle: the DG chain byte +0x15d5 readers	routed	Engine R14d: both differ further from March ( LoadAttached: DITT 0x1d / 0x53 render switches, many new item ids; AttachParticle: June's group entry ) -> LoadAttached whole june-engine R14f, AttachParticle with the group june-engine R6c; tsv replace rows
+329d1c30	CX2GUAdd::DieFrontStartFuture	PORTED	Char Add CH1b: inside, carved; June body under JUNE_CHAR_ADD_LIVE ( also ANSI_RIDING_DIE ); = March ( CommonStateStartFuture )
+329d1c40	CX2GUAdd::DieFrontFrameMove	PORTED	Char Add CH1b: inside, carved; = March ( DieFrameMove 31ffcba0 with 0.19 / 1.12 )
+329d5320	CX2GUAdd::DieFrontEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( !GetShowObject() inlined at +0xc / +0x172, anim end -> GUSI_DIE 4 )
+32a00010	CX2GUAdd::DieFrontStart	PORTED	Char Add CH1b: inside, carved; CommonStateStart, DyingStart ( vslot 0x338 ), play speed 0.5, then HaveThisBuff( BTI_BUFF_APOCALYPSE 0x159 ) -> FinishSummonedNPC( NUI_SI_HA_APOCALYPSE 0x644 ): the Apocalypse tail is June-only
+329d1c60	CX2GUAdd::DieBackStartFuture	PORTED	Char Add CH1b: inside, carved; = March ( CommonStateStartFuture )
+329d1c70	CX2GUAdd::DieBackFrameMove	PORTED	Char Add CH1b: inside, carved; = March ( DieFrameMove 0.19 / 1.12 )
+329d5360	CX2GUAdd::DieBackEventProcess	PORTED	Char Add CH1b: inside, carved; = March
+32a000a0	CX2GUAdd::DieBackStart	PORTED	Char Add CH1b: inside, carved; same as DieFrontStart ( Apocalypse tail included )
+329d5550	CX2GUAdd::DamageDownFrontFrameMove	PORTED	Char Add CH1b: inside, listing-only; EventTimerOneshot( 0.19 ) ( +0x24c guard + EventTimer 31d28e10 ) -> CreateStepDust, CommonFrameMove; = March ( X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE is defined )
+329d55a0	CX2GUAdd::DamageDownFrontEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( air-fall at foot-off-line y -= 30, standup flags 1-4, 0.33 s key window, big attack -> STANDUP_ATTACK_FRONT )
+329d56f0	CX2GUAdd::DamageDownBackFrameMove	PORTED	Char Add CH1b: inside, listing-only; EventTimer( 0.32 ) -> CreateStepDust, CommonFrameMove; = March
+329d5730	CX2GUAdd::DamageDownBackEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( ids 0xa1 / 0x9e / 0x9f / 0x21 )
+329d5880	CX2GUAdd::DamageAirDownLandingEventProcess	PORTED	Char Add CH1b: inside, listing-only; a jump to 329d55a0 = March ( DamageDownFrontEventProcess )
+329d5890	CX2GUAdd::StandUpRollingFrontFrontEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( JUMP_DOWN y -= 30.0, anim end -> WALK / WAIT )
+329d5900	CX2GUAdd::StandUpRollingFrontBackEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( y -= 30.0 )
+329d5970	CX2GUAdd::StandUpRollingBackFrontEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( y -= 45.0 = LINE_RADIUS * 1.5 )
+329d59e0	CX2GUAdd::StandUpRollingBackBackEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( y -= 45.0 )
+329d5a50	CX2GUAdd::StandUpAttackFrontEventProcess	PORTED	Char Add CH1b: inside, carved; = March ( anim end first, then foot test, y -= 45.0 )
+329d5ac0	CX2GUAdd::StandUpAttackBackEventProcess	PORTED	Char Add CH1b: inside, carved; = March
+329d1e20	CX2GUAdd::StandUpRollingFrontFrontEnd	PORTED	Char Add CH1b: inside, carved; = March ( CommonStateEnd vslot 0x7dc, SetForceInvincible / SetShowInvincible 0.3 )
+329d1e60	CX2GUAdd::StandUpRollingFrontBackEnd	PORTED	Char Add CH1b: inside, carved; byte-equal to 329d1e20
+329d1ea0	CX2GUAdd::StandUpRollingBackFrontEnd	PORTED	Char Add CH1b: inside, carved; byte-equal to 329d1e20
+329d1ee0	CX2GUAdd::StandUpRollingBackBackEnd	PORTED	Char Add CH1b: inside, carved; byte-equal to 329d1e20
+329d1f20	CX2GUAdd::StandUpAttackFrontEnd	PORTED	Char Add CH1b: inside, carved; byte-equal to 329d1e20
+329d1f60	CX2GUAdd::StandUpAttackBackEnd	PORTED	Char Add CH1b: inside, carved; byte-equal to 329d1e20
+329d1fa0	CX2GUAdd::StandUpAttackBackStateEndFuture	PORTED	Char Add CH1b: inside, carved; bIsRight = !bIsRight, CommonStateEndFuture ( vslot 0x7d8 ); = March
+329fb6c0	CX2GUAdd::OnApocalypseSummonEnd	PORTED	Char Add CH1b: new under JUNE_CHAR_ADD_CORE ( March has none ); +0x98e4 = 0 ( m_bApocalypseFinishBlocked ), erase BTI 345, IsMyUnit -> UpdateSkillSlotUI( false ); CX2GUUser::ResetOnSummonEnd keeps Eve CH2b4's inline copy until CH2b0 routes it here
+329fb710	CX2GUAdd::FinishSummonedNPC( iNPCID )	PORTED	Char Add CH1b: new under JUNE_CHAR_ADD_CORE; every live NPC ( id or 0 = any, alive, no gage passes ) whose NAT_ALLY AI owner is me: id 0x644 -> if not self-destructing ( +0x8b40 ) and +0x98e4 == 0: StateChange_LUA( APOCALYPSE_FINISH_ATTACK, direct ), self-destruct, 329fb6c0; any other id -> SetNowHp( 0 ) ( vslot 0xf4 ); callers: the two Die Starts, ReInit 329ffcd0 ( CH1h )

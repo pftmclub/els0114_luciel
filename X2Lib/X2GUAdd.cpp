@@ -3186,56 +3186,165 @@ void CX2GUAdd::FormationModeStart()
 // 스테이트 함수
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+// char-add CH1b: June 329fb6c0, the dying Apocalypse's hook on its owner ( 31fc8a90 reaches it by unit class; CH2b0 routes ResetOnSummonEnd here )
+void CX2GUAdd::OnApocalypseSummonEnd()
+{
+	m_bApocalypseFinishBlocked = false;
+	EraseBuffTempletFromGameUnit( static_cast<BUFF_TEMPLET_ID>( BTI_BUFF_APOCALYPSE ) );
+	if( true == IsMyUnit() )
+		g_pX2Game->UpdateSkillSlotUI( false );
+}
+
+// char-add CH1b: June 329fb710, ends every live ally summon of mine with this NPC id ( 0 = any ): the Apocalypse plays its finish attack, any other one dies
+void CX2GUAdd::FinishSummonedNPC( const int iNPCID_ )
+{
+	if( NULL == g_pX2Game )
+		return;
+
+	for( int i = 0; i < g_pX2Game->GetUnitNum(); ++i )
+	{
+		CX2GameUnit* pUnit = g_pX2Game->GetUnit( i );
+		if( NULL == pUnit || CX2GameUnit::GUT_NPC != pUnit->GetGameUnitType() )
+			continue;
+
+		CX2GUNPC* pNPC = static_cast<CX2GUNPC*>( pUnit );
+		if( 0 != iNPCID_ && pNPC->GetNPCTemplet().m_nNPCUnitID != iNPCID_ )
+			continue;
+
+		/// a unit without a gage passes the life test
+		if( NULL != pNPC->GetGageData() && pNPC->GetNowHp() <= 0.f )
+			continue;
+
+		CX2NPCAI* pAI = pNPC->GetNPCAI();
+		if( NULL == pAI || CX2NPCAI::NAT_ALLY != pAI->GetAIType() ||
+			static_cast<CX2AllyNPCAI*>( pAI )->GetAllyUnitUID() != GetUnitUID() )
+			continue;
+
+		if( CX2UnitManager::NUI_SI_HA_APOCALYPSE == iNPCID_ )
+		{
+			if( false == pNPC->GetSelfDestruction() && false == m_bApocalypseFinishBlocked )
+			{
+				pNPC->StateChange_LUA( "APOCALYPSE_FINISH_ATTACK", true );
+				pNPC->SetSelfDestruction( true );
+				OnApocalypseSummonEnd();
+			}
+		}
+		else
+			pNPC->SetNowHp( 0.f );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 //ANSI_DIE_FRONT
 void CX2GUAdd::DieFrontStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1c30
 	CommonStateStartFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStartFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DieFrontStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 32a00010, an owner with a live Apocalypse ends it on dying
 	CommonStateStart();
 	DyingStart();
 	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+	if( true == HaveThisBuff( static_cast<BUFF_TEMPLET_ID>( BTI_BUFF_APOCALYPSE ) ) )
+		FinishSummonedNPC( CX2UnitManager::NUI_SI_HA_APOCALYPSE );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStart();
+	DyingStart();
+	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DieFrontFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1c40
+	const float TIME_CREATE_STEP_DUST = 0.19f;
+	const float TIME_SACRIFICE_OF_HERO = 1.12f;
+
+	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	const float TIME_CREATE_STEP_DUST = 0.19f;		// 연기가 발생되야하는 애니메이션 시간
 	const float TIME_SACRIFICE_OF_HERO = 1.12f;		// 영웅의 희생이 실행되어야 하는 애니메이션 시간
 
 	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DieFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5320
+	if( false == GetShowObject() && true == m_pXSkinAnim->IsAnimationEnd() )
+	{
+		StateChange( GUSI_DIE );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( GetShowObject() == false && m_pXSkinAnim->IsAnimationEnd() == true )
 	{
 		StateChange( GUSI_DIE );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DIE_BACK
 void CX2GUAdd::DieBackStartFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1c60
 	CommonStateStartFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStartFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DieBackStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 32a000a0, an owner with a live Apocalypse ends it on dying
 	CommonStateStart();
 	DyingStart();
 	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+	if( true == HaveThisBuff( static_cast<BUFF_TEMPLET_ID>( BTI_BUFF_APOCALYPSE ) ) )
+		FinishSummonedNPC( CX2UnitManager::NUI_SI_HA_APOCALYPSE );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateStart();
+	DyingStart();
+	m_pXSkinAnim->SetPlaySpeed( 0.5f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DieBackFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1c70
+	const float TIME_CREATE_STEP_DUST = 0.19f;
+	const float TIME_SACRIFICE_OF_HERO = 1.12f;
+
+	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	const float TIME_CREATE_STEP_DUST = 0.19f;		// 연기가 발생되야하는 애니메이션 시간
 	const float TIME_SACRIFICE_OF_HERO = 1.12f;		// 영웅의 희생이 실행되어야 하는 애니메이션 시간
 
 	DieFrameMove( TIME_CREATE_STEP_DUST, TIME_SACRIFICE_OF_HERO );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DieBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5360
+	if( false == GetShowObject() && true == m_pXSkinAnim->IsAnimationEnd() )
+	{
+		StateChange( GUSI_DIE );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( GetShowObject() == false  && m_pXSkinAnim->IsAnimationEnd() == true )
 	{
 		StateChange( GUSI_DIE );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_WAIT
@@ -5030,6 +5139,13 @@ void CX2GUAdd::DamageBigEventProcess()
 //ANSI_DAMAGE_DOWN_FRONT
 void CX2GUAdd::DamageDownFrontFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5550
+	if( true == m_pXSkinAnim->EventTimerOneshot( 0.19f ) )
+		CreateStepDust();
+
+	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 	if( true == m_pXSkinAnim->EventTimerOneshot( 0.19f ) )
 #else   X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
@@ -5038,9 +5154,87 @@ void CX2GUAdd::DamageDownFrontFrameMove()
 		CreateStepDust();
 
 	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DamageDownFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d55a0
+	bool& bChangeStandUpAttackFront			= m_FrameDataFuture.stateParam.bEventFlagList[1];
+	bool& bChangeStandUpRollingFrontFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
+	bool& bChangeStandUpRollingFrontBack	= m_FrameDataFuture.stateParam.bEventFlagList[3];
+	bool& bChangeStandUpBigAttackFront		= m_FrameDataFuture.stateParam.bEventFlagList[4];
+
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DAMAGE_AIR_FALL );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == bChangeStandUpAttackFront || true == bChangeStandUpBigAttackFront )
+			StateChange( ANSI_STAND_UP_ATTACK_FRONT );
+		else if( true == bChangeStandUpRollingFrontFront )
+			StateChange( ANSI_STAND_UP_ROLLING_FRONT_FRONT );
+		else if( true == bChangeStandUpRollingFrontBack )
+			StateChange( ANSI_STAND_UP_ROLLING_FRONT_BACK );
+		else
+			StateChange( USI_DAMAGE_STANDUP_FRONT );
+	}
+	else if( 0.33f < m_pXSkinAnimFuture->GetNowAnimationTime() )
+	{
+		if( true == m_InputData.oneZ )
+		{
+			bChangeStandUpAttackFront		= true;
+			bChangeStandUpRollingFrontFront	= false;
+			bChangeStandUpRollingFrontBack	= false;
+			bChangeStandUpBigAttackFront	= false;
+		}
+		else if( true == m_InputData.oneX )
+		{
+			bChangeStandUpAttackFront		= false;
+			bChangeStandUpRollingFrontFront	= false;
+			bChangeStandUpRollingFrontBack	= false;
+			bChangeStandUpBigAttackFront	= true;
+		}
+		else if( true == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontBack	= false;
+				bChangeStandUpRollingFrontFront	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontFront	= false;
+				bChangeStandUpRollingFrontBack	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+		}
+		else
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontFront	= false;
+				bChangeStandUpRollingFrontBack	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackFront		= false;
+				bChangeStandUpRollingFrontBack	= false;
+				bChangeStandUpRollingFrontFront	= true;
+				bChangeStandUpBigAttackFront	= false;
+			}
+		}
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	bool& bChangeStandUpAttackFront			= m_FrameDataFuture.stateParam.bEventFlagList[1];
 	bool& bChangeStandUpRollingFrontFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
 	bool& bChangeStandUpRollingFrontBack	= m_FrameDataFuture.stateParam.bEventFlagList[3];
@@ -5141,18 +5335,104 @@ void CX2GUAdd::DamageDownFrontEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DAMAGE_DOWN_BACK
 void CX2GUAdd::DamageDownBackFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d56f0
 	if( true == m_pXSkinAnim->EventTimer( 0.32f ) )
 		CreateStepDust();
 
 	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	if( true == m_pXSkinAnim->EventTimer( 0.32f ) )
+		CreateStepDust();
+
+	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::DamageDownBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5730
+	bool& bChangeStandUpAttackBack			= m_FrameDataFuture.stateParam.bEventFlagList[1];
+	bool& bChangeStandUpRollingBackFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
+	bool& bChangeStandUpRollingBackBack		= m_FrameDataFuture.stateParam.bEventFlagList[3];
+	bool& bChangeStandUpBigAttackBack		= m_FrameDataFuture.stateParam.bEventFlagList[4];
+
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DAMAGE_AIR_FALL );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == bChangeStandUpAttackBack || true == bChangeStandUpBigAttackBack )
+			StateChange( ANSI_STAND_UP_ATTACK_BACK );
+		else if( true == bChangeStandUpRollingBackFront )
+			StateChange( ANSI_STAND_UP_ROLLING_BACK_FRONT );
+		else if( true == bChangeStandUpRollingBackBack )
+			StateChange( ANSI_STAND_UP_ROLLING_BACK_BACK );
+		else
+			StateChange( USI_DAMAGE_STANDUP_BACK );
+	}
+	else if( 0.33f < m_pXSkinAnimFuture->GetNowAnimationTime() )
+	{
+		if( true == m_InputData.oneZ )
+		{
+			bChangeStandUpAttackBack		= true;
+			bChangeStandUpRollingBackFront	= false;
+			bChangeStandUpRollingBackBack	= false;
+			bChangeStandUpBigAttackBack		= false;
+		}
+		else if( true == m_InputData.oneX )
+		{
+			bChangeStandUpAttackBack		= false;
+			bChangeStandUpRollingBackFront	= false;
+			bChangeStandUpRollingBackBack	= false;
+			bChangeStandUpBigAttackBack		= true;
+		}
+		else if( true == m_FrameDataFuture.syncData.bIsRight )
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackBack	= false;
+				bChangeStandUpRollingBackFront	= true;
+				bChangeStandUpBigAttackBack		= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackFront	= false;
+				bChangeStandUpRollingBackBack	= true;
+				bChangeStandUpBigAttackBack		= false;
+			}
+		}
+		else
+		{
+			if( true == m_InputData.pureRight )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackFront	= false;
+				bChangeStandUpRollingBackBack	= true;
+				bChangeStandUpBigAttackBack		= false;
+			}
+			else if( true == m_InputData.pureLeft )
+			{
+				bChangeStandUpAttackBack		= false;
+				bChangeStandUpRollingBackBack	= false;
+				bChangeStandUpRollingBackFront	= true;
+				bChangeStandUpBigAttackBack		= false;
+			}
+		}
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	bool& bChangeStandUpAttackBack			= m_FrameDataFuture.stateParam.bEventFlagList[1];
 	bool& bChangeStandUpRollingBackFront	= m_FrameDataFuture.stateParam.bEventFlagList[2];
 	bool& bChangeStandUpRollingBackBack		= m_FrameDataFuture.stateParam.bEventFlagList[3];
@@ -5257,17 +5537,40 @@ void CX2GUAdd::DamageDownBackEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DAMAGE_AIR_DOWN_LANDING
 void CX2GUAdd::DamageAirDownLandingEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5880 ( a jump to 329d55a0 )
 	DamageDownFrontEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	DamageDownFrontEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_STANDUP_ROLLING_FRONT_FRONT
 void CX2GUAdd::StandUpRollingFrontFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5890
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChange( USI_WALK );
+		else
+			StateChange( USI_WAIT );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5285,18 +5588,43 @@ void CX2GUAdd::StandUpRollingFrontFrontEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::StandUpRollingFrontFrontEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1e20
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	CommonStateEnd();
 
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_STANDUP_ROLLING_FRONT_BACK
 void CX2GUAdd::StandUpRollingFrontBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5900
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChange( USI_WALK );
+		else
+			StateChange( USI_WAIT );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5314,17 +5642,42 @@ void CX2GUAdd::StandUpRollingFrontBackEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::StandUpRollingFrontBackEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1e60
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_STANDUP_ROLLING_BACK_FRONT
 void CX2GUAdd::StandUpRollingBackFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5970
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChange( USI_WALK );
+		else
+			StateChange( USI_WAIT );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5341,17 +5694,42 @@ void CX2GUAdd::StandUpRollingBackFrontEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::StandUpRollingBackFrontEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1ea0
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_STANDUP_ROLLING_BACK_BACK
 void CX2GUAdd::StandUpRollingBackBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d59e0
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChange( USI_WALK );
+		else
+			StateChange( USI_WAIT );
+	}
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -5368,17 +5746,41 @@ void CX2GUAdd::StandUpRollingBackBackEventProcess()
 	}
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::StandUpRollingBackBackEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1ee0
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_STANDUP_ATTACK_FRONT
 void CX2GUAdd::StandUpAttackFrontEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5a50
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChange( USI_WALK );
+		else
+			StateChange( USI_WAIT );
+	}
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
 	{
 		if( false == IsOnSomethingFuture() )
@@ -5396,17 +5798,41 @@ void CX2GUAdd::StandUpAttackFrontEventProcess()
 		}
 	}
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::StandUpAttackFrontEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1f20
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_STANDUP_ATTACK_BACK
 void CX2GUAdd::StandUpAttackBackEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d5ac0
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+		}
+		else if( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			StateChange( USI_WALK );
+		else
+			StateChange( USI_WAIT );
+	}
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
 	{
 		if( false == IsOnSomethingFuture() )
@@ -5424,17 +5850,31 @@ void CX2GUAdd::StandUpAttackBackEventProcess()
 		}
 	}
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::StandUpAttackBackEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1f60
 	CommonStateEnd();
 	SetForceInvincible( 0.3f );
 	SetShowInvincible( 0.3f );
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	CommonStateEnd();
+	SetForceInvincible( 0.3f );
+	SetShowInvincible( 0.3f );
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 void CX2GUAdd::StandUpAttackBackStateEndFuture()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1b: June 329d1fa0
 	m_FrameDataFuture.syncData.bIsRight = !m_FrameDataFuture.syncData.bIsRight;
 	CommonStateEndFuture();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	m_FrameDataFuture.syncData.bIsRight = !m_FrameDataFuture.syncData.bIsRight;
+	CommonStateEndFuture();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 //ANSI_DASH_JUMP_POWER_LANDING

@@ -161,3 +161,4 @@ offset	kind	name	note
 0x95a5	field	m_bEnableLevitationWait	CX2GUAdd bool; JumpUp / JumpDown test and clear it before ANSI_LEVITATION_WAIT ( CH1a )
 0x96d8	field	m_NasodArmorAttackTargetData.m_uidTargetUID	CX2GUAdd, 8 bytes; WaitStart / HyperWaitStart zero it ( ResetTargetData, CH1a )
 0x96e0	field	m_NasodArmorAttackTargetData.m_bIsNPC	CX2GUAdd bool; zeroed with the uid ( CH1a )
+0x98e4	field	m_bApocalypseFinishBlocked	CX2GUAdd bool ( Mastermind ); June only ever stores 0 ( ctor / ReInit 32a22ffc, Apocalypse FrameMove 329f52b7, 329fb6c0 ); read by FinishSummonedNPC 329fb710 @329fb87a ( CH1b )

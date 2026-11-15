@@ -595,6 +595,10 @@ protected:
 	void DieBackStart();
 	void DieBackFrameMove();
 	void DieBackEventProcess();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+	void OnApocalypseSummonEnd();					/// char-add CH1b: June 329fb6c0, CH2b0 routes CX2GUUser::ResetOnSummonEnd here
+	void FinishSummonedNPC( const int iNPCID_ );	/// char-add CH1b: June 329fb710, the Die states under _LIVE call it
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 	/// ANSI_WAIT
 	void WaitStartFuture();
@@ -1379,6 +1383,9 @@ protected:
 	vector<CX2DamageEffect::CEffectHandle> m_vecDoomsDayLinkEffect;			/// ø¨∞· ¿Ã∆Â∆Æ ¿˙¿Â ∞¥√º
 #endif //SERV_ADD_LUNATIC_PSYKER
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+	bool					m_bApocalypseFinishBlocked;	/// char-add CH1b: June +0x98e4, only ever stored false; FinishSummonedNPC skips the Apocalypse end while true ( CH1h clears it in the ctor )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// protected Valuable End
 
 };

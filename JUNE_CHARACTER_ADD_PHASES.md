@@ -586,6 +586,31 @@ All 32 class-map rows of phase CH1a are handled: 30 `inside` rows written (June'
 
 **Nothing to play-test.** Review: none of its own, the CH1b review covers CH1a-CH1b (no `_DEBUG` define here). Next: `/x2-phase char-add CH1b` (Sonnet 5.5 high).
 
+### CH1b - Done (2026-11-15)
+
+All 28 class-map rows of phase CH1b are handled: 26 `inside` rows written (June's body in March's own `CX2GUAdd` function under `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`, March's in `#else`, tag `// char-add CH1b: June <va>`) and 2 helper rows written **new** under `_CORE` (`329fb6c0` was marked `inside`, but March has no such function). 3 rows were listing-only (`329d5550`, `329d56f0`, `329d5880`); all 28 were read from the raw listing (`charport_adis.py add --phase CH1b`) and the two helpers also from the Ghidra decompile. None needed "this needs Opus". New: 28 funcmap rows `Char Add CH1b`, one `ch1_offsets.tsv` row (`+0x98e4`), JUNE_BUGS 751, checklist L291 (`329fb6c0`) marked.
+
+| June | `CX2GUAdd::` | June | `CX2GUAdd::` |
+|---|---|---|---|
+| `329d1c30` `329d1c40` `32a00010` `329d5320` | DieFront StartFuture / FrameMove / Start / EventProcess (also `ANSI_RIDING_DIE`) | `329d1c60` `329d1c70` `32a000a0` `329d5360` | DieBack StartFuture / FrameMove / Start / EventProcess |
+| `329d5550` `329d55a0` | DamageDownFront FrameMove / EventProcess | `329d56f0` `329d5730` | DamageDownBack FrameMove / EventProcess |
+| `329d5880` | DamageAirDownLanding EventProcess (a jump to `329d55a0`) | `329d5890` `329d5900` `329d5970` `329d59e0` | StandUpRolling FrontFront / FrontBack / BackFront / BackBack EventProcess |
+| `329d5a50` `329d5ac0` | StandUpAttack Front / Back EventProcess | `329d1e20` `329d1e60` `329d1ea0` `329d1ee0` `329d1f20` `329d1f60` | StandUpRolling x4 / StandUpAttack x2 End (six byte-equal bodies) |
+| `329d1fa0` | StandUpAttackBack StateEndFuture | `329fb6c0` (new) `329fb710` (new) | `OnApocalypseSummonEnd`, `FinishSummonedNPC( iNPCID_ )` |
+
+**Where June differs from March** (2 of the 28; the other 26 are March's text written out, each checked against the raw listing):
+- **`32a00010` / `32a000a0` DieFront / DieBack Start:** after `CommonStateStart` / `DyingStart` ( vslot 0x338 ) / play speed 0.5, an owner with `BTI_BUFF_APOCALYPSE` (345) calls `FinishSummonedNPC( NUI_SI_HA_APOCALYPSE )` (June `329fb710( 0x644 )`). March has no tail.
+- **`329fb710` `FinishSummonedNPC`** (new; the NPC loop is the shape of Eve's `RecoverSummonedNPC`): every game unit that is an NPC with this id (0 = any), alive (no gage passes), whose `NAT_ALLY` AI names me as owner. For the Apocalypse (1604): if it is not self-destructing (`+0x8b40`) and `+0x98e4` is 0 -> `StateChange_LUA( "APOCALYPSE_FINISH_ATTACK", true )`, `SetSelfDestruction( true )`, `OnApocalypseSummonEnd()`; any other id -> `SetNowHp( 0 )` (NPC vslot 0xf4). Callers: the two Die Starts and ReInit `329ffcd0` (CH1h). **`329fb6c0` `OnApocalypseSummonEnd`** (new): `+0x98e4 = 0`, erase BTI 345, `IsMyUnit()` -> `UpdateSkillSlotUI( false )`; the member is `m_bApocalypseFinishBlocked` under `_CORE`.
+- **`329d5550` DamageDownFront FrameMove:** `EventTimerOneshot( 0.19 )` ( the `+0x24c` guard + `EventTimer` `31d28e10` ); March's `#ifdef X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE` branch is the same call and the flag is defined, so flag-off already behaves as June. The Back FrameMove is the plain `EventTimer( 0.32 )`, as March.
+- **Not in the CH1b range (nothing to write):** `ANSI_START` / `_WIN` / `_LOSE` blocks (36 job-tagged tables), small / big / air / groggy / bounding / revenge damage, amusement, wall landing, `ANSI_DAMAGE_STANDUP_*` use base callbacks (`ch0_state_skill.tsv`); CH1m registers them. `ANSI_RIDING_DAMAGE_BACK` (86) and `ANSI_WALL_LANDING` (164) have no script table.
+- **Routed:** the ctor / ReInit init of `m_bApocalypseFinishBlocked` -> CH1h (June stores 0 at `32a22ffc`); `CX2GUUser::ResetOnSummonEnd` (`X2GUUser.cpp:30287`, Eve CH2b4's inline erase for `UC_ADD_MASTERMIND`) is switched to `OnApocalypseSummonEnd()` by CH2b0, which also widens the `protected` declaration; JUNE_BUGS 751 (the gate flag is only ever stored 0).
+
+**Gates.** `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h --with JUNE_CHAR_ADD_LIVE JUNE_CHAR_ADD_CORE`: `JUNE_CHAR_ADD_CORE` PASS (`files: 2 PASS, 0 FAIL, 0 ERROR`); `JUNE_CHAR_ADD_LIVE` INERT (`//#define`; `files: 1 PASS`, 0 deleted, 0 non-ASCII, 0 EOL-mismatched, 0 `#else`/`#endif` without the token; its one OTHER is the `X2GUAdd.h` CORE lines); `junediverge` PASS; `enumscan` PASS; `stateends` / `skillicons` / `luabind` skipped (no skill state, no skill, no script). `git diff --patience --numstat`: `X2GUAdd.cpp` 440 / 0, `X2GUAdd.h` 7 / 0.
+- One-file `/Zs` probe of `X2GUAdd.cpp` (`census.cl_cmd`, no PCH): 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`. `/P` hits off / on: `FinishSummonedNPC( ... NUI_SI_HA_APOCALYPSE )` 0 / 2, `HaveThisBuff( BTI_BUFF_APOCALYPSE )` 0 / 2, `StateChange( ANSI_STAND_UP_ATTACK_BACK )` 2 / 1, `EventTimerOneshot( 0.19f )` 1 / 1 (March's branch), both helper definitions and the member 1 / 1.
+- Full build skipped: no play-test (`_LIVE` is off; nothing registers a June body), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** Review: `kickoffs/char-add/CH1b-review.md` (Opus 5.5 high, covers CH1a-CH1b; no `_DEBUG` define here). Next: `/x2-phase char-add CH1b review`.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.
