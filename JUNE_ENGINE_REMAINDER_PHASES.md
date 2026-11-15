@@ -1395,7 +1395,8 @@ and the fix moves a member into `KTDGXSkinAfterImage` and edits three closed cla
 **Gates.** Before the fix, `finish.py --review --commits 46e515f9 --with ..._CUSTOM_RENDER_STATE_EQUIP -v`: flagcheck PASS (7 PASS, 1 PASS~ blank line in `X2Eqip.cpp`, 1 DEFINE,
 0 OTHER, 0 FAIL, 0 ERROR; 0 deleted lines), junediverge PASS, `--check-all` PASS, enumscan exit 0, RESULT PASS. The fix on the worktree (`--files X2GameUnit.cpp X2GameUnit.h
 X2GUUser.cpp`): flagcheck PASS (2 PASS, 1 OTHER = a peer's uncommitted `GetEquipGroup` line in `X2GUUser.cpp`, char-luciel DU3 review, not staged; the 4 deleted lines are the
-rename of R5b's own lines), junediverge PASS, enumscan exit 0. Commit range line: see the commit's `finish.py --range`.
+rename of R5b's own lines), junediverge PASS, enumscan exit 0. Commit `3a17bbda` (`--range 3a17bbda^..3a17bbda`): flagcheck PASS (3 PASS, 0 OTHER, 0 FAIL;
+5 deleted lines = the rename, all inside the flag), junediverge PASS, enumscan exit 0, RESULT PASS; stateends skipped: no skill states.
 **Compile:** `/Zs` probes of `X2GUUser.cpp` and `X2GameUnit.cpp` (census.py command): 0 errors each. **Build:** none (no play-test; the next play-test phase builds).
 The review commit stages only its own hunks of `X2GUUser.cpp` and `funcmap.tsv` (a peer's hunks in both stay unstaged).
 
