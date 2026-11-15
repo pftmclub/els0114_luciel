@@ -13541,3 +13541,30 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG needs SERV_IRUHADEV_JUNE_USER_STATE_IDS
 #endif
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH1o3: June's user state-data byte +0x11 ( a skill state ) as UserUnitStateData::m_bSkillState and the base
+//              reader IsSkillState ( June 3208e430, vslot 0x528 ); the engine's two skill-slot-state tests read it. Classes that do not set
+//              the byte still count by the slot tables. Lu/Ciel's setter sets it ( slot states and the extra states June marks ).
+#define SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+#if defined( SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE ) && !defined( SERV_IRUHADEV_JUNE_SOCKET_PARITY )
+#error SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE needs SERV_IRUHADEV_JUNE_SOCKET_PARITY ( IsSkillSlotState ), char-luciel CH1o3
+#endif
+#ifndef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE needs SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE ( the setter's m_bSkillState, ReservedSkillStart ), char-luciel CH1o3
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH1o3: June's two-body dungeon win speech: INIT_SYSTEM's DUNGEON_SPEECH_LUCIEL rows ( LU / CIEL string pairs,
+//              June 3202b9e0 ) and GetRandomWinSpeech for unit type 10 ( June 32009dd0 ), which rolls the speaking body into
+//              CX2Game ( June +0xb54, read by the dungeon-clear picture ). Other classes keep March's DUNGEON_SPEECH.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH ) && !defined( SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH needs SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE ( UT_LUCIEL ), char-luciel CH1o3
+#endif
+//////////////////////////////////////////////////////////////////////////

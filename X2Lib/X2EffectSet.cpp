@@ -6042,6 +6042,39 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 					vecTables[j]->fForceDownValue = fForceDown;
 			} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+		case 4:
+			{
+				// char-luciel CH1o3: June @321db477-321db4b5: the damage effect's hit count ( +0x84c ) plus ( int )v or times v, truncated; no NEXT table
+				const int iDamageTime = pEffect_->GetDamageTime();
+				pEffect_->SetDamageTime( true == modifier.m_bAdd ? static_cast<int>( modifier.m_vValue.x ) + iDamageTime : static_cast<int>( modifier.m_vValue.x * static_cast<float>( iDamageTime ) ) );
+			} break;
+		case 10:
+			{
+				// char-luciel CH1o3: June @321db7cf-321db915: EXTRA_DAMAGE's damage ( +0x2a4 ) plus or times v; its NEXT loop writes the main effect's own value again ( JUNE_BUGS 725 )
+				const float fExtraDamage = pEffect_->GetDamageData().m_ExtraDamage.m_Damage;
+				pEffect_->GetDamageData().m_ExtraDamage.m_Damage = ( true == modifier.m_bAdd ? modifier.m_vValue.x + fExtraDamage : modifier.m_vValue.x * fExtraDamage );
+			} break;
+		case 11:
+			{
+				// char-luciel CH1o3: June @321db91a-321db996: the relate skill index byte ( +0x7a8 ) plus or times v, truncated; its NEXT loop writes the main effect's own byte again ( JUNE_BUGS 725 )
+				const float fSkillIndex = static_cast<float>( pEffect_->GetDamageData().m_RelateSkillData.m_byteSkillIndex );
+				const float fNewSkillIndex = ( true == modifier.m_bAdd ? modifier.m_vValue.x + fSkillIndex : modifier.m_vValue.x * fSkillIndex );
+				pEffect_->GetDamageData().m_RelateSkillData.m_byteSkillIndex = static_cast<Byte>( static_cast<int>( fNewSkillIndex ) );
+			} break;
+#ifndef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL
+		case 9:
+			{
+				// char-luciel CH1o3: June @321db77e-321db7cd, as char-elsword wrote it, for Lu's Punisher when Elsword's skills are off
+				const float fForceDown = true == modifier.m_bAdd ? modifier.m_vValue.x + pEffect_->GetDamageData().fForceDownValue : modifier.m_vValue.x * pEffect_->GetDamageData().fForceDownValue;
+				pEffect_->GetDamageData().fForceDownValue = fForceDown;
+				std::vector<CX2DamageManager::DamageData*> vecTables;
+				pEffect_->GetNextTables( vecTables );
+				for ( size_t j = 0; j < vecTables.size(); j++ )
+					vecTables[j]->fForceDownValue = fForceDown;
+			} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 		default:
 			{
 				static bool s_abLogged[24] = { false };

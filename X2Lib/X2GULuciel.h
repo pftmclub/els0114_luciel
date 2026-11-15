@@ -728,6 +728,7 @@ public:
 	virtual bool		SpecialAttackNoStageChange( const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	// June 32b1c880 ( vslot 0x810 )
 	virtual void		CommonFrameMoveFuture();	// June 32b1edd0 ( vslot 0x7c8 )
 	virtual void		SpecialAttackCooldown( const int iSkillID_, const float fMpConsume_ );	// June 32b1eef0 ( vslot 0x800 ); class-own: the engine reaches it through ReservedSkillStart ( CH1o3 )
+	virtual void		ReservedSkillStart( const CX2SkillTree::SkillTemplet* pSkillTemplet_ );	// char-luciel CH1o3: June 32057b80 @32057c4c-cb2, vslots 0x800 / 0x764
 	virtual void		CommonStateStart();	// June 32b37910 ( vslot 0x7c4 )
 	virtual void		NoStateChangeActionFrameMove();	// June 32b37c40 ( vslot 0x80c )
 	virtual void		CommonFrameMove();	// June 32b397a0 ( vslot 0x7cc )

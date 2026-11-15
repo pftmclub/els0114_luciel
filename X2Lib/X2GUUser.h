@@ -1365,6 +1365,9 @@ public:
 
 			bool    m_bHyperState;	// 각성중인 상태인지
 
+#ifdef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+			bool				m_bSkillState;	// char-luciel CH1o3: June +0x11 ( 3208e430 ), set by a class's skill setter on its skill states
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 			GUStateCBFunc		StateInit;
 			GUStateCBFunc		StateStartFuture;
 			GUStateCBFunc		StateStart;
@@ -1411,6 +1414,9 @@ public:
 				StateEnd			= GUStateCBFunc();
 
 				m_bHyperState = false;
+#ifdef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+				m_bSkillState = false;	// char-luciel CH1o3
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 				m_ptrComboAndSkillChainInfo.reset();
 			}
 
@@ -1442,6 +1448,9 @@ public:
 				StateEnd			= rhs.StateEnd;
 
 				m_bHyperState		= rhs.m_bHyperState;
+#ifdef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+				m_bSkillState		= rhs.m_bSkillState;	// char-luciel CH1o3
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 				m_ptrComboAndSkillChainInfo = rhs.m_ptrComboAndSkillChainInfo;
 
 				return *this;
@@ -2244,6 +2253,9 @@ public:
 #else SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 		bool IsHyperState() { return m_NowStateData.m_bHyperState; }
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
+#ifdef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+		bool IsSkillState( const bool bFuture_ ) const;	// char-luciel CH1o3: June 3208e430 ( vslot 0x528, no class overrides it )
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 #ifdef SERV_IRUHADEV_JUNE_USER_COPY_STATE_CALLBACKS
 		void							CopyStateCallbacks( UserUnitStateData& rHyperStateData_, const UserUnitStateData& rNormalStateData_ );	/// June 329cc2c0 ( Aisha and Eve )
 #endif SERV_IRUHADEV_JUNE_USER_COPY_STATE_CALLBACKS
@@ -2400,6 +2412,9 @@ public:
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+		const wstring GetRandomWinSpeech();	// char-luciel CH1o3: June 32009dd0
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 		const wstring GetRandomWinSpeech() //optimization
 		{
 			if( m_vecDungeonWinSpeech.size() == 0 )
@@ -2410,6 +2425,7 @@ public:
 			int iRand = rand() % (int) m_vecDungeonWinSpeech.size(); 
 			return m_vecDungeonWinSpeech[ iRand ];
 		} 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 
 
 		//virtual float				GetEvadePercent();
@@ -5278,6 +5294,9 @@ public:
 
 		//optimization
 		std::vector< wstring >							m_vecDungeonWinSpeech;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+		std::vector< std::pair< wstring, wstring > >	m_vecDuoDungeonWinSpeech;	// char-luciel CH1o3: June +0x8920, DUNGEON_SPEECH_LUCIEL's ( LU, CIEL ) lines
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 
 		float											m_fTimeToDashCameraChange;
 		float											m_fAngleDegree;

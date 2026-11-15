@@ -1430,6 +1430,10 @@ class CX2Game : public CKTDXStage
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 		void						UpdateLucielSwitchingGuideUI( const bool* pbShow_, const float fCoolTimeLeft_ );	/// char-luciel CH1a0: June 322e6300
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+		int							GetWinSpeechForm() const { return m_iWinSpeechForm; }	// char-luciel CH1o3: June +0xb54, read by the dungeon-clear picture 324ce260
+		void						SetWinSpeechForm( const int iForm_ ) { m_iWinSpeechForm = iForm_; }	// char-luciel CH1o3: written by GetRandomWinSpeech @32009e90
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_SLOTBUFF
 		void						TranscendSlotGuideFrameMove();		/// June 322d8100
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_SLOTBUFF
@@ -2198,6 +2202,9 @@ protected:
 		bool						m_bSkipStartSent;		/// June +0xb41 ( set by the ESC; the party path waits on it )
 		std::vector<int>			m_vecSkipStartNPCUID;	/// June +0xb44: the UIDs ( NPC +0x270 ) of the NPCs in a DIRECTION_STATE state
 #endif SERV_IRUHADEV_JUNE_SKIP_START
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+		int							m_iWinSpeechForm;		// char-luciel CH1o3: June +0xb54, the body of the last two-body win speech ( 1 = Ciel )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 		
 #ifdef ADD_GAME_STAGE_DELETE_DAMAGEEFFECT
 #ifdef  X2OPTIMIZE_PARTICLE_AND_ETC_HANDLE

@@ -49,3 +49,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - `ShowActiveSkillCutInAndLight` ( `32b16940` ) reads file-local tables in `_CONST_LUCIEL_CH1L3_` of `X2GULuciel.cpp` ( `s_aSkillCutIn` 4 sets x 3, `s_aTransformedFormSkillCutIn`, `s_aEventSkillCutInFirst` / `Second`; June `337ad268` / `337ad4a8` / `337ad148` / `337ad1d8`,
   names with no extension ). This phase confirms the asset names against the staged `.gfx` and the set index ( `SetSkillCutInSetIndexByUnitClass` ), and moves the tables if the creation-screen work needs them; the customize-manager cut-in override stays a stand-in ( backlog Stage 12 ).
+
+## Amended by char-luciel CH1o3 (2026-11-15)
+
+- **Dungeon-clear picture ( June `324ce260` @`324ce351`-`324ce3f1` ):** for Lu/Ciel's classes it shows Ciel's picture ( `HQ_Dungeon_Clear_Ciel_TGA`, `HQ_Dungeon_Clear_LUCIEL_ROYAL_GU...`, `HQ_Dungeon_Clear_Ciel_tga` ) when `g_pX2Game->GetWinSpeechForm()` ( June game `+0xb54` ) is 1, else the default. CH1o3 wrote the member and the roll in `CX2GUUser::GetRandomWinSpeech` ( flag `SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH` ); add the cases to March's clear-picture switch.
+- **Dungeon ending speech ( June `327e0040`, from the DungeonData loader `327e0f80` @`327e625e` ):** `ENDING_SPEECH` gains a `LUCIEL = { { LU = id, CIEL = id }, ... }` set ( June `DungeonData.src.lua`, e.g. lines 454-463 ), read into a vector of two-string vectors; March's `X2DungeonManager.cpp` `ENDING_SPEECH` reader has no `LUCIEL` key. Port the reader and find which body its consumer shows.

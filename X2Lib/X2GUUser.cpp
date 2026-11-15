@@ -2703,6 +2703,26 @@ void CX2GUUser::InitSystem()
 
 
 		// fix!! 일단 여기에 두고 나중에 테이블을 따로 만들던지 하자
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+		// char-luciel CH1o3: June 3202b9e0, read before DUNGEON_SPEECH; a row without LU or CIEL ends the list and leaves its table open ( JUNE_BUGS 724 )
+		if( true == m_LuaManager.BeginTable( "DUNGEON_SPEECH_LUCIEL" ) )
+		{
+			for( int iRow = 1; true == m_LuaManager.BeginTable( iRow ); ++iRow )
+			{
+				int iLuStringID = -1;
+				int iCielStringID = -1;
+				LUA_GET_VALUE( m_LuaManager, "LU", iLuStringID, -1 );
+				LUA_GET_VALUE( m_LuaManager, "CIEL", iCielStringID, -1 );
+				if( -1 == iLuStringID || -1 == iCielStringID )
+					break;
+
+				m_vecDuoDungeonWinSpeech.push_back( std::pair< wstring, wstring >( GET_STRING( iLuStringID ), GET_STRING( iCielStringID ) ) );
+				m_LuaManager.EndTable();
+			}
+			m_LuaManager.EndTable(); // DUNGEON_SPEECH_LUCIEL
+		}
+		else
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 		if( true == m_LuaManager.BeginTable( "DUNGEON_SPEECH" ) )
 		{
 			int iStringIndex = -1;
@@ -17762,6 +17782,36 @@ static bool IsSkillSlotState( const int iStateID_ )
 	return false;
 }
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
+#ifdef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+// char-luciel CH1o3: June 3208e430; classes that leave the byte unset still have their slot states counted by the slot tables
+bool CX2GUUser::IsSkillState( const bool bFuture_ ) const
+{
+#ifdef SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
+	const UserUnitStateData& stateData = ( true == bFuture_ ? m_itFutureStateData : m_itNowStateData )->second;	// June +0x7cb0 / +0x7cbc
+#else SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
+	const UserUnitStateData& stateData = ( true == bFuture_ ? m_FutureStateData : m_NowStateData );
+#endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
+	return true == stateData.m_bSkillState || true == IsSkillSlotState( stateData.stateID );
+}
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+// char-luciel CH1o3: June 32009dd0; unit type 10 rolls the speaking body into the game, then takes that body's line of a random row
+const wstring CX2GUUser::GetRandomWinSpeech()
+{
+	if( NULL != GetUnit() && NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType
+		&& false == m_vecDuoDungeonWinSpeech.empty() && NULL != g_pX2Game )
+	{
+		g_pX2Game->SetWinSpeechForm( rand() % 2 );
+		const int iRow = rand() % static_cast<int>( m_vecDuoDungeonWinSpeech.size() );
+		return ( 0 < g_pX2Game->GetWinSpeechForm() ) ? m_vecDuoDungeonWinSpeech[iRow].second : m_vecDuoDungeonWinSpeech[iRow].first;
+	}
+
+	if( true == m_vecDungeonWinSpeech.empty() )
+		return L"VICTORY";
+
+	return m_vecDungeonWinSpeech[ rand() % static_cast<int>( m_vecDungeonWinSpeech.size() ) ];
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 void CX2GUUser::CommonStateStart()
 {
 	KTDXPROFILE();
@@ -17887,7 +17937,11 @@ void CX2GUUser::CommonStateStart()
 	/// June's string setter also stores a float 0 at X2Game +0xb3c (the string's display timer, read by 32308c20), which March's X2Game
 	/// does not have (routed to S3e). March's in-house ADD_DAMAGE_LOG chat line is kept as March has it.
 	const CX2SkillTree::SkillTemplet* pSkillTemplet = NULL;
+#ifdef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+	if ( true == IsSkillState( true ) )	// char-luciel CH1o3: June slot 0x528( true )
+#else SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 	if ( true == IsSkillSlotState( GetFutureStateID() ) )
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 	{
 		const int iMemoSkillID = GetTranscendenceMemoSkillID( static_cast<int>( GetNowStateSkillID() ) );
 		pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( ( 0 != iMemoSkillID ) ? static_cast<CX2SkillTree::SKILL_ID>( iMemoSkillID ) : GetNowStateSkillID() );
@@ -18985,7 +19039,11 @@ void CX2GUUser::CommonStateStart()
 	/// skill's category (32070510 on GetSkillTemplet 32206450) applies its factor at its level (slot 135). Kept verbatim:
 	/// the kill-only and SIEE 15 entries carry +0xc = 0, the category of a skill type outside 5/6/7/13-16 (JUNE_BUGS #48).
 	/// Not ported: June's slot 474 call in the same block (31fe9ed0, the skill-memo type 14 path; skill-memo work).
+#ifdef SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
+	if ( CX2SkillTree::SI_NONE != GetNowStateSkillID() && true == IsSkillState( false )	// char-luciel CH1o3: June slot 0x528( false )
+#else SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 	if ( CX2SkillTree::SI_NONE != GetNowStateSkillID() && true == IsSkillSlotState( GetNowStateID() )
+#endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 		&& NULL != g_pData && NULL != g_pData->GetSkillTree() )
 	{
 		const vector<CX2SocketItem::SocketData::ConditionalBuff>& vecConditionalBuff = m_SocketData.m_vecConditionalBuff;

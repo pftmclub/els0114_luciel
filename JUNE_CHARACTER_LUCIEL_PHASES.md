@@ -2574,6 +2574,48 @@ No review of its own: the CH1o3 review covers CH1o2. Verdicts: `june2017_re/char
 - **How to see it in game:** nothing ( every base getter equals March's constant; Lu/Ciel is not live ).
 - **Next:** `/x2-phase char-luciel CH1o3` ( Opus 5.5 high; kickoff checked, read list gains this note ).
 
+### CH1o3 - Done (2026-11-15)
+
+Opus 5.5 high. Two new class-agnostic flags, both **defined**: `SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE` ( `#error` without `JUNE_SOCKET_PARITY`; `_CORE` now `#error`s without it ) and
+`SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH` ( `#error` without `JUNE_CHAR_UNIT_TYPE_RANGE` ); the effect-set cases and Lu's code under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`. No debug define.
+Commit `@COMMIT@`. Review: `CH1o3-review.md` covers CH1o2 and CH1o3. funcmap: `grep "(CH1o3)" june2017_re/funcmap.tsv` ( 6 rows ). `JUNE_BUGS.md` 724, 725.
+- **Effect-set tags ( `X2EffectSet.cpp` `ApplyDamageEffectModifiers`, June `321db1b0`, table `321dbc60` ):** 4 @`321db477` = CEffect `+0x84c` `m_DamageTime` ( funcmap AttackResult row ):
+  add `( int )v + count` ( `_ftol2` ), else `( int )( v * count )` ( `FIMUL` ), no NEXT loop ( CH1f2's `EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT` is this hit count ); 10 @`321db7cf` =
+  `m_ExtraDamage.m_Damage` ( protected float ), `v + x` / `v * x`; 11 @`321db91a` = `m_RelateSkillData.m_byteSkillIndex`, float math, chop rounding ( `FISTP`, RC 0xc00 ).
+  **Confirmed in the listing:** the tag 10 / 11 NEXT loops ( `+0xd8` / `+0xdc` ) store into the main damage data again ( `EBX` = main `+0x2a4`, `[EDI + 0x7a8]` ): the tables keep their
+  values, so no NEXT write is ported ( JUNE_BUGS 725 ). **Tag 9 widened:** a copy of Elsword's case under `#ifndef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL` inside `_CORE` ( CH1o's insert-only
+  pattern ), so Lu's Punisher keeps it when Elsword's skills are off; inert while `_ELSWORD_SKILL` is defined.
+- **Skill-state byte ( representation: a state-data member, as June stores it ):** June's `UserUnitStateData` has `+0x11` right after `m_bHyperState` ( `+0x10` ): March's struct gains
+  `bool m_bSkillState` there ( `Init()` clears it, `operator=` copies it ). New base `CX2GUUser::IsSkillState( bool bFuture )` = June `3208e430` ( vslot 0x528; all 13 vtables hold the base ):
+  reads the future / now entry ( `m_itFutureStateData` / `m_itNowStateData` under `JUNE_SKILL_STATE_PTR` = June `+0x7cb0` / `+0x7cbc` ), **OR** March's slot-table test, because no March
+  class's setter sets the byte ( their slot states answer as before ). The engine's two readers ( `CommonStateStart` S3d state string = `0x528( true )`, socket conditional buffs =
+  `0x528( false )` ) now call it. Class-local copies ( Chung, Arme, Eve `IsSkillSlotState` ) are untouched.
+  **Lu's setter:** normal slot state `@32b46622`, hyper ( word `0x101` @`32b4665c` ), Punishing Accel's extra state 265 `@32b468fa`. June marks 15 more extra states ( 266 / 267 CH2a, 296 / 297 CH2b,
+  344 / 345 / 403 CH2c, 459 CH2d, 377 / 575 CH3a, 402 / 404 / 584 CH3b, 466 / 581 CH3c ): new column `skill_state_extra` in `ch1n_skill_cases.tsv` and one amendment line in each owner's kickoff.
+- **Lu's `ReservedSkillStart`** ( standing rule ): June `32057b80` @`32057c4c`-`cb2`: `SpecialAttackCooldown( GetNowStateSkillID(), m_fReservedSkillMp )` then `SkillMemoMpRefund( id,
+  IsSkillState( false ), m_fReservedSkillMp )`; June reads the id through vslot 0x524 ( base `3208e410` = `GetNowStateSkillID` ), not the templet ( Chung's port reads the templet ).
+  Declared and defined under `_CORE`; reached through CH1o's `_LIVE` link.
+- **Checklist rows:** §5 L184-188 **ported** ( `DUO_WIN_SPEECH` ): June's InitSystem `3202b9e0` reads `DUNGEON_SPEECH_LUCIEL` rows `{ LU = id, CIEL = id }` before March's `DUNGEON_SPEECH`
+  ( no unit-type test there; CH0's "type-10 branch" is the reader's ), a row missing a key breaks with its table open ( JUNE_BUGS 724, dormant ); pairs at June `+0x8920` =
+  `m_vecDuoDungeonWinSpeech`. `GetRandomWinSpeech` = June `32009dd0` ( moved out of the header ): unit type 10 + pairs + game: game `+0xb54` = `rand() % 2`, row = `rand() % count`, CIEL's line
+  when 1, else LU's; other classes keep March's body. New `CX2Game::m_iWinSpeechForm` ( `+0xb54`, zeroed in the ctor @`3230770e` ) with Get / Set.
+  §7 L260 / L263: **done by CH1l2** ( `CanUseSpecialAttack`: the quick-slot wait at the top; the riding-key wait after the four checks `3202cba0` / `3202d140` / `3202d3c0` / summon,
+  @`32b3a61f` = June's order ). §7ap L977: **wired already**: Lu overrides 0x56c / 0x6a8 ( CH1l / CH1l2 ), the bases are `JUNE_USER_SKILL_ICON_OVERRIDE` / `_SHOWN_SKILL_COOL_TIME`
+  ( defined, engine callers `X2UISkillTreeNew2015.cpp`, `X2Game.cpp` ), and @`32b3a6ba` is the `ShownSkillCoolTime` call in Lu's `CanUseSpecialAttack`.
+- **Routed ( scope ):** to **CH5** ( kickoff amended ): June's dungeon-clear picture `324ce260` ( Ciel's pictures when game `+0xb54` is 1, @`324ce351`-`324ce3f1` ) and `ENDING_SPEECH`'s `LUCIEL`
+  set ( `327e0040`, from the DungeonData loader `327e0f80` @`327e625e`; March's reader has no `LUCIEL` key ).
+- **Gates:** `finish.py --files <8 code files> --with JUNE_USER_SKILL_STATE_BYTE JUNE_CHAR_DUO_WIN_SPEECH --state X2GULuciel.cpp Luciel_Duo / Luciel_Demonio`: `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`;
+  `DUO_WIN_SPEECH` `4 PASS, 4 OTHER, 0 FAIL` / PASS, `SKILL_STATE_BYTE` `2 PASS, 6 OTHER, 0 FAIL` / PASS ( OTHER = the other new flag's and `_CORE`'s files ), 0 deleted; `junediverge` PASS; `enumscan` exit 0;
+  `stateends` PASS both. `_CORE` run directly ( `--files X2EffectSet.cpp X2GULuciel.cpp X2GULuciel.h` ): `3 PASS, 0 FAIL` / PASS, 3 deleted = the three Lu setter comment lines rewritten
+  ( "+0x11 store is IsSkillSlotState", "word +0x10 = 0x101", "routed to CH1o" ). With `_CORE` as a partner, flagcheck stops on CH1a's own `#if defined( _LIVE ) && !defined( _CORE )` ( `Always.h:13430`,
+  unevaluable, as CH1o noted ), so `_CORE` is not a `--with` partner; my `_CORE` guard is nested `#ifndef` / `#ifdef` for the same reason. 0 non-ASCII, 0 EOL, 0 encoding change.
+  Range: @RANGE@
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GUUser.cpp`, `X2GULuciel.cpp`, `X2EffectSet.cpp`, `X2Game.cpp`, `X2StateDungeonGame.cpp` ( the speech caller ), `X2GUChung.cpp`, plain and
+  `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 12 x 0 errors, 0 warnings in the touched files ( the first `X2GUUser.cpp` run caught `m_NowStateData` under `JUNE_SKILL_STATE_PTR`: fixed to the iterators ).
+  The `#error` guards compile, so `JUNE_SOCKET_PARITY` and `JUNE_CHAR_UNIT_TYPE_RANGE` are defined there. Full build skipped: no play-test.
+- **How to see it in game:** nothing ( every new engine path needs a unit-type-10 unit, a `DUNGEON_SPEECH_LUCIEL` script, tag 4 / 10 / 11 or a set byte; Lu/Ciel is not live ).
+- **Next:** `/x2-phase char-luciel CH1o3 review` ( Opus 5.5 high; covers CH1o2 and CH1o3 ), then `CH1p`.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

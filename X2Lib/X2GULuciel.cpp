@@ -10718,6 +10718,14 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 	CX2RandomMissionManager::GetInstance()->OnSkillUse( pSkillTemplet->m_eID );
 }
 
+// char-luciel CH1o3: June 32057b80 @32057c4c-cb2; the reserved skill's state started: vslot 0x800 pays, 0x764 refunds the memo share when the now state is a skill state
+/*virtual*/ void CX2GULuciel::ReservedSkillStart( const CX2SkillTree::SkillTemplet* pSkillTemplet_ )
+{
+	const int iSkillID = static_cast<int>( GetNowStateSkillID() );	// June reads vslot 0x524 ( base 3208e410 ), not the templet
+	SpecialAttackCooldown( iSkillID, m_fReservedSkillMp );
+	SkillMemoMpRefund( iSkillID, IsSkillState( false ), m_fReservedSkillMp );
+}
+
 // char-luciel CH1l2: June 32b37910 ( vslot 0x7c4 ); skills with a combination point cost take the specialization B rate, the Communion skills their rate, the camera override clears, the Altar of Evil effect sets stop
 /*virtual*/ void CX2GULuciel::CommonStateStart()
 {
@@ -14205,12 +14213,14 @@ void CX2GULuciel::InitStateCommon()
 	const int iNormalStateID = ( false == bSlotB_ ? aNormalSkillStateID[iSlotIndex_] : aNormalSkillStateIDSlotB[iSlotIndex_] );
 	UserUnitStateData& normalStateData = m_StateList[ iNormalStateID ];
 	normalStateData.Init();		// June's 31fd2af0 snapshot before it is the engine's ( checklist 7i )
-	normalStateData.stateID = iNormalStateID;	// June's +0x11 = 1 store is IsSkillSlotState ( X2GUUser.cpp )
+	normalStateData.stateID = iNormalStateID;
+	normalStateData.m_bSkillState = true;	// char-luciel CH1o3: June @32b46622 byte +0x11
 
 	const int iHyperStateID = ( false == bSlotB_ ? aHyperSkillStateID[iSlotIndex_] : aHyperSkillStateIDSlotB[iSlotIndex_] );
 	UserUnitStateData& hyperStateData = m_StateList[ iHyperStateID ];
 	hyperStateData.Init();
-	hyperStateData.m_bHyperState = true;	// June word +0x10 = 0x101
+	hyperStateData.m_bHyperState = true;	// June word +0x10 = 0x101 @32b4665c
+	hyperStateData.m_bSkillState = true;	// char-luciel CH1o3: the same word's +0x11
 	hyperStateData.stateID = iHyperStateID;
 
 	const CX2SkillTree::SkillTemplet* pSkillTempletEquipped = GetEquippedActiveSkillTemplet( eSkillID_, true );
@@ -14272,7 +14282,8 @@ void CX2GULuciel::InitStateCommon()
 					stateData.Init();
 					stateData.stateID			= LSI_SA_M_COMMON_AURA_PUNISHING_ACCEL;
 					m_LuaManager.MakeTableReference( "LSI_SA_M_COMMON_AURA_PUNISHING_ACCEL", stateData.stateID );
-					stateData.m_eSkillID		= eSkillID_;	// June also sets byte +0x11 here ( no March member; routed to CH1o )
+					stateData.m_eSkillID		= eSkillID_;
+					stateData.m_bSkillState		= true;	// char-luciel CH1o3: June @32b468fa byte +0x11
 					stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, COMMON_BUFF_FrameMove );
 					stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );
 					m_StateList[stateData.stateID] = stateData;

@@ -343,6 +343,9 @@ m_bSkillSlotJustChanged(true)
 #ifdef SERV_IRUHADEV_JUNE_SKIP_START
 	SkipStartReset();	/// June CX2Game ctor 32306600 @323076e0-323076fe: the skip-the-start list ( +0xb40 ) is built and reset ( 322d8010 )
 #endif SERV_IRUHADEV_JUNE_SKIP_START
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+	m_iWinSpeechForm = 0;	// char-luciel CH1o3: June CX2Game ctor @3230770e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 
 // #ifndef _SERVICE_
 // 	g_pData->GetUnitManager()->OpenNPCStatScriptFile( L"NPCStat.lua" );
