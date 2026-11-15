@@ -1483,7 +1483,10 @@ Ghidra read-only; decompiles and listings in the session scratchpad.
 - **Compile:** `/Zs` probes of `X2Eqip.cpp`, `X2GUUser.cpp`, `X2Inventory.cpp`, `X2Unit.cpp`, `X2UICharInfo.cpp`: 5 x 0 errors. **Build blocked** (run 19:20): 11 `LNK2019` in a peer's uncommitted `X2GULuciel.cpp`
   (CH2b's `LSI_SA_LLC_DARK_CRESCENT_*` / `_RUINOUS_IMPACT_*` declared, not defined); no error in a DU3 review file; nothing deployed (exe still md5 `df9afaf4`).
 - **Save:** testlu1 (unit 166) raised to level 80, Henir dual weapon 62119 worn in slot 9 (Cobo weapon to bag 1 slot 3); `elsdb.py`, backed up.
-- **Play-test:** owed, handed off after the next `DEPLOY OK` (Lu's Henir weapon at init, taken off and put back in a dungeon).
+- **Deploy:** the 19:41 build of `6d076802` (+ CH2b's then-uncommitted files), md5 `f9a0cda2`.
+- **Play-test: passed** (user, 2026-11-15, run 20:15 on md5 `f9a0cda2`), on LuSkillA (unit 191, Curse of Darkness Dual Weapon 30344): weapon at init, off and
+  on in the field, body switches; 15 `LUCIEL DUO switch` lines, 0 EXCEPTION, UNHANDLED only `E_DISABLE_HB_CHECK_REQ`. 30344 has a minor-unit id, so
+  the JUNE_BUGS 739 double push itself was not on that path (testlu1 keeps the Henir weapon for it); the change is one dropped `reset()`, Ghidra-proven.
 
 
 ## Phase CH1 - Deploy unit: the class core
