@@ -2072,7 +2072,10 @@ June's way (`#else` = Phase S's stand-in).
 hunk: `X2Unit.h` FAIL comes from june-engine R5's uncommitted `ET_EMOTION_AVATAR26` lines (line 332); `X2GUUser.cpp` / `Always.h` OTHER are R5's
 `CUSTOM_RENDER_STATE` lines; `X2ItemManager.h` OTHER is the `JUNE_ENUM_NAMES` enum line (intended). R14c's own hunks: X2Eqip.cpp PASS +113,
 X2Eqip.h PASS +7, X2GUArme_VioletMage.cpp PASS +6; 0 deleted, 0 non-ASCII. 47 EOL-mismatched lines are the `InitAttatchAnim` block, which took
-the CRLF of its anchor line in a mostly-LF file. junediverge RESULT: PASS; enumscan exit 0. The commit range gate is below.
+the CRLF of its anchor line in a mostly-LF file. junediverge RESULT: PASS; enumscan exit 0.
+**Commit `2dce458c`** (only R14c's hunks staged; peers' lines in the same files left unstaged). `finish.py --range 2dce458c^..2dce458c --with
+..._BASIC_COLLISION_ANIM ..._DEBUG`: flagcheck RESULT: PASS (5 PASS, 1 DEFINE, 1 OTHER = the `JUNE_ENUM_NAMES` enum line, 0 FAIL, 0 ERROR, 0
+deleted, 0 non-ASCII); junediverge RESULT: PASS; enumscan exit 0; FINISH RESULT: PASS.
 **Compile:** one-file `/Zs` probes (X2Lib US_SERVICE flags) of `X2Eqip.cpp`, `X2GUUser.cpp`, `X2GUArme_VioletMage.cpp`: 0 errors each.
 **Build: blocked, not deployed.** `build.py --deploy` (twice) stops in KTDXLIB at `Always.h(13695)`: the `#error` guard of
 `SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS` (char-luciel CH3c20, commit `b4f80375`) fires in the KTDXLIB project. That is not this phase's file to fix;
