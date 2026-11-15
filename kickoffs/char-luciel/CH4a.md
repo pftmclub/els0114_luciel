@@ -74,3 +74,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   the passive, so the bounding key never shows before this phase: the play-test checks the key ( V ) over a bounced enemy for 0.5 s.
 - Renamed by CH1p: `m_iLastUsedSkillID` -> `m_iPendingCombinationPoint`, `m_iBoundingStrikeCount` -> `m_iBoundingStrikeCombinationPointCost`,
   `m_iBoundingTargetUnitIndex` -> `m_iBoundingTargetLastHitAttackSerial`, `m_fBoundingDamageRate` -> `m_fFreeBoundingStrikeRate`.
+
+## Amended by char-luciel CH2a2 (2026-11-15)
+
+- **Point on hit, owed since CH1:** the CH1 review moved the check to CH2a, but it cannot pass before your push ( CH2a2 logs: 0 `LUCIEL DUO point` lines ).
+  Your play-test carries it: Lu's `ZZZZX` ( or `XXXZX`, dash-jump `XXXXZ` ) on a monster gives `[JUNE_CHAR] LUCIEL DUO point: +1 on hit ( HIT_ADD_COMBINATION_POINT )`
+  at most once a second and the HUD point row fills; the same finishers on Ciel.

@@ -3256,7 +3256,16 @@ No review of its own ( the CH2b review covers it; the debug define stays on ). C
   ( peers' ). `EXESTR OK: 3 of 3 found in X2_offline.exe` ( the use / cooldown / refused lines ).
 - **Staging slip:** `7997ac26` staged the `X2GUUser.cpp` lines by `-U0` line numbers while a peer commit moved the file: the `#ifdef` landed in the Ara arm and the
   `#endif` inside the key loop ( HEAD did not compile ). `18808960` moves them back; the worktree was right throughout. `finish.py --commits 7997ac26 18808960`: PASS.
-- **Play-test:** owed ( same saves as CH2a ). After it passes: CH2b ( Sonnet ) then its review.
+- **Play-test 1 (2026-11-15, user: all passed; logs 18:37-18:46 on the 18:31 build):** 48 casts, each one `use` + one `cooldown` line on the same skill id
+  ( 0 mismatches ); bank B keys reach slots 5-8 and states 60 / 62 / 64 / 66, page 2 puts the bases there; Ciel's Heavy Hit / Haunting Beat enter 266 / 267.
+  **Wrong cast: fixed.** Cool time is stored on the pressed skill, but **not enforced**: the save's `auth_level` 3 makes `IsDevUnlimitedSkillUse()` true
+  ( `TOGGLE_UNLIMITED_SKILL_USE` is JP-only, `_SERVICE_` undefined, so `auth >= XUAL_DEV` ), and Lu's `CanUseSpecialAttack` then skips cool time, MP and
+  combination points ( standing dev rule 2026-10-22 ). So 0 `refused` lines, 5 recasts inside the cool time ( Flick Shot+ by Lu after 5.1 s of 12 ) and
+  Nether Shredder / Soul Infest usable without a full gauge ( user's question ) are the dev rule, not a bug. **Owed:** one short retest on `auth_level` 2
+  ( second press refused, Nether Shredder refused without a full gauge ), then back to 3.
+- **Point on hit ( CH1 review's ask ):** 0 `LUCIEL DUO point` lines, as expected: `AddCombinationPointOnHit` has no caller until CH4a's
+  `InitPassiveSkillState` pushes it ( `X2GULuciel.h:779` ). The ask was early; it moves to CH4a's play-test. The HUD points the user saw come from skill hits.
+- **Next:** the auth-2 retest, then CH2b ( Sonnet ) and its review.
 
 ### CH2d20 - Done (2026-11-15)
 
