@@ -2453,6 +2453,28 @@ No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. 
 - **How to see it in game:** nothing yet ( inert until CH1 final ).
 - **Next:** `/x2-phase char-luciel CH1n` ( Opus 5.5 high ).
 
+### CH1n - Done (2026-11-15)
+
+Opus 5.5 high. `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex` ( June `32b46580`, vslot 0x7b4, uncarved: read from `ghidra/disasm_32b46580_SetEquippedSkillFunc_capstone.txt` ) written under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE` ( inert, `_LIVE` stays `//#define` ). Code commit: see `git log --grep "char-luciel Phase CH1n"`.
+No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. funcmap row `32b46580 (CH1n)`. `JUNE_BUGS.md` 722.
+- **Case count: 64 cases, 112 skill ids** ( `ch0_skill.tsv`, re-read in the listing ). **4 written** ( every callback a base one ), **60 left to the phase that writes their state functions**, one row each in `june2017_re/char_luciel/ch1n_skill_cases.tsv` ( new: entry, path, ids, slot table, extra states, owner ):
+  CH2a 8, CH2b 5, CH2c 7, CH2d 6, CH3a 12 ( incl. the memo branch ), CH3b 9, CH3c 10, CH3d 3. The skill phases' kickoffs are amended with their rows. Writing those cases now would reference ~400 bodies that do not exist ( link error ) or leave table-only, stuck states ( `stateends` ).
+- **The head ( as June ):** slot 0..4; normal / hyper slot state at June's ids from June's four tables ( `334ed540` / `334ed554` / `334ed568` / `334ed57c` = 50-69 ), `Init()`, hyper flag, `stateID` ( the sibling ports' pattern; June's `+0x11` store is `IsSkillSlotState` ); `GetEquippedActiveSkillTemplet( id, true )`;
+  the transcendence-memo branch ( `31fdbcc0` = `GetTranscendenceMemoSkillID`, `32206450`, `32207210` = `GetUpgradeBaseSkillID`: memo id 30035 `RNSI_SA_LLD_PHANTOM_BLADE_ADD_TRANS` registers Dancing Blade ( CH3a's marker ), any other memo id returns ); then June's type switch ( `[templet + 4] - 5`, table `32b4a834` ): 5 buff, 6 / 7 / 13-16 the id tree, 12 relationship, 8-11 and 17 / 18 return.
+- **Written cases:** buff 208 ( `SI_SA_COMMON_AURA_DARKNESS_ACCEL`: Init = the 0x888 `PreloadAuraAccelResources`, `COMMON_BUFF_FrameMove` ( vslot 0x5f0 ) / `CX2GUUser::COMMON_BUFF_EventProcess`, extra 264 with `m_eSkillID` 208 ), 30301 / 30302 ( Punishing Accel, extra 265 with the raw id ), 30303 ( Phantom Circle, extra 463 with the raw id ),
+  relationship 900 ( `SI_ETC_WS_COMMON_LOVE`, raw-id test: `LSI_LU_THROW_ITEM` on both slot states with `COMMON_RELATIONSHIP_SKILL_FrameMove` / `_EventProcess` ( vslots 0x5f4 / 0x5f8 ), extra 263 = the `LSI_CIEL_THROW_ITEM` table, no June name, as `CH1a`'s `StateChange( 263 )` ). The hyper state gets only the FrameMove / EventProcess June copies ( no Init ).
+  The buff case runs on into the id tree as June ( no `break`; JUNE_BUGS 722: no buff id is there ).
+- **Enum:** June's 20 slot-state names `USI_SPECIAL_ATTACK_1` ... `USI_SPECIAL_ATTACK_SLOTB_HYPER_5` ( Enum.lua `GUSI_END + 45` .. `+ 64` = 50-69 ) added to `LUCIEL_STATE_ID` under `SERV_IRUHADEV_JUNE_ENUM_NAMES`. Probed: March's `CX2GUUser::USI_SPECIAL_ATTACK_1` is 49, `_SLOTB_HYPER_5` 68 ( one lower ). Inside the class the names shadow the base members on purpose ( the class runs on June ids ).
+- **Checklist rows:** §7 L261 dev free-skill gate: done by CH1l2 ( `32b3a310` @`IsDevUnlimitedSkillUse()`; the payment `32b1eef0` has none in June either ). §7b: the setter's `31fdbcc0` caller = `GetTranscendenceMemoSkillID` ( S3b's port ); the `32b3c3b0` callers are CH3a's ( Dancing Blade EventProcess ).
+  §7i: no `31fd2af0` call in the class ( the engine's `SnapshotBeforeSlotRebind` ). §7ae: types 14-16 named `ST_SPECIAL_ACTIVE_GRADE_1-3`; 17 / 18 fall to `default` as June; `ResetLeftSkillCoolTimeBySkillType`: not in the setter. §7ag: the setter takes slot 0..4 + bank bool ( `cmp edi, 5` ), no > 3 / -4 decode: nothing here.
+- **Routed:** to CH1o ( the state-id seam it owns ): the engine's slot tables are March's 49-68 ( `SnapshotBeforeSlotRebind`, `IsSkillSlotState`, `IsBlankSlotSkillState` / `LogNoStateSkill`, the skill-use `StateChange` ), so Lu's slot states 50-69 are missed until the seam lands; June's byte `+0x11` on non-slot states ( 265 here; 344 in CH2c's Soul Shock ) has no March member.
+  To CH3c: the Transcendence case ( @`32b487cf` ) ends with `m_ptrShrewdCutterLockOn = CreateLockOnSystem()` ( `32b4cf30` / `32b4ce90` @`32b490e0`-`32b49108` ), after CH3c20 moves `SLockOnSystem` out of `CX2GUAra`.
+- **Gates:** `finish.py --files X2GULuciel.cpp X2GULuciel.h --state X2GULuciel.cpp Luciel_Duo --state X2GULuciel.cpp Luciel_Demonio`: `flagcheck JUNE_CHAR_LUCIEL_CORE` `2 PASS, 0 PASS~, 0 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` / `RESULT: PASS`; `flagcheck JUNE_ENUM_NAMES` `0 PASS, 2 OTHER` ( the class files are `_CORE`'s ) / `RESULT: PASS`;
+  `junediverge` PASS, `enumscan` exit 0, `stateends` PASS both; skillicons / luabind not run ( no skill added, no script staged ). `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`. 0 deleted lines.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp` plain and with `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 0 errors, 0 warnings in the class. Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( inert until CH1 final ).
+- **Next:** `/x2-phase char-luciel CH1o` ( Opus 5.5 high; its review covers CH1m, CH1n, CH1o ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

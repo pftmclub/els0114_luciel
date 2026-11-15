@@ -14215,5 +14215,155 @@ void CX2GULuciel::InitStateCommon()
 	// June 32b3e8b0 @1922 LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT ( id 364 ): registered by CH3b with its callbacks
 }
 
+// char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
+/*virtual*/ void CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex( const CX2SkillTree::SKILL_ID eSkillID_, const int iSlotIndex_, const bool bSlotB_ )
+{
+	if ( iSlotIndex_ < 0 || iSlotIndex_ > 4 )
+		return;
+
+	const int aNormalSkillStateID[]			= { USI_SPECIAL_ATTACK_1, USI_SPECIAL_ATTACK_2, USI_SPECIAL_ATTACK_3, USI_SPECIAL_ATTACK_4, USI_SPECIAL_ATTACK_5 };	// June 334ed540
+	const int aHyperSkillStateID[]			= { USI_SPECIAL_ATTACK_HYPER_1, USI_SPECIAL_ATTACK_HYPER_2, USI_SPECIAL_ATTACK_HYPER_3, USI_SPECIAL_ATTACK_HYPER_4, USI_SPECIAL_ATTACK_HYPER_5 };	// June 334ed554
+	const int aNormalSkillStateIDSlotB[]	= { USI_SPECIAL_ATTACK_SLOTB_1, USI_SPECIAL_ATTACK_SLOTB_2, USI_SPECIAL_ATTACK_SLOTB_3, USI_SPECIAL_ATTACK_SLOTB_4, USI_SPECIAL_ATTACK_SLOTB_5 };	// June 334ed568
+	const int aHyperSkillStateIDSlotB[]		= { USI_SPECIAL_ATTACK_SLOTB_HYPER_1, USI_SPECIAL_ATTACK_SLOTB_HYPER_2, USI_SPECIAL_ATTACK_SLOTB_HYPER_3, USI_SPECIAL_ATTACK_SLOTB_HYPER_4, USI_SPECIAL_ATTACK_SLOTB_HYPER_5 };	// June 334ed57c
+
+	const int iNormalStateID = ( false == bSlotB_ ? aNormalSkillStateID[iSlotIndex_] : aNormalSkillStateIDSlotB[iSlotIndex_] );
+	UserUnitStateData& normalStateData = m_StateList[ iNormalStateID ];
+	normalStateData.Init();		// June's 31fd2af0 snapshot before it is the engine's ( checklist 7i )
+	normalStateData.stateID = iNormalStateID;	// June's +0x11 = 1 store is IsSkillSlotState ( X2GUUser.cpp )
+
+	const int iHyperStateID = ( false == bSlotB_ ? aHyperSkillStateID[iSlotIndex_] : aHyperSkillStateIDSlotB[iSlotIndex_] );
+	UserUnitStateData& hyperStateData = m_StateList[ iHyperStateID ];
+	hyperStateData.Init();
+	hyperStateData.m_bHyperState = true;	// June word +0x10 = 0x101
+	hyperStateData.stateID = iHyperStateID;
+
+	const CX2SkillTree::SkillTemplet* pSkillTempletEquipped = GetEquippedActiveSkillTemplet( eSkillID_, true );
+	if ( NULL == pSkillTempletEquipped )
+		return;
+
+	const int iTranscendenceSkillID = GetTranscendenceMemoSkillID( eSkillID_ );
+	if ( 0 != iTranscendenceSkillID && NULL != g_pData->GetSkillTree()->GetSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( iTranscendenceSkillID ) ) )
+	{
+		if ( CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE_ADD_TRANS != g_pData->GetSkillTree()->GetUpgradeBaseSkillID( static_cast<CX2SkillTree::SKILL_ID>( iTranscendenceSkillID ) ) )
+			return;
+
+		// June @32b466c5: LSI_SA_LLD_DANCING_BLADE on both slot states + LSI_SA_LLD_DANCING_BLADE_LOOP ( 380 ), registered by CH3a
+		return;
+	}
+
+	UserUnitStateData stateData;
+	const int iBaseSkillID = g_pData->GetSkillTree()->GetUpgradeBaseSkillID( eSkillID_ );	// June 32207210
+
+	switch ( pSkillTempletEquipped->m_eType )
+	{
+	case CX2SkillTree::ST_BUFF:
+		{
+			switch ( iBaseSkillID )
+			{
+			case CX2SkillTree::SI_SA_COMMON_AURA_DARKNESS_ACCEL:
+				{
+					m_LuaManager.MakeTableReference( "LSI_SA_F_COMMON_AURA_DEPRAVITY_ACCEL", normalStateData.stateID );
+					normalStateData.StateInit		= SET_CB_FUNC( CX2GULuciel, PreloadAuraAccelResources );	// June 32b4c1a0 > vslot 0x888
+					normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, COMMON_BUFF_FrameMove );	// June 329ccd90 > vslot 0x5f0
+					normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );	// June 329cba40 > 31fcbd60
+
+					m_LuaManager.MakeTableReference( "LSI_SA_F_COMMON_AURA_DEPRAVITY_ACCEL", hyperStateData.stateID );
+					hyperStateData.m_bHyperState	= true;
+					hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+					hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+					stateData.Init();
+					stateData.stateID			= LSI_SA_M_COMMON_AURA_DEPRAVITY_ACCEL;
+					m_LuaManager.MakeTableReference( "LSI_SA_M_COMMON_AURA_DEPRAVITY_ACCEL", stateData.stateID );
+					stateData.m_eSkillID		= CX2SkillTree::SI_SA_COMMON_AURA_DARKNESS_ACCEL;
+					stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, COMMON_BUFF_FrameMove );
+					stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );
+					m_StateList[stateData.stateID] = stateData;
+				} break;
+
+			case CX2SkillTree::RNSI_A_LUCIEL_AURA_PUNISHMENT_ACCEL:
+			case CX2SkillTree::RNSI_A_LUCIEL_AURA_PUNISHMENT_ACCEL_UPGRADE:
+				{
+					m_LuaManager.MakeTableReference( "LSI_SA_F_COMMON_AURA_PUNISHING_ACCEL", normalStateData.stateID );
+					normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, COMMON_BUFF_FrameMove );
+					normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );
+
+					m_LuaManager.MakeTableReference( "LSI_SA_F_COMMON_AURA_PUNISHING_ACCEL", hyperStateData.stateID );
+					hyperStateData.m_bHyperState	= true;
+					hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+					hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+					stateData.Init();
+					stateData.stateID			= LSI_SA_M_COMMON_AURA_PUNISHING_ACCEL;
+					m_LuaManager.MakeTableReference( "LSI_SA_M_COMMON_AURA_PUNISHING_ACCEL", stateData.stateID );
+					stateData.m_eSkillID		= eSkillID_;	// June also sets byte +0x11 here ( no March member; routed to CH1o )
+					stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, COMMON_BUFF_FrameMove );
+					stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );
+					m_StateList[stateData.stateID] = stateData;
+				} break;
+
+			case CX2SkillTree::RNSI_BUFF_PHANTOM_CIRCLE:
+				{
+					m_LuaManager.MakeTableReference( "LSI_SA_F_COMMON_BUFF_PHANTOM_CIRCLE", normalStateData.stateID );
+					normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, COMMON_BUFF_FrameMove );
+					normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );
+
+					m_LuaManager.MakeTableReference( "LSI_SA_F_COMMON_BUFF_PHANTOM_CIRCLE", hyperStateData.stateID );
+					hyperStateData.m_bHyperState	= true;
+					hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+					hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+					stateData.Init();
+					stateData.stateID			= LSI_SA_M_COMMON_BUFF_PHANTOM_CIRCLE;
+					m_LuaManager.MakeTableReference( "LSI_SA_M_COMMON_BUFF_PHANTOM_CIRCLE", stateData.stateID );
+					stateData.m_eSkillID		= eSkillID_;
+					stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, COMMON_BUFF_FrameMove );
+					stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_BUFF_EventProcess );
+					m_StateList[stateData.stateID] = stateData;
+				} break;
+
+			default:
+				break;
+			}
+		}
+		// no break: June falls into the active-skill ids ( none of them is a buff id; JUNE_BUGS 722 )
+
+	case CX2SkillTree::ST_ACTIVE:
+	case CX2SkillTree::ST_SPECIAL_ACTIVE:
+	case CX2SkillTree::ST_HYPER_ACTIVE_SKILL:
+	case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_1:
+	case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_2:
+	case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_3:
+		// June @32b469d6: the 59 skill-id cases on iBaseSkillID, each written by its skill phase ( june2017_re/char_luciel/ch1n_skill_cases.tsv )
+		return;
+
+	case CX2SkillTree::ST_RELATIONSHIP_SKILL:
+		{
+			if ( CX2SkillTree::SI_ETC_WS_COMMON_LOVE == eSkillID_ )	// June compares the raw id here
+			{
+				m_LuaManager.MakeTableReference( "LSI_LU_THROW_ITEM", normalStateData.stateID );
+				normalStateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, COMMON_RELATIONSHIP_SKILL_FrameMove );	// June 329ccda0 > vslot 0x5f4
+				normalStateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_RELATIONSHIP_SKILL_EventProcess );	// June 329ccdb0 > vslot 0x5f8
+
+				m_LuaManager.MakeTableReference( "LSI_LU_THROW_ITEM", hyperStateData.stateID );
+				hyperStateData.m_bHyperState	= true;
+				hyperStateData.OnFrameMove		= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess	= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID			= 263;	// no June name: the LSI_CIEL_THROW_ITEM table again ( InitStateCommon binds it to 228 )
+				m_LuaManager.MakeTableReference( "LSI_CIEL_THROW_ITEM", stateData.stateID );
+				stateData.m_eSkillID		= CX2SkillTree::SI_ETC_WS_COMMON_LOVE;
+				stateData.OnFrameMove		= SET_CB_FUNC( CX2GUUser, COMMON_RELATIONSHIP_SKILL_FrameMove );
+				stateData.OnEventProcess	= SET_CB_FUNC( CX2GUUser, COMMON_RELATIONSHIP_SKILL_EventProcess );
+				m_StateList[stateData.stateID] = stateData;
+			}
+		} return;
+
+	default:
+		return;
+	}
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}

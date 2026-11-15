@@ -87,6 +87,27 @@ public:
 		LSI_LU_PEPPER_RUN_END                                     = 47,
 		LSI_LU_PEPPER_RUN_JUMP_UP                                 = 48,
 		LSI_LU_PEPPER_RUN_JUMP_DOWN                               = 49,
+		// char-luciel CH1n: June's slot states ( Enum.lua USER_STATE_ID, GUSI_END + 45 to + 64 ); CX2GUUser's March values are one lower
+		USI_SPECIAL_ATTACK_1                                      = 50,
+		USI_SPECIAL_ATTACK_HYPER_1                                = 51,
+		USI_SPECIAL_ATTACK_2                                      = 52,
+		USI_SPECIAL_ATTACK_HYPER_2                                = 53,
+		USI_SPECIAL_ATTACK_3                                      = 54,
+		USI_SPECIAL_ATTACK_HYPER_3                                = 55,
+		USI_SPECIAL_ATTACK_4                                      = 56,
+		USI_SPECIAL_ATTACK_HYPER_4                                = 57,
+		USI_SPECIAL_ATTACK_5                                      = 58,
+		USI_SPECIAL_ATTACK_HYPER_5                                = 59,
+		USI_SPECIAL_ATTACK_SLOTB_1                                = 60,
+		USI_SPECIAL_ATTACK_SLOTB_HYPER_1                          = 61,
+		USI_SPECIAL_ATTACK_SLOTB_2                                = 62,
+		USI_SPECIAL_ATTACK_SLOTB_HYPER_2                          = 63,
+		USI_SPECIAL_ATTACK_SLOTB_3                                = 64,
+		USI_SPECIAL_ATTACK_SLOTB_HYPER_3                          = 65,
+		USI_SPECIAL_ATTACK_SLOTB_4                                = 66,
+		USI_SPECIAL_ATTACK_SLOTB_HYPER_4                          = 67,
+		USI_SPECIAL_ATTACK_SLOTB_5                                = 68,
+		USI_SPECIAL_ATTACK_SLOTB_HYPER_5                          = 69,
 		LSI_LU_THROW_ITEM                                         = 70,
 		LSI_RIDING_START                                          = 72,
 		LSI_RIDING_ON                                             = 73,
@@ -804,6 +825,9 @@ protected:
 	void				DieBackFrameMove();	// June 32000910
 	void				DieBackEventProcess();	// June 31fcd220
 	void				DashEndStartFuture();	// June 31fd2680
+
+	// char-luciel CH1n: June 32b46580 ( vslot 0x7b4, uncarved )
+	virtual void		SetEquippedSkillFuncBySkillSlotIndex( const CX2SkillTree::SKILL_ID eSkillID_, const int iSlotIndex_, const bool bSlotB_ );
 
 	// char-luciel CH1b: Lu's common states ( June 32ae5540 - 32b3a270 )
 	void				LSI_LU_JUMP_UP_EventProcess();	// June 32ae5540
