@@ -3249,10 +3249,12 @@ No review of its own ( the CH2b review covers it; the debug define stays on ). C
 - **Gates:** `finish.py --files X2GULuciel.cpp X2GUUser.cpp --with JUNE_CHAR_LUCIEL_SKILL JUNE_CHAR_LUCIEL_SKILL_DEBUG`: flagcheck `0 FAIL, 2 OTHER` ( my lines sit
   inside `_CORE` in `.cpp`; the worktree rows also held peers' uncommitted CH2d20 / CH3c20 hunks, whose 3 + 3 deleted lines are theirs ), junediverge PASS, enumscan exit 0,
   `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`. Skipped: stateends ( no state registered ), skillicons ( no skill added ), luabind ( no script staged ).
-- **Build: blocked by a peer.** `build.py --deploy` ( 17:44 ): `BUILD FAILED (KTDXLIB)`, `Always.h(13695): fatal error C1189` = char-luciel CH3c20's `#error` guard for
-  `SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS` ( committed `b4f80375` ); it tests macros the KTDXLIB project does not see ( the X2Lib `cl /P` passes ). Not this phase's
-  to fix ( shared-builds rule 4 ); the rebuild runs once CH3c20 fixes it, then the deploy and `EXESTR` lines are added here.
-- **Play-test:** owed after that build ( same saves as CH2a ). After it passes: CH2b ( Sonnet ) then its review.
+- **Build:** the first run ( 17:44 ) failed in char-luciel CH3c20's `NPC_LUA_BINDS` guard ( `Always.h:13695`, not this phase's; the peer narrowed it ). Rebuild:
+  `DEPLOY OK: X2_offline.exe is 26,948,608 B, dated 2026-11-15 18:31:09, md5 df9afaf486b60758f01f2f05bc28f749, equal to X2/US_SERVICE/x2.exe (2026-11-15 18:31:01); built at main 18808960 + 2 uncommitted code file(s)`
+  ( peers' ). `EXESTR OK: 3 of 3 found in X2_offline.exe` ( the use / cooldown / refused lines ).
+- **Staging slip:** `7997ac26` staged the `X2GUUser.cpp` lines by `-U0` line numbers while a peer commit moved the file: the `#ifdef` landed in the Ara arm and the
+  `#endif` inside the key loop ( HEAD did not compile ). `18808960` moves them back; the worktree was right throughout. `finish.py --commits 7997ac26 18808960`: PASS.
+- **Play-test:** owed ( same saves as CH2a ). After it passes: CH2b ( Sonnet ) then its review.
 
 ### CH2d20 - Done (2026-11-15)
 
