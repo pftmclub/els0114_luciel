@@ -2957,7 +2957,10 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` (`Always.h`, `
   data151 (`272e8aaa`), data215 (`d6c07e6f`), datai020 (`0a590f9f`). (2) Promotion cubes 109999 / 110850 refuse (NetError 285,
   `CUBE refused - item 110850 lists no item group for class 128 / 129`): the packed `RandomItemTable.lua` is the March-era US server table, with no
   row for any June class (Lu/Ciel, Ara 34 / 124, Elesis 35 / 125, Add); June's server table is not in the repo. Decision with the user.
-- **Play-test 2:** owed (textures). Review kickoff `kickoffs/char-luciel/CHN-review.md` written.
+- **Play-test 2 (16:44-16:47, units 187 / 188):** no `OpenTexture` failure left, but the pictures still did not draw: each picture names piece
+  `"01"`, defined in the texture's `.TET` sidecar, which name staging by `.tga` does not bring. Fix: the 15 `.tet` (`kom.py stage-june`, 15 new,
+  6 identical, 0 replaced), `PACK OK` / `COPY OK` data052 (md5 `2e048616`), data151 (`df705629`), data215 (`14e12b3f`), datai020 (`4eb0e867`).
+- **Play-test 3:** owed (pictures; units `LuTetDuo` / `LuTetRG`). Review kickoff `kickoffs/char-luciel/CHN-review.md` written.
 
 ## Phase TU - Tutorial
 
