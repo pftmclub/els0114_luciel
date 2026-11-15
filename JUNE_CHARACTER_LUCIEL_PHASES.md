@@ -2988,6 +2988,7 @@ A new Lu/Ciel's first select now enters June's tutorial dungeon 41240 (it fell t
 - **Revert.** Comment out the `#define`: Lu/Ciel falls back to Elsword's tutorial. The data rows are inert.
 - **Play-test hand-off.** See the commit's hand-off: create a fresh Lu/Ciel, play the tutorial to its end; `logs.py --grep "JUNE_CHAR\] LUCIEL TUTORIAL"`.
   Open for the user: none.
+- **Commit / play-test.** `f9da0f89`. Play-test passed 2026-11-15 (user): a fresh Lu/Ciel played the tutorial to the village. Logs: `[JUNE_CHAR] LUCIEL TUTORIAL room 1001 dungeon 41240 for unit 186`, `ROOM tutorial room 1001 ... dungeonID=41240`, ErrorLog 0 lines, lua 0 unbound, 0 EXCEPTION (the 5 `E_DISABLE_HB_CHECK_REQ` UNHANDLED are old noise). Range gate `f9da0f89^..f9da0f89`: flagcheck 0 FAIL (3 PASS, 1 PASS~, the `#error` guard row), junediverge / enumscan PASS.
 
 ## Phase CH2 - Skills: base and first jobs (200, 37, 38, 39)
 
