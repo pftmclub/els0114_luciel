@@ -1400,6 +1400,8 @@ June's view list is ported whole for every class; March's bodies stay in each `#
 - **Gates:** `finish.py --files <15 files> --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`: flagcheck PASS (14 PASS, 1 PASS~, 0 OTHER, 0 FAIL; the 2
   deleted lines are DU3's `#error` guard pair widened in `Always.h`, the bare `#endif` is that guard's own), junediverge PASS, enumscan exit 1 on 190
   A/B rows that predate DU3b in these files (0 on DU3b's added lines, intersected with `git diff -U0`); stateends n/a (no skill states registered).
+  Commit `aa720258`; `finish.py --range aa720258^..aa720258 --with ...`: the same (flagcheck PASS 14 / 1 PASS~ / 0 FAIL, junediverge PASS, enumscan
+  the same pre-existing rows).
 - **Compile:** `/Zs` probes of the 9 changed `.cpp` files: 9 x 0 errors; break-tests (`-DsSlotID_=@`, `-DGetItemSlotID=@`) fail inside the new blocks of
   every file. Full build skipped: no play-test yet (DU3c is the seam).
 - **Play-test deferred:** section DU3b in `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), batch at DU3c.
