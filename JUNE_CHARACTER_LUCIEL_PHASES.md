@@ -3337,7 +3337,11 @@ Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's, no new de
   ( mine ). `EXESTR OK: 5 of 5` ( the five debug lines ), `2 of 2` ( `LSI_SA_LLC_DARK_CRESCENT`, `LSI_A_LLC_M_BACKSTAB` ), `1 of 1` wide ( `EffectSet_SA_LLC_APOLLYON_Attack_MemoFX` ).
 - **Play-test save ( `elsdb`, backups `db_backup/*pre_createchar*` ):** `LuChA` ( unit 193, class 37, level 70: the five Chiliarch bases + Blasting Fear + Backstab at level 1, upgrades level 0 ) and `LuChB` ( unit 194: upgrades level 1,
   bases level 0 ). Page 1: A bank Dead Hands / Ruinous Impact / Dark Crescent / Blasting Fear, B bank Power of Oriax / Apollyon / Backstab; page 2 swaps the banks.
-- **Next:** play-test, then `/x2-phase char-luciel CH2b review` on Opus 5.5 high.
+- **Play-test ( 2026-11-15, user: all passed; logs 20:15-20:19 on the 19:41 build ):** 24 casts of all 14 ids from A and B slots on both pages, each one `use` + one `cooldown` line on the same skill id; bank B reaches slots 5-8 ( states 60 / 62 / 64 ),
+  Blasting Fear / Backstab enter 296 / 297 on Ciel ( body C ) and the F states on Lu; `dead hands buff level 1` for 30008 / 30038; `apollyon stacks 0 max 20 range 800` ( 0 stacks as expected ); `dark crescent slash set played` each cast; 0 EXCEPTION,
+  UNHANDLED only `E_DISABLE_HB_CHECK_REQ`. **Not exercised:** the Ruinous Impact -> Dark Crescent target landing: `ruinous impact end` shows `presses 0-1 targets 0` every time, because the function that records the hit enemies in
+  `m_vecDarkCrescentTargetUnit` ( June `32b177b0`, a Ruinous Impact damage callback ) is CH4a's ( `ch0_class_map.tsv` row, phase CH4a ), so the vector stays empty and Dark Crescent starts with no target ( June behaviour without it ). Retest the chain at CH4a.
+- **Next:** `/x2-phase char-luciel CH2b review` on Opus 5.5 high.
 
 ### CH2d20 - Done (2026-11-15)
 
