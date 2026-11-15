@@ -46,3 +46,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L283, L290, L291, L309, L314, L359, L733, L789, L117, L178, L258, L727, L787, L865.
 - `june2017_re/char_add/ch0_summon.tsv`: five live sites (one more, `329f350a` in `329f3070`, is dead code: no caller in the exe). Particle Prism `32a0c740` -> 1576 / 1577 (pairs with March's two `CreateNPCReq`, `X2GUAdd.cpp:6103` / `:6120`; class 9, **first in CH2a: CH2b0 runs before CH2a**), ADE Void Impact `329fe650` -> 5188, AMM Charged Impulsar `32a05470` -> 5189 or 5190 (formation mode and mutation > 0), Apocalypse `329f5200` -> 1604 (the plan's `329f5190` is Doom's Day's End). 5189 / 5190 lack `X2UnitManager.h` members. `luabind.py check`: `PlayEffectSet_CustomSet_LUA` unbound in both Charged Impulsar scripts (bind whole from June or row it); Apocalypse's two known rows (`GetEffectSetInstance`, `SetLocalRotateDegree`) are this phase's. Dying Apocalypse `329fb6c0` (L291) is here.
+
+## Amended by the CH1b review (2026-11-15)
+
+- `CX2GUUser::ResetOnSummonEnd` (`X2GUUser.cpp`, Eve CH2b4's inline erase for `UC_ADD_MASTERMIND`) is June `31fc8a90` @`31fc8ab0` calling Add's `329fb6c0`: switch that branch to `CX2GUAdd::OnApocalypseSummonEnd()` (CH1b wrote it under `_CORE`) and widen its `protected` declaration so the user class can call it. CH1b left the inline copy alone.

@@ -612,6 +612,33 @@ All 28 class-map rows of phase CH1b are handled: 26 `inside` rows written (June'
 
 **Nothing to play-test.** Review: `kickoffs/char-add/CH1b-review.md` (Opus 5.5 high, covers CH1a-CH1b; no `_DEBUG` define here). Next: `/x2-phase char-add CH1b review`.
 
+### CH1b - Review (2026-11-15, covers CH1a-CH1b)
+
+**Verdict: pass, no code change.** Commits reviewed: `d1d3f460` (CH1a), `6b5c8bb5` (CH1b). Ghidra read-only; listings from `charport_adis.py add`.
+
+- **Every row written.** Tags `// char-add CH1a|CH1b: June <va>` in `X2GUAdd.*` against `ch0_class_map.tsv`: CH1b 28 / 28; CH1a 31 / 32 plus `329e4d00`, named in WaitStart's tag as March's `PlayAnimationWaitStartByAdd` (decompile: `Fatal` / `Wait` split at 0.25 of max HP, no gage = 1.0; nothing to write).
+- **CH1b June-only pieces = June.** `32a00010` / `32a000a0`: vslot 0x7c4 / 0x338, play speed 0.5 inlined, `HaveThisBuff( 0x159 )` -> `329fb710( 0x644 )`. `FinishSummonedNPC` `329fb710`: singleton guard; per unit `+0x264 == 1` (`GUT_NPC`), templet id (0 = any); gage test `FLDZ; FCOMP hp; test ah, 1; jz skip` skips only an ordered `hp <= 0` (a NaN HP passes, as the port's `<= 0.f` continue; a null gage passes); AI `+0x38 == 1` (`NAT_ALLY`), `+0x78` == vslot 0x54 (`GetUnitUID`); `0x644`: `+0x8b40 != 1` and `+0x98e4 == 0` -> `3275da30( "APOCALYPSE_FINISH_ATTACK", 1 )` (= `GetStateID` + vslot 0x5c, March's `StateChange_LUA`), `+0x8b40 = 1`, `329fb6c0`; else vslot 0xf4 ( 0.0 ) = slot 61 `SetNowHp`. The 0x644 test is on the argument, not the NPC's id, as the port. `OnApocalypseSummonEnd` `329fb6c0`: `+0x98e4 = 0`, `3229e160( 0x159 )` (erase by BTI), vslot 0x198 `IsMyUnit` -> `322de5d0( 0 )` `UpdateSkillSlotUI( false )`.
+- **JUNE_BUGS 751 holds.** A disp scan of the class range (`0x329cf870`-`0x32a31735`) for `+0x98e4` finds 3 stores, all 0 (`329f52b7`, `329fb6c8`, `32a22ffc` `mov [esi + 0x98e4], bl` with EBX cleared at `32a221d0` in the ctor `32a22170`) and one read (`329fb87a`). (`ch1_offsets.tsv` calls `32a22ffc` "ctor / ReInit": it is the ctor only.) `X2GUUser.cpp` `ResetOnSummonEnd` untouched by `6b5c8bb5`.
+- **March-equal bodies, spot-checks pass (3 asked, 7 read):** `329d5730` DamageDownBack EventProcess (ids 0xa1 / 0x9e / 0x9f / 0x21, flag writes per arm, 0.33 strict, 30.0); `329d5970` StandUpRolling BackFront (45.0 = `LINE_RADIUS * 1.5f`, WALK / WAIT); `329d5550` (`0.19` vs anim `+0x24c` then `EventTimer` = `EventTimerOneshot`); also `329d55a0`, `329d5ac0`, `329d1c40` (0.19 / 1.12), `329d1fa0` (flip + vslot 0x7d8).
+- **CH1a `_DP` lines = June.** Wait `329eaa40`, Walk `329eafe0`, JumpLanding `329eb210`, Dash `329eb560`, DashEnd `329eba20`: vslot 0x55c `TryHyperModeStateChange( 0x17 )` only, no 0x6c8 release arm. HyperWait `329eacc0`: `oneLCtr && 0x6c8 GetIsFormationMode` -> nowAction `0x1c` (= `UAI_RELEASE_FORMATION_MODE`, 28th member) + vslot 0x6cc ( 0 ) `SetIsFormationMode( false )`; end arm `!GetIsFormationMode` -> WAIT. Wait's end arm `GetIsFormationMode` -> 0x9b HYPER_WAIT.
+- **CH1a JumpComboZ / X arms = June.** `329d7220`: foot -> 0x12; `[+0x8ef4] <= fStateTime` (`fcompp; test ah, 0x41; jp`, NaN skips) -> 0xc2 `ANSI_CAN_NOT_ATTACK_JUMP_DOWN`; then the `SKILL_CANCEL_AFTER_ONLY_ADD` expansion (vslot 0x7f4, black hole, oneLCtr, 0x6d0( 1 ), 0x17) in March's order and compares; walk ( `+0x8c98` ) and dash ( `+0x8c9c` ) cancels read the `+0x8e90`-picked anim (= `GetXSkinAnimFuture()`) and test `bFootOnLine`. `329d7590` the same without the useful-value arm. `329d73e0` and `329e4840` (walk speed = additional walk speed x `m_fRunJumpSpeedRate` = `GetWalkSpeed()`) = the port. `329d54d0` (new): foot -> 0x12, else `GetRidingOn` -> 0x49.
+- **No `_DEBUG` define** for CH1a or CH1b.
+- **Kickoffs amended:** `CH1h.md` (initialise `m_bApocalypseFinishBlocked` in the ctor, June `32a22ffc`), `CH2b0.md` (`ResetOnSummonEnd` -> `OnApocalypseSummonEnd()` + widen the declaration); both routings were only in the CH1b Done note. `CH1c.md` checked: ready.
+
+**Gates.** `finish.py --review --commits d1d3f460 6b5c8bb5 --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE JUNE_CHAR_ADD_DP -v`:
+```
+flagcheck JUNE_CHAR_ADD_CORE  PASS   files: 4 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR; 0 deleted, 0 non-ASCII, 0 EOL-mismatched
+flagcheck JUNE_CHAR_ADD_DP    FAIL   define NOT FOUND (//#define until CH1q); files: 2 PASS, 1 DEFINE, 2 OTHER, 0 FAIL, 0 ERROR; 0 deleted
+flagcheck JUNE_CHAR_ADD_LIVE  INERT  files: 2 PASS, 1 DEFINE, 2 OTHER, 0 FAIL, 0 ERROR; 0 deleted
+junediverge PASS · junediverge --check-all PASS · enumscan PASS · stateends / skillicons / luabind SKIPPED (no skill state, skill or script)
+FINISH RESULT: FAIL (9 gates, 1 failed, 3 skipped)
+```
+- The `_DP` FAIL is its only complaint, "not #defined": `_DP` is a `//#define` (`Always.h:13915`) by design until CH1q, and `finish.py` marks only `_LIVE`-named flags INERT; every file check passes. Not a finding (CH1a used `--skip-flag` for it).
+- OTHER rows: `X2GUAdd.h` in both commits = `_CORE` lines (enum member, declarations, member), listed under `_LIVE` / `_DP` as partner-flag lines. 0 deleted lines.
+- No build: no code change (nothing to probe); no play-test.
+
+**Nothing to play-test.** Next: `/x2-phase char-add CH1c` (Sonnet 5.5 high).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.

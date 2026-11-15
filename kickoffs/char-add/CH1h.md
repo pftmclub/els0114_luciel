@@ -56,3 +56,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - Class map: **25** functions (1 listing-only; 9 `inside`, 16 `new`), filter `awk -F'\t' '$7=="CH1h"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
 - CH0 split: CH1h = carved overrides below 0x600 + ctor `32a22170` (vtable stores 334daaec / 334daae4) + **dtor body `32a23b90`** (the plan called it a second ctor) + scalar deleting dtor `32a316c0` + secondary-vtable adjustors `32a31530` / `32a31540` (25); CH1h3 = their container helpers (33). InitComponent `329cf870` reads the four June-only `INIT_COMPONENT` keys (`DP_RATE_BY_FORMATION_MODE_USE_MP_3RD_LINE_SKILL`, `DP_USE_RATE_WITH_FORMATION`, `VOID_IMPACT_UP_ANGLE` / `_DOWN_ANGLE`; DP reads under `_DP`). Unnamed for this phase to name by body: 0x2a0 `329e21f0`, 0x3dc `329f9a30`, 0x4c0 `329e7ca0`, 0xd0 `329ffba0`. 0xc0 ApplyHyperModeBuff and 0x2c4 / 0x3e0 / 0x4c4 / 0x4c8 / 0x4bc are not here (CH1q / CH1q2 / CH1o).
+
+## Amended by the CH1b review (2026-11-15)
+
+- The ctor `32a22170` stores 0 to `+0x98e4` at `32a22ffc` (`mov [esi + 0x98e4], bl`, EBX cleared at `32a221d0`): that member is CH1b's `m_bApocalypseFinishBlocked` (`X2GUAdd.h`, `_CORE`); initialise it to `false` in the ctor (the only store outside `329f52b7` / `329fb6c8`; ReInit `329ffcd0` only calls `FinishSummonedNPC`). Until then it is unread (only the `_LIVE` Die Starts reach `FinishSummonedNPC`).
