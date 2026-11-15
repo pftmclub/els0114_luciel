@@ -1614,6 +1614,55 @@ DU5 four phases' work): DU5b viewer second body, DU5c create / select / village 
   testlu1 selected, 0 EXCEPTION, no form REQ in it), and the save holds none of the hand-off's test items (233220, 183697, 63000) on any character;
   testlu1's `minor_unit_form` is 1. The review may ask for a repeat of checks 2-4 if it wants the `LUCIEL DUO FORM` line.
 
+### DU5 - Review (2026-11-15)
+
+Opus 5.5 high. Reviewed `b99ac347` against June in Ghidra / `disasm_range.py` (read-only). **Verdict: pass, no code change.** No play-test (no fix landed).
+- **Click switch** `3291d390 @3291d4a2-3291d622`: `+0x1e4` clicked and `!+0x25b`, viewer `[esp+0x10]` = `+0x1b4` (set `@3291d418`), my unit type 10 (`31fac140`);
+  gate `bl`: no `g_pTFieldGame` or no square unit = 1, `+0x608` emotion != 0 (`ET_NONE` 0; `+0x608` = emotion, D1-3c) -> 0, `+0x49c` == 0 -> 0
+  (`+0x49c` = `m_bFootOnLine`: June `@323f0f7b` writes it by `fabs( y - land ) < 1` and `speed.y <= 0` = March `PhysicProcess`); state 0xe -> `32916e10( +0xe40 == 0 )`;
+  0xf agit (no March state) not ported; else `32912c50( !+0x25a )`, `3291d2e0` (its push is unread: `ret 4`, no arg use = March `EquipChanged()`), `31f94190` stand-in,
+  `3291cfb0( 1 )`, `329146d0`, inventory shown (`+0x1dc`) -> vslot 8 `SetShow( 1 )`: = `SwitchViewOnlyThisDialog`, same order.
+- **Buttons** `3291db60 @3291dc9f-3291ddd1`: same gate (no `g_pTFieldGame` skips it = `CanSwitchFormInVillage` true), my unit type 10, REQ `( +0xe40 == 0 )` with no
+  village test (only 0xf agit is tested) = the port; `@3291dd2d` = the click's local lines.
+- **NOT** `323acfb0`: square unit by UID; type 11 -> Rose (stand-in); type 10: `-1` (`movsx`) skips the form and leaves `bl` 0; else `bl = 323f3290( form == 1 )`,
+  `323fa700` / `323fad80` (DU5c); my UID -> `321524d0( 0x13 )` = `UI_MENU_CHARINFO` (bottombar_buttons.tsv, funcmap 32158070) -> `32912c50( bl )`, `3291d2e0`, viewer x4
+  (DU5b); `( 0x1f )` = `UI_MENU_INVEN` -> `321969e0` = `SetInventorySort( +0xd8, sort == 12 ? 1 : page[sort] )` = `GetSortType()` / `GetNowInvenSortTypePageNum()`
+  (`ST_PC_BANG` 12 -> 1); `( 0x14 )` pet list `328f3550` (June-only, stand-in). The port's extra NULL tests change nothing reachable.
+- **Setter** `3234b8c0`: store `+0xe40`, inventory (`3214ef90`) `+0x1dc == 1` -> vslot 8 `( 1 )` = the port. **Square head** `323f3290`: `m_pUnit` -> `3234b8c0( arg )`,
+  reads `+0xe40` back (the return), `323f1490` SD mesh (DU5c), `3234d930( arg == 1 )`; no unit -> skips to the viewer rebuild (DU5c) and returns 0 = the port's false.
+- **Drop** `32918410 @32918837-32918bb9`: remap `321693b0( &pos )` before the slot search (the port's `UIInventory` is created above it, so June's inventory NULL test
+  never differs); body: `+4 & 0xf000 == 0x1000` (anyone) and `+6 & 0xf == 3` (accessory) -> viewer `+0xd80` (stand-in `m_bSwitchingView`, viewer NULL -> 0), else
+  fashion `+4 & 1` or accessory -> templet `+8` bit 2 = `IsMinorUnitItem`; `3234f4d0` on my unit -> string `0x9a45` box, `@32918a7b` -> `@32918c37` return 0 with no
+  vslot `0x40` (drag return) = the port; the final test re-remaps, then slot `+0x44` set, or item bit 2 clear (`@32918baa-32918bb9`) = the port's minor clause.
+- **Right-click** `321abd20`: `@321aeb3e` conflict -> box, `@321aee54` -> `@321ac121` return 0; `@321aebf3` ring remap before the slot match = the port. Order: June tests the
+  conflict before the usable test `328825c0`; the port's March endurance `continue` sits before it. Unreachable: item.kim has one accessory with `PT_ENDURANCE`
+  (183270, a leg test item), and `328825c0` passes accessories. `32350de0` (return false) stays the stage9 divergence row, as DU5 said.
+- **Conflict** `3234f4d0`: NULL item -> 0; templet `+6 & 0xf == 3`; `32807db0( 0x4c )` = `DITT_ITEM_ID_HEAD_TYPE_ACCESSORY` 76 (June `Enum.src.lua:17425`; no March member
+  at 76; the division loader takes every group); `i < unit +0x2cc` = inventory `+0x28` = `m_MaxSize[ ST_E_EQUIP 9 ]` (`m_pOwnerUnit` +0, `m_MaxSize` +4), `3286a280( 9, i )`;
+  position `+0xd5` differs; also group 76; `3286a350( uid ) == ( item +0xc4 owner +0xe40 != 0 )` -> 1 = the port (owner NULL -> this: June would crash, kept as DU5 wrote).
+- **Ring** `321693b0`: `*pos == 0x17`; body `+0xe40`, or CharInfo `+0x25a` while shown `+0x1e5`; `32869e10( 23, 0, body )` held and `( 28, 0, body )` free -> `0x1c` = the port.
+  **Highlight** `32913b90 @32913d3e`: slot `+0x44 != 0` compared to `3286a350( dragging uid )` = the port; JUNE_BUGS 749 reads right.
+- **SetShow** `@3291e636` / `@3291ea14` pass my unit `+0xe40`; **ResetStat** `@3291cfeb-3291d021`: arg 1 and viewer -> viewer `+0xd80`, else unit `+0xe40`, `== 1` = the port.
+- **Packets:** `32916e10` = `32920900( 0x4d9, &byte, 1, 0 )`; `320aa0f0` = UidType (`33052190`) then char (`33051d30`) at +8 = the structs. Emulator: `minor_unit_form` +
+  the session cache with the row's MP; the play-status handler (`Handlers_Field.cpp:292`) writes both on every change, so the row's MP is current.
+- **Flag-off = March:** `cl /P` (census.py `cl_cmd`, no `/Yu`) of `X2UICharInfo.cpp` / `X2UIInventory.cpp` / `X2TFieldGame.cpp` in a mirrored header tree, flag on vs
+  `//#define` in both shadow `Always.h` and `ServerDefine.h` (an `/I` shadow loses to the same-directory include): 21 / 12 / 10 hunks, every flag-on line is DU5's added
+  text (or its `DECL_PACKET` / `GET_STRING` expansion), every flag-off line is the pre-DU5 text (0 unmatched).
+- **Gates:** `finish.py --review --commits b99ac347 --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW`:
+  ```
+  flagcheck JUNE_CHAR_DUO_VIEW       PASS     files: 13 PASS, 6 PASS~ (blank/marker only), 2 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR
+  junediverge                        PASS     RESULT: PASS
+  junediverge --check-all            PASS     RESULT: PASS
+  enumscan                           FAIL     exit 1: 190 A/B row(s) remain in 17 file(s)
+  stateends / skillicons / luabind   SKIPPED  not requested
+  FINISH RESULT: FAIL (7 gates, 1 failed, 3 skipped)
+  ```
+  enumscan: all 190 rows are pre-existing `X2Unit.cpp` `SI_*` lines (6193-6216 and like); intersected with `git show -U0 b99ac347`: **0 on DU5's lines**. No OTHER row to explain.
+  INFO (not run, `--with`): CHARINFO_DLG / _SHOW / _STATS / _VIEW, CHAR_DUO_BODY, CHAR_NESI_RENUMBER, DIVERGE_SKILL_COOL_TIME_RATE, EQUIP_EFFECT_SET, OFFLINE (enclosing).
+- **Build:** none (no code change). **Play-test:** none (no fix; DU5's passed). The `LUCIEL DUO FORM` log line was not captured (DU5 note); not asked for, since every
+  path it covers matches June byte for byte.
+- **Next:** `/x2-phase char-luciel DU5b` and `/x2-phase char-luciel DU5e` (Opus 5.5 high; no shared files, can run side by side); CH5 (Sonnet 5.5 high) is ready too.
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under
