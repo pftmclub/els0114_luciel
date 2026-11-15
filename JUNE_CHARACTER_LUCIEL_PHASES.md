@@ -1608,6 +1608,11 @@ DU5 four phases' work): DU5b viewer second body, DU5c create / select / village 
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,020,800 B, dated 2026-11-15 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3` (built at `fac2180d` + 38
   uncommitted code files: a peer's coalesced build had already linked DU5's files); `EXESTR OK: 2 of 2` (`[JUNE_CHAR] LUCIEL DUO FORM unit ...` and
   `... FORM REQ %d ignored: no selected unit`, wide).
+- **Commit** `b99ac347`; `finish.py --range b99ac347^..b99ac347 --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW`: flagcheck PASS (13 PASS, 6 PASS~, 2 DEFINE,
+  0 OTHER, 0 FAIL); junediverge PASS; enumscan the same 190 pre-existing rows.
+- **Play-test: passed** (user, 2026-11-15, on md5 `49fa44dc`). Evidence gap for the review: the logs keep only the last launch (22:30-22:36:
+  testlu1 selected, 0 EXCEPTION, no form REQ in it), and the save holds none of the hand-off's test items (233220, 183697, 63000) on any character;
+  testlu1's `minor_unit_form` is 1. The review may ask for a repeat of checks 2-4 if it wants the `LUCIEL DUO FORM` line.
 
 ## Phase CH1 - Deploy unit: the class core
 

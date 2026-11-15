@@ -244,7 +244,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5 | play-test owed (built 2026-11-15): form packets + emulator, window switch (click / buttons / opening form), head-accessory conflict, second ring; rest split to DU5b-DU5e | Opus 5.5 / high, Opus review, user play-test | DU4 review | `X2UICharInfo.*`, `X2UIInventory.*`, `X2TFieldGame.*`, `Handlers_Field.cpp` | `DU5.md` |
+| DU5 | play-test passed 2026-11-15, review ready: form packets + emulator, window switch (click / buttons / opening form), head-accessory conflict, second ring; rest split to DU5b-DU5e | Opus 5.5 / high, Opus review, user play-test | DU4 review | `X2UICharInfo.*`, `X2UIInventory.*`, `X2TFieldGame.*`, `Handlers_Field.cpp` | `DU5.md` |
 | DU5b | blocked (DU5 review): the unit viewer's second body in the character window | Opus 5.5 / high, Opus review, user play-test | DU5 review | `X2UnitViewerUI.*`, `X2UICharInfo.*` | `DU5b.md` |
 | DU5c | blocked (DU5b review): both bodies on the create / select screens, the village avatar by form | Opus 5.5 / high, Opus review, user play-test | DU5b review | `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2SquareUnit.*` | `DU5c.md` |
 | DU5d | blocked (DU5b review): viewer weapon effects case 10, CH0's viewer checklist rows | Opus 5.5 / high, Opus review, user play-test | DU5b review | `X2UnitViewerUI.cpp`, `X2SlotItem.cpp` | `DU5d.md` |
