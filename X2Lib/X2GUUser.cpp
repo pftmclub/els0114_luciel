@@ -3368,7 +3368,7 @@ void CX2GUUser::InitSocketData()
 		// char-luciel DU3c: June 3206d770 @3206dc6a, Lu/Ciel sum only the active body's equips and the shared ones ( 3286a4b0 )
 		if ( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
 		{
-			const int iEquipDuoType = GetUnit()->GetInventory().GetEquipDuoType( eqipUID );
+			const int iEquipDuoType = GetUnit()->GetInventory().GetEquipGroup( eqipUID );
 			const int iActiveBody = ( true == m_bMinorUnitActive ) ? CX2Unit::DT_MINOR : CX2Unit::DT_MAJOR;
 			if ( CX2Unit::DT_BOTH != iEquipDuoType && iActiveBody != iEquipDuoType )
 				continue;
@@ -39748,8 +39748,7 @@ void CX2GUUser::UpdateEqip( const bool bLoad_ )
 			if ( CX2Unit::UT_LUCIEL == eUnitType && false == pUnit->IsFashionEquipInThePosition( eEquipPosition, 1 ) )
 			{
 				if ( NULL != pEquip )
-					m_ViewEqipList.push_back( pEquip );
-				pEquip.reset();
+					m_ViewEqipList.push_back( pEquip );	// char-luciel DU3 review: June bug, pushed again below when no Ciel equip replaces it ( JUNE_BUGS 739 )
 
 				if ( 0 == pItemTemplet->GetItemIDForMinorUnit() )
 				{

@@ -143,7 +143,6 @@ private:
 		short		GetItemSlotID( UidType itemUID ) const;					// char-luciel DU3b: June 3286a310
 		bool		IsMinorUnitEquipItem( UidType itemUID ) const;			// char-luciel DU3b: June 3286a350
 		static bool	IsMinorUnitEquipSlot( const short sSlotID_ );			// char-luciel DU3b: June 32070ef0
-		int			GetEquipDuoType( UidType itemUID ) const;				// char-luciel DU3c: June 3286a4b0, a CX2Unit::DUO_TYPE ( DT_BOTH = both bodies )
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 		void		SetItemMaxNum( SORT_TYPE sortType, int maxNum );

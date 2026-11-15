@@ -1383,7 +1383,9 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 		
 		bool			EqipConflict( CX2Item* pItem );
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
-		void			AdjustEquipPositionForSecondRing( const CX2Item* pItem_, int& iEquipPosition_ ) const;	// char-luciel DU3b: June 3234fe90
+	public:
+		void			AdjustEquipPositionForSecondRing( const CX2Item* pItem_, int& iEquipPosition_ ) const;	// char-luciel DU3b: June 3234fe90 ( public since the DU3 review: the CX2Eqip ctor calls it )
+	protected:
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool			UpdateViewEqip();
 

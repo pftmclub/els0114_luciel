@@ -1446,6 +1446,45 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW` (DU3's; no new define, 
 - **Play-test:** sections DU3b + DU3c of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off assembled 2026-11-15. **Passed** (user, 2026-11-15; run 18:33 on md5 `df9afaf4`): 12 `LUCIEL DUO switch`
   lines (testlu1 7, LuSkillA 5), 0 EXCEPTION, UNHANDLED only `E_DISABLE_HB_CHECK_REQ` x6, ErrorLog only the usual optional XET / texture misses.
 
+### DU3 - Review (2026-11-15)
+
+Opus 5.5 high. Covers DU3 `f238da7b`, DU3b `aa720258`, DU3c `2fbfe93d` (flag `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`). **Verdict: pass after three fixes.**
+Ghidra read-only; decompiles and listings in the session scratchpad.
+- **DU3:** ctor `32961280` stores arg 8 / 9 at `+0x15d4` / `+0x15d5` (`@3296148d` / `@32961493`); the unit-type clear is the templet's use-condition
+  nibble `!= 0x1000` (= `UC_ANYONE` 1); the three keyed reads push `+0x15d4` (`@329616f6` / `@3296182a` / `@3296186c`). `32882540` / `32882440` / `328825c0`
+  = `GetEffectiveEnchantLevel` / the PvP helper / `IsUsableEquip` line by line (SA `+8` = `m_Value1`; `+0x48d` PC-bang stand-in labelled).
+  **Fix 1:** June's ctor also remaps a second ring through the owner (`3234fe90( item, &m_EqipPos )` `@329615f4`); DU3 had left it out. Now in
+  `X2Eqip.cpp` (`AdjustEquipPositionForSecondRing` made public); it does nothing until DU4 adds slots 0x29 / 0x2a (`DU4.md` amended).
+- **DU3b:** `3201b930` both branches (fashion / accessory by `IsMinorUnitEquipSlot( slot )` = body, break after one; normal removes every unprotected equip
+  with restart; remove path's `return 0` with no tail on a missing normal item; basic via `323516d0` then `AddEquipToViewList( item, slot, 1 )` by stack
+  reuse; tail vslot 0x63c `( 0 )`), `31ffe990` (Ciel first, override `+0x9570` / `+0x9574`, JUNE_BUGS 730 read, slot table `0x14 + 0x17` with the 4 Lu
+  slots), `31fd2f00` (both branches, index in both cases), `32350070` / `32350130` / `31fac260` (offsets `+0xb7d` / `+0xbf2` / `+0xc67`, band 16..29,
+  flat table at the raw position, active body `+0xe40`). Callers pass the packet's `m_sSlotID` or `GetItemSlotID( uid )`. All = the transcriptions.
+- **DU3c:** `31fe3e30` (memset 0x75 = `[39][3]`, eight calls in June's order, templet `+0xe4..+0x100`, Raven pos 0x24) and `31fe2fb0` = the port.
+  `31fe4210`: arguments and bodies match, but **fix 2:** after pushing Lu's equip June keeps it in the local (`326df830` is a plain push_back); Ciel's equip
+  is moved into that local (`31e4f5a0`, `ECX = local_1d0` `@31fe45de`), and with no minor-unit id and no Ciel model (`@31fe458c`) the tail
+  (`@31fe44f2`) pushes Lu's equip a second time. Ported verbatim (March's `pEquip.reset()` dropped), JUNE_BUGS 739: 8 Lu/Ciel weapons reach it (Henir
+  dual weapons); the DG manager refuses the second chain add and ASSERT is compiled out, so March is safe.
+  Socket skip `@3206dc6a` (gate unit type 10, body `+0x8e90`, skip when group != 2, body != 2, group != body), `NOT_SHOW_UNIT_BY_DUOTYPE`
+  `@320618a8-3206194c`, `3204e4a0` (window `[start, end)`, inlined `SetShowObject( false )`), `_UpdateSkin` term (`+0x5a8` = model [1]) = the port.
+  **Fix 3 (owed):** `GetEquipDuoType` deleted; `InitSocketData` calls S7k's `GetEquipGroup` (same table, equipped-only scan); the flag's `#error` guard
+  now names `JUNE_SKILL_STAT_GETTERS`; funcmap `3286a4b0 (DU3c)` row re-pointed.
+- **Dummy stand-in:** accepted. June's ctor never reads `param_5` (the dummy flag) and zeroes `+0x190`, so its stack items were never kept; owning heap
+  items is the bridge. Chain byte `m_bAttachedInDGManagerChain` default `true` = March for unported callers: accepted.
+- **Flag-off = March:** `cl /P` of `X2GUUser.cpp`, `X2Eqip.cpp`, `X2Item.cpp` with the flag on and off (scratch `KTDX.h` / `Always.h` searched first;
+  the control with the unmodified copy = the real flag-on output): 66 / 24 / 18 hunks, every ON line inside an `EQUIP_VIEW` block, every OFF line in its
+  `#else` (7 hand-checked: a `/*= */` default comment, `OUT`, `((void)0)`). `flagcheck --base f238da7b^ --with <12 peer flags>` over the 10 touched
+  sources: PASS, 0 OTHER, 0 deleted; the only residue is one blank line outside the flag in 5 files. `/Zs` with the flag off: 6 x 0 errors.
+- **Gates:** `finish.py --review --commits f238da7b aa720258 2fbfe93d --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`: flagcheck PASS (27 PASS, 2 PASS~,
+  1 DEFINE, 0 OTHER, 0 FAIL; 12 deleted lines = DU3c's rename / dummy lines and DU3b's guard, the 2 bare `#endif`s are the `#error` guard's), junediverge
+  PASS, `--check-all` PASS, enumscan exit 1 on 190 rows, **0 on DU3 lines** (`git blame`: 163 from `dd63297`, the rest older peer commits). Fixes:
+  `finish.py --files <6 files> --with ...`: flagcheck PASS (6 PASS, 0 OTHER, 0 FAIL; 23 deleted lines, all inside the flag), junediverge PASS, enumscan PASS.
+  Commit range gate: see the follow-up line below.
+- **Compile:** `/Zs` probes of `X2Eqip.cpp`, `X2GUUser.cpp`, `X2Inventory.cpp`, `X2Unit.cpp`, `X2UICharInfo.cpp`: 5 x 0 errors. **Build blocked** (run 19:20): 11 `LNK2019` in a peer's uncommitted `X2GULuciel.cpp`
+  (CH2b's `LSI_SA_LLC_DARK_CRESCENT_*` / `_RUINOUS_IMPACT_*` declared, not defined); no error in a DU3 review file; nothing deployed (exe still md5 `df9afaf4`).
+- **Save:** testlu1 (unit 166) raised to level 80, Henir dual weapon 62119 worn in slot 9 (Cobo weapon to bag 1 slot 3); `elsdb.py`, backed up.
+- **Play-test:** owed, handed off after the next `DEPLOY OK` (Lu's Henir weapon at init, taken off and put back in a dungeon).
+
 
 ## Phase CH1 - Deploy unit: the class core
 

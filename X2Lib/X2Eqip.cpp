@@ -66,6 +66,11 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 	if( NULL != m_pOwnerUnit )
 	{
 		m_OwnerUnitUID				= m_pOwnerUnit->GetUID();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		int iEquipPosition = m_EqipPos;	// char-luciel DU3 review: June 32961280 @329615f4, the owner remaps a second ring ( slots 0x29 / 0x2a arrive with DU4 )
+		m_pOwnerUnit->AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+		m_EqipPos = static_cast<CX2Unit::EQIP_POSITION>( iEquipPosition );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	}
 	else
 	{

@@ -62,6 +62,8 @@ hidden in the switching view; Ciel {20..34,36,38,40,42} shown only there).
   with the NESI names you register.
 - **Second-ring remap stand-in:** June's `3234fe90` reads unit `+0x294` (a per-UID map whose value starts with the slot id; not identified). DU3b's
   `CX2Unit::AdjustEquipPositionForSecondRing` reads `GetInventory().GetItemSlotID( uid )` (June `3286a310`) instead: identify `+0x294` and confirm or replace.
+  Since the DU3 review it has a fourth caller, the `CX2Eqip` ctor (June `32961280 @329615f4`, `X2Eqip.cpp`): a second ring's equip takes `EP_AC_TEMP4`.
+  The play-test's second-ring check covers it (the ring shows on the second ring's position).
 
 ## Amended after DU3c (user report, 2026-11-15)
 

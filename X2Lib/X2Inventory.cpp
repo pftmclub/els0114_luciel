@@ -718,22 +718,6 @@ bool CX2Inventory::IsMinorUnitEquipItem( UidType itemUID ) const
 	return IsMinorUnitEquipSlot( GetItemSlotID( itemUID ) );
 }
 
-// char-luciel DU3c: June 3286a4b0, the weapon and armour slots serve both bodies, a minor-unit slot Ciel, the rest Lu
-int CX2Inventory::GetEquipDuoType( UidType itemUID ) const
-{
-	const short sSlotID = GetItemSlotID( itemUID );
-	switch ( sSlotID )
-	{
-	case CX2Unit::NESI_DEFENCE_BODY:
-	case CX2Unit::NESI_DEFENCE_LEG:
-	case CX2Unit::NESI_DEFENCE_HAND:
-	case CX2Unit::NESI_DEFENCE_FOOT:
-	case CX2Unit::NESI_WEAPON_HAND:
-		return CX2Unit::DT_BOTH;
-	}
-
-	return ( true == IsMinorUnitEquipSlot( sSlotID ) ) ? CX2Unit::DT_MINOR : CX2Unit::DT_MAJOR;
-}
 
 // char-luciel DU3b: June 32070ef0 ( the same table is inlined in 3286a350, 3201b930 and 31ffe990 )
 /*static*/ bool CX2Inventory::IsMinorUnitEquipSlot( const short sSlotID_ )
