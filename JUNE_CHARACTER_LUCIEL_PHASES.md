@@ -2646,7 +2646,8 @@ Opus 5.5 high. Reviewed CH1o2 `4cd0f5c2` and CH1o3 `8b026393`. **Verdict: pass a
   every OTHER row is a partner flag's or `_CORE`'s file, or `Always.h`'s other define block; `junediverge` + `--check-all` PASS, `enumscan` exit 0, `stateends` PASS both.
   `_CORE` alone ( `flagcheck --commits 4cd0f5c2 8b026393 --files X2EffectSet.cpp X2GULuciel.cpp X2GULuciel.h` ): `5 PASS, 0 OTHER, 0 FAIL` / PASS, 9 deleted = CH1o2's 6 ( Lu's const
   declarations / definitions + comments ) and CH1o3's 3 setter comments. The fix: `finish.py --files X2Lib/X2GUUser.cpp --with <3 flags>`: `FINISH RESULT: PASS (8 gates, 0 failed, 3 skipped)`,
-  1 deleted = the replaced return line ( inside `SKILL_STATE_BYTE`'s own block ).
+  1 deleted = the replaced return line ( inside `SKILL_STATE_BYTE`'s own block ). Commit `1fed231e`; `finish.py --range 1fed231e^..1fed231e --with SKILL_STATE_BYTE`:
+  flagcheck PASS, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 - **Compile:** `/Zs` probes of `X2GUUser.cpp` after the fix, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 2 x 0 errors, 0 warnings. Full build skipped: no play-test.
 - **Next:** `/x2-phase char-luciel CH1p` ( Opus 5.5 high; kickoff checked, its dependencies are done ).
 
