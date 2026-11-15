@@ -36,3 +36,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by CH0 (2026-11-02)
 
 - S3 baseline `june2017_re/char_luciel/ch0_s3_baseline.txt`: 301 tree rows, 301 no_state (March has no class), 137 distinct ids; rerun with `s3_no_state.py` (Lu/Ciel families added by CH0).
+
+## Amended after DU3c (user, 2026-11-15)
+
+- **Ciel's skill-window header on the becoming-transcended walk:** June loads Ciel's description and main combos (`COMMAND_DATA_MINOR`) only when the
+  unit is transcended (`JUNE_BUGS` 736; `/tc` does not handle Lu/Ciel yet, so DU3c could not check it). In the transcendence walk: before transcending,
+  open the skill window (K) and press V: Ciel's header is empty (June's behaviour, not a failure). After transcending, reopen the window and press V:
+  Ciel's description and combo rows must show, and V back shows Lu's. An empty Ciel header on the transcended unit is a port gap: name the job.
