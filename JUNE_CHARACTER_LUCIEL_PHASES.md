@@ -1360,6 +1360,8 @@ the glow cases and the one full build + play-test. One review (`DU3-review.md`) 
   `IsEquipForMinorUnit` (`32b18220`), `SetHandEquipShow`'s hand and arm tests (`32b143e0`).
 - **Gates:** `finish.py --files <9 files> --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`: flagcheck PASS (6 PASS, 1 PASS~, 2 OTHER = the stand-in
   sites inside `JUNE_CHAR_DUO_BODY` / `JUNE_CHAR_LUCIEL_CORE` blocks, 0 FAIL), junediverge PASS, enumscan PASS; FINISH RESULT: PASS.
+  Commit `f238da7b`; `finish.py --range f238da7b^..f238da7b`: flagcheck PASS (7 PASS, 1 PASS~, 1 DEFINE, 0 FAIL; 0 deleted lines; the one bare
+  `#endif` is the `Always.h` `#error` guard, as its neighbours), junediverge PASS, enumscan PASS; FINISH RESULT: PASS.
 - **Compile:** `/Zs` probes of `X2Item.cpp`, `X2Eqip.cpp`, `X2GULuciel.cpp`, `X2GUUser.cpp`, `X2ItemManager.cpp`: 5 x 0 errors; break-test defines on
   the new names fail in each file (the blocks compile). Full build skipped: no play-test (DU3c is the seam).
 - **Kickoff rows done here:** NU0 `DU3` rows `32882540`, `328825c0`; CH0 §7g L407-409 (accessors were K2's, the body now reaches them); DU1b / DU1b2
