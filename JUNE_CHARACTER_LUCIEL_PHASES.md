@@ -3265,7 +3265,12 @@ No review of its own ( the CH2b review covers it; the debug define stays on ). C
   ( second press refused, Nether Shredder refused without a full gauge ), then back to 3.
 - **Point on hit ( CH1 review's ask ):** 0 `LUCIEL DUO point` lines, as expected: `AddCombinationPointOnHit` has no caller until CH4a's
   `InitPassiveSkillState` pushes it ( `X2GULuciel.h:779` ). The ask was early; it moves to CH4a's play-test. The HUD points the user saw come from skill hits.
-- **Next:** the auth-2 retest, then CH2b ( Sonnet ) and its review.
+- **Retest (2026-11-15, user set `auth_level` 0; logs 18:54-18:55):** the user saw the combination-point refusal; 4 casts, no recast inside a cool time
+  ( Triple Shot again after 9 s of 6 ), no `refused` line ( no press fell inside a cool time; the cool-time test sits in the same block as the gauge test ).
+  `auth_level` set back to 3. **Passed.**
+- **Found, routed to CH5:** the HUD icon does not grey while the gauge is short. June `UpdateSkillCoolTime` `322e07e0` @322e1840 has a `UT_LUCIEL` arm
+  ( cost `32b14f70` > points `32b0fa00` -> fade picture ); March has none. Lu/Ciel HUD, so `CH5.md` ( amended ), not this phase.
+- **Next:** CH2b ( Sonnet ) and its review.
 
 ### CH2d20 - Done (2026-11-15)
 

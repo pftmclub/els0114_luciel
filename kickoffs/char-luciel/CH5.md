@@ -54,3 +54,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - **Dungeon-clear picture ( June `324ce260` @`324ce351`-`324ce3f1` ):** for Lu/Ciel's classes it shows Ciel's picture ( `HQ_Dungeon_Clear_Ciel_TGA`, `HQ_Dungeon_Clear_LUCIEL_ROYAL_GU...`, `HQ_Dungeon_Clear_Ciel_tga` ) when `g_pX2Game->GetWinSpeechForm()` ( June game `+0xb54` ) is 1, else the default. CH1o3 wrote the member and the roll in `CX2GUUser::GetRandomWinSpeech` ( flag `SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH` ); add the cases to March's clear-picture switch.
 - **Dungeon ending speech ( June `327e0040`, from the DungeonData loader `327e0f80` @`327e625e` ):** `ENDING_SPEECH` gains a `LUCIEL = { { LU = id, CIEL = id }, ... }` set ( June `DungeonData.src.lua`, e.g. lines 454-463 ), read into a vector of two-string vectors; March's `X2DungeonManager.cpp` `ENDING_SPEECH` reader has no `LUCIEL` key. Port the reader and find which body its consumer shows.
+
+## Amended by char-luciel CH2a2 (2026-11-15)
+
+- **Skill icon greys while the combination gauge is short ( user, play-test of CH2a2 ):** June `CX2Game::UpdateSkillCoolTime` `322e07e0` @322e1840-322e1885:
+  my unit type 10 ( `UT_LUCIEL` ) and `GetSkillCombinationPointCost` `32b14f70` ( the slot skill; read the call's arguments in the listing ) above
+  `GetNowCombinationPoint` `32b0fa00` -> the slot's fade picture shows ( `@322e1be1`, picture `+8` = 1 ). March's `X2Game.cpp` `UpdateSkillCoolTime` has the
+  Chung cannonball and Ara force-power arms but no Lu arm: port it in its place in the else chain ( the type 9 / 0xb arms beside it are other classes' ).
