@@ -3644,6 +3644,9 @@ Files: `X2GULuciel.cpp` / `.h`, `Always.h` ( the debug line ), `ch1_offsets.tsv`
   `833d1d53` 3 = CH2c's "body in CH2c2" markers. `833d1d53` also carried a racing peer's deletion of `kickoffs/june-stat-calc/D5-review.md`; its owner restored it ( `ddaf8568` ).
 - **This review's gates:** `/Zs` probe of `X2GULuciel.cpp`: exit 0, 0 errors. Worktree `finish.py --files X2GULuciel.cpp X2GULuciel.h Always.h --with _SKILL _CORE _SKILL_DEBUG`: both class files PASS, junediverge PASS, enumscan 0,
   `_SKILL_DEBUG` retired; the `Always.h` ERROR is a peer's uncommitted `Always.h` hunks ( char-add ) plus the `_LIVE` / `_CORE` guard pairing. Range gate after the commit: below.
+- **Commit `bc2f6000`, range gate:** `finish.py --range bc2f6000^..bc2f6000 --with _SKILL _SKILL_DEBUG` reports 1 ERROR on `Always.h` ( the retired `_SKILL_DEBUG` guard line 13688; the tool limit the CH2b review
+  met ), and with `_CORE` as a partner 1 ERROR on the `_LIVE` / `_CORE` guard line 13445. Per file: `flagcheck _CORE --range ... --files X2GULuciel.cpp X2GULuciel.h` 2 PASS, 0 FAIL, `RESULT: PASS` ( 8 deleted lines =
+  the 5 replaced Soul Shock lines, the comment line, the 2 renamed member lines ); `flagcheck _SKILL_DEBUG --files Always.h`: only the retire's "not #defined"; junediverge PASS, enumscan exit 0.
 - **Build:** full build skipped: no play-test ( the fix changes one number on Soul Shock's damage effect; CH2d's build carries it, and its hand-off re-casts Soul Shock once ).
 - **Next:** `/x2-phase char-luciel CH2d` on Sonnet 5.5 high.
 

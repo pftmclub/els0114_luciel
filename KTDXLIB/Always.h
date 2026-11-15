@@ -13904,7 +13904,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
 // Description: june-engine R14d debug: one "[JUNE_ENGINE] EQTRACE" line per TraceLandPos move ( first 10, then every 600th ); the
 //              review retires it.
-#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE_DEBUG
+//#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE_DEBUG	// retired by the R14d review 2026-11-15
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
