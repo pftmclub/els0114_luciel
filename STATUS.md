@@ -105,7 +105,6 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH0b | staged + packed + copied 2026-11-15 (7,686 assets, 31 koms, data207; icons PASS, Apocalypse tree piece = June gap); waits on the user's play-test + check logs | Sonnet 5.5 / high, user play-test | CH0 (done), char-elesis CH6 | koms, save | `CH0b.md` |
 | CH1b | ready (CH1a done): reactions; review covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUAdd.*` | `CH1b.md` |
 | CH1c | blocked (CH1b review): riding, pepper run, dance; no review of its own | Sonnet 5.5 / high | CH1b review | `X2GUAdd.*` | `CH1c.md` |
 | CH1d0 | blocked (CH1c): the 12 June engine helpers Sonnet phases call (line-map snap `32294530`, line-side test, CEffect / mesh / user accessors) | Opus 5.5 / high, Opus review | CH1c | engine files (`X2GameUnit.*`, `X2DamageEffect.*`, `X2GUUser.*`, `X2Game.*`, KTDXLIB mesh) | `CH1d0.md` |
@@ -151,7 +150,7 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 | CH6 | blocked (CH4b, CH5, CHNb, TU reviews): scans rerun + user walk incl. creation screen, all job changes, the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH4b, CH5, CHNb, CH0c, TU reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, template paragraph, **closes Stage 7** (unparks char-luciel) | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
 
-Done: CH1a (2026-11-15, 32 rows: 30 inside + 1 new under `_CORE`, helper `329e4d00` = March's `PlayAnimationWaitStartByAdd`; 10 differ ( `_DP` formation lines, JumpComboZ / X ), JUNE_BUGS 747; /Zs probes, no build; the CH1b review covers it), CH0 (2026-11-13; maps + asset list, 5 splits + new Opus CH1d0, no code), CH0c (2026-11-13, reviewed: pass, no code fix; Add creatable, slot + shop combos; tutorial skipped until TU; debug retired).
+Done: CH1a (2026-11-15, 32 rows: 30 inside + 1 new under `_CORE`, helper `329e4d00` = March's `PlayAnimationWaitStartByAdd`; 10 differ ( `_DP` formation lines, JumpComboZ / X ), JUNE_BUGS 747; /Zs probes, no build; the CH1b review covers it), CH0b (2026-11-15, 7,686 June assets in 29 koms + 9 dialog Lua, 31 koms packed / copied, icons PASS, play-test passed, 0 KEM_ERROR / Motion Error; JUNE_BUGS 744 / 748), CH0 (2026-11-13; maps + asset list, 5 splits + new Opus CH1d0, no code), CH0c (2026-11-13, reviewed: pass, no code fix; Add creatable, slot + shop combos; tutorial skipped until TU; debug retired).
 
 Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for all seven Add classes are derived (class 9 from June's `UT_ADD` row by Lu/Ciel's formula; first jobs = 9; second jobs = 9 with their own level 1); CH0c writes 9 / 32 / 122, CHNa the rest; the user packs `StatTable.lua`. **Moot (CH0, 2026-11-13):** the flat `StatTable.lua` (e37c9211) already has all seven Add classes; CH0c and CHNa write no stat rows.
 
