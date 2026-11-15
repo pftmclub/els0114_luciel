@@ -11179,9 +11179,11 @@ namespace _CONST_LUCIEL_CH1L3_
 	const int		PUNISHER_MAX_TARGET_COUNT							= 5;		// June 32b34c70
 	const float		PUNISHER_FIRST_HIT_EFFECT_RATE						= 0.5f;		// June 32b34c70 ( 334ed42c ): the modifier value while the relate skill index is 0
 	const float		PUNISHER_LATER_HIT_EFFECT_RATE						= 0.25f;	// June 32b34c70 ( 33437818 )
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int		EFFECT_MODIFIER_TAG_FORCE_DOWN_VALUE				= 9;		// June 321db1b0 modifier tag ( no Enum entry ): the damage data's force down value, multiplied or added
 	const int		EFFECT_MODIFIER_TAG_EXTRA_DAMAGE					= 10;		// June 321db1b0 modifier tag ( no Enum entry ): the damage data's extra damage, multiplied or added
 	const int		EFFECT_MODIFIER_TAG_RELATE_SKILL_INDEX				= 11;		// June 321db1b0 modifier tag ( no Enum entry ): the damage data's relate skill index byte
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int		ALTAR_OF_EVIL_MAX_EFFECT_COUNT						= 8;		// June 32b35600
 	const int		STATE_ID_ALTAR_OF_EVIL_UNNAMED						= 444;		// June 32b35c60 ( 0x1bc ): Enum.lua has no name for it ( between COMBO_XXX_END 443 and DEATH_TOUCH 446 )
 	const int		OPEN_MIND_DEFAULT_COMBINATION_POINT					= 5;		// June 32b4c7f0: the threshold when the skill templet is missing
@@ -11191,11 +11193,9 @@ namespace _CONST_LUCIEL_CH1L3_
 	bool TryGetAcquiredSkillAbilityValue( CX2Unit* pUnit_, const CX2SkillTree::SKILL_ABILITY_TYPE eType_, const CX2SkillTree::SKILL_ID eSkillID_, const bool bMemoSwap_, float& fOut_ )
 	{
 		if ( NULL == pUnit_ )
-#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			return false;
 
 		const int iSkillLevel = pUnit_->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID_, false, 0, true );
-#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		if ( iSkillLevel <= 0 )
 			return false;
 
