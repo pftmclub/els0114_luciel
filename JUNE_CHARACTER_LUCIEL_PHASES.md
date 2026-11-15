@@ -1745,7 +1745,12 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `S
   uncommitted code files); `EXESTR OK: 1 of 1` (`[JUNE_CHAR] LUCIEL DUO STAT ...`, wide).
 - **Commit** `9286ce8d`; `finish.py --range 9286ce8d^..9286ce8d --with SERV_IRUHADEV_JUNE_CHAR_DUO_STAT`: flagcheck PASS (13 PASS, 2 PASS~, 2 DEFINE,
   0 OTHER, 0 FAIL); junediverge PASS; enumscan the same 191 pre-existing rows.
-- **Play-test:** owed (hand-off: testlu1, Necklace of Vitality on Ciel only, dungeon tag compare).
+- **Play-test: run read** (2026-11-16, 04:07-04:13 on md5 `8c2dc751`; the user played battlefield 40000, not the village first). testlu1's own gear
+  already splits the bodies: `LUCIEL DUO STAT unit 166: Lu hp 128500 atk 6881 / 6608 def 353 / 347, Ciel hp 128500 atk 6911 / 6638 def 363 / 357`. The
+  necklace (`/additem 64000`) went on Lu's slot 18 both times (dropped with Lu active: outside the village the window follows the active body, DU5):
+  each room equip NOT sent one line, Lu hp 128500 -> 129700 -> back, Ciel unchanged. The user saw no HP-bar change on tag: = June (one shared HP bar,
+  every handler sets max HP from the first stat, JUNE_BUGS 753); Ciel's own atk / def (+30 / +10) is not visible in play. 0 EXCEPTION, ErrorLog clean,
+  UNHANDLED only `E_DISABLE_HB_CHECK_REQ` x4. The review may ask for a Ciel-slot drop (switch to Ciel in game, then drop) if it wants that direction too.
 
 ## Phase CH1 - Deploy unit: the class core
 
