@@ -7112,3 +7112,16 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO` (`//#define` until CH1 final defines i
 - **Data (live now).** data036 `Enum.lua` (core list): June's `DUO_TYPE.DT_BOTH` 2 / `DT_KEEP` 3. data034: June's `DLG_LUCIEL_BOUNDING_KEY.lua` (new,
   June's bytecode via `adopt-june`). Both koms packed and copied (backups `kom_backup_tools\data036.kom.20261115_125324`, `data034.kom.20261115_125325`).
 - **Revert:** keep `_DUO` commented out; data: copy the two backups back, or drop the two `DUO_TYPE` lines and the staged file and repack.
+
+## Stage 8 Lu/Ciel, CH1: Lu/Ciel goes live (char-luciel CH1, 2026-11-15)
+
+Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO` defined; one override under `_CORE`; the die-state ends under
+`SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS`. Plan `JUNE_CHARACTER_LUCIEL_PHASES.md`, "CH1 - Done".
+- **What changes.** A Lu/Ciel character loads as `CX2GULuciel` in villages, fields and dungeons (`CX2Game::CreateGUUser` and the intruder copy), with
+  June's class scripts, both bodies, the V-key body swap, the Combination Point gauge and the switching guide. Every `_LIVE` / `_DUO` site written by
+  NU / DU / CH1a-CH1p is now on. Every class: a die state's end (socket SIEE 18, buff clear-all) is matched through `GetDieFrontStateID()` /
+  `GetDieBackStateID()` as well as `USI_DIE_*` (March classes return the same ids, so no change for them; Ciel's 192 / 193 now clear).
+- **Data (live now).** data036: June's `Luciel_Duo.lua` and `Luciel_Demonio.lua` (new, June bytecode via `adopt-june`), `Enum.lua` (core list) gains
+  `SKILL_ID.RNSI_A_LLD_BLUFF = 30304`. data034: June's `DLG_Luciel_CombinationPoint.lua` (new). Both koms packed and copied (backups
+  `kom_backup_tools\data034.kom.20261115_132507`, `data036.kom.20261115_132507`).
+- **Revert:** comment out `_LIVE` and `_DUO` (Lu/Ciel then cannot enter a game); data: copy the two backups back.

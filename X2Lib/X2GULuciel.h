@@ -736,6 +736,26 @@ public:
 
 	void				SetBoundingTarget( const CX2GameUnit::GAME_UNIT_TYPE eTargetType_, const UidType uidTarget_, const int iTargetLastHitAttackSerial_ );	// char-luciel CH1p: June 32b38cb0, called by the bounding hooks of CX2GUUser 31fd02d0 and CX2GUNPC 3275a070
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	// char-luciel CH1: June 3230f470, the factory's case 10 in 322ced00 / 322d5bf0 ( Chung's CreateGUChung pattern )
+	static CX2GULuciel*	CreateGULuciel( int iUnitIndex_, int iTeamNum_,
+#ifdef	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
+			lua_State*   pScriptLuaState,
+#else	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
+			const WCHAR* pScriptFileName,
+#endif	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
+		int iFrameBufferNum_, IN CX2Unit* pUnit_ )
+	{
+		return new CX2GULuciel( iUnitIndex_, iTeamNum_,
+#ifdef	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
+			pScriptLuaState,
+#else	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
+			pScriptFileName,
+#endif	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
+			iFrameBufferNum_, pUnit_ );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 #ifdef	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
@@ -803,6 +823,7 @@ protected:
 	// char-luciel CH1m: registration, and the CX2GUUser bodies only Lu / Ciel register
 	virtual void		InitState();	// June 32b43d10 ( vslot 0x7a4 )
 	void				InitStateCommon();	// June 32b3e8b0
+	virtual void		ParseCommonRandomState();	// char-luciel CH1: March's pure virtual; June parses in CX2GUUser::Init ( 31feaac0 ) by class name
 	void				DieFrontStartFuture();	// June 31fcd0f0
 	void				DieFrontFrameMove();	// June 320008f0
 	void				DieFrontEventProcess();	// June 31fcd160

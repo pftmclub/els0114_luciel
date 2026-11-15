@@ -13425,8 +13425,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-14
 // Description: char-luciel - Lu/Ciel live: the factory cases ( CX2Game::CreateGUUser, the intruder copy ), the two class scripts and their
-//              motions. Defined by CH1 final; until then CX2GULuciel ( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ) compiles unreferenced.
-//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+//              motions. Defined by CH1 final ( 2026-11-15 ), with CX2Game's switching-guide calls, the DATA line and Ciel's die-state end.
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ( the class CX2GULuciel )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
@@ -13574,7 +13574,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Description: char-luciel CH1p: Lu/Ciel's in-class duo switch, live: the bounding-target hooks of CX2GUUser ( June 31fd02d0 ) and
 //              CX2GUNPC ( June 3275a070 ) call CX2GULuciel::SetBoundingTarget, HIT_ADD_COMBINATION_POINT stops logging as
 //              unsupported, and the [JUNE_CHAR] LUCIEL DUO lines ( switch, point ) log. Defined by CH1 final with _LIVE.
-//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 #ifndef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ( CX2GULuciel::SetBoundingTarget ), char-luciel CH1p

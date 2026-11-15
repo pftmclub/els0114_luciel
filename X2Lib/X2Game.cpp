@@ -12,6 +12,9 @@
 #ifdef SERV_IRUHADEV_JUNE_SIMPLE_DLG
 #include ".\X2SimpleDLG_WithLuaFunc.h"
 #endif SERV_IRUHADEV_JUNE_SIMPLE_DLG
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#include "./X2GULuciel.h"	// char-luciel CH1: the UT_LUCIEL factory cases
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 
 
 
@@ -465,6 +468,12 @@ m_bSkillSlotJustChanged(true)
 					ClearAllMemoRiseSlotParticle( true );		// June @32307e99, later in the ctor
 				}
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_MEMORIZE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+				{
+					const bool bShowLucielSwitchingGuide = false;
+					UpdateLucielSwitchingGuideUI( &bShowLucielSwitchingGuide, 0.f );		// char-luciel CH1: June @32307bca
+				}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EVE_UI
 				{
 					const bool bShowEveRecovery = false;
@@ -850,6 +859,10 @@ CX2Game::~CX2Game()
 		const bool bShowMemorize = false;
 		ShowMemorizeStatics( &bShowMemorize );		// June dtor @32308941
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_MEMORIZE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+		const bool bShowLucielSwitchingGuide = false;
+		UpdateLucielSwitchingGuideUI( &bShowLucielSwitchingGuide, 0.f );		// char-luciel CH1: June dtor @32308957
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EVE_UI
 		const bool bShowEveRecovery = false;
 		UpdateEveRecoveryUI( &bShowEveRecovery, false, 0.0f );		// June dtor @3230898d
@@ -2209,6 +2222,14 @@ CX2GUUser* CX2Game::AddUserUnitIntruder( CX2Room::SlotData* pSlotData, int slotI
 		}
 		break;
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	case CX2Unit::UT_LUCIEL:	// char-luciel CH1: June factory 3230f470, case 10 at @322ceeb4 / @322d5d8f
+		{
+			pCX2UserUnit = CX2GULuciel::CreateGULuciel( slotIndex, pSlotData->m_TeamNum, script_info, g_pMain->GetFrameBufferNum(),
+				pSlotData->m_pUnit );
+		}
+		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 	}
 
 
@@ -21845,6 +21866,13 @@ CX2GUUser* CX2Game::CreateGUUser( const CX2Room::SlotData* pSlotData_, int iSlot
 		} break;
 #endif //SERV_9TH_NEW_CHARACTER
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	case CX2Unit::UT_LUCIEL:	// char-luciel CH1: June factory 3230f470, case 10 at @322ceeb4 / @322d5d8f
+		{
+			return CX2GULuciel::CreateGULuciel( iSlotIndex_, pSlotData_->m_TeamNum, script_info, g_pMain->GetFrameBufferNum(),
+				pSlotData_->m_pUnit );
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 	default:
 		{
 			ASSERT( !"Create User Object is Fail!! ( Unknown User Type )" );

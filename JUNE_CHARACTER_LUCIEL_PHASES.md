@@ -2732,6 +2732,40 @@ Opus 5.5 high. Reviewed CH1p `b3ddeef9`. **Verdict: pass, no code change.** No d
   `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO /DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` 5 x 0 errors. Full build skipped: no play-test.
 - **Next:** CH1 ( Opus 5.5 high ): every dependency is now done.
 
+### CH1 - Done (2026-11-15)
+
+Opus 5.5 high. **`SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` and `_DUO` defined** ( `Always.h` ); Lu/Ciel is playable. Files: `Always.h`, `X2Game.cpp`,
+`X2GULuciel.h` / `.cpp`, `X2GUUser.cpp`. funcmap: `grep "(CH1)" june2017_re/funcmap.tsv` ( 4 rows ). Commit: see the STATUS row.
+- **Factory ( `_LIVE` ):** `CX2GULuciel::CreateGULuciel` ( Chung's inline pattern, June `3230f470` ) and `case CX2Unit::UT_LUCIEL` in `CX2Game::CreateGUUser`
+  and `AddUserUnitIntruder` ( June case 10 at @`322ceeb4` / @`322d5d8f`; which caller is which is left to the review ). `X2Game.cpp` includes `X2GULuciel.h`.
+- **Switching guide ( `_LIVE`, CH1a0 amendment ):** `UpdateLucielSwitchingGuideUI( &false, 0.f )` in the `CX2Game` ctor ( @`32307bca` ) and dtor ( @`32308957` ),
+  between the memorize and Eve recovery calls, June's order.
+- **Found by the first instantiation: `ParseCommonRandomState`** was March's last pure virtual Lu lacked ( C2259 ). June has no class override ( base `Init`
+  `3204ea20` calls `31feaac0` ); `CX2GULuciel::ParseCommonRandomState` ( `_CORE` ) calls `ParseCommonRandomStateByUnitClass()`, as Aisha / Ara / Elesis do.
+  `GetUnitClassName` names all seven classes = `Luciel_Duo.lua`'s `INIT_COMMON_RANDOM_STATE` keys ( `LUCIEL_DUO` ... `LUCIEL_DEMONIO` ).
+- **Ciel's die-state end ( CH1o2 lead, `JUNE_USER_VIRTUAL_HOOKS` ):** `ch0_reg.tsv` rows 185 / 186 give `LSI_CIEL_DIE_FRONT` / `_BACK` June's die StateEnd
+  `3202a7d0`, so `DoStateEndStart`'s two stand-ins ( SIEE 18, buff clear-all ) now also match `GetDieFrontStateID()` / `GetDieBackStateID()`. March
+  classes return `USI_DIE_*` ( no change ); a transformed unit's Lu die state still matches `USI_DIE_*`.
+- **DATA line ( `_LIVE`, not June ):** end of `InitState`: `[JUNE_CHAR] LUCIEL DATA class %d script %s motion %s minor_motion %s states %d bounding %d
+  wait_state_change %d active_body %s`.
+- **Data ( sub-agent, checked ):** `adopt-june` ( bytecode ) data036 `Luciel_Duo.lua` 278,167 B / `Luciel_Demonio.lua` 86,377 B, data034
+  `DLG_Luciel_CombinationPoint.lua` 3,378 B ( all new ); data036 `Enum.lua` + `RNSI_A_LLD_BLUFF = 30304` ( `-- char-luciel CH1`, = June `Enum.src.lua:15069`
+  and `X2SkillTree.h:3288` ), `luasrc.py refresh` + `ledger --check` PASS. `luabind.py check` the three: `RESULT: PASS` ( enum gate clean; one June nil
+  `CAMERA_TYPE.CT_PARTS_LOOK_TRACKINGT` left as June's ). `LD_Arousal_UI_01` is in data036 `GameMajorParticle32.txt`. The 20 motions of the UnitTemplet rows
+  are in data208 ( Lu ) / data218 ( Ciel ), in sync with the live koms ( CH0b copied them; nothing was held ). `PACK OK` / `COPY OK` data034 and data036
+  ( md5 `d06aa6f2...` / `53ca067f...`, backups `kom_backup_tools\*.20261115_132507` ).
+- **Gates:** `finish.py --files <5> --with LUCIEL_CORE LUCIEL_LIVE LUCIEL_DUO JUNE_USER_VIRTUAL_HOOKS --state X2GULuciel.cpp LUCIEL_DUO --lua <3>`:
+  flagcheck CORE `3 PASS, 1 DEFINE, 1 OTHER`, DUO `2 PASS, 1 DEFINE, 2 OTHER`, LIVE `4 PASS, 1 DEFINE`, HOOKS `1 PASS, 1 DEFINE, 3 OTHER`, all `0 FAIL` /
+  PASS; 3 deleted lines = `Always.h`'s two `//#define` lines and one description line; junediverge PASS; enumscan exit 0; stateends PASS; luabind PASS;
+  skillicons SKIPPED ( no skill added; CH0b's 195 PASS ). `FINISH RESULT: PASS (9 gates, 0 failed, 1 skipped)`. INFO: `BUFF_DEATH_CLEAR`, `SKILL_STATE_PTR`,
+  `SOCKET_PARITY` enclose the die-state hunks.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,905,600 B, dated 2026-11-15 13:41:00, md5 a9e9de29ddaca6737cc3d40dcf2acd03, equal to X2/US_SERVICE/x2.exe`.
+  `EXESTR OK: 2 of 2 found in X2_offline.exe` ( the DATA and DUO switch lines ).
+- **How to see it in game:** the play-test hand-off below ( create, village, walk / jump / dash / combo, V swap, HUD point row and portraits, dungeon,
+  Ciel MP + form across the hop, Ciel death clears buffs, win-pose return, relog, one other class's regression walk ).
+- **Play-test:** owed by the user. After it, `CH1-review.md` ( written ) covers this commit and june-state-ids S2 `857b18cd`; CH2a / DU3 / CHN / TU are
+  amended from what the play-test shows.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

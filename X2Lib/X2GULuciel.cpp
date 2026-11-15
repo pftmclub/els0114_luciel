@@ -3,6 +3,9 @@
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 #include "Offline/X2OfflineLog.h"	// char-luciel CH1p: the [JUNE_CHAR] LUCIEL DUO lines
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#include "Offline/X2OfflineLog.h"	// char-luciel CH1: the [JUNE_CHAR] LUCIEL DATA line
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 
 //{{ Iruha : 2026-11-14 // char-luciel CH1a: Lu/Ciel's class skeleton ( June 32ae4080-32b4e76f )
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
@@ -12359,6 +12362,21 @@ void CX2GULuciel::DashEndStartFuture()
 	InitPassiveSkillState();					// June vslot 0x690 ( 32b45820, CH4a )
 	InitEquippedActiveSkillState( false );		// June vslot 0x684
 	CX2GUUser::InitState();						// June 31fd8f00
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	// char-luciel CH1: not June, the done-gate line ( script, both bodies' motions, states, bounding / wait-change tables )
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DATA class %d script %s motion %s minor_motion %s states %d bounding %d wait_state_change %d active_body %s",
+		static_cast<int>( eUnitClass ), m_ScriptFileName.c_str(), NULL != m_pMotion ? m_pMotion->GetDeviceID().c_str() : L"(none)",
+		NULL != m_pMinorUnitMotion ? m_pMinorUnitMotion->GetDeviceID().c_str() : L"(none)", static_cast<int>( m_StateList.size() ),
+		true == IsBoundingStatesReady() ? 1 : 0,
+		m_StateList.end() != m_StateList.find( static_cast<UserUnitStateDataMap::key_type>( USI_WAIT_STATE_CHANGE ) ) ? 1 : 0,
+		true == IsMinorUnitActive() ? L"CIEL" : L"LU" );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+}
+
+// char-luciel CH1: June 31feaac0, called by CX2GUUser::Init 3204ea20 for every class ( LUCIEL_DUO ... LUCIEL_DEMONIO tables )
+/*virtual*/ void CX2GULuciel::ParseCommonRandomState()
+{
+	ParseCommonRandomStateByUnitClass();
 }
 
 // char-luciel CH1m: June 32b3e8b0 ( 294 registrations, no class test )

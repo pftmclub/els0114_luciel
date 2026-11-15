@@ -7756,7 +7756,12 @@ void CX2GUUser::DoStateEndStart()
 #ifdef SERV_IRUHADEV_JUNE_SOCKET_PARITY
 			/// June buff port 16-step3b4: the die states' StateEnd (3202a7d0) plays SIEE 18 (@3202a7e1) before its clear-all
 #ifdef SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+			if ( USI_DIE_FRONT == m_itNowStateData->first || USI_DIE_BACK == m_itNowStateData->first
+				|| GetDieFrontStateID() == m_itNowStateData->first || GetDieBackStateID() == m_itNowStateData->first )	// char-luciel CH1: June gives Ciel's die states 192 / 193 3202a7d0 too
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 			if ( USI_DIE_FRONT == m_itNowStateData->first || USI_DIE_BACK == m_itNowStateData->first )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 #else SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 			if ( USI_DIE_FRONT == m_NowStateData.stateID || USI_DIE_BACK == m_NowStateData.stateID )
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
@@ -7766,7 +7771,12 @@ void CX2GUUser::DoStateEndStart()
 			/// June 3202a7d0 is the StateEnd of every class's DIE_FRONT / DIE_BACK (thunk 329cada0, delegate +0x54,
 			/// e.g. @329b8140): clear-all(false) @3202a7ea, then CommonStateEnd. March's die states register no StateEnd.
 #ifdef SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+			if ( USI_DIE_FRONT == m_itNowStateData->first || USI_DIE_BACK == m_itNowStateData->first
+				|| GetDieFrontStateID() == m_itNowStateData->first || GetDieBackStateID() == m_itNowStateData->first )	// char-luciel CH1: June gives Ciel's die states 192 / 193 3202a7d0 too
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 			if ( USI_DIE_FRONT == m_itNowStateData->first || USI_DIE_BACK == m_itNowStateData->first )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 #else SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 			if ( USI_DIE_FRONT == m_NowStateData.stateID || USI_DIE_BACK == m_NowStateData.stateID )
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
