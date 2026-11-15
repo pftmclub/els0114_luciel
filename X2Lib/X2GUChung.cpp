@@ -36262,7 +36262,11 @@ void CX2GUChung::OpenMindAttackResult( const CX2DamageManager::DamageData& damag
 		pRenderParam_->outLineColor		= 0xff00f5ff;
 	}
 	else
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		CX2GUUser::ApplyRenderParam( pRenderParam_ );	// june-engine R5: June 32beeed0's else branch is the user's 31fd4460
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		CX2GameUnit::ApplyRenderParam( pRenderParam_ );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 #else SERV_IRUHADEV_JUNE_CHAR_CHUNG_LIVE
 #ifdef RIDING_SYSTEM
 	if ( m_bPassDash )

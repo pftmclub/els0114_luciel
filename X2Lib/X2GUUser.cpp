@@ -768,6 +768,16 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 , m_fCreateEffectSetRate( 0.f )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_PASSIVE
 #endif SERV_IRUHADEV_JUNE_USER_CREATE_EFFECT_SET
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+, m_iBuffCustomRenderState( CRS_NONE )			/// june-engine R5: June ctor @32040e2b-32040e3d zeroes +0x8e64 .. +0x8e70
+, m_fStateCustomRenderStartTime( 0.f )
+, m_fStateCustomRenderEndTime( 0.f )
+, m_iStateCustomRenderState( CRS_NONE )
+, m_bBuffCustomRenderStateActive( false )
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+, m_iLoggedCustomRenderState( CRS_NONE )
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_INIT_PASSIVE_SKILL_STATE
 , m_fPassiveAnimSpeedRate( 1.f )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_INIT_PASSIVE_SKILL_STATE
@@ -19285,6 +19295,19 @@ void CX2GUUser::CommonStateStart()
 		m_LuaManager.EndTable();
 	}
 #endif SERV_IRUHADEV_JUNE_USER_CREATE_EFFECT_SET
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+	// june-engine R5: June 32057b80 @32060731-32060751: the state key ( 31fce500 zeroes it for a state without one ), then colour alpha 1.0 when no state render
+	const bool bHasCustomRenderStateKey = ParseCustomRenderState( m_LuaManager, m_fStateCustomRenderStartTime, m_fStateCustomRenderEndTime, m_iStateCustomRenderState );
+	if ( CRS_NONE == m_iStateCustomRenderState )
+		m_RenderParam.color.a = 1.f;
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+	if ( true == bHasCustomRenderStateKey )
+		KLOG( "ErrorLog.txt" ) << "[JUNE_ENGINE] CRS state key unit " << (int)GetUnitUID() << " state " << (int)GetNowStateID() << " crs " << m_iStateCustomRenderState
+			<< " start " << m_fStateCustomRenderStartTime << " end " << m_fStateCustomRenderEndTime << fileout;
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+	UNREFERENCED_PARAMETER( bHasCustomRenderStateKey );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
 	m_vecSpecialOptionValue.resize( 0 );	/// June 32057b80 @320608a9-3206092e
 	if( true == m_LuaManager.BeginTable( "SPECIAL_OPTION_VALUE" ) )
@@ -20783,7 +20806,21 @@ void CX2GUUser::CommonFrameMove()
 				//pCX2Eqip->OnFrameMove( m_fTime, m_fElapsedTime * m_AdvanceTimeCount, m_pXSkinAnim->GetRenderParam() );
 #ifdef  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+				// june-engine R5: June 32063650 @320659e9-32065bb4: with UNIT_FADE_WHITE_WITHOUT_WEAPON the equip takes a white black-edge cartoon copy of the body's render param
+				CKTDGXRenderer::RenderParam		kEquipFadeRenderParam;
+				CKTDGXRenderer::RenderParam*	pEquipRenderParam = pEquipXSkinAnim->GetRenderParam();
+				if ( CRS_UNIT_FADE_WHITE_WITHOUT_WEAPON == GetNowCustomRenderState() )
+				{
+					kEquipFadeRenderParam				= *pEquipRenderParam;
+					kEquipFadeRenderParam.renderType	= CKTDGXRenderer::RT_CARTOON_BLACK_EDGE;
+					kEquipFadeRenderParam.color			= D3DXCOLOR( 1.f, 1.f, 1.f, 1.f );
+					pEquipRenderParam					= &kEquipFadeRenderParam;
+				}
+				pCX2Eqip->SetRenderParam( m_fTime, m_fElapsedTime , pEquipRenderParam );
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 				pCX2Eqip->SetRenderParam( m_fTime, m_fElapsedTime , pEquipXSkinAnim->GetRenderParam() );	// char-luciel DU1b2: the equip's body
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				pCX2Eqip->SetRenderParam( m_fTime, m_fElapsedTime , m_pXSkinAnim->GetRenderParam() );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
@@ -23229,6 +23266,9 @@ void CX2GUUser::CommonFrameMove()
 		ShowHyperSkillCutInByScript( m_fShowHyperCutInTime, false );
 #endif SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+	UpdateCustomRenderState();	// june-engine R5: June CommonFrameMove 32063650 @3206ce46 ( user vslot 0x84c )
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	DoCustomFunctionByBuffInCommonFrameMove();
 
 	DamageDataChangeProcess();
@@ -38696,6 +38736,144 @@ void CX2GUUser::EmotionFrameMove()
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+// june-engine R5: June 31fce500, the state key CUSTOM_RENDER_STATE = { start, end, state }; a missing value reads 0
+/*static*/ bool CX2GUUser::ParseCustomRenderState( IN KLuaManager& luaManager_, OUT float& fStartTime_, OUT float& fEndTime_, OUT int& iState_ )
+{
+	fStartTime_	= 0.f;
+	fEndTime_	= 0.f;
+	iState_		= CRS_NONE;
+
+	if ( false == luaManager_.BeginTable( "CUSTOM_RENDER_STATE" ) )
+		return false;
+
+	if ( false == luaManager_.GetValue( 1, fStartTime_ ) )
+		fStartTime_ = 0.f;
+	if ( false == luaManager_.GetValue( 2, fEndTime_ ) )
+		fEndTime_ = 0.f;
+	if ( false == luaManager_.GetValue( 3, iState_ ) )
+		iState_ = CRS_NONE;
+
+	luaManager_.EndTable();
+	return true;
+}
+
+// june-engine R5: June 31fc9570
+void CX2GUUser::ClearCustomRenderState()
+{
+	m_iBuffCustomRenderState		= CRS_NONE;
+	m_RenderParam.color.a			= 1.f;
+	m_RenderParam.bAlphaBlend		= false;
+	m_RenderParam.outLineColor.a	= 1.f;
+}
+
+// june-engine R5: June 31fd4460 @31fd44a9-31fd4590
+int CX2GUUser::GetNowCustomRenderState() const
+{
+	if ( CRS_NONE != m_iBuffCustomRenderState )
+		return m_iBuffCustomRenderState;
+
+	if ( CRS_NONE != m_iStateCustomRenderState )
+	{
+		const CKTDGXSkinAnimPtr ptrXSkinAnim = GetXSkinAnimPtr();
+		if ( NULL != ptrXSkinAnim )
+		{
+			const float fAnimTime = ptrXSkinAnim->GetNowAnimationTime();
+			if ( m_fStateCustomRenderStartTime <= fAnimTime && fAnimTime < m_fStateCustomRenderEndTime )
+				return m_iStateCustomRenderState;
+		}
+	}
+
+	return CRS_NONE;
+}
+
+// june-engine R5: June 31fd4460 ( user vslot of CX2GameUnit::ApplyRenderParam ): cases 3 and 5-9 set the unit's render param, 0-2, 4 and above 9 take CX2GameUnit's
+/*virtual*/ void CX2GUUser::ApplyRenderParam( CKTDGXRenderer::RenderParam* pRenderParam_ )
+{
+	if ( true == m_bPassDash || NULL == pRenderParam_ )
+		return;
+
+	const int iCustomRenderState = GetNowCustomRenderState();
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+	if ( iCustomRenderState != m_iLoggedCustomRenderState )
+	{
+		m_iLoggedCustomRenderState = iCustomRenderState;
+		KLOG( "ErrorLog.txt" ) << "[JUNE_ENGINE] CRS apply unit " << (int)GetUnitUID() << " state " << (int)GetNowStateID() << " crs " << iCustomRenderState
+			<< " buff " << m_iBuffCustomRenderState << " key " << m_iStateCustomRenderState << fileout;
+	}
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+
+	float fAlpha = 0.f;
+	switch ( iCustomRenderState )
+	{
+	case CRS_SPECTOR_WALK:
+		m_RenderParam.renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+		fAlpha						= 0.1f;		// June 334395e0
+		break;
+
+	case CRS_INVISIBLE:
+		m_RenderParam.renderType	= CKTDGXRenderer::RT_CARTOON;
+		fAlpha						= 0.f;
+		break;
+
+	case CRS_UNIT_FADE_WHITE_WITHOUT_WEAPON:
+	case CRS_UNIT_FADE_WHITE:
+		m_RenderParam.renderType		= CKTDGXRenderer::RT_CARTOON_FADE;
+		m_RenderParam.bAlphaBlend		= false;
+		m_RenderParam.color				= D3DXCOLOR( 1.f, 1.f, 1.f, 0.f );
+		m_RenderParam.outLineColor.a	= 1.f;	// June's decompile stores 1.0 here ( the R0 table said 0 )
+		return;
+
+	case CRS_UNIT_BLACK:
+		m_RenderParam.renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+		m_RenderParam.color			= D3DXCOLOR( 0.f, 0.f, 0.f, 1.f );	// June 334387b0 ( 1 / 255 ) x 334350e8 ( 0.0 )
+		return;
+
+	case CRS_EMOTION_INVISIBLE:
+		m_RenderParam.renderType		= CKTDGXRenderer::RT_CARTOON;
+		m_RenderParam.outLineColor.a	= 0.f;
+		m_RenderParam.bAlphaBlend		= true;
+		m_RenderParam.color.a			= 0.f;
+		pRenderParam_->bZWriteEnable	= false;
+		pRenderParam_->bZEnable			= false;
+		return;
+
+	default:
+		CX2GameUnit::ApplyRenderParam( pRenderParam_ );
+		return;
+	}
+
+	m_RenderParam.outLineColor.a	= fAlpha;
+	m_RenderParam.bAlphaBlend		= true;
+	m_RenderParam.color.a			= fAlpha;
+}
+
+// june-engine R5: June 31fcefa0 ( user vslot 0x84c ): the buff override ends with what it needs; the others, and 0, stay
+/*virtual*/ void CX2GUUser::UpdateCustomRenderState()
+{
+	bool bKeep = true;
+	switch ( m_iBuffCustomRenderState )
+	{
+	case CRS_SPECTOR_OF_THUNDER:
+		bKeep = ( CX2SkillTree::SI_SA_AA_SPECTER_OF_THUNDER == GetNowStateSkillID() );
+		break;
+	case CRS_VERITABLE_PANDEMONIUM:
+		bKeep = ( CX2SkillTree::SI_SA_ALS_SEVER == GetNowStateSkillID() );
+		break;
+	case CRS_SPECTOR_WALK:
+		bKeep = m_bBuffCustomRenderStateActive;
+		break;
+	case CRS_EMOTION_INVISIBLE:
+		bKeep = ( CX2Unit::ET_EMOTION_AVATAR26 == m_ePlayedEmotion );
+		break;
+	default:
+		break;
+	}
+
+	if ( false == bKeep )
+		ClearCustomRenderState();
+}
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_UPGRADE_WEAPON_PARTICLE
 bool CX2GUUser::CanShowWeaponEffect()
 {

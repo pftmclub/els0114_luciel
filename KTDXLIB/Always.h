@@ -13698,6 +13698,23 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
+// Description: june-engine R5: June's CUSTOM_RENDER_STATE ( Enum.lua ). The unit's buff override ( +0x8e64 ) and the state key's { start, end, state } window
+//              ( +0x8e68 / +0x8e6c / +0x8e70, reader 31fce500, riding pet copy 32d350bb ) pick the render setup of CX2GUUser::ApplyRenderParam ( 31fd4460:
+//              cases 3, 5-9, the rest take CX2GameUnit's ), the per-equip render param of CommonFrameMove ( case 6 ) and the expiry check ( user vslot
+//              0x84c, 31fcefa0 ). Raven's Power Assault / Wild Charge Dash switch from their stand-in to the member. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+#if defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE ) && !( defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) )
+#error SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( June's skill and emotion names ) and SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( the equip loop's body pick ), june-engine R5
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+// Description: june-engine R5 play-test lines "[JUNE_ENGINE] CRS"; the R5 review retires it.
+#define SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG ) && !defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE )
+#error SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG needs SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
 // Description: june-engine R14c: June's basic-item anim of an attach-anim equip ( CX2Eqip +0x584 / +0x5e4, 3295dfa0 @3295e2a9 ): the owner's
 //              basic item for the equip's position ( CX2Unit::GetBasicItemID, June 329657d0 ) builds a collision-only anim per model slot,
 //              renamed by ChangeAnim, moved each frame, freed in the dtor. UpdateEquipCollisionData ( 31fd8c00, Aisha 32cc8d30 ) takes a

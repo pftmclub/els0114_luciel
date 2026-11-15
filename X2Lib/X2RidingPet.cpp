@@ -1413,6 +1413,24 @@ void CX2RidingPet::StateChange( IN const char* stateName_ )
 					if ( NULL != CX2RidingPetManager::GetInstance() && m_StateData.m_StateID == m_SpecialMoveState )
 						kPhysicParam.passiveSpeed.x *= CX2RidingPetManager::GetInstance()->GetPassiveSpeedRate();
 #endif SERV_IRUHADEV_JUNE_RIDINGPET_STATE
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+					/// june-engine R5: June 32d2f560 @32d3509f-32d350db: the state key CUSTOM_RENDER_STATE ( 31fce500 ), copied into the rider only when the key is there
+					{
+						float	fCustomRenderStart	= 0.f;
+						float	fCustomRenderEnd	= 0.f;
+						int		iCustomRenderState	= CX2GUUser::CRS_NONE;
+						if ( true == CX2GUUser::ParseCustomRenderState( m_LuaManager, fCustomRenderStart, fCustomRenderEnd, iCustomRenderState ) )
+						{
+							pUser->SetStateCustomRenderState( fCustomRenderStart, fCustomRenderEnd, iCustomRenderState );
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+							WCHAR wszCrs[256] = {0};
+							StringCchPrintfW( wszCrs, ARRAY_SIZE(wszCrs), L"[JUNE_ENGINE] CRS riding pet state %d key crs %d start %g end %g", static_cast<int>( m_StateData.m_StateID ),
+								iCustomRenderState, fCustomRenderStart, fCustomRenderEnd );
+							ErrorLogMsg( XEM_ERROR142, wszCrs );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+						}
+					}
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 
 				}
 			}

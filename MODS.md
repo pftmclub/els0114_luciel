@@ -7156,3 +7156,12 @@ Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (`Always.h`; `#error` withou
 - **Differs from March.** March took the hit lines from the worn item's own anim (Phase S stand-in; before that, nothing for non-Add / non-Rose items).
 - **Files.** `X2Eqip.h/.cpp` (members, init, ChangeAnim, frame move, dtor), `X2Unit.h` (`CX2Unit::GetBasicItemID`, June `329657d0`), `X2ItemManager.h` (`DITT_ITEM_ID_JIGGLE_TYPE1 = 30` under `JUNE_ENUM_NAMES`), `X2GUUser.cpp` / `X2GUArme_VioletMage.cpp` (the two collision walks).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (and its `_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The collision walks go back to Phase S's worn-anim stand-in.
+
+## June engine R5: custom render state (june-engine R5, 2026-11-15)
+
+Flag `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE` (`Always.h`; `#error` without `..._JUNE_ENUM_NAMES` and `..._JUNE_CHAR_DUO_BODY`) and the temporary `..._DEBUG` (`[JUNE_ENGINE] CRS` lines; the R5 review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.
+- **What changes in game.** June's CUSTOM_RENDER_STATE: a unit's buff override or its state script's `CUSTOM_RENDER_STATE = { start, end, state }` window picks how it is drawn (invisible, black, white fade, spector walk, emotion invisible; the equips follow). Raven's Power Assault and Wild Charge Dash black-out now run on it instead of a held render param. A riding pet's state key reaches its rider.
+- **Differs from March.** March had no such key; its classes drew from their own stand-ins (Ara, Add keep theirs until their class ports). Classes whose `ApplyRenderParam` ended in `CX2GameUnit::ApplyRenderParam` (Chung, Eve, Lire, Raven) now end in `CX2GUUser::ApplyRenderParam`, which only differs while a custom render state is on.
+- **Files.** `X2GUUser.h/.cpp` (members, parse, apply, expiry check, equip loop param), `X2RidingPet.cpp`, `X2GURaven.cpp`, `X2GUChung.cpp`, `X2GuEve.cpp`, `X2GULire_ElvenRanger.cpp`, `X2SkillTree.h` / `X2Unit.h` (three June names).
+- **Not ported yet.** CRS 3 / 5 / 9 per-equip switch (R5b), buff writers for Add / Ara and emotion 39 (class ports).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE` (and its `_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Raven goes back to the held render param stand-in.

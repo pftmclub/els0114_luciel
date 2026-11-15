@@ -43477,7 +43477,11 @@ CX2BuffFactorPtr CX2GUEve::GetEnergyOfConcentrationBuffFactorClonePtr() const
 	if( false == IsAlphaObject() )
 		m_RenderParam.color.a = 1.0f;
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+	CX2GUUser::ApplyRenderParam( pRenderParam_ );	// june-engine R5: June's else branch is the user's 31fd4460
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	CX2GameUnit::ApplyRenderParam( pRenderParam_ );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 #else
 #ifdef RIDING_SYSTEM
 	if ( m_bPassDash )

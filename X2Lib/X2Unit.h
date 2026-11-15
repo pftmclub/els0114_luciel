@@ -329,6 +329,9 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 	#ifdef CRAYONPOP_EMOTION_WITH_MUSIC
 			ET_EMOTION_AVATAR7,
 	#endif // CRAYONPOP_EMOTION_WITH_MUSIC
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			ET_EMOTION_AVATAR26 = 39,	// june-engine R5: June's Enum.lua EMOTION_TYPE; the custom render state EMOTION_INVISIBLE lasts while it plays
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 	
 		};
 #endif

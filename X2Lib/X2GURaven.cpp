@@ -15884,17 +15884,26 @@ void CX2GURaven::RSI_SI2_POWER_ASSAULT_FrameMove()
 
 	if ( m_pXSkinAnim->EventTimerOneshot( 0.4f ) )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		m_iBuffCustomRenderState = CRS_UNIT_BLACK;	// june-engine R5: June 32c3e7a0 @32c3e7f1
+		SetLayer( XL_EFFECT_2 );
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		/// stand-in: June's custom render state UNIT_BLACK ( +0x8e64 = 8 ) is not ported, the held render param is set black
 		m_bSetCustomRenderParam = true;
 		m_RenderParam.renderType = CKTDGXRenderer::RT_REAL_COLOR;
 		m_RenderParam.color = D3DXCOLOR( 0.f, 0.f, 0.f, 1.f );
 		SetLayer( XL_EFFECT_2 );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	}
 	else if ( m_pXSkinAnim->EventTimerOneshot( 1.14f ) )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		ClearCustomRenderState();	// june-engine R5: June 32c3e7a0 @32c3e82f
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		m_bSetCustomRenderParam = false;
 		m_RenderParam.outLineColor.a = 1.f;
 		m_RenderParam.bAlphaBlend = false;
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		SetLayer( XL_UNIT_0 );
 		m_RenderParam.color = D3DXCOLOR( 1.f, 1.f, 1.f, 1.f );
 		SetAlphaObject( false );
@@ -22590,9 +22599,13 @@ void CX2GURaven::RSI_SI2_POWER_ASSAULT_StateEnd()
 {
 	CommonStateEnd();
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+	ClearCustomRenderState();	// june-engine R5: June 32c2dbd0
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	m_bSetCustomRenderParam = false;
 	m_RenderParam.outLineColor.a = 1.f;
 	m_RenderParam.bAlphaBlend = false;
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	SetLayer( XL_UNIT_0 );
 	m_RenderParam.color = D3DXCOLOR( 1.f, 1.f, 1.f, 1.f );
 	SetAlphaObject( false );
@@ -25912,11 +25925,16 @@ void CX2GURaven::RSI_SA_RRF_WILD_CHARGE_DASH_FrameMove()
 		CX2OfflineLog::Server( L"[JUNE_CHAR] RAVEN SKILL wild charge dash power rate %.2f charge time %.2f", fPowerRateWildCharge, m_WildChargeDataPtr->GetChargeTime() );
 #endif SERV_IRUHADEV_JUNE_CHAR_RAVEN_SKILL_DEBUG
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		m_iBuffCustomRenderState = CRS_UNIT_BLACK;	// june-engine R5: June 32c4a6c0 @32c4a8cb
+		SetLayer( XL_EFFECT_2 );
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		/// stand-in: June's custom render state UNIT_BLACK ( +0x8e64 = 8 ) is not ported, the held render param is set black
 		m_bSetCustomRenderParam = true;
 		m_RenderParam.renderType = CKTDGXRenderer::RT_REAL_COLOR;
 		m_RenderParam.color = D3DXCOLOR( 0.f, 0.f, 0.f, 1.f );
 		SetLayer( XL_EFFECT_2 );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	}
 	else if( m_pXSkinAnim->EventTimerOneshot( 0.35f ) )
 	{
@@ -25924,9 +25942,13 @@ void CX2GURaven::RSI_SA_RRF_WILD_CHARGE_DASH_FrameMove()
 	}
 	else if( m_pXSkinAnim->EventTimerOneshot( 0.8f ) )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		ClearCustomRenderState();	// june-engine R5: June 32c4a6c0 @32c4a973
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		m_bSetCustomRenderParam = false;
 		m_RenderParam.outLineColor.a = 1.f;
 		m_RenderParam.bAlphaBlend = false;
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		SetLayer( XL_UNIT_0 );
 		m_RenderParam.color = D3DXCOLOR( 1.f, 1.f, 1.f, 1.f );
 		SetAlphaObject( false );
@@ -25971,9 +25993,13 @@ void CX2GURaven::RSI_SA_RRF_WILD_CHARGE_DASH_StateEnd()
 	/// June 32c339a0: the unit is drawn normally again when the dash ends
 	CommonStateEnd();
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+	ClearCustomRenderState();	// june-engine R5: June 32c339a0
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	m_bSetCustomRenderParam = false;
 	m_RenderParam.outLineColor.a = 1.f;
 	m_RenderParam.bAlphaBlend = false;
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	SetLayer( XL_UNIT_0 );
 	m_RenderParam.color = D3DXCOLOR( 1.f, 1.f, 1.f, 1.f );
 	SetAlphaObject( false );
@@ -33314,7 +33340,11 @@ void CX2GURaven::CheckAndDoReversalSoldierAndSurvivalTechnique()
 		if ( false == IsAlphaObject() )
 			m_RenderParam.color.a = 1.f;
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		CX2GUUser::ApplyRenderParam( pRenderParam_ );	// june-engine R5: June's else branch is the user's 31fd4460
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		CX2GameUnit::ApplyRenderParam( pRenderParam_ );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	}
 #else SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
 #ifdef RIDING_SYSTEM

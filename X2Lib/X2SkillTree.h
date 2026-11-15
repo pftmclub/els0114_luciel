@@ -1749,6 +1749,13 @@ public:
 		RNSI_A_ROM_G_EX_MAGNETICFORCE_UPGRADE                 = 31320,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-15 // june-engine R5 (CUSTOM_RENDER_STATE)
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		// June SKILL_ID names the custom render state's expiry check spells (values from June's Enum.lua)
+		SI_SA_AA_SPECTER_OF_THUNDER                           = 7018,
+		SI_SA_ALS_SEVER                                       = 7022,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-10-26 // June character port Phase CH1l3 (JUNE_CHARACTER_EVE_PHASES.md)
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		// June SKILL_ID names the Eve skill use spells (values from June's Enum.lua)

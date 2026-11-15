@@ -38476,7 +38476,11 @@ void CX2GULire_ElvenRanger::SetInvisibility(bool bVal_)
 		if( false == IsAlphaObject() )
 			m_RenderParam.color.a = 1.f;
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		CX2GUUser::ApplyRenderParam( pRenderParam_ );	// june-engine R5: June's else branch is the user's 31fd4460
+#else SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 		CX2GameUnit::ApplyRenderParam( pRenderParam_ );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 	}
 #else SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
 #ifdef RIDING_SYSTEM

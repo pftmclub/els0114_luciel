@@ -1236,6 +1236,59 @@ equipped-item effects and the talk boxes look as before.
   script reach it once those scripts are adopted.
 - **Play-test:** whatever March-data path R0 finds; if none, a dev-console Lua call on the player's unit.
 
+### Phase R5 -- Done
+
+**2026-11-15, Sonnet 5.5 high.** Flag `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE` + `_DEBUG` (`[JUNE_ENGINE] CRS` lines; the review retires it). 11 funcmap
+rows `(R5)`; MODS.md entry; checklist 7w updated; follow-up phase **R5b** (kickoff written).
+
+**What R0's map got wrong, read in Ghidra.** `31fd4460` is not a loose render setup: it is `CX2GUUser`'s override of `CX2GameUnit::ApplyRenderParam`
+(`pRenderParam` is its argument; `+0x6840` m_bPassDash returns first). Every class `ApplyRenderParam` ends in it, so March's classes now call
+`CX2GUUser::ApplyRenderParam` in place of `CX2GameUnit::` (Chung, Eve, Lire, Raven; Ara and Add below). Case 6 / 7 stores outline alpha **1.0**
+(R0's tsv said 0). Case 8's colour is `334387b0` (1/255) x `334350e8` (0.0) = black.
+
+**Ported** (March functions, June's lines under the flag; one change in each place):
+- `X2GUUser.h/.cpp`: June's `CUSTOM_RENDER_STATE` enum (`CX2GUAdd`'s own enum stays); members `+0x8e64` buff override, `+0x8e68 / +0x8e6c / +0x8e70`
+  state key, `+0x93d8` (`m_bBuffCustomRenderStateActive`); `ParseCustomRenderState` (`31fce500`, static); `ClearCustomRenderState` (`31fc9570`);
+  `GetNowCustomRenderState` (the pick shared by both consumers); `ApplyRenderParam` (`31fd4460`: cases 3 / 5 / 6-7 / 8 / 9, the rest call
+  `CX2GameUnit`'s); `UpdateCustomRenderState` (user vslot `0x84c`, `31fcefa0`), called from `CommonFrameMove` (`@3206ce46`).
+- `CommonStateStart` reads the state key (`@32060731`, after CREATE_EFFECT_SET) and sets colour alpha 1.0 when it is 0 (`@32060745`).
+- `CommonFrameMove` equip loop (`@320659e9-32065bb4`): CRS 6 passes `CX2Eqip::SetRenderParam` a white black-edge-cartoon copy of the body's param.
+- `X2RidingPet.cpp` (`32d2f560 @32d3509f-32d350db`): the pet's key is parsed and copied into the rider only when the key is there.
+- Raven: Power Assault and Wild Charge Dash (four sites) now set `m_iBuffCustomRenderState = CRS_UNIT_BLACK` and clear with `ClearCustomRenderState`
+  instead of the `m_bSetCustomRenderParam` stand-in; Guardian Strike (dark red held param) is not a custom render state and is unchanged.
+- Names: `SI_SA_AA_SPECTER_OF_THUNDER` (7018), `SI_SA_ALS_SEVER` (7022), `CX2Unit::ET_EMOTION_AVATAR26` (39) under `JUNE_ENUM_NAMES`.
+- **Enum.lua:** June's `CUSTOM_RENDER_STATE` table is already in the merged data036 `Enum.lua` (10 members, same values); nothing to pack or copy.
+- **NPC:** no reader in June (R0). The `+0x160` copy R13 / DU1d5 left for the NPC prepare does not exist: R13's map found the camera flag's only
+  reader is the user function, so there is nothing to port for NPCs.
+
+**Routed, not ported** (each is in funcmap with its June addresses):
+- **R5b** (this plan): the per-equip switch `@32065bc1-32065c9f` (CRS 3 / 5 / 9: sub-equips take the body param, after-image and show / invisibility
+  toggles, the exit path). It needs `CX2SubEquip` `+0x268` (default param, setter `32f08a90` from `32961c80`) and `CX2GameUnit` `+0x7c80`; no March
+  state reaches it. Kickoff `R5b.md`.
+- **Class ports (checklist 7w):** buff writers in `SetSpecificValueByBuffTempletID` (BTI 337 Add Quicksilver Frenzy -> 4, BTI 420 Ara Specter Walk -> 3,
+  their clears in the Unset twin `3202ed60`); Ara's stand-ins (`m_iCustomRenderState`, its own `ClearCustomRenderState`, its `ApplyRenderParam`
+  else branch still calls `CX2GameUnit::`); Add's `ApplyRenderParam` (its own enum, class switch) and the class overrides of vslot `0x84c`.
+- **Emotion 39 -> CRS 9** (`EmotionFrameMove` head `3204a860 @3204a8d0`) and the `0x84c` call in `CommonStateStart` (`@3205a159`, inside the
+  unported emotion-reset head): with the emotion setter `31fe0bb0` (DU1d3b) and June's emotion list; the emotion has no March item.
+- No JUNE_BUGS row: nothing June does wrong was kept.
+
+**Gates** (worktree, `finish.py --files <10 files> --with ..._CUSTOM_RENDER_STATE ..._DEBUG`): flagcheck on the flag: X2GUUser.h / Raven / Chung / Eve /
+Lire / RidingPet PASS (0 deleted, 0 non-ASCII, 0 EOL mismatch); `X2GUUser.cpp` and `Always.h` OTHER (peers' uncommitted hunks beside mine);
+`X2Unit.h` ERROR (the tool cannot evaluate its line-1321 `#if`; by hand: 3 inserted lines under `JUNE_ENUM_NAMES`, 0 deleted). junediverge
+RESULT: PASS. enumscan: 0 rows in my 9 files; its one FAIL is `X2GuEve.cpp:232 / 242` `ENSI_SA_ECE_REASON_PRIDE_ACTION`, untouched here
+(my Eve hunk is at line 43480).
+**Compile:** `/Zs` probes (X2Lib US_SERVICE flags, `june2017_re/census.py` command) of `X2GUUser.cpp`, `X2RidingPet.cpp`, `X2GURaven.cpp`, `X2GUChung.cpp`,
+`X2GULire_ElvenRanger.cpp`, `X2GuEve.cpp`: 0 errors each (a flag probe in the same command line confirms the flag is on).
+**Build: blocked, not deployed.** `build.py --deploy` and `--only X2Lib` stop in KTDXLIB at `Always.h(13695)`: the `#error` guard of
+`SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS` (char-luciel CH3c20, commit `b4f80375`) names `SERV_INSERT_GLOBAL_SERVER`, `SERV_TRAPPING_RANGER_TEST` and
+`SERV_NEW_DEFENCE_DUNGEON`, which only `ServerDefine.h` defines (X2Lib sees it, KTDXLIB does not). Not this phase's file to fix. No `EXESTR` line
+either: the strings check waits for the first build that passes (`python tools/exestr.py "[JUNE_ENGINE] CRS apply unit" "[JUNE_ENGINE] CRS state key unit"`).
+
+**How to see it** (play-test after the first passing build; full hand-off in the session reply):
+- Raven `ravbe` (23, Blade Master, 72) has Power Assault (24002) in slot 3 (C key). Cast it on a monster: at 0.4 s the unit and its equips turn pitch black
+  on the effect layer, at 1.14 s everything is normal again. Log: `[JUNE_ENGINE] CRS apply unit <uid> state <id> crs 8 buff 8 key 0`, then `crs 0`.
+- No March state carries the key (Ara / Add scripts are the users; `arasss` lacks Fox Phantom), so `[JUNE_ENGINE] CRS state key` lines are not expected.
+
 ## Phase R6 - SKIN_MESH_RENDER_TYPE
 
 **Run with:** Opus 5.5 high (R0b: map the whole draw, then port), then an Opus review. Flag `SERV_IRUHADEV_JUNE_SKIN_MESH_RENDER_TYPE`. June's cases 1, 2, 4-7

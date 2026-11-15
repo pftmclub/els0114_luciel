@@ -3055,6 +3055,30 @@ public:
 		float GetNotSelectUnitOffset( IN int iIndex_ ) const { return ( 0 <= iIndex_ && iIndex_ < 2 ) ? m_afNotSelectUnitOffset[iIndex_] : 0.f; }
 		bool GetUseNotSelectMotionDifference() const { return m_bUseNotSelectMotionDifference; }
 #endif SERV_IRUHADEV_JUNE_NOT_SELECT_UNIT_OFFSET
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+		/// june-engine R5: June's Enum.lua CUSTOM_RENDER_STATE ( 31fd4460 / 31fce500 ); March's CX2GUAdd::CUSTOM_RENDER_STATE ( X2GUAdd.h ) is its own enum and stays
+		enum CUSTOM_RENDER_STATE
+		{
+			CRS_NONE								= 0,
+			CRS_SPECTOR_OF_THUNDER					= 1,
+			CRS_VERITABLE_PANDEMONIUM				= 2,
+			CRS_SPECTOR_WALK						= 3,
+			CRS_QUICKSILVER_FRENZY_BUFF				= 4,
+			CRS_INVISIBLE							= 5,
+			CRS_UNIT_FADE_WHITE_WITHOUT_WEAPON		= 6,
+			CRS_UNIT_FADE_WHITE						= 7,
+			CRS_UNIT_BLACK							= 8,
+			CRS_EMOTION_INVISIBLE					= 9,
+		};
+		/// June 31fce500: the state key CUSTOM_RENDER_STATE = { start, end, state }; the out values are zeroed first, false when the key is missing
+		static bool ParseCustomRenderState( IN KLuaManager& luaManager_, OUT float& fStartTime_, OUT float& fEndTime_, OUT int& iState_ );
+		/// June 32d350bb: the riding pet's state key copied into the rider
+		void SetStateCustomRenderState( IN const float fStartTime_, IN const float fEndTime_, IN const int iState_ ) { m_fStateCustomRenderStartTime = fStartTime_; m_fStateCustomRenderEndTime = fEndTime_; m_iStateCustomRenderState = iState_; }
+		/// June 31fc9570: no buff override, colour and outline alpha 1.0, alpha blend off
+		void ClearCustomRenderState();
+		/// June 31fd4460 @31fd44a9-31fd4590 / CommonFrameMove 32063650 @320659e9-32065ae1: the buff override, else the state's while the active body's anim time is in [ start, end )
+		int GetNowCustomRenderState() const;
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 #ifdef SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE
 		/// C9h-4g: June's USI_WAIT_STATE_CHANGE. Every June class InitState registers it with only an OnEventProcess ( 31fc8620 through thunk 329cb720 ); a character port
 		/// calls this with its class table ( e.g. "ESSI_WAIT_STATE_CHANGE" ) and sets WIN's OnEventProcess to JuneRandomLoseEventProcess ( June 320718d0 ).
@@ -5713,6 +5737,18 @@ public:
 	float		m_fCreateEffectSetRate;	/// June +0x8e50 ( ctor 0 @32040e15 ): the chance a state's CREATE_EFFECT_SET plays; Elsword's Wind Slicer sets it ( the reader is CH4a2's )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_PASSIVE
 #endif SERV_IRUHADEV_JUNE_USER_CREATE_EFFECT_SET
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
+	virtual void ApplyRenderParam( CKTDGXRenderer::RenderParam* pRenderParam_ );	/// June 31fd4460 ( CX2GameUnit's override; classes call it in place of CX2GameUnit::ApplyRenderParam )
+	virtual void UpdateCustomRenderState();	/// June user vslot 0x84c ( base 31fcefa0 ): clears the buff override once what it needs has ended
+	int			m_iBuffCustomRenderState;			/// June +0x8e64 ( ctor 0 ): the buff / skill override, wins over the state key
+	float		m_fStateCustomRenderStartTime;		/// June +0x8e68: the state key's start
+	float		m_fStateCustomRenderEndTime;		/// June +0x8e6c: the state key's end
+	int			m_iStateCustomRenderState;			/// June +0x8e70: the state key's state
+	bool		m_bBuffCustomRenderStateActive;		/// June +0x93d8 ( ctor 0 ): keeps the buff override SPECTOR_WALK; its buff writer is the Ara port's
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+	int			m_iLoggedCustomRenderState;			/// the last state "[JUNE_ENGINE] CRS" logged
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE
 
 	float m_fSummonNpcCoolTime;
 #ifdef SERV_IRUHADEV_JUNE_DIVERGE_INIT_PASSIVE_SKILL_STATE
