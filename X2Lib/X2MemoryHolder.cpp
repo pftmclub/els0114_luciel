@@ -465,6 +465,33 @@ CKTDGUIDialogType CX2MemoryHolder::GetChungGiveItemDLG( CKTDXStage* pStage )
 }
 #endif SERV_EVENT_CHUNG_GIVE_ITEM
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+// char-luciel CH5 review: June 32851f90, a unit type's background name; another type gives an empty name
+namespace _CONST_MEMORYHOLDER_CH5_
+{
+	std::wstring GetCommonBackgroundUnitName( const CX2Unit::UNIT_TYPE eUnitType_ )
+	{
+		switch( eUnitType_ )
+		{
+		case CX2Unit::UT_ELSWORD:	return L"Elsword";
+		case CX2Unit::UT_ARME:		return L"Aisha";
+		case CX2Unit::UT_LIRE:		return L"Rena";
+		case CX2Unit::UT_RAVEN:		return L"Raven";
+		case CX2Unit::UT_EVE:		return L"Eve";
+		case CX2Unit::UT_CHUNG:		return L"Chung";
+		case CX2Unit::UT_ARA:		return L"Ara";
+		case CX2Unit::UT_ELESIS:	return L"Elesis";
+		case CX2Unit::UT_ADD:		return L"Add";
+		case CX2Unit::UT_LUCIEL:	return L"Luciel";
+		case CX2Unit::UT_ROSE:		return L"Rose";
+		case CX2Unit::UT_AIN:		return L"Ain";
+		default:					break;
+		}
+		return L"";
+	}
+}
+using namespace _CONST_MEMORYHOLDER_CH5_;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 CKTDGUIDialogType CX2MemoryHolder::GetCommonDLG( CKTDXStage* pStage )
 {
 	if ( m_pCommonDLG == NULL )
@@ -478,6 +505,16 @@ CKTDGUIDialogType CX2MemoryHolder::GetCommonDLG( CKTDXStage* pStage )
 		wstring texName = L"";
 
 		// note!! 전직 추가되면 수정, 혹은 unit_type으로
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+		// char-luciel CH5 review: June 328539c0, picture ( unit type - 1, at least 0 ) and DLG_Background_<name>.tga for every type; a missing picture is skipped
+		const CX2Unit::UNIT_TYPE eUnitType = g_pData->GetMyUser()->GetSelectUnit()->GetType();
+		controlIndex = ( static_cast<int>( eUnitType ) - 1 < 0 ) ? 0 : static_cast<int>( eUnitType ) - 1;
+		texName = L"DLG_Background_" + GetCommonBackgroundUnitName( eUnitType ) + L".tga";
+
+		CKTDGUIStatic* pChararcterBG = (CKTDGUIStatic*)m_pCommonDLG->GetControl( L"ChararcterBG" );
+		if ( NULL != pChararcterBG && NULL != pChararcterBG->GetPicture(controlIndex) )
+			pChararcterBG->GetPicture(controlIndex)->SetShow( true );
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 		switch ( g_pData->GetMyUser()->GetSelectUnit()->GetType() )
 		{
 		case CX2Unit::UT_ELSWORD:
@@ -564,6 +601,7 @@ CKTDGUIDialogType CX2MemoryHolder::GetCommonDLG( CKTDXStage* pStage )
 			pChararcterBG->GetPicture(controlIndex)->SetShow( true );
 		else
 			ASSERT("DLG_Common_BG.lua Error");
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 
 		CKTDGUIStatic* pCharacter = (CKTDGUIStatic*)m_pCommonDLG->GetControl( L"Character" );
 		if ( NULL != pCharacter && NULL != pCharacter->GetPicture(0) )

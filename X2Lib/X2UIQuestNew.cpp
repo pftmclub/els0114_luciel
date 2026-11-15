@@ -9084,6 +9084,11 @@ void CX2UIQuestNew::PlayQuestCompleteSound( bool bIsEverySubQuestInQuestComplete
 	{
 		wstring strQuestCompleteSound ;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+		// char-luciel CH5 review: June 323cd570, every class takes the voice table's quest-complete row by my unit's form ( no type switch )
+		strQuestCompleteSound = g_pData->GetUnitManager()->GetVoiceFileName( g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass,
+			true == g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() ? CX2UnitManager::SPT_QUEST_COMPLETE_MINOR_UNIT : CX2UnitManager::SPT_QUEST_COMPLETE );
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 		switch( g_pData->GetMyUser()->GetSelectUnit()->GetType() )
 		{
 		case CX2Unit::UT_ELSWORD:
@@ -9117,17 +9122,12 @@ void CX2UIQuestNew::PlayQuestCompleteSound( bool bIsEverySubQuestInQuestComplete
 			strQuestCompleteSound = L"QuestComplete_Add.ogg";
 			break;
 #endif //SERV_9TH_NEW_CHARACTER
-#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
-		case CX2Unit::UT_LUCIEL:	// char-luciel CH5: June 323cd570, my unit's form byte picks the voice table's quest-complete row ( SelectVoiceTable.lua )
-			strQuestCompleteSound = g_pData->GetUnitManager()->GetVoiceFileName( g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass,
-				true == g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() ? CX2UnitManager::SPT_QUEST_COMPLETE_MINOR_UNIT : CX2UnitManager::SPT_QUEST_COMPLETE );
-			break;
-#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 
 		default:
 			ASSERT( !L"Unit Type Is Invalid" );
 			break;
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 
 		if ( !strQuestCompleteSound.empty() )
 			g_pKTDXApp->GetDeviceManager()->PlaySound( strQuestCompleteSound.c_str() , false, false );

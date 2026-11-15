@@ -4057,6 +4057,23 @@ table for both bodies (June's names from data152 / data195), the HUD portrait fo
 (CH0), the bounding-key dialog, the Lu/Ciel event-scene and cut-in names the june-gfx bullet lists, and the dialog pieces the earlier phases
 did not take. **Done gate:** a select-screen pass of all ten characters with no new error; both bodies' cut-ins and portraits show June's art.
 
+## CH5 - Review (2026-11-16)
+
+Verdict: **pass after three fixes** ( flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI` ). Reviewed `994f84ac`, `1130d597`, `371c27da`, `c8a57999` against June in Ghidra.
+- **Slot grey ( `322e07e0` @322e1823-322e1887 ):** test `[templet] == 0xa`, `32b14f70( id, level )` ( pushed level then id ), `32b0fa00`, `CMP gauge, cost; JL` -> fade @322e1be1 ( picture `+0x8 = 1`, string `""` ); sits after the type-11 ( Rose ) arm. = port.
+- **Clear picture ( `324ce260` ):** index = class - 6 into `324ce87c`, targets from `324ce82c`, decoded from `unpacked_x2.exe`: 37 / 200 -> `Ciel.TGA`, 38 / 128 -> `LUCIEL_ROYAL_GUARD.TGA`, 39 -> `Ciel.tga`, 127 -> `DREADLORD`, 129 -> `DEMONIO`; each `CMP [game +0xb54], 0; JLE` -> the class row ( type 1, flag `+0x3c` ). = port; JUNE_BUGS 755 correct.
+- **ENDING_SPEECH ( `327e0040` ):** keys XOR-decode to `LU` ( `337aa760`: 0x53^0x1f, 0x13^0x46 ) then `CIEL` ( `337aa75c` ); either missing returns ( = the port's break, the set is filled in place ). = port.
+- **Portrait ( `328db7a0` / `328dcba0` ):** piece table, `param_4 == 1` transcended pieces, flip for 0x26 / 0x7f / 0x81, class from templet `+4`, type 2 = `CIT_160by160`; `CreateSkillTreePortrait` @328e8f2f-328e8f75 tests templet type == 0xa ( the same byte feeds the panels @328e9117 / @328e912a: `1130d597` is right ); `3234d930` calls `328e8cd0` then `328dcba0`. = port.
+- **Emblem ( `324c99d0` ):** type - 2 into `324ca9e4`, type 10 -> @324ca329 `LUCIEL_MAPSD` / Texture88. = port.
+- **Fix 1, `X2Unit.cpp`:** the committed `_UI` hunk sat in `SetMinorUnitForm` ( `pUISkillTree` undeclared there, the inventory test in `#else` ): HEAD did not compile; the worktree, which the CH5 build used, had it in `UpdateSkillTreeCommandGroup` after `SetCommandGroup` ( = June `3234d930` ). Committed that placement.
+- **Fix 2, `PlayQuestCompleteSound` ( `323cd570` ):** June has no type switch: every class takes the voice table's `SPT_QUEST_COMPLETE` / `_MINOR_UNIT` row ( form byte `+0xe40` ). June's body replaces March's switch ( the Lu-only arm is gone ); files unchanged for March classes ( builder `QuestComplete_<name>.ogg`, Lire's table rows `QuestComplete_Lena.ogg` ). Divergent row added.
+- **Fix 3, `GetCommonDLG` ( `328539c0`, name switch `32851f90` ):** JUNE_BUGS 754 said June ships no `DLG_Background_Luciel.tga`; June's data051 has it and its `.TET`. June's body ( picture type - 1, `DLG_Background_<name>.tga` for every type, a missing picture skipped ) now sits inside March's `GetCommonDLG` ( June's dialog handles stay March's ); both files staged ( `kom.py stage-june` ), `PACK OK data051`, `COPY OK data051` ( md5 9f2cbfc0ec06d63385d9db155731b569 ). JUNE_BUGS 754 rewritten: the colour picture 9 is missing in June too. Divergent row added.
+- **Routed:** `324d08a0` names every class by its class templet's description ( March: per-type strings ); the Lu arm is June's, the rest goes to Stage 9 with the whole frame move ( backlog bullet (4), divergent row `stage9` ). The three CH5 routed items have their Stage 9 bullet.
+- **Guard:** `_UI`'s `#error` now also needs `SERV_IRUHADEV_JUNE_SELECT_VOICE_TABLE` ( `GetVoiceFileName`; a top-level define 450 lines above ). `_UI_DEBUG` retired ( `//#define` ).
+- **Gates:** see the block below. Worktree `flagcheck` was polluted by peers' live `X2Unit.cpp` / `Always.h` edits ( DU5f, CH2d ); the committed range is the verdict.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,075,072 B, dated 2026-11-16 05:15:39, md5 06e712e076c2288a3104d1310b06a867` ( the queued peer build at 05:15 compiled these edits; mine found nothing to relink ). `EXESTR OK: 2 of 2 found` ( `DLG_Background_`, `ChararcterBG`, wide ) and `EXESTR OK: 2 of 2 absent` ( `DLG_Background_Elsword.tga`, `QuestComplete_Elsword.ogg`: March's switches are out ).
+- **Play-test:** owed, the three fixes ( hand-off in the session ).
+
 ## Phase CH6 - Whole-character walk and gap reruns
 
 **Run with:** Sonnet 5.5 medium, then the user's walk. Back up the save; one Lu/Ciel per class, made by creation (not only by `createchar.py`),
