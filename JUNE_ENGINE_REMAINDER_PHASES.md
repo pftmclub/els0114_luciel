@@ -1292,6 +1292,10 @@ either: the strings check waits for the first build that passes (`python tools/e
   on the effect layer, at 1.14 s everything is normal again. Log: `[JUNE_ENGINE] CRS apply unit <uid> state <id> crs 8 buff 8 key 0`, then `crs 0`.
 - No March state carries the key (Ara / Add scripts are the users; `arasss` lacks Fox Phantom), so `[JUNE_ENGINE] CRS state key` lines are not expected.
 
+**Deployed and play-tested (2026-11-15).** Another session's build (deploy of `18808960`) carried R5; `EXESTR OK` for both `[JUNE_ENGINE] CRS` strings, md5 `df9afaf4...`.
+Raven `ravbe` Power Assault passed (user). Logs: `CRS apply unit 23 state 56 crs 8 buff 8 key 0` then `crs 0`, twice (two casts), nothing else changed. Also four
+`CRS state key ... state 13 crs 0 start 0 end 0` lines (units 23 / 24 / 25 / 191): a common state-13 script carries the key with zeros; harmless, state 0 stays default.
+
 ## Phase R6 - SKIN_MESH_RENDER_TYPE
 
 **Run with:** Opus 5.5 high (R0b: map the whole draw, then port), then an Opus review. Flag `SERV_IRUHADEV_JUNE_SKIN_MESH_RENDER_TYPE`. June's cases 1, 2, 4-7
