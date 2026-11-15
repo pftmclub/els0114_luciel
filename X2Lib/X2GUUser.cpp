@@ -20853,7 +20853,7 @@ void CX2GUUser::CommonFrameMove()
 						if ( i == (int)m_ViewEqipList.size() - 1 )
 						{
 							m_bEquipCustomRenderStateApplied = false;
-							if ( true == m_bAfterImageByBuffCreated )
+							if ( true == m_bAfterImageEnableRequested )
 								EnableAfterImage( AIB_ACTIVE_UNIT );
 						}
 						pCX2Eqip->RestoreSubEquipRenderParam();
@@ -23544,6 +23544,9 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 		    else
 			    DisableAfterImage();
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+		    m_bAfterImageEnableRequested = ( v2AfterImage.x <= m_pXSkinAnim->GetNowAnimationTime() && v2AfterImage.y > m_pXSkinAnim->GetNowAnimationTime() );	// june-engine R5b review: June 31ff27c0 @31ff2863 / @31ff2875
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 	    }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	    if( m_v2NowMinorUnitAfterImageTime.x != -1.0f && m_v2NowMinorUnitAfterImageTime.y != -1.0f )	// char-luciel DU1d3: June @31ff2882, the second anim's clock
@@ -23553,6 +23556,9 @@ void CX2GUUser::CommonFrameMove_TimedEvent()
 			    EnableAfterImage( AIB_MINOR_UNIT );
 		    else
 			    DisableAfterImage( false, AIB_MINOR_UNIT );
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+		    m_bAfterImageEnableRequested = ( m_v2NowMinorUnitAfterImageTime.x <= m_pMinorUnitXSkinAnim->GetNowAnimationTime() && m_v2NowMinorUnitAfterImageTime.y > m_pMinorUnitXSkinAnim->GetNowAnimationTime() );	// june-engine R5b review: June 31ff27c0 @31ff28eb / @31ff28fe
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 	    }
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     }

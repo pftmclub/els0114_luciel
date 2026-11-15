@@ -1365,6 +1365,52 @@ stateends / skillicons / luabind skipped: no skill states, icons or Lua. (A peer
 same command line confirms `..._CUSTOM_RENDER_STATE_EQUIP`, `ATTACH_SKINMESH` and `..._TRANSFORM_LINK` are on at the include point of `stdafx.h`.
 **Build:** skipped, no play-test (above). No `EXESTR` line.
 
+### Phase R5b -- Review
+
+**2026-11-15, Opus 5.5 high. Verdict: PASS after one fix** (under the same flag), one routed gap (R5c). Reviewed commit `46e515f9`.
+
+**Checked against the listing (`disasm_range.py`), all match:**
+- `32063650 @32065bc1-32065c9f`: `SUB 3` / `SUB 2` / `SUB 4` on the pick, so 3 and 9 take the short path and 5 the long one; every other value (0, 1, 2, 4, 6, 7, 8) falls to the exit path,
+  gated on `+0x941c` = 1. The param handed to `3295a920` is `edi->GetRenderParam()` (vslot `0x14`), with `edi` = `[esp+0x5c]` = the equip's body anim (`+0x87d4`, or the second body
+  by `+0x15d4`): March's `pEquipXSkinAnim->GetRenderParam()`, not R5's CRS 6 copy. Long path order and args: `3322a9c0( 0 )` on `+0x6754` (`SetShowAfterImage`), `322720f0( 1, 3 )`,
+  `31cfe4a0( 0, 0 )`, `3200a590( 1 )`. Exit path: the last-index test is against `+0x8834` / `+0x8838`, the same vector the loop walks (`@32065810`, `@32066151`), March's
+  `m_ViewEqipList`; `EnableAfterImage( 3 )` only when `+0x7c80` = 1; then `3295a990`, `SetShowObject( 1, 0 )`, `SetInvisibility( 0 )`, vslot `0x630` (funcmap: `UpdateNotRenderingOtherEquipList`).
+- `3295a920` skips non-skin sub-equips (`+0x240`), `3295a990` does not; `32f08a50` = `GetRenderParam()` else `+0x198`; `32f08a90` copies only a non-NULL param.
+- `32961c80 @32962937-32962958`: the default is captured after the per-item switch, last thing in each sub-equip iteration (`inc esi` / loop at `@3296295d`); March's insert sits
+  at the same place, inside the loop and after the switch.
+- `3227b220`: `+0x7c80` = 1 after `EnableAfterImage`. `3227a2f0`: the erase, the inline disable and `+0x7c80` = 0 all sit behind the found test (`@3227a319`).
+
+**Fix (transcription gap):** a whole-`.text` scan finds 7 writers of `+0x7c80`, not 2. `CommonFrameMove_TimedEvent` `31ff27c0` writes it every frame around the state's
+after-image windows: inside the window `Enable( 0 )` then 1 (`@31ff2863`), outside it `Disable( false, 0 )` then 0 (`@31ff2875`), and the same for the second body (`@31ff28eb` / `@31ff28fe`).
+The ctor (`322a5ec6`) zeroes it; the only reader is R5b's exit path (`@32065c06`). Ported in `X2GUUser.cpp` after each window's if / else (insert-only, the condition re-read, as
+`GetNowAnimationTime` is a plain getter). The member no longer means "buff after-image": renamed `m_bAfterImageByBuffCreated` -> `m_bAfterImageEnableRequested` (R5b's own lines,
+inside the flag). JUNE_BUGS 738 (a state's window clears the byte while a buff's after-image is still on). Funcmap: new row `31ff27c0 @31ff285e-31ff28fe (R5b review)`.
+
+**Routed, not fixed: `+0x1d1` has readers.** R5b's note said Erase's two `+0x1d1 = 0` writes have no reader. The scan finds `+0x1d1` is the after-image's saved enable: `31fd8230` (user
+base, class 13), `32c85c00` (Rena), `32cc7b90` (Aisha) and `32d08d70` (Elsword) save `+0x194` into it and blank it in their wait states, and copy it back after. `322727c0` (sets it on both
+after-images) has no caller. March's Rena, Elsword and Aisha ports keep a class-held stand-in (`m_bAfterImageSaved`) that is never cleared, so a buff's after-image that ends after the
+unit has idled with it on should come back on the next non-wait frame. June clears the byte in Erase. That bug predates R5b (those class ports), it is not this phase's subject,
+and the fix moves a member into `KTDGXSkinAfterImage` and edits three closed class ports: **new phase R5c** below, checklist row "After-image byte `+0x1d1`" now names it.
+
+**Gates.** Before the fix, `finish.py --review --commits 46e515f9 --with ..._CUSTOM_RENDER_STATE_EQUIP -v`: flagcheck PASS (7 PASS, 1 PASS~ blank line in `X2Eqip.cpp`, 1 DEFINE,
+0 OTHER, 0 FAIL, 0 ERROR; 0 deleted lines), junediverge PASS, `--check-all` PASS, enumscan exit 0, RESULT PASS. The fix on the worktree (`--files X2GameUnit.cpp X2GameUnit.h
+X2GUUser.cpp`): flagcheck PASS (2 PASS, 1 OTHER = a peer's uncommitted `GetEquipGroup` line in `X2GUUser.cpp`, char-luciel DU3 review, not staged; the 4 deleted lines are the
+rename of R5b's own lines), junediverge PASS, enumscan exit 0. Commit range line: see the commit's `finish.py --range`.
+**Compile:** `/Zs` probes of `X2GUUser.cpp` and `X2GameUnit.cpp` (census.py command): 0 errors each. **Build:** none (no play-test; the next play-test phase builds).
+The review commit stages only its own hunks of `X2GUUser.cpp` and `funcmap.tsv` (a peer's hunks in both stay unstaged).
+
+## Phase R5c - after-image saved enable byte `+0x1d1`
+
+**Run with:** Sonnet 5.5 high, then an Opus review, then a user play-test. Flag `SERV_IRUHADEV_JUNE_AFTER_IMAGE_SAVED_ENABLE`. Routed by the R5b review (2026-11-15).
+
+- June's `CKTDGXSkinAfterImage +0x1d1` (saved enable, ctor value from June's ctor) as a member of March's `CKTDGXSkinAfterImage`, with a getter and setter.
+- `CX2GameUnit::EraseAfterImageByBuff` (`3227a2f0 @3227a37f-3227a393`): clear it on both after-images (`+0x6754`, `+0x6758`), inside the found branch.
+- Elsword (`32d08d70`), Rena (`32c85c00`) and Aisha (`32cc7b90` / `32cc7c30`) `AfterImageFrameMove`: their class-held `m_bAfterImageSaved` stand-ins move onto the after-image's byte,
+  each under the new flag with the stand-in in `#else`; where June also toggles the second after-image, follow June. The base `31fd8230` class-13 toggle stays with checklist 7al.
+- `322727c0` has no caller: not ported.
+- **Play-test:** Elsword, Rena or Aisha with a buff that adds an after-image (`CreateAndInsertAfterImageByBuff`; the phase finds one March data reaches), stand still while it is on,
+  then let it end: the after-image must go off and stay off.
+
 ## Phase R6 - SKIN_MESH_RENDER_TYPE
 
 **Run with:** Opus 5.5 high (R0b: map the whole draw, then port), then an Opus review. Flag `SERV_IRUHADEV_JUNE_SKIN_MESH_RENDER_TYPE`. June's cases 1, 2, 4-7

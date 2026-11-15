@@ -5533,7 +5533,7 @@ protected:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		CKTDGXSkinAfterImage*						m_pMinorUnitAfterImage;	// char-luciel DU1d3: June +0x6758, the second body's after-image
 #ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
-		bool										m_bAfterImageByBuffCreated;	// june-engine R5b: June +0x7c80 ( ctor 0 ), 1 after CreateAndInsertAfterImageByBuff, 0 after EraseAfterImageByBuff
+		bool										m_bAfterImageEnableRequested;	// june-engine R5b review: June +0x7c80 ( ctor 0 ), 1 when a buff or the state's after-image window turns the after-image on, 0 when they turn it off
 #endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
