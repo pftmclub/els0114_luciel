@@ -3460,7 +3460,10 @@ No review of its own ( the CH2c2 review covers it ). Commit: see git log `char-l
   Expect: Lu plays her `Out` animation and Ciel casts ( June: `DUO_TYPE` minor ): other units stop for about 0.7 s, an effect set at 0.01 s ( the cross ), the first attack set at 0.32 s and the second at 0.92 s hit the enemies in front; you can walk
   after it ends. Not expected yet: the soul drain at the end ( the `StateEnd` is CH2c2's ). If you are stuck after the skill, or Lu / Ciel cast the wrong skill, say which key. Logs to read: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`:
   `equip skill 30019 slot 0 bank A state <id>` and `... slot 5 bank B ...` ( 30039 on `LuRgB` ), one `use skill 30019 slot 0|5 body L|C` + one `cooldown` line per cast, one `soul extortion start skill <id> anim rate <r> speed <s>` per cast ( rate 1.00 unless the upgrade's `SA_ANI_SPEED` is set ).
-- **Next:** play-test Soul Extortion ( above ), then `/x2-phase char-luciel CH2c2` on Sonnet 5.5 high.
+- **Play-test ( 2026-11-15, user: passed; logs 21:25-21:26 on the 21:23 deploy ):** 9 casts, each one `use` + one `cooldown` + one `soul extortion start` line on the same skill id: `LuRgA` 30019 x4 ( rate 1.00 ), `LuRgB` 30039 x5
+  ( rate 1.30 = the upgrade's `SA_ANI_SPEED` ), both bodies ( `body L` from Lu, `body C` from Ciel ), `equip` lines state 50 ( key A ). 0 EXCEPTION, 0 ErrorLog lines, 0 unbound Lua names; UNHANDLED only `E_DISABLE_HB_CHECK_REQ`.
+  **Not exercised:** page 2 / key Q ( bank B, slot 5 ): no `equip ... slot 5 bank B` line, so the B-slot cast is still owed ( CH2c2's play-test can take it with the other ids ).
+- **Next:** `/x2-phase char-luciel CH2c2` on Sonnet 5.5 high.
 
 ### CH2d20 - Done (2026-11-15)
 
