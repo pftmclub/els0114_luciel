@@ -12772,6 +12772,21 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
+// Date: 2026-11-15
+// Description: june-stat-calc D5 - extra damage as June: the NPC's LevelCorrectionExtraDamage takes June's level-1 dungeon list
+//              (32760210: adds DI_EVENT_WALLY_LAND, drops the Henir challenge case), CX2GUNPC::GetEnchantResist adds the base resist
+//              (32757c50 calls 32274b00: buff change attribute + item resist map), the NPC UpNowHp override (32784200: a
+//              NOT_APPLY_DAMAGE_IN_DUNGEON NPC refuses a change <= 0 in GT_DUNGEON, ticks included), and the per-tick damage
+//              GetCalcPerDamage (32622300) takes its PvP-channel curve in PvP or PvE. With _DEBUG: the "[JUNE_STATCALC] EDT" and
+//              "EDTTICK" lines. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE ) && !( defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) && defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ) && defined( SERV_IRUHADEV_JUNE_BUFF_NEW_FLAG ) && defined( SERV_IRUHADEV_JUNE_CHAR_EVE_SKILL ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE needs June's enum names, D4a's m_bNotApplyDamageInDungeon, the virtual UpNowHp and GetIsNowPVPCorrectionGame
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
 // Date: 2026-11-12
 // Description: June character port ( Elesis ) Phase CH1k - her skill lookup's summon-limit check ( CheckSummonSpecialAttack, June 32b84a50 @32b84d19 ).
 //              CH3b0 ( 2026-11-14 ): defined. Vslots 0x24c / 0x250 whole ( June 32b89260 / 32b74500: June's skill ids, the enhanced Victorious Sword,

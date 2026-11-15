@@ -6786,6 +6786,14 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_elesis/ch0b_stage_li
 - **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` (D4a's); debug `[JUNE_STATCALC] REACT ... special=` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT` in `KTDXLIB/Always.h`, rebuild (reverts D4a too).
 
+## Extra damage, NPC resist and NPC HP change as June's (june-stat-calc D5, 2026-11-15)
+
+- **What:** the NPC's `LevelCorrectionExtraDamage` uses June's level-1 dungeon list (`32760210`: adds `DI_EVENT_WALLY_LAND` 41280, drops the Henir challenge case); `CX2GUNPC::GetEnchantResist` adds the base resist (buff change attribute + item resist map, as June's `32757c50`); new `CX2GUNPC::UpNowHp` override (`32784200`): a `NOT_APPLY_DAMAGE_IN_DUNGEON` NPC takes no HP loss in a dungeon game, ticks included; `GetCalcPerDamage` (`32622300`) takes its PvP-channel tick curve in PvP or PvE. June's NPC-HP debug map and crash trap in the same override are routed to backlog Stage 40, not ported.
+- **Why:** June's extra-damage arithmetic; the rest of both LevelCorrections and the user resist were re-read equal.
+- **Files:** `X2GUNPC.cpp/.h`, `X2GUUser.cpp` (debug lines only), `X2DamageManager.cpp`, `KncWX2Server/Common/Enum/DungeonEnum.h`, `KTDXLIB/Always.h`.
+- **Flags:** `SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE`; debug `[JUNE_STATCALC] EDT` / `EDTTICK` lines under `SERV_IRUHADEV_JUNE_STATCALC_DEBUG`.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE` in `KTDXLIB/Always.h`, rebuild; the dungeon name stays, unused. Save: the play-test gave jtLordKnight's sword socket 25001 and new Apocalypse swords with 25000 / 25004 to jtRuneSlayer / jtInfinitySword (backup `db_backup/els_db_20261115_221853_pre_d5-before.sql`).
+
 ## Stage 7 Add, CH0c: Add on the creation screen (char-add CH0c, 2026-11-13)
 
 - **What:** the US `SERV_LIMIT_UNIT` limit (`_CONST_LIMIT_UNIT_::iLimitType = 8`) no longer hides `AddCreateUnitSlot` on the creation screen (June's ctor `3255bd10` has no limit test) nor Add's entry in the seven personal-shop character combos. The default-select switch keeps March's limit (June opens on Ain, Stage 8). Create Add there: he gets the live-DB class-9 gear (112991-112995) and costume (41757-41761) that `SeedBeginnerGear` already held.

@@ -1707,6 +1707,11 @@ be placed by address.
   `320832a0` stores each hit on the attacker ( or an NPC attacker's owner, `32759f00` ) as protected float `+0x90fc` ( callers `@32049a47`, NPC `@327b4d22` /
   `@327b4f05`; sole reader `32955210`, called from `324babf1`, `326b3330` and `326b4863` ). `31fdcb70` counts a hit taken per attacking NPC id in map `+0x8854`,
   but only for ids in the `g_pData +0x28c` set ( `326f8210` ); it is read by `323179c0` from `322f0020` beside `m_nDamageCount`, possibly a play report. Funcmap rows `StatCalc S33 D4b`.
+- **Found by june-stat-calc D5 (2026-11-15):** a June dev diagnostic for dying NPCs. A chat-box command (`31ec2700` @31ec2905, string 39279)
+  sets game `+0xba4`; NPC `UpNowHp` `32784200` and `SetNowHp` `32778c60` then store the NPC's HP in game map `+0x334` by NPC UID (`322e28e0`,
+  an existing entry only) and write to address 0 (a deliberate crash); NPC `CommonEventProcess` `3276d980` @3276daee prints `-->hp ... nowState`
+  from it (`322d8b80`); erase in `322de0cd`, no insert found. Debug only: name the command text, then exclude or route to a dev-tools stage.
+  Funcmap rows `StatCalc S33 D5`.
 - **Depends on:** june-census Z. Start: `/x2-phase new-plan june-triage` (Opus 5.5 high), brief `kickoffs/june-backlog/stage40-plan.md`.
 
 ### Stage 41: March's user state ids take June's numbers (char-luciel CH1o, 2026-11-15) - CLOSED 2026-11-15 (plan `june-state-ids`)

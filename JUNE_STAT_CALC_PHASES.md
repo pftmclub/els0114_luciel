@@ -980,6 +980,54 @@ the map lists them, `GetEnchantResist`'s user override `31fd8790` with its six p
 **Done gate.** Map rows `June`; gates PASS; `DEPLOY OK`; play-test: poison, fire and frozen ticks on a monster and on the player match
 the log's computed tick; a resist-socketed unit shows the lower tick.
 
+### Phase D5 - Done (2026-11-15)
+
+**Opus 5.5 / high. Flag `SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE` (new).** Commit: this commit. Insert-only: `X2GUNPC.cpp` +114, `X2GUUser.cpp` +80
+(debug only), `Always.h` +15, `X2DamageManager.cpp` +5, `X2GUNPC.h` +3, `DungeonEnum.h` +5 (`DI_EVENT_WALLY_LAND` 41280 under `JUNE_ENUM_NAMES`,
+value proved by `enumprobe`). Map rows 22 / 23 / 24 `June`, 4 rows added; divergence rows `LevelCorrectionExtraDamage`, `GetEnchantResist` updated,
+`GetCalcPerDamage` added (replaced); funcmap 10 rows `StatCalc S33 D5`. Flags read by `cl /Zs` (not by `#ifdef`): `ADDITIONAL_MEMO`, `CHILDRENS_DAY_EVENT_DUNGEON`,
+`EXTRADAMAGE_RATE_BUG_FIX`, `SUMMON_MONSTER_CARD_SYSTEM`, `DAMAGEDATA_RATE_MODIFIER`, `CHUNG_MEMO_01`, `EXTRA_DAMAGE_CUT_NEGATIVE_RATE` on; `NEW_HENIR_DUNGEON`,
+`SERV_HALLOWEEN_EVENT_2013` off.
+
+**Ported:**
+- NPC `LevelCorrectionExtraDamage` `32760210`: June's level-1 list @327602ed-3276044e (Halloween 32500-32502, defence 38300-38302, Valentine 38400,
+  tree day 39500-39550, `DI_EVENT_WALLY_LAND` 41280); March's Henir challenge case (38100) is gone. The rest re-read = March (constants 0.025 / 0.5 / 500
+  read from the exe; cap 0.5, floor 0, rate modifier with no `< 1` test).
+- NPC `GetEnchantResist` `32757c50`: after the 150-per-enchant and NPC-stat terms June adds the base `32274b00` (buff change attribute + item resist map,
+  `ecx` = this @32757cdc). D0 had called it `= March`. Every reader goes through the virtual (buff resist, frozen roll, extra damage): no double count.
+- NPC `UpNowHp` override `32784200` (new, slot `0xec`): a `NOT_APPLY_DAMAGE_IN_DUNGEON` NPC refuses a change <= 0 in `GT_DUNGEON` (NaN passes, as June's
+  `fcomp`), then the base. Its tail (@327842cc-3278435e) is a June dev diagnostic: the HP goes into game map `+0x334` by NPC UID (`322e28e0`, existing
+  entries only), and when game `+0xba4` == 1 June writes to address 0. `+0xba4` is set only by a chat-box command (`31ec2921`, string 39279). The only reader
+  is the NPC's `CommonEventProcess` trace (`322d8b80`). March has none of it. **Not ported, routed to backlog Stage 40** (kickoff said keep the null write with
+  a JUNE_BUGS row; it is a debug trap with no setter here, and porting it would mean porting the command and the map: drift). NPC `SetNowHp` `32778c60` = base +
+  the same tail: nothing to port.
+- `GetCalcPerDamage` `32622300` (the per-tick value both LevelCorrections write): bases 80 / 145 / 60 / 82 (EDT 1 / 3 / 8 / 18), 151 / 156 scripted,
+  `x (1 + 0.2 (lv - 1)) x (1 - resist / 500)` = March. Only the PvP-channel curve's test differs: June PvP **or** PvE (`322cc1a0` = `GetIsNowPVPCorrectionGame`),
+  channel classes 9 / 11 / 10 = March's names. No offline reach.
+
+**Re-read, = June (no code):** user `LevelCorrectionExtraDamage` `31fe6db0` (no dungeon list; rate from `m_fPureRate`; null tests; floor 0); user
+`GetEnchantResist` `31fd8790` = char-chung CH4a2's port; its writer `31fe19d0` @31fe1b80-31fe1da6 (26401 SA `0x58` x6, 28405 SA `0x58` blaze, 30409 SA `0x54` x6) =
+`InitPassiveSkillState`; base `32274b00` = March. Frozen (EDT 17) has no tick base in June either (0 per second for a levelled frozen).
+
+**Lead for the review (map row `extra-damage tick application`, `unknown`):** the per-frame tick sites were not D5 rows and were not read. March's user
+`CommonFrameMoveFuture_ExtraDamage` frozen block subtracts `m_Fire.m_DamagePerSec`; compare NPC `3276b400` and the user's June twin.
+
+**Debug** (`_DEBUG`): `[JUNE_STATCALC] EDT def=npc <uid> id=<npc> | def=user <uid> type= lv= resist= perSec= rate=` after each LevelCorrection (once a second per
+unit and type; written for every hit's extra damage, proc or not), and `EDTTICK def=... poison= fire= cold= lost= in=` once per second of HP lost while a
+poison / fire / cold tick runs (hits in that second are counted too).
+
+**Hygiene.** `finish.py --files <6 files> --with SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE`: flagcheck 4 PASS, 0 DEFINE, 2 OTHER (`Always.h`: peers' uncommitted
+defines; `DungeonEnum.h`: under `JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL, 0 bare `#else` -> `RESULT: PASS`; junediverge `RESULT: PASS`;
+enumscan exit 0. Probes (`/Zs`, US_SERVICE): `X2GUNPC`, `X2GUUser`, `X2DamageManager` 0 errors.
+**Build.** `DEPLOY OK: X2_offline.exe is 27,020,800 B, dated 2026-11-15 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3, equal to X2/US_SERVICE/x2.exe (2026-11-15 22:24:11); built at main fac2180d + 38 uncommitted code file(s).`
+(coalesced: a peer's full build started after the last D5 edit.) `EXESTR OK: 2 of 2 found in X2_offline.exe, 27020800 B, dated 2026-11-15 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3` (the NPC `EDT` and user `EDTTICK` lines).
+
+**Play-test save** (backup `db_backup/els_db_20261115_221853_pre_d5-before.sql`): jtLordKnight (25) Apocalypse sword (item 2435) socket 25001 (poison);
+jtRuneSlayer (26) and jtInfinitySword (71) each got a new equipped Apocalypse sword (4379 / 4380) with 25000 (fire) / 25004 (cold). The three options proc
+at rate 1.0 for 100 s (`OptionItemData`, `LEVEL = 0`), so the rate is capped at 0.5 and the tick is the attacker-level curve. Target: Altera Plain Normal
+stage 2, Nasod Element Fire 232 / Ice 233 behind their barriers (1 damage a hit, so they live). No reliable monster puts these ticks on the player
+(the player-side check is best effort: Hamel secret dungeon's Dark Priest, a March fire attack); the user body is unchanged code. Play-test: owed.
+
 ## Phase D6 - Damage smoke on every ported character, track review
 
 **Scope.** No new code. One play-test sheet per ported character (a geared level-99 unit with sockets and one without): normal, command,

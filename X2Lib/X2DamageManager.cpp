@@ -4574,7 +4574,12 @@ float CX2DamageManager::ExtraDamageData::GetCalcPerDamage(int iUnitLevel, float 
 #endif SERV_IRUHADEV_JUNE_SOCKET_EDT
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+	// june-stat-calc D5: June 32622300 @32622400 takes the PvP-channel curve in PvP or PvE ( 322cc1a0 )
+	if( g_pX2Game != NULL && g_pX2Game->GetIsNowPVPCorrectionGame() )
+#else SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 	if(g_pX2Game != NULL && g_pX2Game->GetGameType() == CX2Game::GT_PVP)
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 	{
 		if( g_pMain->GetPVPChannelClass( g_pMain->GetConnectedChannelID() ) == KPVPChannelInfo::PCC_FREE ||
 			g_pMain->GetPVPChannelClass( g_pMain->GetConnectedChannelID() ) == KPVPChannelInfo::PCC_PLAY ||

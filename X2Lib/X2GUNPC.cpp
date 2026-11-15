@@ -12175,6 +12175,57 @@ void CX2GUNPC::DamageReact_ExtraDamage( CX2DamageManager::DamageData* pDamageDat
 
 
 //{{ oasis907 : 김상윤 [2010.3.22] // 소켓 아이템 ExtraDamage 레벨 보정
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+namespace _CONST_GUNPC_D5_
+{
+	bool IsExtraDamageLogDue( const CX2GameUnit* pUnit_, const int iExtraDamageType_ )	// june-stat-calc D5: one EDT line per unit and type, about once a second
+	{
+		static std::map< std::pair< const CX2GameUnit*, int >, DWORD > s_mapExtraDamageLogged;
+		if ( s_mapExtraDamageLogged.size() > 256 )
+			s_mapExtraDamageLogged.clear();
+		const DWORD dwNow = ::GetTickCount();
+		DWORD& dwLast = s_mapExtraDamageLogged[ std::make_pair( pUnit_, iExtraDamageType_ ) ];
+		if ( dwNow - dwLast < 1000 )
+			return false;
+		dwLast = dwNow;
+		return true;
+	}
+
+	struct ExtraDamageTickTally	// june-stat-calc D5: HP lost while a tick runs, summed per second
+	{
+		DWORD	m_dwStart;
+		DWORD	m_dwLast;
+		float	m_fLost;
+		ExtraDamageTickTally() : m_dwStart( 0 ), m_dwLast( 0 ), m_fLost( 0.f ) {}
+	};
+
+	bool IsExtraDamageTickSecondDone( const CX2GameUnit* pUnit_, const float fLost_, OUT float& fLostInSecond_, OUT float& fSeconds_ )	// june-stat-calc D5
+	{
+		static std::map< const CX2GameUnit*, ExtraDamageTickTally > s_mapTickTally;
+		if ( s_mapTickTally.size() > 256 )
+			s_mapTickTally.clear();
+		const DWORD dwNow = ::GetTickCount();
+		ExtraDamageTickTally& kTally = s_mapTickTally[ pUnit_ ];
+		if ( 0 == kTally.m_dwStart || dwNow - kTally.m_dwLast > 500 )
+		{
+			kTally.m_dwStart = dwNow;
+			kTally.m_fLost = 0.f;
+		}
+		kTally.m_dwLast = dwNow;
+		kTally.m_fLost += fLost_;
+		if ( dwNow - kTally.m_dwStart < 1000 )
+			return false;
+		fLostInSecond_ = kTally.m_fLost;
+		fSeconds_ = static_cast<float>( dwNow - kTally.m_dwStart ) * 0.001f;
+		kTally.m_dwStart = dwNow;
+		kTally.m_fLost = 0.f;
+		return true;
+	}
+}
+using namespace _CONST_GUNPC_D5_;
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 void CX2GUNPC::LevelCorrectionExtraDamage( const CX2DamageManager::DamageData* pDamageData, CX2DamageManager::ExtraDamageData* pExtraDamageData )
 {
 	int iLevel = pExtraDamageData->m_iLevel;
@@ -12192,6 +12243,29 @@ void CX2GUNPC::LevelCorrectionExtraDamage( const CX2DamageManager::DamageData* p
 #endif
 
 #ifdef CHILDRENS_DAY_EVENT_DUNGEON
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+	// june-stat-calc D5: June 32760210 @327602cb-32760462: no Henir challenge case, DI_EVENT_WALLY_LAND joins the level-1 list
+	if( g_pData != NULL && g_pData->GetDungeonRoom() != NULL && g_pData->GetPartyManager() != NULL && g_pData->GetPartyManager()->GetMyPartyData() != NULL )
+	{
+		switch( g_pData->GetDungeonRoom()->GetDungeonID() )
+		{
+		case SEnum::DI_ELDER_HALLOWEEN_NORMAL:
+		case SEnum::DI_ELDER_HALLOWEEN_HARD:
+		case SEnum::DI_ELDER_HALLOWEEN_EXPERT:
+		CASE_DEFENCE_DUNGEON
+		case SEnum::DI_EVENT_VALENTINE_DAY:
+		case SEnum::DI_EVENT_TREE_DAY_ELDER:
+		case SEnum::DI_EVENT_TREE_DAY_BESMA:
+		case SEnum::DI_EVENT_TREE_DAY_ALTERA:
+		case SEnum::DI_EVENT_TREE_DAY_PEITA:
+		case SEnum::DI_EVENT_TREE_DAY_VELDER:
+		case SEnum::DI_EVENT_TREE_DAY_HAMEL:
+		case SEnum::DI_EVENT_WALLY_LAND:
+			iLevel = 1;
+			break;
+		}
+	}
+#else SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 	if( g_pData != NULL && g_pData->GetDungeonRoom() != NULL && g_pData->GetPartyManager() != NULL && g_pData->GetPartyManager()->GetMyPartyData() != NULL )
 	{
 		switch(g_pData->GetDungeonRoom()->GetDungeonID())
@@ -12236,6 +12310,7 @@ void CX2GUNPC::LevelCorrectionExtraDamage( const CX2DamageManager::DamageData* p
 			break;
 		}
 	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 #endif CHILDRENS_DAY_EVENT_DUNGEON
 
 	if( iLevel >= 0 )
@@ -12313,6 +12388,15 @@ void CX2GUNPC::LevelCorrectionExtraDamage( const CX2DamageManager::DamageData* p
 #endif EXTRADAMAGE_RATE_BUG_FIX			
 	}
 #endif DAMAGEDATA_RATE_MODIFIER
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	// june-stat-calc D5: the tick per second and the proc rate this hit leaves, once a second per unit and type
+	if ( CX2DamageManager::EDT_NONE != pExtraDamageData->m_ExtraDamageType && IsExtraDamageLogDue( this, static_cast<int>( pExtraDamageData->m_ExtraDamageType ) ) )
+		CX2OfflineLog::Server( L"[JUNE_STATCALC] EDT def=npc %d id=%d type=%d lv=%d resist=%.1f perSec=%.2f rate=%.3f", GetUID(), static_cast<int>( GetNPCTemplet().m_nNPCUnitID ),
+			static_cast<int>( pExtraDamageData->m_ExtraDamageType ), iLevel, GetEnchantResist( GetEnchantTypeFromExtraDamageType( pExtraDamageData->m_ExtraDamageType ) ),
+			static_cast<float>( pExtraDamageData->m_DamagePerSec ), static_cast<float>( pExtraDamageData->m_fRate ) );
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 
 	return;
 }
@@ -28929,9 +29013,39 @@ float CX2GUNPC::GetEnchantResist( CX2EnchantItem::ENCHANT_TYPE enchantType )
 		
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+	// june-stat-calc D5: June 32757c50 @32757cdc adds the base resist ( 32274b00: buff change attribute + item resist map )
+	fResistValue = CX2GameUnit::GetEnchantResist( enchantType ) + fResistValue;
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 	return fResistValue;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+/*virtual*/ void CX2GUNPC::UpNowHp( const float hpIncrement, const float hpMinimum /*= 0.f*/ )
+{
+	// june-stat-calc D5: June 32784200: a NOT_APPLY_DAMAGE_IN_DUNGEON NPC refuses a change <= 0 in GT_DUNGEON, ticks included
+	if ( true == m_bNotApplyDamageInDungeon && NULL != g_pX2Game && CX2Game::GT_DUNGEON == g_pX2Game->GetGameType() && hpIncrement <= 0.f )
+		return;
+
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	const float fHpBeforeTick = GetNowHp();	// june-stat-calc D5
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+	CX2GameUnit::UpNowHp( hpIncrement, hpMinimum );
+	// june-stat-calc D5: June @327842cc-3278435e ( the game's NPC-HP debug map +0x334 and its crash trap +0xba4 ) is routed to Stage 40
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	if ( 0.f > hpIncrement && ( m_ExtraDamagePack.m_Poison.m_fTime > 0.0f || m_ExtraDamagePack.m_Fire.m_fTime > 0.0f || m_ExtraDamagePack.m_Cold.m_fTime > 0.0f ) )
+	{
+		float fLostInSecond = 0.f;
+		float fSeconds = 0.f;
+		if ( IsExtraDamageTickSecondDone( this, fHpBeforeTick - GetNowHp(), fLostInSecond, fSeconds ) )
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] EDTTICK def=npc %d id=%d poison=%.2f fire=%.2f cold=%.2f lost=%.1f in=%.2fs", GetUID(), static_cast<int>( GetNPCTemplet().m_nNPCUnitID ),
+				m_ExtraDamagePack.m_Poison.m_fTime > 0.0f ? static_cast<float>( m_ExtraDamagePack.m_Poison.m_DamagePerSec ) : 0.f,
+				m_ExtraDamagePack.m_Fire.m_fTime > 0.0f ? static_cast<float>( m_ExtraDamagePack.m_Fire.m_DamagePerSec ) : 0.f,
+				m_ExtraDamagePack.m_Cold.m_fTime > 0.0f ? static_cast<float>( m_ExtraDamagePack.m_Cold.m_DamagePerSec ) : 0.f, fLostInSecond, fSeconds );
+	}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 void CX2GUNPC::ClearRecieveSyncData()
 {
 	m_NPCFrameData.syncData.lastTouchLineIndex = 0;

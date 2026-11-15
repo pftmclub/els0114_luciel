@@ -3154,6 +3154,9 @@ class CX2GUNPC : public CX2GameUnit
 	virtual CX2GageUI* CreateGageUI( const CX2GageData* pOwnerGageData_ );
 
 	float			GetEnchantResist( CX2EnchantItem::ENCHANT_TYPE enchantType ); 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
+	virtual void	UpNowHp( const float hpIncrement, const float hpMinimum = 0.f );	// june-stat-calc D5: June 32784200 ( slot 0xec )
+#endif SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE
 
 	void			GetBuffInfo( OUT vector<KNpcUnitBuffInfo>& vecNpcUnitBuffInfo_ ) const;
 //#ifdef SERV_KTDX_OPTIMIZE_UDP_PACKET_PACK

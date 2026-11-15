@@ -548,6 +548,11 @@ namespace SEnum
 		DI_SPACE_OF_THOUGHT_DUMMY				= 41510,
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 	//}}
+	//{{ Iruha : 2026-11-15 // june-stat-calc D5 -- June DungeonEnum's Wally Land event dungeon ( LevelCorrectionExtraDamage's level-1 list )
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		DI_EVENT_WALLY_LAND						= 41280,	// June DungeonEnum.lua:134
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+	//}}
 #ifdef SERV_IRUHADEV_ELYSION_PORT
 	//{{ Iruha : 2026-10-17 // Atlas/Elysion port Phase A3 -- DUNGEON_ID, Hero rows are june-dungeons
 		DI_ATLASDEVELOPMENT_NORMAL = 33330,
