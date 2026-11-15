@@ -1752,6 +1752,48 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `S
   every handler sets max HP from the first stat, JUNE_BUGS 753); Ciel's own atk / def (+30 / +10) is not visible in play. 0 EXCEPTION, ErrorLog clean,
   UNHANDLED only `E_DISABLE_HB_CHECK_REQ` x4. The review may ask for a Ciel-slot drop (switch to Ciel in game, then drop) if it wants that direction too.
 
+### DU5e - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed `9286ce8d` against June (`disasm_range.py`, read-only). **Verdict: pass, no code change.** No build, no play-test (no fix landed).
+- **Writer** `323571c0` (`ret 0x38` = two 7-dword KStats by value): per body it decodes the 13-dword xor-protected stat, zeroes dwords 0-5, writes the KStat's
+  float field 0 + six ints (`fild`) into dwords 6-12, re-protects; first -> `+0x164` (`m_GameStat`), second -> `+0x1a0` (`m_MinorUnitGameStat`). March's `SetKStat`
+  = the same five values + the six rate resets; its `LimitMaximum` is empty, so no difference. June's two extra KStat ints have no March field (wire and struct are
+  March's five; Stage 33). Note: `june_march_divergent.tsv` row `SetKStat` (stage33) says "no extra-rate reset"; the listing does zero six dwords (left to Stage 33).
+- **Push order** (every site: first `sub esp, 0x1c` copies the higher offset = arg 2, second the lower = arg 1): equip change room `+0x19` / `+0x35` (`@31ed47e5`),
+  skill info `+9` / `+0x25` (`@31ed4d63`), game stat `ebp` / `+0x1c` (`@31ed5884`), StateMenu equip `[esp+0x3d]` / `[esp+0x59]` (`@31f1eec5`), zero endurance local
+  `+0x50` / `+0x6c` (`@32461fd4`), level up (`@324740fe`, `+0x5d` / `+0x79`), room user info `+0xb0` / `+0xcc` (`@323608a9`). All = the port (first, second), each pair
+  0x1c apart = the second KStat right after `m_kGameStat`, as the packet structs and Put / Get place it.
+- **User stat (vslot 0x1e0):** `31f1ed70 @31f1ee8c` `cmp byte [unit +0xe40], 1` picks `+0x59` (second) else `+0x3d` = `IsMinorUnitForm()` (DU1); zero endurance
+  `@32461fc5` passes local `+0x50` (first). Max HP: equip `@31f1eef7` and game stat `@31ed589f` feed the gage the first's base HP. JUNE_BUGS 753 reads right.
+- **Transform test** equip `@31f1f1d4`: `IsTransformed( 2 )` true -> `@31f1f27f`, skipping vslots 0x63c( 1 ) / 0x630 / 0x634, the three `SetEnableAttackBox` calls, the
+  weapon loop (category 9 = `ST_E_EQUIP`, slot 9 / 10 = `g_iEquippedNormalWeaponSlotID` / `g_iEquippedFashionWeaponslotID`, vslot 0x28c, break) and `UpdateDuo( 0 )`
+  `@31f1f27a`: exactly March's NEW_CHARACTER_CHUNG block + weapon loop, `UpdateDuo` inside it. Zero endurance `@324620b5`: same test around the same block, weapon refresh
+  by templet `+0xd5 == 2` (`EP_WEAPON_HAND`), no `UpdateDuo`, inside the per-item loop after vslot 0x644 = the port.
+- **Emulator stand-in:** `AddEquippedStat( kStat, group )` filter = `GetEqipStat`'s test (`2 != want && 2 != slot && slot != want`); `GetEquipGroupOfSlot` = the
+  `NESI_RENUMBER` branch of `CX2Inventory::GetEquipGroup` (March's onepiece is 35 there, not a minor slot, so the CHARINFO special case changes nothing). Lu = group 0,
+  Ciel = group 1 (`MakeMinorUnitGameStat`, zero for other classes, which keep group 2 = every slot). Senders: room user info, room equip NOT, title NOT, level up fill
+  both; the other `MakeGameStat` callers are `KUnitInfo` (no second stat in June), the play status max HP and the dungeon base HP (first stat, as June's HP).
+  Groups stay numbers: no Enum entry (the values coincide with `DT_*`, but June names no equip group; DU4 / DU5 reviews kept them the same way).
+- **Flag-off = March:** `cl /P` (census.py `cl_cmd`, no `/Yu`) of `X2StateMenu.cpp` / `X2Unit.cpp` / `X2Room.cpp` in a mirrored header tree, flag on vs `//#define` in
+  both shadow `Always.h` and `ServerDefine.h`: 17 / 10 / 13 hunks (7 each = the six packet fields + the `SetGameStats` declaration), every flag-on line is DU5e's
+  added text, every flag-off line the pre-DU5e text (the commit deletes no line in those files; 0 unmatched).
+- **Gates:** `finish.py --review --commits 9286ce8d --with SERV_IRUHADEV_JUNE_CHAR_DUO_STAT -v`:
+  ```
+  flagcheck JUNE_CHAR_DUO_STAT       PASS     files: 13 PASS, 2 PASS~ (blank/marker only), 2 DEFINE, 0 OTHER (other flags), 0 FAIL, 0 ERROR
+  junediverge                        PASS     RESULT: PASS
+  junediverge --check-all            PASS     RESULT: PASS
+  enumscan                           FAIL     exit 1: 191 A/B row(s) remain in 12 file(s)
+  stateends / skillicons / luabind   SKIPPED  not requested
+  FINISH RESULT: FAIL (7 gates, 1 failed, 3 skipped)
+  ```
+  enumscan: the 191 rows are the pre-existing `X2Unit.cpp` `SI_*` lines (DU5e's note intersected them with its diff: 0 on its lines). 0 OTHER rows, 0 deleted lines;
+  PASS~ = one blank line each in `X2OfflineInventory.cpp` / `X2OfflineServer.cpp`. INFO (not run): DUO_BODY, EQUIP_VIEW, NESI_RENUMBER, TRANSFORM_LINK,
+  JUNE_SKILL_MEMO_RESYNC, OFFLINE (enclosing).
+- **Stale comments kept** (old comments are not rewritten): `X2Unit.h` `m_MinorUnitGameStat` "zero until its writer lands", `X2Room.cpp` skill-info "March's packet has one".
+- **Play-test:** DU5e's run stands; the Ciel-slot drop is not asked for: group 1 is the same filter with another argument and the run's first line already shows
+  Ciel's own sum differing from Lu's (atk 6911 vs 6881).
+- **Next:** `/x2-phase char-luciel DU5f` (Opus 5.5 high).
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under
