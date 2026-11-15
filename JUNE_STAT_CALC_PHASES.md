@@ -1029,7 +1029,16 @@ After commit `a93c5420`: `finish.py --range a93c5420^..a93c5420 --with ..._EXTRA
 jtRuneSlayer (26) and jtInfinitySword (71) each got a new equipped Apocalypse sword (4379 / 4380) with 25000 (fire) / 25004 (cold). The three options proc
 at rate 1.0 for 100 s (`OptionItemData`, `LEVEL = 0`), so the rate is capped at 0.5 and the tick is the attacker-level curve. Target: Altera Plain Normal
 stage 2, Nasod Element Fire 232 / Ice 233 behind their barriers (1 damage a hit, so they live). No reliable monster puts these ticks on the player
-(the player-side check is best effort: Hamel secret dungeon's Dark Priest, a March fire attack); the user body is unchanged code. Play-test: owed.
+(the player-side check is best effort: Hamel secret dungeon's Dark Priest, a March fire attack); the user body is unchanged code.
+**Play-test run 1 (2026-11-15 22:30-22:48, exe md5 49fa44dc, after the deploy): poison and fire pass, cold not run.** The user fought Elysion field
+monsters (Plingchu G / R 2129 / 2130, Pyurita 2131, Pimpim 2134), not the Altera elements. Script over every `EDT` / `EDTTICK` line:
+- jtLordKnight (25), poison: `EDT ... type=1 lv=99 resist=350.0 perSec=494.40 rate=0.292` (= 80 x 20.6 x 0.3; rate (19 x 0.025 + 0.5) x 0.3); 2134's 43 clean
+  seconds: median `lost` 493.9 / s against `perSec` 494.40.
+- jtRuneSlayer (26), fire: `type=3 lv=99 resist=50.0 perSec=2688.30 rate=0.500` (= 145 x 20.6 x 0.9; cap 0.5) on four monsters; 116 seconds, median 2688.8 / s
+  (2651 / 2726 = one frame more or less). Seconds with hits in them read higher, as the note says.
+- Resisted tick: the same monsters resist poison 350 and fire 50, so poison ticks at 30 % of its 1,648 base and fire at 90 %. 0 formula mismatches over 32 `EDT`
+  lines; the other 13 are EDT 16 at level -1 (fixed, no tick). ErrorLog: no `JUNE_STATCALC` line, no crash.
+- Open: cold (jtInfinitySword, 71) never attacked; ticks on the player have no reliable source (review / D6).
 
 ## Phase D6 - Damage smoke on every ported character, track review
 
