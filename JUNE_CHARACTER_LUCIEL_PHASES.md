@@ -3287,6 +3287,34 @@ Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateM
   3-line `_LIVE needs TRANSFORM_LINK` guard, and the probes compile with `_LIVE` on, so the guard holds. OTHER rows: each flag's run lists the other flag's blocks, plus
   `X2GULuciel.cpp`'s 3 replaced stand-in comments inside `_CORE` ( its 3 deleted lines ). stateends / skillicons / luabind skipped: no skill states, skills or scripts.
 
+### CH2d20 - Review (2026-11-15)
+
+Opus 5.5 high. Reviewed commit `47c478ef` against June in Ghidra (read-only). **Verdict: pass, no code change.** Two doc corrections, one drift bullet.
+- **`3200f7a0` OnFrameMove, from the listing:** first test `fldz; fcom [cool]; test ah, 5; jp` = enter only when `0 < cool` ( NaN skips ); the clamp `fcomp; test ah, 5; jp`
+  = `new < 0 -> 0`; the string test ( `@3200f828` ) writes `STR_ID_2632` ( 0xa48, format "i" ) only when `0 < cool`, else `L""`; `+ 0.5` is the qword at `0x3342ebc8` then
+  `_ftol2` ( = `static_cast<int>( cool + 0.5 )` ); the cover test `@3200f8ce` `test ah, 1; jnz` = cover when `0 < cool` or NaN, then `CanUseSlot( i ) != 1`. The first
+  block reads `CoolTime` with no handle test, the cover branches test it ( `31d41cd0` ), the else branch clears the cover picture then the string: all as ported.
+- **Hook `@32070133`:** after the SIEE 15 call, `+0x8f70` window, `+0x8f6e` / `+0x8f6f` either byte, `fld [user +0x2b0]` ( = `m_fElapsedTime`, funcmap 322722e0 ) ->
+  `3200f7a0`: = the port ( `GetElapsedTime()` ).
+- **`324617c0` SetShowDlgMenu:** riding pet ( 2, 0 ) ( 0x28, +0x8b ); transform ( 0x2c, +0x89 ) ( 0x28, 0 ) ( 2, 0 ); else ( 2, +0x89 ) ( 0x28, 0 ) ( 0x2c, 0 ); then ( 1, +0x8a ).
+  Hidden: ( 2, 0 ) ( 1, 0 ) ( 0x28, 0 ) ( 0x2c, 0 ). Every branch's order = the port.
+- **`ToggleUI` case 44 `@32158eab`:** game + my unit ( vslot 0x98 ) -> `31fe3c90`, then `jmp 32158301` ( the shared tail ): `break` is right. **`GetShow` case 44 `@3215277d`:**
+  returns `31fd03b0`; no game / unit jumps to `xor al, al` = March's trailing `return false`.
+- **`31fe12f0` / `31fe2b10` constants** ( `charport_consts.py --fn` and a float read ): 12.0, 0.5, 297.0 qwords, slots 0..3 ( `< 4` ), LT byte `+0x240`; type B floats
+  `0x33474740` = -297.0 ( x ), `0x3347473c` = -615.0 ( y ). **`@322f7b41` F6:** `m_pUnit` non-NULL and `+0x38 == 0x81` ( `UC_LUCIEL_DEMONIO` 129 ) -> `31fc9f00( 0.0, 0 )`;
+  March's `GetUnitClass()` tests `m_pUnit` the same way.
+- **`UI_MENU_END` readers** ( `X2UIManager.cpp` ): `CloseAll` ( `ToggleUI( i, false )` ), `PetInventoryOpenCondition`, `PetInventoryForceOpenCondition` and the `m_LUMenu*`
+  sentinels; nothing persists or sizes by it. June's END bounds the same loops, so menu 44 in them = June.
+- **Correction:** June `32153450` is March's `PetInventoryForceOpenCondition`, not `PetInventoryOpenCondition`: its caller `3216d750` is the inventory's pet button
+  ( March `X2UIInventory.cpp`, `PetInventoryForceOpenCondition()` ) and its nine exclusions are ForceOpen's. funcmap row and `JUNE_BUGS` 731 renamed; the bug itself stands.
+- **Drift ( routed ):** that June body refuses four main states ( 7, 8, 0x10, 0x17 ), March three: bullet in backlog Stage 9 ( UI sweep ), not this plan's subject.
+- **Gates** ( `finish.py --review --commits 47c478ef --with JUNE_CHAR_TRANSFORM_LINK JUNE_CHAR_LUCIEL_LIVE -v` ): junediverge `RESULT: PASS`, `--check-all` `RESULT: PASS`,
+  enumscan exit 0; flagcheck `_LIVE` `5 PASS, 2 OTHER, 0 FAIL, 1 ERROR`, `TRANSFORM_LINK` `3 PASS, 4 OTHER, 0 FAIL, 1 ERROR` ( FINISH `FAIL` from the ERROR only ), both
+  `0 deleted line(s)` in the flag's files. The ERROR is the unevaluable compound guard at `Always.h:13652` ( not in this commit's hunk ), as the Done note says: the hunk is
+  the 3-line `_LIVE needs TRANSFORM_LINK` guard, flag-off it is skipped = base. OTHER rows: each flag lists the other's blocks, and `X2GULuciel.cpp`'s 3 replaced stand-in
+  comments sit inside `_CORE` ( the commit's only 3 deleted lines ). stateends / skillicons / luabind: not applicable.
+- **Build:** none ( no code change; the window has no creator until CH2d2 ). CH2d2 kickoff checked: its CH2d20 amendment names the March calls; it now waits only for CH2d.
+
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 
 | Sub-phase | Scope |

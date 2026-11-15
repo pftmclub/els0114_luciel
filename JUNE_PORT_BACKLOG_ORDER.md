@@ -816,6 +816,9 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
   CX2GUUser* )` ) and `32491480` ( not mapped ) take their gauge data from `CreateGageDataByUnitClass` `3248ec80`; CH1a3 ported only that call
   ( under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ). The rest of both bodies ( the room-slot observer byte `+0x93`, the game vslot `0x98` team test )
   was not diffed against March. PvP only, unreachable offline; diff and port whole when PvP is emulated.
+- **Pet inventory force-open states (char-luciel CH2d20 review, 2026-11-15).** June's `CX2UIManager::PetInventoryForceOpenCondition` `32153450` refuses four main
+  states ( 7, 8, 0x10, 0x17 ) where March refuses three ( `XS_PVP_LOBBY`, `XS_PVP_ROOM`, `XS_SQUARE_GAME` ); June's state numbering is shifted, so map the ids by June's
+  state enum before porting the body whole. Offline reach: the inventory's pet button. The menu loop itself already equals June ( CH2d20 added menu 44 ).
 
 **Why UI is last and not first:** UI is not one system. Each stage above brings its own June dialogs: the region maps (1), slots and skill tree (3), quests (4), and the transcendence guides (6). A UI-first pass would port buttons with no system behind them, and then collide with every feature stage that touches the same dialog. The only UI work that must come early is the framework itself, and that is measured in Stage 2.
 
