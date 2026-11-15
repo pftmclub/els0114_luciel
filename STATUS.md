@@ -244,8 +244,8 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH1 | **play-test blocked on CH1q** (2026-11-15, `5e880f3c` + fix `975e8b87`): field entry crashes on Lu's `UT_SKIN` weapon; play-test resumes after CH1q, then `CH1-review.md` | Opus 5.5 / high, Opus review, user play-test | CH1p review, NU4 review, CH0b, june-state-ids S2 | `X2GULuciel.*`, `X2Game.cpp`, Always.h, data036 | `CH1.md` |
-| CH1q | ready: play-test fix, June's weapon loader for a skin-type weapon ( NULL normal anim in `Weapon::LoadDataForUser` ), class-agnostic flag | Opus 5.5 / high, no review of its own (CH1 review covers it), user play-test | CH1 | `X2GameUnit.cpp`, `X2Eqip.*`, Always.h | `CH1q.md` |
+| CH1 | **play-test owed by the user** (2026-11-15, `5e880f3c` + fix `975e8b87` + CH1q): resume from the field entry, then `CH1-review.md` | Opus 5.5 / high, Opus review, user play-test | CH1p review, NU4 review, CH0b, june-state-ids S2 | `X2GULuciel.*`, `X2Game.cpp`, Always.h, data036 | `CH1.md` |
+| CH1q | **done, play-test owed (CH1's)** (2026-11-15): June's `Weapon::LoadDataForUser` + `CreateSkinAfterImage` NULL test, `JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER` | Opus 5.5 / high, no review of its own (CH1 review covers it), user play-test | CH1 | `X2GameUnit.cpp`, `X2Eqip.*`, Always.h | `CH1q.md` |
 | DU3 | blocked (CH1 review): June's equip-view rewrite (every class) + item-templet minor-unit fields | Opus 5.5 / high, Opus review, user play-test | CH1 review | `X2GUUser.*`, `X2Eqip.*`, `X2Item*`, class overrides | `DU3.md` |
 | DU4 | blocked (DU3 review): NESI renumber + forward-only save migration (user yes 2026-11-02) | Opus 5.5 / xhigh, Opus review, user play-test | DU3 review | `X2Item.h`, `X2OfflineDB.*`, `X2UICharInfo.cpp`, save | `DU4.md` |
 | DU5 | blocked (DU4 review): two bodies in the character window / unit viewer, form packets `0x4d9` / `0x4da` | Opus 5.5 / high, Opus review, user play-test | DU4 review | `X2UICharInfo.*`, `X2UnitViewerUI.*`, `Handlers_*` | `DU5.md` |

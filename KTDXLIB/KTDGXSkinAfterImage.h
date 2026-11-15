@@ -29,6 +29,10 @@ class CKTDGXSkinAfterImage : public CKTDGObject
 
 		static CKTDGXSkinAfterImage* CreateSkinAfterImage( CKTDGXSkinAnim* pOriginAnim, int imageNum, int layer )
 		{
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER
+			if ( NULL == pOriginAnim )	// char-luciel CH1q: June 31f8ace0 builds nothing for a NULL origin anim
+				return NULL;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER
 #ifndef WORLD_TOOL		// 09.12.24 태완 : 월드툴에서 오작동.
 			return new CKTDGXSkinAfterImage( pOriginAnim, imageNum, layer );
 #else

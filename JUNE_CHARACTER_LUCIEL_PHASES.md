@@ -2779,6 +2779,38 @@ same flagcheck tallies as below, `FINISH RESULT: PASS (9 gates, 0 failed, 3 skip
   March's `Weapon::LoadDataForUser` passes `GetNormalAnim( i )` unguarded. Fix 1 stays ( a real June guard ). **Routed: new phase CH1q** ( `CH1q.md`, the
   user's call ): June's weapon loader for a skin-type weapon; CH1's play-test resumes after it.
 
+### CH1q - Done (2026-11-15)
+
+Opus 5.5 high. New class-agnostic flag **`SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER`** ( `Always.h`, defined ). Files: `X2GameUnit.cpp`,
+`KTDGXSkinAfterImage.h`, `Always.h`; rows in `june2017_re/funcmap.tsv` ( `grep "(CH1q)"`, 2 ) and `tools/data/june_march_divergent.tsv` ( 2 `replace`
+rows, ported ).
+- **June's skin-type weapon handling is one NULL test.** June's `Weapon::LoadDataForUser` is `3228d660` ( called from `InitComponent` `31fee090`
+  @`31fee9ba` ). Its loop is March's: an after-image when the eqip has a normal **model**, built from the normal **anim**, then the slash traces only when
+  the normal anim exists. June's `CreateSkinAfterImage` `31f8ace0` returns 0 for a NULL origin anim before the `new` ( March's news it and the ctor reads
+  the anim: the crash ). June's `InitSkin` `32963eb0` ( already ported, `JUNE_EQIP_SKIN` ) builds no normal anim for a `UT_SKIN` eqip either, only the
+  hyper anims, so June shows Lu's weapon with **no after-image and no weapon slash trace**; that is June's behaviour, not a gap.
+- **`CreateSkinAfterImage` ( `KTDGXSkinAfterImage.h` ):** `if ( NULL == pOriginAnim ) return NULL;` at the top. A NULL anim crashed before, so no caller depended on that path.
+- **`LoadDataForUser` ( `X2GameUnit.cpp` ): June's whole body** replaces March's ( `#else` keeps March's ). Differences from March, all June's:
+  head tests `GetMotion()`, the eqip and the eqip's **templet** ( March: the eqip's item and its templet ); the fashion test reads `m_pItemTempletOrigin`
+  or the eqip's templet; the non-fashion enchant attribute comes from the inventory, `GetItem( eqip UID, true )` @`3228ea5a` ( March: `eqip->GetItem()` );
+  **15 enchant types** take the textured slash trace ( 3 double master, 3 quadra master, 9 tripple, @`3228eb09`-`3228eb85`, all named in
+  `X2DamageManager.h`; March had the 3 double master ); `GetSlashTraceTextureName` gets the unit templet's type with a NULL test. The rest ( Lua reads,
+  after-image colour 0.8 / 1.0, 4 slash traces, Ara's attack-line frames ) = March. Constants read from the exe: 0.3 / 0.4 / 0.5 / 1.5 / 0.5 / 0.2 /
+  400 / 150 / 0.8. June's Lua keys are XOR-encrypted; types, order and defaults match March's 8 reads.
+- **Other `GetNormalAnim` / `GetHyperAnim` readers of a weapon eqip:** all already NULL-tested in March ( `X2GameUnit.cpp` frame move / render, bone
+  matrix, `GetWeaponBonePos`; `X2GUUser.cpp` collision sets skip non-`UT_ATTACH_ANIM`; `X2GULuciel.cpp` tests both ). The NULL trace frames reach
+  only `GetFramePos`, which tests NULL ( Lu's `EnchantParticleFrameMoveForLuciel` included ). Nothing else to port here.
+- **DU3's part:** the equip view for a two-body unit ( which body wears which eqip, the minor-unit equip byte ) stays DU3's. Nothing in the weapon
+  loader needs it for playability.
+- **CH1 fix 1** ( `JUNE_SKIN_AFTER_IMAGE_NULL_MESH` ) stays: a real June guard in the ctor, now reached only by a non-NULL anim.
+- **Compile:** `/Zs` probes of `X2GameUnit.cpp`, `KTDGXSkinAfterImage.cpp`, `X2GUUser.cpp`: 0 errors; a break-test define on the new code fails as
+  expected ( proves the flag's code is compiled ).
+- **Gates:** `finish.py --files <3>`: flagcheck `2 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR` / PASS, 0 deleted; junediverge PASS; enumscan
+  exit 0; stateends / skillicons / luabind SKIPPED ( no states, skills or scripts ). `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,905,600 B, dated 2026-11-15 14:56:53, md5 a6ff3e3a12d0b5fc78f45dae3a813885, equal to X2/US_SERVICE/x2.exe`.
+  No exestr line: the phase adds no string.
+- **Play-test:** CH1's, resumed from the field entry ( hand-off in the session; the CH1 review covers this commit ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

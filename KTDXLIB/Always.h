@@ -13588,3 +13588,11 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              mesh ( June 3322abc0 ). A model-only weapon mesh ( Lu's Mesh_Lu_Cash_Weapon_Sorted.X ) left it NULL and crashed field entry.
 #define SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH1q: June's CX2GameUnit::Weapon::LoadDataForUser ( 3228d660 ) replaces March's, and CreateSkinAfterImage returns NULL
+//              for a NULL origin anim ( June 31f8ace0 ). A UT_SKIN weapon ( Lu's ) has no normal anim: March crashed building its after-image.
+#define SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER
+//////////////////////////////////////////////////////////////////////////

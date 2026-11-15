@@ -11671,6 +11671,220 @@ void CX2GameUnit::Weapon::UpdateSlashTraceTextureName()
 
 bool CX2GameUnit::Weapon::LoadDataForUser( KLuaManager& luaManager )
 {
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER
+	// char-luciel CH1q: June 3228d660; the head tests the eqip's templet ( no item ), a NULL normal anim gets no after-image ( UT_SKIN weapons )
+	CX2GUUser* pUser = static_cast<CX2GUUser*>( &GetOwnerUnit() );
+
+	if( NULL == pUser->GetMotion() ||
+		NULL == m_pUserWeaponEquip ||
+		NULL == m_pUserWeaponEquip->GetItemTemplet() )
+	{
+		return false;
+	}
+
+	float fTexturedSlashTraceDisableTime;
+	LUA_GET_VALUE( luaManager, "TEXTURED_SLASH_TRACE_DISABLE_TIME",		fTexturedSlashTraceDisableTime,		0.3f );
+
+	float fSlashTraceDisableTime;
+	float fSlashTraceTipDisableTime;
+	LUA_GET_VALUE( luaManager, "SLASH_TRACE_DISABLE_TIME",			fSlashTraceDisableTime,		0.4f );
+	LUA_GET_VALUE( luaManager, "SLASH_TRACE_TIP_DISABLE_TIME",		fSlashTraceTipDisableTime,	0.5f );
+	int slashTraceDrawCount;
+	int slashTraceTipDrawCount;
+	LUA_GET_VALUE( luaManager, "SLASH_TRACE_DRAW_COUNT",			slashTraceDrawCount,		1 );
+	LUA_GET_VALUE( luaManager, "SLASH_TRACE_TIP_DRAW_COUNT",		slashTraceTipDrawCount,		3 );
+
+	wstring slashTraceTopBone = L"";
+	wstring slashTraceBottomBone = L"";
+	LUA_GET_VALUE( luaManager, "SLASH_TRACE_TOP_BONE",				slashTraceTopBone,			L"TRACE_START0" );
+	LUA_GET_VALUE( luaManager, "SLASH_TRACE_BOTTOM_BONE",			slashTraceBottomBone,		L"TRACE_END0" );
+	wstring wstrCustomSlashTexture = L"";
+	LUA_GET_VALUE( luaManager, "CUSTOM_SLASH_TRACE_TEXTURE",		wstrCustomSlashTexture,		L"" )
+
+	for( int i=0; i<CX2Item::MAX_MODEL_COUNT_A_ITEM; ++i )
+	{
+		if( NULL != m_pUserWeaponEquip->GetNormalModel(i) )
+		{
+			if( m_pAfterImage[i] != NULL )
+			{
+				SAFE_DELETE_KTDGOBJECT( m_pAfterImage[i] );
+			}
+
+			m_pAfterImage[i] = CKTDGXSkinAfterImage::CreateSkinAfterImage( m_pUserWeaponEquip->GetNormalAnim(i), 10, XL_EFFECT_0 );
+			if( m_pAfterImage[i] != NULL )
+			{
+				m_pAfterImage[i]->SetAfterImageColor( 0xffcccccc );
+				m_pAfterImage[i]->AddMesh( m_pUserWeaponEquip->GetNormalModel(i) );
+			}
+		}
+
+		if ( NULL != m_pUserWeaponEquip->GetNormalAnim(i) )
+		{
+			bool bTexturedSlashTrace = false;
+			wstring slashTraceTextureName = L"";
+			float slashTraceTextureStride = 0.f;
+
+			const CX2Item::ItemTemplet* pFashionTemplet = ( NULL != m_pItemTempletOrigin ) ? m_pItemTempletOrigin : m_pUserWeaponEquip->GetItemTemplet();
+			const bool bFashion = pFashionTemplet->GetFashion();
+
+			CX2EnchantItem::ItemEnchantedAttribute enchantedAttribute;
+			bool	   bUseChangeWeapon = false;
+			CX2GUUser* pUserUnit		= NULL;
+
+			if( CX2GameUnit::GUT_USER == GetOwnerUnit().GetGameUnitType() )
+			{
+				pUserUnit = static_cast<CX2GUUser*>( &GetOwnerUnit() );
+				if( NULL != pUserUnit && true == g_pX2Game->IsValidUnit( pUserUnit ) )
+					bUseChangeWeapon = pUserUnit->GetUseChangeWeapon();
+			}
+
+			if( true == bUseChangeWeapon || true == bFashion )
+			{
+				CX2Item* pItemNotFashion = pUser->GetUnit()->GetInventory().GetEquippingItemByEquipPos( CX2Unit::EP_WEAPON_HAND, false );
+
+				if( NULL != pItemNotFashion )
+				{
+					enchantedAttribute = pItemNotFashion->GetItemData().m_EnchantedAttribute;
+				}
+
+				if( NULL != pUserUnit && true == g_pX2Game->IsValidUnit( pUserUnit ) )
+					pUserUnit->SetUseChangeWeapon( false );
+			}
+			else
+			{
+				CX2Item* pWeaponItem = pUser->GetUnit()->GetInventory().GetItem( m_pUserWeaponEquip->GetItemUID(), true );	// June @3228ea5a: the weapon by UID, bank included
+				if( NULL != pWeaponItem )
+				{
+					enchantedAttribute = pWeaponItem->GetItemData().m_EnchantedAttribute;
+				}
+			}
+
+			CX2DamageManager::EXTRA_DAMAGE_TYPE extraDamageType = g_pData->GetEnchantItem()->GetExtraDamageType( enchantedAttribute );
+			switch( extraDamageType )
+			{
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_DOUBLE_MASTER:
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_DOUBLE_MASTER:
+			case CX2DamageManager::EDT_ENCHANT_POISON_DOUBLE_MASTER:
+			case CX2DamageManager::EDT_ENCHANT_QUADRA_BLAZE_MASTER:
+			case CX2DamageManager::EDT_ENCHANT_QUADRA_FROZEN_MASTER:
+			case CX2DamageManager::EDT_ENCHANT_QUADRA_POISON_MASTER:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_BLAZE_PIERCING:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_FROZEN_PIERCING:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_BLAZE_SHOCK:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_FROZEN_SHOCK:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_BLAZE_SNATCH:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_FROZEN_SNATCH:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_POISON_PIERCING:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_POISON_SHOCK:
+			case CX2DamageManager::EDT_ENCHANT_TRIPPLE_POISON_SNATCH:
+				{
+					const CX2Unit::UnitTemplet* pUnitTemplet = pUser->GetUnit()->GetUnitTemplet();
+					bTexturedSlashTrace = true;
+					slashTraceTextureName = CX2EnchantItem::GetSlashTraceTextureName( NULL != pUnitTemplet ? pUnitTemplet->m_UnitType : CX2Unit::UT_NONE, extraDamageType );
+					slashTraceTextureStride = 400.f;
+				} break;
+			}
+
+			m_pFrame_TRACE_START[i]		= m_pUserWeaponEquip->GetNormalAnim(i)->GetCloneFrame( slashTraceTopBone.c_str() );
+			m_pFrame_TRACE_END[i]		= m_pUserWeaponEquip->GetNormalAnim(i)->GetCloneFrame( slashTraceBottomBone.c_str() );
+
+			if( NULL == m_pSlashTrace[i] )
+			{
+				if( true == GetOwnerUnit().IsMyUnit() )
+					m_pSlashTrace[i] = CKTDGSlashTrace::CreateSlashTrace( 400, bTexturedSlashTrace, slashTraceTextureStride, slashTraceTextureName );
+				else
+					m_pSlashTrace[i] = CKTDGSlashTrace::CreateSlashTrace( 150, bTexturedSlashTrace, slashTraceTextureStride, slashTraceTextureName );
+
+				m_pSlashTrace[i]->SetCenter( pUser->GetMotion()->GetCenter() );
+				m_pSlashTrace[i]->SetBoundingRadius( pUser->GetMotion()->GetBoundingRadius() * 1.5f );
+
+				if( true == bTexturedSlashTrace )
+				{
+					m_pSlashTrace[i]->SetDisableTime( fTexturedSlashTraceDisableTime );
+				}
+				else
+				{
+					m_pSlashTrace[i]->SetDisableTime( fSlashTraceDisableTime );
+				}
+
+				m_pSlashTrace[i]->SetDrawCount( slashTraceDrawCount );
+				m_pSlashTrace[i]->SetLayer( XL_EFFECT_0 );
+				g_pKTDXApp->GetDGManager()->AddObjectChain( m_pSlashTrace[i] );
+			}
+
+			if( NULL == m_pSlashTraceTip[i] &&
+				false == bTexturedSlashTrace )
+			{
+				if( true == GetOwnerUnit().IsMyUnit() )
+					m_pSlashTraceTip[i] = CKTDGSlashTrace::CreateSlashTrace( 400, false, slashTraceTextureStride, slashTraceTextureName );
+				else
+					m_pSlashTraceTip[i] = CKTDGSlashTrace::CreateSlashTrace( 150, false, slashTraceTextureStride, slashTraceTextureName );
+
+				m_pSlashTraceTip[i]->SetCenter( pUser->GetMotion()->GetCenter() );
+				m_pSlashTraceTip[i]->SetBoundingRadius( pUser->GetMotion()->GetBoundingRadius() * 1.5f );
+
+				m_pSlashTraceTip[i]->SetDisableTime( fSlashTraceTipDisableTime );
+				m_pSlashTraceTip[i]->SetDrawCount( slashTraceTipDrawCount );
+				m_pSlashTraceTip[i]->SetLayer( XL_EFFECT_0 );
+				g_pKTDXApp->GetDGManager()->AddObjectChain( m_pSlashTraceTip[i] );
+			}
+
+			if( NULL == m_pSlashTraceTip2[i] )
+			{
+				if( true == GetOwnerUnit().IsMyUnit() )
+					m_pSlashTraceTip2[i] = CKTDGSlashTrace::CreateSlashTrace( 100, bTexturedSlashTrace, slashTraceTextureStride, slashTraceTextureName );
+				else
+					m_pSlashTraceTip2[i] = CKTDGSlashTrace::CreateSlashTrace( 50, bTexturedSlashTrace, slashTraceTextureStride, slashTraceTextureName );
+
+				m_pSlashTraceTip2[i]->SetCenter( pUser->GetMotion()->GetCenter() );
+				m_pSlashTraceTip2[i]->SetBoundingRadius( pUser->GetMotion()->GetBoundingRadius() * 0.5f );
+
+				m_pSlashTraceTip2[i]->SetDisableTime( 0.2f );
+				m_pSlashTraceTip2[i]->SetDrawCount( 1 );
+				m_pSlashTraceTip2[i]->SetLayer( XL_EFFECT_0 );
+				g_pKTDXApp->GetDGManager()->AddObjectChain( m_pSlashTraceTip2[i] );
+			}
+
+			if( false == wstrCustomSlashTexture.empty() &&
+				NULL == m_pSlashTraceCustomTexture[i] )
+			{
+				if( true == GetOwnerUnit().IsMyUnit() )
+					m_pSlashTraceCustomTexture[i] = CKTDGSlashTrace::CreateSlashTrace( 400, true, 400.f, wstrCustomSlashTexture );
+				else
+					m_pSlashTraceCustomTexture[i] = CKTDGSlashTrace::CreateSlashTrace( 150, true, 150.f, wstrCustomSlashTexture );
+
+				m_pSlashTraceCustomTexture[i]->SetCenter( pUser->GetMotion()->GetCenter() );
+				m_pSlashTraceCustomTexture[i]->SetBoundingRadius( pUser->GetMotion()->GetBoundingRadius() * 1.5f );
+
+				if( true == bTexturedSlashTrace )
+				{
+					m_pSlashTraceCustomTexture[i]->SetDisableTime( fTexturedSlashTraceDisableTime );
+				}
+				else
+				{
+					m_pSlashTraceCustomTexture[i]->SetDisableTime( fSlashTraceDisableTime );
+				}
+
+				m_pSlashTraceCustomTexture[i]->SetDrawCount( slashTraceDrawCount );
+				m_pSlashTraceCustomTexture[i]->SetLayer( XL_EFFECT_0 );
+				g_pKTDXApp->GetDGManager()->AddObjectChain( m_pSlashTraceCustomTexture[i] );
+			}
+		}
+	}
+
+	if( CX2GameUnit::GUT_USER == GetOwnerUnit().GetGameUnitType() &&
+		NULL != pUser->GetUnit() &&
+		NULL != pUser->GetUnit()->GetUnitTemplet() &&
+		NULL != m_pUserWeaponEquip &&
+		NULL != m_pUserWeaponEquip->GetNormalAnim(0) &&
+		CX2Unit::UT_ARA == pUser->GetUnit()->GetUnitTemplet()->m_UnitType )
+	{
+		m_pFrame_ATTACK_LINE_END0			= m_pUserWeaponEquip->GetNormalAnim(0)->GetCloneFrame( L"ATTACK_LINE_END0" );
+		m_pFrame_ATTACK_LINE_START0_FRONT	= m_pUserWeaponEquip->GetNormalAnim(0)->GetCloneFrame( L"ATTACK_LINE_START0_FRONT" );
+	}
+
+	return true;
+#else SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER
 //{{ robobeg : 2008-10-28
 	//if( NULL == GetOwnerUnit() )
 	//	return false;
@@ -11964,6 +12178,7 @@ bool CX2GameUnit::Weapon::LoadDataForUser( KLuaManager& luaManager )
 #endif ADD_UPGRADE_WEAPON_PARTICLE
 
 	return true;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER
 }
 
 /*static*/

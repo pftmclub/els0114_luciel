@@ -31,6 +31,9 @@ June in Ghidra (read-only):
   `InitEventStates` no longer writing 92, the `Always.h` guard. Re-read June's InitState `32b43d10` at @`32b44174` and the bounding registrations.
 - The data: data036 `Luciel_Duo.lua` / `Luciel_Demonio.lua` and data034 `DLG_Luciel_CombinationPoint.lua` = June's bytecode ( `luabind.py check` the three ),
   data036 `Enum.lua` `RNSI_A_LLD_BLUFF = 30304` = June's `Enum.src.lua:15069`.
+- CH1q ( `JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER` ): `CreateSkinAfterImage`'s NULL test = June `31f8ace0`; March's `Weapon::LoadDataForUser` `#ifdef` body =
+  June `3228d660` line by line ( head guard, the inventory `GetItem( uid, true )` @`3228ea5a`, the 15 switch ids @`3228eb09`-`3228eb85`, the 4 traces ).
+  Add `JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER` to the `--with` list below and CH1q's commit to `--commits`.
 - The play-test result: every check in the hand-off has a verdict; any failure is routed ( a fix phase in this plan if it is playability, else its owner ).
 
 Hygiene is one command, not a fresh script:
