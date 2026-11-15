@@ -13541,7 +13541,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x31fc8200	656	studio	funcmap		mapped	confirmed			P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr		FUN_31fc8200	none in March: IsSummonSkill(skillId)
 0x31fc8490	48	studio	block		none							FUN_31fc8490	
 0x31fc84c0	48	studio	block		none							FUN_31fc84c0	
-0x31fc84f0	192	studio	block		none							FUN_31fc84f0	
+0x31fc84f0	192	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	S2,S4,S6,S8,S9,S10,S11,S17,S19,S21,S33,S41	class	X2Lib/X2GUUser.h	FUN_31fc84f0	CX2GUUser::SetEnableDash( bool, ENABLE_DASH_STATE )
 0x31fc85b0	112	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	P:JUNE_BUGS	addr	X2Lib/X2GUUser.h	FUN_31fc85b0	CX2GUUser::StateChangeDashIfPossible
 0x31fc8620	48	studio	funcmap	CX2GUUser	mapped	confirmed	no		P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr	X2Lib/X2GUUser.h	FUN_31fc8620	CX2GUUser::EventProcess of the June-only *_WAIT_STATE_CHANGE state (registered by 12 classes' InitState through thunk 32
 0x31fc8650	144	studio	block		none							FUN_31fc8650	
@@ -13603,7 +13603,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x31fc9f80	16	studio	funcmap		mapped	confirmed						FUN_31fc9f80	CX2GUUser: SetEquippedSkillLevel( SI_NONE, true ) wrapper ( vslot 0x7b8 )
 0x31fc9f90	16	studio	funcmap		mapped	confirmed			P:JUNE_BUFF_PORT_PHASES	addr		FUN_31fc9f90	none in March: IsStickShaking
 0x31fc9fa0	112	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	P:JUNE_BUFF_PORT_ARCHIVE	addr	X2Lib/X2GUUser.h	FUN_31fc9fa0	CX2GUUser::StickShakeInput(bLeft, bRight)
-0x31fca010	48	studio	funcmap	CX2GUUser	mapped	ported	yes	no	K:char-luciel	addr	X2Lib/X2GUUser.h	FUN_31fca010	CX2GUUser::SetShowViewListAndUpdate ( user vslot 0x640 )
+0x31fca010	48	studio	funcmap	CX2GUUser	mapped	ported	yes	no	P:JUNE_CHARACTER_LUCIEL_PHASES	addr	X2Lib/X2GUUser.h	FUN_31fca010	CX2GUUser::SetShowViewListAndUpdate ( user vslot 0x640 )
 0x31fca040	48	studio	block	CX2GUUser	none				P:JUNE_CHARACTER_RENA_PHASES	addr	X2Lib/X2GUUser.h	thunk_FUN_32296570	
 0x31fca070	32	studio	block	CX2GUUser	none				S2,S4,S6,S8,S9,S10,S11,S17,S19,S21,S33,S41	class	X2Lib/X2GUUser.h	FUN_31fca070	
 0x31fca090	16	studio	block	CX2GUUser	none				S2,S4,S6,S8,S9,S10,S11,S17,S19,S21,S33,S41	class	X2Lib/X2GUUser.h	thunk_FUN_3226e220	
@@ -13823,7 +13823,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x31fd7500	320	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	P:JUNE_CHARACTER_RENA_PHASES	addr	X2Lib/X2GUUser.h	FUN_31fd7500	CX2GUUser::GetSkillSlotIndexUsed
 0x31fd7640	608	studio	funcmap	CX2GUUser	mapped	ported	yes	no	P:JUNE_CHARACTER_AISHA_PHASES	addr	X2Lib/X2GUUser.h	FUN_31fd7640	CX2GUUser::IsNotCommonMoveState (user vslot 0x828 base; corrects the CH0 row: +0x7cbc is the Now state-data pointer, not
 0x31fd78a0	144	studio	funcmap		mapped	routed			S9	addr		FUN_31fd78a0	none in March: CX2GUUser idle float +0x91b4 reset
-0x31fd7930	448	studio	funcmap		mapped	likely			P:JUNE_CHARACTER_ELESIS_PHASES	addr		FUN_31fd7930	CX2GUUser: next state's skill-id test
+0x31fd7930	448	studio	funcmap	CX2GUUser	mapped	PORTED	yes	no	P:JUNE_CHARACTER_ELESIS_PHASES	addr	X2Lib/X2GUUser.h	FUN_31fd7930	CX2GUUser::CanRidingState ( vslot 0x628 base )
 0x31fd7af0	112	studio	block		none							FUN_31fd7af0	
 0x31fd7b60	112	studio	block		none				S10	addr		FUN_31fd7b60	
 0x31fd7bd0	240	studio	funcmap		mapped	confirmed			P:JUNE_BUFF_PORT_PHASES	addr		FUN_31fd7bd0	none in March: CX2GUUser socket cool time tick( dt )
@@ -13981,7 +13981,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x31fe9840	592	studio	funcmap	CX2GUUser	mapped	PORTED	yes	no	P:JUNE_CHARACTER_CHUNG_PHASES	addr	X2Lib/X2GUUser.h	FUN_31fe9840	CX2GUUser::SetRotateBone( bEnable, wstrBoneName, vAxis, vDegree ) (none in March)
 0x31fe9a90	288	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr	X2Lib/X2GUUser.h	FUN_31fe9a90	CX2GUUser::TryHyperModeStateChange (slot 343)
 0x31fe9bb0	496	studio	block	CX2GUUser	none				S2,S4,S6,S8,S9,S10,S11,S17,S19,S21,S33,S41	class	X2Lib/X2GUUser.h	FUN_31fe9bb0	
-0x31fe9da0	160	studio	funcmap	CX2GUUser	mapped	ported	yes	no	K:char-luciel	addr	X2Lib/X2GUUser.h	FUN_31fe9da0	CX2GUUser::SyncFutureMpFromGage ( user vslot 0x64c )
+0x31fe9da0	160	studio	funcmap	CX2GUUser	mapped	ported	yes	no	P:JUNE_CHARACTER_LUCIEL_PHASES	addr	X2Lib/X2GUUser.h	FUN_31fe9da0	CX2GUUser::SyncFutureMpFromGage ( user vslot 0x64c )
 0x31fe9e40	432	studio	funcmap	CX2GUUser	mapped	PORTED	yes	no	P:JUNE_CHARACTER_LUCIEL_PHASES	addr	X2Lib/X2GUUser.h	FUN_31fe9e40	CX2GUUser::CommonFrameMoveFuture: Future I = ( +0x8e90 == 1 )
 0x31fe9ff0	304	studio	funcmap		mapped	confirmed			S20	addr		FUN_31fe9ff0	CX2GUUser damage-number skin sync (L / M)
 0x31fea120	784	studio	funcmap		mapped	confirmed			P:JUNE2017_EFFECT_COMPLETION_PHASES	addr		FUN_31fea120	CX2GUUser sound player (replaces March's loop in CommonFrameMove_TimedEvent, X2GUUser.cpp:19201)
@@ -14130,8 +14130,8 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x32009900	480	studio	block		none							FUN_32009900	
 0x32009ae0	144	studio	funcmap		mapped	confirmed			P:JUNE2017_EFFECT_COMPLETION_PHASES	addr		FUN_32009ae0	CX2GUUser: clear the STATE_SOUND_PLAY records and stop their handles (none in March)
 0x32009b70	608	studio	block		none							FUN_32009b70	
-0x32009dd0	480	studio	block		none							FUN_32009dd0	
-0x32009fb0	1504	studio	block		none							FUN_32009fb0	
+0x32009dd0	480	studio	funcmap	CX2GUUser	mapped	PORTED (JUNE_CHAR_DUO_WIN_SPEECH)	yes	no	P:JUNE_CHARACTER_LUCIEL_PHASES	addr	X2Lib/X2GUUser.h	FUN_32009dd0	CX2GUUser::GetRandomWinSpeech
+0x32009fb0	1504	studio	block	CX2GUUser	none				S2,S4,S6,S8,S9,S10,S11,S17,S19,S21,S33,S41	class	X2Lib/X2GUUser.h	FUN_32009fb0	
 0x3200a590	1216	studio	funcmap	CX2GUUser	mapped	PORTED	yes	no	P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr	X2Lib/X2GUUser.h	FUN_3200a590	CX2GUUser::SetInvisibility( bool ) (X2GUUser.cpp)
 0x3200aa50	272	studio	block		none							FUN_3200aa50	
 0x3200ab60	240	studio	funcmap		mapped	ported			P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr		FUN_3200ab60	CX2GUUser static: show a skill's name as the state string for 3 s
@@ -14232,7 +14232,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x3202ac40	1232	studio	funcmap		mapped	confirmed			P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr		FUN_3202ac40	none in March: CX2GUUser skill-memo DamageData switch
 0x3202b110	2192	studio	funcmap		mapped	confirmed			P:JUNE2017_EFFECT_COMPLETION_PHASES	addr		FUN_3202b110	CX2GUUser base state registration (June event states; none in March)
 0x3202b9a0	64	studio	funcmap		mapped	confirmed			P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr		FUN_3202b9a0	none in March: user death-prevention trigger
-0x3202b9e0	2432	studio	block		none				K:char-luciel	addr		FUN_3202b9e0	
+0x3202b9e0	2432	studio	funcmap	CX2GUUser	mapped	PORTED (JUNE_CHAR_DUO_WIN_SPEECH)	yes	yes	P:JUNE_BUGS	addr	X2Lib/X2GUUser.cpp	FUN_3202b9e0	CX2GUUser::InitSystem: DUNGEON_SPEECH_LUCIEL before DUNGEON_SPEECH
 0x3202c360	2112	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	S2	addr	X2Lib/X2GUUser.h	FUN_3202c360	CX2GUUser::ProcessAcceleraterBuff
 0x3202cba0	1440	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr	X2Lib/X2GUUser.h	FUN_3202cba0	CX2GUUser::CheckSkillUsePVPOfficial
 0x3202d140	640	studio	funcmap	CX2GUArme_VioletMage	mapped	PORTED	no		S22	addr	X2Lib/X2GUArme_VioletMage.h	FUN_3202d140	CX2GUArme_VioletMage::June_CheckSkillUseNotPve
@@ -14317,7 +14317,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x32057b80	41072	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	S2	addr	X2Lib/X2GUUser.h	FUN_32057b80	CX2GUUser::CommonStateStart (slot 497)
 0x32061bf0	6752	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	P:JUNE2017_EFFECT_COMPLETION_PHASES	addr	X2Lib/X2GUUser.h	FUN_32061bf0	CX2GUUser::CommonFrameMoveFuture (slot 498)
 0x32063650	39328	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	S2	addr	X2Lib/X2GUUser.h	FUN_32063650	CX2GUUser::CommonFrameMove
-0x3206cff0	1168	studio	funcmap	CX2GUUser	mapped	candidate	yes	no	S2,S4,S6,S8,S9,S10,S11,S17,S19,S21,S33,S41	class	X2Lib/X2GUUser.h	FUN_3206cff0	CX2GUUser::PopFrameData
+0x3206cff0	1168	studio	funcmap	CX2GUUser	mapped	candidate	yes	no	P:JUNE_CHARACTER_LUCIEL_PHASES	addr	X2Lib/X2GUUser.h	FUN_3206cff0	CX2GUUser::PopFrameData
 0x3206d480	752	studio	funcmap	CX2GUUser	mapped	confirmed	yes	yes	P:JUNE2017_CHARACTER_PORT_CHECKLIST	addr	X2Lib/X2GUUser.cpp	FUN_3206d480	CX2GUUser::ApplyBuffByUseHyperMode (June form; supersedes the 16-step3b4 review 'periodic CX2Unit +0x280 list' row)
 0x3206d770	4992	studio	funcmap	CX2GUUser	mapped	confirmed	yes	yes	P:JUNE2017_EFFECT_COMPLETION_PHASES	addr	X2Lib/X2GUUser.cpp	FUN_3206d770	CX2GUUser::InitSocketData(SocketData*) (user vslot 484)
 0x3206eaf0	5872	studio	funcmap	CX2GUUser	mapped	confirmed	yes	no	S2	addr	X2Lib/X2GUUser.h	FUN_3206eaf0	CX2GUUser::OnFrameMove
@@ -19793,7 +19793,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x3225aec0	848	studio	string	KSession	none				S41	class		FUN_3225aec0	
 0x3225b210	208	studio	block		none							FUN_3225b210	
 0x3225b2e0	192	studio	block		none							FUN_3225b2e0	
-0x3225b3a0	64	studio	block		none							FUN_3225b3a0	
+0x3225b3a0	64	studio	block		none				P:JUNE_CHARACTER_LUCIEL_PHASES	addr		FUN_3225b3a0	
 0x3225b3e0	240	studio	block		none							FUN_3225b3e0	
 0x3225b4d0	80	studio	block		none							FUN_3225b4d0	
 0x3225b520	208	studio	block		none							FUN_3225b520	
@@ -29216,7 +29216,7 @@ june_va	size	bucket	basis	group	status	fm_status	march_has	june_guarded	owner	ow
 0x327defc0	624	studio	funcmap	CX2DungeonManager	mapped	likely	no		K:june-effect	addr	X2Lib/X2DungeonManager.h	FUN_327defc0	none in March: CX2DungeonManager::Add_HeroDungeon_ExtraMonsterGradeStat (Lua)
 0x327df230	2576	studio	block		none							FUN_327df230	
 0x327dfc40	1024	studio	block		none							FUN_327dfc40	
-0x327e0040	1616	studio	block		none							FUN_327e0040	
+0x327e0040	1616	studio	funcmap		mapped	ROUTED (CH5)			P:JUNE_CHARACTER_LUCIEL_PHASES	addr		FUN_327e0040	dungeon-clear picture Lu/Ciel cases; DungeonData ENDING_SPEECH LUCIEL rows
 0x327e0690	928	studio	block		none							FUN_327e0690	
 0x327e0a30	1360	studio	block		none							FUN_327e0a30	
 0x327e0f80	22640	studio	block		none				P:ATLAS_PORT_PHASES	addr		FUN_327e0f80	
