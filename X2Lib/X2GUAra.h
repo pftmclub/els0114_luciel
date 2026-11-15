@@ -458,6 +458,9 @@ public:
 
 	};
 	#pragma endregion SMoonLightSlashData
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+	// char-luciel CH3c20: SLockOnSystem and sLockOnSystemPtr are CX2GUUser's now
+#else SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 
 	#pragma region SLockOnSystem 
 
@@ -526,6 +529,7 @@ public:
 	};
 	#pragma endregion 
 		
+#endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 	#pragma endregion Enum, Struct, Class
 
 	#pragma region private
@@ -1989,7 +1993,11 @@ protected:
 };
 #pragma endregion Å¬·¡½º
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+// char-luciel CH3c20: CX2GUUser::SLockOnSystem's IMPLEMENT_INTRUSIVE_PTR is in X2GUUser.h
+#else SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 IMPLEMENT_INTRUSIVE_PTR( CX2GUAra::SLockOnSystem );
+#endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 IMPLEMENT_INTRUSIVE_PTR( CX2GUAra::sMoonLightSlashData );
 
 #endif

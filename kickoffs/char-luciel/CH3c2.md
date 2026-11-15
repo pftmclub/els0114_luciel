@@ -55,3 +55,12 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `SetTransformEndTexture( wstrFile, wstrKey )` ( `31fd4930` ); before every delete `ReleaseDialog()` ( `31fd03f0`, already in the three Lu/Ciel delete sites ).
   The user's wrappers are `HasTransformSkillSlotUI` ( `31fd0380` ), `GetShowTransformSkillSlotUI` ( `31fd03b0` ), `SetShowTransformSkillSlotUI` ( `31fe3c90` ); the UI manager
   menu is `CX2UIManager::UI_TRANSFORM_SKILL_SLOT` ( June 44 ). The per-frame cool-time count, the menu toggles and the training-F6 reset are hooked ( `LUCIEL_LIVE` ): do not add them again.
+
+## Amended by char-luciel CH3c20 (2026-11-15)
+
+- **Lock-on:** `m_ptrShrewdCutterLockOn` ( +0x9830 ) is `CX2GUUser::sLockOnSystemPtr` now ( flag `SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM` ); June `3200fa20` =
+  `m_ptrShrewdCutterLockOn->ProcessLockOn( this )`, its range setters / `GetSafePos` / `GetDestPos` / `SetFacingLineRange` as Ara's. CH3c creates the
+  instance ( InitState @`32b490e0` ); if CH3c has not, this phase must not dereference a null pointer.
+- **Garden of Haures:** the NPC script's four methods are bound ( `SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS`; `luabind.py check SA_LDN_GARDEN_OF_HAURES` PASS );
+  its plants ( 2270 ) carry the owner the script passes ( `GetOwnerUserUnitUID` ), so check that the Garden NPC itself gets the user as its owner
+  ( June's `322e67c0` arguments at `@32b340ce`: ally UID and `NAT_ALLY` ), or `IsSameOwnerUserID` never matches. The `NPCTemplet` rows of 2269 / 2270 are CH3a0's.

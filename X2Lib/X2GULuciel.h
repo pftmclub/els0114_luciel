@@ -1326,7 +1326,11 @@ protected:
 	float								m_fMadnessCraveDuration;			// +0x9824
 	float								m_fMadnessDestroyRate;				// +0x9828
 	float								m_fMadnessDestroyCoolTime;			// +0x982c
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+	sLockOnSystemPtr					m_ptrShrewdCutterLockOn;			// char-luciel CH3c20: +0x9830, CX2GUUser's type
+#else SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 	CX2GUAra::sLockOnSystemPtr			m_ptrShrewdCutterLockOn;			// +0x9830: Ara's type until CH3c20 moves it out of CX2GUAra
+#endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 	int									m_iShrewdCutterAttackCount;			// +0x9834
 	float								m_fShadowFuryAccumulatedDamage;		// +0x9838: June's ctor leaves it unset
 	CX2EffectSet::Handle				m_hTransformedFormEffectSet;		// +0x983c

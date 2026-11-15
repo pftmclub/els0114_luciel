@@ -9666,6 +9666,9 @@ void CX2GUAra::RemoveBerserkEquipFromViewList( CX2EqipPtr pEquipPtrToRemove, int
 }
 #pragma endregion 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+// char-luciel CH3c20: CX2GUUser::SLockOnSystem::ProcessLockOn is in X2GUUser.cpp
+#else SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 #pragma region SLockOnSystem::ProcessLockOn
 void CX2GUAra::SLockOnSystem::ProcessLockOn( CX2GUAra* myUnit )
 {
@@ -9885,6 +9888,7 @@ void CX2GUAra::SLockOnSystem::ProcessLockOn( CX2GUAra* myUnit )
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LOCKON
 }
 #pragma endregion 
+#endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 
 #pragma region OnFrameMove
 /** @function	: OnFrameMove

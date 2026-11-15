@@ -933,6 +933,58 @@ public:
 			InitDeviceData          m_device;
 			void                AppendToDeviceList( CKTDXDeviceDataList& listInOut_, CX2Unit* pX2Unit_ ) const;
 		};//struct  InitData
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+		// char-luciel CH3c20: June 3200fa20's lock-on, moved from CX2GUAra ( Ara and Lu/Ciel share it; June 32b4cf30 allocates 0x38 bytes )
+#ifndef X2OPTIMIZE_REMOVE_UNNECESSARY_SHARED_PTR
+#error SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM needs X2OPTIMIZE_REMOVE_UNNECESSARY_SHARED_PTR ( intrusive_ptr ), char-luciel CH3c20
+#endif X2OPTIMIZE_REMOVE_UNNECESSARY_SHARED_PTR
+		struct SLockOnSystem;
+		typedef boost::intrusive_ptr<SLockOnSystem> sLockOnSystemPtr;
+		struct SLockOnSystem : boost::noncopyable
+		{
+		private:
+			unsigned	m_uRefCount;
+			bool		m_bLockOnUnit;
+			float		m_fPvpRange;
+			float		m_fPveRange;
+			D3DXVECTOR3	m_vDestPos;
+			D3DXVECTOR3	m_vSafePos;
+			UidType		m_BeforeTargetUID;
+			float		m_fFacingLineRange;	// char-ara CH2b0: June +0x30, max xz distance from the owner's facing line in a PvP / PvE game
+
+			SLockOnSystem() : m_bLockOnUnit( false ), m_fPvpRange( 0.f ), m_fPveRange( 0.f ), m_BeforeTargetUID( -1 ), m_uRefCount( 0 )
+			{
+				INIT_VECTOR3( m_vDestPos,	0.f, 0.f, 0.f );
+				INIT_VECTOR3( m_vSafePos,	0.f, 0.f, 0.f );
+				m_fFacingLineRange = 99999.f;	// char-ara CH2b0: June 32b4cf30 ( 33441c60 )
+			}
+
+		public:
+			static sLockOnSystemPtr CreateLockOnSystem() { return sLockOnSystemPtr( new SLockOnSystem ); }
+
+			bool	CheckLockOnUnit() { return m_bLockOnUnit; }
+			void	ResetLockOnUnit() { m_bLockOnUnit = false; }
+
+			float	GetPvpRange() { return m_fPvpRange; }
+			void	SetPvpRange( float fRange_ ) { m_fPvpRange = fRange_; }
+
+			float	GetPveRange() { return m_fPveRange; }
+			void	SetPveRange( float fRange_ ) { m_fPveRange = fRange_; }
+
+			D3DXVECTOR3	GetDestPos() { return m_vDestPos; }
+
+			D3DXVECTOR3 GetSafePos() { return m_vSafePos; }
+			void		SetSafePos( D3DXVECTOR3 vPos_ ) { m_vSafePos = vPos_; }
+
+			float	GetFacingLineRange() const { return m_fFacingLineRange; }	// char-ara CH2b0: Swallow Assault Ready resets it ( 32b9b3c0 )
+			void	SetFacingLineRange( float fRange_ ) { m_fFacingLineRange = fRange_; }
+
+			void	ProcessLockOn( CX2GUUser* myUnit );
+
+			void	AddRef()	{ ++m_uRefCount; }
+			void	Release()	{ if ( (--m_uRefCount) == 0 ) delete this; }
+		};
+#endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 
 		//{{ kimhc // 2010.11.2 // 쿨타임, 남은시간 등을 필요로하는 스킬등에 사용하기 위한 클래스
 #ifdef	NEW_SKILL_2010_11
@@ -6127,4 +6179,7 @@ typedef KObserverPtr<CX2GUUser> CX2GUUseroPtr;
 bool IsEventGamePlayable( bool bSummonSkill_ = false );	/// June 3201bd60 ( defined in X2GUUser.cpp ): Chung's Artillery Strike ready state asks it too
 #endif SERV_IRUHADEV_JUNE_CHAR_CHUNG_SKILL
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+IMPLEMENT_INTRUSIVE_PTR( CX2GUUser::SLockOnSystem );	// char-luciel CH3c20
+#endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 IMPLEMENT_INTRUSIVE_PTR( CX2GUUser::CSkillDataBase );

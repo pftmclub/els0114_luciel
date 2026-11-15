@@ -3283,6 +3283,10 @@ class CX2GUNPC : public CX2GameUnit
 		void CreateNPCReqAlly( int unitID, int level, bool bActive, D3DXVECTOR3 vPos, bool bRight, D3DXVECTOR3 vfDelayTimeNKeyCode, bool bNoDrop, int iTeam );	/// June 32779bc0
 		void PushCreateNPCReq_Lua( int unitID, int level, bool bActive, D3DXVECTOR3 vPos, bool bRight, float fDelayTime, bool bNoDrop, int iKeyCode );	/// June 32779cb0: creates at once, no push list ( JUNE_BUGS )
 #endif SERV_IRUHADEV_JUNE_NPC_CREATE_NPC_REQ
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+		void PushCreateNPCReq_LUA4( int unitID, int level, bool bActive, D3DXVECTOR3 vPos, bool bRight, D3DXVECTOR3 vfDelayTimeNKeyCode, bool bNoDrop, D3DXVECTOR3 vTeamNAITypeNAllyTeam, UidType iAllyUID );	// char-luciel CH3c20: June 327799c0
+		bool IsSameOwnerUserID( CX2GUNPC* pNPC_ );	// char-luciel CH3c20: June 3275b0f0
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
 #ifdef SERV_IRUHADEV_JUNE_NPC_STORED_GUUSER
 		CX2GUUser* GetStoredGUUser();					/// June 32759660
 		void SetStoredGUUser( CX2GUUser* pGUUser_ );	/// June 31e57960

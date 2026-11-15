@@ -764,6 +764,9 @@ class CX2Game : public CKTDXStage
 			CX2Room::TEAM_NUM eTeam = CX2Room::TN_MONSTER, CX2NPCAI::NPC_AI_TYPE eAIType = CX2NPCAI::NAT_NORMAL, UidType iAllyUID = -1 );
 		void						PushCreateNPCReq_Lua( int unitID, int level, bool bActive, D3DXVECTOR3 vPos, bool bRight, float fDelayTime, bool bNoDrop, int iKeyCode );
 		void						FlushCreateNPCReq();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+		D3DXVECTOR3					GetPosCheckDistStandardNPC( D3DXVECTOR3 vPos, bool bIsRight, float fDist, D3DXVECTOR3 vDir, CX2GUNPC* pNPC );	// char-luciel CH3c20: June 322f27e0
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
 
 #ifdef SERV_IRUHADEV_OFFLINE
 		/// AI_PARTY_PLAN.md phase 1. Spawn the AI party members the offline

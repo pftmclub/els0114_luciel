@@ -3270,6 +3270,46 @@ Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateM
 **Done gate:** as CH2 for 127 / 128 / 129 and the hyper actives. A transcended Lu/Ciel (`settranscend`) casts the hyper-class skills, slots
 A-5 / B-5 work, and both bodies' transcended pictures and cut-ins show. `skillicons.py check` = PASS after the transcendence rows.
 
+### CH3c20 - Done (2026-11-15)
+
+Opus helpers for CH3c2: the lock-on struct leaves `CX2GUAra`, and the four Lua methods the Garden of Haures NPC script lacked are bound.
+Inert for play: nothing in Lu/Ciel calls them until CH3c2 (Garden of Haures, Shrewd Cutter); Ara's lock-on is the same code, moved.
+
+- **`SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM`** (guard: `_CHAR_ARA_LOCKON`; `X2OPTIMIZE_REMOVE_UNNECESSARY_SHARED_PTR` is checked in `X2GUUser.h`,
+  because it is defined after `Always.h`). `CX2GUUser::SLockOnSystem` + `sLockOnSystemPtr` (public, beside `InitData`) = Ara's struct with the
+  CH2b0 `+0x30` member unconditional; `ProcessLockOn( CX2GUUser* )` in `X2GUUser.cpp` = Ara's CH2b0 June branch of `3200fa20`, 111 lines byte-copied
+  (generated from `X2GUAra.cpp` 9674-9784, not retyped). `X2GUAra.h` (struct, `IMPLEMENT_INTRUSIVE_PTR`) and `X2GUAra.cpp` (the definition, both
+  branches) sit in `#else`; Ara's `SLockOnSystem::CreateLockOnSystem()` and `m_sLockOnSystemPtr->ProcessLockOn( this )` resolve to the base by
+  inheritance, no Ara call site changed. `X2GULuciel.h` `m_ptrShrewdCutterLockOn` (+0x9830) is `sLockOnSystemPtr` under the flag. The body uses
+  only `CX2GameUnit` calls (`GetPos`, `GetTeam`, `GetDirVector`, `GetRandomInt`). Creating Lu's instance is CH3c's (InitState @`32b490e0`, routed by CH1m).
+- **`SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS`** (guard: `_LINEMAP_LAND_MONSTER_ROAD`, `_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER`, `RAVEN_WEAPON_TAKER`,
+  `_CHAR_ARME_CORE`, `DUNGEON_RANK_NEW`, `SERV_INSERT_GLOBAL_SERVER`, `SERV_TRAPPING_RANGER_TEST`, `SUMMON_MONSTER_CARD_SYSTEM`, `SERV_NEW_DEFENCE_DUNGEON`).
+  Bind sites from `xorstrings.tsv` + `c3z4_binder_sites.py`; bodies read from the listing (Ghidra has no function at three of them).
+  - `CX2Game::GetPosCheckDistStandardNPC( vPos, bIsRight, fDist, vDir, CX2GUNPC* )` = June `322f27e0` (ret 0x28, hidden return): result = vPos; with a
+    line map, June's weapon-taker walk `31c60890` (= CH1i2's `GetFixedDistancePositionForWeaponTaker`) wins; else `GetLandPosition( vPos +- fDist * vDir,
+    false, 30.0 )` (`31c7bb00`, `33441b9c`), then the nearest point (segment clamp: projection <= 0 -> start, length <= projection -> end) on every
+    enabled line that is not `LT_WALL` (1) / `LT_MONSTER_ROAD` (7), best from 9999999.0 (`3344915c`), `!( best < d )` keeps the later line on a tie.
+    Last, when the NPC is given and `IsPosAlongLastTouchLine( result )` (`32293b80`) differs from bIsRight, the result is vPos again. June's loop
+    repeats the line filter inline with a -1.0 distance (`334380f0`) that the outer filter makes unreachable: not ported.
+  - `CX2GUNPC::PushCreateNPCReq_LUA4` = June `327799c0` (ret 0x40): the create core at once (no push list, as row 168's `32779cb0`) with delay = .x,
+    key = (int) .y of arg 6, team / AI type / ally team = (int) .x / .y / .z of arg 8, the caller's ally UID, elite false, `NCT_NONE`. The summoner's
+    templet id June passes last is not carried (as the five C3z-4 wrappers, user 2026-10-10). `JUNE_BUGS` 733: the script then flushes an empty list.
+  - `CX2GUNPC::IsSameOwnerUserID( CX2GUNPC* )` = June `3275b0f0`: NULL -> false; both `+0x8d5c` owner UIDs ( = `GetOwnerGameUnitUID`, as June's
+    `GetOwnerUserUnitUID` bind `31e56300` reads the same member ) >= 0 and equal.
+  - `GetRemainHyperModeTime` bound on `CX2GameUnit` (June class_def `@31de9747`, `31e4f890` = March's inline). June also binds a `CX2Game`
+    `PushCreateNPCReq_LUA4` (`322e7980` @`31dc7eea`); the Garden script calls the NPC one only, so it is not bound here.
+- **Data:** data036 `Enum.lua` `NPC_UNIT_ID` gains June's `NUI_SA_LDN_GARDEN_OF_HAURES = 2269` / `_ADD = 2270` (`Enum.src.lua:5996` / `3777`;
+  live 2268 / 2271 neighbours, no collision); `luasrc.py refresh`, `ledger --check` PASS. `PACK OK data036` (1 changed: `Enum.lua`), `COPY OK data036`
+  md5 `d8b0794aafbbb1410adc246a9d192332`. CH3a0 keeps the `NPCTemplet` rows and the C++ name of 2270 (its kickoff notes the two Enum lines are done).
+- **luabind** `SA_LDN_GARDEN_OF_HAURES` + `_ADD`: 24 methods, 0 unbound, ENUM 0 missing, `RESULT: PASS` (was 4 unbound + 1 enum).
+- **Compile:** `/Zs` probes (census `cl_cmd`) of `X2Game.cpp`, `X2GUNPC.cpp`, `X2Main.cpp`, `X2GUUser.cpp`, `X2GUAra.cpp`, `X2GULuciel.cpp`: 6 x 0 errors.
+  The first probe caught my own `Always.h` guard on `X2OPTIMIZE_REMOVE_UNNECESSARY_SHARED_PTR` (defined later); fixed within minutes, before any build
+  read it (the 17:30 peer build's log has no `C1189`; its `X2StateMenu.cpp` errors are a peer's transform-HUD edit). Full build skipped: no play-test.
+- **Gates (worktree):** `finish.py --with JUNE_CHAR_LOCKON_SYSTEM JUNE_CHAR_NPC_LUA_BINDS --lua ...`: flagcheck PASS / PASS (0 FAIL, 0 deleted lines;
+  the OTHER rows are peers' uncommitted hunks in `Always.h`, `X2GUUser.*`, `X2Game.cpp`), junediverge PASS, enumscan PASS, luabind PASS; stateends
+  not applicable (no state registered). Commit staged from HEAD + this phase's hunks only.
+- **funcmap:** 5 rows `(CH3c20)`. **Review:** `kickoffs/char-luciel/CH3c20-review.md` (Opus); CH3c2 waits on it.
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, Opus review, user play-test.

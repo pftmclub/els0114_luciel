@@ -30264,6 +30264,30 @@ void CX2GUNPC::PushCreateNPCReq_Lua( int unitID, int level, bool bActive, D3DXVE
 }
 #endif SERV_IRUHADEV_JUNE_NPC_CREATE_NPC_REQ
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+// char-luciel CH3c20: June 327799c0; the create core at once like 32779cb0, team / AI type / ally team ride in one vector, the ally UID is the caller's
+void CX2GUNPC::PushCreateNPCReq_LUA4( int unitID, int level, bool bActive, D3DXVECTOR3 vPos, bool bRight, D3DXVECTOR3 vfDelayTimeNKeyCode, bool bNoDrop, D3DXVECTOR3 vTeamNAITypeNAllyTeam, UidType iAllyUID )
+{
+	if ( NULL == g_pX2Game )
+		return;
+
+	g_pX2Game->CreateNPCReq( (CX2UnitManager::NPC_UNIT_ID) unitID, level, bActive, vPos, bRight, vfDelayTimeNKeyCode.x, bNoDrop, (int) vfDelayTimeNKeyCode.y,
+		(CX2Room::TEAM_NUM) (int) vTeamNAITypeNAllyTeam.x, (CX2NPCAI::NPC_AI_TYPE) (int) vTeamNAITypeNAllyTeam.y, iAllyUID, false,
+		(CX2Room::TEAM_NUM) (int) vTeamNAITypeNAllyTeam.z, CX2GUNPC::NCT_NONE );
+}
+
+// char-luciel CH3c20: June 3275b0f0; both owners must be set ( UID >= 0 ) and equal
+bool CX2GUNPC::IsSameOwnerUserID( CX2GUNPC* pNPC_ )
+{
+	if ( NULL == pNPC_ )
+		return false;
+
+	const UidType iMyOwnerUID = GetOwnerGameUnitUID();
+	const UidType iOtherOwnerUID = pNPC_->GetOwnerGameUnitUID();
+	return ( 0 <= iMyOwnerUID && 0 <= iOtherOwnerUID && iMyOwnerUID == iOtherOwnerUID );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+
 #ifdef SERV_IRUHADEV_JUNE_NPC_STORED_GUUSER
 /** @function : GetStoredGUUser
 	@brief : June 32759660: the observer at +0x8d64, when it still points at a unit whose game unit type ( +0x264 ) is

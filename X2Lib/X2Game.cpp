@@ -9206,6 +9206,80 @@ void CX2Game::PushCreateNPCReq_LUA3( int unitID, int level, bool bActive, D3DXVE
 }
 #endif CREATE_NPC_REQ_FULL_ARGUMENTS
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+// char-luciel CH3c20: June 322f27e0; the weapon-taker walk, else the nearest point on a walkable line to the land under the probe
+D3DXVECTOR3 CX2Game::GetPosCheckDistStandardNPC( D3DXVECTOR3 vPos, bool bIsRight, float fDist, D3DXVECTOR3 vDir, CX2GUNPC* pNPC )
+{
+	D3DXVECTOR3 vResultPos = vPos;
+
+	if ( NULL != g_pX2Game && NULL != g_pX2Game->GetWorld() && NULL != g_pX2Game->GetWorld()->GetLineMap() )
+	{
+		CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+
+		D3DXVECTOR3 vFixedDistancePos = vPos;
+		if ( true == pLineMap->GetFixedDistancePositionForWeaponTaker( &vPos, fDist, bIsRight, vFixedDistancePos ) )
+		{
+			vResultPos = vFixedDistancePos;
+		}
+		else
+		{
+			const D3DXVECTOR3 vOffset = fDist * vDir;
+			const D3DXVECTOR3 vProbePos = ( true == bIsRight ) ? vPos + vOffset : vPos - vOffset;
+			int iLandLineIndex = -1;
+			const D3DXVECTOR3 vLandPos = pLineMap->GetLandPosition( vProbePos, false, LINE_RADIUS, &iLandLineIndex );
+
+			float fNearestDistance = 9999999.f;	// June 3344915c
+			int iNearestLineIndex = -1;
+			D3DXVECTOR3 vNearestPos = vPos;
+			for ( int i = 0; i < pLineMap->GetNumLineData(); ++i )
+			{
+				const CKTDGLineMap::LineData* pLineData = pLineMap->GetLineData( i );
+				if ( NULL == pLineData || false == pLineData->bEnable ||
+					CKTDGLineMap::LT_MONSTER_ROAD == pLineData->lineType || CKTDGLineMap::LT_WALL == pLineData->lineType )
+					continue;
+
+				const D3DXVECTOR3 vSegment = pLineData->endPos - pLineData->startPos;
+				D3DXVECTOR3 vLineDir = vSegment;
+				D3DXVec3Normalize( &vLineDir, &vLineDir );
+				const D3DXVECTOR3 vFromStart = vLandPos - pLineData->startPos;
+				const float fProjection = vFromStart.y * vLineDir.y + vFromStart.x * vLineDir.x + vFromStart.z * vLineDir.z;
+
+				D3DXVECTOR3 vPosOnLine = pLineData->startPos;
+				if ( fProjection <= 0.f )
+				{
+					vPosOnLine = pLineData->startPos;
+				}
+				else
+				{
+					const float fSegmentLength = sqrtf( vSegment.x * vSegment.x + vSegment.y * vSegment.y + vSegment.z * vSegment.z );
+					if ( fSegmentLength <= fProjection )
+						vPosOnLine = pLineData->endPos;
+					else
+						vPosOnLine = pLineData->startPos + vLineDir * fProjection;
+				}
+
+				const D3DXVECTOR3 vGap = vPosOnLine - vLandPos;
+				const float fDistance = sqrtf( vGap.x * vGap.x + vGap.y * vGap.y + vGap.z * vGap.z );
+				if ( false == ( fNearestDistance < fDistance ) )	// June keeps the later line on a tie
+				{
+					fNearestDistance = fDistance;
+					iNearestLineIndex = i;
+					vNearestPos = vPosOnLine;
+				}
+			}
+
+			if ( 0 <= iNearestLineIndex )
+				vResultPos = vNearestPos;
+		}
+	}
+
+	if ( NULL != pNPC && bIsRight != pNPC->IsPosAlongLastTouchLine( vResultPos ) )
+		vResultPos = vPos;
+
+	return vResultPos;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+
 
 
 #ifdef SERV_BATTLEFIELD_MIDDLE_BOSS

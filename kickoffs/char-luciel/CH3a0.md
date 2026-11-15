@@ -47,3 +47,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   `char-raven CH1o` sites test `GUT_USER` only ), and an ally NPC hands it to its owner ( `CX2GUNPC` `32778fe0`: the `+0x7c98` owner record, dynamic cast, unit by uid,
   then the owner's vslot 0x300 ). Port both with the summons ( class-agnostic flag: every class's summons then reach their owner, so the play-test covers one
   other class with a summon ). Lu's override `32b1e720` is already written ( CH1k ).
+
+## Amended by char-luciel CH3c20 (2026-11-15)
+
+- data036 `Enum.lua` `NPC_UNIT_ID` already has `NUI_SA_LDN_GARDEN_OF_HAURES = 2269` and `NUI_SA_LDN_GARDEN_OF_HAURES_ADD = 2270` ( CH3c20, packed and
+  copied: the Garden script's enum gate ). The `NPCTemplet.lua` rows of all five NPCs and the C++ name of 2270 in `X2UnitManager.h` stay this phase's.

@@ -13674,3 +13674,24 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH3c20: SLockOnSystem ( June 3200fa20 ProcessLockOn, shared by Ara and Lu/Ciel ) moves from CX2GUAra to CX2GUUser;
+//              Ara's CH2b0 June body moves unchanged into X2GUUser.cpp. Revert: comment out the #define ( JUNE_CHAR_LOCKON_SYSTEM ).
+#define SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ARA_LOCKON )
+#error SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM needs SERV_IRUHADEV_JUNE_CHAR_ARA_LOCKON ( the June body and the +0x30 member it moves ), char-luciel CH3c20
+#endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH3c20: the Lua methods the Garden of Haures NPC script ( SA_LDN_GARDEN_OF_HAURES.lua ) calls that March lacks:
+//              CX2Game::GetPosCheckDistStandardNPC ( June 322f27e0 ), CX2GUNPC::PushCreateNPCReq_LUA4 ( 327799c0 ), CX2GUNPC::IsSameOwnerUserID
+//              ( 3275b0f0 ), and a CX2GameUnit bind of GetRemainHyperModeTime ( 31e4f890 ). Revert: comment out the #define ( JUNE_CHAR_NPC_LUA_BINDS ).
+#define SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+#if defined( SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS ) && ( !defined( SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD ) || !defined( SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER ) || !defined( RAVEN_WEAPON_TAKER ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ARME_CORE ) || !defined( DUNGEON_RANK_NEW ) || !defined( SERV_INSERT_GLOBAL_SERVER ) || !defined( SERV_TRAPPING_RANGER_TEST ) || !defined( SUMMON_MONSTER_CARD_SYSTEM ) || !defined( SERV_NEW_DEFENCE_DUNGEON ) )
+#error SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS needs June's GetLandPosition ( _LINEMAP_LAND_MONSTER_ROAD ), June's weapon-taker walk ( _DIVERGE_FIXED_DISTANCE_WEAPON_TAKER, RAVEN_WEAPON_TAKER ), IsPosAlongLastTouchLine ( _CHAR_ARME_CORE ), GetOwnerGameUnitUID ( DUNGEON_RANK_NEW ) and CreateNPCReq's full argument list, char-luciel CH3c20
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+//////////////////////////////////////////////////////////////////////////

@@ -4189,6 +4189,9 @@ void CX2Main::RegisterLuabind()
 #endif SEASON3_MONSTER_2011_7
 	lua_tinker::class_def<CX2Game>( L, "PushCreateNPCReq_Lua",					&CX2Game::PushCreateNPCReq_Lua );
 	lua_tinker::class_def<CX2Game>( L, "FlushCreateNPCReq",						&CX2Game::FlushCreateNPCReq );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+	lua_tinker::class_def<CX2Game>( L, "GetPosCheckDistStandardNPC",			&CX2Game::GetPosCheckDistStandardNPC );	// char-luciel CH3c20: June 322f27e0 ( bound @31dc7c78 )
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
 #ifdef CREATE_NPC_REQ_FULL_ARGUMENTS
 	lua_tinker::class_def<CX2Game>( L, "CreateNPCReq_LUA3",						&CX2Game::CreateNPCReq_LUA3 );
 	lua_tinker::class_def<CX2Game>( L, "PushCreateNPCReq_LUA3",					&CX2Game::PushCreateNPCReq_LUA3 );
@@ -4416,6 +4419,9 @@ void CX2Main::RegisterLuabind()
 	lua_tinker::class_def<CX2GameUnit>( L, "GetIsRight",				&CX2GameUnit::GetIsRight );			/// June @31ded26f ( thunk 31e4eaf0, vslot 0x170 )
 	lua_tinker::class_def<CX2GameUnit>( L, "GetRotateDegree",			&CX2GameUnit::GetRotateDegree );		/// June @31dee047 ( thunk 31e4eac0, vslot 0x150 )
 #endif SERV_IRUHADEV_JUNE_UNIT_BASE_BINDS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+	lua_tinker::class_def<CX2GameUnit>( L, "GetRemainHyperModeTime",	&CX2GameUnit::GetRemainHyperModeTime );	// char-luciel CH3c20: June 31e4f890 ( bound @31de9747 )
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARME_SKILL
 	lua_tinker::class_def<CX2GameUnit>( L, "GetWalkSpeedParam",			&CX2GameUnit::GetWalkSpeedParam );		/// June @31de5878 ( 31e4cfd0 ), read by Ufo_Aisha_Droper_Memo.lua
 	lua_tinker::class_def<CX2GameUnit>( L, "GetJumpSpeedParam",			&CX2GameUnit::GetJumpSpeedParam );		/// June 31e4e020, same script
@@ -4921,6 +4927,10 @@ void CX2Main::RegisterLuabind()
 #ifdef CHUNG_SECOND_CLASS_CHANGE
 	lua_tinker::class_def<CX2GUNPC>( L, "GetOwnerUserUnitUID",		&CX2GUNPC::	GetOwnerGameUnitUID );
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+	lua_tinker::class_def<CX2GUNPC>( L, "IsSameOwnerUserID",		&CX2GUNPC::IsSameOwnerUserID );		// char-luciel CH3c20: June 3275b0f0 ( bound @31e0ccbe )
+	lua_tinker::class_def<CX2GUNPC>( L, "PushCreateNPCReq_LUA4",	&CX2GUNPC::PushCreateNPCReq_LUA4 );	// char-luciel CH3c20: June 327799c0 ( bound @31e0e76f )
+#endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
 #ifdef FINALITY_SKILL_SYSTEM //±Ë√¢«—
 	lua_tinker::class_def<CX2GUNPC>( L, "GetOwnerGameUnit",		&CX2GUNPC::	GetOwnerGameUnit );
 #endif //FINALITY_SKILL_SYSTEM
