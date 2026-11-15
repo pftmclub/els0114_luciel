@@ -2470,6 +2470,7 @@ line, each replaced in place inside an Iruha block; junediverge PASS; enumscan e
 **Build:** `DEPLOY OK: X2_offline.exe is 27,015,680 B, dated 2026-11-15 23:08:47, md5 7439b24a67aba5bc82e4c1e17a9fa5e7` (built with the fix on
 disk). `EXESTR OK: 1 of 1 absent` (`] EQTRACE item `: the debug line is gone). Shared tree: peers' commits swept in three of this review's edits: the
 `_DEBUG` retire (`Always.h`, R9 review `b068aeb4`), JUNE_BUGS 102 and the funcmap ids (`b8d17bd8` / `4ecb6f3d`).
+Commit `154ad7e9`; `finish.py --range 154ad7e9^..154ad7e9`: both flags PASS (1 PASS each), junediverge PASS, enumscan exit 0, FINISH PASS.
 **Play-test of the fix:** Elsword `jtLordKnight`, `/additem 275891 1` (Elsword's SeeU costume gloves), equip, village: the gloves draw with June's
 alpha blend (soft edges, no opaque or black fringe). When it passes, R14d moves to Done.
 
