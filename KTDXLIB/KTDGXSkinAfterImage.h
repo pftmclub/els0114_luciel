@@ -63,6 +63,9 @@ class CKTDGXSkinAfterImage : public CKTDGObject
 		}
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
+#ifdef SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
+		void SetAddNewImage( const bool bAddNewImage_ ) { m_bAddNewImage = bAddNewImage_; }	// char-luciel CH1q: June +0x1d0, written by Lu/Ciel's 32b15430
+#endif SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 		void SetAfterImageColor( const D3DXCOLOR& afterImageColor ){ m_AfterImageColor = afterImageColor; }
 		void SetNextImageTime( float nextImageTime ){ m_NextImageTimeNow = m_NextImageTime = nextImageTime; }
 		void SetHideImageSpeed( float hideImageSpeed ){ m_HideImageSpeed = hideImageSpeed; }
@@ -106,6 +109,9 @@ class CKTDGXSkinAfterImage : public CKTDGObject
 		float							m_HideImageSpeed;
 
 		vector<AfterImageData>			m_AfterImageList;
+#ifdef SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
+		bool							m_bAddNewImage;	// char-luciel CH1q: June +0x1d0 ( ctor 1 ), a second gate beside m_bEnable on taking a new image
+#endif SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 
 #ifdef MODIFY_AFTER_IMAGE // 오현빈 // 2013-07-19	
 		CKTDXDeviceXSkinMesh* m_pHairXSkinMesh; // 모자 착용 중 애프터 이미지에 현재 착용중인 Hair를 추가 하기 위한 변수

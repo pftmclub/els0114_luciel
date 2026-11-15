@@ -13596,3 +13596,11 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              for a NULL origin anim ( June 31f8ace0 ). A UT_SKIN weapon ( Lu's ) has no normal anim: March crashed building its after-image.
 #define SERV_IRUHADEV_JUNE_DIVERGE_WEAPON_LOAD_DATA_FOR_USER
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH1q play-test fix: June's after-image takes a new image only when m_bEnable and a June-only flag ( +0x1d0, default on )
+//              are both set. Lu/Ciel's AfterImageFrameMove ( June 32b15430 ) writes that flag, not m_bEnable: Lu's after-image no longer runs while Ciel moves.
+#define SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
+//////////////////////////////////////////////////////////////////////////

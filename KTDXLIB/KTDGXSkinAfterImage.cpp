@@ -17,6 +17,9 @@ CKTDGXSkinAfterImage::CKTDGXSkinAfterImage( CKTDGXSkinAnim* pOriginAnim, int ima
 	//}} seojt // 2009-1-12, 14:57
 
 	m_bEnable			= false;
+#ifdef SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
+	m_bAddNewImage		= true;	// char-luciel CH1q: June 3322abc0 word +0x1d0 = 1
+#endif SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 	m_AfterImageNum		= imageNum;
 	m_AfterImageColor	= 0xffffffff;
 	m_NextImageTime		= 0.02f;
@@ -92,7 +95,11 @@ void CKTDGXSkinAfterImage::AddMesh( CKTDXDeviceXSkinMesh* pMesh )
 HRESULT CKTDGXSkinAfterImage::OnFrameMove( double fTime, float fElapsedTime )
 {
 	KTDXPROFILE();
+#ifdef SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
+	if( m_bEnable == true && m_bAddNewImage == true )	// char-luciel CH1q: June 3322a620
+#else SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 	if( m_bEnable == true )
+#endif SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 	{
 		m_NextImageTimeNow -= fElapsedTime;
 		if( m_NextImageTimeNow <= 0.0f )

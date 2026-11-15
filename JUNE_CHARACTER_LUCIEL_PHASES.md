@@ -2811,6 +2811,19 @@ rows, ported ).
 - **Build:** `DEPLOY OK: X2_offline.exe is 26,905,600 B, dated 2026-11-15 14:56:53, md5 a6ff3e3a12d0b5fc78f45dae3a813885, equal to X2/US_SERVICE/x2.exe`.
   No exestr line: the phase adds no string.
 - **Play-test:** CH1's, resumed from the field entry ( hand-off in the session; the CH1 review covers this commit ).
+- **Play-test 1 ( 2026-11-15, run 14:59-15:05 on md5 a6ff3e3a ):** field entry fixed ( 3 `LUCIEL DATA` loads, 16 body swaps, 0 EXCEPTION ); walk / combo /
+  village / dungeon pass. Two defects with Ciel active: **(a) Ciel draws no body** ( his animation, effects and sound run ): every equip is Lu's until DU3
+  ( the `+0x15d4` stand-in ), and June builds Ciel's look from each item's minor-unit id ( `31fe4210` / `31ffe990` ). DU3's own play-test target ( kickoff
+  amended ). **(b) a frozen Lu after-image** while Ciel moves: fix 2 below. Ciel's death check is still owed ( no body to see ).
+- **Fix 2 ( a CH1l2 transcription error ), new flag `SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE`:** June's `AfterImageFrameMove` `32b15430`
+  writes byte `+0x1d0` on both after-images; CH1l2 read it as `m_bEnable` ( which is `+0x194` ), so Lu's after-image was enabled whenever Ciel moved and kept
+  copying Lu's hidden, still pose. `+0x1d0` is June-only: the ctor sets it to 1 and `OnFrameMove` `3322a620` takes a new image only with both bytes set.
+  Ported as `CKTDGXSkinAfterImage::m_bAddNewImage` / `SetAddNewImage` ( `.h` / `.cpp` ), and Lu/Ciel's override now calls it ( March's `Enable` /
+  `Disable` in `#else` ). funcmap rows `grep "(CH1q)"` ( now 4 ). `/Zs` `KTDGXSkinAfterImage.cpp`, `X2GULuciel.cpp`, `X2GameUnit.cpp`: 0 errors; break-test
+  fails as expected. `finish.py --files <4> --with JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE`: flagcheck `3 PASS, 0 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR`,
+  0 deleted / PASS; INFO `JUNE_CHAR_LUCIEL_CORE` ( the edit sits in CH1l2's `_CORE` body ); junediverge PASS; enumscan exit 0; stateends SKIPPED ( no state
+  registered ). `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Fix 2 build:** `DEPLOY OK: X2_offline.exe is 26,906,112 B, dated 2026-11-15 15:23:23, md5 8ea4a8d44d1ccdf800a84c0ad872455f, equal to X2/US_SERVICE/x2.exe`.
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 

@@ -10664,6 +10664,14 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 	const int iNowStateID = GetNowStateID();
 	const bool bEnable = ( LSI_LU_WAIT != iNowStateID && LSI_CIEL_WAIT != iNowStateID );
 
+#ifdef SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
+	// char-luciel CH1q: June writes +0x1d0 ( new images ) on both, never m_bEnable ( @32b15478 / @32b15488 )
+	if ( NULL != m_pAfterImage )
+		m_pAfterImage->SetAddNewImage( bEnable );
+
+	if ( NULL != m_pMinorUnitAfterImage )
+		m_pMinorUnitAfterImage->SetAddNewImage( bEnable );
+#else SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 	if ( NULL != m_pAfterImage )
 	{
 		if ( true == bEnable )
@@ -10679,6 +10687,7 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 		else
 			m_pMinorUnitAfterImage->Disable();
 	}
+#endif SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 
 	if ( NULL != m_pAfterImage )
 		m_pAfterImage->OnFrameMove( m_fTime, m_fElapsedTime );

@@ -80,3 +80,9 @@ strings), `328825c0`, `32882540`. `31fd48a0`, `31fd63c0`, `32882540` have no Mar
   plain ): before the read `+0x8fac` = -9999.0 ( `3347284c` ), `+0x8fb0` = 0, `+0x8fa8` = 0, `+0x8fa4` = 0; table present -> `[1]` float `+0x8fac` ( miss -9999.0 ),
   `[2]` float `+0x8fb0` ( miss 0 ), `[3]` int `+0x8fa8` ( miss 0 ), `+0x8fa4` = 1. funcmap row `320618a8-3206194c (CH1p)`. Two Duo states use it ( `LSI_LDB_WIN`
   `{ 1, 5, 0 }`, Luciel_Duo L3920 / L4598 ). CH1p left it here because its consumer `3204e4a0` reads the equip's minor-unit byte ( `+0x15d4` ).
+
+## Amended by char-luciel CH1q (2026-11-15)
+
+- CH1's play-test: **Ciel draws no body** in a field ( his animation, effects and sound run ), because every equip is Lu's under the `+0x15d4` stand-in and
+  Ciel's look ( `31fe4210` -> `31fe2fb0`, form 1 `31ffe990` ) is not built. This phase's play-test must show Ciel's body and equipment after a swap, then
+  CH1's owed check: Ciel dies with a buff on ( `/invin 0` ), the buff is gone after the revive.
