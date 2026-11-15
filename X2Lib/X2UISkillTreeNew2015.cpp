@@ -3578,6 +3578,10 @@ void CX2UISkillTreeNew::UpdateSkillSlotString()
 				pStaticSkillHotKeyA->GetString(i)->msg = g_pMain->GetKeyPad()->GetKeyString( aeAction[i] );
 		}
 	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	if( NULL != g_pX2Game && NULL != g_pX2Game->GetMyUnit() )
+		g_pX2Game->GetMyUnit()->UpdateTransformSkillSlotString();	// char-luciel CH2d3: June 328e1170 @328e15da, the transform window's key labels too
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 }
 
 void CX2UISkillTreeNew::SetSkillUIType( bool bIsTypeA_ )
@@ -3619,6 +3623,10 @@ void CX2UISkillTreeNew::SetSkillUIType( bool bIsTypeA_ )
 	SetOffsetPosEtcSkillSlotUI();
 	UpdateSkillSlotString();
 	SwapSkillSlot( m_bSkillSlotSwap, true );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	if( NULL != g_pX2Game && NULL != g_pX2Game->GetMyUnit() )
+		g_pX2Game->GetMyUnit()->SetTransformSkillUIType( bIsTypeA_ );	// char-luciel CH2d3: June 328e1680 @328e179e, the transform window follows type A / B
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 }
 
 void CX2UISkillTreeNew::SetOffsetPosEtcSkillSlotUI()

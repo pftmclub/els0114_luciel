@@ -64,3 +64,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Garden of Haures:** the NPC script's four methods are bound ( `SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS`; `luabind.py check SA_LDN_GARDEN_OF_HAURES` PASS );
   its plants ( 2270 ) carry the owner the script passes ( `GetOwnerUserUnitUID` ), so check that the Garden NPC itself gets the user as its owner
   ( June's `322e67c0` arguments at `@32b340ce`: ally UID and `NAT_ALLY` ), or `IsSameOwnerUserID` never matches. The `NPCTemplet` rows of 2269 / 2270 are CH3a0's.
+
+## Amended by char-luciel CH2d3 (2026-11-16)
+
+- **Ciel's form model is already wired:** the buff hook `SetSpecificValueByBuffTempletID` ( `32b37d40` ) starts `StartTransformedForm( 1 )` whenever Ciel is the body in play
+  ( `Motion_Ciel_LDN_Evil.X`, anim `Wait`, `EffectSet_LDN_Ciel_Horn` ), for BTI 763 or 764. Your Transcendence start state ( `32b43b10` ) only applies the buff and the window,
+  as CH2d2's Altar of Evil start does; the form's end goes through `EndTransformedForm( 1, ... )` from your end state. The transform window's key labels and A / B type
+  follow the skill tree ( CH2d3's `UpdateTransformSkillSlotString` / `SetTransformSkillUIType` hooks ).

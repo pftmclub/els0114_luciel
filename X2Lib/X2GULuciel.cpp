@@ -604,6 +604,10 @@ void CX2GULuciel::SetFormSkinAnim( const int iForm_, STransformedSkin& transform
 void CX2GULuciel::EndTransformedForm( const int iForm_, const bool bByDie_ )
 {
 	const BUFF_TEMPLET_ID eTransformBuffID = 0 != iForm_ ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	if ( true == IsTransformed( iForm_ ) || NULL != m_pTransformSkillSlotUI )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL transform form end form %d die %d transformed %d swapped %d window %d", iForm_, static_cast<int>( bByDie_ ), static_cast<int>( IsTransformed( iForm_ ) ), static_cast<int>( m_aTransformedSkin[0 != iForm_ ? 1 : 0].m_bSwapped ), static_cast<int>( NULL != m_pTransformSkillSlotUI ) );	// char-luciel CH2d3
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 
 	if ( true == IsTransformed( iForm_ ) )
 	{
@@ -17754,6 +17758,81 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_StateStart()
 	SetTransformBuffFactorToSelf( BFI_BUFF_ALTAR_OF_EVIL, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LDB_ALTAR_OF_EVIL, false, 0, true ) );
 
 	CommonStateStart();
+}
+
+namespace _CONST_LUCIEL_CH2D3_
+{
+	const WCHAR*	LU_TRANSFORMED_WAIT_ANIM_NAME					= L"EVIL_Ru_Wait";	// June 32b34fe0 ( 334f3130 )
+	const WCHAR*	CIEL_TRANSFORMED_WAIT_ANIM_NAME					= L"Wait";	// June 32b34fe0 ( 33474724 )
+	const WCHAR*	LU_TRANSFORMED_HORN_EFFECT_SET					= L"EffectSet_LDB_Lu_Horn";	// June 32b34fe0 ( 334f3104 )
+	const WCHAR*	CIEL_TRANSFORMED_HORN_EFFECT_SET				= L"EffectSet_LDN_Ciel_Horn";	// June 32b34fe0 ( 334f30d4 )
+}
+using namespace _CONST_LUCIEL_CH2D3_;
+
+// char-luciel CH2d3: June 32b37d40: Altar of Evil ( 763 ) or Transcendence ( 764 ) starts the form of the body in play
+void CX2GULuciel::SetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ )
+{
+	CX2GUUser::SetSpecificValueByBuffTempletID( eBuffTempletId_ );
+
+	if ( BTI_BUFF_ALTAR_OF_EVIL <= eBuffTempletId_ && eBuffTempletId_ <= BTI_BUFF_TRANSCENDENCE )
+		StartTransformedForm( true == IsMinorUnitActive() ? 1 : 0 );
+}
+
+// char-luciel CH2d3: June 32b34fe0: the form's transformed set takes the body's place, equipment hidden, the horn effect set on
+void CX2GULuciel::StartTransformedForm( const int iForm_ )
+{
+	if ( true == IsTransformed( iForm_ ) )
+		return;
+
+	SetTransformed( iForm_, true );
+
+	STransformedSkin& transformedSkin = m_aTransformedSkin[0 != iForm_ ? 1 : 0];
+	if ( true == transformedSkin.m_bSwapped )
+		return;
+
+	SetShowViewList( false );
+
+	BOOST_TEST_FOREACH( Weapon*, pWeapon, m_vecpWeapon )
+	{
+		if ( NULL == pWeapon || NULL == pWeapon->m_pUserWeaponEquip )
+			continue;
+
+		for ( int iModel = 0; iModel < CX2Item::MAX_MODEL_COUNT_A_ITEM; ++iModel )
+		{
+			if ( NULL != pWeapon->m_pUserWeaponEquip->GetNormalAnim( iModel ) )
+				pWeapon->m_pUserWeaponEquip->GetNormalAnim( iModel )->SetShowObject( false );
+
+			if ( NULL != pWeapon->m_pUserWeaponEquip->GetHyperAnim( iModel ) )
+				pWeapon->m_pUserWeaponEquip->GetHyperAnim( iModel )->SetShowObject( false );
+		}
+	}
+
+	SetFormSkinAnim( iForm_, transformedSkin );
+
+	CKTDGXSkinAnim* pXSkinAnimFuture = 0 != iForm_ ? m_pMinorUnitXSkinAnimFuture : m_pXSkinAnimFuture;
+	CKTDGXSkinAnimPtr pXSkinAnim = 0 != iForm_ ? m_pMinorUnitXSkinAnim : m_pXSkinAnim;
+	CKTDXDeviceXSkinMesh::MultiAnimFrame*& pFrameHead = 0 != iForm_ ? m_pFrame_MinorUnit_Bip01_Head : m_pFrame_Bip01_Head;
+
+	m_CollisionListSet.clear();
+	m_AttackListSet.clear();
+	m_CollisionListSet.insert( &pXSkinAnim->GetCollisionDataList() );
+	m_AttackListSet.insert( &pXSkinAnim->GetAttackDataList() );
+
+	const std::wstring wstrWaitAnimName = ( 0 != iForm_ ) ? CIEL_TRANSFORMED_WAIT_ANIM_NAME : LU_TRANSFORMED_WAIT_ANIM_NAME;
+	pXSkinAnim->ResetOneshotPerformed();
+	pXSkinAnim->ChangeAnim( wstrWaitAnimName.c_str(), false, 0.f );
+	pXSkinAnim->Play( CKTDGXSkinAnim::XAP_LOOP );
+	pXSkinAnimFuture->ResetOneshotPerformed();
+	pXSkinAnimFuture->ChangeAnim( wstrWaitAnimName.c_str(), false, 0.f );
+	pXSkinAnimFuture->Play( CKTDGXSkinAnim::XAP_LOOP );
+
+	pFrameHead = pXSkinAnim->GetCloneFrame( L"Bip01_Head" );
+	SetUnitReForm();
+
+	m_hTransformedFormEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( ( 0 != iForm_ ) ? CIEL_TRANSFORMED_HORN_EFFECT_SET : LU_TRANSFORMED_HORN_EFFECT_SET, this );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL transform form start form %d swapped %d anim %s", iForm_, static_cast<int>( transformedSkin.m_bSwapped ), wstrWaitAnimName.c_str() );	// char-luciel CH2d3
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 }
 
 // char-luciel CH2d2: June 32b31260 ( thunk 32b4e2d0 ): the form's wait; June tests the walk before the double step here

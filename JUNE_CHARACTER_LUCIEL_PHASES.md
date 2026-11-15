@@ -4020,6 +4020,40 @@ Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h` ( bytepatch ), `MODS.md`, `func
 - **Play-test ( 2026-11-16, user: every skill in the normal form works; the Altar of Evil form's model and slot UI are wrong -> CH2d3; logs 05:34-05:40 on the 05:15 deploy ):** 0 EXCEPTION; `use` lines: Nightmare 30042 x6 / 30076 x2, Altar of Evil 30043 x3 / 30077 x2, Abyss Strike 30215 x8 / 30219 x2, Phantom Rush 30216 x7 / 30220 x2; `nightmare target ... found 1` x8, `abyss strike end` x9, `altar transform start ... buff 1` each cast. **Not in the logs:** `phantom rush target` ( the second use ), `death touch beam`, `altar projectile` ( the form's skills; CH2d3 first ).
 - **Play-test hand-off:** in the message that closes the session ( `LuDbA` / `LuDbB` per key, the log lines to expect ). Logs to read: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
 
+### CH2d3 - Done (2026-11-16)
+
+Opus 5.5 high. Flags: `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( class code ), `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK` ( user wrappers ), `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ( skill tree hooks ),
+`_SKILL_DEBUG` ( 2 lines; stays on, the CH2d2 review retires it ). No new define. Files: `X2GULuciel.h` / `.cpp`, `X2GUUser.h` / `.cpp` ( bytepatch ), `X2UISkillTreeNew2015.cpp`.
+funcmap `grep "(CH2d3)"` ( 6 rows ). Review: `CH2d2-review.md` ( covers CH2d, CH2d2, CH2d3 ). Commit: see git log `char-luciel Phase CH2d3`.
+- **Why the form looked wrong ( user report, CH2d2 play-test ):** the model swap in June is made by the form buff's hook, not by a state. `SetSpecificValueByBuffTempletID`
+  `32b37d40` ( Lu/Ciel override 0x24c ) calls the base, then for BTI 763 / 764 `StartTransformedForm( m_bMinorUnitActive )` `32b34fe0`. Neither was ported ( CH0 put both in CH4a ),
+  so the skin never changed and the transformed byte stayed false. The end state's `EndTransformedForm( 0, false )` then found the form not transformed and skipped its
+  whole block, the transform window's release included: `HasTransformSkillSlotUI()` stayed true, and `CX2StateMenu::SetShowDlgMenu` ( every frame from
+  `CX2StateMenu::OnFrameMove`, CH2d20's hook ) kept the regular slot bar hidden. One cause for all three symptoms.
+- **Ported whole:** `SetSpecificValueByBuffTempletID` ( the only live caller of `32b34fe0`; `32b38c70` / `32b38c90` are dead ) and `StartTransformedForm`: transformed -> return,
+  `SetTransformed( form, true )`, swapped set -> return, `SetShowViewList( false )`, every weapon's normal / hyper anims hidden, `SetFormSkinAnim`, the collision / attack sets
+  given the new anim's lists, both anims' oneshot timer reset + `ChangeAnim( EVIL_Ru_Wait | Wait, false, 0 )` + `Play( XAP_LOOP )`, `Bip01_Head` frame, `SetUnitReForm`,
+  `m_hTransformedFormEffectSet = PlayEffectSet( EffectSet_LDB_Lu_Horn | EffectSet_LDN_Ciel_Horn, this )`. `UnSetSpecificValueByBuffTempletID` `32ae5080` is a `jmp` to the
+  base: nothing to port. Assets checked before code: `Motion_Lu_LDB_Evil.x` ( data208, holds `EVIL_Ru_Wait` ), `Motion_Ciel_LDN_Evil.X` ( data218 ), both horn effect sets in
+  data036 `EffectSet.lua`, the window's dialog ( data034 ) and its 4 textures with their `.TET`.
+- **Slot UI:** the window's position is June's ( `SetSkillUIType` `31fe2b10` re-read: type A at 0,0, type B at -297, -615 ); June has no other show / hide of the slot bar for
+  PvE ( the only `ToggleUI( 44 )` callers are `SetShowDlgMenu` and PvP's `325290f0` ). Added June's two user wrappers the skill tree calls: `UpdateTransformSkillSlotString`
+  `31fe12e0` and `SetTransformSkillUIType` `31fe3cb0` ( window private refreshers reached by a `friend` line ), hooked as the last statement of
+  `CX2UISkillTreeNew::UpdateSkillSlotString` `328e1170` and `SetSkillUIType` `328e1680` ( `_LIVE` ): a key or A / B change now reaches the window. `3200f9f0` ( an unreferenced
+  frame-move wrapper ) not ported.
+- **Kickoffs amended:** `CH4a.md` ( both functions done here; 689's reach ), `CH3c2.md` ( Ciel's form model rides the same hook ). No June bug added: none visible kept
+  ( the start sets the byte before its swapped test, the mirror of JUNE_BUGS 689; nothing reaches it ).
+- **Debug lines ( `_SKILL_DEBUG` ):** `[JUNE_CHAR] LUCIEL SKILL transform form start form N swapped N anim NAME`, `transform form end form N die N transformed N swapped N window N`
+  ( printed only when a form is transformed or the window exists ).
+- **Gates ( `finish.py --files` 5 files `--with JUNE_CHAR_LUCIEL_SKILL JUNE_CHAR_TRANSFORM_LINK JUNE_CHAR_LUCIEL_LIVE JUNE_CHAR_LUCIEL_SKILL_DEBUG` ):** FINISH RESULT PASS
+  ( 8 gates, 0 failed, 3 skipped: stateends, no state registered; skillicons, no skill added; luabind, no script ); flagcheck `_LIVE` 5 PASS, `_SKILL` 3 PASS + 2 OTHER, `TRANSFORM_LINK`
+  3 PASS + 2 OTHER ( each flag's OTHER rows are the other two flags' files ), 0 FAIL, junediverge PASS, enumscan exit 0. `/Zs` probes of `X2GULuciel.cpp`, `X2GUUser.cpp`,
+  `X2UISkillTreeNew.cpp`: 0 errors each.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,077,120 B, dated 2026-11-16 06:18:49, md5 383991cd4b67a71ea6192b711738a34f, equal to X2/US_SERVICE/x2.exe (2026-11-16 06:18:43); built at main f7d74f91 + 7 uncommitted code file(s)`
+  ( peers' `Always.h` / `X2GameUnit.cpp` / `X2UnitViewerUI.h` built in ). `EXESTR OK: 3 of 3` wide ( the start debug line, `EffectSet_LDB_Lu_Horn`, `EVIL_Ru_Wait` ).
+- **How to see it in game:** the hand-off in the closing message ( `LuDbA` / `LuDbB`, keys S and W, the form's end on key C and at the buff's end ). Logs:
+  `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
+
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 
 | Sub-phase | Scope |

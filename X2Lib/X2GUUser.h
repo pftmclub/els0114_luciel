@@ -551,6 +551,7 @@ public:
 	void OnFrameMove( const float fElapsedTime_ );						/// char-luciel CH2d20: June 3200f7a0
 	bool IsDialogValid() const { return m_hDlgTransformSkillSlot != NULL; }	/// char-luciel CH2d20: inlined in June 31fd0380
 	bool GetShow() const;												/// char-luciel CH2d20: inlined in June 31fd03b0
+	friend class CX2GUUser;												/// char-luciel CH2d3: June's user wrappers 31fe12e0 / 31fe3cb0 call the private refreshers
 
 private:
 	void SetCoolTimeShow( const int iSlot_, const bool bShow_ );		/// June 31fc9df0
@@ -2598,6 +2599,8 @@ public:
 		bool HasTransformSkillSlotUI() const;										/// char-luciel CH2d20: June 31fd0380
 		bool GetShowTransformSkillSlotUI() const;									/// char-luciel CH2d20: June 31fd03b0
 		void SetShowTransformSkillSlotUI( const bool bShow_ );						/// char-luciel CH2d20: June 31fe3c90
+		void UpdateTransformSkillSlotString();										/// char-luciel CH2d3: June 31fe12e0
+		void SetTransformSkillUIType( const bool bIsTypeA_ );						/// char-luciel CH2d3: June 31fe3cb0
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
 

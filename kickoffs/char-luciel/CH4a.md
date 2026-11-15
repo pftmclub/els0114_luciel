@@ -80,3 +80,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Point on hit, owed since CH1:** the CH1 review moved the check to CH2a, but it cannot pass before your push ( CH2a2 logs: 0 `LUCIEL DUO point` lines ).
   Your play-test carries it: Lu's `ZZZZX` ( or `XXXZX`, dash-jump `XXXXZ` ) on a monster gives `[JUNE_CHAR] LUCIEL DUO point: +1 on hit ( HIT_ADD_COMBINATION_POINT )`
   at most once a second and the HUD point row fills; the same finishers on Ciel.
+
+## Amended by char-luciel CH2d3 (2026-11-16)
+
+- **Done in CH2d3, do not re-port:** `SetSpecificValueByBuffTempletID` `32b37d40` ( base, then BTI 763 / 764 -> `StartTransformedForm` ) and `StartTransformedForm`
+  `32b34fe0` are in `X2GULuciel.cpp` under `_SKILL`. `UnSetSpecificValueByBuffTempletID` `32ae5080` is a `jmp` to the base: nothing to write. JUNE_BUGS 689's reach:
+  the start sets the transformed byte before its own swapped test, the mirror of the end's early return; nothing in play reaches either half.

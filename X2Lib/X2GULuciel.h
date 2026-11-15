@@ -1379,6 +1379,9 @@ protected:
 	void				LSI_A_LDB_F_PHANTOM_RUSH_FrameMove();	// June 32b38140
 	void				LSI_A_LDB_M_PHANTOM_RUSH_FrameMove();	// June 32b38340 ( the class map's CameraMove: June registers it in the FrameMove slot )
 	void				LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture();	// June 32b38540, also the male target state's
+	// char-luciel CH2d3: the transformed form's start, from the form buff's hook
+	virtual void		SetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ );	// June 32b37d40 ( override 0x24c )
+	void				StartTransformedForm( const int iForm_ );	// June 32b34fe0
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
 	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3

@@ -26357,6 +26357,20 @@ void CX2GUUser::SetShowTransformSkillSlotUI( const bool bShow_ )
 	if( NULL != m_pTransformSkillSlotUI )
 		m_pTransformSkillSlotUI->SetShow( bShow_ );
 }
+
+// char-luciel CH2d3: June 31fe12e0, the skill tree's key-label refresh reaches the transform window
+void CX2GUUser::UpdateTransformSkillSlotString()
+{
+	if( NULL != m_pTransformSkillSlotUI )
+		m_pTransformSkillSlotUI->UpdateSkillSlotString();
+}
+
+// char-luciel CH2d3: June 31fe3cb0, the skill tree's UI type A / B reaches the transform window
+void CX2GUUser::SetTransformSkillUIType( const bool bIsTypeA_ )
+{
+	if( NULL != m_pTransformSkillSlotUI )
+		m_pTransformSkillSlotUI->SetSkillUIType( bIsTypeA_ );
+}
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 #ifdef SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE
 /// June class InitState ( e.g. Eve 329ba9c0 @329bae2a-329bae48 ): UpdateUserUnitStateData( 0x82 = USI_WAIT_STATE_CHANGE, "<prefix>WAIT_STATE_CHANGE", data ) with only
