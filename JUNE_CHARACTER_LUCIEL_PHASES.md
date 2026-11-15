@@ -3030,7 +3030,7 @@ Sonnet 5.5 high. Server Lua only: no flag, no client change, **no build** (the e
   127 -> 5000088, 128 -> 5000089, 129 -> 5000090). 109999 therefore opens on all 18 June jobs, 110850 on the 10 second jobs.
 - **Decisions.** **5 pieces:** `item.kim` shows the same five-piece reading for every class, and March's groups drop the hair / face / helm pieces
   where they exist (Chung's helm 40050, Infinity Sword's hair 41250), so Diabla's 42108, Demonio's 42116 and the Ara / Elesis / Add hair and face pieces
-  are not in the groups. **No Ciel copy:** every promotion piece has `item_id_for_minor_unit` 0. **No row, said once:** Rose 40-43 / 130-133, Ain 44-46 /
+  are not in the groups. **One set per job class, no Ciel pair** (corrected 2026-11-15: the right test is `is_for_minor_unit`, not `item_id_for_minor_unit`): `item.kim` has one promotion set per job class, flagged Ciel-body for 38 / 127 / 129 and Lu-body for 37 / 39 / 128; only the base Duo (200) has both Lu's Promotion 41890-41894 and Ciel's Promotion 41900-41904, and it has no cube row (open question). **No row, said once:** Rose 40-43 / 130-133, Ain 44-46 /
   134-136 (no unit type in the client; their sets are not looked up) and the base classes 1 / 9 / 8 / 7 / 10 (no job cube). Elesis 29 / 30 and Ara 28 / 118 /
   31 / 119 already had rows.
 - **Names resolve:** all 16 `UC_*` names are in data036 `Enum.lua` (`:317-:386`) with values equal to `X2Unit.h`'s enum; the emulator's UNIT_CLASS table is
