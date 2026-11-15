@@ -13627,6 +13627,18 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM needs SERV_IRUHADEV_JUNE_CHAR_EFFECTSET_MODIFIER ( the modifier list )
 #endif
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CHN: Lu/Ciel's job change. Item compatibility for 200 / 37 / 38 / 39 / 127 / 128 / 129 ( June 31ed6500 ), the
+//              emulator's class-change seed ( 8 tickets, 6 job-advance items, parent rows, Diablura side step ) and the 7 UC_LUCIEL_*
+//              server-Lua enum names. The level-15 / level-35 guide rows are data ( data036 LevelUpEvent.lua TYPE9 ).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE ) && !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE needs SERV_IRUHADEV_JUNE_ENUM_NAMES ( UC_LUCIEL_* ), char-luciel CHN
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+//////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15

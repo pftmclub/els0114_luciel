@@ -45,3 +45,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by CH0 (2026-11-13)
 
 - `june2017_re/char_add/ch0_classn_route.tsv`: Arc Tracer 35540-35543 (`CJT_JOB_SECOND`, from 9 at 15), Mastermind 35550-35554 (from 33 at 35), Time Tracer 35580-35583 (`CJT_JOB_THIRD`), Diabolic Esper 35590-35594 (from 36); level-35 chains are `CJT_NONE` and only the fifth quest grants the class. `Handlers_Quest.cpp:586-625` grants any class; auto-learn rows exist for all four. `X2OfflineClassChangeSeed.h` has no Add rows; `GetClassChangeDialogName` (`X2StateClassChange.cpp:304-380`) already has 33 / 36 / 123 / 126. `LevelUpEvent.lua`: level 15 needs only the dialog name; level 35 lacks Arc / Time Tracer and the guide; no level-70 row. March lacks `DLG_1ST_` / `2ND_Class_Change_Guide_Add`, `DLG_Class_Change_Add_AT` / `MM` / `TT` / `DE` (CH0b stages them).
+
+## Amended by char-luciel CHN (2026-11-15)
+
+- `X2OfflineClassChangeSeed.h` now has a flagged Lu/Ciel block (ROWS by family: job-advance item = parent class, re-pick ticket = the class; `PARENT_ROWS`; side step). Add the same for Add (33 / 36 / 123 / 126: find the items with `/x2-kim find --re "(?i)(arc tracer|mastermind|time tracer|diabolic esper)"`), and, in the same edit, Ara 34 / 124 and Elesis 35 / 125, whose tickets also land in the bag today (no seed rows). One bullet in the Done note per class.

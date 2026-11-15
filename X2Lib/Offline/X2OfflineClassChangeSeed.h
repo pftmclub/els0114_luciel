@@ -242,6 +242,23 @@ namespace X2OfflineClassChangeSeed
 		{ 272171    , 120, false },	// UC_ELESIS_GRAND_MASTER
 		{ 272172    , 121, false },	// UC_ELESIS_BLAZING_HEART
 		//}}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+		// char-luciel CHN: June item.kim; job-advance items carry the parent class, tickets the class itself
+		{ 242371    , CX2Unit::UC_LUCIEL_CHILIARCH,   true  },
+		{ 242372    , CX2Unit::UC_LUCIEL_ROYAL_GUARD, true  },
+		{ 277105    , CX2Unit::UC_LUCIEL_DIABLURA,    true  },
+		{ 242373    , CX2Unit::UC_LUCIEL_DREAD_LORD,  true  },
+		{ 242374    , CX2Unit::UC_LUCIEL_NOBLESSE,    true  },
+		{ 277107    , CX2Unit::UC_LUCIEL_DEMONIO,     true  },
+		{ 276955    , CX2Unit::UC_LUCIEL_CHILIARCH,   false },
+		{ 276956    , CX2Unit::UC_LUCIEL_ROYAL_GUARD, false },
+		{ 135824    , CX2Unit::UC_LUCIEL_DIABLURA,    false },
+		{ 277104    , CX2Unit::UC_LUCIEL_DIABLURA,    false },
+		{ 276957    , CX2Unit::UC_LUCIEL_DREAD_LORD,  false },
+		{ 276958    , CX2Unit::UC_LUCIEL_NOBLESSE,    false },
+		{ 135825    , CX2Unit::UC_LUCIEL_DEMONIO,     false },
+		{ 277106    , CX2Unit::UC_LUCIEL_DEMONIO,     false },
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
 	};
 
 	static const int ROW_COUNT = sizeof( ROWS ) / sizeof( ROWS[0] );
@@ -301,6 +318,16 @@ namespace X2OfflineClassChangeSeed
 		{ 117 , 27   },	// UC_CHUNG_TACTICAL_TROOPER
 		{ 118 , 28   },	// UC_ARA_SAKRA_DEVANAM
 		{ 119 , 31   },	// UC_ARA_YAMA_RAJA
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+		// char-luciel CHN: June's class tree ( 3234b390 row 10 )
+		{ CX2Unit::UC_LUCIEL_DUO        , CX2Unit::UC_LUCIEL_DUO        },
+		{ CX2Unit::UC_LUCIEL_CHILIARCH  , CX2Unit::UC_LUCIEL_DUO        },
+		{ CX2Unit::UC_LUCIEL_ROYAL_GUARD, CX2Unit::UC_LUCIEL_DUO        },
+		{ CX2Unit::UC_LUCIEL_DIABLURA   , CX2Unit::UC_LUCIEL_DUO        },
+		{ CX2Unit::UC_LUCIEL_DREAD_LORD , CX2Unit::UC_LUCIEL_CHILIARCH  },
+		{ CX2Unit::UC_LUCIEL_NOBLESSE   , CX2Unit::UC_LUCIEL_ROYAL_GUARD},
+		{ CX2Unit::UC_LUCIEL_DEMONIO    , CX2Unit::UC_LUCIEL_DIABLURA   },
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
 	};
 
 	static const int PARENT_ROW_COUNT = sizeof( PARENT_ROWS ) / sizeof( PARENT_ROWS[0] );
@@ -315,6 +342,9 @@ namespace X2OfflineClassChangeSeed
 		25  ,	// UC_RAVEN_WEAPON_TAKER
 		26  ,	// UC_EVE_ELECTRA
 		27  ,	// UC_CHUNG_SHELLING_GUARDIAN
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+		CX2Unit::UC_LUCIEL_DIABLURA,	// char-luciel CHN: stand-in, June's server table is not readable; Diablura is the later third branch
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
 	};
 
 	static const int SIDE_STEP_COUNT = sizeof( SIDE_STEP_CLASSES ) / sizeof( SIDE_STEP_CLASSES[0] );

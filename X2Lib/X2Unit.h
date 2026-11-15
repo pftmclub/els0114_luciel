@@ -2270,6 +2270,96 @@ inline bool GetX2UnitClassCompatibility( CX2Unit::UNIT_CLASS unitClass, CX2Unit:
 
 #endif //SERV_9TH_NEW_CHARACTER
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+	// char-luciel CHN: June 31ed6500 case 200 / 0x25-0x27 / 0x7f-0x81
+	case CX2Unit::UC_LUCIEL_DUO:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_LUCIEL_DUO:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+	case CX2Unit::UC_LUCIEL_CHILIARCH:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_LUCIEL_DUO:
+			case CX2Unit::UC_LUCIEL_CHILIARCH:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+	case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_LUCIEL_DUO:
+			case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+	case CX2Unit::UC_LUCIEL_DIABLURA:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_LUCIEL_DUO:
+			case CX2Unit::UC_LUCIEL_DIABLURA:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+	case CX2Unit::UC_LUCIEL_DREAD_LORD:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_LUCIEL_DUO:
+			case CX2Unit::UC_LUCIEL_CHILIARCH:
+			case CX2Unit::UC_LUCIEL_DREAD_LORD:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+	case CX2Unit::UC_LUCIEL_NOBLESSE:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_LUCIEL_DUO:
+			case CX2Unit::UC_LUCIEL_ROYAL_GUARD:
+			case CX2Unit::UC_LUCIEL_NOBLESSE:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+	case CX2Unit::UC_LUCIEL_DEMONIO:
+		{
+			switch( stuffClass )
+			{
+			case CX2Unit::UC_LUCIEL_DUO:
+			case CX2Unit::UC_LUCIEL_DIABLURA:
+			case CX2Unit::UC_LUCIEL_DEMONIO:
+				return true;
+				break;
+			default:
+				break;
+			}
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+
 	}
 
 	return false;

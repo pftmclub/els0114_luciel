@@ -116,6 +116,16 @@ namespace X2OfflineLuaEnumSeed
 		{ "UC_ADD_LUNATIC_PSYKER",                   122 },
 		{ "UC_VALIDE_END",                           123 },
 		{ "UC_END",                                  124 },
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
+		// char-luciel CHN: June Enum.lua UNIT_CLASS
+		{ "UC_LUCIEL_CHILIARCH",                     CX2Unit::UC_LUCIEL_CHILIARCH },
+		{ "UC_LUCIEL_ROYAL_GUARD",                   CX2Unit::UC_LUCIEL_ROYAL_GUARD },
+		{ "UC_LUCIEL_DIABLURA",                      CX2Unit::UC_LUCIEL_DIABLURA },
+		{ "UC_LUCIEL_DREAD_LORD",                    CX2Unit::UC_LUCIEL_DREAD_LORD },
+		{ "UC_LUCIEL_NOBLESSE",                      CX2Unit::UC_LUCIEL_NOBLESSE },
+		{ "UC_LUCIEL_DEMONIO",                       CX2Unit::UC_LUCIEL_DEMONIO },
+		{ "UC_LUCIEL_DUO",                           CX2Unit::UC_LUCIEL_DUO },
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE
 	};
 
 	// CXSLItem::USE_CONDITION - the client has no copy of this one

@@ -2912,6 +2912,45 @@ route for 200 -> 37 / 38 / 39 and 37 -> 127, 38 -> 128, 39 -> 129: the quests (`
 the change itself shows. Tree rows for the new class go to `SeedJuneAutoLearn` where free. **Done gate:** a level-15 Lu/Ciel reaches each first
 job, and a level-35 one reaches each second job, by quest or item. The tree, the portrait and the motions follow, and a relog keeps it.
 
+### CHN - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` (`Always.h`, `#error` guard on `JUNE_ENUM_NAMES`, which the older
+`JUNE_CLASS_PATH` guard at `:12480` already requires in this tree). Commit: see `git log --grep "char-luciel Phase CHN"`.
+- **Already class-generic (no change):** the quest route (data036 `FieldQuest.lua` = June bytecode: 35644-35647 -> 37, 35648-35651 -> 38,
+  35660 / 35670 / 35680 / 35690 -> 39, 35750-35790 -> 127, 35700-35740 -> 128, 35800-35840 -> 129); `Handlers_Quest.cpp:590-625` applies any
+  class + `SeedAutoLearn` (Lu/Ciel's rows are in `X2OfflineSkillAutoLearn.h`); the guide runtime (Ara CHNb / CHNb2: `UICustomEventProc`,
+  `GuideAcceptClassUpQuest`, `OpenClassChangeGuideItem` map with 242371-242374 / 277105 / 277107, line / tier helpers with the Lu/Ciel rows);
+  `GetClassLevel` (June `3234c170`, generic); portraits 60-65 (`X2Data.cpp:3098`); the 10 dialogs staged by CH0b (data034 guides, data217
+  `DLG_Class_Change_Luciel_*`).
+- **Item compatibility (`X2Unit.h`, checklist 7ar, owed since NU1):** `GetX2UnitClassCompatibility` had no Lu/Ciel arm, so no Lu/Ciel
+  class could equip from the bag. Seven cases = June `31ed6500` case 200 (200 only), 0x25-0x27 (200 + self), 0x7f-0x81 (200 + parent + self).
+- **Emulator seed (`X2OfflineClassChangeSeed.h`):** 14 rows from June `item.kim` by family: job-advance (unit class = the parent) 242371 -> 37,
+  242372 -> 38, 277105 -> 39, 242373 -> 127, 242374 -> 128, 277107 -> 129; re-pick tickets 276955 / 276956 / 135824 / 277104 / 276957 / 276958 /
+  135825 / 277106 (two Diabla / Demonio ticket ids each, same name, both kept). `PARENT_ROWS` 200 / 37 / 38 / 39 / 127 / 128 / 129 = June's tree
+  (`3234b390` row 10). `SIDE_STEP_CLASSES` + 39: a labelled stand-in (June's `ClassChangeTable` is server-only), NU0's call. Claim path only
+  (cash deposit), as live; `/additem` of a ticket puts it in the bag and does nothing, so the play-test uses the quest route.
+- **Server-Lua enum seed (`X2OfflineLuaEnumSeed.h`):** the 7 `UC_LUCIEL_*` names, values from the C++ enum.
+- **Data (data036 `LevelUpEvent.lua`, core-list source):** `TYPE9` level 15 (Duo -> `DLG_1ST_Class_Change_Guide_Luciel.lua`) and level 35
+  (37 / 38 / 39 -> `DLG_2ND_Class_Change_Guide_Luciel.lua`), both with the two `LucielVoice_ClassUpReady` sounds (data162) = June
+  `LevelUpEvent.src.lua:154-170` / `:377-395`. BOM + CRLF kept (475 -> 511 lines); `luasrc.py refresh`; `ledger --check` / `core --check` PASS.
+  The level-70 transcendence row (`:623-640`) stays CH3d's (§7ao).
+- **luabind** on the 10 dialogs + LevelUpEvent: 0 unbound, ENUM 0 / 0 on every dialog. One `ENUM MISSING NAME LUEI_SECRET_DUNGEON_OPEN_GUIDE`
+  is June's file line 437, a secret-dungeon event block our LevelUpEvent.lua does not carry: not this phase's, not reached.
+- **Pack:** `PACK OK data036` (vs live: ~1 changed LevelUpEvent.lua; TU had packed and copied its data036 at 16:04 first), `COPY OK data036`
+  md5 `ad8c5a10b0f106fcaf316772c5a5fcdc`, backup `kom_backup_tools/data036.kom.20261115_160901`.
+- **Units** (backup `db_backup/els_db_20261115_160952_pre_pre_char-luciel-CHN.sql`): `LuGuideLC` 180, `LuGuideCG` 181, `LuGuideDB` 182 (200,
+  level 14, exp 81600 = 100 below 15); `LuGuideLD` 183 (37), `LuGuideCN` 184 (38), `LuGuideDN` 185 (39) (level 34, exp 1212400 = 100 below 35).
+- **Gates (`finish.py --files`, worktree):** flagcheck `JUNE_CHAR_LUCIEL_CLASS_CHANGE` PASS (2 PASS, 1 PASS~, 1 OTHER = peers' Always.h
+  blocks), junediverge PASS, enumscan PASS. FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped: no states, skills or staged June script).
+- **Deploy:** `DEPLOY OK: X2_offline.exe is 26,907,648 B, dated 2026-11-15 16:19:28, md5 17cf42ad3caa06c5489edb86b88d42b2` (built at main
+  61c2ff4c + 10 uncommitted files incl. peers' TU; `X2Unit.obj` 16:17 / `Handlers_Shop.obj` 16:09 / `X2OfflineLuaEnum.obj` 16:10, after these edits).
+  No exestr check: the change adds no string.
+- **No new log line:** the always-on `QUEST complete <id> CLASS CHANGE`, `CLASS GUIDE 1st / 2nd` and `[JUNE_CHAR] LUCIEL DATA class <id>` lines
+  prove the play-test; no `_DEBUG` flag.
+- **Found, routed:** Ara 34 / 124, Elesis 35 / 125 and Add 33 / 36 / 123 / 126 have no seed rows either (their tickets land in the bag): one
+  bullet in `kickoffs/char-add/CHNb.md` (the next class-path phase on the same file). `SetDungeonClearTexture` for 37-39 / 127-129: CH6 walk.
+- **Play-test:** owed (hand-off in the CHN commit's session). Review kickoff `kickoffs/char-luciel/CHN-review.md` written.
+
 ## Phase TU - Tutorial
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TUTORIAL`, sub-tag `TUTORIAL`. Add the
