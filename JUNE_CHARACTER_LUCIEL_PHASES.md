@@ -1765,6 +1765,47 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's; no new define,
   glove swaps, Ciel visible in the village, other classes unchanged. Open, already routed: the window's switch does not yet change the village
   avatar (DU5c, `323f3290` / `323fa700` / `323fad80`); the awakening fire stays behind on Ciel (new phase DU6, user report).
 
+### DU5b2 - Review (2026-11-16)
+
+Opus 5.5 high. Covers DU5b + DU5b2: commits `5b6c5880` (DU5b), `f3c4e39a` (DU5b2), `d2e49ce9` and `f7d74f91` (its two play-test fixes), read
+against June in Ghidra and the exe bytes. **Verdict: pass, no code change.**
+- **Form filter `31f94190`:** the first `SetShowObject` (`31cfe4a0`) is on `+0x1e8` (Lu) with ( `!+0xd80`, `+0xd80` ), the second on `+0xd7c` (Ciel)
+  with ( `+0xd80`, `+0xd80` ). The equip loop matches `+0x1b0` (position) against the kept list and keeps it unless position 2 (`EP_WEAPON_HAND`),
+  Lu shown and the equip is Ciel's (`+0x15d4`). Otherwise it hides when the body differs from the switch (inline `SetShowObject( false )`:
+  `+0x172` = 0, vslot 0x28 when it was shown). Equal to `ApplySwitchingViewFilter`.
+- **`UpdateSwitchingView` `31f93a10`:** shown skin colour (1, 1, 1, 1), viewer scale `+0x128`, rotation `+0x11c`. The back skin (`31f91020`) gets
+  colour `3345993c` (0.3f from the exe) and scale x `3346f728` (a double holding the float 0.85f, 0.8500000238, from the exe), so the port's `0.85f` is exact.
+- **SetUnit's minor switch `31faa6f0 @31faab03-31faac3c`:** June switches on state - 1 (`@31faa760 DEC EAX`), jump table `31faaff8`. Templet
+  `+0x1e0` / `+0x1fc` / `+0x218` / `+0x234` = Common / Field / Lobby / Emotion (`wstring` 0x1c each, `X2Unit.h:443-446` order). Cases: CASHSHOP
+  C+E; ROOM, CREATEUNIT C+L+E; FIELD C+F+E; CLASSCHANGE, SELECTUNIT C+L; CHARINFO, WATCH C; default (NONE, others) C+L+E+F, in that order.
+  Equal to the port's switch, push for push.
+- **`PlayAnim` `31fa3010 @31fa3062-31fa319d`:** body 0 / 2 plays `+0x1e8` and body 1 / 2 plays `+0xd7c`, both behind unit manager `+0x38`, unit
+  `+0x1e0` and templet `+0xaf0`. Ciel's branch: a ChangeAnim miss calls Stop (`31d28d40`), then Play. Equal. The default `UVPB_BOTH` (`f7d74f91`)
+  is the 2 every outside caller passes.
+- **`RemoveEqip` `31f9f560`, line by line:** templet missing -> erase only. Position via `3234fe90` (second ring). Body = Ciel's only for a fashion
+  or accessory (`+6 & 0xf == 3`) item. Fashion branch: when the normal slot is empty and the item is not an accessory, `31fac260` then
+  `32869e10( pos, 0, 0 )`, then `AddEqip`; otherwise the normal shows again. Normal branch: when Ciel's skin exists and the item is not an accessory,
+  it erases and zeroes `[ pos ][ 1 ]` (`( pos * 3 + 0x42 ) * 8` = `+0x208 + 8`). Then `erase`, `31f9e930` or `31f9a2a0` on the flag, and `31f94360`.
+  Equal.
+- **`AddEquipByTID` `31f9c640`:** the `+0x118c` test reads the unit's `[ pos ][ body ]` fashion bytes (`+0xb7d`); position `> 0x26` returns. Dummy
+  UID: -1 on an empty map, else `min( first key, -1 ) - 1` (June's sign / -1 tests). `!bBasic` -> period 2, quantity 1. A negative enchant reads
+  `32882540`. State 3 (`UVS_FIELD`): Lu/Ciel and body != `+0xd80` deletes the dummy and returns. States 7-9 (`UVS_CHARINFO`, `UVS_WATCH`, 9) are not
+  attached to the DG chain. Body 1 -> `+0xd7c` skin, else `+0x1e8`. Then `31f9a2a0` and the state-9 copy (stand-in, DU5c). Equal.
+- **`[ pos ][ 3 ]` at every site:** `cl /P` of `X2UnitViewerUI.cpp` (census `cl_cmd`), flag on: no `m_ViewEquipNormal` / `m_ViewEquipFashion`
+  use with one index survives. The old `[ ePos ]` sites are in March's `#else` bodies or in `JUNE_VIEWER_EQUIP_VISIBILITY`'s dead `#else`, which
+  the header's `#error` keeps dead. No other file reads the tables (`X2Eqip.cpp` / `X2NPCUnitViewerUI.h` hits are comments).
+- **Shown-body local:** `OnFrameMove`, `GetRenderParam`, `OnFrameRender_Prepare` / `_Draw` and `SetPositionOnScr` only re-point `m_pXSkinAnim`.
+  Their reads that need Lu's skin are the weapon effects (`InitWeaponTrace` reads Lu's weapon, already routed to DU5d). Other classes have
+  `+0xd80` = 0, so they are unchanged.
+- **Accepted as is:** `d2e49ce9` adds June's unconditional `Move` after March's `if ( false == m_bFixed )` `Move`. A non-fixed viewer moves twice
+  to the same position (idempotent), so behaviour = June. Not rewritten into `#else`: that would mean a rebuild for no change in behaviour.
+- **Gates:** `finish.py --review --commits 5b6c5880 f3c4e39a d2e49ce9 f7d74f91 --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER -v`:
+  `FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped)`. flagcheck PASS (9 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR). The 1 deleted line is
+  `f7d74f91`'s change of the `PlayAnim` default inside DU5b's flagged declaration, so flag-off = March. `junediverge` PASS; `--check-all` PASS;
+  `enumscan` exit 0; stateends / skillicons / luabind not requested. No OTHER rows.
+- **Build:** no code change; full build skipped: no play-test (DU5b2's `DEPLOY OK` md5 `2c919c74` and the passed run-3 play-test stand).
+- **Next:** DU5c and DU5d are ready (`DU5c.md`, `DU5d.md`). Both edit `X2UnitViewerUI.cpp`, so run them one at a time.
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;
