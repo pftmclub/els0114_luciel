@@ -2735,7 +2735,8 @@ Opus 5.5 high. Reviewed CH1p `b3ddeef9`. **Verdict: pass, no code change.** No d
 ### CH1 - Done (2026-11-15)
 
 Opus 5.5 high. **`SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` and `_DUO` defined** ( `Always.h` ); Lu/Ciel is playable. Files: `Always.h`, `X2Game.cpp`,
-`X2GULuciel.h` / `.cpp`, `X2GUUser.cpp`. funcmap: `grep "(CH1)" june2017_re/funcmap.tsv` ( 4 rows ). Commit: see the STATUS row.
+`X2GULuciel.h` / `.cpp`, `X2GUUser.cpp`. funcmap: `grep "(CH1)" june2017_re/funcmap.tsv` ( 4 rows ). Commit `5e880f3c`; `finish.py --range 5e880f3c^..5e880f3c --with <the 4 flags>`:
+same flagcheck tallies as below, `FINISH RESULT: PASS (9 gates, 0 failed, 3 skipped)`.
 - **Factory ( `_LIVE` ):** `CX2GULuciel::CreateGULuciel` ( Chung's inline pattern, June `3230f470` ) and `case CX2Unit::UT_LUCIEL` in `CX2Game::CreateGUUser`
   and `AddUserUnitIntruder` ( June case 10 at @`322ceeb4` / @`322d5d8f`; which caller is which is left to the review ). `X2Game.cpp` includes `X2GULuciel.h`.
 - **Switching guide ( `_LIVE`, CH1a0 amendment ):** `UpdateLucielSwitchingGuideUI( &false, 0.f )` in the `CX2Game` ctor ( @`32307bca` ) and dtor ( @`32308957` ),
