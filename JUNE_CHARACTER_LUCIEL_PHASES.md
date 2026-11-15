@@ -1953,6 +1953,32 @@ Found by the user in the DU5b2 play-test: awakening with Ciel active left the fi
   switch; Elsword and Aisha awakening unchanged. Visual check only ( DU6 adds no log line ).
 - **Next:** `/x2-phase char-luciel DU6 review` (Opus 5.5 high).
 
+### DU6 - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed commit `04ab6729` against June's listing (`disasm_range.py 32291060 32291440`) and the exe bytes. **Verdict: pass, no code change.**
+- **Positions:** each of the eight calls is vslot 0x84 with one string; the strings read from the exe are `3345bbc8` `Bip01_R_Foot`, `3345bbac`
+  `Bip01_L_Foot`, `3347481c` `Bip01_R_UpperArm`, `334747f8` `Bip01_L_UpperArm`. Right-facing ( vslot 0x170 == 1 ): R_Foot -> handle +0xcbc
+  ( `m_hHyperBoostRFoot` ), L_Foot -> +0xcc0, R_UpperArm -> +0xcc4, L_UpperArm -> +0xcc8; left-facing swaps each pair. Equal to the commit line by line.
+  `SetPosition` is `31cf1a40` ( vec, 0, 0 ), then `+0x3a4 = 1` on all four = March's `SetTrace( true )`.
+- **Emit rates:** remain < max / 3.0 ( `33439b50` ) -> `3345b368` 15 / `33438a8c` 20; remain < max * 0.5 ( `3342ebc8` ) -> 20 / `33441b9c` 30; else
+  30 / `33438b40` 40 (doubles and floats read from the exe). Equal to March's tiers, which the commit keeps.
+- **Which GetBonePos:** June Lu/Ciel vtable `334f06fc` slot 0x84 = `31fda280` = March `CX2GUUser::GetBonePos( const WCHAR* ) const`, which under
+  `JUNE_CHAR_DUO_BODY` takes `GetCloneFrameByBodyPrefix` -> `GetXSkinAnimPtr()` (the active body). June NPC vtable `334ba584` slot 0x84 = `32755aa0`:
+  `+0x8604` skin anim null test, `GetCloneFrame` `31d38a20`, `combineMatrix._41-_43` else zero = March `CX2GUNPC::GetBonePos( const WCHAR* ) const`
+  ( `m_pXSkinAnim`; `INDEPENDENT_ANIMATION_TIME` is off, else NPC would not compile against the pure-virtual const base ).
+- **No re-bind on a body switch:** a `.text` scan for every `[reg + 0xcbc]` operand: the CX2GameUnit / CX2GUUser readers are `32291060` (this one),
+  `31ffda00` `ShowMinorParticleHyperModeTrace` (also positions by vslot 0x84 name; March's already calls `GetBonePos`, so it follows the body too),
+  `3200a730` and `322845c0` (show / hide only: sequence `+0x172`, no position), create / destroy / ctor sites, and the per-class
+  `HyperModeBuffEffectStart` overrides (Lu's `32b1f0b0` = vslot 0xc4, reached at awakening start). `SetActiveBody` `3204e030` touches no handle.
+- **Flag-off = March:** `cl /P` ( census `cl_cmd` ) of `X2GameUnit.cpp` with the flag on, of a scratch copy with the guard renamed (flag off), and of
+  `04ab6729^`: flag-off equals the base after normalising file paths and line numbers ( 379,527 lines each ); flag-on differs only in the eight
+  `SetPosition` lines.
+- **Gates:** `finish.py --review --commits 04ab6729 --with SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT -v`: `FINISH RESULT: PASS (7 gates, 0 failed,
+  3 skipped)`; flagcheck PASS ( 1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL; 0 deleted lines ); `junediverge` PASS; `junediverge --check-all` PASS; `enumscan`
+  exit 0; stateends / skillicons / luabind not requested (nothing registered or staged). No OTHER rows to explain.
+- **Build:** no code change; full build skipped: no play-test (DU6's `DEPLOY OK` and passed play-test stand).
+- **Next:** none from DU6. Waiting on the user: the DU5b + DU5b2 batched play-test, then the CH2d3 play-test.
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under
