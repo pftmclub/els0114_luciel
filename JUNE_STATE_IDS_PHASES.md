@@ -1,0 +1,114 @@
+# June user state ids - March's `USER_STATE_ID` takes June's numbers
+
+Plan key `june-state-ids` · backlog Stage 41 · branch `main` · created 2026-11-15 (planning session, brief `kickoffs/june-backlog/stage41-plan.md`).
+Flag `SERV_IRUHADEV_JUNE_USER_STATE_IDS` (+ `_DEBUG` in S1 only) · log tag `[STATE_IDS]` (`python tools/logs.py --tag STATE_IDS`) · kickoffs
+`kickoffs/june-state-ids/`.
+
+## Context
+
+March's `CX2GUUser::USER_STATE_ID` (`X2Lib/X2GUUser.h:578-721`) and June's agree up to 23 and then fall behind. Lu/Ciel registers every state at
+June's id, so every engine `StateChange( USI_* )` at 24 or above sends Lu to the wrong state, `InitEventStates` overwrites `LSI_RIDING_SPECIAL_MOVE`
+( 92 ), and `m_bBoundingStatesReady` stays false (char-luciel CH1m / CH1n / CH1o Done notes). **User, 2026-11-15 (char-luciel CH1o):** shift March's
+enum to June's numbers, with June's members inserted at June's values; every class enum and the core-list `Enum.lua` follow. Getters at every engine site
+were rejected. Precedent: `SERV_IRUHADEV_JUNE_RESERVED_STATE_IDS` (effect C9h-4g, 2026-10-10) shifted the class ids by 11 with `Enum.lua` shipped
+alongside, the same way.
+
+## Census (done in planning, 2026-11-15)
+
+`tools/data/june_user_state_ids.tsv` (147 rows: name, June value, March value, live `Enum.lua` value, note). Sources: June
+`june_src_fixed/data036_kom/Enum.src.lua:11254-11404` (`GUSI_END` = 5); March from `june2017_re/enumprobe.py` (all 101 names resolved, every flag
+inside the enum on: `JUNE_SKILL_SLOT_10`, `RIDING_SYSTEM`, `JUNE_USER_STATE_ID16`, `JUNE_RESERVED_STATE_IDS`); live
+`24965799\kom_contents\data036_kom\Enum.lua:9150-9253` (BOM source, equals March C++ row for row).
+- **June 147 members (`USI_END` 152), March 101 (`USI_END` 106).** March has no member June lacks. The shared names are in the same order, and June's
+  values run 6..152 without a gap. **Inserting June's 46 missing names at June's values makes every shared name equal.** No March member is renumbered
+  or renamed by hand.
+- **The 46 inserted members:** 24 `USI_TRANSCENDENTAL_HYPER_MODE`; 93-109 `USI_RIDING_SPECIFIC` .. `USI_RIDING_ATTACK_X_END`, the 12
+  `USI_QUICK_SLOT_SKILL_[HYPER_]ITEM_1-6`, `USI_CHEAT_CUSTOM_MOTION`; 123-129 the phoenix run (4) and dance (3); 131-151 the 20
+  `USI_SPECIAL_ATTACK_CORE_*` and `TSI_BUFF_COMMON_CLOCK_OF_ELIAN_HALF` (June's own name and prefix, `Enum.src.lua:11402`, kept verbatim).
+- **Every class enum moves by +46:** the nine `*_BASE = USI_END + 1` (`X2GUAdd.h:372`, `X2GUAra.h:60`, `X2GUArme_VioletMage.h:8`, `X2GUChung.h:16`,
+  `X2GUEl.h:12`, `X2GUElsword_SwordMan.h:8`, `X2GULire_ElvenRanger.h:8`, `X2GURaven.h:8`, `X2GuEve.h:8`) go from 107 to 153. `X2GULuciel.h`'s
+  `LUCIEL_STATE_ID` is absolute June numbers and does not move.
+
+## Readers of the numbers (survey, 2026-11-15)
+
+| Reader | Verdict |
+|---|---|
+| Class enums at `USI_END + 1`, `_CONST_GUUSER_::aNormal/aHyperSkillStateID[SlotB]` (`X2GUUser.h:5974-5993`), `UserSkillTree` switch, `aiState[]` tables | by name: shift with the enum |
+| Range tests `USI_DAMAGE_GROGGY..USI_DAMAGE_GRAPPLED_FRONT` (`X2GURaven.cpp:21161`, `X2GuEve.cpp:49900`), `USI_RIDING_WAIT_HABIT..USI_RIDING_DASH_JUMP_LANDING` (`X2GUUser.cpp:47548`) | safe: no inserted id falls inside either block (24 sits before GROGGY; riding ends at 92) |
+| Sync data, `UserUnitStateData::stateID`, the state map, `UnitCondition::nextState`, P2P `m_ucNowState` | USHORT / short under `JUNE_USER_STATE_ID16`: safe up to 65535 |
+| Offline emulator, `X2OfflineDB`, `els_db.sql`, packets in `KncWX2Server/Common` | no user state id stored or sent: safe |
+| Buff / finalizer / effect-set state ids (`X2BuffFinalizerTemplet.cpp:765-811`, `X2BuffTemplet.cpp:2474-2536`, `X2EffectSet.cpp:3523`) | runtime values from names: safe |
+| **`X2TrainingGameUI.cpp:98, 277, 343`** `GetNowStateID() == (const char) iStateID` | **edit (S1):** a signed char never matches above 127; after the shift every class state is 153 or above. Compare as int |
+| `X2StateDungeonGame.cpp:4121, 4451` `(char)GetNowStateID()` (TextOutSkillList, no caller: `c3d1_state_id_sites.tsv` row 12) | dead: left, noted |
+| **`Enum.lua` `USER_STATE_ID`** (`GUSI_END + n` rows) | **edit (S1):** June's table rows, same pack as the exe. `CHUNG_STATE_ID` / `ARA_STATE_ID` (`USI_END + n`) follow by themselves |
+| `Enum.lua` absolute class tables `ELSWORD_SWORDMAN` / `ARME_VIOLEMAGE` / `LIRE_ELVENRANGER` / `RAVEN` / `EVE` (`*_BASE = 6`) | already out of step with C++ (107) before this plan; the shift changes nothing. Routed (below) |
+| Class scripts, `CommonSkillState.lua`, NPC scripts | read names through `Enum.lua` at load, or use string state names: follow |
+| `tools/luabind.py` STATE gate, `tools/stateends.py` | parse the enum or names, no hard-coded numbers: the gate S1 runs |
+| `X2GULuciel.*` (absolute June ids, `StateChange( 263 / 268 )`, shadow `USI_SPECIAL_ATTACK_*` = 50-69, member-scope tables `X2GULuciel.cpp:14224-14227`) | right after the shift; tidy in S2 |
+| No `static_assert` on state values, no `[USI_END]` array, no `USI_X + i` arithmetic, no numeric state id in any March class | - |
+
+**Routed, not this plan's subject:** the five absolute class tables in `Enum.lua` feed the 23 `Dungeon_Training_*` scripts (data035) through
+`X2TrainingGameUI` and were already wrong before this plan (Lua `ESSI_COMBO_X1` 60, C++ about 122). Owner: backlog Stage 2's training-game bullet (added
+2026-11-15). The plan fixes only the char cast, which the shift would otherwise make worse.
+
+## Rules for this plan
+
+- Standing rules: `CLAUDE.md`, `JUNE_PORT_BACKLOG_ORDER.md` "Standing rules". Enum rule: June's names go inside March's enum under the flag; never
+  renumber or rename a March member; the inserted members do the shifting.
+- **The exe and `data036.kom` ship together.** With the flag on, the staged `Enum.lua` must carry June's `USER_STATE_ID` rows; with the flag off it
+  needs March's rows back (the `luasrc.py` backup / `kom_contents_bytecode` snapshot). The flag's `Always.h` description says so, as `RESERVED_STATE_IDS`' does.
+- **`X2GUUser.h` and `X2GULuciel.*` are shared with char-luciel.** S1 runs alone in `X2GUUser.*`; S2 runs alone in `X2GULuciel.*`. Neither runs beside a
+  char-luciel phase that has uncommitted edits in those files.
+- **Gate: `tools/stateids.py check` (S1 writes it).** It resolves every `USER_STATE_ID` name with `enumprobe.py`, then compares the result with June's
+  `Enum.src.lua` table and the staged `Enum.lua`. `RESULT: PASS` means all three agree on every name. Rose and Ain reuse it.
+
+## Starting context
+
+- Tools: `tools/bytepatch.py` (`X2GUUser.h` is CP949), `tools/finish.py`, `tools/build.py --deploy`, `tools/luasrc.py` (Enum.lua is core-list BOM
+  source: edit, `luasrc.py refresh`, `ledger --check`), `tools/kom.py pack data036` / `copy data036`, `tools/luabind.py check`, `tools/logs.py`,
+  `june2017_re/enumprobe.py` (a file of expressions; makes and deletes its own probe in `X2Lib`).
+- Census: `tools/data/june_user_state_ids.tsv`. June table: `june_src_fixed/data036_kom/Enum.src.lua:11254-11404`.
+- Existing flags inside the enum: `SERV_IRUHADEV_JUNE_USER_STATE_ID16` (`Always.h:6188`), `SERV_IRUHADEV_JUNE_RESERVED_STATE_IDS` (`Always.h:6493`).
+
+## S1 - The shift: June's 46 members, `Enum.lua`, the training-UI casts, regression play-test
+
+**Scope.** In `X2GUUser.h`'s `USER_STATE_ID`, under `SERV_IRUHADEV_JUNE_USER_STATE_IDS`, insert the 46 census members at their June positions, each with
+an explicit `= <June value>`. The flag `#error`s without `JUNE_USER_STATE_ID16` and `JUNE_RESERVED_STATE_IDS`. Write `tools/stateids.py check` (rules).
+Change the three `X2TrainingGameUI.cpp` casts to int compares under the same flag. Replace the staged `Enum.lua` `USER_STATE_ID` rows with June's table
+(core list; `luasrc.py refresh`; ledger), then pack and copy data036. A `_DEBUG` line logs every `StateChange` to a user state id that the unit has not
+registered (`[STATE_IDS] UNREGISTERED <class> <id>`, throttled), unless March already logs that case, in which case the phase uses March's line.
+Full build + deploy. One regression play-test over every live class (see the kickoff).
+**Run with.** Sonnet 5.5 / high (the census fixes the list; the work is transcription and data). Opus 5.5 / high review.
+**Read list.** This doc: "Census", "Readers of the numbers", "Rules for this plan", "S1"; `Always.h:6480-6512`.
+**Done gate.** `stateids.py check` PASS; `luabind.py check Ara_Martial_Artist Chung_Iron_Cannon` STATE gate PASS; `finish.py` PASS; `DEPLOY OK` +
+`PACK OK` / `COPY OK`; play-test passed; the log shows no `UNREGISTERED` line from a March class.
+
+## S2 - Lu/Ciel on the shared numbers
+
+**Scope.** In `X2GULuciel.*` (inert `_CORE`), after S1:
+1. Drop the shadow copies June's names now share with the base. CLAUDE.md: when March's and June's names share a value, March's is used. These are
+   `USI_SPECIAL_ATTACK_1` .. `_SLOTB_HYPER_5` (50-69; CH1n) and any other `LUCIEL_STATE_ID` member that only re-declares a `CX2GUUser` name.
+   Prove each removed value equals the base value with `enumprobe.py`.
+2. List the `LSI_*` members that now equal base members: riding 72-92 (`LSI_RIDING_*`), event kit 110-119, bounding 120-122, `LSI_WAIT_STATE_CHANGE`
+   130, the slot states. Keep June's `LSI_` names, since they are June's Lu table. The one-line comment says they equal `USI_*`.
+3. **`InitBoundingStates` / `InitWaitStateChange`.** CH1m registered Lu's bounding rows (120-122) and the wait change (130) inline because March's ids
+   were 102-104 / 105. Compare June's namesakes (the bounding vslots 0x5d4-0x5e4 Lu calls, and June's wait-change helper) with March's bodies in Ghidra.
+   If they match (junediverge rule), Lu calls them: `m_bBoundingStatesReady` is set and RT_BOUNDING works. Ciel's bounding (417-419) stays inline,
+   and the flag `m_bBoundingStatesReady` is set the way June sets it. If they differ, add a divergent-table row and the replacement in the same commit,
+   or route it.
+4. Re-check `StateChange( 263 )` / `( 268 )` and the member-scope slot tables (`X2GULuciel.cpp:14224-14227`) against the base tables: after S1 the two
+   must agree.
+5. In `Always.h`, add the guard `#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE needs SERV_IRUHADEV_JUNE_USER_STATE_IDS`, confirmed with `cl /EP`.
+6. Close the CH1m / CH1o seam notes: amend char-luciel `CH1.md` (nothing left for the engine id seam) and `CH1o2.md` / `CH1o3.md` if they name the seam.
+
+**Run with.** Opus 5.5 / high (Ghidra comparison). No review of its own: char-luciel CH1's review covers it (inert class code; `CH1.md` amended).
+**Read list.** This doc: "Census", "S2"; char-luciel `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH1m - Done (2026-11-15)", "CH1n - Done (2026-11-15)".
+**Done gate.** `finish.py --files X2GULuciel.cpp X2GULuciel.h --state ...` PASS; `/Zs` probe of `X2GULuciel.cpp` plain and with
+`/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, 0 errors. Full build skipped: no play-test (Lu goes live in CH1).
+
+## Z - Close
+
+**Scope.** `MODS.md` row (flag, the `Enum.lua` coupling, how to revert); backlog Stage 41 closed; `STATUS.md` block to `STATUS_ARCHIVE.md` plus a
+*Closed plans* row; `tools/README.md` row for `stateids.py`; checklist row in `JUNE2017_CHARACTER_PORT_CHECKLIST.md` (new characters register at June's
+ids with no shadow names; run `stateids.py check`). Stage-end census (`junebinary.py --check`, `v2_exclusions.py`).
+**Run with.** Sonnet 5.5 / medium. **Done gate.** Both census tools `RESULT: PASS`; STATUS archived.

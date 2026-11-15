@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel CH1` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | CH1p review, CH1a2 review, CH1a3 review, NU4 review, CH0b, **plan `june-state-ids`'s last code phase** ( user, 2026-11-15 ) |
+| Depends on | CH1p review, CH1a2 review, CH1a3 review, NU4 review, CH0b, **`june-state-ids` S2** ( user, 2026-11-15; S2 = that plan's last code phase ) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO` defined |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL CORE` / `DATA`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | kickoffs/char-luciel/CH1-review.md (Opus 5.5 high; the phase writes it when done) |
@@ -74,5 +74,9 @@ Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_
 - **Waits for plan `june-state-ids`** ( user, 2026-11-15 ): March's `USER_STATE_ID` shifts to June's numbers, so the engine's riding / slot / event / bounding /
   wait-change state changes land on Lu's June-numbered states. After it, set `m_bBoundingStatesReady` for Lu / Ciel ( CH1m registers bounding inline ) and check
   that `InitEventStates` no longer overwrites `LSI_RIDING_SPECIAL_MOVE`.
+  **Amended by june-state-ids planning (2026-11-15):** that plan's S1 shifts the enum ( 46 June members, `USI_END` 106 -> 152, every class +46,
+  `Enum.lua` with it ) and S2 does the Lu/Ciel part ( shadow `USI_SPECIAL_ATTACK_*` dropped, `InitBoundingStates` / `InitWaitStateChange` or a
+  replacement, `m_bBoundingStatesReady` ); S2 has no review of its own, so this phase's review covers S2's diff. Read S2's Done note
+  ( `python tools/docsection.py JUNE_STATE_IDS_PHASES.md "S2 - Done"` ) before the task.
 - `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( CH1o, defined ) is live for every class from CH1o on: the regression part of this play-test walks one other class
   ( emotion, a skill, a dash, a jump, a death ) to show nothing changed.

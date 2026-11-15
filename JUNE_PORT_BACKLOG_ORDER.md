@@ -77,6 +77,7 @@ The user's remaining backlog, in the order they listed it:
 | 38 | June village / field game core *(added 2026-11-09, june-census V2)* | - (found by the census) | Not a backlog item but unowned June code: `CX2TFieldGame` (121 functions) and `CX2SquareUnit` (47) beyond the entrance lists Atlas and Stage 24 touched. Brief `kickoffs/june-backlog/stage38-plan.md`. |
 | 39 | June game-event systems *(added 2026-11-09, june-census V2)* | - (found by the census) | Not a backlog item but unowned June systems: `CX2CustomEventManager` + `CX2CustomEventItemSlotManager`, `CX2LVUpEventMgr`, `CX2RandomMission` (148 functions); date windows switch on from the save DB. Brief `kickoffs/june-backlog/stage39-plan.md`. |
 | 40 | Triage of the June code no address can place *(added 2026-11-09, june-census V2)* | - (found by the census) | 191 address gaps (9,641 functions) lie between source files of different systems, plus the boss raid class (9); a read-only Opus triage names their classes and routes each run to a stage, a new stage or an exclusion. Runs first among 38-40, with anything. Brief `kickoffs/june-backlog/stage40-plan.md`. |
+| 41 | March's user state ids take June's numbers *(added 2026-11-15, user: char-luciel CH1o)* | - (found by char-luciel CH1m) | `USER_STATE_ID` gets June's 46 missing members at June's values; every class enum and `Enum.lua` follow; Lu/Ciel drops its shadow names. **Planned 2026-11-15:** plan `june-state-ids` (`JUNE_STATE_IDS_PHASES.md`). |
 
 **Concurrency.** There is one working tree and one branch, `main` (user, 2026-10-16). Every stage's code sessions commit onto it with explicit pathspecs; no stage creates a branch or a worktree, and nothing is merged.
 
@@ -232,6 +233,11 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   (`GetActualCoolTime`) with June's third argument true (`@31fd9069`) and writes the result with `32893880`. It is the only caller that passes true; Eve's
   override `32979420` then returns the base cool time for Link Overcharge Illusion 25601 / 25604 instead of -1 under Ferdinand (BTI 409). March's equip
   change sets no cool time and its virtual has two arguments. Every class; port `31fd8ff0` whole, with the third argument on every override.
+- **Training-dungeon state tables** (june-state-ids planning, 2026-11-15). `Enum.lua`'s absolute `ELSWORD_SWORDMAN_STATE_ID` / `ARME_VIOLEMAGE_STATE_ID` /
+  `LIRE_ELVENRANGER_STATE_ID` / `RAVEN_STATE_ID` / `EVE_STATE_ID` (`*_BASE = 6`; June's `Enum.src.lua` has the same shape, Raven at 89) feed the 23
+  `Dungeon_Training_*` scripts (data035) through `X2TrainingGameUI`, but C++ puts those classes at `USI_END + 1` (107 today, 153 after june-state-ids S1):
+  the training waits compare against wrong ids. Find June's own reader (June's training-UI state compare and how June's C++ bases relate to these tables)
+  before changing data; june-state-ids S1 fixes only the signed-char cast (`X2TrainingGameUI.cpp:98 / 277 / 343`).
 - **Training-game F5 / F6 / F7 keys** (char-elsword CH1q2, 2026-11-04). June's `CX2Game::KeyProcess` `322f7170` training block (June states
   0x12 / 0x1a, `@322f7a40`-`322f7b81`): F5 (0x3f) full HP, F6 (0x40) full MP and one awakening orb (Add: her own value, `329e2170` -> vslot `0x6c4`;
   Ain 0xc: count 3) plus `32894490( 1 )`, then June-only F7 (0x41) -> `322ed400`: one step of my unit's class gauge per unit type. Elsword (1) / Elesis
@@ -1704,6 +1710,9 @@ inserted at June's values; every class enum and the core-list `Enum.lua` follow)
   every live class (riding, a skill slot, an event state, the wait change after a win).
 - **Gates:** char-luciel CH1 final (the Lu/Ciel play-test) waits for this plan's last code phase.
 - **Depends on:** nothing. Start: `/x2-phase new-plan june-state-ids` (Opus 5.5 high), brief `kickoffs/june-backlog/stage41-plan.md`.
+- **Planned 2026-11-15:** `JUNE_STATE_IDS_PHASES.md` + `kickoffs/june-state-ids/` + the `june-state-ids` STATUS block. S1 (the shift, `Enum.lua`, regression
+  play-test over every live class), S2 (Lu/Ciel tidy; char-luciel CH1 depends on it), Z. Census `tools/data/june_user_state_ids.tsv`: June's 46 missing members
+  inserted at June's values make all 101 shared names equal; `USI_END` 106 -> 152.
   Touches `X2GUUser.h` and every class header's state enum: one at a time with a char-port phase in `X2GUUser.*`.
 
 ## Open decisions that gate stages
