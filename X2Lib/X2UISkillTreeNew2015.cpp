@@ -1550,11 +1550,21 @@ void CX2UISkillTreeNew::CreateSkillTreePortrait( CX2Unit::UNIT_CLASS eUnitClass,
 	/// are what keeps each tab's statics off the other tab ( play-test 2026-10-18: the command background showed on the skill tab )
 #ifdef SERV_IRUHADEV_JUNE_SKILL_TREE_PANELS
 	/// @328e9104..328e912e ( June passes its 2nd argument, my unit +0x3c, to 3220bdb0 and 328e8820 as their "minor" flag )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
+	/// char-luciel CH5: the flag is "my unit is UT_LUCIEL" ( the byte June stores at [esp+0x18] @328e8f44, passed @328e9117 / @328e912a ), not +0x3c
+	const bool bMinorForm = ( NULL != g_pData->GetMyUser() && NULL != g_pData->GetMyUser()->GetSelectUnit() && CX2Unit::UT_LUCIEL == g_pData->GetMyUser()->GetSelectUnit()->GetType() );
+	m_kSkillCommandDesc.Reset();
+	if ( NULL != g_pData->GetSkillTree() )
+		g_pData->GetSkillTree()->LoadSkillCommandDescription( static_cast<int>( eUnitClass ), bMinorForm, &m_kSkillCommandDesc );
+	CreateMajorSkillPanel( eUnitClass );
+	CreateMajorCommandPanel( eUnitClass, bMinorForm );
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 	m_kSkillCommandDesc.Reset();
 	if ( NULL != g_pData->GetSkillTree() )
 		g_pData->GetSkillTree()->LoadSkillCommandDescription( static_cast<int>( eUnitClass ), bTranscended_, &m_kSkillCommandDesc );
 	CreateMajorSkillPanel( eUnitClass );
 	CreateMajorCommandPanel( eUnitClass, bTranscended_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI
 #else SERV_IRUHADEV_JUNE_SKILL_TREE_PANELS
 	RegisterMajorSkillPanelControls();
 	RegisterMajorCommandPanelControls();
