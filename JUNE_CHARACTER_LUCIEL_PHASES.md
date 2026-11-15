@@ -3311,6 +3311,34 @@ No review of its own ( the CH2b review covers it; the debug define stays on ). C
   ( cost `32b14f70` > points `32b0fa00` -> fade picture ); March has none. Lu/Ciel HUD, so `CH5.md` ( amended ), not this phase.
 - **Next:** CH2b ( Sonnet ) and its review.
 
+### CH2b - Done (2026-11-15)
+
+Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's, no new define ) and the temporary `_SKILL_DEBUG` ( stays on until the CH2b review ). Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h`
+( BTI 460 / 464 / 520, BFI 524 under `JUNE_ENUM_NAMES` ), `MODS.md`, `JUNE_BUGS.md` 740, `funcmap.tsv` ( `grep "(CH2b)"`, 9 rows ), `kickoffs/char-luciel/CH2b-review.md` ( covers CH2a, CH2a2, CH2b ). Commit: see git log `char-luciel Phase CH2b`.
+- **27 functions + 5 setter cases + 2 registrations.** Seven preloads ( strings read from the listing ), Dead Hands ( 5 ), Dark Crescent ( 6 ), Ruinous Impact ( 5 ), Power of Oriax ( 3 ), Apollyon ( 4 ),
+  Blasting Fear and Backstab ( Init + the shared EventProcess each ). Four EventProcess are the CH2a cancel chain unchanged ( normalised listings equal ); Dead Hands adds a head ( animation end or the table's event time
+  passed -> wait ), Dark Crescent's lands into `LSI_LU_JUMP_LANDING` when the foot is on a line, Ruinous Impact's at the end casts Dark Crescent through `TryUseSkillWithCombinationPoint` when learned and 5 presses were counted.
+  Cases: 30008 / 30038, 30010 / 30062, 30011 / 30063, 30203 / 30213 ( + male 296 ), 30205 / 30307 ( + male 297 ), each with the hyper copies June makes ( `ch1n_skill_cases.tsv` ). 298 / 299 replace CH1m's markers; `ch1m_regcheck.py` 339 matched, 0 problems.
+- **Bodies of note.** Dark Crescent's start-future is Aisha's `32cd4830` target pick over `m_vecDarkCrescentTargetUnit` ( AT_SPECIAL for the invincible test, no physic loop ), only when the previous state's skill was Ruinous Impact,
+  and it clears the vector on every path. Apollyon at 1.5 s: takes the Seized by Fear stacks ( BTI 460 ) of every enemy in range, multiplies the power rate by `count x ( rate - 1 ) + 1`, plays the `Attack` / `_MEMO` set and the
+  `_FX` / `_MemoFX` set scaled by `count x size + 1.2 / 1.0`, and with Throne Authority ( 30417 ) can cut cool times and give combination points. Dead Hands' buff is BFI 524 at 0.7 s.
+- **June +0x9444 ( `m_eStateStartSkillID` ).** June's `CommonStateStart` copies the state's skill id into it; Ruinous Impact's start reads it **before** its own CommonStateStart ( the previous state ), Dark Crescent's start-future too.
+  March's `GetNowStateSkillID()` is already the new state there, so `CX2GULuciel` keeps its own copy ( written after `CX2GUUser::CommonStateStart` ). `31edf560` is a new `CX2GULuciel::IsSkillOrUpgrade` ( Chung's body ).
+- **CH1a fix.** `TryUseSkillWithCombinationPoint` ( June `32b3acf0` ) returns bool: June's `al` is 0 at every refusal and 1 after the skill started; CH1a ported it void. No caller existed before Ruinous Impact.
+- **Stand-ins / not written.** Dark Crescent's 0.25 s memo block ( skill memo 610011 ) is behind June's `31fca9e0` stub ( answers 0 ), as Evil Claw's memo sets in CH2a. Apollyon's stacks come from the Seized by Fear passive ( CH4a ): until then the
+  count is 0 and the power rate is unchanged.
+- **June bug found.** JUNE_BUGS 740: Apollyon's Throne Authority roll passes at or above the rate ( the memo-set roll before it passes at or under ). Kept.
+- **Debug lines ( `_SKILL_DEBUG` ).** `dead hands buff level <n> skill <id>`, `ruinous impact end presses <n> targets <n>`, `dark crescent start previous skill <id> targets <n>`, `dark crescent slash set played`,
+  `apollyon stacks <n> max <n> range <r> attack step <a> size step <s> memo set <0|1>`. Damage numbers: `[JUNE_SKILL] NUM use`.
+- **Gates:** `finish.py --files X2GULuciel.cpp X2GULuciel.h X2BuffFactor.h --with JUNE_CHAR_LUCIEL_SKILL JUNE_CHAR_LUCIEL_SKILL_DEBUG JUNE_ENUM_NAMES --state X2GULuciel.cpp Luciel_Duo --icons 30001-30307`: flagcheck `JUNE_CHAR_LUCIEL_SKILL` PASS
+  ( 3 OTHER: the `_CORE` enclosure; the `return` -> `return false` lines are the CH1a fix ), `JUNE_ENUM_NAMES` PASS ( 1 PASS~, 2 OTHER ), junediverge PASS, enumscan exit 0, stateends PASS, skillicons PASS,
+  `FINISH RESULT: PASS (7 gates, 0 failed, 1 skipped)` ( luabind: no script staged ). `/Zs` probe of `X2GULuciel.cpp`: exit 0.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,962,432 B, dated 2026-11-15 19:41:20, md5 f9a0cda252fc7f6b92f966694b6de7dc, equal to X2/US_SERVICE/x2.exe (2026-11-15 19:41:13); built at main 6d076802 + 3 uncommitted code file(s)`
+  ( mine ). `EXESTR OK: 5 of 5` ( the five debug lines ), `2 of 2` ( `LSI_SA_LLC_DARK_CRESCENT`, `LSI_A_LLC_M_BACKSTAB` ), `1 of 1` wide ( `EffectSet_SA_LLC_APOLLYON_Attack_MemoFX` ).
+- **Play-test save ( `elsdb`, backups `db_backup/*pre_createchar*` ):** `LuChA` ( unit 193, class 37, level 70: the five Chiliarch bases + Blasting Fear + Backstab at level 1, upgrades level 0 ) and `LuChB` ( unit 194: upgrades level 1,
+  bases level 0 ). Page 1: A bank Dead Hands / Ruinous Impact / Dark Crescent / Blasting Fear, B bank Power of Oriax / Apollyon / Backstab; page 2 swaps the banks.
+- **Next:** play-test, then `/x2-phase char-luciel CH2b review` on Opus 5.5 high.
+
 ### CH2d20 - Done (2026-11-15)
 
 Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`, `Always.h`. Flags: `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`

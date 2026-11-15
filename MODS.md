@@ -7149,6 +7149,15 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` (`Always.h`; `#error` without `..._L
 - **Damage.** The skills' damage is the numerical tables of June's `Luciel_Duo.lua` states and damage effects ( no C++ number ); March has no Lu/Ciel, so the number is read from the `[JUNE_SKILL] NUM use` lines of the play-test.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 8 Lu/Ciel, CH2b: Chiliarch skills (char-luciel CH2b, 2026-11-15)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ) and its temporary `..._SKILL_DEBUG` ( retired by the CH2b review ); `SERV_IRUHADEV_JUNE_ENUM_NAMES` gains BTI 460 / 464 / 520 and BFI 524. Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH2b - Done"; log lines `[JUNE_CHAR] LUCIEL SKILL ...`.
+- **What changes in game.** Dead Hands ( 30008 / 30038 ), Power of Oriax ( 30010 / 30062 ), Apollyon ( 30011 / 30063 ), Blasting Fear ( 30203 / 30213 ) and Backstab ( 30205 / 30307 ) get their states, callbacks and the male Blasting Fear 296 / Backstab 297 states in `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex`; Dark Crescent ( 298 ) and Ruinous Impact ( 299 ) are registered in `InitStateCommon` ( their skills ride the chain below ).
+  Dead Hands gives its buff ( BFI 524 ) at 0.7 s and counts presses of the skill's key ( up to 5 ) in Ruinous Impact. Ruinous Impact, at its end with Dark Crescent learned and 5 presses, casts Dark Crescent; Dark Crescent, after Ruinous Impact, lands at the nearest enemy Ruinous Impact hit ( a facing one first, within 700 ) and plays its slash set at 0.2 s. Apollyon, at 1.5 s, takes the Seized by Fear stacks off every enemy in range ( up to the skill's count ), multiplies its power rate by 1 + stacks x ( rate - 1 ) and plays two effect sets scaled by the stacks; Throne Authority can cut cool times and give combination points. Power of Oriax, Blasting Fear and Backstab end into wait at animation end.
+- **Differs from March.** None to compare ( Lu/Ciel is new ). Stand-ins: the Dark Crescent memo block ( skill memo 610011, June's stub answers 0 ) is not written. CH1a's `TryUseSkillWithCombinationPoint` now answers whether the skill started ( June's `al` ), and `CX2GULuciel` keeps the skill of the last state that ran CommonStateStart ( June +0x9444 ).
+- **Damage.** The numerical tables of June's `Luciel_Duo.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ## Engine R14c: the basic-item anim behind every attach-anim weapon's hits (june-engine R14c, 2026-11-15)
 
 Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (`Always.h`; `#error` without `..._JUNE_EQIP_ATTACH_ANIM`, `..._DIVERGE_UPDATE_EQUIP_COLLISION_DATA`, `..._JUNE_ITEM_KIM`, `..._JUNE_EQUIP_EFFECT_SET` and `..._JUNE_ENUM_NAMES`) and the temporary `..._DEBUG` (`[JUNE_ENGINE] EQBASIC` lines; the R14c review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.

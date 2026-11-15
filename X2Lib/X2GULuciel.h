@@ -609,8 +609,8 @@ public:
 	};
 
 	virtual void		CountDamageEffectHit( const CX2DamageManager::DamageData* pDamageData_ );	// own virtual 0x880, June 32b14db0
-	virtual void		TryUseSkillWithCombinationPoint( const CX2SkillTree::SKILL_ID eSkillID_,
-							const CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ );	// own virtual 0x884, June 32b3acf0
+	virtual bool		TryUseSkillWithCombinationPoint( const CX2SkillTree::SKILL_ID eSkillID_,
+							const CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ );	// own virtual 0x884, June 32b3acf0; char-luciel CH2b: June answers whether the skill started ( al )
 	virtual void		PreloadAuraAccelResources();	// own virtual 0x888, June 32ae6130
 
 	// char-luciel CH1k: overrides band 1 part 1 ( June 32ae4080 - 32b1e8e0 ); bases in X2GUUser.h / X2GameUnit.h
@@ -1203,6 +1203,35 @@ protected:
 	void				LSI_A_LD_F_HAUNTING_BEAT_EventProcess();	// June 32aff250
 	void				LSI_A_LD_M_HAUNTING_BEAT_FrameMove();	// June 32ae6790
 	void				LSI_A_LD_M_HAUNTING_BEAT_EventProcess();	// June 32aff050
+	// char-luciel CH2b: Chiliarch ( 37 ) skills ( June 32ae6900 - 32b3d010 )
+	bool				IsSkillOrUpgrade( const int iSkillID_, const int iTarget_ ) const;	// June 31edf560
+	void				LSI_SA_LLC_DEAD_HANDS_Init();	// June 32ae6900
+	void				LSI_SA_LLC_DEAD_HANDS_StateStartFuture();	// June 32ae6a30
+	void				LSI_SA_LLC_DEAD_HANDS_FrameMoveFuture();	// June 32ae6a60
+	void				LSI_SA_LLC_DEAD_HANDS_FrameMove();	// June 32b13180
+	void				LSI_SA_LLC_DEAD_HANDS_EventProcess();	// June 32aff850
+	void				LSI_SA_LLC_DARK_CRESCENT_Init();	// June 32ae6a70
+	void				LSI_SA_LLC_DARK_CRESCENT_StateStartFuture();	// June 32b2ac20
+	void				LSI_SA_LLC_DARK_CRESCENT_StateStart();	// June 32affa70
+	void				LSI_SA_LLC_DARK_CRESCENT_FrameMove();	// June 32b3d010
+	void				LSI_SA_LLC_DARK_CRESCENT_EventProcess();	// June 32affa90
+	void				LSI_SA_LLC_DARK_CRESCENT_StateEndFuture();	// June 32b1d200
+	void				LSI_SA_LLC_RUINOUS_IMPACT_Init();	// June 32ae6ad0
+	void				LSI_SA_LLC_RUINOUS_IMPACT_StateStart();	// June 32affca0
+	void				LSI_SA_LLC_RUINOUS_IMPACT_FrameMoveFuture();	// June 32ae6b40
+	void				LSI_SA_LLC_RUINOUS_IMPACT_FrameMove();	// June 32ae6b30
+	void				LSI_SA_LLC_RUINOUS_IMPACT_EventProcess();	// June 32b16ca0
+	void				LSI_SA_LLC_POWER_OF_ORIAX_Init();	// June 32ae6b80
+	void				LSI_SA_LLC_POWER_OF_ORIAX_FrameMove();	// June 32ae6be0
+	void				LSI_SA_LLC_POWER_OF_ORIAX_EventProcess();	// June 32affcf0
+	void				LSI_SA_LLC_APOLLYON_Init();	// June 32ae6bf0
+	void				LSI_SA_LLC_APOLLYON_StateStart();	// June 32ae6ce0
+	void				LSI_SA_LLC_APOLLYON_FrameMove();	// June 32b2b050
+	void				LSI_SA_LLC_APOLLYON_EventProcess();	// June 32affef0
+	void				LSI_A_LLC_F_BLASTING_FEAR_Init();	// June 32ae7920
+	void				LSI_A_LLC_F_BLASTING_FEAR_EventProcess();	// June 32b01050, also the male body's
+	void				LSI_A_LLC_F_BACKSTAB_Init();	// June 32ae7980
+	void				LSI_A_LLC_F_BACKSTAB_EventProcess();	// June 32b01250, also the male body's
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
 	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
@@ -1348,6 +1377,9 @@ protected:
 	std::vector<SDamageEffectHitCount>	m_vecDamageEffectHitCount;			// +0x9890
 	bool								m_bSkillCameraOverride;				// +0x8d90 ( CX2GUUser's camera group ): stand-in, the reader is Stage 9's camera pair; CommonStateStart clears it
 	float								m_fSkillCameraOverrideValue;		// +0x8da4 ( CX2GUUser's camera group ): stand-in, as above
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+	CX2SkillTree::SKILL_ID				m_eStateStartSkillID;				// +0x9444 ( CX2GUUser ): char-luciel CH2b: the skill of the state that last ran CommonStateStart ( June 32057b80 @32060cd9 )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 };
 
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE

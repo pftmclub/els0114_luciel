@@ -699,6 +699,13 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_P_LDN_STABLE_DARKENERGY               = 895,	// June's Enum.lua; Lu/Ciel's Stable Dark Energy upkeep
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-15 // char-luciel CH2b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_DEBUFF_SEIZED_BY_FEAR                      = 460,	// June's Enum.lua; Apollyon takes its stacks off the enemies it hits
+	BTI_BUFF_POWER_OF_ORIAX                        = 464,	// June's Enum.lua; Apollyon's effect-set chance test
+	BTI_BUFF_POWER_OF_ORIAX_MEMO                   = 520,	// June's Enum.lua; the same test
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID
@@ -1010,6 +1017,11 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_CHASER_OF_DARKNESS_MEMO      = 603,	// June's Enum.lua; Lu/Ciel's Chaser of Darkness fire
 	BFI_BUFF_P_LUCIEL_OPEN_MIND           = 906,	// June's Enum.lua; Lu/Ciel's Open Mind upkeep
 	BFI_BUFF_P_LDN_STABLE_DARKENERGY      = 925,	// June's Enum.lua; Lu/Ciel's Stable Dark Energy upkeep
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-15 // char-luciel CH2b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_BUFF_DEAD_HANDS                   = 524,	// June's Enum.lua; Dead Hands' buff
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };
