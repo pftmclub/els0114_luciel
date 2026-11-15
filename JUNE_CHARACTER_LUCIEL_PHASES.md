@@ -2697,6 +2697,41 @@ one enum-name line under `JUNE_CHAR_DUO_BODY`. No debug define. Commit `b3ddeef9
 - **Watch ( CH4a play-test ):** the key dialog is `SetModal( true )` in June's script; if V does not reach the strike while it shows, that is the modal flag, not the port.
 - **Next:** `/x2-phase char-luciel CH1p review` ( Opus 5.5 high ).
 
+### CH1p - Review (2026-11-15)
+
+Opus 5.5 high. Reviewed CH1p `b3ddeef9`. **Verdict: pass, no code change.** No debug define to retire ( CH1p added none ); `_DUO` stays `//#define` for CH1 final.
+- **`AddCombinationPointOnHit` `32b14bc0`:** `+0x594` `JLE` = `0 <` the point; `FLDZ` / `FCOMP +0x96a8` / `TEST AH,5` / `JNP` skips only an ordered `0 < cool time`, so a NaN
+  adds ( `false == ( 0.f < ... )` ); `UpCombinationPoint( point )` then `FLD1` into `+0x96a8`. Same.
+- **`SetBoundingTarget` `32b38cb0`:** exits in June's order: `0 <= +0x973c` by `TEST AH,0x41` / `JP` ( NaN exits ), uid high / low sign, vslot 0x200 = `GetRidingOn` ( funcmap
+  `3208ddd0` row ), uid `+0x96f0` >= 0 and `+0x96ec` == the serial. Cost: vslot 0x1cc = `GetRandomFloat( 0 )` ( funcmap `32274f60` reads it the same ) `FCOMP` the rate,
+  `JP` -> 1, so `<=` costs 0 and a NaN 1; stored at `+0x96dc` before the points test ( `+0xc04` -> `+0x114` = `GetNowCombinationPoint` `32b0fa00`, null 0 ). Type 0 -> game vslot
+  0xa0 ( uid64 ), 1 -> 0xa8 ( low dword ), else exit ( March `GUT_USER` 0 / `GUT_NPC` 1 ). Stores 0.5 ( `334ed42c`, read from the exe ), `+0x96f8` type, `+0x96f0` uid, `+0x96e8` /
+  `+0x96e0` 0, `SetShow( 1 )`, static `334f34a0` = `"DLG_LUCIEL_BOUNDING_KEY"`, `31cbe6a0` = `CKTDGUIStatic::SetString( int, WCHAR* )` ( same guard as March's ), key 0x27 =
+  `GAMEACTION_SIT` ( counted with `JUNE_SKILL_SLOT_10` defined; `X2KeyPad.cpp` maps it to V ), then `UpdateBoundingKeyDialogPosition` even without the static. Same.
+- **`UpdateBoundingKeyDialogPosition` `32b35cf0`:** null handle -> return; vslot 0x138( 1 ) pos, 0x170 = `GetIsRight` picks + / - vslot 0x16c dir x 100; y + 208 written back into the
+  same vector that later feeds the distance; `GetProj3DPos` / app `+0x1b8` / `+0x1bc`; `SetPos`; game -> vslot 0x94 camera -> `+0x38` eye `+0x44..+0x4c`; distance / 1500; both
+  size halves / that divisor ( `FDIVP` / `FDIVR` read ). Constants 100 / 208 / 1500 read from the exe. **Dialog offset:** June ctor `31cd9230` writes `+0x118` / `+0x11c` 0 ( mouse x / y ),
+  `+0x120` / `+0x124` ( size ), `+0x128` byte, `+0x12c..+0x138` ( drag centre / range ) = March's member order `m_PrevMousePointX/Y`, `m_vSize`, `m_bEnableDraggingRange`,
+  `m_vDraggingRangeCenter`, `m_vDraggingRange`, 0x10 later: `GetSize` / `SetSize` are right. JUNE_BUGS 726 right.
+- **Hooks:** `31fd02d0` = vslot 0x7c4 ( `CommonStateStart` ) then the hook; `3275a070` is called only from NPC `CommonStateStart` @`327af3aa`, first half = March's bounding-up
+  block, second half @`3275a0ac` compares `+0x8708` unguarded, as ported. Both: `+0x40e8` == 0, `32294460` on the `+0x40e0` key ( uid >= 0, game lookup by type ) =
+  `GetUnitByUIDAndType`, unit `+0x867c` -> templet `+0xaf0` -> type == 10 ( `UT_LUCIEL` ), args `+0x264` type, vslot 0x54 uid, `+0x40dc` serial ( March getters cite the same
+  offsets, `X2GameUnit.h:3605` / `5520-5527` ). Same.
+- **Renames:** `+0x96bc` is read and zeroed as a point count by all three June users ( `32b0fa20` stores `CP_AMOUNT`, `32b1eef0` and `32b32550` pay it to `UpCombinationPoint` ):
+  `m_iPendingCombinationPoint` right, JUNE_BUGS 723 rightly withdrawn. `+0x96dc` 0 / 1 cost ( the strike end subtracts it, `CheckBoundingTarget` voids `1 <` it ), `+0x96ec`
+  compared with the serial, `+0x9730` the free-strike roll: names fit; `ch1_offsets.tsv` follows. JUNE_BUGS 727 right ( only `CheckBoundingTarget` writes `+0x96ec`, -1 ).
+  `AddCombinationPointOnHit( const DamageData& )` fits `DelegateProcessWithDamageData` ( `X2GameUnit.h:48` ) for CH4a's push.
+- **Data:** data036 `Enum.lua` `DUO_TYPE` = June `Enum.src.lua:17513-17518` ( 0 / 1 / 2 / 3, order aside ); `luabind.py check DLG_LUCIEL_BOUNDING_KEY`: 14 methods, 0 unbound, ENUM 0
+  missing, PASS. **Routes:** `CH4a.md` ( push @`32b4583e`, `+0x9730` / `+0x973c` ) and `DU3.md` ( `NOT_SHOW_UNIT_BY_DUOTYPE` parse ) amendments present and right.
+- **Gates:** `finish.py --review --commits b3ddeef9 --with JUNE_CHAR_LUCIEL_DUO`: junediverge PASS, `--check-all` PASS, enumscan exit 0; `_DUO` `3 PASS, 1 DEFINE, 3 OTHER, 0 FAIL,
+  0 ERROR`, 0 deleted, its one FAIL line is "not #defined" ( deferred like `_LIVE` ); OTHER = `X2GULuciel.*` ( `_CORE` ) and `X2UnitManager.cpp` ( `DUO_BODY` ), checked below.
+  `flagcheck JUNE_CHAR_DUO_BODY --commits b3ddeef9 --files X2Lib/X2UnitManager.cpp`: `1 PASS` / PASS. `flagcheck JUNE_CHAR_LUCIEL_CORE --with JUNE_CHAR_LUCIEL_DUO --commits
+  b3ddeef9 --files X2GULuciel.cpp X2GULuciel.h`: `2 PASS, 0 FAIL` / PASS, 14 deleted = 10 renamed / rewritten lines in the `.cpp` and 4 member lines in the `.h`, all inside `_CORE`.
+  stateends / skillicons / luabind SKIPPED in finish.py: no skill state registered, no skill added ( luabind run by hand above ).
+- **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GULuciel.cpp`, `X2GUUser.cpp`, `X2GUNPC.cpp`, `X2DamageManager.cpp`, `X2UnitManager.cpp`: plain 5 x 0 errors; with
+  `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO /DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` 5 x 0 errors. Full build skipped: no play-test.
+- **Next:** CH1 ( Opus 5.5 high ): every dependency is now done.
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
