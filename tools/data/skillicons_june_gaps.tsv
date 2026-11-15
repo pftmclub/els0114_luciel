@@ -4,3 +4,5 @@ skill_id	kind	piece	reason
 27414	image	SI_P_AA_SPIRITUAL_EYE	June's DLG_ARA_SKILL_ScreenShot_04.TET has no such piece (the staged sheet is byte-identical to June's); JUNE_BUGS 582
 28208	image	SI_A_SPK_AVATAR_OF_THE_FIRE	June's DLG_Elesis_SKILL_ScreenShot_02.TET has no such piece (the staged sheet is byte-identical to June's); JUNE_BUGS 625
 28229	image	SI_A_SPK_AVATAR_OF_THE_FIRE	same piece as 28208 (the Enhanced skill); JUNE_BUGS 625
+29601	image	SI_HA_AMM_APOCALYPSE	June's DLG_Add_SKILL_ScreenShot_03.TET has no such piece (the staged sheet is byte-identical to June's); JUNE_BUGS 744
+29604	image	SI_HA_AMM_APOCALYPSE	same piece as 29601 (the Enhanced skill); JUNE_BUGS 744

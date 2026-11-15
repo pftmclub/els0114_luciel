@@ -105,7 +105,7 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH0b | ready (char-elesis CH6 done): 7,686 June Add assets staged (new kom data207), packed, copied; PT / LP motions held for CH1 | Sonnet 5.5 / high, user play-test | CH0 (done), char-elesis CH6 | koms, save | `CH0b.md` |
+| CH0b | staged + packed + copied 2026-11-15 (7,686 assets, 31 koms, data207; icons PASS, Apocalypse tree piece = June gap); waits on the user's play-test + check logs | Sonnet 5.5 / high, user play-test | CH0 (done), char-elesis CH6 | koms, save | `CH0b.md` |
 | CH1a | ready (CH0 done, char-elesis Z done): movement and slot-head states; no review of its own | Sonnet 5.5 / high | CH0, char-elesis Z | `X2GUAdd.*`, Always.h | `CH1a.md` |
 | CH1b | blocked (CH1a): reactions; review covers CH1a-CH1b | Sonnet 5.5 / high, Opus review | CH1a | `X2GUAdd.*` | `CH1b.md` |
 | CH1c | blocked (CH1b review): riding, pepper run, dance; no review of its own | Sonnet 5.5 / high | CH1b review | `X2GUAdd.*` | `CH1c.md` |
