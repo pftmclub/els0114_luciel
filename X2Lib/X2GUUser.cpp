@@ -1087,6 +1087,10 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 	m_bHideEquipByBody					= false;	// char-luciel DU1d5: DU3 writes the three
 	m_iHideEquipBody					= 0;
 	m_bHideEquipByBodyApplied			= false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	m_fHideEquipStartAnimTime			= -9999.f;	// char-luciel DU3c: the state start's reset values ( June 32057b80 @320618a8 )
+	m_fHideEquipEndAnimTime				= 0.f;
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 	m_pTransformSkillSlotUI				= NULL;	// char-luciel CH1a0: June ctor @320431fd
@@ -3347,6 +3351,16 @@ void CX2GUUser::InitSocketData()
 		if ( pItem->GetItemData().m_PeriodType == CX2Item::PT_ENDURANCE && pItem->GetItemData().m_Endurance <= 0 )
 			continue;
 #endif REAL_TIME_ELSWORD
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		// char-luciel DU3c: June 3206d770 @3206dc6a, Lu/Ciel sum only the active body's equips and the shared ones ( 3286a4b0 )
+		if ( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
+		{
+			const int iEquipDuoType = GetUnit()->GetInventory().GetEquipDuoType( eqipUID );
+			const int iActiveBody = ( true == m_bMinorUnitActive ) ? CX2Unit::DT_MINOR : CX2Unit::DT_MAJOR;
+			if ( CX2Unit::DT_BOTH != iEquipDuoType && iActiveBody != iEquipDuoType )
+				continue;
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		//}} kimhc // 실시간 엘소드 중 실시간 내구도 감소
 
 		const float fAtkMagic = pItem->GetStat().m_fAtkMagic;
@@ -5429,7 +5443,11 @@ void CX2GUUser::InitEqip()
 	}
 	#else EQUIP_STRIP_TEST
 	//{{AFX
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	UpdateEqip( true );	// char-luciel DU3c: June InitEqip 32024510 @32024551
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	g_pData->GetItemManager()->UpdateEqip( GetUnit(), m_pXSkinAnim, m_pMotion, m_pAniXET, OUT m_ViewEqipList );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	//}}AFX
 	#endif EQUIP_STRIP_TEST
 #endif //EFFECT_TOOL
@@ -19277,6 +19295,24 @@ void CX2GUUser::CommonStateStart()
 			m_bTimeStopImmuneState = bTimeStopImmune;
 	}
 #endif SERV_IRUHADEV_JUNE_HIT_STOP_LISTS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	// char-luciel DU3c: June 32057b80 @320618a8-3206194c, NOT_SHOW_UNIT_BY_DUOTYPE = { start anim time, end anim time, body }
+	m_fHideEquipStartAnimTime	= -9999.f;
+	m_fHideEquipEndAnimTime		= 0.f;
+	m_iHideEquipBody			= 0;
+	m_bHideEquipByBody			= false;
+	if ( true == m_LuaManager.BeginTable( "NOT_SHOW_UNIT_BY_DUOTYPE" ) )
+	{
+		if ( false == m_LuaManager.GetValue( 1, m_fHideEquipStartAnimTime ) )
+			m_fHideEquipStartAnimTime = -9999.f;
+		if ( false == m_LuaManager.GetValue( 2, m_fHideEquipEndAnimTime ) )
+			m_fHideEquipEndAnimTime = 0.f;
+		if ( false == m_LuaManager.GetValue( 3, m_iHideEquipBody ) )
+			m_iHideEquipBody = 0;
+		m_bHideEquipByBody = true;
+		m_LuaManager.EndTable();
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_ENGINE
 	m_bHyperModeBuffPending = IsHyperModeState();		// June 32057b80 @320619a6 ( vslot 0x51c )
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_ENGINE
@@ -20904,6 +20940,9 @@ void CX2GUUser::CommonFrameMove()
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
     }
 #endif  X2OPTIMIZE_NPC_ADAPTIVE_FRAME_MOVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	UpdateHideEquipByBody();	// char-luciel DU3c: June CommonFrameMove @320661f9
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 
 
@@ -39224,6 +39263,167 @@ bool CX2GUUser::IsEquipInViewList( const CX2Unit::EQIP_POSITION eEquipPosition_,
 
 	return false;
 }
+
+// char-luciel DU3c: June 31fe4210, the view list at init; Lu/Ciel's normal item also builds Ciel's equip on the second body
+void CX2GUUser::UpdateEqip( const bool bLoad_ )
+{
+	m_ViewEqipList.resize( 0 );
+
+	CX2Unit* pUnit = GetUnit();
+	const CX2Unit::UNIT_TYPE eUnitType = ( NULL != pUnit->GetUnitTemplet() ) ? pUnit->GetUnitTemplet()->m_UnitType : CX2Unit::UT_NONE;
+	for ( int i = 0; i < pUnit->GetViewEqipNum(); ++i )
+	{
+		CX2Item* pItem = pUnit->GetInventory().GetItem( pUnit->GetViewEqipUID( i ) );
+		if ( NULL == pItem || NULL == pItem->GetItemTemplet() || false == pItem->IsUsableEquip() )
+			continue;
+
+		const int iEnchantLevel = pItem->GetEffectiveEnchantLevel();
+		const CX2Item::ItemTemplet* pItemTemplet = pItem->GetItemTemplet();
+		const CX2Unit::EQIP_POSITION eEquipPosition = pItemTemplet->GetEqipPosition();
+		if ( false == pItemTemplet->GetFashion() && CX2Item::IT_ACCESSORY != pItemTemplet->GetItemType() )
+		{
+			CX2EqipPtr pEquip;
+			if ( false == pUnit->IsFashionEquipInThePosition( eEquipPosition, 0 ) )
+				pEquip = CX2Eqip::CreateEquip( pItem, m_pXSkinAnim, iEnchantLevel, false, bLoad_, eUnitType, false, true );
+
+			if ( CX2Unit::UT_LUCIEL == eUnitType && false == pUnit->IsFashionEquipInThePosition( eEquipPosition, 1 ) )
+			{
+				if ( NULL != pEquip )
+					m_ViewEqipList.push_back( pEquip );
+				pEquip.reset();
+
+				if ( 0 == pItemTemplet->GetItemIDForMinorUnit() )
+				{
+					const wchar_t* pMinorUnitModelName = pItemTemplet->GetCommonItemModelName( CX2Unit::UT_LUCIEL, true );
+					if ( NULL != pMinorUnitModelName && 0 != pMinorUnitModelName[0] )
+						pEquip = CX2Eqip::CreateEquip( pItem, m_pMinorUnitXSkinAnim, iEnchantLevel, false, bLoad_, eUnitType, true, true );
+				}
+				else
+				{
+					CX2Item::ItemData kMinorUnitItemData;
+					kMinorUnitItemData.m_ItemUID	= pItem->GetUID();
+					kMinorUnitItemData.m_ItemID		= pItemTemplet->GetItemIDForMinorUnit();
+					kMinorUnitItemData.m_Endurance	= 1;
+					// stand-in: June's equip never keeps its dummy item; March's basic equip owns and deletes it
+					pEquip = CX2Eqip::CreateEquip( new CX2Item( kMinorUnitItemData, pUnit ), m_pMinorUnitXSkinAnim, iEnchantLevel, true, bLoad_, eUnitType, true, true );
+				}
+			}
+
+			if ( NULL != pEquip )
+				m_ViewEqipList.push_back( pEquip );
+		}
+		else if ( false == pUnit->GetInventory().IsMinorUnitEquipItem( pItem->GetUID() ) )
+		{
+			m_ViewEqipList.push_back( CX2Eqip::CreateEquip( pItem, m_pXSkinAnim, iEnchantLevel, false, bLoad_, eUnitType, false, true ) );
+		}
+		else if ( CX2Unit::UT_LUCIEL == eUnitType )
+		{
+			m_ViewEqipList.push_back( CX2Eqip::CreateEquip( pItem, m_pMinorUnitXSkinAnim, iEnchantLevel, false, bLoad_, eUnitType, true, true ) );
+		}
+	}
+
+	ReplaceEmptyToBasic( bLoad_ );
+}
+
+// char-luciel DU3c: June 31fe3e30, the basic equips for the positions no view equip fills, per body ( 31fca7e0 )
+void CX2GUUser::ReplaceEmptyToBasic( const bool bLoad_ )
+{
+	bool abViewEqipPosition[CX2Unit::EP_END][3];
+	memset( abViewEqipPosition, 0, sizeof( abViewEqipPosition ) );
+	for ( UINT i = 0; i < m_ViewEqipList.size(); ++i )
+	{
+		if ( NULL != m_ViewEqipList[i] )
+			abViewEqipPosition[m_ViewEqipList[i]->GetEqipPos()][( true == m_ViewEqipList[i]->IsMinorUnitEquip() ) ? 1 : 0] = true;
+	}
+
+	const CX2Unit::UnitTemplet* pUnitTemplet = GetUnit()->GetUnitTemplet();
+	ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_DEFENCE_HAIR,	pUnitTemplet->m_BasicHairItemID,	bLoad_ );
+	ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_DEFENCE_FACE,	pUnitTemplet->m_BasicFaceItemID,	bLoad_ );
+	ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_DEFENCE_BODY,	pUnitTemplet->m_BasicBodyItemID,	bLoad_ );
+	ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_DEFENCE_LEG,	pUnitTemplet->m_BasicLegItemID,		bLoad_ );
+	ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_DEFENCE_HAND,	pUnitTemplet->m_BasicHandItemID,	bLoad_ );
+	ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_DEFENCE_FOOT,	pUnitTemplet->m_BasicFootItemID,	bLoad_ );
+	ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_WEAPON_HAND,	pUnitTemplet->m_BasicWeaponItemID,	bLoad_ );
+	if ( CX2Unit::UT_RAVEN == pUnitTemplet->m_UnitType )
+		ReplaceEmptyToBasic( abViewEqipPosition, CX2Unit::EP_RAVEN_LEFT_ARM, pUnitTemplet->m_RavenLeftArmItemID, bLoad_ );
+}
+
+// char-luciel DU3c: June 31fe2fb0, the first body's basic equip and, when the basic item has a minor-unit id, the second body's
+void CX2GUUser::ReplaceEmptyToBasic( const bool abViewEqipPosition_[][3], const CX2Unit::EQIP_POSITION eEquipPosition_, const int iItemID_, const bool bLoad_ )
+{
+	if ( 0 == iItemID_ )
+		return;
+
+	CX2Unit* pUnit = GetUnit();
+	CX2Item::ItemData kBasicItemData;
+	kBasicItemData.m_ItemID		= iItemID_;
+	kBasicItemData.m_Endurance	= 1;
+	CX2Item kBasicItem( kBasicItemData, pUnit );
+	if ( NULL == kBasicItem.GetItemTemplet() )
+		return;
+
+	const int iEnchantLevel = kBasicItem.GetEffectiveEnchantLevel();
+	const int iMinorUnitItemID = kBasicItem.GetItemTemplet()->GetItemIDForMinorUnit();
+	const CX2Unit::UNIT_TYPE eUnitType = ( NULL != pUnit->GetUnitTemplet() ) ? pUnit->GetUnitTemplet()->m_UnitType : CX2Unit::UT_NONE;
+	// stand-in: June's equips never keep the stack items; March's basic equip owns and deletes its dummy, so each gets its own
+	if ( false == abViewEqipPosition_[eEquipPosition_][0] )
+		m_ViewEqipList.push_back( CX2Eqip::CreateEquip( new CX2Item( kBasicItemData, pUnit ), m_pXSkinAnim, iEnchantLevel, true, bLoad_, eUnitType, false, true ) );
+
+	if ( false == abViewEqipPosition_[eEquipPosition_][1] && 0 != iMinorUnitItemID )
+	{
+		CX2Item::ItemData kMinorUnitItemData;
+		kMinorUnitItemData.m_ItemID		= iMinorUnitItemID;
+		kMinorUnitItemData.m_Endurance	= 1;
+		m_ViewEqipList.push_back( CX2Eqip::CreateEquip( new CX2Item( kMinorUnitItemData, pUnit ), m_pMinorUnitXSkinAnim, iEnchantLevel, true, bLoad_, eUnitType, true, true ) );
+	}
+}
+
+// char-luciel DU3c: June 3204e4a0, NOT_SHOW_UNIT_BY_DUOTYPE hides one body's equips while that body's anim time is in the window
+void CX2GUUser::UpdateHideEquipByBody()
+{
+	if ( true != m_bHideEquipByBody )
+	{
+		if ( true == m_bHideEquipByBodyApplied )
+		{
+			m_bHideEquipByBodyApplied = false;
+			UpdateDuo( true );
+		}
+		return;
+	}
+
+	CKTDGXSkinAnimPtr pBodyXSkinAnim;
+	bool bHideMinorUnitEquip = false;
+	if ( 0 == m_iHideEquipBody )
+	{
+		pBodyXSkinAnim = m_pXSkinAnim;
+	}
+	else if ( 1 == m_iHideEquipBody )
+	{
+		pBodyXSkinAnim = m_pMinorUnitXSkinAnim;
+		bHideMinorUnitEquip = true;
+	}
+	if ( NULL == pBodyXSkinAnim )
+		return;
+
+	const float fNowAnimTime = pBodyXSkinAnim->GetNowAnimationTime();
+	if ( fNowAnimTime < m_fHideEquipStartAnimTime || m_fHideEquipEndAnimTime <= fNowAnimTime )
+	{
+		if ( true == m_bHideEquipByBodyApplied )
+		{
+			m_bHideEquipByBodyApplied = false;
+			UpdateDuo( true );
+		}
+	}
+	else if ( false == m_bHideEquipByBodyApplied )
+	{
+		m_bHideEquipByBodyApplied = true;
+		for ( UINT i = 0; i < m_ViewEqipList.size(); ++i )
+		{
+			if ( NULL != m_ViewEqipList[i] && bHideMinorUnitEquip == m_ViewEqipList[i]->IsMinorUnitEquip() )
+				m_ViewEqipList[i]->SetShowObject( false );
+		}
+	}
+}
 #else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 bool CX2GUUser::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList )
 {
@@ -39610,14 +39810,18 @@ void CX2GUUser::AddEquipToViewList( CX2Item* const pItem, const short sSlotID_, 
 				kMinorUnitItemData.m_ItemUID	= iMinorUnitItemUID;
 				kMinorUnitItemData.m_ItemID		= iMinorUnitItemID;
 				kMinorUnitItemData.m_Endurance	= 1;
-				CX2Item kMinorUnitItem( kMinorUnitItemData, GetUnit() );
-				vecNewEquip.push_back( CX2Eqip::CreateEquip( &kMinorUnitItem, GetSkinAnimByForm( 1 ), iEnchantLevel, true, true, eUnitType, true, true ) );
+				// char-luciel DU3c: stand-in: June's equip never keeps its dummy item; March's basic equip owns and deletes it
+				vecNewEquip.push_back( CX2Eqip::CreateEquip( new CX2Item( kMinorUnitItemData, GetUnit() ), GetSkinAnimByForm( 1 ), iEnchantLevel, true, true, eUnitType, true, true ) );
 			}
 			else
 			{
 				const wchar_t* pMinorUnitModelName = pItemTemplet->GetCommonItemModelName( CX2Unit::UT_LUCIEL, true );
 				if ( NULL != pMinorUnitModelName && 0 != pMinorUnitModelName[0] )
-					vecNewEquip.push_back( CX2Eqip::CreateEquip( pItem, GetSkinAnimByForm( 1 ), iEnchantLevel, bBasicEquip, true, eUnitType, true, true ) );
+				{
+					// char-luciel DU3c: a basic item gets its own copy for Ciel, since each basic equip deletes its dummy
+					CX2Item* pMinorUnitItem = ( true == bBasicEquip ) ? new CX2Item( pItem->GetItemData(), GetUnit() ) : pItem;
+					vecNewEquip.push_back( CX2Eqip::CreateEquip( pMinorUnitItem, GetSkinAnimByForm( 1 ), iEnchantLevel, bBasicEquip, true, eUnitType, true, true ) );
+				}
 			}
 		}
 

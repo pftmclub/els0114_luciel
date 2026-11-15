@@ -41,3 +41,11 @@ Output:
 - funcmap rows tagged `Customize S12`.
 
 No code, no build. Open design questions go to the user at the end, each with a recommendation.
+
+## Amended by char-luciel DU3c (2026-11-15)
+
+- The equip pass `3201f8d0` (called from Init `3204ea20 @3204eb06`, `31f1ed70`, `31f23850`) reads the unit's customize list (`+0xa44`) and, for a
+  face entry, writes the user's Ciel face override (`+0x9570` = 7 `EP_DEFENCE_FACE`, `+0x9574` = an item id; members
+  `m_iMinorUnitEquipOverridePosition` / `m_iMinorUnitEquipOverrideItemID`, declared by DU3b) and rebuilds the face equips via `31ffe990`. Its reader
+  (DU3b's `AddEquipToViewList`) is ported; the writer is customize, so it goes with this stage. `31fd7b40` (named as a second writer by DU1d2) is not a
+  function start in June.

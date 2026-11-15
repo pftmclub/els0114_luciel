@@ -28,3 +28,11 @@ Review the three commits against June:
 
 Hygiene: `python tools/finish.py --review --commits <DU3> <DU3b> <DU3c> --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`. Paste the block; explain every
 OTHER row. Write "DU3 - Review" into the plan doc, set DU3 / DU3b / DU3c done and DU4 ready in STATUS.md, commit. No play-test unless a fix lands.
+
+## Amended by DU3c (2026-11-15)
+
+- What DU3c landed and what it routed is in "DU3c - Done". Check in Ghidra: `UpdateEqip` = `31fe4210` (both branches, the push order), the two
+  `ReplaceEmptyToBasic` = `31fe3e30` / `31fe2fb0` (the `[pos][3]` table from `31fca7e0`, the eight calls), `GetEquipDuoType` = `3286a4b0`, the socket skip
+  `@3206dc6a`, `NOT_SHOW_UNIT_BY_DUOTYPE` `@320618a8-3206194c`, `UpdateHideEquipByBody` = `3204e4a0` (its loop is an inlined `SetShowObject( false )`),
+  the `_UpdateSkin` term `3295ae20`.
+- Judge the dummy-item stand-in (heap items the equip owns, where June's equip keeps no item pointer) and the chain-byte rename / default `true`.

@@ -1439,8 +1439,10 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW` (DU3's; no new define, 
 - **Gates:** `finish.py --files <6 files> --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`: flagcheck PASS (6 PASS, 0 OTHER, 0 FAIL; the 10 deleted lines are
   DU3's chain-byte lines renamed and DU3b's two dummy lines replaced, all inside the flag), junediverge PASS, enumscan PASS; FINISH RESULT: PASS.
 - **Compile:** `/Zs` probes of `X2GUUser.cpp`, `X2Eqip.cpp`, `X2Inventory.cpp`: 3 x 0 errors; break-tests on the new names fail inside the new blocks.
-- **Build:** DEPLOY_LINE
-- **Play-test:** sections DU3b + DU3c of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off assembled.
+- **Build:** blocked twice by other sessions' unfinished edits: run 1 failed in CH2d20's `X2StateMenu.cpp` / `X2UIManager.cpp` (members not yet
+  declared), run 2 in CH3c20's `Always.h:13695` `#error` (`SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS`); no DU3c file had an error. The play-test is handed
+  off after the next `DEPLOY OK`.
+- **Play-test:** sections DU3b + DU3c of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off assembled after that deploy.
 
 
 ## Phase CH1 - Deploy unit: the class core

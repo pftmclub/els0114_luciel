@@ -38,3 +38,43 @@ staying after removal, or Ara's awakened body missing the spear (berserk view li
 
 ### Logs
 [JUNE_CHAR] (no DU3b lines; read `ErrorLog.txt` for new errors)
+
+## DU3c - Lu and Ciel each wear their own equipment; Ciel draws a body
+
+### Dev console
+`/invin 0` (turns invincibility off so Ciel can die in step 6)
+`/additem 30344 1` (Curse of Darkness Dual Weapon, Lu/Ciel: Lu's weapon, with a separate Ciel version of the model)
+
+### Loadout
+n/a - no skills are tested; the checks are what each body wears, an equipment change, and one death. Swap bodies with V.
+
+### Steps
+1. Log in **testlu1** (Lu/Ciel, Duo; raised to level 15 in the save so the level-10 weapon fits). Enter any battle field (not the village)
+   and stand still.
+2. Look at both bodies. Press V to swap to Ciel, then V again to swap back to Lu.
+3. Open the inventory (I), take off the **Cobo Top Piece for Beginners** (normal top, under Lu's Promotion avatar top), look at both bodies,
+   then put it back on.
+4. Equip the **Curse of Darkness Dual Weapon** in place of the Cobo Dual Weapon. Swap to Ciel (V) and look at his weapon, then swap back.
+5. Leave the field and come back (or relog), so the unit is built fresh with the new weapon. Look at both bodies again.
+6. With Ciel active, use one **Ventus' Wings (Elixir)** from the quick slot (a buff icon appears), go into a dungeon (`/stage` any) and let
+   Ciel die. Revive (resurrection or back to the village).
+
+### Expect
+- Step 2: **Ciel has a body** with clothes and a weapon (the Ciel version of the Cobo beginner set); Lu wears Lu's Promotion avatar. Each
+  swap shows the other body with its own clothes; no body is invisible, no clothes float without a body, and neither body wears the other's
+  clothes.
+- Step 3: Lu still shows Lu's Promotion top (the avatar covers the slot). Ciel's top changes to his basic top while the Cobo top is off and
+  comes back when it is put on again.
+- Step 4: Lu holds the Curse of Darkness weapon; Ciel holds his own version of it (a different model, not Lu's weapon and not empty hands).
+- Step 5: the same look as at the end of step 4 (this is the build-at-load path; steps 2-4 were the equip-change path).
+- Step 6: after the revive the Ventus' Wings buff icon is gone (CH1's owed check).
+- Nothing new in `ErrorLog.txt`, no crash on load, on swap, on an equipment change or on leaving the field.
+
+### If not
+Name the step and what you saw: Ciel invisible or only a floating weapon (his equips were not built: say whether it happens at load (step 2 / 5)
+or only after an equipment change (step 3 / 4)), Ciel wearing Lu's Promotion avatar or Lu's model (the body byte is wrong), two weapons in one
+hand, a crash when leaving the field (a dummy item freed twice: send the X2_*.tmp bundle from %TEMP%), or the buff still shown after the revive.
+
+### Logs
+[JUNE_CHAR] LUCIEL (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`: `LUCIEL DUO switch` per swap; DU3c adds no lines of its own, so read
+`ErrorLog.txt` for new errors)

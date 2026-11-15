@@ -42,9 +42,9 @@ class CX2Eqip : public CKTDGObject
 	private:
 		//CX2Eqip() { ASSERT( !"invalid" ); }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
-		// char-luciel DU3: June 32961280 takes the equip's body ( +0x15d4 ) and the sub-equip chain byte ( +0x15d5 )
+		// char-luciel DU3: June 32961280 takes the equip's body ( +0x15d4 ) and the DG chain byte ( +0x15d5 )
 		CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantLevel, bool bDummyBasic = false, bool bLoad = true,
-			CX2Unit::UNIT_TYPE eUnitType = CX2Unit::UT_NONE, bool bMinorUnitEquip = false, bool bSkipSubEquipChainAdd = false );
+			CX2Unit::UNIT_TYPE eUnitType = CX2Unit::UT_NONE, bool bMinorUnitEquip = false, bool bAttachedInDGManagerChain = true );
 #else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		// @eUnitType: 공용템인 경우에 unit_type에 따라 다른 메시를 로딩한다.
 		CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantLevel, bool bDummyBasic = false, bool bLoad = true, 
@@ -61,9 +61,9 @@ class CX2Eqip : public CKTDGObject
 		// char-luciel DU3: June 31fac2a0
 		static CX2EqipPtr CreateEquip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim
             , int enchantLevel, bool bDummyBasic = false, bool bLoad = true
-            , CX2Unit::UNIT_TYPE eUnitType = CX2Unit::UT_NONE, bool bMinorUnitEquip = false, bool bSkipSubEquipChainAdd = false )
+            , CX2Unit::UNIT_TYPE eUnitType = CX2Unit::UT_NONE, bool bMinorUnitEquip = false, bool bAttachedInDGManagerChain = true )
 		{
-			CX2EqipPtr  ptrEquip( new CX2Eqip( pItem, pUnitXSkinAnim, enchantLevel, bDummyBasic, bLoad, eUnitType, bMinorUnitEquip, bSkipSubEquipChainAdd )
+			CX2EqipPtr  ptrEquip( new CX2Eqip( pItem, pUnitXSkinAnim, enchantLevel, bDummyBasic, bLoad, eUnitType, bMinorUnitEquip, bAttachedInDGManagerChain )
 #else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		static CX2EqipPtr CreateEquip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim
             , int enchantLevel, bool bDummyBasic = false, bool bLoad = true
@@ -325,7 +325,7 @@ private:
 		bool						m_bDummyBasic;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool						m_bMinorUnitEquip;			// char-luciel DU3: June +0x15d4
-		bool						m_bSkipSubEquipChainAdd;	// char-luciel DU3: June +0x15d5 ( readers 32960ad0 / 32961c80 are DU3c's )
+		bool						m_bAttachedInDGManagerChain;	// char-luciel DU3c: June +0x15d5, sub-equips and particles stay in the DG chain ( readers: june-engine R14c )
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		CX2Item*					m_pDummyItem;
 		const CX2Item::ItemTemplet*		m_pItemTemplet;

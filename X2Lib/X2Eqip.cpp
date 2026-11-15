@@ -8,7 +8,7 @@
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 // char-luciel DU3: June 32961280
 CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantLevel, bool bDummyBasic, bool bLoad,
-				 CX2Unit::UNIT_TYPE eUnitType /*= CX2Unit::UT_NONE */, bool bMinorUnitEquip /*= false */, bool bSkipSubEquipChainAdd /*= false */)
+				 CX2Unit::UNIT_TYPE eUnitType /*= CX2Unit::UT_NONE */, bool bMinorUnitEquip /*= false */, bool bAttachedInDGManagerChain /*= true */)
 #else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantLevel, bool bDummyBasic, bool bLoad,
 				 CX2Unit::UNIT_TYPE eUnitType /*= CX2Unit::UT_NONE */)
@@ -44,7 +44,7 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 	m_eObjectType = OT_CX2Eqip;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	m_bMinorUnitEquip			= bMinorUnitEquip;
-	m_bSkipSubEquipChainAdd		= bSkipSubEquipChainAdd;
+	m_bAttachedInDGManagerChain	= bAttachedInDGManagerChain;
 	// char-luciel DU3: June @32961362 keeps the unit type only for a UC_ANYONE templet ( June's appearance templet swap is Stage 16 )
 	if ( NULL != pItem->GetItemTemplet() && CX2Item::UC_ANYONE != pItem->GetItemTemplet()->GetUseCondition() )
 		eUnitType = CX2Unit::UT_NONE;
@@ -2075,6 +2075,12 @@ void CX2Eqip::_UpdateSkin()
 		|| true == g_pData->GetItemManager()->IsDivisionItem( 0x36, m_pItemTemplet->GetItemID() )
 		|| true == g_pData->GetItemManager()->IsDivisionItem( 7, m_pItemTemplet->GetItemID() ) ) )
 		bAllModels = true;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	// char-luciel DU3c: June 3295ae20, Lu's equip ( body byte clear ) with a second model attaches every model
+	if( NULL != m_pOwnerUnit && NULL != m_pOwnerUnit->GetUnitTemplet() && CX2Unit::UT_LUCIEL == m_pOwnerUnit->GetUnitTemplet()->m_UnitType
+		&& false == m_bMinorUnitEquip && NULL != m_pNormalXSkinModel[1] )
+		bAllModels = true;
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 	for( int i=0; i< CX2Item::MAX_MODEL_COUNT_A_ITEM; i++ )
 	{

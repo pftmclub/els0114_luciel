@@ -3132,6 +3132,10 @@ public:
 		virtual bool		UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList, const short sSlotID_ );	// char-luciel DU3b: June vslot 0x644 ( base 3201b930 )
 		void		AddEquipToViewList( CX2Item* const pItem, const short sSlotID_, const bool bForceBasicEquip_ );	// char-luciel DU3b: June 31ffe990
 		bool		IsEquipInViewList( const CX2Unit::EQIP_POSITION eEquipPosition_, const int iBody_ ) const;	// char-luciel DU3b: June 31fd63c0
+		void		UpdateEqip( const bool bLoad_ );	// char-luciel DU3c: June 31fe4210
+		void		ReplaceEmptyToBasic( const bool bLoad_ );	// char-luciel DU3c: June 31fe3e30
+		void		ReplaceEmptyToBasic( const bool abViewEqipPosition_[][3], const CX2Unit::EQIP_POSITION eEquipPosition_, const int iItemID_, const bool bLoad_ );	// char-luciel DU3c: June 31fe2fb0
+		void		UpdateHideEquipByBody();	// char-luciel DU3c: June 3204e4a0
 #else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		virtual bool		UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item* const pItemToRemoveInViewList );
 		void		AddEquipToViewList( CX2Item* const pItem );
@@ -5233,6 +5237,10 @@ public:
 		bool											m_bHideEquipByBody;				/// char-luciel DU1d5: June +0x8fa4, set by DU3's hide-equip-by-body pass ( 3204e4a0 ); false until then
 		int												m_iHideEquipBody;				/// char-luciel DU1d5: June +0x8fa8, the body whose equips hide ( 0 first, 1 second )
 		bool											m_bHideEquipByBodyApplied;		/// char-luciel DU1d5: June +0x8fb4, the pass is inside its time window
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		float											m_fHideEquipStartAnimTime;		/// char-luciel DU3c: June +0x8fac, NOT_SHOW_UNIT_BY_DUOTYPE [1]
+		float											m_fHideEquipEndAnimTime;		/// char-luciel DU3c: June +0x8fb0, NOT_SHOW_UNIT_BY_DUOTYPE [2]
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 		CX2TransformSkillSlotUI*						m_pTransformSkillSlotUI;		/// char-luciel CH1a0: June +0x8f70; the class news and deletes it ( Lu/Ciel 32b43910 / 32b39380 )

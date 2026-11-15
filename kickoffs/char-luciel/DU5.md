@@ -88,3 +88,10 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
 
 - Three of the packet / unit-viewer sites also read the transform pair `31fc9d90` ( `CX2GUUser::IsTransformed`, CH1a0 ): `31f1ed70` @`31f1f1d8`,
   `32461e80` @`324620b9` and `32195e40` @`3219618d` skip vslots 0x63c / 0x630 while a body is transformed. Port that test with the site.
+
+## Amended by DU3c (2026-11-15)
+
+- **Per-body socket record:** June `InitSocketData 3206d770 @3206dbd3-3206dc6a` (unit type 10 only, `SocketData*` argument non-null) passes each
+  equip's four or five socket vectors (random, templet, data, set when `3286a6b0` says so) with its body (`CX2Inventory::GetEquipDuoType`, DU3c) to
+  `3271a060`, a `SocketData` method that adds the options' `+0x304` / `+0x23c` values to per-body accumulators (`+0x468..` for body 0 / both, the
+  other set for body 1). DU3c ported only the skip that follows (`@3206dc6a`); port the record and its readers here, with the set-socket count.
