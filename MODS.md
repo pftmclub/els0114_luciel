@@ -7215,20 +7215,6 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_add/ch0b_stage_list.
 
 **Revert.** Restore the replaced files from the backup folders, `kom.py pack` / `copy` the koms; `data207.kom` and `data217.kom` can be deleted from the game dir if they were not there before. Saves `AddNR40` (uid 200) and `AddLP99` (uid 201) are in `els_db.sql`; the pre-phase snapshot is `db_backup/els_db_20261115_220214_pre_pre_CH0b_add.sql`.
 
-## June engine R9: render small deltas (june-engine R9, 2026-11-15)
-
-Six flags in `Always.h`: `SERV_IRUHADEV_JUNE_RENDER_PARTICLE_ADD_TYPES`, `_PARTICLE_EFFECT_ALPHA_PATHS` (`#error` without `..._JUNE_EFFECT_ALPHA_OPTION`), `_PARTICLE_SEQ_ALPHA`, `_PARTICLE_OUTLINE_CLAMP`, `_RENDER_EFFECT_STATE_LOST`, `_RENDER_SKINMESH_SMALL_LOADS` (`#error` without `..._JUNE_SOUND_AUTO_RELEASE`), plus the temporary `_RENDER_SMALL_DELTAS_DEBUG` (`[JUNE_ENGINE] FX small delta` lines; the R9 review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.
-- **What changes in game.**
-  - A particle `.txt` mesh render type of `RT_ADD_CARTOON_BLACK_EDGE` / `_COLOR_EDGE` / `RT_ADD_CARTOON` parses (no shipped June file uses them yet).
-  - RHW and skin-mesh particles follow the effect-alpha option (`MY_EFFECT_ALPHA` etc. in `GameOptions.lua`) like the other particle draws.
-  - Mesh and skin-mesh particles of the UI particle systems cap their outline width at 1.2 (every system at 999).
-  - The effect state manager is reset by `CKTDXApp::OnLostDevice`, not by the renderer.
-  - A skin mesh looks its XET up as the id up to the last `.` plus `.XET`, and closes the XET and its textures by pointer.
-  - Sequence alpha `+0x1ac` is multiplied into the four particle draws and stays 1.0 (no writer in June).
-- **Differs from March.** March accepted only four mesh render types, skipped the option in the RHW and skin-mesh draws, had no outline cap, reset the state manager from the renderer, appended `ET` to the id and closed by id.
-- **Files.** `KTDGParticleSystem.h/.cpp` (parser, draws, `m_fSequenceAlphaRate`, `m_iSystemKind`), `X2Data.cpp` (the four Reset functions set the kind), `KTDXApp.cpp` / `KTDGXRenderer.cpp` (lost device), `KTDXDeviceXSkinMesh.cpp` (XET name, close by pointer).
-- **Revert:** comment out the flag(s) (and `_RENDER_SMALL_DELTAS_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Each item reverts on its own.
-
 ## Engine R14d: June's equip frame move, TraceLandPos and the equip effect-set stop (june-engine R14d, 2026-11-15)
 
 Flags `SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE` (+ the temporary `..._DEBUG`, `[JUNE_ENGINE] EQTRACE` lines; the R14d review retires it) and `SERV_IRUHADEV_JUNE_EQIP_DTOR` (`Always.h`); `RPUI_RAKSHASA = 63` under `SERV_IRUHADEV_JUNE_ENUM_NAMES`. Plan `JUNE_ENGINE_REMAINDER_PHASES.md`, "Phase R14d -- Done".
