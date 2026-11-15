@@ -4,21 +4,21 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel CH2d2 review` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | CH2d and CH2d2 done (their Done notes and commits; the CH2d2 play-test passed and its logs were read) |
+| Depends on | CH2d, CH2d2 and CH2d3 done (their Done notes and commits; the play-tests passed and their logs were read) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `SERV_IRUHADEV_JUNE_ENUM_NAMES` (`BFI_BUFF_DEATH_TOUCH`, `BFI_BUFF_ALTAR_OF_EVIL`) and the temporary `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` (this review retires it) |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL SKILL`) |
 
 ## Read first
 
 ```sh
-python tools/docsection.py JUNE_CHARACTER_LUCIEL_PHASES.md "CH2d - Done (2026-11-16)" "CH2d2 - Done (2026-11-16)"
+python tools/docsection.py JUNE_CHARACTER_LUCIEL_PHASES.md "CH2d - Done (2026-11-16)" "CH2d2 - Done (2026-11-16)" "CH2d3 - Done"
 ```
 
 ## Task
 
 Review the commits of CH2d and CH2d2 (`git log --oneline --grep "char-luciel Phase CH2d"`) against June in Ghidra and the capstone listings
 (`june2017_re/charport_adis.py luciel --phase CH2d` / `CH2d2`; the four setter cases with `june2017_re/char_luciel/ch2c_cases.py <entry_va>`: Nightmare `32b47d2e`,
-Altar of Evil `32b47de9`, Abyss Strike `32b49cd0`, Phantom Rush `32b49d69`). This review covers both (user, 2026-11-10: one review per CH stage).
+Altar of Evil `32b47de9`, Abyss Strike `32b49cd0`, Phantom Rush `32b49d69`). This review covers CH2d, CH2d2 and CH2d3 (the form's model swap and slot UI fix, user report after the CH2d2 play-test; user, 2026-11-10: one review per CH stage).
 What CH2d2 could get wrong ( every item below was read from a listing, not decompiled ):
 - **The setter cases.** Slot offsets were decoded with a stack-offset script ( state struct base = esp0 + 0x1c, a push moves every later offset by 4 ): re-read two states by hand. Nightmare's hyper copies StartFuture + EventProcess only
   ( no StateStart ); Phantom Rush's hyper copies Init + FrameMove + EventProcess; state 461's FrameMove is `32b38340` ( the class map calls it CameraMove ) in the +0x38 slot; states 446-448 and 459 / 461 carry the skill-state byte;
