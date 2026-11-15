@@ -3393,7 +3393,7 @@ Opus 5.5 high. Reviewed commit `b4f80375` against June's listing (`disasm_range.
   `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`; flagcheck `_LOCKON_SYSTEM` 4 PASS, 1 PASS~, 1 DEFINE, 5 OTHER, 0 FAIL; `_NPC_LUA_BINDS` 3 PASS, 2 PASS~, 1 DEFINE,
   5 OTHER, 0 FAIL; both 0 deleted lines; every OTHER row = the partner flag's file. junediverge + `--check-all` PASS, enumscan exit 0, luabind PASS; stateends /
   skillicons skipped ( no state, no skill ). Fix worktree: `finish.py --files X2Lib/X2Game.cpp --with JUNE_CHAR_NPC_LUA_BINDS` PASS ( 1 PASS, the 1 deleted line = the
-  replaced line inside the flag's own block ).
+  replaced line inside the flag's own block ). Commit `191732e7`, range gate `191732e7^..191732e7`: the same, `FINISH RESULT: PASS`.
 - **Build:** `/Zs` probe of `X2Game.cpp`: 0 errors. Full build skipped: no play-test ( CH3c2 plays it ). CH3c2's kickoff checked: its CH3c20 amendment stands; it waits only on CH3c.
 
 ## Phase CH4 - Passives and class mechanics
