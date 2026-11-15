@@ -1942,11 +1942,13 @@ Found by the user in the DU5b2 play-test: awakening with Ciel active left the fi
 - **Rows:** `funcmap.tsv` `32291060` -> PORTED (DU6 text); `june_march_divergent.tsv` new `HyperModeBuffEffectOnFrameMove` replace row, ported.
 - **Gates:** `finish.py --files X2Lib/X2GameUnit.cpp KTDXLIB/Always.h --with SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT`: `FINISH RESULT: PASS (8 gates,
   0 failed, 5 skipped)`; flagcheck `1 PASS, 1 OTHER, 0 FAIL` (the OTHER is `Always.h`, a peer's uncommitted lines); `junediverge` PASS; `enumscan` exit 0;
-  two `retired` (peer debug defines), stateends / skillicons / luabind not requested (nothing registered or staged). Range gate: after the commit, its line goes in with the play-test note.
+  two `retired` (peer debug defines), stateends / skillicons / luabind not requested (nothing registered or staged). Range gate `finish.py --range 04ab6729^..04ab6729 --with SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT`: flagcheck PASS ( 1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL ), junediverge PASS, enumscan exit 0, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`. Commit `04ab6729`.
 - **Build:** `COALESCED` (peer full build started 06:08:28, after these edits), then `DEPLOY OK: X2_offline.exe is 27,077,120 B, dated 2026-11-16 06:18:49, md5 383991cd4b67a71ea6192b711738a34f, equal to X2/US_SERVICE/x2.exe`.
 - **How to see it in game:** LuDbA (202): awaken with Ciel active, the fire stays on Ciel's feet and arms while she walks and dashes; switch body while
   awake, it moves to Lu. Elsword / Aisha awakening unchanged.
-- **Next:** play-test, then `/x2-phase char-luciel DU6 review` (Opus 5.5 high).
+- **Play-test: passed (user, 2026-11-16).** LuDbA (202): the fire stays on Ciel while she moves, dashes and jumps; it moves to whichever body is active on a
+  switch; Elsword and Aisha awakening unchanged. Visual check only ( DU6 adds no log line ).
+- **Next:** `/x2-phase char-luciel DU6 review` (Opus 5.5 high).
 
 ## Phase CH1 - Deploy unit: the class core
 
