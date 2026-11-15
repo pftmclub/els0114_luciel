@@ -2774,6 +2774,10 @@ same flagcheck tallies as below, `FINISH RESULT: PASS (9 gates, 0 failed, 3 skip
   ( `X2OPTIMIZE_SKIN_ANIM_MESH_CRASH_BUG_FIX`, `KTDX.h:378` ). Gates: flagcheck `1 PASS, 1 DEFINE, 0 FAIL` / PASS, junediverge PASS, enumscan exit 0.
   `DEPLOY OK: X2_offline.exe is 26,905,600 B, dated 2026-11-15 14:13:15, md5 f509c92055b89741bbfceb8d53258f35, equal to X2/US_SERVICE/x2.exe`.
   Not seen yet ( the class never reached it ): the creation preview shows Lu only ( DU5's ), the tutorial is March's default ( TU's ).
+- **Correction ( second crash, same EIP ):** fix 1 did not reach the crash. The ctor is handed a **NULL origin anim** ( `[this + 0x74]` = `m_pOriginalAnim`
+  is 0 ), not an anim without a mesh: Lu's weapons are `UT_SKIN` ( 113300 / 41890 ), the eqip's skin path opens models but builds no normal anim, and
+  March's `Weapon::LoadDataForUser` passes `GetNormalAnim( i )` unguarded. Fix 1 stays ( a real June guard ). **Routed: new phase CH1q** ( `CH1q.md`, the
+  user's call ): June's weapon loader for a skin-type weapon; CH1's play-test resumes after it.
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
