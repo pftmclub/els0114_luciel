@@ -13132,12 +13132,16 @@ namespace _CONST_ELSWORD_CH3B_
 {
 	const float COUNTER_GUARD_MAX_HOLD_TIME				= 5.f;		/// June 32cf4d70: the counter guard ends after 5 s even when the key is held
 	const int EXTREME_RUNE_BUSTER_RANDOM_COUNT			= 10;		/// June 32d09310: random numbers drawn when the state starts
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int EFFECT_MODIFIER_TAG_MAIN_LIFE_TIME_RATE	= 19;		/// June 321db1b0 modifier tag ( no Enum entry ): main effect life time rate, inherited by the children
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 }
 using namespace _CONST_ELSWORD_CH3B_;
 namespace _CONST_ELSWORD_CH3C_
 {
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int EFFECT_MODIFIER_TAG_FORCE_DOWN	= 9;	/// June 321db1b0 modifier tag ( no Enum entry ): the damage effect's force down ( and its NEXT tables' ), added or multiplied
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const float MAELSTROM_RAGE_UPGRADE_FORCE_DOWN	= -2.f;	/// June 32d13e20: an upgraded Maelstrom Rage adds -2 to its effect set's force down
 }
 using namespace _CONST_ELSWORD_CH3C_;
@@ -26690,7 +26694,11 @@ void CX2GUElsword_SwordMan::ESSI_SI_SA_ETK_MAELSTORM_RAGE_FrameMove()
 
 		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_ETK_MAELSTORM_RAGE", (CX2GameUnit*) this, NULL, false, GetPowerRate(), m_fMaelStormEffectiveTime );
 		if( true == IsNowStateSkillUpgraded() )
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_FORCE_DOWN_VALUE, MAELSTROM_RAGE_UPGRADE_FORCE_DOWN, true );
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_FORCE_DOWN, MAELSTROM_RAGE_UPGRADE_FORCE_DOWN, true );
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL_DEBUG
 		CX2OfflineLog::Server( L"[JUNE_CHAR] ELSWORD SKILL maelstrom rage: effective time %.2f, upgraded %d", m_fMaelStormEffectiveTime, ( true == IsNowStateSkillUpgraded() ) ? 1 : 0 );
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL_DEBUG

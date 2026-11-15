@@ -518,7 +518,9 @@ namespace _CONST_EVE_CH3b_
 	const int	ELECTRONIC_FIELD_KEY_CODE_NORMAL	= -1;
 	const int	REASON_PRIDE_KEY_CODE				= 2;			/// June 329ae5c4 / 329ae639: the key code of both summons
 	const float	REASON_PRIDE_SUMMON_GAP			= 150.f;		/// June 329ae5a0 / 329ae601: in front of and behind me on the line map
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int	EFFECT_MODIFIER_TAG_SCALE			= 15;			/// June 3299efa6: modifier tag with no enum name ( CH3a0 )
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const float	SPIT_FIRE_PLAY_TIME				= 0.1f;			/// June 3299ed6f: Spit Fire plays its effect set at this animation time
 }
 using namespace _CONST_EVE_CH3b_;
@@ -528,9 +530,11 @@ using namespace _CONST_EVE_CH3b_;
 //{{ Iruha : 2026-10-28 // June character Eve Phase CH3c ( JUNE_CHARACTER_EVE_PHASES.md )
 namespace _CONST_EVE_CH3c_
 {
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int		EFFECT_MODIFIER_TAG_IGNORE_STATE_DEFENCE	= 12;	/// June 3299ac53: modifier tag with no enum name ( CH3a0 )
 	const int		EFFECT_MODIFIER_TAG_IGNORE_DEFENCE			= 16;	/// June 3299ac11
 	const int		EFFECT_MODIFIER_TAG_CRITICAL_RATE			= 20;	/// June 3299acad
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int		THOUSAND_STAR_COUNT_MEMO					= 120;	/// June 329a2f81: the star count when +0x9c28 is 1
 	const int		THOUSAND_STAR_COUNT						= 100;
 	const float		ENERGY_NEEDLES_FIRST_TIME					= 1.766f;	/// June 329968a0: the first needle and the needle data start here
@@ -55989,7 +55993,11 @@ void CX2GUEve::ENSI_SA_ECB_EXTREME_VIRTUAL_FrameMove()
 
 		float fCriticalRate = 0.f;
 		if( true == TryGetEquippedSkillAbilityValue( CX2SkillTree::SA_ATK_CRITICAL_RATE_ABS, CX2SkillTree::RNSI_P_ECB_HYPER_OPTICAL_RESEARCH, false, fCriticalRate ) )
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_CRITICAL_RATE_INHERIT, fCriticalRate, true );
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_CRITICAL_RATE, fCriticalRate, true );
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	}
 
 	CommonFrameMove();

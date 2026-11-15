@@ -7127,3 +7127,11 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_
 - **Revert:** comment out `_LIVE` and `_DUO` (Lu/Ciel then cannot enter a game); data: copy the two backups back.
 - **Play-test fix:** `SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH` (every unit): an after-image whose origin anim has no mesh (a model-only weapon such as
   Lu's `Mesh_Lu_Cash_Weapon_Sorted.X`) skips the mesh's center / radius, as June `3322abc0` does, instead of crashing. Revert: comment out the `#define`.
+
+## Effect-set modifier tag enum (modifier-tag-enum, 2026-11-15)
+- **What changes.** One shared `enum EFFECT_MODIFIER_TAG` in `X2EffectSet.h` (June has no Enum entry for these tags; names come from the field each tag
+  writes). The `case` labels of `CX2EffectSet::ApplyDamageEffectModifiers` use it, the class files' own `EFFECT_MODIFIER_TAG_*` constants (Eve, Elsword,
+  Luciel, EL) drop out under the flag, and Aisha's bare `1` / `2` become `MAIN_VELOCITY` / `MAIN_MAX_LIFE_TIME`. Renames at call sites: Luciel
+  `SOUL_COLLECTOR_MAX_COUNT` -> `DAMAGE_TIME` (4), Elsword `FORCE_DOWN` -> `FORCE_DOWN_VALUE` (9), Eve `CRITICAL_RATE` -> `CRITICAL_RATE_INHERIT` (20; plain
+  `CRITICAL_RATE` is tag 5). Tags 3 / 6 / 7 / 8 / 18 / 21 / 22 stay unnamed and unported; 13 / 14 / 17 / 23 are named but have no `case` yet. No behaviour change.
+- **Flag:** `SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM` in `KTDXLIB/Always.h` (needs `SERV_IRUHADEV_JUNE_CHAR_EFFECTSET_MODIFIER`). **Revert:** comment out the `#define`.

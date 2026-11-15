@@ -5934,7 +5934,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 		const EffectSetInstance::DamageEffectModifier& modifier = vecModifier_[i];
 		switch ( modifier.m_iTag )
 		{
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_MAIN_VELOCITY:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 1:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// June 321db1b0 tag 1: the main effect's velocity, added or multiplied per component by v3 ( = ( v, 0, 0 ) ), also pushed onto the mesh ( 31c8a9b0 )
 				CKTDGXMeshPlayer::CXMeshInstance* pMainEffect = pEffect_->GetMainEffect();
@@ -5953,7 +5957,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 					pMainEffect->AddVelocityModifier( modifier.m_bAdd, modifier.m_vValue );
 				}
 			} break;
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 2:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				CKTDGXMeshPlayer::CXMeshInstance* pMainEffect = pEffect_->GetMainEffect();
 				if ( NULL != pMainEffect )
@@ -5963,9 +5971,17 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 				}
 			} break;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EVE_CORE
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_CRITICAL_RATE_INHERIT:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 20:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			pEffect_->m_bInheritCriticalRate = true;	// June @321db4ba, then falls into tag 5
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_CRITICAL_RATE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 5:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// June 321db1b0 tag 5: CRITICAL_RATE added or multiplied; every NEXT table takes the result, not its own (JUNE_BUGS 437)
 				const float fCriticalRate = true == modifier.m_bAdd ? modifier.m_vValue.x + pEffect_->GetDamageData().m_fCriticalRate : modifier.m_vValue.x * pEffect_->GetDamageData().m_fCriticalRate;
@@ -5975,7 +5991,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 				for ( size_t j = 0; j < vecTables.size(); j++ )
 					vecTables[j]->m_fCriticalRate = fCriticalRate;
 			} break;
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_IGNORE_STATE_DEFENCE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 12:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// June @321db998: the gate takes the entry's b, IGNORE_STATE_DEFENCE ( own and NEXT tables ) = v > 0
 				const bool bValue = 0.f < modifier.m_vValue.x;
@@ -5986,7 +6006,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 				for ( size_t j = 0; j < vecTables.size(); j++ )
 					vecTables[j]->m_bIgnoreStateDefence = bValue;
 			} break;
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_IGNORE_DEFENCE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 16:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// June @321dbb01: as tag 12 for IGNORE_DEFENCE and IGNORE_DEFENCE_ON_PVP
 				const bool bValue = 0.f < modifier.m_vValue.x;
@@ -6003,7 +6027,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 			} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_CORE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EVE_SKILL
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_SCALE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 15:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// June @321dba36-321dbaf4: base scale = v + base or v * base; SetScale gets the old base, so a second tag 15 squares the first (JUNE_BUGS 453)
 				if ( NULL != pEffect_->GetMainEffect() )
@@ -6019,7 +6047,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 #endif SERV_IRUHADEV_JUNE_CHAR_EVE_SKILL
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_MAIN_LIFE_TIME_RATE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 19:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// June 321db1b0 @321dbb95-321dbbec: the children inherit the rate ( the gate is set at once ); the main effect's life time is multiplied by v, whatever the entry's b
 				pEffect_->m_bInheritMainEffectLifeTimeRate = true;
@@ -6031,7 +6063,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 					pMainEffect->SetMaxLifeTime( fLifeTime * modifier.m_vValue.x );
 				}
 			} break;
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_FORCE_DOWN_VALUE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 9:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// June 321db1b0 @321db77e-321db7cd: the damage effect's FORCE_DOWN ( +0x5f0 ) plus or times v, and every NEXT table takes the result
 				const float fForceDown = true == modifier.m_bAdd ? modifier.m_vValue.x + pEffect_->GetDamageData().fForceDownValue : modifier.m_vValue.x * pEffect_->GetDamageData().fForceDownValue;
@@ -6043,19 +6079,31 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 			} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_DAMAGE_TIME:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 4:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// char-luciel CH1o3: June @321db477-321db4b5: the damage effect's hit count ( +0x84c ) plus ( int )v or times v, truncated; no NEXT table
 				const int iDamageTime = pEffect_->GetDamageTime();
 				pEffect_->SetDamageTime( true == modifier.m_bAdd ? static_cast<int>( modifier.m_vValue.x ) + iDamageTime : static_cast<int>( modifier.m_vValue.x * static_cast<float>( iDamageTime ) ) );
 			} break;
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_EXTRA_DAMAGE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 10:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// char-luciel CH1o3: June @321db7cf-321db915: EXTRA_DAMAGE's damage ( +0x2a4 ) plus or times v; its NEXT loop writes the main effect's own value again ( JUNE_BUGS 725 )
 				const float fExtraDamage = pEffect_->GetDamageData().m_ExtraDamage.m_Damage;
 				pEffect_->GetDamageData().m_ExtraDamage.m_Damage = ( true == modifier.m_bAdd ? modifier.m_vValue.x + fExtraDamage : modifier.m_vValue.x * fExtraDamage );
 			} break;
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_RELATE_SKILL_INDEX:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 11:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// char-luciel CH1o3: June @321db91a-321db996: the relate skill index byte ( +0x7a8 ) plus or times v, truncated; its NEXT loop writes the main effect's own byte again ( JUNE_BUGS 725 )
 				const float fSkillIndex = static_cast<float>( pEffect_->GetDamageData().m_RelateSkillData.m_byteSkillIndex );
@@ -6063,7 +6111,11 @@ void CX2EffectSet::ApplyDamageEffectModifiers( CX2DamageEffect::CEffect* pEffect
 				pEffect_->GetDamageData().m_RelateSkillData.m_byteSkillIndex = static_cast<Byte>( static_cast<int>( fNewSkillIndex ) );
 			} break;
 #ifndef SERV_IRUHADEV_JUNE_CHAR_ELSWORD_SKILL
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		case EFFECT_MODIFIER_TAG_FORCE_DOWN_VALUE:
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		case 9:
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			{
 				// char-luciel CH1o3: June @321db77e-321db7cd, as char-elsword wrote it, for Lu's Punisher when Elsword's skills are off
 				const float fForceDown = true == modifier.m_bAdd ? modifier.m_vValue.x + pEffect_->GetDamageData().fForceDownValue : modifier.m_vValue.x * pEffect_->GetDamageData().fForceDownValue;

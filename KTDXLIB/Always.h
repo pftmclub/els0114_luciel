@@ -13604,3 +13604,14 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              are both set. Lu/Ciel's AfterImageFrameMove ( June 32b15430 ) writes that flag, not m_bEnable: Lu's after-image no longer runs while Ciel moves.
 #define SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: the effect-set modifier tags get one shared enum ( EFFECT_MODIFIER_TAG, X2EffectSet.h ): the case labels of ApplyDamageEffectModifiers,
+//              the class files' own tag constants ( Eve, Elsword, Luciel, EL ) and Aisha's bare 1 and 2 use it. Revert: undefine the flag ( JUNE_EFFECT_MODIFIER_TAG_ENUM ).
+#define SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+#if defined( SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM ) && !defined( SERV_IRUHADEV_JUNE_CHAR_EFFECTSET_MODIFIER )
+#error SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM needs SERV_IRUHADEV_JUNE_CHAR_EFFECTSET_MODIFIER ( the modifier list )
+#endif
+//////////////////////////////////////////////////////////////////////////

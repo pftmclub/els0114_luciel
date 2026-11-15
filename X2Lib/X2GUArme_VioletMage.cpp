@@ -35744,7 +35744,11 @@ void CX2GUArme_VioletMage::AVSI_SKILL_EventProcess()
 void CX2GUArme_VioletMage::PlayChainFireBall( const bool bHyper_ )
 {
 	const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_Aisha_ChainFireBall", this, NULL, bHyper_, GetPowerRate() * m_fIceBallPower );
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+	g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME, m_fFireBallRangeRate, false );
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, 2, m_fFireBallRangeRate, false );
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 }
 
 void CX2GUArme_VioletMage::CreateGuideFireBall( const WCHAR* pwszEffectName_ )
@@ -36211,7 +36215,11 @@ void CX2GUArme_VioletMage::RNSI_A_ABM_ENERGETIC_ROAD_FrameMove()
 			const CX2SkillTree::SkillTemplet* pLearnedTemplet = ( 0 < iLearnedLevel ) ? userSkillTree.GetUserSkillTemplet( eRoadSkillID, true ) : NULL;
 			float fMoveSpeed = 1.f;
 			if( NULL != pLearnedTemplet && true == pLearnedTemplet->TryGetSkillAbilityValue( CX2SkillTree::SA_MOVE_SPEED, iLearnedLevel, false, fMoveSpeed ) )
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+				g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_VELOCITY, fMoveSpeed, false );
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 				g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, 1, fMoveSpeed, false );
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		}
 	}
 

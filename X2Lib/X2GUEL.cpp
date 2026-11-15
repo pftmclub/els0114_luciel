@@ -251,7 +251,9 @@ namespace _CONST_EL_CH2B2_
 	const float LEAP_CRASH_LANDING_SCALE_PER_DASH_TIME			= 0.4f;
 	const float LEAP_CRASH_LANDING_SCALE_LIMIT					= 2.f;
 	const int	LEAP_CRASH_UPGRADE_NUMERICAL_INDEX				= 3;		// the 4th numerical table of the enhanced skill ( June @32b75456 )
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int	EFFECT_MODIFIER_TAG_SCALE						= 15;		// June 321dad70 tag with no enum name ( as Eve's )
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 }
 using namespace _CONST_EL_CH2B2_;
 // char-elesis CH2c: constants of Avatar of the Fire ( June 32b7db80 )

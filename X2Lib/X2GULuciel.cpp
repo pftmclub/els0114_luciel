@@ -3876,8 +3876,10 @@ namespace _CONST_LUCIEL_CH1F2_
 	const float		CIEL_DASH_JUMP_COMBO_XXX_PROJECTILE_MP				= 5.f;
 	const float		CIEL_DASH_JUMP_COMBO_XXXX_PROJECTILE_TIME			= 0.378f;	// June 32b25cd0
 	const float		CIEL_DASH_JUMP_COMBO_XXXX_PROJECTILE_MP				= 5.f;
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	const int		EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME				= 2;		// June 321db1b0 modifier tag ( no Enum entry ): the main effect's max life time, multiplied or added
 	const int		EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT		= 4;		// June 321db1b0 modifier tag ( no Enum entry ): an int on the damage effect, added
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 }
 using namespace _CONST_LUCIEL_CH1F2_;
 
@@ -5176,7 +5178,11 @@ CX2EffectSet::Handle CX2GULuciel::PlayRatedProjectileEffectSet( const WCHAR* pws
 
 	if( true == bAddMaxCountModifier_ )
 	{
+#ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+#else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	}
 
 	return hEffectSet;
@@ -11173,9 +11179,11 @@ namespace _CONST_LUCIEL_CH1L3_
 	bool TryGetAcquiredSkillAbilityValue( CX2Unit* pUnit_, const CX2SkillTree::SKILL_ABILITY_TYPE eType_, const CX2SkillTree::SKILL_ID eSkillID_, const bool bMemoSwap_, float& fOut_ )
 	{
 		if ( NULL == pUnit_ )
+#ifndef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 			return false;
 
 		const int iSkillLevel = pUnit_->GetUnitData().m_UserSkillTree.GetSkillLevel( eSkillID_, false, 0, true );
+#endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 		if ( iSkillLevel <= 0 )
 			return false;
 
