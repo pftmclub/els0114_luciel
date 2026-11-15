@@ -1038,6 +1038,12 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_SHADOW_CIEL                  = 546,	// June's Enum.lua; Shadow's factor on Ciel
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-16 // char-luciel CH2d2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_BUFF_DEATH_TOUCH                  = 786,	// June's Enum.lua; Death Touch's buff, applied when the beam locks a target
+	BFI_BUFF_ALTAR_OF_EVIL                = 789,	// June's Enum.lua; the Altar of Evil transformed form's buff
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 

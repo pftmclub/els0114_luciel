@@ -7192,6 +7192,14 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ) and the temporary `..._SK
 - **Damage.** The numerical tables of June's `Luciel_Demonio.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
 
+## Stage 8 Lu/Ciel, CH2d2: Diablura skills part 2 (char-luciel CH2d2, 2026-11-16)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's ), the temporary `..._SKILL_DEBUG` ( still on; the CH2d2 review retires it ) and `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( `BFI_BUFF_DEATH_TOUCH` 786, `BFI_BUFF_ALTAR_OF_EVIL` 789 ). Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH2d2 - Done"; log lines `[JUNE_CHAR] LUCIEL SKILL ...`.
+- **What changes in game.** Nightmare ( 30042 / 30076 ), Altar of Evil ( 30043 / 30077 ) with its whole transformed form ( 31 states: start, wait / walk / jump / dash, combos, Death Touch / Mortal Fear / Dark Plasma, hyper mode, end ), Abyss Strike ( 30215 / 30219 ) and Phantom Rush ( 30216 / 30220 ) get their states and callbacks in `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex`. The form's buff, the transform skill window, Death Touch's beam, the Altar of Evil projectiles and Phantom Rush's second use are the new bodies.
+- **Differs from March.** None to compare ( Lu/Ciel is new ). Save: `kickoffs/char-luciel/CH2d2_save.sql` fills `LuDbA` / `LuDbB` for the play-test.
+- **Damage.** The numerical tables of June's `Luciel_Demonio.lua`; read the number from the `[JUNE_SKILL] NUM use` lines of the play-test.
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. The `LuDbA` / `LuDbB` skill rows are in the `db_backup/` snapshot `elsdb` takes before it applies the sql.
+
 ## Engine R14c: the basic-item anim behind every attach-anim weapon's hits (june-engine R14c, 2026-11-15)
 
 Flag `SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM` (`Always.h`; `#error` without `..._JUNE_EQIP_ATTACH_ANIM`, `..._DIVERGE_UPDATE_EQUIP_COLLISION_DATA`, `..._JUNE_ITEM_KIM`, `..._JUNE_EQUIP_EFFECT_SET` and `..._JUNE_ENUM_NAMES`) and the temporary `..._DEBUG` (`[JUNE_ENGINE] EQBASIC` lines; the R14c review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.

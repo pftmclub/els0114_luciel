@@ -1315,10 +1315,6 @@ protected:
 	void				LSI_A_LCN_M_SHADOW_FrameMove();	// June 32b30d40
 	void				LSI_SA_LCG_SOUL_EXTORTION_StateEnd();	// June 32b3dd80
 	void				AddSoulCollectorStack();	// June 32b3db80: one more Soul Collector stack, the Tribute / Soul Strike side effects ride with it ( four callers, two in CH2c2 )
-#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
-	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
-	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
-	void				CreateChaserOfDarknessDamageEffect( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b1f800: body in CH1l3
 	// char-luciel CH2d: Diablura ( 39 ) skills part 1; the setter cases of Nightmare, Altar of Evil, Abyss Strike and Phantom Rush wait for CH2d2
 	void				LSI_SA_LDB_LAND_CRASHER_Init();	// June 32ae87b0
 	void				LSI_SA_LDB_LAND_CRASHER_EventProcess();	// June 32b02840
@@ -1351,6 +1347,42 @@ protected:
 	void				LSI_A_LDB_F_PHANTOM_RUSH_Init();	// June 32ae8ff0
 	void				LSI_A_LDB_M_PHANTOM_RUSH_Init();	// June 32ae90b0
 	CX2SkillTree::SKILL_ID	GetTransformedSkillID( const int iSlotIndex_ ) const;	// June 32ae9c90: the linked skill of slot 0-2
+	// char-luciel CH2d2: Diablura ( 39 ) skills part 2; the setter cases of Nightmare, Altar of Evil, Abyss Strike and Phantom Rush
+	bool				CollectNightmareTargetUnit();	// June 32b17090: the enemies in front within range, kept in m_vecNightmareTargetUnit
+	void				SetTransformBuffFactorToSelf( const UINT uiBuffFactorID_, const UINT uiSkillLevel_ );	// June 32b3e720: the form's buff factor at the skill's level
+	void				CreateAltarOfEvilProjectile();	// June 32b358b0
+	void				LSI_SA_LDB_NIGHTMARE_StateStartFuture();	// June 32b16f50
+	void				LSI_SA_LDB_NIGHTMARE_EventProcess();	// June 32b178b0
+	void				LSI_SA_LDB_NIGHTMARE_TARGET_StateStartFuture();	// June 32b30ec0
+	void				LSI_SA_LDB_NIGHTMARE_TARGET_FrameMove();	// June 32b13360
+	void				LSI_SA_LDB_NIGHTMARE_TARGET_EventProcess();	// June 32b17c20
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_StateStartFuture();	// June 32b43910
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_StateStart();	// June 32b43ae0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT_EventProcess();	// June 32b31260
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK_EventProcess();	// June 32b31480
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY_EventProcess();	// June 32b133d0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING_EventProcess();	// June 32b316a0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_EventProcess();	// June 32b36290
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END_EventProcess();	// June 32b364e0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_EventProcess();	// June 32b14180
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING_EventProcess();	// June 32b36750
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z_EventProcess();	// June 32b13500
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_StateStart();	// June 32b380a0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_SECOND_StateStart();	// June 32b380f0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_StateStart();	// June 32b38110
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove();	// June 32b318e0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_EventProcess();	// June 32b04640, also Mortal Fear's and Dark Plasma's
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_EventProcess();	// June 32b048c0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_StateEnd();	// June 32b3a2d0
+	void				LSI_SA_LDB_ALTAR_OF_EVIL_END_EventProcess();	// June 32b04910
+	void				LSI_A_LDB_F_ABYSS_STRIKE_EventProcess();	// June 32b04d30, also the male state's
+	void				LSI_A_LDB_F_PHANTOM_RUSH_FrameMove();	// June 32b38140
+	void				LSI_A_LDB_M_PHANTOM_RUSH_FrameMove();	// June 32b38340 ( the class map's CameraMove: June registers it in the FrameMove slot )
+	void				LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture();	// June 32b38540, also the male target state's
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
+	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
+	void				CreateChaserOfDarknessDamageEffect( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b1f800: body in CH1l3
 	void				ProcessPhantomRushHit( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b347f0: body in CH1l3
 	void				PlayPunisherEffectSet( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b34c70: body in CH1l3
 	void				RegisterDesperadoTarget( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b18060: body in CH1l3

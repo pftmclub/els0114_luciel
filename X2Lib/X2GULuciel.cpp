@@ -17521,6 +17521,951 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END_EventProcess(
 
 	CommonEventProcess();
 }
+
+// char-luciel CH2d2: Diablura ( 39 ) skills part 2 ( Nightmare, Altar of Evil's transformed form, Abyss Strike, Phantom Rush )
+namespace _CONST_LUCIEL_CH2D2_
+{
+	const float		NIGHTMARE_TARGET_RANGE							= 1200.f;	// June 32b17090 ( 334712f8 )
+	const float		NIGHTMARE_TARGET_CONE_HALF_DEGREE				= 180.f;	// June 32b17090 ( 3344d398 / 33477e98 )
+	const float		NIGHTMARE_TARGET_CONE_DEGREE					= 360.f;	// June 32b17090 ( 3346a6f0 )
+	const double	NIGHTMARE_UNIT_WIDTH_RATE						= 0.5;		// June 32b30ec0 ( 3342ebc8 ): half the target's width
+	const double	NIGHTMARE_STAND_DISTANCE_ADD					= 10.0;		// June 32b30ec0 ( 33438088 )
+	const float		NIGHTMARE_LAND_RADIUS							= 30.f;		// June 32b30ec0 ( 334ed3f8 ): GetLandPosition radius
+	const float		NIGHTMARE_VOICE_TIME							= 0.285f;	// June 32b13360 ( 334f03d4 )
+	const float		DEATH_TOUCH_BEAM_TIME							= 0.847f;	// June 32b318e0 ( 334f2cc8 )
+	const float		DEATH_TOUCH_DEFAULT_SEARCH_RANGE				= 800.f;	// June 32b318e0 ( 334ed3e0 ): kept when the skill has no range value
+	const float		DEATH_TOUCH_DEFAULT_TIME						= 10.f;		// June 32b318e0 ( 334ed3d0 ): kept when the skill has no time value
+	const float		DEATH_TOUCH_LINK_DISTANCE						= 99999.f;	// June 32b318e0 ( 33441c60 )
+	const float		PHANTOM_RUSH_EFFECT_SET_TIME					= 0.001f;	// June 32b38140 ( 33431564 )
+	const float		PHANTOM_RUSH_STAND_LAND_RADIUS					= 30.f;		// June 32b38540 ( 334ed3f8 ): GetLandPosition and CanDown radius
+	const double	PHANTOM_RUSH_UNIT_WIDTH_RATE					= 0.5;		// June 32b38540 ( 3342ebc8 )
+	const float		ALTAR_OF_EVIL_PROJECTILE_CONE_DEGREE			= 180.f;	// June 32b358b0 ( 3344d398 )
+	const float		TRANSFORM_BUFF_PVP_TIME_RATE					= 0.5f;		// June 32b3e720 ( 334ed42c ): the form's time in a PvP or PvE game
+	const WCHAR*	TRANSFORM_END_TEXTURE_FILE						= L"DLG_UI_Common_Texture96_NEW.tga";	// June 32b43910 ( 3345c8b0 )
+	const WCHAR*	TRANSFORM_END_TEXTURE_KEY						= L"LUCIEL_LDB_LOCK";	// June 32b43910 ( 334f55a4 )
+}
+using namespace _CONST_LUCIEL_CH2D2_;
+
+// char-luciel CH2d2: June 32b16f50 ( thunk 32b4d320 ): the key of the slot, the hit list restarts
+void CX2GULuciel::LSI_SA_LDB_NIGHTMARE_StateStartFuture()
+{
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+	m_vecNightmareHitUnit.clear();
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH2d2: June 32b17090 ( no thunk ): needs a combination point; the enemies in front within 1200, kept for the target state
+bool CX2GULuciel::CollectNightmareTargetUnit()
+{
+	if ( GetNowCombinationPoint() <= 0 )
+		return false;
+
+	std::vector<CX2GameUnit*> vecEnemyUnit;
+	CollectEnemyUnitsInCone( vecEnemyUnit, 1, NIGHTMARE_TARGET_RANGE, -NIGHTMARE_TARGET_CONE_HALF_DEGREE, NIGHTMARE_TARGET_CONE_HALF_DEGREE, false, NIGHTMARE_TARGET_CONE_DEGREE, true );
+	m_vecNightmareTargetUnit.swap( vecEnemyUnit );
+
+	return false == m_vecNightmareTargetUnit.empty();
+}
+
+// char-luciel CH2d2: June 32b178b0 ( thunk 32b4d380 ): the key held inside its window ( with a target in front ) goes to the target state
+void CX2GULuciel::LSI_SA_LDB_NIGHTMARE_EventProcess()
+{
+	m_kSkillSlotKey.FollowSlotSwap();
+
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		( true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) && true == CollectNightmareTargetUnit() ), LSI_SA_LDB_NIGHTMARE_TARGET )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b17c20 ( thunk 32b4d390 ): the same listing as the Nightmare state's, byte for byte; its window goes to this state again
+void CX2GULuciel::LSI_SA_LDB_NIGHTMARE_TARGET_EventProcess()
+{
+	LSI_SA_LDB_NIGHTMARE_EventProcess();
+}
+
+// char-luciel CH2d2: June 32b30ec0 ( thunk 32b4e2c0 ): the target costs a combination point; the next enemy not hit yet ( the first once all were ) is the one stood beside
+void CX2GULuciel::LSI_SA_LDB_NIGHTMARE_TARGET_StateStartFuture()
+{
+	UpCombinationPoint( -1 );
+
+	CX2GameUnit* pTargetUnit = NULL;
+	for ( std::vector<CX2GameUnit*>::const_iterator vit = m_vecNightmareTargetUnit.begin(); vit != m_vecNightmareTargetUnit.end(); ++vit )
+	{
+		CX2GameUnit* pEnemyUnit = *vit;
+		if ( NULL == pEnemyUnit )
+			continue;
+
+		bool bAlreadyHit = false;
+		for ( std::vector<SGameUnitKey>::const_iterator vitHit = m_vecNightmareHitUnit.begin(); vitHit != m_vecNightmareHitUnit.end(); ++vitHit )
+		{
+			if ( vitHit->m_eGameUnitType == pEnemyUnit->GetGameUnitType() && vitHit->m_uidGameUnit == pEnemyUnit->GetUnitUID() )
+			{
+				bAlreadyHit = true;
+				break;
+			}
+		}
+		if ( true == bAlreadyHit )
+			continue;
+
+		SGameUnitKey hitUnitKey;
+		hitUnitKey.m_uidGameUnit = pEnemyUnit->GetUnitUID();
+		hitUnitKey.m_eGameUnitType = pEnemyUnit->GetGameUnitType();
+		m_vecNightmareHitUnit.push_back( hitUnitKey );
+		pTargetUnit = pEnemyUnit;
+		break;
+	}
+
+	if ( NULL == pTargetUnit )
+	{
+		m_vecNightmareHitUnit.clear();
+		for ( std::vector<CX2GameUnit*>::const_iterator vit = m_vecNightmareTargetUnit.begin(); vit != m_vecNightmareTargetUnit.end(); ++vit )
+		{
+			if ( NULL != *vit )
+			{
+				pTargetUnit = *vit;
+				break;
+			}
+		}
+	}
+
+	if ( NULL != pTargetUnit )
+	{
+		const D3DXVECTOR3 vTargetPos = pTargetUnit->GetPos( true );
+		D3DXVECTOR3 vStandPos = GetPos( false );
+		const bool bTargetRight = pTargetUnit->GetIsRight();
+		bool bStandRight = bTargetRight;
+
+		CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+		const float fStandDistance = static_cast<float>( pTargetUnit->GetUnitWidth( false ) * NIGHTMARE_UNIT_WIDTH_RATE + NIGHTMARE_STAND_DISTANCE_ADD );
+		if ( false == pLineMap->GetFixedDistancePositionForWeaponTaker( &vTargetPos, fStandDistance, !bTargetRight, vStandPos ) )
+		{
+			if ( false == pLineMap->GetFixedDistancePositionForWeaponTaker( &vTargetPos, fStandDistance, bTargetRight, vStandPos ) )
+				vStandPos = vTargetPos;
+
+			bStandRight = GetIsRight();
+		}
+		vStandPos.y = vTargetPos.y;
+
+		int iLandLineIndex = -1;
+		g_pX2Game->GetWorld()->GetLineMap()->GetLandPosition( vStandPos, true, NIGHTMARE_LAND_RADIUS, &iLandLineIndex );
+
+		const CKTDGLineMap::LineData* pLandLineData = g_pX2Game->GetWorld()->GetLineMap()->GetLineData( iLandLineIndex );
+		if ( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
+		{
+			m_FrameDataFuture.syncData.position = vStandPos;
+			m_FrameDataFuture.syncData.bIsRight = bStandRight;
+		}
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL nightmare target body %c found %d hit list %d", ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( NULL != pTargetUnit ), static_cast<int>( m_vecNightmareHitUnit.size() ) );	// char-luciel CH2d2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH2d2: June 32b13360 ( thunk 32b4cde0 ): the voice plays once, at 0.285 s
+void CX2GULuciel::LSI_SA_LDB_NIGHTMARE_TARGET_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( NIGHTMARE_VOICE_TIME ) && false == m_bNightmareTargetHit )
+	{
+		m_bNightmareTargetHit = true;
+		PlaySound( L"LuVoice_Nightmare02.ogg" );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2d2: June 32b3e720 ( no thunk ): the form's buff factor ( June's SetBuffFactorToGameUnitByBuffFactorID without the can-apply test, in a PvP or PvE game it lasts half as long )
+void CX2GULuciel::SetTransformBuffFactorToSelf( const UINT uiBuffFactorID_, const UINT uiSkillLevel_ )
+{
+	CX2BuffFactorPtr ptrBuffFactor = CX2BuffTempletManager::GetInstance()->GetBuffFactorPtr( uiBuffFactorID_ );
+	if ( NULL == ptrBuffFactor )
+		return;
+
+	CX2BuffFactorPtr ptrBuffFactorClone = ptrBuffFactor->GetClonePtr( uiSkillLevel_ );
+	if ( NULL == ptrBuffFactorClone )
+		return;
+
+	if ( NULL != g_pX2Game && true == g_pX2Game->GetIsNowPVPCorrectionGame() )	// June 322cc1a0: PVP or PVE
+		ptrBuffFactorClone->SetFinalizerValue( BFT_TIME, TRANSFORM_BUFF_PVP_TIME_RATE, 1 );
+
+	AdjustBuffFactorByIndex( ptrBuffFactorClone, GetNowStateSkillID() );	// June vslot 0x524, not the state buff skill id
+	ptrBuffFactorClone->SetGameUnitBuffFactor( this, -1, true );
+	SetBuffFactorToGameUnit( *ptrBuffFactorClone );
+}
+
+// char-luciel CH2d2: June 32b43910 ( thunk 32b4e730 ): the sound list clears, the form's buff starts, my unit shows the linked skills' window
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_StateStartFuture()
+{
+	m_vecSoundPlayData.clear();
+
+	SetTransformBuffFactorToSelf( BFI_BUFF_ALTAR_OF_EVIL, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LDB_ALTAR_OF_EVIL, false, 0, true ) );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL altar transform start body %c buff %d", ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( true == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) ) );	// char-luciel CH2d2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+	if ( true == IsMyUnit() )
+	{
+		if ( NULL == m_pTransformSkillSlotUI )
+			m_pTransformSkillSlotUI = new CX2TransformSkillSlotUI();
+
+		if ( NULL != m_pTransformSkillSlotUI )
+		{
+			for ( int iSlot = 0; iSlot < CX2TransformSkillSlotUI::TRANSFORM_SKILL_SLOT_NUM; ++iSlot )
+			{
+				const CX2SkillTree::SKILL_ID eLinkedSkillID = GetTransformedSkillID( iSlot );
+				m_pTransformSkillSlotUI->SetSlotSkill( iSlot, eLinkedSkillID, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( eLinkedSkillID, false, 0, true ) );
+			}
+
+			m_pTransformSkillSlotUI->SetShow( true );
+			m_pTransformSkillSlotUI->SetTransformEndTexture( TRANSFORM_END_TEXTURE_FILE, TRANSFORM_END_TEXTURE_KEY );
+		}
+	}
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH2d2: June 32b43ae0 ( thunk 32b4e740 )
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_StateStart()
+{
+	SetTransformBuffFactorToSelf( BFI_BUFF_ALTAR_OF_EVIL, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LDB_ALTAR_OF_EVIL, false, 0, true ) );
+
+	CommonStateStart();
+}
+
+// char-luciel CH2d2: June 32b31260 ( thunk 32b4e2d0 ): the form's wait; June tests the walk before the double step here
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X );
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK );
+	}
+	else if ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if ( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b31480 ( thunk 32b4e2e0 )
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( false == m_InputData.pureRight && false == m_InputData.pureLeft )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X );
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if ( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b133d0 ( thunk 32b4cdf0 ): Z / X / the rise start the jump states, each with the jump speed
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() || true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b13500 ( thunk 32b4ce10 ): the jump Z lands ( the event flag sets the can-not-jump time ); in the air the held direction keeps the walk speed
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+			m_fCanNotJumpTime = ALTAR_OF_EVIL_JUMP_X_CAN_NOT_JUMP_TIME;
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );
+	}
+	else if ( ( true == m_InputData.pureRight && true == m_FrameDataFuture.syncData.bIsRight )
+		|| ( true == m_InputData.pureLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		m_PhysicParam.nowSpeed.x = GetWalkSpeed();
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b316a0 ( thunk 32b4e2f0 )
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+	}
+	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK );
+	}
+	else if ( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY );
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	ELSE_IF_KEY_PRESSED_AT_SKIP_POINT_ZXCAS
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b36290 ( thunk 32b4e300, Ciel's dash registers it too ): a dash that leaves the line is a dash jump; Z / X are the plain combos
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_LU_DASH_JUMP );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_COMBO_X );
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == m_InputData.oneUp )
+	{
+		StateChange( LSI_LU_DASH_JUMP );
+		m_PhysicParam.nowSpeed.y = GetDashJumpSpeed();
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if ( ( false == m_InputData.pureRight && false == m_InputData.pureLeft )
+		|| ( true == m_InputData.pureRight && ( true == m_InputData.pureLeft || false == m_FrameDataFuture.syncData.bIsRight ) )
+		|| ( true == m_InputData.pureLeft && true == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		StateChange( LSI_LU_DASH_END );
+	}
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_DASH_JUMP );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b364e0 ( thunk 32b4e310, Ciel's dash end registers it too )
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_COMBO_X );
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft
+		|| ( true == m_InputData.oneRight && true == m_FrameDataFuture.syncData.bIsRight )
+		|| ( true == m_InputData.oneLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_WALK );
+	}
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( true == m_InputData.oneUp )
+	{
+		StateChange( LSI_LU_JUMP_READY );
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b14180 ( thunk 32b4ce00, Ciel's dash jump registers it too ): the landing chain has no power landing, the air chain has no special attack
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_EventProcess()
+{
+	if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
+		{
+			StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		}
+		else
+		{
+			if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+			{
+				StateChange( LSI_LU_DASH_JUMP );
+				m_PhysicParam.nowSpeed.y = GetDashJumpSpeed();
+			}
+			else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+			{
+				StateChangeDashIfPossible();
+			}
+			else
+			{
+				StateChange( LSI_LU_DASH_JUMP_LANDING );
+			}
+
+			m_bDownForce = false;
+		}
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_JUMP_COMBO_X );
+	}
+	else if ( ( true == m_InputData.pureRight && false == m_FrameDataFuture.syncData.bIsRight )
+		|| ( false == m_InputData.pureRight && true == m_InputData.pureLeft && true == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		if ( GetJumpSpeed() < m_PhysicParam.nowSpeed.y )
+			m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+
+		if ( m_PhysicParam.nowSpeed.y <= 0.f )
+			StateChange( LSI_LU_JUMP_DOWN );
+		else
+			StateChange( LSI_LU_JUMP_UP );
+	}
+
+	if ( true == m_InputData.oneUp && m_PhysicParam.nowSpeed.y <= 0.f )
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+
+	if ( true == m_InputData.oneDown )
+	{
+		m_bDownForce = true;
+		m_PhysicParam.nowSpeed.y = m_PhysicParam.fMaxGSpeed;
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b36750 ( thunk 32b4e320, Ciel's dash jump landing registers it too )
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		StateChange( LSI_LU_COMBO_Z );
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		StateChange( LSI_LU_COMBO_X );
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft
+		|| ( true == m_InputData.oneRight && true == m_FrameDataFuture.syncData.bIsRight )
+		|| ( true == m_InputData.oneLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		StateChange( LSI_LU_WALK );
+	}
+	else if ( true == m_InputData.pureUp )
+	{
+		StateChange( LSI_LU_JUMP_READY );
+	}
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		StateChange( LSI_LU_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b380a0 ( thunk 32b4e540, the XXX ready state ): the altars restart, the ring's range, interval and MP are the state's useful values, and three altars start at once
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_StateStart()
+{
+	CommonStateStart();
+	ClearAltarOfEvilEffectSet();
+
+	m_AltarOfEvilData.m_fRange = m_afUsefulValueNow[0][0];
+	m_AltarOfEvilData.m_fInterval = m_afUsefulValueNow[0][1];
+	m_AltarOfEvilData.m_fMpCostPerEffectSet = m_afUsefulValueNow[0][2];
+	PlayAltarOfEvilEffectSet();
+	PlayAltarOfEvilEffectSet();
+	PlayAltarOfEvilEffectSet();
+}
+
+// char-luciel CH2d2: June 32b380f0 ( thunk 32b4e550, the ready table's second id ): the altars' projectiles fly out as the state starts
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_SECOND_StateStart()
+{
+	CreateAltarOfEvilProjectile();
+
+	CommonStateStart();
+}
+
+// char-luciel CH2d2: June 32b358b0 ( no thunk ): a projectile on each altar's place flies at the next enemy in front, then the altars stop
+void CX2GULuciel::CreateAltarOfEvilProjectile()
+{
+	std::vector<CX2GameUnit*> vecEnemyUnit;
+	CollectEnemyUnitsInCone( vecEnemyUnit, 1, m_AltarOfEvilData.m_fRange, -NIGHTMARE_TARGET_CONE_HALF_DEGREE, NIGHTMARE_TARGET_CONE_HALF_DEGREE, true, ALTAR_OF_EVIL_PROJECTILE_CONE_DEGREE, false );
+
+	const int iEnemyCount = static_cast<int>( vecEnemyUnit.size() );
+	if ( 0 < iEnemyCount )
+	{
+		PlaySound( L"Luciel_Altar_Of_Evil_XXX02.ogg" );
+		PlaySound( L"LuVoice_Altar_of_Evil_XXX_End.ogg" );
+	}
+
+	int iTargetCursor = 0;
+	UINT uiPositionIndex = 0;
+	for ( std::vector<CX2EffectSet::Handle>::iterator vit = m_AltarOfEvilData.m_vecEffectSet.begin(); vit != m_AltarOfEvilData.m_vecEffectSet.end(); ++vit )
+	{
+		const bool bEffectOptionLow = ( CX2GameOption::OL_LOW == g_pMain->GetGameOption().GetOptionList().m_eEffect );	// June 3241d2a0 on g_pMain +0x180
+		if ( NULL == g_pX2Game->GetEffectSet()->GetEffectSetInstance( *vit ) && false == bEffectOptionLow )
+			continue;
+
+		D3DXVECTOR3 vAltarPos;
+		if ( false == bEffectOptionLow )
+		{
+			vAltarPos = g_pX2Game->GetEffectSet()->GetEffectPosition_LUA( *vit, 0 );
+		}
+		else
+		{
+			if ( m_AltarOfEvilData.m_vecPosition.size() <= uiPositionIndex )
+				continue;	// stand-in: June throws the vector subscript error here
+
+			vAltarPos = m_AltarOfEvilData.m_vecPosition[uiPositionIndex];
+		}
+		++uiPositionIndex;
+
+		CX2DamageEffect::CEffect* pProjectile = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SA_LDB_ALTAR_OF_EVIL_XXX_Projectile", GetPowerRate(), vAltarPos, GetRotateDegree(), GetRotateDegree(),
+			m_FrameDataNow.unitCondition.landPosition.y, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+		if ( NULL != pProjectile && 0 < iEnemyCount )
+		{
+			if ( iTargetCursor >= iEnemyCount )
+				iTargetCursor = 0;
+
+			CX2GameUnit* pEnemyUnit = vecEnemyUnit[iTargetCursor];
+			if ( NULL != pEnemyUnit )
+			{
+				if ( CX2GameUnit::GUT_USER == pEnemyUnit->GetGameUnitType() )
+					pProjectile->SetLockOnUnitUID( pEnemyUnit->GetUnitUID() );
+				else if ( CX2GameUnit::GUT_NPC == pEnemyUnit->GetGameUnitType() )
+					pProjectile->SetLockOnNPCUID( static_cast<int>( pEnemyUnit->GetUnitUID() ) );
+
+				++iTargetCursor;
+			}
+		}
+
+		g_pX2Game->GetEffectSet()->StopEffectSet( *vit );
+	}
+
+	m_AltarOfEvilData.m_vecEffectSet.clear();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL altar projectile body %c altars %d enemies %d", ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( uiPositionIndex ), iEnemyCount );	// char-luciel CH2d2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+}
+
+// char-luciel CH2d2: June 32b38110 ( thunk 32b4e560 ): Death Touch's linked skill pays its MP and cool time at the start
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_StateStart()
+{
+	CommonStateStart();
+	ClearDeathTouch();
+	ApplyTransformSkillCost();
+	SetEquippedSkillLevel( CX2SkillTree::SI_NONE, true );	// June 31fc9f80
+}
+
+// char-luciel CH2d2: June 32b318e0 ( thunk 32b4e330 ): at 0.847 s the beam arm, the link and its attack start on the nearest enemy in front, which the buff then marks
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( DEATH_TOUCH_BEAM_TIME ) )
+	{
+		float fAbilityValue = DEATH_TOUCH_DEFAULT_SEARCH_RANGE;
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_PROJECTILE_RANGE_REL, GetNowStateSkillID(), true, fAbilityValue );	// June SA 0x1f
+
+		const std::set<UidType> setExceptUnitUID;
+		CX2GameUnit* pTargetUnit = g_pX2Game->GetFrontNearestEnemyUnit( this, fAbilityValue, setExceptUnitUID, -1 );
+		if ( NULL != pTargetUnit )
+		{
+			TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_PROJECTILE_RANGE_REL_2, GetNowStateSkillID(), true, fAbilityValue );	// June SA 0x90: a miss keeps the first value
+			m_fDeathTouchRange = fAbilityValue;
+
+			float fDeathTouchTime = DEATH_TOUCH_DEFAULT_TIME;
+			TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_EFFECTIVE_TIME, GetNowStateSkillID(), true, fDeathTouchTime );
+			m_fDeathTouchTime = fDeathTouchTime;
+
+			D3DXVECTOR3 vMyPos = GetBonePos( L"Bip01" );
+			vMyPos.y += DEATH_TOUCH_SELF_BONE_OFFSET_Y;
+
+			D3DXVECTOR3 vTargetPos;
+			if ( true == pTargetUnit->GetBonePos( L"Bip01", vTargetPos ) )
+			{
+				vTargetPos.y += DEATH_TOUCH_TARGET_BONE_OFFSET_Y;
+			}
+			else
+			{
+				vTargetPos = pTargetUnit->GetPos( false );
+				vTargetPos.y += DEATH_TOUCH_TARGET_POSITION_OFFSET_Y;
+			}
+
+			CX2DamageEffect* pDamageEffect = g_pX2Game->GetDamageEffect();
+			CX2DamageEffect::CEffect* pArmEffect = pDamageEffect->CreateInstance( this, L"DamageEffect_SA_LDB_Death_Touch_ARM", GetPowerRate(), vMyPos, GetRotateDegree(), GetRotateDegree(),
+				0.f, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+			if ( NULL != pArmEffect )
+				pArmEffect->SetLinkMainEffectByPos( vMyPos, vTargetPos, DEATH_TOUCH_LINK_DISTANCE );
+
+			CX2DamageEffect::CEffect* pLinkingAttackEffect = pDamageEffect->CreateInstance( this, L"DamageEffect_SA_LDB_Death_Touch_Linking_Attack", GetPowerRate(), vTargetPos, GetRotateDegree(), GetRotateDegree(),
+				0.f, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+			CX2DamageEffect::CEffect* pLinkEffect = pDamageEffect->CreateInstance( this, L"DamageEffect_SA_LDB_Death_Touch_Link", GetPowerRate(), vMyPos, GetRotateDegree(), GetRotateDegree(),
+				0.f, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+			if ( NULL != pLinkEffect && NULL != pLinkingAttackEffect )
+			{
+				pLinkEffect->SetLinkMainEffectByPos( vMyPos, vTargetPos, DEATH_TOUCH_LINK_DISTANCE );
+				pLinkingAttackEffect->SetPos( vTargetPos );
+
+				m_hDeathTouchBeamEffect = pLinkEffect->GetHandle();
+				m_hDeathTouchTargetEffect = pLinkingAttackEffect->GetHandle();
+				m_DeathTouchTarget.m_eGameUnitType = pTargetUnit->GetGameUnitType();
+				m_DeathTouchTarget.m_uidGameUnit = pTargetUnit->GetUnitUID();
+				SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_DEATH_TOUCH, 1, NULL, 0, false );	// 7ai arguments
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+				CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL death touch beam body %c range %.0f time %.2f", ( true == IsMinorUnitActive() ? L'C' : L'L' ), m_fDeathTouchRange, m_fDeathTouchTime );	// char-luciel CH2d2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			}
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2d2: June 32b04640 ( thunk 32b4c450, also Mortal Fear's and Dark Plasma's ): the animation end goes to the form's wait or fall, then the cancel chain with the linked skill
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		else
+			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b048c0 ( thunk 32b4c460 ): after the state change time the altars end
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_EventProcess()
+{
+	if ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() )
+	{
+		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_END );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b3a2d0 ( thunk 32b4e630 )
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_StateEnd()
+{
+	EndTransformedForm( 0, false );
+
+	CommonStateEnd();
+}
+
+// char-luciel CH2d2: June 32b04910 ( thunk 32b4c470 )
+void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_END_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b04d30 ( thunk 32b4c750, the male state registers it too ): the sit key tries the bounding target, then the cancel chain
+void CX2GULuciel::LSI_A_LDB_F_ABYSS_STRIKE_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL abyss strike end body %c foot %d", ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( m_FrameDataFuture.unitCondition.bFootOnLine ) );	// char-luciel CH2d2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	else if ( true == m_InputData.oneSit )
+	{
+		CheckBoundingTarget();
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH2d2: June 32b38140 ( thunk 32b4e570 ): at the first frame the dummy effect set plays and the second use's time starts
+void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( PHANTOM_RUSH_EFFECT_SET_TIME ) )
+	{
+		ResetPhantomRushReady();
+		m_hPhantomRushEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDB_PHANTOM_RUSH_Lu_Dummy", this );
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_EFFECTIVE_TIME, GetNowStateSkillID(), true, m_fPhantomRushReadyTime );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2d2: June 32b38340 ( thunk 32b4e590, registered in the FrameMove slot ): the same listing with Ciel's dummy effect set
+void CX2GULuciel::LSI_A_LDB_M_PHANTOM_RUSH_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( PHANTOM_RUSH_EFFECT_SET_TIME ) )
+	{
+		ResetPhantomRushReady();
+		m_hPhantomRushEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDB_PHANTOM_RUSH_Ciel_Dummy", this );
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_EFFECTIVE_TIME, GetNowStateSkillID(), true, m_fPhantomRushReadyTime );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH2d2: June 32b38540 ( thunk 32b4e580, the male target state registers it too ): the second use stands beside the target, or on the nearest line when there is no standing place; the ready state ends
+void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( m_PhantomRushTarget.m_uidGameUnit, m_PhantomRushTarget.m_eGameUnitType );
+	if ( NULL != pTargetUnit )
+	{
+		const D3DXVECTOR3 vTargetPos = pTargetUnit->GetPos( true );
+		D3DXVECTOR3 vStandPos = GetPos( false );
+		const bool bTargetRight = pTargetUnit->GetIsRight();
+		bool bStandRight = bTargetRight;
+
+		CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+		const float fStandDistance = static_cast<float>( pTargetUnit->GetUnitWidth( false ) * PHANTOM_RUSH_UNIT_WIDTH_RATE + GetUsefulValueFuture( 0, 0 ) );
+		if ( false == pLineMap->GetFixedDistancePositionForWeaponTaker( &vTargetPos, fStandDistance, !bTargetRight, vStandPos ) )
+		{
+			if ( false == g_pX2Game->GetWorld()->GetLineMap()->GetFixedDistancePositionForWeaponTaker( &vTargetPos, fStandDistance, bTargetRight, vStandPos ) )
+				vStandPos = vTargetPos;
+
+			bStandRight = GetIsRight();
+		}
+		vStandPos.y = vTargetPos.y;
+
+		int iLandLineIndex = -1;
+		g_pX2Game->GetWorld()->GetLineMap()->GetLandPosition( vStandPos, true, PHANTOM_RUSH_STAND_LAND_RADIUS, &iLandLineIndex );
+
+		const CKTDGLineMap::LineData* pLandLineData = g_pX2Game->GetWorld()->GetLineMap()->GetLineData( iLandLineIndex );
+		if ( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
+		{
+			D3DXVECTOR3 vFloorPos;
+			D3DXVECTOR3 vResultPos = vStandPos;
+			if ( true != g_pX2Game->GetWorld()->GetLineMap()->CanDown( vStandPos, PHANTOM_RUSH_STAND_LAND_RADIUS, &vFloorPos, NULL, NULL, false, false, true, false ) )
+			{
+				D3DXVECTOR3 vNearestPos;
+				if ( -1 != g_pX2Game->GetWorld()->GetLineMap()->GetNearestLine( vStandPos, &vNearestPos, false ) )
+					vResultPos = vNearestPos;
+				else
+					vResultPos = GetPos( false );
+			}
+
+			m_FrameDataFuture.syncData.position = vResultPos;
+			m_FrameDataFuture.syncData.bIsRight = bStandRight;
+		}
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL phantom rush target body %c found %d", ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( NULL != pTargetUnit ) );	// char-luciel CH2d2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+	ResetPhantomRushReady();
+}
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
@@ -18172,7 +19117,315 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END_EventProcess(
 				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
 			} break;
 
-		// Nightmare ( @32b47d2e ), Altar of Evil ( @32b47de9 ), Abyss Strike ( @32b49cd0 ) and Phantom Rush ( @32b49d69 ) wait for CH2d2: each has a state whose callbacks are CH2d2's, and a state with none would leave the player stuck
+		case CX2SkillTree::RNSI_SA_LDB_NIGHTMARE:	// char-luciel CH2d2: June @32b47d2e ( ids 30042 / 30076 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_NIGHTMARE", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_NIGHTMARE_Init );	// June 32b4b1a0
+				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_NIGHTMARE_StateStartFuture );	// June 32b4d320
+				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_NIGHTMARE_StateStart );	// June 32b4b1b0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_NIGHTMARE_EventProcess );	// June 32b4d380
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_NIGHTMARE", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_NIGHTMARE_TARGET;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_NIGHTMARE_TARGET", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_NIGHTMARE_TARGET_StateStartFuture );	// June 32b4e2c0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_NIGHTMARE_TARGET_FrameMove );	// June 32b4cde0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_NIGHTMARE_TARGET_EventProcess );	// June 32b4d390
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDB_ALTAR_OF_EVIL:	// char-luciel CH2d2: June @32b47de9 ( ids 30043 / 30077 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_Init );	// June 32b4b1c0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_EventProcess );	// June 32b4c380
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_StateStartFuture );	// June 32b4e730
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_StateStart );	// June 32b4e740
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_EventProcess );	// June 32b4c390
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT_EventProcess );	// June 32b4e2d0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, WalkFrameMoveFuture );	// June 329cadf0 > 31fd23e0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK_EventProcess );	// June 32b4e2e0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY_EventProcess );	// June 32b4cdf0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );	// June 329cae00 > 31fd2470
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP_EventProcess );	// June 32b4b1d0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );	// June 329cae00 > 31fd2470
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN_EventProcess );	// June 32b4c3a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, JumpLandingStart );	// June 329cae20 > 31fc7f30
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING_EventProcess );	// June 32b4e2f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashStartFuture );	// June 329cc580 > 329cc1f0
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, DashStart );	// June 329cae30 > 31fc7fa0
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, DashFrameMoveFuture );	// June 329cae40 > 31fd25e0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_EventProcess );	// June 32b4e300
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, DashEndStartFuture );	// June 32b4aa90 > 31fd2680
+				// June 32b4aaa0 > 31fc7fc0 ( StateStart ): = CommonStateStart, which an empty slot runs
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_END_FrameMove );	// June 32b4cbe0 > 32b0fef0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END_EventProcess );	// June 32b4e310
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashJumpStartFuture );	// June 32a2b990 > 31fc7f50
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, DashJumpStart );	// June 32a2b9a0 > 31fcbdf0
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, DashJumpFrameMoveFuture );	// June 32a2b9b0 > 31fd2520
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_EventProcess );	// June 32b4ce00
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GUUser, DashJumpEndFuture );	// June 32a2b9c0 > 31fc7f80
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashJumpLandingStartFuture );	// June 329cae70 > 31fcbe40
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, JumpLandingStart );	// June 329cae20 > 31fc7f30
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING_EventProcess );	// June 32b4e320
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z_EventProcess );	// June 32b4ce10
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X_EventProcess );	// June 32b4c3b0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z_EventProcess );	// June 32b4c3c0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZ_EventProcess );	// June 32b4c3d0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZ_EventProcess );	// June 32b4c3e0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZZ_EventProcess );	// June 32b4c3f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X_EventProcess );	// June 32b4c400
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XX;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XX", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XX_EventProcess );	// June 32b4c410
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_StateStart );	// June 32b4e540
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_EventProcess );	// June 32b4c420
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END_EventProcess );	// June 32b4c430
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= STATE_ID_ALTAR_OF_EVIL_UNNAMED;	// June @32b482d4: the ready table again, with the projectile start
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_SECOND_StateStart );	// June 32b4e550
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_SECOND_EventProcess );	// June 32b4c440
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= ALTAR_OF_EVIL_COMBO_XXX_END_SECOND_STATE_ID;	// June @32b4830d: the end table again
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END_EventProcess );	// June 32b4c430
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH", stateData.stateID );
+				stateData.m_bSkillState				= true;
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_Init );	// June 32b4b1e0
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_StateStart );	// June 32b4e560
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove );	// June 32b4e330
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_EventProcess );	// June 32b4c450
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR", stateData.stateID );
+				stateData.m_bSkillState				= true;
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR_Init );	// June 32b4b1f0
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_MORTAL_FEAR_StateStart );	// June 32b4b200
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_EventProcess );	// June 32b4c450
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA", stateData.stateID );
+				stateData.m_bSkillState				= true;
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA_Init );	// June 32b4b210
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DARK_PLASMA_StateStart );	// June 32b4b220
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_EventProcess );	// June 32b4c450
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				const bool bUnitTranscended = ( NULL != GetUnit() && 0 != GetUnit()->GetUnitData().m_iUnitClassTran );	// June 32070d40 @32b4846f
+				stateData.stateID					= ( true == bUnitTranscended ) ? LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_HYPER_MODE_TR : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_HYPER_MODE;
+				m_LuaManager.MakeTableReference( ( true == bUnitTranscended ) ? "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_HYPER_MODE_TR" : "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_HYPER_MODE", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, HyperModeStartFuture );	// June 329caf10
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, HyperModeStart );	// June 329caef0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, HyperModeFrameMove );	// June 32bd5f20
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, HyperModeEventProcess );	// June 329caf00
+				stateData.StateEnd					= SET_CB_FUNC( CX2GUUser, HyperModeEnd );	// June 329cc5a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_THROW_ITEM;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_THROW_ITEM", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateStart );	// June 329cb120
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMoveFuture );	// June 329cb130
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMove );	// June 329cb140
+				stateData.OnCameraMove				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_CameraMove );	// June 329cb150
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_EventProcess );	// June 329cb160
+				stateData.StateEnd					= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateEnd );	// June 329cb170
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_EventProcess );	// June 32b4c460
+				stateData.StateEnd					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_StateEnd );	// June 32b4e630
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDB_ALTAR_OF_EVIL_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDB_ALTAR_OF_EVIL_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_END_EventProcess );	// June 32b4c470
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LDB_ABYSS_STRIKE:	// char-luciel CH2d2: June @32b49cd0 ( ids 30215 / 30219 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_F_ABYSS_STRIKE", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_ABYSS_STRIKE_Init );	// June 32b4b4b0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_ABYSS_STRIKE_EventProcess );	// June 32b4c750
+
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_F_ABYSS_STRIKE", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDB_M_ABYSS_STRIKE;
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_M_ABYSS_STRIKE", stateData.stateID );
+				stateData.m_bSkillState				= true;
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_ABYSS_STRIKE_Init );	// June 32b4b4b0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_ABYSS_STRIKE_EventProcess );	// June 32b4c750
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LDB_PHANTOM_RUSH:	// char-luciel CH2d2: June @32b49d69 ( ids 30216 / 30220 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_F_PHANTOM_RUSH", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_PHANTOM_RUSH_Init );	// June 32b4b4c0
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_PHANTOM_RUSH_FrameMove );	// June 32b4e570
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_F_PHANTOM_RUSH", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateInit			= normalStateData.StateInit;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDB_F_PHANTOM_RUSH_TARGET;
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_F_PHANTOM_RUSH_TARGET", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture );	// June 32b4e580
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDB_M_PHANTOM_RUSH;
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_M_PHANTOM_RUSH", stateData.stateID );
+				stateData.m_bSkillState				= true;
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_M_PHANTOM_RUSH_Init );	// June 32b4b4d0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_M_PHANTOM_RUSH_FrameMove );	// June 32b4e590
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDB_M_PHANTOM_RUSH_TARGET;
+				m_LuaManager.MakeTableReference( "LSI_A_LDB_M_PHANTOM_RUSH_TARGET", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture );	// June 32b4e580
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
 
 		default:
 			break;
