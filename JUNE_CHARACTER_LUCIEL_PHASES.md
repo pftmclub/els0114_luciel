@@ -1479,7 +1479,7 @@ Ghidra read-only; decompiles and listings in the session scratchpad.
   1 DEFINE, 0 OTHER, 0 FAIL; 12 deleted lines = DU3c's rename / dummy lines and DU3b's guard, the 2 bare `#endif`s are the `#error` guard's), junediverge
   PASS, `--check-all` PASS, enumscan exit 1 on 190 rows, **0 on DU3 lines** (`git blame`: 163 from `dd63297`, the rest older peer commits). Fixes:
   `finish.py --files <6 files> --with ...`: flagcheck PASS (6 PASS, 0 OTHER, 0 FAIL; 23 deleted lines, all inside the flag), junediverge PASS, enumscan PASS.
-  Commit range gate: see the follow-up line below.
+  Commit `4fd494d2`; `finish.py --range 4fd494d2^..4fd494d2 --with ...`: flagcheck PASS (6 PASS, 0 OTHER, 0 FAIL), junediverge PASS, enumscan PASS.
 - **Compile:** `/Zs` probes of `X2Eqip.cpp`, `X2GUUser.cpp`, `X2Inventory.cpp`, `X2Unit.cpp`, `X2UICharInfo.cpp`: 5 x 0 errors. **Build blocked** (run 19:20): 11 `LNK2019` in a peer's uncommitted `X2GULuciel.cpp`
   (CH2b's `LSI_SA_LLC_DARK_CRESCENT_*` / `_RUINOUS_IMPACT_*` declared, not defined); no error in a DU3 review file; nothing deployed (exe still md5 `df9afaf4`).
 - **Save:** testlu1 (unit 166) raised to level 80, Henir dual weapon 62119 worn in slot 9 (Cobo weapon to bag 1 slot 3); `elsdb.py`, backed up.
