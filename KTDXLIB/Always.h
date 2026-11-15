@@ -13511,3 +13511,30 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY, char-luciel CH1o
 #endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-state-ids Phase S1: inserts June's 46 missing USER_STATE_ID members at June's values ( 24, 93-109, 123-129, 131-151 ),
+//              so USI_END goes 106 -> 152 and every class state enum ( USI_END + 1 ) moves up by 46. data036 Enum.lua carries June's
+//              USER_STATE_ID rows: the exe and data036.kom ship TOGETHER, and turning this off needs the old Enum.lua back
+//              ( kom_contents_bytecode snapshot ). X2TrainingGameUI compares the state id as int. Off = March's ids.
+#define SERV_IRUHADEV_JUNE_USER_STATE_IDS
+#if defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS ) && !defined( SERV_IRUHADEV_JUNE_USER_STATE_ID16 )
+#error SERV_IRUHADEV_JUNE_USER_STATE_IDS needs SERV_IRUHADEV_JUNE_USER_STATE_ID16 ( ids above 255 )
+#endif
+#if defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS ) && !defined( SERV_IRUHADEV_JUNE_RESERVED_STATE_IDS )
+#error SERV_IRUHADEV_JUNE_USER_STATE_IDS needs SERV_IRUHADEV_JUNE_RESERVED_STATE_IDS ( USI_WAIT_STATE_CHANGE sits between the inserted runs )
+#endif
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-state-ids Phase S1 debug: logs [STATE_IDS] UNREGISTERED when StateChange targets a user state id the unit has not
+//              registered. Retired by the S1 review.
+#define SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG ) && !defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS )
+#error SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG needs SERV_IRUHADEV_JUNE_USER_STATE_IDS
+#endif
+//////////////////////////////////////////////////////////////////////////

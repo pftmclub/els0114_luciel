@@ -83,6 +83,20 @@ Full build + deploy. One regression play-test over every live class (see the kic
 **Done gate.** `stateids.py check` PASS; `luabind.py check Ara_Martial_Artist Chung_Iron_Cannon` STATE gate PASS; `finish.py` PASS; `DEPLOY OK` +
 `PACK OK` / `COPY OK`; play-test passed; the log shows no `UNREGISTERED` line from a March class.
 
+### S1 - Done (2026-11-15)
+
+- **Landed:** flag `SERV_IRUHADEV_JUNE_USER_STATE_IDS` (+ `_DEBUG`). `X2GUUser.h`: 46 members at June's values, 4 runs (24; 93-109 after `USI_RIDING_SPECIAL_MOVE` inside `RIDING_SYSTEM`; 123-129 after `USI_BOUNDING_UP`; 131-151 after `USI_WAIT_STATE_CHANGE`). `USI_END` 106 -> 152. `X2TrainingGameUI.cpp`: 3 int compares, March's cast in `#else`.
+- **`tools/stateids.py check`:** `147 / 147 C++ = June; 147 June names, 147 staged Enum.lua names, 147 C++ names`, `RESULT: PASS`; `--write-tsv` regenerated the census (column `march_value` is now `cpp_value`). README row added. (cl stops at 100 errors, so it probes in chunks of 60.)
+- **Enum.lua:** `USER_STATE_ID` block (was 104 lines incl. the char-ara CH1 comment) replaced by June's 148-line block, BOM + CRLF kept; `luasrc.py refresh` + `ledger --check` PASS (0 FAIL), `core --check` PASS. `luabind.py check Ara_Martial_Artist Chung_Iron_Cannon`: `STATE: 64 state-id reference(s) compared with the C++ enum, 0 wrong`, `RESULT: PASS`. `PACK OK data036`, `COPY OK data036` (md5 7f53674276abdd04581275d626e10285, backup `kom_backup_tools/data036.kom.20261115_093540`).
+- **Debug line:** `StateChange` logs nothing for an unregistered target (it only sets `nextState`). The lookup that fills the gap is `GetStateDataIterator` (it inserts a default entry), so the line sits there: `[STATE_IDS] UNREGISTERED unit class <class> state <id> from <now id>`, once a second per id, id 0 skipped. `EXESTR OK: 1 of 1 found` (wide, `[STATE_IDS] UNREGISTERED unit class`).
+- **Tool change (enumscan):** the explicit `= <June value>` on an inserted member is the enum's definition, so `tools/enumscan.py` now skips enumerator initializers. Six old rows in `X2GUUser.h` / `.cpp` (two `NUI_*` constants of C9h-4h, four relative-position `case 1..4` of DU1b3) are not this phase's code: `stray` verdicts appended to `june2017_re/enum_literals.tsv`. The review confirms.
+- **Gates:** `finish.py --files ... --skip-flag JUNE_RESERVED_STATE_IDS / JUNE_USER_STATE_ID16 / JUNE_SKILL_STATE_PTR (outer blocks the inserts sit in)`: flagcheck JUNE_USER_STATE_IDS PASS (3 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted lines, 6 bare `#else` / `#endif` = the 3 `#else` in the training UI and 3 `#error` guards `#endif`); junediverge PASS; enumscan PASS; stateends / skillicons / luabind SKIPPED here (no skill states, no June script staged; luabind run by hand above). The post-commit `--range` block is below.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,625,536 B, dated 2026-11-15 09:32:42, md5 8627a24f1fdeec48048c7f99a3245f35` (`--pch force`; 0 errors, 638 warning lines).
+- **Not tested, no reachable trigger:** bounding (only some `DamageEffect` rows use `RT_BOUNDING`; no monster identified) and the event kit states (pickup of items 100005740-43 is a field drop). The unregistered-state log covers them if they ever fire.
+- **Readers:** nothing new beyond the survey table; the review re-greps the char casts and `255` tests.
+- **Save:** play-test units use existing characters; slot 5 filled for Raven, Ara and Add (Deadly Blow, Wind Wedge, Particle Prism) by `elsdb x` (backup `db_backup/els_db_20261115_092304_pre_sql.sql`).
+- **Review:** `kickoffs/june-state-ids/S1-review.md` written. Play-test: owed by the user (hand-off below in chat).
+
 ## S2 - Lu/Ciel on the shared numbers
 
 **Scope.** In `X2GULuciel.*` (inert `_CORE`), after S1:

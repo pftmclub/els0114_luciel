@@ -3569,6 +3569,7 @@ Flag-off compiles the original code (the `#else` branch). Extra rules:
 | `ITEM_KIM` (+ `KIM_LAYOUT_CHECK`, `KIM_MINIME_REMAP`) | data036's `item.kim`: the exe and June's 228-byte kim ship together. Off with June's kim packed reads it at 188 bytes per record (wrong items, nothing logs); put March's kim back in data036 as well. See "June item.kim adoption K2" |
 | `BUFF_ENUM` | data036 `Enum.lua` (the buff Phase 2 file): "ships paired with" it; the BBT / BFT values differ between the two |
 | `RESERVED_STATE_IDS`, `USER_STATE_ID16` | data036 `Enum.lua`: USI_END 91 -> 102 and the three bounding ids shift every class state id; the old `Enum.lua` is in the `kom_contents_bytecode` snapshot |
+| `USER_STATE_IDS` (june-state-ids S1) | data036 `Enum.lua`: June's 147 `USER_STATE_ID` rows (`USI_END` 106 -> 152, every class state +46); the pre-S1 file is `24965799\kom_backup_tools\Enum.lua.before_june_state_ids_S1` (copy it over the staged `data036_kom\Enum.lua`, `luasrc.py refresh`, repack). Off alone is wrong |
 | `ENCHANT_PARITY` | data036 `Enum.lua`: the `EDT_ENCHANT_*` values are renumbered with it |
 | `RIDINGPET_UI_FX` | needs data036 `Enum.lua`'s two RESERVED tables when it is on; off is safe |
 | `BUFF_FACTOR_WIRE`, `PET_PREVIEW_LOOKUP` | a **second** `#define` at the end of `KncWX2Server/Common/ServerDefine.h` (`CommonPacket.h` / `ClientPacket_Global.h` precede `Always.h`); toggle both, `tools/flagcheck.py` `SECOND_HOMES` |
@@ -7091,3 +7092,11 @@ No `SERV_IRUHADEV_JUNE_CHAR_ELESIS_*_DEBUG` flag is defined (`_WOS_DEBUG`, `_DEB
 **Data (one deploy unit with the exe):** CH0b staged 6,452 June files (6,314 new, 138 replaced; backup `kom_backup_stage_june/20261112_144313`; new kom `data206`, 57 motions) and adopted the class-change dialogs; CH1 adopted `ELESIS_KNIGHT.lua` as June's bytecode and replaced `MOTION_EL_GM.x` / `Motion_EL_BH.x` in data033 (backup `kom_backup_stage_june/20261113_083036`); data036 core-list source: `Enum.lua` (4 RNSI names), `UnitTemplet.lua` (her 7 rows), `LevelUpEvent.lua` (level-15 / level-35 guide rows, TYPE7), NPC rows for the summons (CH3b0). Packed and copied by the phases.
 
 **Revert, in this order:** (1) comment out `SERV_IRUHADEV_JUNE_CHAR_ELESIS_LIVE` (the other Elesis flags then compile March's code; `_WOS` / `_SKILL` / `_PASSIVE` / `_BLOOD` / `_TRANSCEND` go with it); keep `JUNE_CLASS_PATH` / `JUNE_CLASS_CHANGE_GUIDE` while Add is ported on them; (2) restore data036 and data033 from the `kom_backup_tools/` backups and `kom.py copy`; (3) restore the staged koms from the `kom_backup_stage_june` backups named above (delete `data206`); (4) `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Exe, data036, data033 and the motion koms go together: June's script against March's exe stalls her states. `els_db.sql` is not touched by the revert.
+
+## june-state-ids S1: June's 46 missing user state ids (2026-11-15)
+
+- **Flag:** `SERV_IRUHADEV_JUNE_USER_STATE_IDS` (+ `_DEBUG`, retired by the S1 review), `Always.h`; `#error` without `USER_STATE_ID16` and `RESERVED_STATE_IDS`.
+- **C++:** `X2GUUser.h` `USER_STATE_ID` gains 46 members at June's values (24, 93-109, 123-129, 131-151), so `USI_END` is 152 and every class enum moves by 46; `X2TrainingGameUI.cpp` compares the state id as int (3 sites); `X2GUUser.cpp` `GetStateDataIterator` logs `[STATE_IDS] UNREGISTERED` under `_DEBUG`.
+- **Data:** data036 `Enum.lua` `USER_STATE_ID` block replaced by June's rows (core list, `luasrc.py refresh`); exe and data036 ship together.
+- **Tools:** `tools/stateids.py` (new); `tools/enumscan.py` skips an enumerator's own `NAME = value`; 6 old rows got `stray` verdicts in `june2017_re/enum_literals.tsv`.
+- **Revert:** comment out the define, put `kom_backup_tools\Enum.lua.before_june_state_ids_S1` back as the staged `Enum.lua` (not `luasrc.py restore`: that gives March's bytecode), `luasrc.py refresh`, `kom.py pack` + `copy data036`, rebuild with `--pch force`.

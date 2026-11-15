@@ -575,6 +575,8 @@ def scan_file(path):
                 ent = {'ch': '{', 'sw': None, 'fn': None, 'ns': None, 'kind': 'block', 'pos': i}
                 if pv[1] in ('=', ',', '{', ']') or (pv[1] == ')' and False):
                     ent['kind'] = 'init'
+                if pv[1] == 'enum' or (pv[0] == 'id' and prev_sig(i, 2)[1] == 'enum') or (pv[0] == 'id' and prev_sig(i, 2)[1] == 'class' and prev_sig(i, 3)[1] == 'enum'):
+                    ent['enum'] = True                  # an enumerator's own `NAME = value` is the definition, not a use (june-state-ids S1)
                 if pv[1] == ')' or (pv[1] == 'const' and prev_sig(i, 2)[1] == ')'):
                     if last_closed:
                         callee, inner = last_closed
@@ -618,6 +620,8 @@ def scan_file(path):
         top = stack[-1] if stack else None
         if top and top['ch'] == '[':
             continue                                    # array size / subscript
+        if top and top.get('enum'):
+            continue                                    # enumerator definition
         ctx, prim, name = 'other', [], ''
         if pv[1] == 'case':
             ctx = 'case'

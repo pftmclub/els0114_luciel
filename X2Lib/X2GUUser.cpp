@@ -7564,6 +7564,21 @@ bool CX2GUUser::CheckSkillUsePVPOfficial( CX2SkillTree::SKILL_ID eSkill_ID_ )
 /// entry 0. March's map has no size: an id with no entry gets a default one, which is what March's m_StateList[ id ] copy read.
 CX2GUUser::UserUnitStateDataMap::iterator CX2GUUser::GetStateDataIterator( const int iStateID_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG
+	/// june-state-ids S1: an id with no entry gets a default one below; log it once a second per id ( id 0 is the constructor's placeholder )
+	if( 0 != iStateID_ && m_StateList.end() == m_StateList.find( static_cast<UserUnitStateDataMap::key_type>( iStateID_ ) ) )
+	{
+		static std::map< int, DWORD > s_mapUnregisteredLogTime;
+		const DWORD dwNowTime = timeGetTime();
+		DWORD& dwLastLogTime = s_mapUnregisteredLogTime[ iStateID_ ];
+		if( 0 == dwLastLogTime || dwNowTime - dwLastLogTime > 1000 )
+		{
+			dwLastLogTime = dwNowTime;
+			CX2OfflineLog::Server( L"[STATE_IDS] UNREGISTERED unit class %d state %d from %d",
+				( NULL != GetUnit() ) ? static_cast<int>( GetUnit()->GetClass() ) : 0, iStateID_, static_cast<int>( m_FrameDataNow.syncData.nowState ) );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG
 	return m_StateList.insert( UserUnitStateDataMap::value_type( static_cast<UserUnitStateDataMap::key_type>( iStateID_ ), UserUnitStateData() ) ).first;
 }
 

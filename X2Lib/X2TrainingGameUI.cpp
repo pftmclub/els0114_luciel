@@ -95,7 +95,11 @@ void CX2TrainingGameUI::OnFrameMove( double fTime, float fElapsedTime )
 				if( waitState.iNowCount < waitState.iMaxCount )
 				{
 					if( m_bWasSimpleWaitState == true &&
+#ifdef SERV_IRUHADEV_JUNE_USER_STATE_IDS
+						pMyUnit->GetNowStateID() == (int) waitState.iStateID )	// June ids above 127 never match a signed char
+#else
 						pMyUnit->GetNowStateID() == (const char) waitState.iStateID )
+#endif SERV_IRUHADEV_JUNE_USER_STATE_IDS
 					{
 						if( -1 != waitState.iIsRight )
 						{
@@ -274,7 +278,11 @@ void CX2TrainingGameUI::OnFrameMove( double fTime, float fElapsedTime )
 				if( waitState.iNowCount < waitState.iMaxCount )
 				{
 					if( m_bWasWaitState == true &&
+#ifdef SERV_IRUHADEV_JUNE_USER_STATE_IDS
+						pMyUnit->GetNowStateID() == (int) waitState.iStateID )
+#else
 						pMyUnit->GetNowStateID() == (const char) waitState.iStateID )
+#endif SERV_IRUHADEV_JUNE_USER_STATE_IDS
 					{
 						m_bWasWaitState = false;
 						waitState.iNowCount += 1;
@@ -340,7 +348,11 @@ void CX2TrainingGameUI::OnFrameMove( double fTime, float fElapsedTime )
 						}
 					}
 					
+#ifdef SERV_IRUHADEV_JUNE_USER_STATE_IDS
+					if( pMyUnit->GetNowStateID() == (int) waitSeqState.vecStateID[ waitSeqState.iStateIndex ] )
+#else
 					if( pMyUnit->GetNowStateID() == (const char) waitSeqState.vecStateID[ waitSeqState.iStateIndex ] )
+#endif SERV_IRUHADEV_JUNE_USER_STATE_IDS
 					{
 						if( waitSeqState.iStateIndex == waitSeqState.vecStateID.size()-1 )
 						{
