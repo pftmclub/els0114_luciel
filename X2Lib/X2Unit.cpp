@@ -4793,6 +4793,15 @@ void CX2Unit::UnitData::SetKUnitInfo( const KUnitInfo& data )
 #endif SERV_EVENT_CHECK_POWER
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+// char-luciel DU5e: June 323571c0, the first body's game stat and the second's ( June's KStat has 7 fields, March's SetKStat reads 5 )
+void CX2Unit::UnitData::SetGameStats( const KStat& kGameStat_, const KStat& kMinorUnitGameStat_ )
+{
+	m_GameStat.SetKStat( kGameStat_ );
+	m_MinorUnitGameStat.SetKStat( kMinorUnitGameStat_ );
+}
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 void CX2Unit::UnitData::SetKRoomUserInfo( const KRoomUserInfo& data )
 {
 	m_UnitUID				= data.m_nUnitUID;
@@ -4922,7 +4931,11 @@ void CX2Unit::UnitData::SetKRoomUserInfo( const KRoomUserInfo& data )
 	//}}
 #endif //SERV_DELETE_ROOM_USER_INFO_DATA
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	SetGameStats( data.m_kGameStat, data.m_kMinorUnitGameStat );	// char-luciel DU5e: June 32360090 @323608cf
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	m_GameStat.SetKStat( data.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 //#ifdef TITLE_SYSTEM
 #ifdef SERV_TITLE_DATA_SIZE

@@ -358,7 +358,30 @@ namespace
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+namespace _CONST_OFFLINE_INVENTORY_DU5E_
+{
+	// char-luciel DU5e: CX2Inventory::GetEquipGroup's slot table ( June 3286a4b0 ) by slot id: weapon / armour shared, Ciel's slots 1, the rest 0
+	int GetEquipGroupOfSlot( const int iSlotID_ )
+	{
+		switch( iSlotID_ )
+		{
+		case CX2Unit::NESI_DEFENCE_BODY:
+		case CX2Unit::NESI_DEFENCE_LEG:
+		case CX2Unit::NESI_DEFENCE_HAND:
+		case CX2Unit::NESI_DEFENCE_FOOT:
+		case CX2Unit::NESI_WEAPON_HAND:
+			return 2;
+		}
+		return CX2Inventory::IsMinorUnitEquipSlot( static_cast<short>( iSlotID_ ) ) ? 1 : 0;
+	}
+}
+using namespace _CONST_OFFLINE_INVENTORY_DU5E_;
+
+void CX2OfflineInventory::AddEquippedStat( IN OUT KStat& kInOut, const int iEquipGroup ) const
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 void CX2OfflineInventory::AddEquippedStat( IN OUT KStat& kInOut ) const
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 {
 	if( NULL == g_pData )
 		return;
@@ -374,6 +397,12 @@ void CX2OfflineInventory::AddEquippedStat( IN OUT KStat& kInOut ) const
 		const UidType nItemUID = GetItemUID( CX2Inventory::ST_E_EQUIP, iSlot );
 		if( 0 == nItemUID )
 			continue;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		const int iSlotGroup = GetEquipGroupOfSlot( iSlot );	// char-luciel DU5e: June 3234e210's group test
+		if( 2 != iEquipGroup && 2 != iSlotGroup && iSlotGroup != iEquipGroup )
+			continue;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 		const KOfflineItemRow* pRow = FindRow( nItemUID );
 		if( NULL == pRow )

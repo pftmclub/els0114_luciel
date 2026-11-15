@@ -13938,3 +13938,18 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER needs SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ( the form, the window switch ), _MINOR_UNIT_TEMPLET ( Ciel's motions ), SEPARATION_MOTION ( SetUnit's templet ) and SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER ( ViewerFxStop ), char-luciel DU5b
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel DU5e: each Lu/Ciel body's own game stat. KRoomUserInfo and the room NOTs ( equip change, skill info,
+//              game stat, zero endurance, level up ) carry June's second KStat after m_kGameStat; UnitData::SetGameStats
+//              ( 323571c0 ) writes m_GameStat and m_MinorUnitGameStat from them ( 7 June sites ), the equip change gives the user
+//              the stat of the unit's form and skips the view refresh while transformed ( 31f1ed70, 32461e80 ). The emulator
+//              sends Lu's stat as base + gear of her slots and Ciel's as base + gear of hers ( stand-in, no June server ).
+//              Also defined in KncWX2Server/Common/ServerDefine.h and X2ServerProtocol_2010.vcxproj ( X2TOOL ): toggle all three.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_STAT ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK ) && defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_STAT needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( m_MinorUnitGameStat ), _TRANSFORM_LINK ( IsTransformed ), _EQUIP_VIEW and _NESI_RENUMBER ( the slot bodies )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+//////////////////////////////////////////////////////////////////////////

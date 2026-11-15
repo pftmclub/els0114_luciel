@@ -65,6 +65,7 @@ SECOND_HOMES = {
     "SERV_IRUHADEV_JUNE_CHAR_UNIT_CLASS_WORD": "KncWX2Server/Common/ServerDefine.h",  # CommonPacket.h precedes Always.h; also X2ServerProtocol_2010.vcxproj X2TOOL (char-luciel NU2)
     "SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS": "KncWX2Server/Common/ServerDefine.h",  # CommonPacket.h precedes Always.h; also X2ServerProtocol_2010.vcxproj X2TOOL (char-luciel CH1a2)
     "SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW": "KncWX2Server/Common/ServerDefine.h",  # EventID_Client.h / ClientPacket.h precede Always.h (char-luciel DU5)
+    "SERV_IRUHADEV_JUNE_CHAR_DUO_STAT": "KncWX2Server/Common/ServerDefine.h",  # CommonPacket.h / ClientPacket.h precede Always.h; also X2ServerProtocol_2010.vcxproj X2TOOL (char-luciel DU5e)
 }
 
 

@@ -1775,6 +1775,9 @@ SERIALIZE_DEFINE_PUT( KRoomUserInfo, obj, ks )
 		//}}
 		&& PUT( m_ucLevel )
 		&& PUT( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& PUT( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		&& PUT( m_mapEquippedItem )
 #ifdef SERV_PAYMENT_ITEM_WITH_CONSUMING_OTHER_ITEM
 		&& PUT( m_mapSpecialItem )
@@ -1964,6 +1967,9 @@ SERIALIZE_DEFINE_GET( KRoomUserInfo, obj, ks )
 		//}}
 		&& GET( m_ucLevel )
 		&& GET( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& GET( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		&& GET( m_mapEquippedItem )
 #ifdef SERV_PAYMENT_ITEM_WITH_CONSUMING_OTHER_ITEM
 		&& GET( m_mapSpecialItem )

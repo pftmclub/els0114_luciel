@@ -3175,6 +3175,9 @@ SERIALIZE_DEFINE_PUT( KEGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT, obj, ks )
 		//}}
 		&& PUT( m_vecInventorySlotInfo )
 		&& PUT( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& PUT( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		//{{ 2010. 11. 17	ÃÖÀ°»ç	ÄªÈ£ µ¥ÀÌÅÍ Å©±â ´ÃÀÌ±â
 #ifdef SERV_TITLE_DATA_SIZE
 		&& PUT( m_iEquippedTitleID )
@@ -3197,6 +3200,9 @@ SERIALIZE_DEFINE_GET( KEGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT, obj, ks )
 		//}}    
 		&& GET( m_vecInventorySlotInfo )
 		&& GET( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& GET( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		//{{ 2010. 11. 17	ÃÖÀ°»ç	ÄªÈ£ µ¥ÀÌÅÍ Å©±â ´ÃÀÌ±â
 #ifdef SERV_TITLE_DATA_SIZE
 		&& GET( m_iEquippedTitleID )
@@ -7909,6 +7915,9 @@ SERIALIZE_DEFINE_PUT( KEGS_CHAR_LEVEL_UP_NOT, obj, ks )
 		&& PUT( m_ucLevel )
 		&& PUT( m_kBaseStat )
 		&& PUT( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& PUT( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 #ifdef SERV_ELESIS_UPDATE_EVENT
 		&& PUT( m_iNoteViewCount )
 #endif SERV_ELESIS_UPDATE_EVENT
@@ -7921,6 +7930,9 @@ SERIALIZE_DEFINE_GET( KEGS_CHAR_LEVEL_UP_NOT, obj, ks )
 		&& GET( m_ucLevel )
 		&& GET( m_kBaseStat )
 		&& GET( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& GET( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 #ifdef SERV_ELESIS_UPDATE_EVENT
 		&& GET( m_iNoteViewCount )
 #endif SERV_ELESIS_UPDATE_EVENT
@@ -7946,6 +7958,9 @@ SERIALIZE_DEFINE_PUT( KEGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT, obj, ks )
 	return PUT( m_UnitUID )
 		&& PUT( m_vecInventorySlotInfo )
 		&& PUT( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& PUT( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		;
 }
 
@@ -7954,6 +7969,9 @@ SERIALIZE_DEFINE_GET( KEGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT, obj, ks )
 	return GET( m_UnitUID )
 		&& GET( m_vecInventorySlotInfo )
 		&& GET( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& GET( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		;
 }
 
@@ -9437,6 +9455,9 @@ SERIALIZE_DEFINE_PUT( KEGS_CHANGE_SKILL_INFO_IN_ROOM_NOT, obj, ks )
 	return PUT( m_iUnitUID )
 		&& PUT( m_ucMemberShipGrade )
 		&& PUT( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& PUT( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		&& PUT( m_UnitSkillData )
 		;
 }
@@ -9446,6 +9467,9 @@ SERIALIZE_DEFINE_GET( KEGS_CHANGE_SKILL_INFO_IN_ROOM_NOT, obj, ks )
 	return GET( m_iUnitUID )
 		&& GET( m_ucMemberShipGrade )
 		&& GET( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& GET( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		&& GET( m_UnitSkillData )
 		;
 }
@@ -13670,6 +13694,9 @@ SERIALIZE_DEFINE_PUT( KEGS_CHANGE_GAME_STAT_INFO_IN_ROOM_NOT, obj, ks )
 {
 	return PUT( m_iUnitUID )
 		&& PUT( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& PUT( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		;
 }
 
@@ -13677,6 +13704,9 @@ SERIALIZE_DEFINE_GET( KEGS_CHANGE_GAME_STAT_INFO_IN_ROOM_NOT, obj, ks )
 {
 	return GET( m_iUnitUID )
 		&& GET( m_kGameStat )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		&& GET( m_kMinorUnitGameStat )	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		;
 }
 

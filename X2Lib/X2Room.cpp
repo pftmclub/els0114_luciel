@@ -1497,7 +1497,11 @@ bool CX2Room::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( KEGS_CHANGE_EQUIPPED
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	pSlotData->m_pUnit->AccessUnitData().SetGameStats( kEGS_CHANGE_EQUIPPED_ITEM_NOT.m_kGameStat, kEGS_CHANGE_EQUIPPED_ITEM_NOT.m_kMinorUnitGameStat );	// char-luciel DU5e: June 31ed46e0 @31ed4807
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	pSlotData->m_pUnit->AccessUnitData().m_GameStat.SetKStat( kEGS_CHANGE_EQUIPPED_ITEM_NOT.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 
 
@@ -1661,7 +1665,11 @@ bool CX2Room::Handler_EGS_CHANGE_SKILL_INFO_IN_ROOM_NOT( KEGS_CHANGE_SKILL_INFO_
 
 	CX2Unit::UnitData& kUnitData = pUnit->AccessUnitData();
 	// June 323571c0 takes a second KStat ( packet +0x25 ); March's packet has one, March's KStat 5 fields
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	kUnitData.SetGameStats( kEvent_.m_kGameStat, kEvent_.m_kMinorUnitGameStat );	// char-luciel DU5e: June 31ed4c80 @31ed4d87
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	kUnitData.m_GameStat.SetKStat( kEvent_.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	kUnitData.m_byMemberShipGrade = kEvent_.m_ucMemberShipGrade;
 
 	if ( g_pData->GetMyUser()->GetSelectUnit()->GetUID() != kEvent_.m_iUnitUID )
@@ -2638,7 +2646,11 @@ bool CX2Room::Handler_EGS_CHANGE_GAME_STAT_INFO_IN_ROOM_NOT( KEGS_CHANGE_GAME_ST
 
 	CX2Unit::UnitData& kUnitData = pUser->GetUnit()->AccessUnitData();//pSlotData->m_pUnit->GetUnitData();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	kUnitData.SetGameStats( kEvent_.m_kGameStat, kEvent_.m_kMinorUnitGameStat );	// char-luciel DU5e: June 31ed57d0 @31ed5890
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	kUnitData.m_GameStat.SetKStat( kEvent_.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	pUser->SetMaxHp( static_cast< const float >( kEvent_.m_kGameStat.m_iBaseHP ) );
 	if ( pUser->GetNowHp() > pUser->GetMaxHp() )

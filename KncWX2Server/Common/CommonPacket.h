@@ -2341,6 +2341,9 @@ DECL_DATA( KRoomUserInfo )
 
     UCHAR                   m_ucLevel;
     KStat                   m_kGameStat;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+    KStat                   m_kMinorUnitGameStat;	// char-luciel DU5e: June's second KStat ( pkt +0xcc, 32360090 -> 323571c0 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
     std::map< int, KInventoryItemInfo > m_mapEquippedItem;
 #ifdef SERV_PAYMENT_ITEM_WITH_CONSUMING_OTHER_ITEM
 	std::map< int, KInventoryItemInfo > m_mapSpecialItem;

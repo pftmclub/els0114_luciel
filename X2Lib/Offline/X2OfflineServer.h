@@ -688,6 +688,10 @@ public:
 	/// there is, and every place that sends a game stat has to go through here
 	/// or a weapon stops mattering the moment the player leaves the village.
 	static void MakeGameStat( const KOfflineUnitRow& kRow, OUT KStat& kOut );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	/// char-luciel DU5e stand-in ( no June server ): the second body's game stat, June's second KStat; Lu/Ciel only, zero for every other class.
+	static void MakeMinorUnitGameStat( const KOfflineUnitRow& kRow, OUT KStat& kOut );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	/// The PvP rank every offline character carries. One source of truth for
 	/// KUnitInfo::m_cRank and KRoomUserInfo::m_cRank both - the two disagreed

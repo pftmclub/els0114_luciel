@@ -2255,6 +2255,9 @@ DECL_PACKET( EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT )
     UidType                             m_UnitUID;
     std::vector< KInventoryItemInfo >   m_vecInventorySlotInfo;
     KStat                               m_kGameStat;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+    KStat                               m_kMinorUnitGameStat;	// char-luciel DU5e: June's second KStat ( pkt +0x35, 31ed46e0 / 31f1ed70 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	//{{ 2010. 11. 17	√÷¿∞ªÁ	ƒ™»£ µ•¿Ã≈Õ ≈©±‚ ¥√¿Ã±‚
 #ifdef SERV_TITLE_DATA_SIZE
 	int									m_iEquippedTitleID;
@@ -5416,6 +5419,9 @@ DECL_PACKET( EGS_CHAR_LEVEL_UP_NOT )
 	UCHAR                           	m_ucLevel;
 	KStat								m_kBaseStat;
 	KStat                               m_kGameStat;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	KStat								m_kMinorUnitGameStat;	// char-luciel DU5e: June's second KStat ( 32473f70 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 #ifdef SERV_ELESIS_UPDATE_EVENT
 	int									m_iNoteViewCount;
 #endif SERV_ELESIS_UPDATE_EVENT
@@ -5442,6 +5448,9 @@ DECL_PACKET( EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT )
 	UidType                             m_UnitUID;
 	std::vector< KInventoryItemInfo >   m_vecInventorySlotInfo;
 	KStat                               m_kGameStat;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	KStat								m_kMinorUnitGameStat;	// char-luciel DU5e: June's second KStat ( 32461e80 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 };
 
 DECL_PACKET( EGS_DECREASE_SPIRIT_NOT )
@@ -6328,6 +6337,9 @@ DECL_PACKET( EGS_CHANGE_SKILL_INFO_IN_ROOM_NOT )
     UidType								m_iUnitUID;
 	u_char								m_ucMemberShipGrade;
 	KStat								m_kGameStat;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	KStat								m_kMinorUnitGameStat;	// char-luciel DU5e: June's second KStat ( pkt +0x25, 31ed4c80 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	KUnitSkillData						m_UnitSkillData;
 };
 
@@ -9701,6 +9713,9 @@ DECL_PACKET( EGS_CHANGE_GAME_STAT_INFO_IN_ROOM_NOT )
 {
 	UidType								m_iUnitUID;
 	KStat								m_kGameStat;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	KStat								m_kMinorUnitGameStat;	// char-luciel DU5e: June's second KStat ( pkt +0x24, 31ed57d0 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	KEGS_CHANGE_GAME_STAT_INFO_IN_ROOM_NOT()
 	{

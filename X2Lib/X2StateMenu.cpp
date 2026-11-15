@@ -4765,8 +4765,13 @@ bool CX2StateMenu::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( HWND hWnd, UINT
 
 	CX2Unit::UnitData*	pUnitData	= &pUnit->AccessUnitData();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	pUser->SetGameStat( true == pUnit->IsMinorUnitForm() ? kEvent.m_kMinorUnitGameStat : kEvent.m_kGameStat );	// char-luciel DU5e: June 31f1ed70 @31f1ee8c, the unit's form picks the user's stat
+	pUnitData->SetGameStats( kEvent.m_kGameStat, kEvent.m_kMinorUnitGameStat );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	pUser->SetGameStat( kEvent.m_kGameStat );
 	pUnitData->m_GameStat.SetKStat( kEvent.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	pUser->SetMaxHp( static_cast< const float >( kEvent.m_kGameStat.m_iBaseHP ) );
 	if ( pUser->GetNowHp() > pUser->GetMaxHp() )
@@ -4848,6 +4853,10 @@ bool CX2StateMenu::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( HWND hWnd, UINT
 					} // if
 				} // BOOST
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+				if ( false == pUser->IsTransformed( CX2Unit::DT_BOTH ) )	// char-luciel DU5e: June 31f1ed70 @31f1f1d8, no view refresh while a body is transformed
+				{
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 				//{{ kimhc // 2010.12.11 // 2010-12-23 New Character CHUNG
 #ifdef	NEW_CHARACTER_CHUNG
 				pUser->SetShowViewList( true );
@@ -4872,6 +4881,10 @@ bool CX2StateMenu::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( HWND hWnd, UINT
 						break;
 					} // if
 				} // BOOST
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+				pUser->UpdateDuo( false );	// char-luciel DU5e: June 31f1ed70 @31f1f27a ( Lu/Ciel only )
+				}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 			} // if
 
@@ -5064,7 +5077,11 @@ bool CX2StateMenu::Hander_EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT( HWND hWnd, UINT u
 
 
 	pUser->SetGameStat( kEvent.m_kGameStat );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	pUnitData->SetGameStats( kEvent.m_kGameStat, kEvent.m_kMinorUnitGameStat );	// char-luciel DU5e: June 32461e80 @32461ffe ( the user takes the first stat )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	pUnitData->m_GameStat.SetKStat( kEvent.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	for (size_t i = 0; i < kEvent.m_vecInventorySlotInfo.size(); i++ )
 	{
@@ -5094,6 +5111,10 @@ bool CX2StateMenu::Hander_EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT( HWND hWnd, UINT u
 		}
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		if ( false == pUser->IsTransformed( CX2Unit::DT_BOTH ) )	// char-luciel DU5e: June 32461e80 @324620b9, no view refresh while a body is transformed
+		{
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		//{{ kimhc // 2010.12.11 // 2010-12-23 New Character CHUNG
 #ifdef	NEW_CHARACTER_CHUNG
 		pUser->SetShowViewList( true );
@@ -5113,6 +5134,9 @@ bool CX2StateMenu::Hander_EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT( HWND hWnd, UINT u
 		{
 			pUser->UpdateWeaponEnchantEffectAndExtraDamageType();
 		}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 		if( g_pChatBox != NULL)
 		{
@@ -5171,7 +5195,11 @@ bool CX2StateMenu::Hander_EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT( HWND hWnd, UINT u
 	if ( pUser->GetNowHp() > 0 )
 	{
 		// 유닛 데이타 변경
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		pUnitData->SetGameStats( kEvent.m_kGameStat, kEvent.m_kMinorUnitGameStat );	// char-luciel DU5e: June 32473f70 @32474126 ( the user takes the first stat )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		pUnitData->m_GameStat.SetKStat( kEvent.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		pUnitData->m_Stat.SetKStat( kEvent.m_kBaseStat );
 
 		pUnitData->m_Level					= kEvent.m_ucLevel;

@@ -373,8 +373,16 @@ void CX2OfflineServer::PushEquipChanged( KOfflineSession& kSes,
 		// assigns it straight over the unit's game stat, so a zeroed one would
 		// give the character max HP 0 the moment it changed a hat.
 		KOfflineUnitRow kRow;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		if( true == CX2OfflineDB::Instance()->LoadUnit( kSes.m_nSelectedUnitUID, kRow ) )
+		{
+			MakeGameStat( kRow, kNot.m_kGameStat );
+			MakeMinorUnitGameStat( kRow, kNot.m_kMinorUnitGameStat );	// char-luciel DU5e
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 		if( true == CX2OfflineDB::Instance()->LoadUnit( kSes.m_nSelectedUnitUID, kRow ) )
 			MakeGameStat( kRow, kNot.m_kGameStat );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 		Reply( kSes, EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT, kNot );
 		return;

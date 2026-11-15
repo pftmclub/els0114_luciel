@@ -116,7 +116,12 @@ public:
 	/// item (EGS_SOCKET_ITEM_REQ still refuses - see Handlers_Inventory.cpp),
 	/// so every item's socket list is empty. Enhancement was in that same
 	/// sentence until phase 23 implemented it.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	/// char-luciel DU5e: only the slots of one equip group ( CX2Unit::GetEqipStat's test: 2 = every slot, 0 = Lu's + shared, 1 = Ciel's + shared ).
+	void	AddEquippedStat( IN OUT KStat& kInOut, const int iEquipGroup = 2 ) const;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	void	AddEquippedStat( IN OUT KStat& kInOut ) const;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	//////////////////////////////////////////////////////////////////////////
 	// writes. Each fills vecChanged with one entry per touched slot, in the

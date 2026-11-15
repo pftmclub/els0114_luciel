@@ -1070,6 +1070,10 @@ Routed elsewhere:
 - *(from june-march-divergence D1-3, 2026-10-29)* June's item time field: `ItemData +0x50` (64-bit, from `KItemInfo +0x97`, ctor `31ed7e90`
   @`31ed7f41`), tested by `32882230` (true while the time is not reached; 20+ callers, e.g. `3216a2b0` shows string 1813). March's `KItemInfo`
   and `ItemData` lack it; D1-3's `GetNumItemByTID` keeps June's argument with a stand-in. Port with the packet field and the emulator.
+- *(from char-luciel DU5e, 2026-11-15)* the in-game equip-change and zero-endurance handlers: June's shared `31f1ed70` (4 dispatchers; March
+  `CX2StateMenu::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT`) and `32461e80` (`Hander_EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT`) differ beyond DU5e's
+  stat, transform-test and `UpdateDuo` lines: a change type 5 that also refreshes my own unit (`@31f1efc5`), the HP clamp read from the gage's
+  protected values, the item lookups (`3286a280`, `32883640`). Not compared line by line; port both bodies whole here (funcmap `(DU5e)` rows).
 
 **Depends on:** Stage 13 (K2).
 

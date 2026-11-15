@@ -710,7 +710,8 @@ Opus 5.5 high. **Verdict: pass after one hygiene fix** (a missing flag-dependenc
 | DU5b2 | (split from DU5b, 2026-11-16) Each body's equipment in the unit viewer: June's whole `UpdateEqip` `31fa9e60`, `AddEqip` `31f9df40`, `AddEquipByTID` `31f9c640`, `ReplaceEmptyToBasic` `31f9e930` / `31f9cfd0`, `RemoveEqip` / `RemoveAllEquips`; slot tables `[ pos ][ 3 ]` (drops R14e's two stand-ins). | DU5b's |
 | DU5c | (split from DU5) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the village avatar (`323f3290` rest: `323f1490`, the viewer rebuild; `323fa700` / `323fad80`; SD mesh table `31ee3470`). | DU5b's, or `_DUO_AVATAR` |
 | DU5d | (split from DU5) Viewer weapon effects case 10 (`X2UnitViewerUI.cpp:960`, `:6255`, `:8559`, `:8681`) and CH0's checklist viewer rows (CharCustomData, UnitViewerEffectSetTable, `IS_FOR_MINOR_UNIT` slot key, glow). | DU5b's |
-| DU5e | (split from DU5) Each body's numbers: `SetGameStats` second `KStat` `323571c0` + packet fields, the type-10 socket aggregate and the HUD's second gage, the set-socket count `3286a6b0` and the per-body socket record `3271a060`, the window's other-form set sum `@3291bf2d`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` |
+| DU5e | (split from DU5) Each body's game stat: `SetGameStats` second `KStat` `323571c0`, the packet fields and the seven sites, the emulator's per-body numbers. | `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` |
+| DU5f | (split from DU5e, 2026-11-15) Each body's sockets: the type-10 socket aggregate and the HUD's second gage, the set-socket count `3286a6b0` and the per-body socket record `3271a060`, the window's other-form set sum `@3291bf2d`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET` |
 
 **Done gate:** DU1 / DU2: every other class's play is unchanged (the reviews diff `cl /P`), and a Lu/Ciel's second body follows and syncs once CH1
 lands (CH1's play-test). DU3-DU5: Lu and Ciel each wear their own equipment in the village, in the character window and on the select screen;
@@ -1713,6 +1714,36 @@ of viewer `+0xd7c..+0xd82` / `+0xe40` in 44 functions of `31f8f000-31fb2000`.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2UnitViewerUI.cpp`, `X2UICharInfo.cpp`, `X2TFieldGame.cpp`: 0 errors each; a flag
   probe shows `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` on. Full build skipped: no play-test yet (batched at DU5b2).
 - **Play-test deferred:** section DU5b in `kickoffs/char-luciel/playtest.md`, batch at DU5b2. Review: `DU5b2-review.md` covers DU5b + DU5b2.
+
+### DU5e - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;
+`#error` guard: `DUO_BODY`, `TRANSFORM_LINK`, `EQUIP_VIEW`, `NESI_RENUMBER`, all ON by the /Zs probes). Rows: funcmap `(DU5e)` (9), JUNE_BUGS 753.
+**Split:** the socket half (type-10 aggregate, HUD second gage, set count, per-body socket record, `@3291bf2d`) -> **DU5f** (kickoff written).
+- **Writer:** `CX2Unit::UnitData::SetGameStats( first, second )` = `323571c0`: `m_GameStat` and `m_MinorUnitGameStat` by March's `SetKStat` each (June's
+  KStat has 7 fields, field 0 a float base HP; the inline conversion zeroes the extra rates as `SetKStat` does). June's `SetKUnitInfo` `3235eb20`
+  writes no second stat (`@3235fa09` / `@3235fb58`): the village unit keeps the last room's.
+- **Packets:** `KRoomUserInfo` (`CommonPacket.h`, June +0xb0 / +0xcc) and five NOTs (`ClientPacket.h`: equip change +0x19 / +0x35, skill info
+  +9 / +0x25, game stat +8 / +0x24, zero endurance, level up) carry `m_kMinorUnitGameStat` right after `m_kGameStat`; Put / Get beside it.
+- **Seven sites:** `SetKRoomUserInfo` (`32360090 @323608cf`), `CX2Room` equip / skill info / game stat (`31ed46e0`, `31ed4c80`, `31ed57d0`),
+  `CX2StateMenu` equip change (`31f1ed70`), zero endurance (`32461e80`), level up (`32473f70`). Only the equip change gives the user the stat of the
+  unit's form (`@31f1ee8c`); the other four give the first and every max HP reads the first (JUNE_BUGS 753, verbatim).
+- **Transform test:** both StateMenu handlers wrap March's NEW_CHARACTER_CHUNG view refresh and the weapon refresh in `!IsTransformed( DT_BOTH )`
+  (`@31f1f1d8`, `@324620b9`); the equip change then calls `UpdateDuo( false )` (`@31f1f27a`; returns at once for other classes, re-reads Lu/Ciel's
+  stat). The rest of those two June bodies (change type 5, the gage clamp) is not compared: routed to backlog Stage 16.
+- **Emulator** (stand-in, no June server): `MakeGameStat` sums Lu's slots + the shared ones for `UT_LUCIEL` (`AddEquippedStat( kStat, 0 )`), every
+  slot for other classes (unchanged); new `MakeMinorUnitGameStat` = base + Ciel's slots + shared (group 1; zero for other classes), the slot table of
+  `CX2Inventory::GetEquipGroup`. Filled in the room user info, the room equip and title NOTs and the level up. Log
+  `[JUNE_CHAR] LUCIEL DUO STAT unit <uid>: Lu hp .. atk .. / .. def .. / .., Ciel hp ...`.
+- **Character window:** no change needed: DU5's `GetShownEquipStat( form )` already sums each body's gear.
+- **Stale comment kept:** `X2Unit.h`'s `m_MinorUnitGameStat` still says "stand-in: zero until its writer lands" (DU1c's line; not rewritten).
+- **Gates:** `finish.py --files <17 files> --with SERV_IRUHADEV_JUNE_CHAR_DUO_STAT`: flagcheck 12 PASS, 2 PASS~, 1 DEFINE, 1 OTHER (`Always.h`: peers'
+  uncommitted blocks), 1 FAIL = `X2Unit.cpp` stripped line 6293, a peer's uncommitted char-luciel CH5 `LUCIEL_UI` hunk in the same file (not staged;
+  the range run below has none); 0 deleted, 0 non-ASCII. junediverge PASS. enumscan exit 1 on 191 pre-existing rows, **0 on DU5e's lines** (`git diff -U0` intersect).
+- **Compile:** `/Zs` probes of the 9 changed TUs (incl. `X2ServerPacket.cpp`): 0 errors.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,048,960 B, dated 2026-11-16 04:04:33, md5 8c2dc751abba8b12eb0886bb3d122baf` (built at `2c38224a` + 19
+  uncommitted code files); `EXESTR OK: 1 of 1` (`[JUNE_CHAR] LUCIEL DUO STAT ...`, wide).
+- **Play-test:** owed (hand-off: testlu1, Necklace of Vitality on Ciel only, dungeon tag compare).
 
 ## Phase CH1 - Deploy unit: the class core
 

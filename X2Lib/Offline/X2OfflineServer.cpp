@@ -534,9 +534,38 @@ bool CX2OfflineServer::ReplyID( KOfflineSession& kSes, unsigned short usEventID 
 	// happened to be loaded last.
 	CX2OfflineInventory* pInven = CX2OfflineInventory::Instance();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	// char-luciel DU5e stand-in: Lu's stat counts her slots and the shared ones only ( CX2Unit::GetEqipStat group 0 ), every other class every slot
+	const int iEquipGroup = ( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) ) ? 0 : 2;
+	if( true == pInven->Load( kRow.m_nUnitUID ) )
+		pInven->AddEquippedStat( kOut, iEquipGroup );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	if( true == pInven->Load( kRow.m_nUnitUID ) )
 		pInven->AddEquippedStat( kOut );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 }
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+// char-luciel DU5e stand-in ( no June server ): Ciel's stat = the same base + her slots and the shared ones ( group 1 ), logged beside Lu's
+/*static*/ void CX2OfflineServer::MakeMinorUnitGameStat( const KOfflineUnitRow& kRow, OUT KStat& kOut )
+{
+	kOut.Init();
+	if( CX2Unit::UT_LUCIEL != CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) )
+		return;
+
+	CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel, kOut );
+
+	CX2OfflineInventory* pInven = CX2OfflineInventory::Instance();
+	if( true == pInven->Load( kRow.m_nUnitUID ) )
+		pInven->AddEquippedStat( kOut, 1 );
+
+	KStat kMajor;
+	MakeGameStat( kRow, kMajor );
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO STAT unit %I64d: Lu hp %d atk %d / %d def %d / %d, Ciel hp %d atk %d / %d def %d / %d",
+		(__int64)kRow.m_nUnitUID, kMajor.m_iBaseHP, kMajor.m_iAtkPhysic, kMajor.m_iAtkMagic, kMajor.m_iDefPhysic, kMajor.m_iDefMagic,
+		kOut.m_iBaseHP, kOut.m_iAtkPhysic, kOut.m_iAtkMagic, kOut.m_iDefPhysic, kOut.m_iDefMagic );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -1191,6 +1220,9 @@ void CX2OfflineServer::PushLevelUp( KOfflineSession& kSes, UidType nUnitUID )
 	CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel,
 												 kNot.m_kBaseStat );
 	MakeGameStat( kRow, kNot.m_kGameStat );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	MakeMinorUnitGameStat( kRow, kNot.m_kMinorUnitGameStat );	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	Reply( kSes, EGS_CHAR_LEVEL_UP_NOT, kNot );
 }

@@ -4812,3 +4812,9 @@
 // Description: char-luciel DU5: June's form REQ / NOT ( 0x4d9 / 0x4da ) events and packets. Also defined in KTDXLIB/Always.h; this second home exists because EventID_Client.h and ClientPacket.h are compiled before Always.h is reachable. Comment out both together.
 #define SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel DU5e: KRoomUserInfo and the room NOTs carry June's second KStat ( each Lu/Ciel body's game stat ). Also defined in KTDXLIB/Always.h and in X2ServerProtocol_2010.vcxproj ( X2TOOL ): toggle all three.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+//////////////////////////////////////////////////////////////////////////

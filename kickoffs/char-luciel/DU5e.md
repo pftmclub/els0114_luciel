@@ -46,3 +46,10 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Split by DU5e (2026-11-15)
+
+DU5e ported the second game stat (the first task bullet: `SetGameStats`, the seven sites, the packet fields, the emulator's per-body numbers).
+The rest moved to **DU5f** (`kickoffs/char-luciel/DU5f.md`): the type-10 socket aggregate, the HUD's second gage, the set-socket count and its
+window reader `@3291bf2d`, the per-body socket record `3271a060`, and the other players' form bytes if DU5c routes them. The character window
+already shows each body's HP / attack / defence (DU5's `GetShownEquipStat` by form), so DU5e's gate is the dungeon side.

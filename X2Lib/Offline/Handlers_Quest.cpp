@@ -949,6 +949,9 @@ bool CX2OfflineServer::Handler_EGS_EQUIP_TITLE_REQ( KOfflineSession& kSes, const
 		// m_kGameStat straight over the unit's own, so a zeroed one would give
 		// the in-dungeon character max HP 0 for the sake of a title change.
 		MakeGameStat( kRow, kNot.m_kGameStat );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+		MakeMinorUnitGameStat( kRow, kNot.m_kMinorUnitGameStat );	// char-luciel DU5e
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 		Reply( kSes, EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT, kNot );
 	}

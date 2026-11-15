@@ -288,6 +288,9 @@ void CX2OfflineServer::MakeRoomUserInfo( const KOfflineUnitRow& kRow, OUT KRoomU
 	// with the base stat alone would strip the player's equipment bonuses at
 	// exactly the point they are needed.
 	MakeGameStat( kRow, kOut.m_kGameStat );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+	MakeMinorUnitGameStat( kRow, kOut.m_kMinorUnitGameStat );	// char-luciel DU5e: Ciel's own stat, SetKRoomUserInfo's second KStat
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
 	// The equipped items and the skill state, so the in-dungeon character wears
 	// what the village character was wearing and has the same skills on its
