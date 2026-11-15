@@ -2960,7 +2960,9 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE` (`Always.h`, `
 - **Play-test 2 (16:44-16:47, units 187 / 188):** no `OpenTexture` failure left, but the pictures still did not draw: each picture names piece
   `"01"`, defined in the texture's `.TET` sidecar, which name staging by `.tga` does not bring. Fix: the 15 `.tet` (`kom.py stage-june`, 15 new,
   6 identical, 0 replaced), `PACK OK` / `COPY OK` data052 (md5 `2e048616`), data151 (`df705629`), data215 (`14e12b3f`), datai020 (`4eb0e867`).
-- **Play-test 3:** owed (pictures; units `LuTetDuo` / `LuTetRG`). Review kickoff `kickoffs/char-luciel/CHN-review.md` written.
+- **Play-test 3 (16:49-16:51, user: all pictures show):** 1ST guide portraits, Diabla popup panel, 2ND guide Noblesse portrait, Noblesse popup panel;
+  `CLASS CHANGE` 189 200 -> 39, 190 38 -> 128; ErrorLog 0 lines for the Lu/Ciel dialog textures, 0 EXCEPTION. CHN passed; promotion cubes go to
+  CHN2; review kickoff `kickoffs/char-luciel/CHN-review.md` (covers CHN + CHN2).
 
 ## Phase TU - Tutorial
 
