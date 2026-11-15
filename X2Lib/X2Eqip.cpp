@@ -310,7 +310,7 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 #ifdef SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET
 // June2017 3295ca60: stop the per-equip effect set (+0x15f8) on the UI effect set (g_pData +0x9c) only when bStop and the handle is
 // valid; the handle is forgotten (-1) either way. The GUUser and square miss paths pass false, so the set plays on to its own end;
-// only the square's RemoveUnit stop (323f56d0) passes true. June has no CX2Eqip dtor stop (3 callers only). Both: JUNE_BUGS.md.
+// only the square's RemoveUnit stop (323f56d0) passes true. June's dtor 329602f0 stops it directly (june-engine R14d). JUNE_BUGS.md.
 void CX2Eqip::ReleaseEquipEffectSet( bool bStop )
 {
 	if( true == bStop && NULL != g_pData && INVALID_EFFECTSET_HANDLE != m_hEquipEffectSet )
@@ -1189,15 +1189,15 @@ HRESULT CX2Eqip::OnFrameMove( double fTime, float fElapsedTime )
 
 					case 202560:	// June drops March's Ara SetUseRenderParam ids ( 41510 / 41640 / 41700 / 41736 / 41743 )
 					case 202610:
-					case 276915:
-					case 276922:
-					case 276929:
-					case 276936:
-					case 276943:
-					case 276950:
-					case 276957:
-					case 276964:
-					case 276971:
+					case 275891:	// june-engine R14d review: June @32965412 / 3296568c, the nine SeeU costume gloves
+					case 275898:
+					case 275905:
+					case 275912:
+					case 275919:
+					case 275926:
+					case 275933:
+					case 275940:
+					case 275947:
 					case 282812:
 					case 282819:
 						m_pNormalXSkinModel[i]->SetAlphaRender( true );

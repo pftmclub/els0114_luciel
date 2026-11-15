@@ -2432,6 +2432,47 @@ before the field loaded. **Why the light is missing:** 85811's visible part is i
 with `TraceLandPos`, 334c9a84) and June's group frame move puts it at the owner's land position (`3296479f` -> `329645a0`). March's `AttachParticle`
 looks the bone up in the item mesh, finds none and deletes the particle. Both functions are R6c's (kickoff amended: 85811 is its proof).
 
+### Phase R14d -- Review
+
+**2026-11-15, Opus 5.5 high. Verdict: PASS after one fix.** Reviewed `58fbaab4` (+ `eb5043c5` MODS only) against June in Ghidra (read-only: decompile
+and disassembly of `32964ae0`, `329645a0`, `329602f0`, the ctor `32961280` @`329615dc`-`32961620`); debug line retired.
+- **Fixed: the 9 skin alpha ids.** June's second jump table (`3296547f`, base `0x435ba`, plus `CMP 0x435b3` @`32965412`, `0x435dd`, `0x435e4`, `+7`)
+  is **275891 / 275898 / 275905 / 275912 / 275919 / 275926 / 275933 / 275940 / 275947** (item.kim: the nine classes' SeeU costume gloves). R14d
+  wrote 276915-276971 (off by 0x400: Ara's Psychic Devil Wing, Add's hair, a Pelican Gunblade ...). Corrected in `X2Eqip.cpp` under the same flag,
+  and in funcmap row `32964ae0 (R14d)`. The Done note's id range above is the old, wrong one.
+- **Withdrawn: JUNE_BUGS 102** ("no equip-dtor stop"). June's dtor stops `+0x15f8` itself @`329605db` (`321dafb0` on `g_pData +0x9c`, when the
+  handle is not -1), not through `3295ca60`; R14d's `ReleaseEquipEffectSet( true )` after the sub-equips is that stop. The row and the stale comment
+  above `ReleaseEquipEffectSet` (`JUNE_EQUIP_EFFECT_SET` block) now say so.
+- **Gate** (@`32964b1d`): templet NULL -> E_FAIL; hidden = (`+0xc` manager && !`31fae370`) || `+0x172` == 0 = March's `GetShowObject()`; then only
+  type 2 (`UT_ATTACH_ANIM`), game, `GetMyUnit` (vslot 0x98), riding pet (`32071c10`) id `+0x350` == 0x3f. `+0x350` is the pet's unit id (funcmap
+  `32d3cf40` / `32d281f0` test transformer ids 0x20 / 0x21 and pass it to the manager): `GetInfo().m_Id` is right. PASS.
+- **UT_SKIN** (`329653f5`-`32965507`): face ids 2 / 9 / 16 / 29 / 36 (table 1), 44 / 45, 50 / 51, 57, 41400 -> `+0x8d0` only; alpha as fixed above
+  plus 202560 / 202610 / 282812 / 282819; default 0; hyper `+0x564` with `+0x1c4` / `+0x1c5`: 202560 / 202610 only. LoadAttached on `+0x929`. PASS.
+- **TraceLandPos** (`32964dbd`-`32964f1c`): `GetAttachFrameName( 0 )` for every slot (JUNE_BUGS 745), owner `+0x1b4` set -> `32867660( type
+  ( owner +0xaf0 ), +0x15d4 )`, then `329645a0( &land )` on `+0x8f0`, then only with `+0x1c0`: `31c8ef80( &root, anim +0x324 )` and offset +=
+  land - root. `329645a0`: source not 0 / 3 -> fixed pos, false; state 14..15 (March `XS_VILLAGE_MAP` = 14 too) -> field unit `+0x4a0`; else game
+  user vslot `0x554`; true whenever the manager exists. Ctor UID copy @`32961616` runs after both owner branches (join `3296160a`). PASS.
+- **Attach anims** (`32964f22`-`329653e3`): basic `+0x584`, normal `+0x544`, hyper `+0x564` (`+0x1c4` / `+0x1c5`); each: scale `32867710` x
+  yaw-pitch-roll( y, x, z ) `328677c0` x translation `+0x8cc` x unit matrix -> `+0x2dc`, vslot 4. The vslot `0x14` call before each is
+  `GetRenderParam()` (March calls it too, result unused): not transcribed, no effect. UT_ATTACH_NORMAL (`+0x324` -> `+0x344 + 0x40 i`) with the
+  body, no LoadAttached. PASS.
+- **Enum**: `RPUI_RAKSHASA = 63` matches June `Enum.src.lua:16695`, after `RPUI_END` (value kept explicit). PASS.
+- **Stand-ins**: `3295ce00` after normal / hyper (R6c), the `+0x15f0` switch (Stage 11), sub-equips `+0x8dc` vslot 4, then `329646c0` (R6c,
+  March's group frame move meanwhile). Nothing else in `32964ae0` is missing.
+- **Play-test log** (from the Done note): `found 1` in village / field / dungeon with offset 0 = frame offset + land - root at the feet; the one
+  character-window line is JUNE_BUGS 746. Judged right.
+
+**Gates.** `finish.py --review --commits 58fbaab4 --with JUNE_EQIP_FRAME_MOVE _DEBUG JUNE_EQIP_DTOR --skip-flag JUNE_ENUM_NAMES -v`:
+JUNE_EQIP_DTOR PASS (1 PASS, 1 DEFINE, 2 OTHER = `X2Eqip.h` (FRAME_MOVE's members) and the enum line), JUNE_EQIP_FRAME_MOVE PASS (2 PASS, 1
+DEFINE, 1 OTHER = the enum line), 0 deleted lines; junediverge PASS, `--check-all` PASS; enumscan exit 0; FINISH RESULT: PASS. Fix, worktree
+(`--files X2Eqip.cpp --with JUNE_EQIP_FRAME_MOVE JUNE_EQUIP_EFFECT_SET`): both PASS; the 10 deleted lines are the 9 case lines and the one comment
+line, each replaced in place inside an Iruha block; junediverge PASS; enumscan exit 0.
+**Build:** `DEPLOY OK: X2_offline.exe is 27,015,680 B, dated 2026-11-15 23:08:47, md5 7439b24a67aba5bc82e4c1e17a9fa5e7` (built with the fix on
+disk). `EXESTR OK: 1 of 1 absent` (`] EQTRACE item `: the debug line is gone). Shared tree: peers' commits swept in three of this review's edits: the
+`_DEBUG` retire (`Always.h`, R9 review `b068aeb4`), JUNE_BUGS 102 and the funcmap ids (`b8d17bd8` / `4ecb6f3d`).
+**Play-test of the fix:** Elsword `jtLordKnight`, `/additem 275891 1` (Elsword's SeeU costume gloves), equip, village: the gloves draw with June's
+alpha blend (soft edges, no opaque or black fringe). When it passes, R14d moves to Done.
+
 ## Phase R14f - June's whole CX2Eqip::LoadAttached
 
 **Run with:** Opus 5.5 high (map, then port), Opus review, user play-test. Added by R14d (2026-11-15). Proposed flag
