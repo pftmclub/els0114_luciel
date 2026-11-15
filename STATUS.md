@@ -239,8 +239,8 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5b | **play-test owed** (2026-11-16, batch with DU5b2): viewer's second body, shown-body switch, window one body; split: equipment -> DU5b2 | Opus 5.5 / high, Opus review, user play-test | DU5 review | `X2UnitViewerUI.*`, `X2UICharInfo.cpp`, `X2TFieldGame.cpp` | `DU5b.md` |
-| DU5b2 | **play-test owed** (2026-11-16): each body's equipment in the viewer, June's 6 equip functions, [ pos ][ 3 ] slots; DEPLOY OK; batch DU5b + DU5b2, then `DU5b2-review.md` | Opus 5.5 / high, Opus review (covers DU5b), user play-test | DU5b | `X2UnitViewerUI.*`, `X2Eqip.h` | `DU5b2.md` |
+| DU5b | **play-test passed** 2026-11-16 (batch with DU5b2, run 3): viewer's second body, shown-body switch, window one body; review: `DU5b2-review.md` | Opus 5.5 / high, Opus review, user play-test | DU5 review | `X2UnitViewerUI.*`, `X2UICharInfo.cpp`, `X2TFieldGame.cpp` | `DU5b.md` |
+| DU5b2 | **play-test passed** 2026-11-16 (run 3, after 2 fixes: fixed-viewer move, PlayAnim both bodies); owes `DU5b2-review.md` (covers DU5b); village switch = DU5c | Opus 5.5 / high, Opus review (covers DU5b), user play-test | DU5b | `X2UnitViewerUI.*`, `X2Eqip.h` | `DU5b2.md` |
 | DU5c | blocked (DU5b2 review): both bodies on the create / select screens, the village avatar by form | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2SquareUnit.*` | `DU5c.md` |
 | DU5d | blocked (DU5b2 review): viewer weapon effects case 10, CH0's viewer checklist rows | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2UnitViewerUI.cpp`, `X2SlotItem.cpp` | `DU5d.md` |
 | DU6 | play-test passed 2026-11-16 ( the awakening fire follows the active body, Elsword / Aisha unchanged ); Opus review next | Opus 5.5 / high, Opus review, user play-test | - | `X2GUUser.*`, `X2GULuciel.*` | `DU6.md` |

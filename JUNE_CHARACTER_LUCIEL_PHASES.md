@@ -1761,6 +1761,9 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's; no new define,
   `DEPLOY OK: X2_offline.exe is 27,077,632 B, dated 2026-11-16 06:08:24, md5 2c919c742b8639ca0aaab3c4e1c28ef0` (main adffeace + peers' files).
 - **Play-test:** the DU5b batch seam: sections DU5b + DU5b2 of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off
   assembled. Review: `DU5b2-review.md` covers DU5b + DU5b2.
+- **Play-test passed** (user, 2026-11-16, run 3 on md5 `2c919c74`): window body in place and idling, switch / click swap, each body's gear,
+  glove swaps, Ciel visible in the village, other classes unchanged. Open, already routed: the window's switch does not yet change the village
+  avatar (DU5c, `323f3290` / `323fa700` / `323fad80`); the awakening fire stays behind on Ciel (new phase DU6, user report).
 
 ### DU5e - Done (2026-11-15)
 
