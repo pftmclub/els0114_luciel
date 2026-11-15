@@ -30265,6 +30265,9 @@ void CX2GUNPC::PushCreateNPCReq_Lua( int unitID, int level, bool bActive, D3DXVE
 #endif SERV_IRUHADEV_JUNE_NPC_CREATE_NPC_REQ
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
+#if !defined( SERV_INSERT_GLOBAL_SERVER ) || !defined( SERV_TRAPPING_RANGER_TEST ) || !defined( SERV_NEW_DEFENCE_DUNGEON )
+#error SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS needs CreateNPCReq's full argument list ( ServerDefine.h, unseen by KTDXLIB ), char-luciel CH3c20 review
+#endif
 // char-luciel CH3c20: June 327799c0; the create core at once like 32779cb0, team / AI type / ally team ride in one vector, the ally UID is the caller's
 void CX2GUNPC::PushCreateNPCReq_LUA4( int unitID, int level, bool bActive, D3DXVECTOR3 vPos, bool bRight, D3DXVECTOR3 vfDelayTimeNKeyCode, bool bNoDrop, D3DXVECTOR3 vTeamNAITypeNAllyTeam, UidType iAllyUID )
 {

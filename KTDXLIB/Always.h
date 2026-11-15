@@ -13691,8 +13691,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              CX2Game::GetPosCheckDistStandardNPC ( June 322f27e0 ), CX2GUNPC::PushCreateNPCReq_LUA4 ( 327799c0 ), CX2GUNPC::IsSameOwnerUserID
 //              ( 3275b0f0 ), and a CX2GameUnit bind of GetRemainHyperModeTime ( 31e4f890 ). Revert: comment out the #define ( JUNE_CHAR_NPC_LUA_BINDS ).
 #define SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
-#if defined( SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS ) && ( !defined( SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD ) || !defined( SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER ) || !defined( RAVEN_WEAPON_TAKER ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ARME_CORE ) || !defined( DUNGEON_RANK_NEW ) || !defined( SERV_INSERT_GLOBAL_SERVER ) || !defined( SERV_TRAPPING_RANGER_TEST ) || !defined( SUMMON_MONSTER_CARD_SYSTEM ) || !defined( SERV_NEW_DEFENCE_DUNGEON ) )
-#error SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS needs June's GetLandPosition ( _LINEMAP_LAND_MONSTER_ROAD ), June's weapon-taker walk ( _DIVERGE_FIXED_DISTANCE_WEAPON_TAKER, RAVEN_WEAPON_TAKER ), IsPosAlongLastTouchLine ( _CHAR_ARME_CORE ), GetOwnerGameUnitUID ( DUNGEON_RANK_NEW ) and CreateNPCReq's full argument list, char-luciel CH3c20
+#if defined( SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS ) && ( !defined( SERV_IRUHADEV_JUNE_LINEMAP_LAND_MONSTER_ROAD ) || !defined( SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER ) || !defined( RAVEN_WEAPON_TAKER ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ARME_CORE ) || !defined( DUNGEON_RANK_NEW ) || !defined( SUMMON_MONSTER_CARD_SYSTEM ) )
+#error SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS needs June's GetLandPosition ( _LINEMAP_LAND_MONSTER_ROAD ), June's weapon-taker walk ( _DIVERGE_FIXED_DISTANCE_WEAPON_TAKER, RAVEN_WEAPON_TAKER ), IsPosAlongLastTouchLine ( _CHAR_ARME_CORE ), GetOwnerGameUnitUID ( DUNGEON_RANK_NEW ), char-luciel CH3c20 ( ServerDefine.h flags are checked in X2GUNPC.cpp )
 #endif SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////

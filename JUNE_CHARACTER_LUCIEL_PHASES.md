@@ -3396,6 +3396,10 @@ Opus 5.5 high. Reviewed commit `b4f80375` against June's listing (`disasm_range.
   5 OTHER, 0 FAIL; both 0 deleted lines; every OTHER row = the partner flag's file. junediverge + `--check-all` PASS, enumscan exit 0, luabind PASS; stateends /
   skillicons skipped ( no state, no skill ). Fix worktree: `finish.py --files X2Lib/X2Game.cpp --with JUNE_CHAR_NPC_LUA_BINDS` PASS ( 1 PASS, the 1 deleted line = the
   replaced line inside the flag's own block ). Commit `191732e7`, range gate `191732e7^..191732e7`: the same, `FINISH RESULT: PASS`.
+- **Second fix ( found by the full build ):** `Always.h`'s `_NPC_LUA_BINDS` guard named three `ServerDefine.h` flags ( `SERV_INSERT_GLOBAL_SERVER`,
+  `SERV_TRAPPING_RANGER_TEST`, `SERV_NEW_DEFENCE_DUNGEON` ) that KTDXLIB never sees ( `C1189` ); the CH3c20 probes compiled X2Lib files only. Those three now
+  sit in an `#error` inside the flag block in `X2GUNPC.cpp` ( beside the `CreateNPCReq` call ); the `Always.h` guard keeps the six it can see. Gates PASS ( 2 deleted
+  lines = the replaced guard pair ). `DEPLOY OK: X2_offline.exe is 26,948,608 B, dated 2026-11-15 18:31:09, md5 df9afaf486b60758f01f2f05bc28f749`.
 - **Build:** `/Zs` probe of `X2Game.cpp`: 0 errors. Full build skipped: no play-test ( CH3c2 plays it ). CH3c2's kickoff checked: its CH3c20 amendment stands; it waits only on CH3c.
 
 ## Phase CH4 - Passives and class mechanics
