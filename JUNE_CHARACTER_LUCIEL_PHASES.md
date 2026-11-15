@@ -2477,7 +2477,7 @@ No debug define. No review of its own: the CH1o review covers CH1m, CH1n, CH1o. 
 
 ### CH1o - Done (2026-11-15)
 
-Opus 5.5 high. New class-agnostic flag `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( **defined**; `#error` without `JUNE_CHAR_DUO_BODY` ) plus `_LIVE` widenings. Commit: see `git log --grep "char-luciel Phase CH1o:"`.
+Opus 5.5 high. New class-agnostic flag `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( **defined**; `#error` without `JUNE_CHAR_DUO_BODY` ) plus `_LIVE` widenings. Commit `b557510a` ( code, note, kickoffs ).
 No debug define. Review: `CH1o-review.md` covers CH1m, CH1n, CH1o. funcmap: `grep "(CH1o)" june2017_re/funcmap.tsv` ( 10 rows ). `JUNE_BUGS.md` 723.
 - **Split ( scope ):** the kickoff's amendments came to ~200 engine call sites ( `june2017_re/char_luciel/ch1o_vcall_sites.tsv`, scan `ch1o_vcall_scan.py`: June's
   `mov r,[vtable+slot]; call r` pairs ). CH1o does the bases and the hook sites; **CH1o2** the 84 readers of the state getters; **CH1o3** effect-set tags 4 / 10 / 11,
@@ -2506,7 +2506,7 @@ No debug define. Review: `CH1o-review.md` covers CH1m, CH1n, CH1o. funcmap: `gre
   ( `X2GUUser.cpp:28408-28417` NUI_BEE*, `X2GUUser.h:2943-2944`; none in this diff ). Its flagcheck cannot pass a second phase flag as `--with` ( only `_DEBUG` ), and its `_CORE` run
   crashes on a peer's `#if` ( `X2GUUser.cpp:29435`, Unevaluable ), so flagcheck ran directly: `JUNE_USER_VIRTUAL_HOOKS --with JUNE_CHAR_LUCIEL_LIVE` `5 PASS, 1 DEFINE, 2 OTHER ( X2GUNPC: _LIVE ),
   0 FAIL` / `RESULT: PASS`; `JUNE_CHAR_LUCIEL_LIVE --with JUNE_USER_VIRTUAL_HOOKS` `7 PASS, 1 DEFINE, 0 FAIL`, only 'not #defined' ( `//#define` until CH1 final: INERT ); `JUNE_CHAR_LUCIEL_CORE`
-  ( the two class files ) `2 PASS` / `RESULT: PASS`, 44 deleted lines = the class header's comment updates and the 0x2e4 / 0x648 renames. Engine files: 0 deleted, 0 non-ASCII.
+  ( the two class files ) `2 PASS` / `RESULT: PASS`, 44 deleted lines = the class header's comment updates and the 0x2e4 / 0x648 renames. Engine files: 0 deleted, 0 non-ASCII. Range `b557510a^..b557510a`: `HOOKS --with _LIVE` `5 PASS, 1 DEFINE, 4 OTHER, 0 FAIL` / PASS; `_LIVE --with HOOKS` `7 PASS, 0 FAIL`, INERT only.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ): `X2GUUser.cpp`, `X2GULuciel.cpp` plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`, `X2DamageManager.cpp`, `X2GUNPC.cpp`,
   `X2GUChung.cpp`: 0 errors, 0 warnings in the touched files. Full build skipped: no play-test ( CH1 final's play-test walks one other class as the regression check, `CH1.md` ).
 - **How to see it in game:** nothing ( every base equals March; Lu/Ciel is not live ).
