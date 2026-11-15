@@ -2147,6 +2147,13 @@ Drone +11 + Tassel Drone fashion), Elsword `jtLordKnight` (25, Void Sword +10 + 
 `LunaticPsykerT` (36) still hits with the dynamos (own anim). Log: `[JUNE_ENGINE] EQBASIC item <worn id> pos 2 basic_item 21 / 41 / 7 ...
 attack_lines N`. With `attack_lines 0`, the basic mesh carries no hit lines and Z hits nothing: a finding for the review (June's mesh vs March's).
 
+**Play-test 2026-11-15: PASSED** (user: Aisha, Eve, Elsword and Add Z combos hit; weapons unchanged). Log (exe md5 df9afaf4, run 18:33-18:43,
+0 EXCEPTION; UNHANDLED only `E_DISABLE_HB_CHECK_REQ`, pre-existing): 77 `EQBASIC` lines, every one with `attack_lines` >= 1. Aisha 131642 / 128010
+`basic_item 21`; Eve 116934 / 229990 `basic_item 41 anims 2 attack_lines 2`; Elsword 163450 / 131136 / 69865 / 81020 `basic_item 7`; Raven
+131644 / 131649 `basic_item 34`; Ara 112700 / 41738 / 69895 / 41450 `basic_item 41450`; Lu/Ciel's Ciel equips (41886, 41900, 200030344, 200113300)
+`basic_item 41876 minor 1 anims 2 attack_lines 2` (the minor-unit branch: Lu's basic weapon -> its Ciel item 41886). No line for Add's dynamos
+(own anim). Note for the review: the debug throttle printed lines 65-85 though it should stop at 60; the review retires the line anyway.
+
 ## Phase R14d - June's whole CX2Eqip::OnFrameMove and the DG-chain byte readers
 
 **Run with:** Opus 5.5 high (map, then port), Opus review, user play-test. Added by R14c (2026-11-15). Proposed flag
