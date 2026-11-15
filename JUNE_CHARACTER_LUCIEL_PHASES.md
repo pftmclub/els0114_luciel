@@ -1527,7 +1527,12 @@ the retired `JUNE_CHARINFO_EQUIP_GROUP`, whose define is commented out). Rows: f
   DU4 files + CH2c's uncommitted `X2GULuciel.*`); `EXESTR OK: 1 of 1` (`[JUNE_CHAR] LUCIEL DUO DB MIG v24 done`, wide) and `1 of 1` (the size UPDATE).
 - **Data:** `PACK OK data036` (only `Enum.lua` changed), `COPY OK data036` md5 `e4dfe3d0`.
 - **Save prep:** onepieces worn in March's slot 20 on jtLordKnight (25, 163569), reyaa (12, 163571), testlu1 (166, Lu's 163578); Ciel's Spa Wear
-  163579 bagged on testlu1 (`elsdb.py`, backed up). Play-test: below.
+  163579 and Archdevil Bottom Piece (Lu) 85912 bagged on testlu1 (`elsdb.py`, backed up).
+- **Play-test: passed** (user, 2026-11-15, on md5 `439247b2`). Save after: `user_version` 24, the three onepieces at slot 35, testlu1's Ciel promotion
+  set in Ciel's slots 21-25 and Ciel's Spa Wear in 36, all 59 worn bags 43. The v24 line ran in the first launch (screenshot run); the last run
+  (21:13) has 20 handled `EGS_CHANGE_INVENTORY_SLOT_ITEM_REQ`, 0 EXCEPTION, UNHANDLED only `E_DISABLE_HB_CHECK_REQ`. Finding (not DU4): a June
+  onepiece shows merged with the costume top / bottom in the U window only, March's viewer `UpdateEquipSlotVisibility` id lists; in play it is right.
+  Routed to june-engine R14e (kickoff amended, `8b5d3e7c` / `5218e482`).
 
 ## Phase CH1 - Deploy unit: the class core
 
