@@ -86,3 +86,9 @@ strings), `328825c0`, `32882540`. `31fd48a0`, `31fd63c0`, `32882540` have no Mar
 - CH1's play-test: **Ciel draws no body** in a field ( his animation, effects and sound run ), because every equip is Lu's under the `+0x15d4` stand-in and
   Ciel's look ( `31fe4210` -> `31fe2fb0`, form 1 `31ffe990` ) is not built. This phase's play-test must show Ciel's body and equipment after a swap, then
   CH1's owed check: Ciel dies with a buff on ( `/invin 0` ), the buff is gone after the revive.
+
+## Split by DU3 (2026-11-15)
+
+- This phase is part 1 of 3: the item / equip foundation (CX2Eqip's two ctor arguments, `CX2Item::GetEffectiveEnchantLevel` / `IsUsableEquip`,
+  `SAT_PVP_EQUIP`, `DITT_PC_BANG_ONLY_EQUIPMENT`, the stand-ins above read `IsMinorUnitEquip()`). The view list is `DU3b.md`; Ciel's look at init, the
+  hide / socket passes, the CX2Eqip body readers, the glow cases and the play-test are `DU3c.md`. `DU3-review.md` covers all three at DU3c.

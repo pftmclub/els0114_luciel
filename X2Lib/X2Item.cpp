@@ -602,6 +602,67 @@ bool CX2Item::IsDisabled()
 }
 #endif
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+// char-luciel DU3: June 32882440 ( a PvP equip's level is its SAT_PVP_EQUIP value, 7 when that is 0 )
+namespace _CONST_ITEM_DU3_
+{
+	const int PVP_EQUIP_ENCHANT_LEVEL = 7;	// June 32882440 / 32882540: no Enum entry
+
+	int GetPvpEquipEnchantLevel( const CX2Item::ItemTemplet* pItemTemplet_ )
+	{
+		if ( NULL == pItemTemplet_ )
+			return 0;
+
+		int iEnchantLevel = 0;
+		for ( unsigned i = 0; i < pItemTemplet_->GetNumSpecialAbility(); ++i )
+		{
+			const CX2Item::KItemFormatSpecialAbility& kSpecialAbility = pItemTemplet_->GetSpecialAbility( i );
+			iEnchantLevel = kSpecialAbility.m_Value1;
+			if ( CX2Item::SAT_PVP_EQUIP == kSpecialAbility.GetType() )
+				break;
+			iEnchantLevel = 0;
+		}
+
+		if ( true == pItemTemplet_->GetPvpEquip() && 0 == iEnchantLevel )
+			iEnchantLevel = PVP_EQUIP_ENCHANT_LEVEL;
+		return iEnchantLevel;
+	}
+}
+using namespace _CONST_ITEM_DU3_;
+
+// char-luciel DU3: June 32882540
+int CX2Item::GetEffectiveEnchantLevel() const
+{
+	if ( NULL != m_pItemTemplet )
+	{
+		if ( true == m_pItemTemplet->GetPvpEquip() )
+			return GetPvpEquipEnchantLevel( m_pItemTemplet );
+
+		if ( true == g_pData->GetItemManager()->IsDivisionItem( CX2ItemManager::DITT_PC_BANG_ONLY_EQUIPMENT, m_pItemTemplet->GetItemID() ) )
+			return PVP_EQUIP_ENCHANT_LEVEL;
+	}
+	return m_kItemData.m_EnchantLevel;
+}
+
+// char-luciel DU3: June 328825c0
+bool CX2Item::IsUsableEquip() const
+{
+	if ( ( CX2Item::IT_WEAPON == m_pItemTemplet->GetItemType() || CX2Item::IT_DEFENCE == m_pItemTemplet->GetItemType() )
+		&& false == m_pItemTemplet->GetFashion() && GetEffectiveEnchantLevel() < 0 )
+		return false;
+
+	if ( CX2Item::PT_ENDURANCE == m_kItemData.m_PeriodType && m_kItemData.m_Endurance <= 0 )
+		return false;
+
+	// stand-in: June reads the owner unit's byte +0x48d ( a PC-bang session ); offline has none, so a PC-bang-only equip with an owner is never usable
+	if ( true == g_pData->GetItemManager()->IsDivisionItem( CX2ItemManager::DITT_PC_BANG_ONLY_EQUIPMENT, m_pItemTemplet->GetItemID() )
+		&& NULL != m_pOwnerUnit )
+		return false;
+
+	return true;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+
 /** @function : GetEnchantStat
 	@brief : 강화가 적용된 스탯을 구함 (기본 아이템 스탯 포함)
 	@param : 강화가 적용된 스탯을 저장할 레퍼런스

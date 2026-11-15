@@ -6081,7 +6081,11 @@ void CX2GUUser::UpdateEquipCollisionData( IN vector<CX2EqipPtr>& m_vecEquipList 
 			continue;
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		const bool bEquipForMinorUnit = pEqip->IsMinorUnitEquip();	// char-luciel DU3: June @31fd8cff
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		const bool bEquipForMinorUnit = false;	// char-luciel DU1d3: June @31fd8cff; stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		if( false == m_bDuoEnabled && bEquipForMinorUnit != IsMinorUnitActive() )
 			continue;
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
@@ -20711,7 +20715,11 @@ void CX2GUUser::CommonFrameMove()
 				if ( pCX2Eqip == NULL )
 					continue;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+				const bool bEquipForMinorUnit = pCX2Eqip->IsMinorUnitEquip();	// char-luciel DU3: June @3206585b
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 				const bool bEquipForMinorUnit = false;	// char-luciel DU1b2: June @3206585b; stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 				CKTDGXSkinAnimPtr pEquipXSkinAnim = ( true == bEquipForMinorUnit ) ? m_pMinorUnitXSkinAnim : m_pXSkinAnim;
 				if( NULL == pEquipXSkinAnim )
 				{
@@ -25473,7 +25481,11 @@ void CX2GUUser::UpdateShowViewListByActiveBody()
 {
 	for( UINT i = 0; i < m_ViewEqipList.size(); ++i )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		const bool bEquipForMinorUnit = m_ViewEqipList[i]->IsMinorUnitEquip();	// char-luciel DU3: June 31fd6260
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		const bool bEquipForMinorUnit = false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's; every equip is Lu's until then
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		m_ViewEqipList[i]->SetShowObject( true == m_bDuoEnabled || bEquipForMinorUnit == m_bMinorUnitActive );
 	}
 #ifdef NOT_RENDERING_OTHER_EQUIP_POS

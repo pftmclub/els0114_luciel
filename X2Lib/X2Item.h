@@ -836,6 +836,10 @@ public:
 #ifdef ITEM_RECOVERY_TEST
         bool            IsDisabled();
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+        int             GetEffectiveEnchantLevel() const;	// char-luciel DU3: June 32882540 ( a PvP equip shows its fixed level )
+        bool            IsUsableEquip() const;				// char-luciel DU3: June 328825c0 ( broken, worn out or PC-bang-only -> false )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 
         CX2Stat::Stat   GetStat( bool bIncludeSocketOption = false );

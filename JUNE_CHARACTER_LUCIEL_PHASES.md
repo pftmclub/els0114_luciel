@@ -1337,6 +1337,34 @@ Opus 5.5 high. **Verdict: pass, no code change** (commit `14fe2f4d`, flag `SERV_
   flag-off preprocess needs an `Always.h` edit, which the shared tree forbids).
 - **Build:** none (no fix, no play-test). CH1p's DU2 dependency is met.
 
+### DU3 - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW` (defined; `#error` guard: `JUNE_ITEM_KIM`, `JUNE_EQUIP_EFFECT_SET`, `JUNE_CHAR_DUO_BODY`).
+**Split:** June's equip view is three layers, too much for one session: **DU3** (this) the item / equip foundation, **DU3b** the view list
+(`3201b930`, `31fd2f00`, `31ffe990`, overrides, callers, the unit's per-body tables), **DU3c** Ciel's look at init (`31fe4210` chain), the body readers,
+the glow cases and the one full build + play-test. One review (`DU3-review.md`) at DU3c. Kickoffs `DU3b.md`, `DU3c.md` carry the Ghidra reading.
+- **CX2Eqip** (June ctor `32961280`, CreateEquip `31fac2a0`): two new trailing arguments with `false` defaults, so every March caller is unchanged:
+  the equip's body `m_bMinorUnitEquip` (+0x15d4, getter `IsMinorUnitEquip`) and `m_bSkipSubEquipChainAdd` (+0x15d5; its readers `32960ad0` /
+  `32961c80` are DU3c's). The ctor keeps the unit type only for a `UC_ANYONE` templet (`@32961362`; March's callers already gate, so no change), and
+  reads the frame offset, common model and XET rows with the body (`32867660` / `32867880` / `32867960`; K2's keyed readers). June's appearance-templet
+  swap (`325bb740`, +0x15d8 / +0x15dc, Ciel's appearance id) stays Stage 16.
+- **CX2Item:** `GetEffectiveEnchantLevel` (`32882540`: PvP equip -> its `SAT_PVP_EQUIP` value or 7 (`32882440`); `DITT_PC_BANG_ONLY_EQUIPMENT` -> 7;
+  else `m_EnchantLevel`) and `IsUsableEquip` (`328825c0`: weapon / defence, not fashion, level < 0 -> false; endurance item at 0 -> false; a PC-bang-only
+  item with an owner -> false). Stand-in (labelled): June reads the owner unit's byte +0x48d (a PC-bang session); offline has none. The division sets
+  load no rows yet (Stage 11), so both PC-bang branches read false today. Not called yet: DU3b's view list is the first caller.
+- **Enum names** (June `Enum.src.lua`): `SAT_PVP_EQUIP = 40` after March's `SAT_END` (`X2Item_Preprocessing.inl`), `DITT_PC_BANG_ONLY_EQUIPMENT = 77`
+  (`X2ItemManager.h`). June's `EP_AC_RING2` (28) is March's `EP_AC_TEMP4` (28): the enum rule keeps March's name, so none is registered (DU3b / DU5
+  write `EP_AC_TEMP4` with June's name in the comment).
+- **Stand-ins replaced** (they now read `IsMinorUnitEquip()`; every equip still says Lu until DU3b / DU3c build Ciel's): `X2GUUser.cpp`
+  `@31fd8cff` (UpdateEquipCollisionData), `@3206585b` (CommonFrameMove render param), `31fd6260` (UpdateShowViewListByActiveBody); `X2GULuciel.cpp`
+  `IsEquipForMinorUnit` (`32b18220`), `SetHandEquipShow`'s hand and arm tests (`32b143e0`).
+- **Gates:** `finish.py --files <9 files> --with SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW`: flagcheck PASS (6 PASS, 1 PASS~, 2 OTHER = the stand-in
+  sites inside `JUNE_CHAR_DUO_BODY` / `JUNE_CHAR_LUCIEL_CORE` blocks, 0 FAIL), junediverge PASS, enumscan PASS; FINISH RESULT: PASS.
+- **Compile:** `/Zs` probes of `X2Item.cpp`, `X2Eqip.cpp`, `X2GULuciel.cpp`, `X2GUUser.cpp`, `X2ItemManager.cpp`: 5 x 0 errors; break-test defines on
+  the new names fail in each file (the blocks compile). Full build skipped: no play-test (DU3c is the seam).
+- **Kickoff rows done here:** NU0 `DU3` rows `32882540`, `328825c0`; CH0 §7g L407-409 (accessors were K2's, the body now reaches them); DU1b / DU1b2
+  / DU1d3 / CH1l stand-ins. The `Char Chung CH1l0` and `stage8` rows move to DU3b.
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under

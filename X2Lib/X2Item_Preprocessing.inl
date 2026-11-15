@@ -135,6 +135,9 @@ enum SPECIAL_ABILITY_TYPE
 	SAT_RIDINGPET_STAMINA_PERCENT_UP,    // 해외 라이딩펫 스테미너 증가 (%)
 //#endif RIDINGPET_STAMINA_ITEM
     SAT_END,
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	SAT_PVP_EQUIP = 40,		/// June Enum.lua SPECIAL_ABILITY_TYPE ( June's SAT_END is past it; March's ends here )
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 };
 
 //#ifdef DUNGEON_ITEM

@@ -5,8 +5,14 @@
 
 
 // constructor
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+// char-luciel DU3: June 32961280
+CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantLevel, bool bDummyBasic, bool bLoad,
+				 CX2Unit::UNIT_TYPE eUnitType /*= CX2Unit::UT_NONE */, bool bMinorUnitEquip /*= false */, bool bSkipSubEquipChainAdd /*= false */)
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantLevel, bool bDummyBasic, bool bLoad,
 				 CX2Unit::UNIT_TYPE eUnitType /*= CX2Unit::UT_NONE */)
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 //{{ robobeg : 2008-10-17
     : CKTDGObject( NULL )
 //}} robobeg : 2008-10-17
@@ -36,6 +42,13 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 	m_bLoadedAttached = false;
 
 	m_eObjectType = OT_CX2Eqip;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	m_bMinorUnitEquip			= bMinorUnitEquip;
+	m_bSkipSubEquipChainAdd		= bSkipSubEquipChainAdd;
+	// char-luciel DU3: June @32961362 keeps the unit type only for a UC_ANYONE templet ( June's appearance templet swap is Stage 16 )
+	if ( NULL != pItem->GetItemTemplet() && CX2Item::UC_ANYONE != pItem->GetItemTemplet()->GetUseCondition() )
+		eUnitType = CX2Unit::UT_NONE;
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 	m_bDummyBasic				= bDummyBasic;
 	if ( m_bDummyBasic == true )
@@ -76,7 +89,11 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
         )
 	{
 #ifdef	X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+        m_Offset = m_pItemTemplet->GetFrameOffset( m_pOwnerUnit->GetType(), m_bMinorUnitEquip );	// char-luciel DU3: June @3296142f
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
         m_Offset = m_pItemTemplet->GetFrameOffset( m_pOwnerUnit->GetType() );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 #else   //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
 		switch( m_pOwnerUnit->GetType() )
 		{
@@ -167,14 +184,22 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 //#endif  //X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
         ) // 공용 아이템
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+        const wchar_t* pCIMName = m_pItemTemplet->GetCommonItemModelName( eUnitType, m_bMinorUnitEquip );	// char-luciel DU3: June 32867880
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
         const wchar_t* pCIMName = m_pItemTemplet->GetCommonItemModelName( eUnitType );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
         if ( pCIMName[0] != NULL )
         {
 			bCommonItem = true;
 			m_ModelName[0] = pCIMName;
 
 			// 오현빈 // 공용 아이템 XET 적용 되도록 추가
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+			const wchar_t* pCIMXetName = m_pItemTemplet->GetCommonItemXETName( eUnitType, m_bMinorUnitEquip );	// char-luciel DU3: June 32867960
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 			const wchar_t* pCIMXetName = m_pItemTemplet->GetCommonItemXETName( eUnitType );
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 			if( pCIMXetName[0] != NULL )
 				m_ChangeTexName = pCIMXetName;
 			else

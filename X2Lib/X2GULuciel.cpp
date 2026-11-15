@@ -8777,8 +8777,12 @@ namespace _CONST_LUCIEL_CH1L_
 	// June 32b18220: the equip's body ( CX2Eqip +0x15d4 ); every equip is Lu's until DU3
 	bool IsEquipForMinorUnit( const CX2EqipPtr& pEquip_ )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		return pEquip_->IsMinorUnitEquip();	// char-luciel DU3
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		UNREFERENCED_PARAMETER( pEquip_ );
 		return false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	}
 
 	// June 32b18220: the equip positions each division group hides ( June's case lists, the hair position included where June handles it )
@@ -9039,13 +9043,21 @@ using namespace _CONST_LUCIEL_CH1L_;
 	const bool bShowHandEquip = ( true == m_bOtherEquipNotRendered ) ? false : bShow_;
 	BOOST_TEST_FOREACH( CX2EqipPtr, pViewEquip, m_ViewEqipList )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+		const bool bEquipForMinorUnit = pViewEquip->IsMinorUnitEquip();	// char-luciel DU3
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		const bool bEquipForMinorUnit = false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		if ( CX2Unit::EP_DEFENCE_HAND == pViewEquip->GetEqipPos() && false == bEquipForMinorUnit )
 			pViewEquip->SetShowObject( bShowHandEquip );
 	}
 
 	CX2EqipPtr pArmEquip = GetEquipPtrFromEquipViewListByEquipPosition( CX2Unit::EP_AC_ARM );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+	const bool bArmEquipForMinorUnit = ( NULL != pArmEquip && true == pArmEquip->IsMinorUnitEquip() );	// char-luciel DU3
+#else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	const bool bArmEquipForMinorUnit = false;	// stand-in: the equip's minor-unit byte ( +0x15d4 ) is DU3's
+#endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	if ( NULL != pArmEquip && false == bArmEquipForMinorUnit )
 		pArmEquip->SetShowObject( bShow_ );
 }

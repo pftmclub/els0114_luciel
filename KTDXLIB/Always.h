@@ -13608,6 +13608,18 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
+// Description: char-luciel DU3 ( equip view, part 1 ): CX2Eqip's ctor takes June's two extra arguments ( the equip's body +0x15d4, the
+//              sub-equip chain byte +0x15d5 ) and reads its per-type item rows with the body; CX2Item gains June's enchant level ( 32882540 )
+//              and usable test ( 328825c0 ); the DU1 / CH1 stand-ins read the equip's body. DU3b / DU3c port the view list and the init build.
+#define SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+#if defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) && !( defined( SERV_IRUHADEV_JUNE_ITEM_KIM ) && defined( SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) )
+#error SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW needs JUNE_ITEM_KIM ( keyed rows, PvP equip ), JUNE_EQUIP_EFFECT_SET ( IsDivisionItem ) and JUNE_CHAR_DUO_BODY, char-luciel DU3
+#endif
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
 // Description: the effect-set modifier tags get one shared enum ( EFFECT_MODIFIER_TAG, X2EffectSet.h ): the case labels of ApplyDamageEffectModifiers,
 //              the class files' own tag constants ( Eve, Elsword, Luciel, EL ) and Aisha's bare 1 and 2 use it. Revert: undefine the flag ( JUNE_EFFECT_MODIFIER_TAG_ENUM ).
 #define SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
