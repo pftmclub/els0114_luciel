@@ -1865,8 +1865,13 @@ the review retires it). Commit: see git log `char-luciel Phase DU5f`. Funcmap: 1
   intersect); stateends / skillicons / luabind not applicable (no skill states, skills or scripts). Syntax probe (`cl /Zs`) of the 7 changed .cpp: 0 errors.
 - **Build:** COALESCED into peer build `95f548ff` (started after my last edit), then `DEPLOY OK: X2_offline.exe is 27,075,072 B, dated 2026-11-16 05:15:39,
   md5 06e712e076c2288a3104d1310b06a867`; `EXESTR OK: 2 of 2` (`LUCIEL DUO SOCKET HUD unit`, `... GAME unit`, wide).
-- **Play-test:** owed: testlu1 (unit 166), Energy Fusion Ring 188833 (socket 60405 = +30 MP) on Ciel's ring slot 32, then on Lu's 17; read
-  `LUCIEL DUO SOCKET` lines.
+- **Range gate (`finish.py --range 15a08390^..15a08390`):** flagcheck `DUO_SOCKET` PASS (11 PASS, 1 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL); junediverge PASS;
+  enumscan the same 190 pre-existing rows.
+- **Play-test: passed (user, 2026-11-16).** testlu1 (unit 166), Energy Fusion Ring 188833 (socket 60405 = +30 MP). Logs (`offline_server.log`, run
+  after the deploy): no ring `HUD ... Lu max MP 300.0, Ciel max MP 300.0`; ring on Ciel `HUD ... Lu 300.0 ( add 0 ), Ciel 330.0 ( add 30 )` and in game
+  `GAME ... gauge 0 ... -> 300.0` / `gauge 1 ... add 30 -> 330.0` on every reset; ring off `300 / 300`; ring on Lu `HUD ... Lu 330.0 ( add 30 ), Ciel 300.0`
+  and `gauge 0 ... add 30 -> 330.0` / `gauge 1 -> 300.0`. Set count by the window's view: user-confirmed (soft check, no log line).
+- **Next:** `/x2-phase char-luciel DU5f review` (Opus 5.5 high; retires `_DEBUG`).
 
 ## Phase CH1 - Deploy unit: the class core
 
