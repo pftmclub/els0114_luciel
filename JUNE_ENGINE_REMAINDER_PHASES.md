@@ -1296,6 +1296,37 @@ either: the strings check waits for the first build that passes (`python tools/e
 Raven `ravbe` Power Assault passed (user). Logs: `CRS apply unit 23 state 56 crs 8 buff 8 key 0` then `crs 0`, twice (two casts), nothing else changed. Also four
 `CRS state key ... state 13 crs 0 start 0 end 0` lines (units 23 / 24 / 25 / 191): a common state-13 script carries the key with zeros; harmless, state 0 stays default.
 
+### Phase R5 -- Review
+
+**2026-11-15, Opus 5.5 high. PASS, no transcription error** (code `86c4e334`). Only edit: `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG` commented out
+(the play-test log was read), so `[JUNE_ENGINE] CRS` lines stop. Build skipped: debug retire only.
+
+**Checked in Ghidra (read-only), every item matches:**
+- `31fd4460` ApplyRenderParam: `+0x6840` / null return first; pick = `+0x8e64`, else `+0x8e70` while `start <= t < end` (anim `+0x214` of the
+  active body `32071d80`: `+0x8e88` / `+0x87d4` by `+0x8e90`, as `GetXSkinAnimPtr`). Writes go to the unit's `+0xc10` (March `m_RenderParam`; June's
+  render fill `@31ff057f` copies it into the anim's param before the call, as March), the z bytes `+0x65 / +0x66` to the argument. Offsets against
+  March's `RenderParam`: renderType +0, outLineColor.a +0x24, color +0x28, bAlphaBlend +0x64. Case 3 RT 0, alpha `334395e0` = 0.1; case 5 RT 3, alpha 0;
+  6 / 7 RT 0x11 (`RT_CARTOON_FADE`), no blend, colour (1,1,1,0), outline a 1.0; case 8 RT 0, colour `334387b0` x `334350e8` = 1/255 x 0.0 = (0,0,0,1);
+  case 9 RT 3, outline a 0, blend on, colour a 0, z write / z off; others call `32275140` (CX2GameUnit's). Cases 6-9 return without the base, as ported.
+- `31fcefa0` (vslot `0x84c`): 1 keeps while vslot `0x524` = 0x1b6a (7018), 2 while 0x1b6e (7022), 3 while byte `+0x93d8`, 9 while `+0x89d8` = 0x27 (39);
+  the clear writes are `31fc9570`'s (`+0x8e64` 0, colour a / outline a 1.0, blend off). `31fce500`: zeroes three outs, `{ float, float, int }`, true only
+  with the table.
+- `CommonStateStart @32060740-32060750`: parse into `+0x8e68`, then colour a 1.0 when `+0x8e70` is 0. Riding pet `@32d3509f-32d350db`: copy into the
+  rider only on a true parse; both paths meet at `32d35f00`.
+- Equip loop `@320659e9-32065bb4`: same window test (`test ah,1` / `test ah,5`), buff override wins; CRS 6 copies `0x2a` dwords of the body anim's
+  param, RT 1 (`RT_CARTOON_BLACK_EDGE`), colour (1,1,1,1), into `32963c80`.
+- Raven `32c3e7a0`: 0.4 s `+0x8e64 = 8` + layer 0x10, 1.14 s `31fc9570` + layer 0xb, colour 1.0, alpha object off: as ported. Class else branches:
+  `xrefs_to 31fd4460` lists Chung `32beeed0` and the other class overrides.
+- Enum: `CUSTOM_RENDER_STATE` 0-9 as June's `Enum.lua`; 7018 / 7022 / 39 under `JUNE_ENUM_NAMES`. Every `#else` is March's original line.
+
+**Gates** (`finish.py --review --commits 86c4e334 --with ..._CUSTOM_RENDER_STATE ..._DEBUG`): flagcheck 7 PASS, 1 DEFINE, 1 OTHER (`X2SkillTree.h`, the
+`JUNE_ENUM_NAMES` names), 0 FAIL, 1 ERROR (`X2Unit.h` line-1321 `#if` the tool cannot evaluate; by hand 3 inserted lines under `JUNE_ENUM_NAMES`, 0
+deleted), 0 deleted, 0 non-ASCII; junediverge RESULT: PASS; `--check-all` RESULT: PASS; enumscan exit 1 only on `X2GuEve.cpp:232 / 242`
+(`ENSI_SA_ECE_REASON_PRIDE_ACTION`, commits `09107672` / `affc89cd`, not R5). The retire: flagcheck on `_DEBUG` shows the one deleted line is its
+`#define` (now `//#define`), nothing else.
+
+**Next:** R5b (Sonnet 5.5 high; kickoff checked).
+
 ## Phase R6 - SKIN_MESH_RENDER_TYPE
 
 **Run with:** Opus 5.5 high (R0b: map the whole draw, then port), then an Opus review. Flag `SERV_IRUHADEV_JUNE_SKIN_MESH_RENDER_TYPE`. June's cases 1, 2, 4-7

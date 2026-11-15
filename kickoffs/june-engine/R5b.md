@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, high** effort, then type `/x2-phase june-engine R5b` |
 | Plan doc | `JUNE_ENGINE_REMAINDER_PHASES.md` (branch `main`) |
-| Depends on | R5 (code landed; build + play-test of R5 first) |
+| Depends on | R5 + its review (done 2026-11-15) |
 | Flag | `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP` (+ `_DEBUG` if the phase logs) |
 | Log tag | `[JUNE_ENGINE] CRS` (`python tools/logs.py --tag JUNE_ENGINE`) |
 | Review | `kickoffs/june-engine/R5b-review.md` (the phase writes it when done) |
@@ -13,7 +13,7 @@
 ## Read first (and nothing else from the plan doc unless you need it)
 
 ```sh
-python tools/docsection.py JUNE_ENGINE_REMAINDER_PHASES.md "Rules" "Starting context" "Phase R5 -- Done"
+python tools/docsection.py JUNE_ENGINE_REMAINDER_PHASES.md "Rules" "Starting context" "Phase R5 -- Done" "Phase R5 -- Review"
 grep -n "(R5)" june2017_re/funcmap.tsv
 ```
 
