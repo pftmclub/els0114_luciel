@@ -2495,6 +2495,43 @@ held R14e. Checks 1 and 3 passed, and check 2 in the U window. On the select scr
 this code. The select-screen unit keeps the 24-slot equip bag, so the viewer never visits slot 35 (DU4's renumber). Routed to char-luciel DU5c,
 kickoff amended with the cause and lines.
 
+### Phase R14e -- Review
+
+**2026-11-15, Opus 5.5 high. Verdict: PASS, no code change.** Reviewed `a5140256` (+ `9981136c`, docs only) against June in Ghidra (read-only:
+decompile and disassembly of `32024510` and `31f94360`).
+- **InitEqip = June.** `UpdateEqip( true )` @`32024551`; weapons EP 2 -> index 0, EP 37 -> index 1; slash colours pushed as `+0x268, +0x288,
+  +0x278, +0x298` = Trace, Tip, Hyper, TipHyper (March's members sit Trace, Hyper, Tip, TipHyper), unit type from `m_pUnit +0xaf0`. The
+  `UpdateNotRenderingOtherEquipList` call is direct (`CALL 0x3201c3a0`); vslot 0x638 takes `&m_ViewEqipList` (`PUSH ESI` = `+0x8834`). Ability
+  test @`32024a17`: type nibble 3 (accessory) or fashion bit -> `m_pUnit +0x2a4` inventory `3286a350( uid )` vs `+0x8e90`; else skip when
+  `+0x15d4` is set. The main-weapon particle stand-in is correct (June makes particles for EP 37 only).
+- **Viewer = June, block by block.** Offsets decoded as `0x958 + pos * 3 + body`. SET1 / SET2 walk (uid > 0, restart, SET1 re-show) matches.
+  The one-piece run: all 16 groups in June's order with June's slot lists; 1001 clears 6 slots and breaks without counting; 1002 / 39 / 98 / 74
+  set their flag before the templet `NULL` return; limit 2 when `m_pUnit +0xaf0 -> type == 10` (`UT_LUCIEL`). DITT 41 writes 17 named slots plus
+  slot 0. Nasod hand @`31f952c3`: `m_pUnit +0x2a4` inventory, skipped with no unit (last body kept), needs `HAND` visible. Hand 44 only without
+  the nasod hide. Hair / face `else` chain: 31 needs no one-piece and breaks; 32 breaks; 33 / 42 / 65 count; 43 needs no SET2 hide and falls
+  through to 65 with one. The face-1 / face-2 flags (pos 17: 33 / 31 / 99, else 42; pos 18: 43), the per-body passes (body 1 only for
+  `UT_LUCIEL`, fashion slot `[pos][1]` = `+0x5b8`), one shared count; second ring (`3286a230( uid, false )`, `3234fe90` on the select unit,
+  slot 28); the apply loop (fashion first, normal shown only without fashion) all match.
+- **Local table.** June's visible table is a member (`+0x958`); the port's is a local. March's `m_bViewEquipVisible` is read only inside the
+  `#else` body (`X2UnitViewerUI.cpp` 4835 / 4870), so nothing loses it.
+- **`#else`** = March unchanged: 0 deleted lines in both flags' files.
+- **Kickoff fix.** R14d sent `LoadAttached` (`32961c80`) to R14f, so R14e's "delete the main-weapon particle stand-in" note now sits in
+  `kickoffs/june-engine/R14f.md` too.
+
+**Gates.** `python tools/finish.py --review --commits a5140256 9981136c --with SERV_IRUHADEV_JUNE_INIT_EQIP SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY -v`:
+```
+  other flags (not run, --with)      INFO     JUNE_CHAR_DUO_BODY, JUNE_CHAR_EQUIP_VIEW  (found on the changed lines; not this change's)
+  flagcheck JUNE_INIT_EQIP           PASS     RESULT: PASS   files: 1 PASS, 1 DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR
+  flagcheck JUNE_VIEWER_EQUIP_VISIBILITY PASS RESULT: PASS   files: 1 PASS, 1 DEFINE, 1 OTHER (other flags), 0 FAIL, 0 ERROR
+  junediverge                        PASS     RESULT: PASS
+  junediverge --check-all            PASS     RESULT: PASS
+  enumscan                           PASS     exit 0
+FINISH RESULT: PASS (8 gates, 0 failed, 3 skipped)
+```
+- Each OTHER row is the other flag's file. Neither flag deleted a line. The INFO flags are the `#error` guard targets. The 3 skips are
+  stateends / skillicons / luabind: R14e registers no skill states, adds no skills and stages no June script.
+- No build: no code change, play-test already passed.
+
 ## Phase R13 - World object mesh render
 
 **Run with:** Opus 5.5 high (map, then port), then an Opus review and a user play-test. Flag `SERV_IRUHADEV_JUNE_RENDER_WORLD_MESH`.
