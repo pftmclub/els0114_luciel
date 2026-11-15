@@ -13533,7 +13533,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-15
 // Description: june-state-ids Phase S1 debug: logs [STATE_IDS] UNREGISTERED when StateChange targets a user state id the unit has not
 //              registered. Retired by the S1 review.
-#define SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG
+//#define SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG ) && !defined( SERV_IRUHADEV_JUNE_USER_STATE_IDS )
 #error SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG needs SERV_IRUHADEV_JUNE_USER_STATE_IDS
 #endif

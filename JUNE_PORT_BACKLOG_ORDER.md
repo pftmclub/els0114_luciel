@@ -238,6 +238,8 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   `Dungeon_Training_*` scripts (data035) through `X2TrainingGameUI`, but C++ puts those classes at `USI_END + 1` (107 today, 153 after june-state-ids S1):
   the training waits compare against wrong ids. Find June's own reader (June's training-UI state compare and how June's C++ bases relate to these tables)
   before changing data; june-state-ids S1 fixes only the signed-char cast (`X2TrainingGameUI.cpp:98 / 277 / 343`).
+  The S1 review adds: Eve's C++ class enum is out of step with June's exe beyond state 176 (June InitState `329ba9c0`: `ENSI_COMBO_XXZ4` 0xbe vs
+  C++ 189, `ENSI_DASH_COMBO_ZX` 180 vs 241). Take each class's numbering from June's exe InitState pushes, not from `Enum.lua`; other classes unchecked.
 - **Training-game F5 / F6 / F7 keys** (char-elsword CH1q2, 2026-11-04). June's `CX2Game::KeyProcess` `322f7170` training block (June states
   0x12 / 0x1a, `@322f7a40`-`322f7b81`): F5 (0x3f) full HP, F6 (0x40) full MP and one awakening orb (Add: her own value, `329e2170` -> vslot `0x6c4`;
   Ain 0xc: count 3) plus `32894490( 1 )`, then June-only F7 (0x41) -> `322ed400`: one step of my unit's class gauge per unit type. Elsword (1) / Elesis

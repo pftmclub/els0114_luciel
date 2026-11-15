@@ -99,6 +99,37 @@ Full build + deploy. One regression play-test over every live class (see the kic
 - **Play-test (user, 2026-11-15): passed** for Elsword, Aisha, Rena, Raven, Eve, Chung, Ara, Elesis. Add (LunaticPsykerT) stays in the win pose and does not return to the normal state on the result screen: ignored by the user, Add's port has not happened ( `USI_WAIT_STATE_CHANGE` is not registered for her; char-add owns it ).
 - **Review:** `kickoffs/june-state-ids/S1-review.md` written. Play-test: owed by the user (hand-off below in chat).
 
+### S1 - Review (2026-11-15, Opus 5.5)
+
+**Verdict: S1 stands; no code fix.** The only edit is the debug retire (`//#define SERV_IRUHADEV_JUNE_USER_STATE_IDS_DEBUG`).
+- **Numbers.** `stateids.py check`: `147 / 147 C++ = June`, `RESULT: PASS`. `enumprobe.py`: `USI_TRANSCENDENTAL_HYPER_MODE` 24, `USI_WAIT_STATE_CHANGE`
+  130, `USI_END` 152. Ghidra: June's Eve InitState `329ba9c0` registers `ENSI_WAIT_STATE_CHANGE` with `push 0x82` (@329bae3d), and its first class states
+  equal C++ after the shift (`ENSI_COMBO_ZZZdownZZ` 0xab = 171, `ENSI_COMBO_XXfrontXX` 0xb0 = 176), so the class base 153 (`USI_END` + 1) is June's.
+- **Readers (re-grepped).** Every `char` / `UCHAR` / `BYTE` hold of a state id is safe: `GetGameUnitState[Future]` `(UCHAR)` casts, `UnitCondition::nextState`,
+  `UserUnitStateData::stateID`, `m_OldStateId`, P2P `m_ucNowState` are in the dead `#else` of `JUNE_USER_STATE_ID16` (guarded by S1's `#error`);
+  `KXPT_UNIT_NPC_SYNC::m_cNowState`, the pet sync struct, `X2GUNPC.cpp:4989` (`> 127`) and `X2GUUser.cpp:25947` (`BYTE`) are NPC states;
+  `m_TutorialBeforeUserStateID` is set in the ctor and never read; `X2StateDungeonGame.cpp:4121 / 4451` stay dead (survey). No `[USI_END]` array,
+  no `USI_END -` / `*` arithmetic, no `static_assert`.
+- **Training UI.** The three compares are `(int)`, March's `(const char)` in `#else` (`X2TrainingGameUI.cpp:99 / 282 / 352`). `GetNowStateID()` is `int`.
+- **Enum.lua.** `luasrc.py ledger --check` PASS (0 FAIL, 0 WARN); `luabind.py check Ara_Martial_Artist Chung_Iron_Cannon` STATE 64 refs, 0 wrong, PASS.
+  Deployed `data036.kom` md5 `7f53674276abdd04581275d626e10285` = S1's `COPY OK`; the staged `Enum.lua` carries the inserted rows.
+- **Logs.** `logs.py --tag STATE_IDS` now reads 250 lines (S1 counted 274), same picture: states 50-68 `from 0` for classes 100-122 (the
+  `SnapshotBeforeSlotRebind` lookup at `X2GUUser.cpp:7611` before the slot's Init registers it, checked), class 103 state 4 from 8, class 109 state 242.
+  No line for an inserted id, none from a failed state change. Not defects.
+- **Enumscan.** Both `stray` verdicts are right: `NUI_NEIL_THE_SNIPER_EVENT` / `NUI_PROTON_BOMB_EVENT` are the definitions of June's names (C9h-4h), and
+  `GetUserUnitRelativePos` returns a plain `int` with no enum (`X2GUNPC.h:3394`), so `case 1..4` is not an NPC id. The initializer skip in
+  `enumscan.py` only marks a `{` opened after `enum` / `enum X` / `enum class X`.
+- **Routed, not this plan (found here).** Eve's class enum is out of step with June's exe beyond state 176, before and after S1: `ENSI_COMBO_XXZ4` June
+  0xbe (190) / C++ 189, `ENSI_ECN_COMBO_ZZX_LOOP` 232 / 229, `ENSI_DASH_COMBO_ZX` 180 / 241 (one member missing, one moved; other classes not checked).
+  No numeric Eve id is sent or compared in offline play, so the play-test passed. Appended to the Stage 2 training-dungeon bullet in
+  `JUNE_PORT_BACKLOG_ORDER.md` (the training scripts are the only numeric readers).
+- **Gates.** `finish.py --review --commits 61d8b2a2 --skip-flag JUNE_RESERVED_STATE_IDS / JUNE_USER_STATE_ID16 / JUNE_SKILL_STATE_PTR (outer blocks) -v`:
+  flagcheck JUNE_USER_STATE_IDS PASS (3 PASS, 1 DEFINE, 0 OTHER, 0 FAIL, 0 deleted lines; 6 bare `#else` / `#endif` = the training UI's 3 `#else` and the
+  3 `#error` guards' `#endif`), junediverge PASS, junediverge `--check-all` PASS, enumscan PASS: `FINISH RESULT: PASS (10 gates, 0 failed, 6 skipped)`.
+  Retire: `finish.py --files KTDXLIB/Always.h`: `JUNE_USER_STATE_IDS_DEBUG retired`, `FINISH RESULT: PASS`.
+- **Build skipped: debug retire only.** The next built phase drops the `[STATE_IDS]` line from the exe.
+- **Next:** S2 ready (`kickoffs/june-state-ids/S2.md` checked).
+
 ## S2 - Lu/Ciel on the shared numbers
 
 **Scope.** In `X2GULuciel.*` (inert `_CORE`), after S1:

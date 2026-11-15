@@ -282,10 +282,11 @@ Plan `JUNE_STATE_IDS_PHASES.md` - branch `main` - log tag `[STATE_IDS]` - flag `
 
 **Scope:** June's 46 missing `USER_STATE_ID` members inserted at June's values (`USI_END` 106 -> 152, every class enum +46), `Enum.lua` in the same pack, one regression play-test over every live class; then Lu/Ciel drops its shadow names. S1 runs alone in `X2GUUser.*`, S2 alone in `X2GULuciel.*` (both shared with char-luciel). char-luciel CH1 waits for S2.
 
+Done: S1 (+ review, 2026-11-15).
+
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| S1 | done 2026-11-15, play-test passed (Add win-pose stuck: her port is open, ignored); Opus review next (`S1-review.md`, retires `_DEBUG`) | Sonnet 5.5 / high; review Opus 5.5 / high | - (alone in `X2GUUser.*`) | `X2GUUser.h`, `X2TrainingGameUI.cpp`, Always.h, data036 `Enum.lua`, `tools/stateids.py` | `S1.md`, `S1-review.md` |
-| S2 | blocked (S1 review): Lu/Ciel on the shared numbers (shadow names, bounding / wait-change helpers), inert, probe build | Opus 5.5 / high; covered by char-luciel CH1 review | S1 review | `X2GULuciel.*`, Always.h | `S2.md` |
+| S2 | **ready** (S1 review done 2026-11-15, debug retired): Lu/Ciel on the shared numbers (shadow names, bounding / wait-change helpers), inert, probe build | Opus 5.5 / high; covered by char-luciel CH1 review | S1 review | `X2GULuciel.*`, Always.h | `S2.md` |
 | Z | blocked (S2): close | Sonnet 5.5 / medium | S2 | `MODS.md`, backlog, checklist, STATUS archive | `Z.md` |
 
 ## field-rewards - offline EXP / ED / drop rows for June-only dungeons and fields (stand-in)
