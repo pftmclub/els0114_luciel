@@ -1443,7 +1443,8 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW` (DU3's; no new define, 
   declared), run 2 in CH3c20's `Always.h:13695` `#error` (`SERV_IRUHADEV_JUNE_CHAR_NPC_LUA_BINDS`); no DU3c file had an error. The play-test is handed
   off after the next `DEPLOY OK`. Deployed by a peer's build at 18:31 (after `2fbfe93d`): `EXESTR OK: 1 of 1 found in X2_offline.exe`
   (`NOT_SHOW_UNIT_BY_DUOTYPE`), md5 `df9afaf4`; no rebuild (user, 2026-11-15).
-- **Play-test:** sections DU3b + DU3c of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off assembled 2026-11-15.
+- **Play-test:** sections DU3b + DU3c of `kickoffs/char-luciel/playtest.md` (`playtest.py check`: PASS), handed off assembled 2026-11-15. **Passed** (user, 2026-11-15; run 18:33 on md5 `df9afaf4`): 12 `LUCIEL DUO switch`
+  lines (testlu1 7, LuSkillA 5), 0 EXCEPTION, UNHANDLED only `E_DISABLE_HB_CHECK_REQ` x6, ErrorLog only the usual optional XET / texture misses.
 
 
 ## Phase CH1 - Deploy unit: the class core
