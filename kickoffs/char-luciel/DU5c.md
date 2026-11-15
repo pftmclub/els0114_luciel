@@ -43,3 +43,17 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Amended by june-engine R14e (2026-11-15): select-screen onepiece missing (DU4 fallout, every class)
+
+- **Symptom (R14e play-test):** `jtLordKnight` wears Spa Wear 163569 (save: cat 9, slot 35). It shows in play and in the U window, but the select
+  screen shows his normal costume.
+- **Cause:** a select-screen unit is built by `new CX2Unit( kUnitInfo )` (`X2StateServerSelect.cpp:11142`, `Handler_EGS_CHARACTER_LIST_ACK`), and
+  `ResetInventorySize` never runs on it (only the selected-unit and in-game paths call it: `:3721`, `:3874`, `:4685`, `X2StateBeginning.cpp:2192`).
+  Its equip bag therefore keeps the constructor default `MAX_INVENTORY_SIZE` 24 (`X2Inventory.cpp:25`, `X2Inventory.h:3`).
+  `CX2UnitViewerUI::UpdateEqip` loops `i < GetItemMaxNum( ST_E_EQUIP )` (`X2UnitViewerUI.cpp:3024`, and `:2961` in the other branch), so slot 35
+  (`NESI_ONEPIECE_FASHION` since DU4's renumber; it was 20) and every slot from 24 up (41 / 42 second rings, June minor-unit slots) are never added.
+  The emulator sends them (`X2OfflineInventory.cpp:772-790` over 43 slots).
+- **Fix here, with the select screen's two bodies:** give that unit June's equip size (`NESI_END`) the way June's character-list handler does
+  (find June's counterpart of `:11142`; do not invent a size path). Check the other `GetItemMaxNum( ST_E_EQUIP )` loops on units without a reset
+  (`X2Unit.cpp:3038`, `:6321`). Play-test: `jtLordKnight` with 163569 shows the Spa Wear alone on the select screen.

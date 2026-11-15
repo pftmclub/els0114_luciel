@@ -2489,6 +2489,11 @@ FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped: stateends / skillicons / luab
 group 47, not in March's three ids). `jtLordKnight` wearing Spa Wear 163569 has the onepiece alone in the U window (group 35 hides hair, top,
 bottom, gloves, shoes, face-1, earring). Every other equip shows as before.
 
+**Play-test (user, 2026-11-15): passed** on the exe another session's build deployed at 22:24, built from a tree that already
+held R14e. Checks 1 and 3 passed, and check 2 in the U window. On the select screen the Spa Wear is missing (normal costume shown): that is not
+this code. The select-screen unit keeps the 24-slot equip bag, so the viewer never visits slot 35 (DU4's renumber). Routed to char-luciel DU5c,
+kickoff amended with the cause and lines.
+
 ## Phase R13 - World object mesh render
 
 **Run with:** Opus 5.5 high (map, then port), then an Opus review and a user play-test. Flag `SERV_IRUHADEV_JUNE_RENDER_WORLD_MESH`.
