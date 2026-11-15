@@ -1277,6 +1277,9 @@ Lire / RidingPet PASS (0 deleted, 0 non-ASCII, 0 EOL mismatch); `X2GUUser.cpp` a
 `X2Unit.h` ERROR (the tool cannot evaluate its line-1321 `#if`; by hand: 3 inserted lines under `JUNE_ENUM_NAMES`, 0 deleted). junediverge
 RESULT: PASS. enumscan: 0 rows in my 9 files; its one FAIL is `X2GuEve.cpp:232 / 242` `ENSI_SA_ECE_REASON_PRIDE_ACTION`, untouched here
 (my Eve hunk is at line 43480).
+**Commit `86c4e334`** (only R5's hunks of `X2GUUser.cpp` staged; the peer's 5 / 5 lines in `CommonSpecialAttackEventProcess` left unstaged).
+`finish.py --range 86c4e334^..86c4e334 --with ..._CUSTOM_RENDER_STATE ..._DEBUG`: flagcheck 7 PASS, 1 DEFINE, 1 OTHER (the `JUNE_ENUM_NAMES` names), 0 FAIL, 1 ERROR
+(`X2Unit.h` line 1321, by hand: 3 inserted lines, 0 deleted), 0 deleted, 0 non-ASCII; junediverge RESULT: PASS; enumscan exit 1 only on `X2GuEve.cpp:232 / 242` (not mine).
 **Compile:** `/Zs` probes (X2Lib US_SERVICE flags, `june2017_re/census.py` command) of `X2GUUser.cpp`, `X2RidingPet.cpp`, `X2GURaven.cpp`, `X2GUChung.cpp`,
 `X2GULire_ElvenRanger.cpp`, `X2GuEve.cpp`: 0 errors each (a flag probe in the same command line confirms the flag is on).
 **Build: blocked, not deployed.** `build.py --deploy` and `--only X2Lib` stop in KTDXLIB at `Always.h(13695)`: the `#error` guard of
