@@ -18,7 +18,7 @@ grep "(CH1)" june2017_re/funcmap.tsv
 
 ## Task
 
-Review CH1's commits ( `5e880f3c`, fix `975e8b87` ), CH1q's commit `16997120`, and **june-state-ids S2's commit `857b18cd`** ( S2 had no review of its own; `CH1.md`'s CH1o amendment hands it here ), against
+Review CH1's commits ( `5e880f3c`, fix `975e8b87` ), CH1q's commits `16997120` and fix 2 `4b5106c9` ( add `JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE` to `--with` ), and **june-state-ids S2's commit `857b18cd`** ( S2 had no review of its own; `CH1.md`'s CH1o amendment hands it here ), against
 June in Ghidra (read-only):
 - The factory `3230f470` and its two callers `322ced00` @`322ceeb4` / `322d5bf0` @`322d5d8f`: case 10 does nothing but `new` + ctor `32b1bd90` ( no
   extra call after it that March's `CreateGUUser` / `AddUserUnitIntruder` lacks ). Say which caller is which.

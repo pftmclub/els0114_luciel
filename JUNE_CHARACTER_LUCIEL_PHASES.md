@@ -2824,6 +2824,7 @@ rows, ported ).
   0 deleted / PASS; INFO `JUNE_CHAR_LUCIEL_CORE` ( the edit sits in CH1l2's `_CORE` body ); junediverge PASS; enumscan exit 0; stateends SKIPPED ( no state
   registered ). `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 - **Fix 2 build:** `DEPLOY OK: X2_offline.exe is 26,906,112 B, dated 2026-11-15 15:23:23, md5 8ea4a8d44d1ccdf800a84c0ad872455f, equal to X2/US_SERVICE/x2.exe`.
+  Commit `4b5106c9`; `finish.py --range 4b5106c9^..4b5106c9 --with JUNE_SKIN_AFTER_IMAGE_ADD_NEW_IMAGE`: same tallies, `FINISH RESULT: PASS`.
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
