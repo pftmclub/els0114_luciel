@@ -43,3 +43,9 @@ Spot-check 2-3 items directly in Ghidra (read-only); if one fails, re-check the 
 Fix clear transcription errors under the same flag (then `tools/build.py --deploy`); hand
 design decisions back to the user. Write "Phase R14c -- Review" into the plan doc, update the
 phase's STATUS.md row, check the R14d kickoff, and commit.
+
+## Amended by char-luciel DU3c (2026-11-15)
+
+- Route or port the equip's DG chain byte readers (`CX2Eqip::m_bAttachedInDGManagerChain`, June `+0x15d5`): `32961c80 @32962094` adds a new sub-equip to
+  the DG chain only when it is set, `32960ad0 @32960c7a / @32960d33` unchains a new attached particle (and sets its `+0x45a`) only when it is clear. Only the
+  viewer callers pass 0 (`31f9c640`, `31f9df40`, `3280a170`, `32810500`, `32812380`); detail in `R14c.md` "Amended by char-luciel DU3c".
