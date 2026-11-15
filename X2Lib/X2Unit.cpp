@@ -694,9 +694,15 @@ void CX2Unit::AdjustEquipPositionForSecondRing( const CX2Item* pItem_, int& iEqu
 	if ( EP_AC_RING != iEquipPosition_ || NULL == pItem_ )
 		return;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+	// char-luciel DU4 stand-in: June's +0x294 is UnitData's worn UID -> slot map ( AddEqip 323574c0 ); on every offline path it holds the inventory's slot
+	const short sSlotID = GetInventory().GetItemSlotID( pItem_->GetUID() );
+	if ( NESI_AC_RING2 == sSlotID || NESI_MINORUNIT_AC_RING2 == sSlotID )
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 	// stand-in: June reads unit +0x294 ( a per-UID map of slot ids, not identified; DU4 ), the inventory's slot id has the same value
 	const short sSlotID = GetInventory().GetItemSlotID( pItem_->GetUID() );
 	if ( 0x29 == sSlotID || 0x2a == sSlotID )	// June NESI_AC_RING2 / NESI_MINORUNIT_AC_RING2
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		iEquipPosition_ = EP_AC_TEMP4;	// June's EP_AC_RING2
 }
 #else SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW

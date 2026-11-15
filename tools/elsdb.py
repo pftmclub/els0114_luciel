@@ -63,8 +63,18 @@ EQUIP_SLOTS = {
     9: ('EP_WEAPON_HAND', False), 10: ('EP_WEAPON_HAND', True), 11: ('EP_AC_FACE1', None),
     12: ('EP_AC_FACE2', None), 13: ('EP_AC_FACE3', None), 14: ('EP_AC_BODY', None), 15: ('EP_AC_LEG', None),
     16: ('EP_AC_ARM', None), 17: ('EP_AC_RING', None), 18: ('EP_AC_NECKLESS', None), 19: ('EP_AC_WEAPON', None),
-    20: ('EP_ONEPIECE_FASHION', True),
+    # June's numbering since char-luciel DU4 (save schema v24): Ciel's slots 20-34 / 36 / 38 / 40 / 42, the onepiece 35, the bag 43
+    20: ('EP_DEFENCE_HAIR', True), 21: ('EP_DEFENCE_BODY', True), 22: ('EP_DEFENCE_LEG', True),
+    23: ('EP_DEFENCE_HAND', True), 24: ('EP_DEFENCE_FOOT', True), 25: ('EP_WEAPON_HAND', True),
+    26: ('EP_AC_FACE1', None), 27: ('EP_AC_FACE2', None), 28: ('EP_AC_FACE3', None), 29: ('EP_AC_BODY', None),
+    30: ('EP_AC_LEG', None), 31: ('EP_AC_ARM', None), 32: ('EP_AC_RING', None), 33: ('EP_AC_NECKLESS', None),
+    34: ('EP_AC_WEAPON', None), 35: ('EP_ONEPIECE_FASHION', True), 36: ('EP_ONEPIECE_FASHION', True),
+    37: ('EP_AC_TEMP2', None), 38: ('EP_AC_TEMP2', None), 39: ('EP_AC_TEMP3', None), 40: ('EP_AC_TEMP3', None),
+    41: ('EP_AC_RING', None), 42: ('EP_AC_RING', None),
 }
+# Ciel's (the minor unit's) slots: a costume or accessory not for anyone goes on the body its is_for_minor_unit names
+# (X2OfflineInventory.cpp IsSuitableSlot, char-luciel DU4).
+MINOR_SLOTS = set(range(20, 35)) | {36, 38, 40, 42}
 
 
 def die(msg):
@@ -433,6 +443,8 @@ def cmd_additem(a):
             if a.equip:  # straight into the worn category at the slot that takes this item's position
                 fashion = bool(r['fashion'])
                 slots = [s for s, (pos, f) in EQUIP_SLOTS.items() if pos == epos and (f is None or f == fashion)]
+                if (fashion or itype == 'IT_ACCESSORY') and r.get('use_condition') != 1:  # 1 = UC_ANYONE
+                    slots = [s for s in slots if (s in MINOR_SLOTS) == bool(r.get('is_for_minor_unit', 0))]
                 if a.slot is not None:
                     slots = [a.slot]
                 if not slots:

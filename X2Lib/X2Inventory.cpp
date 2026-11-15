@@ -722,6 +722,32 @@ bool CX2Inventory::IsMinorUnitEquipItem( UidType itemUID ) const
 // char-luciel DU3b: June 32070ef0 ( the same table is inlined in 3286a350, 3201b930 and 31ffe990 )
 /*static*/ bool CX2Inventory::IsMinorUnitEquipSlot( const short sSlotID_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+	// char-luciel DU4: June 32070ef0 by name
+	switch ( sSlotID_ )
+	{
+	case CX2Unit::NESI_MINORUNIT_DEFENCE_HAIR_FASHION:
+	case CX2Unit::NESI_MINORUNIT_DEFENCE_BODY_FASHION:
+	case CX2Unit::NESI_MINORUNIT_DEFENCE_LEG_FASHION:
+	case CX2Unit::NESI_MINORUNIT_DEFENCE_HAND_FASHION:
+	case CX2Unit::NESI_MINORUNIT_DEFENCE_FOOT_FASHION:
+	case CX2Unit::NESI_MINORUNIT_WEAPON_HAND_FASHION:
+	case CX2Unit::NESI_MINORUNIT_AC_FACE1:
+	case CX2Unit::NESI_MINORUNIT_AC_FACE2:
+	case CX2Unit::NESI_MINORUNIT_AC_FACE3:
+	case CX2Unit::NESI_MINORUNIT_AC_BODY:
+	case CX2Unit::NESI_MINORUNIT_AC_LEG:
+	case CX2Unit::NESI_MINORUNIT_AC_ARM:
+	case CX2Unit::NESI_MINORUNIT_AC_RING:
+	case CX2Unit::NESI_MINORUNIT_AC_NECKLESS:
+	case CX2Unit::NESI_MINORUNIT_AC_WEAPON:
+	case CX2Unit::NESI_MINORUNIT_ONEPIECE_FASHION:
+	case CX2Unit::NESI_MINORUNIT_AC_MINIME:
+	case CX2Unit::NESI_MINORUNIT_AC_EARRING:
+	case CX2Unit::NESI_MINORUNIT_AC_RING2:
+		return true;
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 #ifdef SERV_NEW_ONE_PIECE_AVATAR_SLOT
 	// March's NESI_ONEPIECE_FASHION ( 20 ) is June's slot 35; June's 20 is a minor-unit slot ( DU4 renumbers )
 	if ( CX2Unit::NESI_ONEPIECE_FASHION == sSlotID_ )
@@ -736,6 +762,7 @@ bool CX2Inventory::IsMinorUnitEquipItem( UidType itemUID ) const
 	case 0x24: case 0x26: case 0x28: case 0x2a:
 		return true;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 
 	return false;
 }
@@ -1016,16 +1043,30 @@ CX2Item* CX2Inventory::GetEquippingItemByEquipPos( CX2Unit::EQIP_POSITION equipP
 		if ( NULL == pInvenSlotData || NULL == pInvenSlotData->m_pItem || NULL == pInvenSlotData->m_pItem->GetItemTemplet() )
 			continue;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+		// char-luciel DU4: June @32869e73, a second ring reads as EP_AC_TEMP4 ( June's EP_AC_RING2 ) through my unit ( 3234fe90 )
+		int iEquipPosition = pInvenSlotData->m_pItem->GetItemTemplet()->GetEqipPosition();
+		if ( NULL != g_pData && NULL != g_pData->GetMyUser() && NULL != g_pData->GetMyUser()->GetSelectUnit() )
+			g_pData->GetMyUser()->GetSelectUnit()->AdjustEquipPositionForSecondRing( pInvenSlotData->m_pItem, iEquipPosition );
+		if ( iEquipPosition != equipPos )
+			continue;
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		// stand-in: March has no second ring slot ( June 3234fe90 reads a ring there as position 0x1c )
 		if ( pInvenSlotData->m_pItem->GetItemTemplet()->GetEqipPosition() != equipPos )
 			continue;
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		if ( CX2Item::IT_ACCESSORY != pInvenSlotData->m_pItem->GetItemTemplet()->GetItemType()
 			&& pInvenSlotData->m_pItem->GetItemTemplet()->GetFashion() != bFashion )
 			continue;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+		if ( bMinorUnitSlot == IsMinorUnitEquipSlot( static_cast<short>( pInvenSlotData->m_SlotID ) ) )	// char-luciel DU4: June @32869ed1
+			return pInvenSlotData->m_pItem;
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		// stand-in: March's equip slots have no minor-unit range ( June NESI 20-34, 36, 38, 40, 42 ), so every slot is the main unit's
 		if ( false == bMinorUnitSlot )
 			return pInvenSlotData->m_pItem;
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 	}
 
 	return NULL;
@@ -1297,6 +1338,23 @@ float CX2Inventory::GetAddMaxMPValue( const int iEquipGroup_ ) const
 		if ( NULL == pInvenSlotData )
 			continue;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+		// char-luciel DU4: June 32869f80's slot table by name
+		switch ( pInvenSlotData->m_SlotID )
+		{
+		case CX2Unit::NESI_DEFENCE_BODY:
+		case CX2Unit::NESI_DEFENCE_LEG:
+		case CX2Unit::NESI_DEFENCE_HAND:
+		case CX2Unit::NESI_DEFENCE_FOOT:
+		case CX2Unit::NESI_WEAPON_HAND:
+			break;
+
+		default:
+			if ( ( 0 != iEquipGroup_ ) != IsMinorUnitEquipSlot( static_cast<short>( pInvenSlotData->m_SlotID ) ) )
+				continue;
+			break;
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		switch ( pInvenSlotData->m_SlotID )
 		{
 		case 1:
@@ -1323,6 +1381,7 @@ float CX2Inventory::GetAddMaxMPValue( const int iEquipGroup_ ) const
 			}
 			break;
 		}
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 
 		if ( NULL != pInvenSlotData->m_pItem && NULL != pInvenSlotData->m_pItem->GetItemTemplet() )
 			fAddMaxMPValue += pInvenSlotData->m_pItem->GetItemTemplet()->GetAddMaxMP();
@@ -1356,6 +1415,20 @@ int CX2Inventory::GetEquipGroup( const UidType itemUID_ ) const
 		return 0;
 #endif SERV_NEW_ONE_PIECE_AVATAR_SLOT
 #endif SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+	// char-luciel DU4: June 3286a4b0's slot table by name
+	switch ( iSlotID )
+	{
+	case CX2Unit::NESI_DEFENCE_BODY:
+	case CX2Unit::NESI_DEFENCE_LEG:
+	case CX2Unit::NESI_DEFENCE_HAND:
+	case CX2Unit::NESI_DEFENCE_FOOT:
+	case CX2Unit::NESI_WEAPON_HAND:
+		return 2;
+	}
+
+	return IsMinorUnitEquipSlot( static_cast<short>( iSlotID ) ) ? 1 : 0;
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 	switch ( iSlotID )
 	{
 	case 1:
@@ -1372,6 +1445,7 @@ int CX2Inventory::GetEquipGroup( const UidType itemUID_ ) const
 	}
 
 	return 0;
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 }
 #endif SERV_IRUHADEV_JUNE_SKILL_STAT_GETTERS
 //}} kimhc // 2009-10-19 // 최대 MP 증가 값 얻어오기

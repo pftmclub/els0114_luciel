@@ -456,6 +456,12 @@ public:
 	{
 		/// Schema revision. Bump it and add a rung to Migrate() when a later
 		/// phase needs a new table, so existing saves are not wiped.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+		SCHEMA_VERSION			= 24,	///< v24: worn onepiece slot 20 -> 35, worn bag 21 -> 43 ( char-luciel DU4 )
+
+		/// As in the v23 branch below, which this one replaces wholesale.
+		DEFAULT_RESURRECTION_STONE	= 10,
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 #ifdef SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 		SCHEMA_VERSION			= 23,	///< v23: unit.minor_cur_mp + unit.minor_unit_form ( char-luciel CH1a2 )
 
@@ -525,6 +531,7 @@ public:
 #endif SERV_IRUHADEV_JUNE_QUEST_DATA
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 #endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 
 		//{{ Iruha : 2026-09-16 // Vanilla hardcodes iDelableDay = 1 (one full
 		// day) for every region (GSGameDBThread.cpp). This build has no

@@ -95,3 +95,13 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
   equip's four or five socket vectors (random, templet, data, set when `3286a6b0` says so) with its body (`CX2Inventory::GetEquipDuoType`, DU3c) to
   `3271a060`, a `SocketData` method that adds the options' `+0x304` / `+0x23c` values to per-body accumulators (`+0x468..` for body 0 / both, the
   other set for body 1). DU3c ported only the skip that follows (`@3206dc6a`); port the record and its readers here, with the set-socket count.
+
+## Amended by DU4 (2026-11-15)
+
+- **Slots exist now:** June's NESI ids are live (`NESI_MINORUNIT_*` 20-34 / 36 / 38 / 40 / 42, onepiece 35, minime / earring / second ring 37 / 39 /
+  41, save v24). The window shows and fills slots by June's ids (`32e22ce0`, `329146d0`) and the inventory right-click already picks the item's body
+  (`321aa5d0 @321ae867`). `CX2Inventory::GetEquipDuoType` (named above) was folded into `GetEquipGroup` by the DU3 review.
+- **Second ring still unreachable from the UI:** a ring only reaches slot 41 / 42 through `321693b0` (`*pos == EP_AC_RING`, the ( ring, body ) slot held
+  and ( `EP_AC_TEMP4`, body ) free -> `EP_AC_TEMP4`). Port it here for the drop (`3234f4d0` / `321693b0`) **and** call it from the right-click equip
+  loop (`@321aebf3`), whose remaining June tests (PvP, `3234e750`, `328823d0`, `32350de0`, `3234f4d0`, `328825c0`) are the `OnRClickedItem` divergence
+  row (Stage 9); the emulator already takes a ring in slot 41 / 42.

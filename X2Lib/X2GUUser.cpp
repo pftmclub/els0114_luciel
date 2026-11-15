@@ -39611,7 +39611,11 @@ bool CX2GUUser::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item*
 			return false;
 
 		int iEquipPosition = pItemTempletToAdd->GetEqipPosition();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+		if ( CX2Unit::NESI_AC_RING2 == sSlotID_ || CX2Unit::NESI_MINORUNIT_AC_RING2 == sSlotID_ )	// char-luciel DU4
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		if ( 0x29 == sSlotID_ || 0x2a == sSlotID_ )	// June NESI_AC_RING2 / NESI_MINORUNIT_AC_RING2
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 			iEquipPosition = CX2Unit::EP_AC_TEMP4;	// June's EP_AC_RING2
 
 		const bool bFashionOrAccessory = ( true == pItemTempletToAdd->GetFashion() || CX2Item::IT_ACCESSORY == pItemTempletToAdd->GetItemType() );
@@ -39648,7 +39652,11 @@ bool CX2GUUser::UpdateEquipViewListInfo( CX2Item* pItemToAddInViewList, CX2Item*
 
 		const bool bMinorUnitSlot = CX2Inventory::IsMinorUnitEquipSlot( sSlotID_ );
 		int iEquipPosition = pItemTempletToRemove->GetEqipPosition();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+		if ( CX2Unit::NESI_AC_RING2 == sSlotID_ || CX2Unit::NESI_MINORUNIT_AC_RING2 == sSlotID_ )	// char-luciel DU4
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		if ( 0x29 == sSlotID_ || 0x2a == sSlotID_ )	// June NESI_AC_RING2 / NESI_MINORUNIT_AC_RING2
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 			iEquipPosition = CX2Unit::EP_AC_TEMP4;	// June's EP_AC_RING2
 		const CX2Unit::EQIP_POSITION eEquipPosition = static_cast<CX2Unit::EQIP_POSITION>( iEquipPosition );
 

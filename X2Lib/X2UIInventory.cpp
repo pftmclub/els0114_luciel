@@ -6187,6 +6187,15 @@ bool CX2UIInventory::OnRClickedItem( D3DXVECTOR2 mousePos )
 
 	// 인벤토리 내부 클릭 : 장비 교환
 	// 해당하는 슬롯을 검색, 장비창으로 이동
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+	// char-luciel DU4: June 321aa5d0 @321ae867, the body whose slots take this item; stand-in: June's item +0x80 look id ( Stage 16 ) is not in March, read as none
+	bool bShownMinorUnitBody = pUnit->IsMinorUnitForm();
+	if ( NULL != g_pData->GetUIManager()->GetUICharInfo() && true == g_pData->GetUIManager()->GetUICharInfo()->GetShow() )
+		bShownMinorUnitBody = g_pData->GetUIManager()->GetUICharInfo()->GetSwitchingView();
+	bool bTargetMinorUnitBody = false;
+	if ( true == pkItemTemplet->GetFashion() || CX2Item::IT_ACCESSORY == pkItemTemplet->GetItemType() )
+		bTargetMinorUnitBody = ( CX2Item::UC_ANYONE != pkItemTemplet->GetUseCondition() ) ? pkItemTemplet->GetIsForMinorUnit() : bShownMinorUnitBody;
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 	for ( unsigned int iS = 0; iS < m_SlotList.size(); ++iS )
 	{
 		if(NULL == g_pData->GetUIManager()->GetUICharInfo())
@@ -6254,6 +6263,14 @@ bool CX2UIInventory::OnRClickedItem( D3DXVECTOR2 mousePos )
 
 				//{{ 09.06.02 태완 : 악세사리 류의 경우에는 fashion 조건 체크를 하지 않도록 예외처리 :
 				// 악세사리이면서 패션템인 아이템이 장착되지 않는 것 때문에
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+				// char-luciel DU4: June @321aeb5a-321aec39, the slot's body must be the item's; a onepiece slot with an anyone item takes the shown body
+				bool bSlotMinorUnitBody = pItemSlotEquip->GetIsForMinorUnit();
+				if ( CX2Unit::EP_ONEPIECE_FASHION == pItemSlotEquip->GetEquipPos() && CX2Item::UC_ANYONE == pkItemTemplet->GetUseCondition() )
+					bSlotMinorUnitBody = bShownMinorUnitBody;
+				if ( bSlotMinorUnitBody != bTargetMinorUnitBody )
+					continue;
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
  				if ( pItemSlotEquip->GetEquipPos() == pkItemTemplet->GetEqipPosition() &&
  					(pItem->GetItemTemplet()->GetItemType() == CX2Item::IT_ACCESSORY || pItemSlotEquip->GetFashion() == pkItemTemplet->GetFashion()) )
 				{

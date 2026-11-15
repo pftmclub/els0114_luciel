@@ -200,6 +200,56 @@ void CX2OfflineInventory::Release()
 			const int iPos			= (int)pTemplet->GetEqipPosition();
 			const bool bFashion		= pTemplet->GetFashion();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+			// char-luciel DU4 stand-in ( no June server ): a costume or accessory not for anyone goes on the body its minor-unit flag names ( June's right-click rule 321ae867 )
+			if( ( true == bFashion || CX2Item::IT_ACCESSORY == pTemplet->GetItemType() ) &&
+				CX2Item::UC_ANYONE != pTemplet->GetUseCondition() &&
+				pTemplet->GetIsForMinorUnit() != CX2Inventory::IsMinorUnitEquipSlot( static_cast<short>( iSlotID ) ) )
+				return false;
+
+			// char-luciel DU4 stand-in: June's slots past March's, by the character window's EQUIP_POS / FASHION rows ( DLG_UI_CHARACTER_NEW_4 ); a second ring is a ring
+			switch( iSlotID )
+			{
+			case CX2Unit::NESI_MINORUNIT_DEFENCE_HAIR_FASHION:
+				return ( CX2Unit::EP_DEFENCE_HAIR == iPos && true == bFashion );
+			case CX2Unit::NESI_MINORUNIT_DEFENCE_BODY_FASHION:
+				return ( CX2Unit::EP_DEFENCE_BODY == iPos && true == bFashion );
+			case CX2Unit::NESI_MINORUNIT_DEFENCE_LEG_FASHION:
+				return ( CX2Unit::EP_DEFENCE_LEG == iPos && true == bFashion );
+			case CX2Unit::NESI_MINORUNIT_DEFENCE_HAND_FASHION:
+				return ( CX2Unit::EP_DEFENCE_HAND == iPos && true == bFashion );
+			case CX2Unit::NESI_MINORUNIT_DEFENCE_FOOT_FASHION:
+				return ( CX2Unit::EP_DEFENCE_FOOT == iPos && true == bFashion );
+			case CX2Unit::NESI_MINORUNIT_WEAPON_HAND_FASHION:
+				return ( CX2Unit::EP_WEAPON_HAND == iPos && true == bFashion );
+			case CX2Unit::NESI_MINORUNIT_ONEPIECE_FASHION:
+				return ( CX2Unit::EP_ONEPIECE_FASHION == iPos && true == bFashion );
+
+			case CX2Unit::NESI_MINORUNIT_AC_FACE1:		return ( CX2Unit::EP_AC_FACE1 == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_FACE2:		return ( CX2Unit::EP_AC_FACE2 == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_FACE3:		return ( CX2Unit::EP_AC_FACE3 == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_BODY:		return ( CX2Unit::EP_AC_BODY == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_LEG:		return ( CX2Unit::EP_AC_LEG == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_ARM:		return ( CX2Unit::EP_AC_ARM == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_RING:		return ( CX2Unit::EP_AC_RING == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_NECKLESS:	return ( CX2Unit::EP_AC_NECKLESS == iPos );
+			case CX2Unit::NESI_MINORUNIT_AC_WEAPON:		return ( CX2Unit::EP_AC_WEAPON == iPos );
+
+			case CX2Unit::NESI_AC_MINIME:
+			case CX2Unit::NESI_MINORUNIT_AC_MINIME:
+				return ( CX2Unit::EP_AC_TEMP2 == iPos );	// June's EP_AC_MINIME
+			case CX2Unit::NESI_AC_EARRING:
+			case CX2Unit::NESI_MINORUNIT_AC_EARRING:
+				return ( CX2Unit::EP_AC_TEMP3 == iPos );	// June's EP_AC_EARRING
+			case CX2Unit::NESI_AC_RING2:
+			case CX2Unit::NESI_MINORUNIT_AC_RING2:
+				return ( CX2Unit::EP_AC_RING == iPos );
+
+			default:
+				break;
+			}
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+
 			switch( iSlotID )
 			{
 			case CX2Unit::NESI_DEFENCE_HAIR_FASHION:
@@ -1252,6 +1302,17 @@ namespace
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 	/// char-luciel NU4: Ciel's promotion costume ( set 5934, is_for_minor_unit ), the five rows past the live shape of ten
 	const int LUCIEL_MINOR_UNIT_COSTUME[5] = { 41900, 41901, 41902, 41903, 41904 };
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+	/// char-luciel DU4: Ciel's costume slots, in COSTUME_SLOT's order
+	const int MINOR_UNIT_COSTUME_SLOT[5] =
+	{
+		CX2Unit::NESI_MINORUNIT_WEAPON_HAND_FASHION,
+		CX2Unit::NESI_MINORUNIT_DEFENCE_BODY_FASHION,
+		CX2Unit::NESI_MINORUNIT_DEFENCE_LEG_FASHION,
+		CX2Unit::NESI_MINORUNIT_DEFENCE_HAND_FASHION,
+		CX2Unit::NESI_MINORUNIT_DEFENCE_FOOT_FASHION,
+	};
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_STARTER_ITEMS
 
 	/// Where each half's five pieces go, in the same order the arrays list them.
@@ -1480,9 +1541,16 @@ bool CX2OfflineInventory::SeedPromotionItems( UidType nUnitUID, int iUnitClass )
 			}
 
 			bool bWorn = false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+			// char-luciel DU4: Ciel wears her own five
+			if( false == PlaceAtEquipSlot( nUnitUID, LUCIEL_MINOR_UNIT_COSTUME[i], MINOR_UNIT_COSTUME_SLOT[i],
+										   CX2Item::PT_INFINITY, -1, bWorn ) )
+				continue;
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 			if( false == PlaceAtEquipSlot( nUnitUID, LUCIEL_MINOR_UNIT_COSTUME[i], COSTUME_SLOT[i],
 										   CX2Item::PT_INFINITY, -1, bWorn ) )
 				continue;
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 
 			if( true == bWorn )
 				++iWorn;

@@ -1489,6 +1489,44 @@ Ghidra read-only; decompiles and listings in the session scratchpad.
   the JUNE_BUGS 739 double push itself was not on that path (testlu1 keeps the Henir weapon for it); the change is one dropped `reset()`, Ghidra-proven.
 
 
+### DU4 - Done (2026-11-15)
+
+Opus 5.5 xhigh. Flag `SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER` (defined; `#error` guard: `JUNE_CHAR_MINOR_UNIT_PLAY_STATUS`, `JUNE_CHAR_EQUIP_VIEW`, and against
+the retired `JUNE_CHARINFO_EQUIP_GROUP`, whose define is commented out). Rows: funcmap `(DU4)` (9), divergence `OnRClickedItem` (`stage9`, new) and
+`GetEquippingItemByEquipPos` (source amended), JUNE_BUGS 741-742. Kickoffs: `DU4-review.md` written, `DU5.md` amended.
+- **Enum** (`X2Unit.h`): June's `NOW_EQIP_SLOT_ID` (`Enum.src.lua:6653-6696`): `NESI_ONEPIECE_FASHION` 35, `NESI_END` 43, Ciel's 19 `NESI_MINORUNIT_*`,
+  `NESI_AC_MINIME` / `_EARRING` / `_RING2` 37 / 39 / 41; March's 0-19 unchanged. data036 `Enum.lua` (core list) had June's names already except
+  `NESI_MINORUNIT_DEFENCE_HAIR_FASHION`, but March's 20 / 21: now June's values (`luasrc.py refresh`, core-list row noted). Without this the June
+  character window's onepiece slot read 20 and Ciel's hair slot had no id.
+- **Save v24** (`X2OfflineDB.*`, nested over v23): `item.slot` 20 -> 35 and `inventory_size.size` 21 -> 43 for category `ST_E_EQUIP`, one savepoint, log
+  `[JUNE_CHAR] LUCIEL DUO DB MIG v24 done: <n> worn onepiece row(s) ...`. `BaseSlotSize` follows `NESI_END`. Snapshot `els_db_20261115_205721_pre_manual.sql`.
+- **Emulator** (`X2OfflineInventory.cpp`, labelled stand-in, no June server): a costume / accessory that is not `UC_ANYONE` must sit on the body its
+  minor-unit flag names (June's right-click rule); June's slots past March's take the character window's `EQUIP_POS` / `FASHION` rows
+  (`DLG_UI_CHARACTER_NEW_4`), minime / earring = `EP_AC_TEMP2` / `_TEMP3` (June's names), a second-ring slot takes a ring. Ciel's NU4 starter costume
+  goes to her own five slots (was bagged).
+- **Character window** (`X2UICharInfo.cpp`): `IsEquippedSlotShown` = June `32e22ce0` by slot id (retires C2's `IS_FOR_MINOR_UNIT` stand-in);
+  `ResetNowEquipUI` = June `329146d0` (item body by its slot `3286a350`, second ring remapped through my unit) in place of C2's `bMinorUnitItem = false`.
+- **Right-click** (`X2UIInventory.cpp` `OnRClickedItem`): June's body test (`321aa5d0 @321ae867`, `@321aeb5a-321aec39`; raw chunk outside every Ghidra
+  function). Not fashion / accessory -> Lu; not `UC_ANYONE` -> the templet's minor-unit flag (a Ciel costume always goes to Ciel); `UC_ANYONE` -> the
+  shown body (`IsMinorUnitForm()`, or the window's `GetSwitchingView()` while it is shown). The kickoff's "slot 0x26" is slot `+0x40` = the slot's
+  **equip position** (`EP_ONEPIECE_FASHION` 38): an onepiece slot with an anyone item takes the shown body, so Lu's onepiece slot always wins (JUNE_BUGS 741).
+  Stand-in: June's item `+0x80` (a look item id, Stage 16) is not in March. The rest of June's loop is the `stage9` divergence row; `321693b0` -> DU5.
+- **Slot tables by name** (`X2Inventory.cpp` `IsMinorUnitEquipSlot` / `GetEquipGroup` / `GetAddMaxMPValue( group )`, the second-ring tests in `X2GUUser.cpp`
+  x2 and `X2Unit.cpp`). `GetEquippingItemByEquipPos` gets June's ring remap and slot-class test (`32869e10`), ending june-stat-calc D2b's two stand-ins.
+- **Unit `+0x294` identified:** `UnitData`'s `std::map<UidType, short>` worn UID -> slot, only writer `AddEqip( item, slot, bCheck )` `323574c0` (wrapper
+  `32358ad0`), never erased. Slot-0 writers: preview items (not in the inventory: stand-in reads -1, June 0, same result) and another player's equip
+  change `31f1ed70` (JUNE_BUGS 742, no other players offline). **Stand-in confirmed:** the inventory slot (`3286a310`) holds the same value offline.
+- **Tools:** `elsdb.py` `EQUIP_SLOTS` on June's ids + `MINOR_SLOTS` body filter for `--equip`.
+- **Gates:** `finish.py --files <10 files> --with SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER`: flagcheck PASS (8 PASS, 1 PASS~ = one blank line in
+  `X2OfflineInventory.cpp`, 1 OTHER = `Always.h`, the retired `CHARINFO_EQUIP_GROUP` define line, 0 FAIL), junediverge PASS, enumscan exit 1 on 190
+  rows, **0 on DU4 lines** (intersected with `git diff -U0`); luasrc `core --check` / `ledger --check` PASS. Range gate: see the line below the commit.
+- **Compile:** `/Zs` probes of the 8 changed `.cpp`: 8 x 0 errors; break-tests fail inside the new blocks.
+- **Build:** `DEPLOY OK: X2_offline.exe is 26,973,696 B, dated 2026-11-15 21:08:20, md5 439247b2c3e968db8ef23b6b032f44cc` (built at `244c652c` + the
+  DU4 files + CH2c's uncommitted `X2GULuciel.*`); `EXESTR OK: 1 of 1` (`[JUNE_CHAR] LUCIEL DUO DB MIG v24 done`, wide) and `1 of 1` (the size UPDATE).
+- **Data:** `PACK OK data036` (only `Enum.lua` changed), `COPY OK data036` md5 `e4dfe3d0`.
+- **Save prep:** onepieces worn in March's slot 20 on jtLordKnight (25, 163569), reyaa (12, 163571), testlu1 (166, Lu's 163578); Ciel's Spa Wear
+  163579 bagged on testlu1 (`elsdb.py`, backed up). Play-test: below.
+
 ## Phase CH1 - Deploy unit: the class core
 
 **Transcription rules (CH1b-CH1l).** Each function from the class map is written whole, from Ghidra (or the capstone dump), under

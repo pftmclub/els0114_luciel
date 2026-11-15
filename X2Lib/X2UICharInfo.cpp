@@ -1671,6 +1671,55 @@ namespace _CONST_CHARINFO_C2_
 	/// June 32e22ce0: stand-in, a minor-unit slot is told by IS_FOR_MINOR_UNIT ( June's NESI ids for them clash with March's )
 	bool IsEquippedSlotShown( CX2SlotItem* pItemSlot_, bool bSwitchingView_ )
 	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+		// char-luciel DU4: June 32e22ce0 by slot id; weapon, armour and any other id always show
+		switch ( pItemSlot_->GetSlotID() )
+		{
+		case CX2Unit::NESI_DEFENCE_HAIR_FASHION:
+		case CX2Unit::NESI_DEFENCE_BODY_FASHION:
+		case CX2Unit::NESI_DEFENCE_LEG_FASHION:
+		case CX2Unit::NESI_DEFENCE_HAND_FASHION:
+		case CX2Unit::NESI_DEFENCE_FOOT_FASHION:
+		case CX2Unit::NESI_WEAPON_HAND_FASHION:
+		case CX2Unit::NESI_AC_FACE1:
+		case CX2Unit::NESI_AC_FACE2:
+		case CX2Unit::NESI_AC_FACE3:
+		case CX2Unit::NESI_AC_BODY:
+		case CX2Unit::NESI_AC_LEG:
+		case CX2Unit::NESI_AC_ARM:
+		case CX2Unit::NESI_AC_RING:
+		case CX2Unit::NESI_AC_NECKLESS:
+		case CX2Unit::NESI_AC_WEAPON:
+		case CX2Unit::NESI_ONEPIECE_FASHION:
+		case CX2Unit::NESI_AC_MINIME:
+		case CX2Unit::NESI_AC_EARRING:
+		case CX2Unit::NESI_AC_RING2:
+			return bSwitchingView_ == false;
+
+		case CX2Unit::NESI_MINORUNIT_DEFENCE_HAIR_FASHION:
+		case CX2Unit::NESI_MINORUNIT_DEFENCE_BODY_FASHION:
+		case CX2Unit::NESI_MINORUNIT_DEFENCE_LEG_FASHION:
+		case CX2Unit::NESI_MINORUNIT_DEFENCE_HAND_FASHION:
+		case CX2Unit::NESI_MINORUNIT_DEFENCE_FOOT_FASHION:
+		case CX2Unit::NESI_MINORUNIT_WEAPON_HAND_FASHION:
+		case CX2Unit::NESI_MINORUNIT_AC_FACE1:
+		case CX2Unit::NESI_MINORUNIT_AC_FACE2:
+		case CX2Unit::NESI_MINORUNIT_AC_FACE3:
+		case CX2Unit::NESI_MINORUNIT_AC_BODY:
+		case CX2Unit::NESI_MINORUNIT_AC_LEG:
+		case CX2Unit::NESI_MINORUNIT_AC_ARM:
+		case CX2Unit::NESI_MINORUNIT_AC_RING:
+		case CX2Unit::NESI_MINORUNIT_AC_NECKLESS:
+		case CX2Unit::NESI_MINORUNIT_AC_WEAPON:
+		case CX2Unit::NESI_MINORUNIT_ONEPIECE_FASHION:
+		case CX2Unit::NESI_MINORUNIT_AC_MINIME:
+		case CX2Unit::NESI_MINORUNIT_AC_EARRING:
+		case CX2Unit::NESI_MINORUNIT_AC_RING2:
+			return bSwitchingView_;
+		}
+
+		return true;
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		if ( pItemSlot_->GetIsForMinorUnit() == true )
 			return bSwitchingView_;
 
@@ -1685,6 +1734,7 @@ namespace _CONST_CHARINFO_C2_
 		}
 
 		return bSwitchingView_ == false;
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 	}
 }
 using namespace _CONST_CHARINFO_C2_;
@@ -3794,6 +3844,28 @@ void CX2UICharInfo::ResetNowEquipUI()
 			if ( pItem == NULL )
 				continue;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+			// char-luciel DU4: June 329146d0, the item's body by its slot ( 3286a350 ), a second ring read as EP_AC_TEMP4 ( 3234fe90 )
+			const bool bMinorUnitItem = kInventory.IsMinorUnitEquipItem( pItem->GetUID() );
+			int iEquipPosition = pItem->GetItemTemplet()->GetEqipPosition();
+			g_pData->GetMyUser()->GetSelectUnit()->AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+
+			for ( int j = 0; j < (int)m_SlotList.size(); j++ )
+			{
+				CX2SlotItem* pItemSlot = (CX2SlotItem*)GetSlot(j);
+				if ( pItemSlot->GetEquipPos() == iEquipPosition &&
+					( pItem->GetItemTemplet()->GetItemType() == CX2Item::IT_ACCESSORY || pItemSlot->GetFashion() == pItem->GetItemTemplet()->GetFashion() ) &&
+					pItemSlot->GetIsForMinorUnit() == bMinorUnitItem )
+				{
+					if ( pItemSlot->IsCreatedItemUI() == true )
+						pItemSlot->ResetItemUI( pItem );
+					else
+						pItemSlot->CreateItemUI( pItem );
+
+					break;
+				}
+			}
+#else SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 			/// stand-in: 3286a350 tests June's minor-unit equip positions, Lu/Ciel not ported; 3234fe90 ( ring in the second ring slot ) needs a slot map March lacks
 			const bool bMinorUnitItem = false;
 
@@ -3812,6 +3884,7 @@ void CX2UICharInfo::ResetNowEquipUI()
 					break;
 				}
 			}
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		}
 	}
 

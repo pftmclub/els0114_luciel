@@ -245,7 +245,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU4 | ready (DU3 review passed 2026-11-15): NESI renumber + forward-only save migration (user yes 2026-11-02) | Opus 5.5 / xhigh, Opus review, user play-test | DU3 review | `X2Item.h`, `X2OfflineDB.*`, `X2UICharInfo.cpp`, save | `DU4.md` |
+| DU4 | done (2026-11-15), play-test owed: June's slot ids (onepiece 35, Ciel's slots), save v24, right-click picks the body, window by June's ids; then `DU4-review.md` | Opus 5.5 / xhigh, Opus review, user play-test | DU3 review | `X2Unit.h`, `X2Inventory.cpp`, `X2UICharInfo.cpp`, `X2UIInventory.cpp`, `X2OfflineDB.*`, save | `DU4.md` |
 | DU5 | blocked (DU4 review): two bodies in the character window / unit viewer, form packets `0x4d9` / `0x4da` | Opus 5.5 / high, Opus review, user play-test | DU4 review | `X2UICharInfo.*`, `X2UnitViewerUI.*`, `Handlers_*` | `DU5.md` |
 | CH2c | ready (CH2b review passed 2026-11-15): Royal Guard (38) skills part 1 | Sonnet 5.5 / high, no review of its own (CH2c2 review covers it), user play-test | CH2b review | `X2GULuciel.*` | `CH2c.md` |
 | CH2c2 | blocked (CH2c): Royal Guard (38) skills part 2 | Sonnet 5.5 / high, Opus review (also covers CH2c), user play-test | CH2c | `X2GULuciel.*` | `CH2c2.md` |

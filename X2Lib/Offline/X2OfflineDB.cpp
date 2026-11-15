@@ -1227,6 +1227,34 @@ bool CX2OfflineDB::Migrate()
 		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DATA DB MIG v23 done: unit.minor_cur_mp 0, unit.minor_unit_form -1 added" );
 	}
 #endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+	if( iFrom < 24 )
+	{
+		// char-luciel DU4: March's NESI_ONEPIECE_FASHION ( 20 ) and NESI_END ( 21 ); June's 20 is Ciel's hair slot
+		const int iMarchOnepieceSlot	= 20;
+		const int iMarchWornSlotCount	= 21;
+
+		char szSlot[192];
+		_snprintf( szSlot, 192, "UPDATE item SET slot = %d WHERE category = %d AND slot = %d;",
+			(int)CX2Unit::NESI_ONEPIECE_FASHION, (int)CX2Inventory::ST_E_EQUIP, iMarchOnepieceSlot );
+		szSlot[191] = '\0';
+
+		char szSize[192];
+		_snprintf( szSize, 192, "UPDATE inventory_size SET size = %d WHERE category = %d AND size = %d;",
+			(int)CX2Unit::NESI_END, (int)CX2Inventory::ST_E_EQUIP, iMarchWornSlotCount );
+		szSize[191] = '\0';
+
+		if( false == Exec( "BEGIN;" ) )			return false;
+		if( false == Exec( szSlot ) )			{ Exec( "ROLLBACK;" ); return false; }
+		const int iSlotRows = sqlite3_changes( m_pDB );
+		if( false == Exec( szSize ) )			{ Exec( "ROLLBACK;" ); return false; }
+		const int iSizeRows = sqlite3_changes( m_pDB );
+		if( false == Exec( "COMMIT;" ) )		return false;
+
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO DB MIG v24 done: %d worn onepiece row(s) slot %d -> %d, %d unit(s) worn bag %d -> %d",
+			iSlotRows, iMarchOnepieceSlot, (int)CX2Unit::NESI_ONEPIECE_FASHION, iSizeRows, iMarchWornSlotCount, (int)CX2Unit::NESI_END );
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 	char szSetVersion[64];
 	_snprintf( szSetVersion, 64, "PRAGMA user_version = %d;", (int)SCHEMA_VERSION );
 	szSetVersion[63] = '\0';

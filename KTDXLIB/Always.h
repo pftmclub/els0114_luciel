@@ -10969,7 +10969,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-10-30
 // Description: june-charinfo C3: CX2Inventory::GetEquipGroup ( June 3286a4b0 ) reads March's NESI_ONEPIECE_FASHION ( 20 ) as June's onepiece slot ( 35, group 0 ) instead of June's minor-unit slot 20 ( group 1 ), so a onepiece costume keeps its stats and sockets in the form-0 sums ( character window, HUD max HP ). Revert: undefine the flag.
-#define SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP
+//#define SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP	// retired by char-luciel DU4 2026-11-15: June's numbering puts the onepiece at 35
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -13736,4 +13736,21 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP ) && !( defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK ) && defined( ATTACH_SKINMESH ) )
 #error SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP needs SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE ( the state pick ), SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( the loop's body anim and AFTER_IMAGE_BODY ), SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK ( SetShowAfterImage ) and ATTACH_SKINMESH ( CX2SubEquip::SetRenderParam ), june-engine R5b
 #endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel DU4: June's equip slot ids ( NOW_EQIP_SLOT_ID, Enum.src.lua:6653-6696 ): NESI_ONEPIECE_FASHION 20 -> 35, NESI_END 21 -> 43,
+//              Ciel's NESI_MINORUNIT_* 20-34 / 36 / 38 / 40 / 42, the minime / earring / second ring 37 / 39 / 41. The save steps to v24 ( worn onepiece
+//              20 -> 35, worn bag 21 -> 43 ); the emulator takes each body's costumes in its own slots and Ciel's starter costume on Ciel; the
+//              character window shows and fills slots by June's ids ( 32e22ce0, 329146d0 ); the inventory right-click picks the item's body
+//              ( 321aa5d0 @321ae867 ); the slot tables use the names. Retires SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP. Revert: comment out the
+//              #define ( an exe without it refuses a v24 save ).
+#define SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+#if defined( SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS ) && defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) )
+#error SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER needs SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS ( the v23 save it steps from ) and SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ( the slot body test, the second ring ), char-luciel DU4
+#endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+#if defined( SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ) && defined( SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP )
+#error SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP reads slot 20 as the onepiece; with SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER it is Ciel's hair slot, char-luciel DU4
+#endif SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP
 //////////////////////////////////////////////////////////////////////////
