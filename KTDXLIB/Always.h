@@ -13568,3 +13568,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH needs SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE ( UT_LUCIEL ), char-luciel CH1o3
 #endif
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH1p: Lu/Ciel's in-class duo switch, live: the bounding-target hooks of CX2GUUser ( June 31fd02d0 ) and
+//              CX2GUNPC ( June 3275a070 ) call CX2GULuciel::SetBoundingTarget, HIT_ADD_COMBINATION_POINT stops logging as
+//              unsupported, and the [JUNE_CHAR] LUCIEL DUO lines ( switch, point ) log. Defined by CH1 final with _LIVE.
+//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+#ifndef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ( CX2GULuciel::SetBoundingTarget ), char-luciel CH1p
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+//////////////////////////////////////////////////////////////////////////

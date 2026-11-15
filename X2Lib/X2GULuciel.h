@@ -734,6 +734,8 @@ public:
 	virtual void		CommonFrameMove();	// June 32b397a0 ( vslot 0x7cc )
 	virtual bool		CanUseSpecialAttack( CX2SkillTree::ACTIVE_SKILL_USE_CONDITION eActiveSkillUseCondition_ = CX2SkillTree::ASUT_GROUND );	// June 32b3a310 ( vslot 0x7f8 ); class-own: each class calls its own
 
+	void				SetBoundingTarget( const CX2GameUnit::GAME_UNIT_TYPE eTargetType_, const UidType uidTarget_, const int iTargetLastHitAttackSerial_ );	// char-luciel CH1p: June 32b38cb0, called by the bounding hooks of CX2GUUser 31fd02d0 and CX2GUNPC 3275a070
+
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 #ifdef	X2OPTIMIZE_GAME_CHARACTER_BACKGROUND_LOAD
@@ -754,6 +756,7 @@ protected:
 	void				UpGageNowMpOfForm( const float fChangeOfNowMp_, const bool bCurrentForm_ );	// June 32aeb1e0
 	int					GetNowCombinationPoint() const;	// June 32b0fa00
 	void				UpCombinationPoint( const int iCombinationPoint_ );	// June 32b14860
+	void				AddCombinationPointOnHit( const CX2DamageManager::DamageData& damageData_ );	// char-luciel CH1p: June 32b14bc0 ( thunk 32b4cee0 ), CH4a's InitPassiveSkillState pushes it
 	int					GetSkillCombinationPointCost( const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ );	// June 32b14f70
 	void				KillMySummonedNPC( const CX2UnitManager::NPC_UNIT_ID eNPCUnitID_ );	// June 32b20100
 	// char-luciel CH1k: helpers of the overrides
@@ -793,6 +796,7 @@ protected:
 	void				UpdateInvasionOfDarkEnergyTargetTime();	// June 32b16760
 	void				FrameMoveAltarOfEvilEnd();	// June 32b35c60
 	void				FrameMoveBoundingKeyDialog();	// June 32b0e550
+	void				UpdateBoundingKeyDialogPosition();	// char-luciel CH1p: June 32b35cf0
 	void				DieFrontStart();	// char-luciel CH1b: June 31fd2d60 ( CX2GUUser's shared body )
 	void				DieBackStart();	// char-luciel CH1b: June 31fd2e30 ( CX2GUUser's shared body )
 
@@ -1217,14 +1221,14 @@ protected:
 	int									m_iEvilClawHitCount;				// +0x96b0
 	float								m_fSwitchingCoolTime;				// +0x96b4
 	int									m_iSkillUseMpForm;					// +0x96b8: the form that pays a skill's MP ( SpecialAttackUse stores 0 for Lu, 1 for Ciel )
-	int									m_iLastUsedSkillID;					// +0x96bc
+	int									m_iPendingCombinationPoint;			// +0x96bc: char-luciel CH1p: a state's CP_AMOUNT, paid at the next SpecialAttackCooldown ( CH1a named it the last used skill id )
 	float								m_fSoulStrikeMoveSpeed;				// +0x96c0
 	float								m_fSoulStrikeSpeedRate;				// +0x96c4
 	std::vector<SGameUnitKey>			m_vecDarkCrescentTargetUnit;		// +0x96c8
-	int									m_iBoundingStrikeCount;				// +0x96dc: June's ctor leaves it unset
+	int									m_iBoundingStrikeCombinationPointCost;	// +0x96dc: char-luciel CH1p: 0 or 1, rolled by SetBoundingTarget; June's ctor leaves it unset
 	bool								m_bBoundingStrikeHit;				// +0x96e0: June's ctor leaves it unset
 	bool								m_bBoundingTargetFound;				// +0x96e8
-	int									m_iBoundingTargetUnitIndex;			// +0x96ec
+	int									m_iBoundingTargetLastHitAttackSerial;	// +0x96ec: char-luciel CH1p: SetBoundingTarget tests it, only CheckBoundingTarget writes it ( -1 )
 	SGameUnitKey						m_BoundingTarget;					// +0x96f0
 	float								m_fBoundingKeyShowTime;				// +0x9700
 	CKTDGUIDialogType					m_pDlgBoundingKey;					// +0x9704
@@ -1232,7 +1236,7 @@ protected:
 	float								m_fPhantomRushReadyTime;			// +0x9714
 	CX2EffectSet::Handle				m_hPhantomRushEffectSet;			// +0x9718
 	SGameUnitKey						m_PhantomRushTarget;				// +0x9720
-	KProtectedType<float>				m_fBoundingDamageRate;				// +0x9730
+	KProtectedType<float>				m_fFreeBoundingStrikeRate;			// +0x9730: char-luciel CH1p: GetRandomFloat( 0 ) <= it makes the bounding strike free ( CH4a's passive sets it )
 	KProtectedType<float>				m_fBoundingDamageRateEx;			// +0x973c
 	SAltarOfEvilData					m_AltarOfEvilData;					// +0x9748
 	bool								m_bNightmareTargetHit;				// +0x9778: June's ctor leaves it unset

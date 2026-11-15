@@ -244,7 +244,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH1p | ready: in-class duo switch, `DT_BOTH` / `DT_KEEP`, combination points, flag `_DUO` | Opus 5.5 / high, Opus review | CH1o3, DU1 reviews (DU2 done) | `X2GULuciel.*`, `Enum.lua` | `CH1p.md` |
+| CH1p | review ready: done 2026-11-15 (bounding hooks + DUO lines under `_DUO` ( `//#define` ), points-on-hit body, bounding key, data036 `DT_BOTH` / `DT_KEEP`, data034 key dialog; packed + copied) | Opus 5.5 / high, Opus review | CH1o3, DU1 reviews (DU2 done) | `X2GULuciel.*`, `X2GUUser.cpp`, `X2GUNPC.cpp`, `Enum.lua` | `CH1p-review.md` |
 | CH1 | blocked (CH1p review; `june-state-ids` S2 done; NU4, CH1a2, CH1a3, CH1a4 reviews done, CH0b): `_LIVE` defined, factory cases, both scripts adopted, play-test | Opus 5.5 / high, Opus review, user play-test | CH1p review, NU4 review, CH0b, june-state-ids S2 | `X2GULuciel.*`, `X2Game.cpp`, Always.h, data036 | `CH1.md` |
 | DU3 | blocked (CH1 review): June's equip-view rewrite (every class) + item-templet minor-unit fields | Opus 5.5 / high, Opus review, user play-test | CH1 review | `X2GUUser.*`, `X2Eqip.*`, `X2Item*`, class overrides | `DU3.md` |
 | DU4 | blocked (DU3 review): NESI renumber + forward-only save migration (user yes 2026-11-02) | Opus 5.5 / xhigh, Opus review, user play-test | DU3 review | `X2Item.h`, `X2OfflineDB.*`, `X2UICharInfo.cpp`, save | `DU4.md` |

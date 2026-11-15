@@ -323,8 +323,12 @@ bool CX2DamageManager::SetDamageDataFromLUA( DamageData* pDamageData, KLuaManage
 
 		// June2017 FUN_32632390 @3263df79-3263e18f: int getter @3263e17b, default 0, to +0x594.
 		LUA_GET_VALUE( luaManager, "HIT_ADD_COMBINATION_POINT",	pDamageData->m_iHitAddCombinationPoint,	0 );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+		// char-luciel CH1p: CX2GULuciel::AddCombinationPointOnHit ( June 32b14bc0 ) reads it, so no unsupported-key line
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 		if( 0 != pDamageData->m_iHitAddCombinationPoint )
 			DamageDataUnsupportedInt( pwszTemplet, pTableName, L"HIT_ADD_COMBINATION_POINT", L"combination-point system", pDamageData->m_iHitAddCombinationPoint );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 
 		// June2017 FUN_32632390 @3263f256-3263f415: int getter @3263f3f7 in the enum shape (-(ok) & temp),
 		// so default 0 (HRDT_NONE), to +0x5f4. March's Enum.lua has no HP_RATE_DAMAGE_TYPE table (Phase 11).

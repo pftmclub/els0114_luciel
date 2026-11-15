@@ -92,3 +92,13 @@ Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_
   ids are 7 / 8 ( match ); Ciel's `LSI_CIEL_DIE_FRONT` / `_BACK` ( 192 / 193 ) do not, so a dying Ciel would keep her buffs. Check whether Lu's InitState rows
   give Ciel's die states `3202a7d0`; if so, make the stand-in ask `GetDieFrontStateID()` / `GetDieBackStateID()` ( const since CH1o2 ) or register the StateEnd,
   and add a Ciel death to the play-test ( buffs gone after the revive ).
+
+## Amended by char-luciel CH1p (2026-11-15)
+
+- Define `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO` with `_LIVE` ( `Always.h`, CH1p's block; `#error`s without `_CORE` ): it turns on the bounding-target hooks in
+  `CX2GUUser::BoundingUpStateStart` and `CX2GUNPC`'s state start, drops `HIT_ADD_COMBINATION_POINT`'s unsupported-key line, and the
+  `[JUNE_CHAR] LUCIEL DUO switch` / `point` lines ( throttled to one a second each ). `/Zs` probes with both defined: 0 errors.
+- Done by CH1p: `DUO_TYPE.DT_BOTH` / `DT_KEEP` in data036 `Enum.lua` and `DLG_LUCIEL_BOUNDING_KEY.lua` adopted in data034 ( both packed and copied ); the
+  enum gate's one remaining gap is `SKILL_ID.RNSI_A_LLD_BLUFF`.
+- Play-test: a body swap writes `LUCIEL DUO switch: active body CIEL` ( then `LU` ). Points on hit and the bounding key wait for CH4a ( the delegate
+  push and the passive that enables bounding ), so do not expect them here.

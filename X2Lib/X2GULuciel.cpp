@@ -1,5 +1,8 @@
 #include "StdAfx.h"
 #include "./X2GULuciel.h"
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+#include "Offline/X2OfflineLog.h"	// char-luciel CH1p: the [JUNE_CHAR] LUCIEL DUO lines
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 
 //{{ Iruha : 2026-11-14 // char-luciel CH1a: Lu/Ciel's class skeleton ( June 32ae4080-32b4e76f )
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
@@ -95,17 +98,17 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_iEvilClawHitCount( 0 )
 , m_fSwitchingCoolTime( 0.f )
 , m_iSkillUseMpForm( 3 )
-, m_iLastUsedSkillID( 0 )
+, m_iPendingCombinationPoint( 0 )
 , m_fSoulStrikeMoveSpeed( 1.f )
 , m_fSoulStrikeSpeedRate( 1.f )
 , m_bBoundingTargetFound( false )
-, m_iBoundingTargetUnitIndex( -1 )
+, m_iBoundingTargetLastHitAttackSerial( -1 )
 , m_fBoundingKeyShowTime( -1.f )
 , m_pDlgBoundingKey( NULL )
 , m_bPhantomRushReady( false )
 , m_fPhantomRushReadyTime( -1.f )
 , m_hPhantomRushEffectSet( INVALID_EFFECTSET_HANDLE )
-, m_fBoundingDamageRate( -1.f )
+, m_fFreeBoundingStrikeRate( -1.f )
 , m_fBoundingDamageRateEx( -1.f )
 , m_fDeathTouchTime( -1.f )
 , m_fDeathTouchRange( 1200.f )
@@ -314,6 +317,46 @@ int CX2GULuciel::GetNowCombinationPoint() const
 		return 0;
 
 	return pLucielGageData->GetNowCombinationPoint();
+}
+
+// char-luciel CH1p: the duo switch, combination points on hit and the bounding key
+namespace _CONST_LUCIEL_CH1P_
+{
+	const float		COMBINATION_POINT_ON_HIT_COOL_TIME		= 1.f;		// June 32b14bc0 @32b14be8 ( FLD1 )
+	const float		BOUNDING_KEY_SHOW_TIME					= 0.5f;		// June 32b38cb0 @32b38e1b ( 334ed42c )
+	const float		BOUNDING_KEY_FORWARD_OFFSET				= 100.f;	// June 32b35cf0 @32b35d6d ( 3342f360 )
+	const float		BOUNDING_KEY_HEIGHT_OFFSET				= 208.f;	// June 32b35cf0 @32b35dfc ( 334f3288 )
+	const float		BOUNDING_KEY_SCALE_DISTANCE				= 1500.f;	// June 32b35cf0 @32b35f45 ( 33459a10 )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+	const DWORD		DUO_LOG_INTERVAL_MS						= 1000;		// the DUO lines' throttle
+
+	bool IsDuoLogDue( DWORD& dwLastLogTick_ )
+	{
+		const DWORD dwNowTick = ::GetTickCount();
+		if ( 0 != dwLastLogTick_ && dwNowTick - dwLastLogTick_ < DUO_LOG_INTERVAL_MS )
+			return false;
+		dwLastLogTick_ = dwNowTick;
+		return true;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+}
+using namespace _CONST_LUCIEL_CH1P_;
+
+// char-luciel CH1p: June 32b14bc0 ( thunk 32b4cee0 ); a hit whose HIT_ADD_COMBINATION_POINT is positive adds it, then waits a second
+void CX2GULuciel::AddCombinationPointOnHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( 0 < damageData_.m_iHitAddCombinationPoint && false == ( 0.f < m_fCombinationPointOnHitCoolTime ) )	// June's FCOMP lets a NaN cool time through
+	{
+		UpCombinationPoint( damageData_.m_iHitAddCombinationPoint );
+		m_fCombinationPointOnHitCoolTime = COMBINATION_POINT_ON_HIT_COOL_TIME;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+		static DWORD s_dwLastPointLogTick = 0;	// char-luciel CH1p
+		if ( true == IsDuoLogDue( s_dwLastPointLogTick ) )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO point: +%d on hit ( HIT_ADD_COMBINATION_POINT ), now %d, unit %I64d",
+				damageData_.m_iHitAddCombinationPoint, GetNowCombinationPoint(), GetUnitUID() );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+	}
 }
 
 // char-luciel CH1a: June 32b14860: combination points up or down, with Nobility's and Communion Absorb's bonuses and refunds
@@ -7537,7 +7580,7 @@ void CX2GULuciel::LSI_BOUNDING_TARGET_LU_STRIKER_StateEnd()
 
 	if( true == m_bBoundingStrikeHit )
 	{
-		UpCombinationPoint( -m_iBoundingStrikeCount );
+		UpCombinationPoint( -m_iBoundingStrikeCombinationPointCost );
 		m_bBoundingStrikeHit = false;
 	}
 }
@@ -8908,7 +8951,7 @@ using namespace _CONST_LUCIEL_CH1L_;
 	if ( true == m_bActiveBodyChanged )
 	{
 		m_fSwitchingCoolTime = 1.f;
-		m_iLastUsedSkillID = 0;
+		m_iPendingCombinationPoint = 0;
 		m_bActiveBodyChanged = false;
 
 		const CX2SkillTree::SkillTemplet* pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( GetFutureStateSkillID() );	// June passes level 1 as a second argument
@@ -8917,7 +8960,14 @@ using namespace _CONST_LUCIEL_CH1L_;
 			m_iDamageEffectIndex = 0;
 
 		if ( NULL == pSkillTemplet )
-			m_iLastUsedSkillID = iCpAmount_;	// char-luciel CH1o: June stores the state's CP_AMOUNT here ( JUNE_BUGS 723 )
+			m_iPendingCombinationPoint = iCpAmount_;	// char-luciel CH1p: a non-skill state's CP_AMOUNT, paid by SpecialAttackCooldown ( was CH1o's JUNE_BUGS 723 )
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+		static DWORD s_dwLastSwitchLogTick = 0;	// char-luciel CH1p
+		if ( true == IsDuoLogDue( s_dwLastSwitchLogTick ) )
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO switch: active body %s, state %d, DUO_TYPE %d, CP_AMOUNT %d, pending points %d, unit %I64d",
+				( true == IsMinorUnitActive() ) ? L"CIEL" : L"LU", GetFutureStateID(), iDuoType_, iCpAmount_, m_iPendingCombinationPoint, GetUnitUID() );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 	}
 }
 
@@ -9163,12 +9213,12 @@ using namespace _CONST_LUCIEL_CH1L_;
 		}
 	}
 
-	if ( 1 < m_iBoundingStrikeCount )
+	if ( 1 < m_iBoundingStrikeCombinationPointCost )
 		bValidTarget = false;
 
 	if ( false == bValidTarget )
 	{
-		m_iBoundingTargetUnitIndex = -1;
+		m_iBoundingTargetLastHitAttackSerial = -1;
 		m_bBoundingTargetFound = false;
 		m_BoundingTarget.m_uidGameUnit = -1;
 		m_BoundingTarget.m_eGameUnitType = CX2GameUnit::GUT_USER;
@@ -9179,6 +9229,46 @@ using namespace _CONST_LUCIEL_CH1L_;
 	StateChange( true == IsMinorUnitActive() ? LSI_BOUNDING_TARGET_LU_STRIKER : LSI_BOUNDING_TARGET_CIEL_STRIKER, false );
 	m_bBoundingTargetFound = true;
 	return true;
+}
+
+// char-luciel CH1p: June 32b38cb0; a unit Lu/Ciel bounced becomes the bounding target ( a free strike by chance, else one point ), and the strike key shows
+void CX2GULuciel::SetBoundingTarget( const CX2GameUnit::GAME_UNIT_TYPE eTargetType_, const UidType uidTarget_, const int iTargetLastHitAttackSerial_ )
+{
+	const float fBoundingDamageRateEx = m_fBoundingDamageRateEx;
+	if ( false == ( 0.f <= fBoundingDamageRateEx ) || uidTarget_ < 0 || true == GetRidingOn() )	// the rate stays -1 until CH4a's passive sets it
+		return;
+
+	if ( 0 <= m_BoundingTarget.m_uidGameUnit && m_iBoundingTargetLastHitAttackSerial == iTargetLastHitAttackSerial_ )	// only -1 is ever stored there ( JUNE_BUGS 727 )
+		return;
+
+	const float fFreeBoundingStrikeRate = m_fFreeBoundingStrikeRate;
+	m_iBoundingStrikeCombinationPointCost = ( GetRandomFloat( 0 ) <= fFreeBoundingStrikeRate ) ? 0 : 1;	// June's JP: a NaN roll costs 1
+	if ( GetNowCombinationPoint() < m_iBoundingStrikeCombinationPointCost )
+		return;
+
+	CX2GameUnit* pBoundingTarget = NULL;
+	if ( CX2GameUnit::GUT_USER == eTargetType_ )
+		pBoundingTarget = g_pX2Game->GetUserUnitByUID( uidTarget_ );
+	else if ( CX2GameUnit::GUT_NPC == eTargetType_ )
+		pBoundingTarget = g_pX2Game->GetNPCUnitByUID( static_cast<int>( uidTarget_ ) );
+	if ( NULL == pBoundingTarget )
+		return;
+
+	m_fBoundingKeyShowTime = BOUNDING_KEY_SHOW_TIME;
+	m_BoundingTarget.m_eGameUnitType = eTargetType_;
+	m_BoundingTarget.m_uidGameUnit = uidTarget_;
+	m_bBoundingTargetFound = false;
+	m_bBoundingStrikeHit = false;
+
+	if ( NULL == m_pDlgBoundingKey )	// June's handle hands a unit without the dialog a dummy one
+		return;
+
+	m_pDlgBoundingKey->SetShow( true );
+	CKTDGUIStatic* pStaticBoundingKey = static_cast<CKTDGUIStatic*>( m_pDlgBoundingKey->GetControl( L"DLG_LUCIEL_BOUNDING_KEY" ) );
+	if ( NULL != pStaticBoundingKey )
+		pStaticBoundingKey->SetString( 0, g_pMain->GetKeyPad()->GetKeyString( GAMEACTION_SIT ).c_str() );	// June game action 0x27
+
+	UpdateBoundingKeyDialogPosition();
 }
 
 // char-luciel CH1l: June 32b37730 ( vslot 0x4e0 ); the base first, then the class's hit readers in June's order
@@ -10687,8 +10777,8 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 	if ( false == IsMyUnit() )
 		return;
 
-	UpCombinationPoint( m_iLastUsedSkillID );	// June passes the stored value as a point count ( the member's name is CH1a's )
-	m_iLastUsedSkillID = 0;
+	UpCombinationPoint( m_iPendingCombinationPoint );	// char-luciel CH1p: the CP_AMOUNT DoProcessWhenActiveBodyChangeApplied stored
+	m_iPendingCombinationPoint = 0;
 
 	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( static_cast<CX2SkillTree::SKILL_ID>( iSkillID_ ), true );
 	if ( NULL == GetUnit() || NULL == pSkillTemplet )
@@ -11165,6 +11255,33 @@ void CX2GULuciel::FrameMoveBoundingKeyDialog()
 			m_pDlgBoundingKey->SetShow( false );
 			m_fBoundingKeyShowTime = -1.f;
 		}
+	}
+}
+
+// char-luciel CH1p: June 32b35cf0; the bounding key sits ahead of the unit's head, and its size is divided by the camera distance / 1500 each time ( JUNE_BUGS 726 )
+void CX2GULuciel::UpdateBoundingKeyDialogPosition()
+{
+	if ( NULL == m_pDlgBoundingKey )
+		return;
+
+	D3DXVECTOR3 vBoundingKeyPos = GetPos( true );
+	if ( true == GetIsRight() )
+		vBoundingKeyPos += GetDirVector() * BOUNDING_KEY_FORWARD_OFFSET;
+	else
+		vBoundingKeyPos -= GetDirVector() * BOUNDING_KEY_FORWARD_OFFSET;
+	vBoundingKeyPos.y += BOUNDING_KEY_HEIGHT_OFFSET;
+
+	D3DXVECTOR2 vScreenPos = g_pKTDXApp->GetProj3DPos( vBoundingKeyPos );
+	vScreenPos.x /= g_pKTDXApp->GetResolutionScaleX();
+	vScreenPos.y /= g_pKTDXApp->GetResolutionScaleY();
+	m_pDlgBoundingKey->SetPos( vScreenPos );
+
+	if ( NULL != g_pX2Game && NULL != g_pX2Game->GetX2Camera() )
+	{
+		const D3DXVECTOR3 vEye = g_pX2Game->GetX2Camera()->GetCamera().GetEye();
+		const float fSizeDivisor = GetDistance( vEye, vBoundingKeyPos ) / BOUNDING_KEY_SCALE_DISTANCE;
+		const D3DXVECTOR2 vSize = m_pDlgBoundingKey->GetSize();
+		m_pDlgBoundingKey->SetSize( vSize.x / fSizeDivisor, vSize.y / fSizeDivisor );
 	}
 }
 

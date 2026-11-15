@@ -7101,3 +7101,14 @@ No `SERV_IRUHADEV_JUNE_CHAR_ELESIS_*_DEBUG` flag is defined (`_WOS_DEBUG`, `_DEB
 - **Tools:** `tools/stateids.py` (new); `tools/enumscan.py` skips an enumerator's own `NAME = value`; 6 old rows got `stray` verdicts in `june2017_re/enum_literals.tsv`.
 - **Revert:** comment out the define, put `kom_backup_tools\Enum.lua.before_june_state_ids_S1` back as the staged `Enum.lua` (not `luasrc.py restore`: that gives March's bytecode), `luasrc.py refresh`, `kom.py pack` + `copy data036`, rebuild with `--pch force`.
 - **S2 (2026-11-15, `857b18cd`):** Lu/Ciel drops its 20 shadow `USI_SPECIAL_ATTACK_*` members and uses the base ids; `InitBoundingStates` / `InitWaitStateChange` replace its inline rows (inert until char-luciel `_LIVE`, `#error` guard in `Always.h`). Plan closed 2026-11-15 (Z): the exe and `data036.kom` ship together; new characters (Rose, Ain) register at June's ids and run `tools/stateids.py check`.
+
+## Stage 8 Lu/Ciel, CH1p: the in-class duo switch, combination points on hit, the bounding key (char-luciel CH1p, 2026-11-15)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO` (`//#define` until CH1 final defines it with `_LIVE`); class code under `_CORE`. Plan `JUNE_CHARACTER_LUCIEL_PHASES.md`, "CH1p - Done".
+- **What changes (once `_DUO` is on).** A user or NPC that a Lu/Ciel user bounces (user `USI_BOUNDING_UP` start, NPC `BOUNDING_LANDCRASH` start)
+  becomes that Lu/Ciel's bounding target and the strike key (`DLG_LUCIEL_BOUNDING_KEY`, the V key's name) shows for 0.5 s; `HIT_ADD_COMBINATION_POINT`
+  no longer logs as an unsupported damage key; `[JUNE_CHAR] LUCIEL DUO switch / point` lines. The unit viewer's DUO_TYPE test reads `CX2Unit::DT_BOTH`
+  (under `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY`, no behaviour change).
+- **Data (live now).** data036 `Enum.lua` (core list): June's `DUO_TYPE.DT_BOTH` 2 / `DT_KEEP` 3. data034: June's `DLG_LUCIEL_BOUNDING_KEY.lua` (new,
+  June's bytecode via `adopt-june`). Both koms packed and copied (backups `kom_backup_tools\data036.kom.20261115_125324`, `data034.kom.20261115_125325`).
+- **Revert:** keep `_DUO` commented out; data: copy the two backups back, or drop the two `DUO_TYPE` lines and the staged file and repack.

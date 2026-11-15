@@ -63,3 +63,14 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1m (2026-11-15)
 
 - The ten delegate callbacks ( checklist 7am ) are pushed by `InitPassiveSkillState` `32b45820` itself, not InitState: Ghidra data references to their thunks sit at `32b4584d` ( `32b14bc0` ), `32b4592a`, `32b459b5`, `32b45eeb`, `32b45f1d`, `32b461c6`, `32b462da`, `32b463fc`, all inside `32b45820`-`32b46580`. CH1m's InitState only calls vslot 0x690, so they are written with `InitPassiveSkillState`.
+
+## Amended by char-luciel CH1p (2026-11-15)
+
+- `InitPassiveSkillState` `32b45820`'s first push ( @`32b4583e`-`32b45855`, thunk `32b4cee0`, onto the attack-result list `+0x66ac` right after the base
+  `31fe19d0` ) is `InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, AddCombinationPointOnHit ) )`: CH1p wrote the body
+  ( `32b14bc0` ), this phase writes the push. Until then no hit adds `HIT_ADD_COMBINATION_POINT`.
+- The same function stores `+0x9730` / `+0x973c`; CH1p named them from `SetBoundingTarget` `32b38cb0`: `m_fFreeBoundingStrikeRate` ( `GetRandomFloat( 0 )` <= it makes
+  the bounding strike free ) and `m_fBoundingDamageRateEx` ( >= 0 enables the bounding target at all; also the command force-down rate ). Both stay -1 without
+  the passive, so the bounding key never shows before this phase: the play-test checks the key ( V ) over a bounced enemy for 0.5 s.
+- Renamed by CH1p: `m_iLastUsedSkillID` -> `m_iPendingCombinationPoint`, `m_iBoundingStrikeCount` -> `m_iBoundingStrikeCombinationPointCost`,
+  `m_iBoundingTargetUnitIndex` -> `m_iBoundingTargetLastHitAttackSerial`, `m_fBoundingDamageRate` -> `m_fFreeBoundingStrikeRate`.

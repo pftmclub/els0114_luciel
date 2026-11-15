@@ -119,6 +119,9 @@ static void LogNoStateSkill( CX2GUUser* pUser_, const CX2SkillTree::SKILL_ID eSk
 #endif //SERV_9TH_NEW_CHARACTER
 
 #endif REDUCED_PRECOMPILED_HEADER_TEST
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+#include "./X2GULuciel.h"	// char-luciel CH1p: BoundingUpStateStart's Lu/Ciel hook
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 
 
 // dmlee 2009.3.12 백그라운드 로딩관련해서 eqip의 unit_xskinanim을 shared_ptr로 해야해서 guuser의 m_pxskinanim, m_porgxskinanim을 shared_ptr로 사용함
@@ -36561,6 +36564,20 @@ void CX2GUUser::BoundingUpStateStartFuture()
 void CX2GUUser::BoundingUpStateStart()
 {
 	CommonStateStart();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+	// char-luciel CH1p: June 31fd02d0 @31fd02dd-31fd032d, the Lu/Ciel user who last hit this unit takes it as the bounding target
+	if ( CX2GameUnit::GUT_USER == GetLastAttackerUnitType() && NULL != g_pX2Game )
+	{
+		CX2GameUnit* pLastAttacker = g_pX2Game->GetUnitByUIDAndType( GetLastAttackerUID(), GetLastAttackerUnitType() );
+		if ( NULL != pLastAttacker )
+		{
+			CX2GUUser* pLastAttackerUser = static_cast<CX2GUUser*>( pLastAttacker );
+			if ( NULL != pLastAttackerUser->GetUnit() && NULL != pLastAttackerUser->GetUnit()->GetUnitTemplet()
+				&& CX2Unit::UT_LUCIEL == pLastAttackerUser->GetUnit()->GetUnitTemplet()->m_UnitType )
+				static_cast<CX2GULuciel*>( pLastAttackerUser )->SetBoundingTarget( GetGameUnitType(), GetUnitUID(), GetLastHitAttackSerial() );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 
 	static bool s_bLogged = false;
 	if( false == s_bLogged )

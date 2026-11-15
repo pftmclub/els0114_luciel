@@ -2651,6 +2651,50 @@ Opus 5.5 high. Reviewed CH1o2 `4cd0f5c2` and CH1o3 `8b026393`. **Verdict: pass a
 - **Compile:** `/Zs` probes of `X2GUUser.cpp` after the fix, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 2 x 0 errors, 0 warnings. Full build skipped: no play-test.
 - **Next:** `/x2-phase char-luciel CH1p` ( Opus 5.5 high; kickoff checked, its dependencies are done ).
 
+### CH1p - Done (2026-11-15)
+
+Opus 5.5 high. New flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO`, **`//#define`** like `_LIVE` ( CH1 final defines both; `#error`s without `_CORE` ); class code under `_CORE`;
+one enum-name line under `JUNE_CHAR_DUO_BODY`. No debug define. funcmap: `grep "(CH1p)" june2017_re/funcmap.tsv` ( 5 rows ). `JUNE_BUGS.md` 723 withdrawn, 726, 727. `MODS.md` section.
+- **Already done before this phase ( checked, no change ):** `DUO_TYPE` at state start ( DU1b, `ApplyDuoTypeAtStateStart`, DU1 review's `CX2Unit::DT_*` ), `MINOR_UNIT_ANIM_NAME`
+  ( DU1b ), `MINOR_UNIT_SPEED_TIME0-4` / `_ULTIMATE` and `MINOR_UNIT_PASSIVE_SPEED_*` ( DU1b4 ), `CP_AMOUNT` into vslot 0x648 ( CH1o ), the switch itself
+  ( `DoProcessWhenActiveBodyChangeApplied`, CH1o ), the bounding key dialog's load ( CH1k ) and hide timer ( CH1l3 ), `CUSTOM_RENDER_STATE` in `Enum.lua` ( char-ara CH1 ).
+- **`AddCombinationPointOnHit` `32b14bc0`** ( thunk `32b4cee0` ): DamageData `+0x594` > 0 and `!( 0 < +0x96a8 )` ( June's FCOMP lets a NaN through ) -> `UpCombinationPoint`,
+  cool time 1.0. Its push sits in `InitPassiveSkillState` `32b45820` @`32b4583e`-`32b45855` ( attack-result list `+0x66ac` ), a CH4a function: **routed to CH4a** ( kickoff
+  amended, one line ), so until CH4a no hit adds points.
+- **`SetBoundingTarget` `32b38cb0`** ( CH0 filed it `not-luciel`, no owner; it is the "key dialog" half of this row ): exits on `m_fBoundingDamageRateEx` < 0 or NaN ( -1 until CH4a's
+  passive ), uid < 0, `GetRidingOn`, or a held target whose serial matches `+0x96ec` ( only ever -1: JUNE_BUGS 727 ); cost = `GetRandomFloat( 0 )` <= `+0x9730` ? 0 : 1, more than the points
+  -> exit; `GetUserUnitByUID` / `GetNPCUnitByUID` by type; then 0.5 s show time, the key, both flags cleared, `SetShow( true )`, static `DLG_LUCIEL_BOUNDING_KEY` gets
+  `GetKeyString( GAMEACTION_SIT )` ( June 0x27 = V, as March's ported switching guide ). June's handle hands a unit without the dialog a dummy one: March returns on NULL.
+- **`UpdateBoundingKeyDialogPosition` `32b35cf0`:** `GetPos( true )` +/- `GetDirVector` x 100 by `GetIsRight`, y + 208, `GetProj3DPos` / resolution scale -> `SetPos`; then
+  the dialog's size / ( camera-eye distance / 1500 ), stored back. **Offsets proved:** June app `+0x1b8` = `GetResolutionScaleX` ( `31cce300` reads it the same way; March `+0x1a0` );
+  June dialog `+0x120` = `m_vSize` ( June ctor `31cd9230`: `+0x128` byte, `+0x12c` = 512 / 384, `+0x134` = 1024 / 768 = March's drag-range defaults; March `m_vSize` is `+0x110`,
+  offsetprobe ). The size compounds call after call: JUNE_BUGS 726 ( March's `m_vSize` only feeds the drag clamp ).
+- **Engine hooks ( `_DUO` ):** `CX2GUUser::BoundingUpStateStart` after `CommonStateStart` ( June `31fd02d0` @`31fd02dd`-`32d` ) and `CX2GUNPC` state start after March's bounding-up block
+  when `nowState == mBoundingLandCrash` ( June `3275a070` @`3275a0ac`-`111`, unguarded as June ): last attacker a user ( `+0x40e8` 0 ) found by `GetUnitByUIDAndType` ( June `32294460` )
+  whose templet type is `UT_LUCIEL` -> `SetBoundingTarget( GetGameUnitType(), GetUnitUID(), GetLastHitAttackSerial() )`. Both files include `X2GULuciel.h` under `_DUO`.
+- **`HIT_ADD_COMBINATION_POINT`** stops calling `DamageDataUnsupportedInt` under `_DUO` ( `X2DamageManager.cpp`, March's lines in `#else` ). **`X2UnitManager.cpp:297`** ( DU1 review route ):
+  `2` -> `CX2Unit::DT_BOTH`, nested `#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` ( the enum's own flag ) inside `JUNE_UNIT_VIEWER_EFFECT_TABLE`'s block.
+- **Sub-tag `DUO` lines ( `_DUO`, throttled 1 s each ):** `[JUNE_CHAR] LUCIEL DUO switch: active body %s, state, DUO_TYPE, CP_AMOUNT, pending points` in
+  `DoProcessWhenActiveBodyChangeApplied`; `LUCIEL DUO point: +%d on hit ( HIT_ADD_COMBINATION_POINT ), now %d` in `AddCombinationPointOnHit`.
+- **Renames ( CH1l3 assigned the first ):** `m_iLastUsedSkillID` -> `m_iPendingCombinationPoint` ( a non-skill state's `CP_AMOUNT`, paid by `SpecialAttackCooldown`: JUNE_BUGS 723 was this
+  misreading, withdrawn ), `m_iBoundingStrikeCount` -> `m_iBoundingStrikeCombinationPointCost`, `m_iBoundingTargetUnitIndex` -> `m_iBoundingTargetLastHitAttackSerial`,
+  `m_fBoundingDamageRate` -> `m_fFreeBoundingStrikeRate`; `ch1_offsets.tsv` rows follow.
+- **Data ( live ):** data036 `Enum.lua` ( core list ) `DUO_TYPE` gains June's `DT_BOTH` 2 / `DT_KEEP` 3 ( `luasrc.py refresh`, `ledger --check` PASS, `core --check` PASS, core-list row `edit:` note );
+  data034 `DLG_LUCIEL_BOUNDING_KEY.lua` adopted ( June's bytecode, new; `luabind.py check` PASS; texture key `LUCIEL_ZX_UI_NO` present, June's `DLG_UI_Image_01` = March's ).
+  `PACK OK data036`, `PACK OK data034`; `COPY OK data036` md5 `5ed5408e`, `COPY OK data034` md5 `172076a0`. `luabind.py check Luciel_Duo Luciel_Demonio`: `DUO_TYPE` resolves;
+  the one ENUM gap left is `SKILL_ID.RNSI_A_LLD_BLUFF` ( CH1's kickoff names it ).
+- **Not ported here ( routed ):** `NOT_SHOW_UNIT_BY_DUOTYPE` ( June `CommonStateStart` @`320618a8`-`3206194c` ): its members and consumer `3204e4a0` read the equip's minor-unit byte, DU1d5
+  gave the key to **DU3** ( kickoff amended with the parse: four members, -9999.0 default ). The delegate push: **CH4a**.
+- **Gates:** `finish.py --files <7 code files> --with JUNE_CHAR_LUCIEL_DUO JUNE_CHAR_DUO_BODY`: junediverge PASS, enumscan exit 0; the two flagcheck FAILs are tool limits, so per flag:
+  `_DUO --worktree` ( Always.h, X2GUUser, X2GUNPC, X2DamageManager, X2GULuciel ): `3 PASS, 1 DEFINE, 1 OTHER ( _CORE's file ), 0 FAIL, 0 ERROR`, 0 deleted, only complaint "not #defined"
+  ( deferred like `_LIVE`; finish.py's INERT test keys on `_LIVE` names ); `DUO_BODY --files X2UnitManager.cpp`: `1 PASS` / PASS ( with Always.h it ERRORs on DIVERGE_PLAY_SOUND_REVIVE's
+  `#if defined && !defined` guard ); `_CORE --with _DUO --files X2GULuciel.cpp X2GULuciel.h`: `2 PASS, 0 FAIL` / PASS, 14 deleted = the renamed lines and two rewritten comments, all inside `_CORE`.
+- **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GULuciel.cpp`, `X2GUUser.cpp`, `X2GUNPC.cpp`, `X2DamageManager.cpp`, `X2UnitManager.cpp`: plain 5 x 0 errors; with `-D_DUO -D_LIVE`
+  5 x 0 errors ( the first run caught `CX2OfflineLog` missing in `X2GULuciel.cpp`: include added under `_DUO` ). Full build skipped: no play-test.
+- **How to see it in game:** nothing yet ( `_DUO` / `_LIVE` off ). From CH1: a body swap logs `LUCIEL DUO switch`; from CH4a: points on combo hits and the V key over a bounced enemy.
+- **Watch ( CH4a play-test ):** the key dialog is `SetModal( true )` in June's script; if V does not reach the strike while it shows, that is the modal flag, not the port.
+- **Next:** `/x2-phase char-luciel CH1p review` ( Opus 5.5 high ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

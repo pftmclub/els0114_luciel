@@ -21,6 +21,9 @@
 #ifdef SERV_IRUHADEV_JUNE_SOUND_SET_PICK_DEBUG
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_JUNE_SOUND_SET_PICK_DEBUG
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+#include "./X2GULuciel.h"	// char-luciel CH1p: CommonStateStart's Lu/Ciel bounding hook
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 #ifdef SERV_IRUHADEV_ELYSION_DEBUG
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_ELYSION_DEBUG
@@ -18229,6 +18232,20 @@ void CX2GUNPC::CommonStateStart()
 #endif SERV_IRUHADEV_JUNE_BOUNDING_STATE_DEBUG
 	}
 #endif SERV_IRUHADEV_JUNE_BOUNDING_STATE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
+	// char-luciel CH1p: June 3275a070 @3275a0ac-3275a111, entering BOUNDING_LANDCRASH makes this NPC the bounding target of the Lu/Ciel user who last hit it
+	if ( m_NPCFrameData.syncData.nowState == mBoundingLandCrash && CX2GameUnit::GUT_USER == GetLastAttackerUnitType() && NULL != g_pX2Game )
+	{
+		CX2GameUnit* pLastAttacker = g_pX2Game->GetUnitByUIDAndType( GetLastAttackerUID(), GetLastAttackerUnitType() );
+		if ( NULL != pLastAttacker )
+		{
+			CX2GUUser* pLastAttackerUser = static_cast<CX2GUUser*>( pLastAttacker );
+			if ( NULL != pLastAttackerUser->GetUnit() && NULL != pLastAttackerUser->GetUnit()->GetUnitTemplet()
+				&& CX2Unit::UT_LUCIEL == pLastAttackerUser->GetUnit()->GetUnitTemplet()->m_UnitType )
+				static_cast<CX2GULuciel*>( pLastAttackerUser )->SetBoundingTarget( GetGameUnitType(), GetUnitUID(), GetLastHitAttackSerial() );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 #ifdef SERV_IRUHADEV_JUNE_NPC_STATE_START_EFFECT_SET
 	/// June CX2GUNPC::CommonStateStart 327ac9d0 @327af3c5-327af3d7 ( C3o ): after the bounding UP write ( and the +0x40dc reset, checklist 7l ), June runs
 	/// the state's effect-set list once at state start: GetNowAnimationTime() ( NPC vslot 0x3bc = 32755be0: m_pXSkinAnim's now time, -1 without one ) into

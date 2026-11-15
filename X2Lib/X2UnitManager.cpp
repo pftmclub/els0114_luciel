@@ -294,7 +294,11 @@ bool CX2UnitManager::GetUnitViewerEffectSet( const std::wstring& wstrMotion, CX2
 		return false;
 	if( 0 != kRow.m_iUnitClass && kRow.m_iUnitClass != static_cast<int>( eUnitClass ) )
 		return false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+	if( CX2Unit::DT_BOTH != iDuoType && iDuoType != kRow.m_iDuoType )	// char-luciel CH1p: June's DUO_TYPE name ( DU1 review route )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	if( 2 != iDuoType && iDuoType != kRow.m_iDuoType )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		return false;
 
 	wstrEffectSetName	= kRow.m_wstrEffectSetName;

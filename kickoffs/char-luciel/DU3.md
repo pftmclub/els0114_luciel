@@ -73,3 +73,10 @@ strings), `328825c0`, `32882540`. `31fd48a0`, `31fd63c0`, `32882540` have no Mar
   `m_bHideEquipByBodyApplied` (+0x8fb4), under `SERV_IRUHADEV_JUNE_CHAR_DUO_BODY` in `X2GUUser.h`. DU3 adds the window floats (+0x8fac / +0x8fb0),
   the script keys that set them, the pass itself (`CommonFrameMove` @`320661f9`) and its restore `3204df80`. `CommonRender_PrepareBody` already reads
   the three (June `31ff03d0`'s override: body 0 hidden draws the second body, 1 draws the first); JUNE_BUGS 673 is what to watch in the play-test.
+
+## Amended by char-luciel CH1p (2026-11-15)
+
+- `NOT_SHOW_UNIT_BY_DUOTYPE` ( the script key that sets the three members ) is read in `CommonStateStart` `32057b80` @`320618a8`-`3206194c` ( key `33478e98`,
+  plain ): before the read `+0x8fac` = -9999.0 ( `3347284c` ), `+0x8fb0` = 0, `+0x8fa8` = 0, `+0x8fa4` = 0; table present -> `[1]` float `+0x8fac` ( miss -9999.0 ),
+  `[2]` float `+0x8fb0` ( miss 0 ), `[3]` int `+0x8fa8` ( miss 0 ), `+0x8fa4` = 1. funcmap row `320618a8-3206194c (CH1p)`. Two Duo states use it ( `LSI_LDB_WIN`
+  `{ 1, 5, 0 }`, Luciel_Duo L3920 / L4598 ). CH1p left it here because its consumer `3204e4a0` reads the equip's minor-unit byte ( `+0x15d4` ).
