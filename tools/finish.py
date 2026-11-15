@@ -7,13 +7,18 @@
     python tools/finish.py --files ... --flag SERV_IRUHADEV_X                       # name a flag the changed lines do not show
     python tools/finish.py --files ... --skip-flag SERV_IRUHADEV_Y "guard target, not this phase's flag"
     python tools/finish.py --files ... --no-flag "comment-only edit, no behaviour"  # say why no flag applies
+    python tools/finish.py --review --commits ... --with JUNE_CHAR_LUCIEL_CORE JUNE_CHAR_LUCIEL_LIVE JUNE_USER_VIRTUAL_HOOKS
+                                                    # run ONLY these (the phase's own flags), each with the others as partners
     python tools/finish.py --files X2Lib/X2GUEL.cpp --state X2Lib/X2GUEL.cpp ELESIS_KNIGHT --icons 25000-25999 --lua ELESIS_KNIGHT
     python tools/finish.py --selftest
 
 Flags run are those on a changed directive line (#if / #ifdef / #elif / #else / #endif / #define) and those of the INNERMOST #if block that
 encloses a changed line (a body edit inside `#ifdef SERV_IRUHADEV_X` names X though the diff never shows the directive). Outer enclosing
 flags are printed on one INFO line and not run (the change sits inside their blocks; --flag NAME runs one). A changed commented-out
-`//#define X` is `retired` and checks nothing (a debug retire). Runs, for the code files given:
+`//#define X` is `retired` and checks nothing (a debug retire).
+--with FLAG ...: the change's own flags. Only they run (plus --flag), each with the other partners passed to flagcheck --with, so one
+flag's lines never read as a flag-off diff of its partner; every other flag found (another character's guard, an enclosing block) goes
+on one INFO line, not run. Use it for a review of a multi-flag phase. Runs, for the code files given:
   flagcheck   once per flag run / given (every *_DEBUG flag found is passed as --with to each run); --worktree --files for
               --files, --range for --range, --commits for --commits. A passing flag prints its `files:` line; -v lists the OTHER rows
   junediverge --check <files under X2 / X2Lib / KTDXLIB>; --review adds --check-all (which opens only files with a June flag)
@@ -253,6 +258,8 @@ def main():
     ap.add_argument("--commits", nargs="+", default=[], help="commits, each checked as c^..c")
     ap.add_argument("--review", action="store_true", help="also run junediverge --check-all (a review)")
     ap.add_argument("--flag", nargs="+", default=[], help="flags to check in addition to those found")
+    ap.add_argument("--with", dest="partners", nargs="+", default=[], metavar="FLAG",
+                    help="the change's own flags: run only these, each with the others as flagcheck --with partners")
     ap.add_argument("--skip-flag", nargs=2, action="append", metavar=("FLAG", "REASON"), default=[])
     ap.add_argument("--no-flag", metavar="REASON", help="client files changed but no SERV_IRUHADEV_ flag applies: say why")
     ap.add_argument("--state", nargs=2, action="append", metavar=("CLASS_FILE", "SCRIPT"), default=[])
@@ -310,12 +317,18 @@ def main():
     retired -= flags
     for f in sorted(retired):
         rows.append(("flagcheck " + f.replace("SERV_IRUHADEV_", ""), "SKIPPED", "retired: its #define is commented out, nothing left to check", [], ""))
-    if outer - flags - retired:
+    partners = {f if f.startswith("SERV_IRUHADEV_") else "SERV_IRUHADEV_" + f for f in a.partners}
+    if partners:
+        partners |= {f if f.startswith("SERV_IRUHADEV_") else "SERV_IRUHADEV_" + f for f in a.flag}
+    if outer - flags - retired and not partners:
         rows.append(("enclosing flags (not run)", "INFO", ", ".join(sorted(x.replace("SERV_IRUHADEV_", "") for x in outer - flags - retired))
                      + "  (the change sits inside their blocks; add --flag NAME to run one)", [], ""))
-    debug = sorted(f for f in flags if f.endswith("_DEBUG"))
-    base = sorted(f for f in flags if f not in debug) or debug
-    withs = [d for d in debug if d not in base]
+    base, withs_of, not_run = plan_flags(flags, partners, set(skip) | retired)
+    if partners:
+        not_run = (not_run | outer) - partners - retired - set(skip)
+    if not_run:
+        rows.append(("other flags (not run, --with)", "INFO", ", ".join(sorted(x.replace("SERV_IRUHADEV_", "") for x in not_run))
+                     + "  (found on the changed lines; not this change's)", [], ""))
 
     if not code:
         rows.append(("code gates", "SKIPPED", "no source file among the changes", [], ""))
@@ -333,8 +346,8 @@ def main():
                 cmd += ["--commits"] + a.commits
             else:
                 cmd += ["--worktree", "--files"] + code
-            if withs:
-                cmd += ["--with"] + withs
+            if withs_of(f):
+                cmd += ["--with"] + withs_of(f)
             gate("flagcheck " + f.replace("SERV_IRUHADEV_", ""), cmd, rows, flag=f)
         if client_now:
             gate("junediverge", [PY, "tools/junediverge.py", "--check"] + client_now, rows)
@@ -379,6 +392,20 @@ def main():
     gates = sum(1 for r in rows if r[1] != "INFO")
     print("FINISH RESULT: %s (%d gates, %d failed, %d skipped)" % ("FAIL" if bad else "PASS", gates, bad, skipped))
     return 1 if bad else 0
+
+
+def plan_flags(flags, partners, skipped=()):
+    """-> (flags to run, f -> its flagcheck --with list, found flags not run). No partners: every found non-debug flag runs alone
+    with the found _DEBUG flags. Partners: only they (and any --flag already in `flags` that is a partner) run, each with the other
+    partners and the found _DEBUG flags; the rest of `flags` is reported, not run."""
+    debug = sorted(f for f in flags | set(partners) if f.endswith("_DEBUG") and f not in skipped)
+    if not partners:
+        base = sorted(f for f in flags if f not in debug) or debug
+        withs = [d for d in debug if d not in base]
+        return base, (lambda f: withs), set()
+    run = sorted(f for f in partners if f not in skipped and f not in debug) or [d for d in debug if d in partners]
+    not_run = set(flags) - set(partners) - set(debug)
+    return run, (lambda f: sorted((set(partners) | set(debug)) - {f} - set(skipped))), not_run
 
 
 def selftest():
@@ -430,6 +457,13 @@ def selftest():
     chk(len(flagcheck_detail(fc_out)) == 3, "detail keeps summary lines and non-PASS rows")
     chk(len(flagcheck_detail(fc_out, brief=True)) == 1, "brief keeps only the files: line when every count is zero")
     chk(len(flagcheck_detail(fc_out.replace("0 deleted", "2 deleted"), brief=True)) == 2, "brief adds the flag-files line when a count is non-zero")
+    S2 = lambda *n: {"SERV_IRUHADEV_" + x for x in n}
+    b, w, nr = plan_flags(S2("A", "B_DEBUG"), set())
+    chk(b == sorted(S2("A")) and w("SERV_IRUHADEV_A") == sorted(S2("B_DEBUG")) and not nr, "no partners: found flags run, debug as --with")
+    b, w, nr = plan_flags(S2("CORE", "LIVE", "RAVEN_LIVE", "ARA_LIVE", "X_DEBUG"), S2("CORE", "LIVE", "HOOKS"))
+    chk(b == sorted(S2("CORE", "HOOKS", "LIVE")), "partners: only partners run (even one not found)")
+    chk(w("SERV_IRUHADEV_LIVE") == sorted(S2("CORE", "HOOKS", "X_DEBUG")), "partners: each runs with the others and the debug flag")
+    chk(nr == S2("RAVEN_LIVE", "ARA_LIVE"), "partners: other characters' guard flags are reported, not run")
     fc = os.path.join(ROOT, "tools", "flagcheck.py")
     try:
         with open(fc, "r", encoding="utf-8", errors="replace") as fh:

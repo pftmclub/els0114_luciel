@@ -128,7 +128,9 @@ step needs the answer, otherwise let it run). The user has authorised this for O
    (or `--commits c1 c2`), never `^..HEAD` (it runs past 580 s on a busy branch) and paste that block too. **A review** runs
    `python tools/finish.py --review --commits <the reviewed phases' commits>` (a `--range` takes in every peer commit between them, with
    their flags; `--review` adds `junediverge --check-all` on top of the per-file check). It runs flagcheck for the flags on changed directive
-   lines and the innermost enclosing block; outer enclosing flags are listed on one `INFO` line (`--flag NAME` runs one). A flag it finds that
+   lines and the innermost enclosing block; outer enclosing flags are listed on one `INFO` line (`--flag NAME` runs one). When the phase owns
+   several flags (`_CORE`, `_LIVE`, a hook flag), add `--with <its flags>`: only they run, each with the others as partners (no false
+   flag-off FAIL from a partner's lines), and every other flag found (other characters' `_LIVE` guards) is one `INFO` line. A flag it finds that
    the phase does not own (the target of an `#error X needs Y` guard) is `--skip-flag NAME "reason"`; when no flag applies, `--no-flag
    "reason"` (quote a multi-word reason). A commented-out `//#define` (a debug retire) is listed as `retired` and checks nothing. A client edit
    with no flag left to check is a FAIL, never a silent pass. `INERT` (a `_LIVE` flag not yet defined) is not a fail; every `SKIPPED` is a

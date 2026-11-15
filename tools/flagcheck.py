@@ -310,6 +310,58 @@ def loose(data):
     return [body(l) for l in split_lines(data) if body(l).strip() and not MARKER.match(body(l))]
 
 
+FLAG_NAME = re.compile(rb"SERV_IRUHADEV_\w+")
+
+
+def _flags_at(lines, changed):
+    """SERV_IRUHADEV_ names of every #if frame open at a changed line, plus those on a changed directive line."""
+    out, stack = set(), []
+    for i, line in enumerate(lines):
+        m = DIRECTIVE.match(body(line))
+        own = set(FLAG_NAME.findall(m.group(2))) if m else set()
+        if m:
+            kw = m.group(1)
+            if kw in (b"if", b"ifdef", b"ifndef"):
+                stack.append(set(own))
+            elif kw == b"elif" and stack:
+                stack[-1] |= own
+            elif kw == b"endif" and stack:
+                stack.pop()
+        if i in changed:
+            out |= own
+            for s in stack:
+                out |= s
+    return out
+
+
+def owner_candidates(old, new, others):
+    """The flags among `others` whose blocks enclose a changed line (either side). Only these can own the change, so the
+    per-flag attribution loop strips for them alone instead of for every flag the file names (330 strips -> ~1)."""
+    import difflib
+    lo, ln = split_lines(old or b""), split_lines(new or b"")
+    co, cn = set(), set()
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, lo, ln).get_opcodes():
+        if tag != "equal":
+            co.update(range(i1, max(i2, i1 + 1)))
+            cn.update(range(j1, max(j2, j1 + 1)))
+    names = {n.decode() for n in _flags_at(lo, co) | _flags_at(ln, cn)}
+    return sorted(names & set(others))
+
+
+def attribute(old, new, others):
+    """Which of `others` the change belongs to: o is involved if stripping every other flag still leaves a diff."""
+    cands = owner_candidates(old, new, others)
+    changed = []
+    for o in cands:
+        rest = set(others) - {o}
+        try:
+            if loose(strip(new or b"", rest)) != loose(strip(old or b"", rest)):
+                changed.append(o)
+        except Unevaluable:
+            changed.append(o + "(?)")
+    return changed or cands or sorted(others)
+
+
 def first_diff(a, b):
     la, lb = split_lines(a), split_lines(b)
     for i in range(max(len(la), len(lb))):
@@ -401,12 +453,7 @@ def classify(path, old, new, flag, extra=()):
                 if a != b and define_file_only(b, a):
                     return "OTHER", "%s: other flags' comments/defines" % os.path.basename(path), stats["tok"]
             if a == b or loose(a) == loose(b):
-                changed = []
-                for o in sorted(others):  # o is involved if stripping everything else still leaves a diff
-                    rest = others - {o}
-                    if loose(strip(s_new, rest)) != loose(strip(s_old, rest)):
-                        changed.append(o)
-                return "OTHER", "change belongs to: %s" % ", ".join(changed or sorted(others)), stats["tok"]
+                return "OTHER", "change belongs to: %s" % ", ".join(attribute(s_old, s_new, others)), stats["tok"]
         except Unevaluable:
             pass
     d = first_diff(s_old, s_new)
@@ -479,8 +526,7 @@ def classify_unflagged(path, old, new):
     except Unevaluable as e:
         return "ERROR", str(e)
     if a == b or loose(a) == loose(b):
-        changed = [o for o in sorted(others) if loose(strip(new or b"", others - {o})) != loose(strip(old or b"", others - {o}))]
-        return "OTHER", "file does not mention the flag; change belongs to: %s" % ", ".join(changed or sorted(others))
+        return "OTHER", "file does not mention the flag; change belongs to: %s" % ", ".join(attribute(old, new, others))
     d = first_diff(b, a)
     note = "UNFLAGGED change in a file that does not mention the flag"
     if d:
