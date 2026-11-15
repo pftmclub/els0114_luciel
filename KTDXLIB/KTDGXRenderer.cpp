@@ -1815,6 +1815,9 @@ HRESULT	CKTDGXRenderer::OnLostDevice()
 #ifdef X2OPTIMIZE_SETSHADERCONSTANT
 	if ( m_pEffect != NULL )
 	{
+#ifdef SERV_IRUHADEV_JUNE_RENDER_EFFECT_STATE_LOST
+		return m_pEffect->OnLostDevice();	// June 31d3c090: the effect only; the state manager has its own lost-device handler ( CKTDXApp::OnLostDevice )
+#endif SERV_IRUHADEV_JUNE_RENDER_EFFECT_STATE_LOST
 		HRESULT hr = m_pEffect->OnLostDevice();
 		if( SUCCEEDED( hr ) && g_pEffectStateManager )
 		{

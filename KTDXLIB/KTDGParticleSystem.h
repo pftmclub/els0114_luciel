@@ -1341,6 +1341,15 @@ class CKTDGParticleSystem
 				BYTE GetEffectAlphaCondition() const { return m_byEffectAlphaCondition; }
 				DWORD ApplyEffectAlphaToColor( DWORD dwColor ) const;	/// June2017 31cf4ed0 @31cf580e: vertex colour with this category's alpha
 #endif SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				DWORD GetColorWithSequenceAlpha( const D3DXCOLOR& color ) const;	/// June2017 31cf4ed0 @31cf562b / 31cf62a0 @31cf65d0: vertex colour, alpha times the sequence's +0x1ac float
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+				float ClampOutlineWidth( float fOutLineWide ) const;	/// June2017 31cfe050: the clamp half ( min with 1.2 for the UI systems, else 999 )
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+				void ApplyEffectAlphaToRenderParam( CKTDGXRenderer::RenderParam* pRenderParam ) const;	/// June2017 31ceefb0 on a skin-mesh particle's render param
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
 #ifdef SERV_IRUHADEV_JUNE_PARTICLE_TRACE_INHERIT
 				void SetOutOfDGManager( bool bVal ){ m_bOutOfDGManager = bVal; }	/// June2017 sequence +0x45a
 #endif SERV_IRUHADEV_JUNE_PARTICLE_TRACE_INHERIT
@@ -1670,6 +1679,9 @@ class CKTDGParticleSystem
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
 				BYTE							m_byEffectAlphaCondition;	/// June2017 CParticleEventSequence +0x1b0 (ctor default 0 @31cf795b): APPLY_EFFECT_ALPHA_CONDITION_BY_OPTION
 #endif SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				float							m_fSequenceAlphaRate;	/// June2017 CParticleEventSequence +0x1ac ( ctor 1.0 @31cf7953; nothing in the exe writes it )
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 #ifdef SERV_IRUHADEV_JUNE_PARTICLE_TRACE_INHERIT
 				bool							m_bOutOfDGManager;	/// June2017 +0x45a ( ctor 0 @31cf7b27 ): the unit viewer took it out of the DG manager
 #endif SERV_IRUHADEV_JUNE_PARTICLE_TRACE_INHERIT
@@ -2183,6 +2195,10 @@ class CKTDGParticleSystem
 #ifdef  X2OPTIMIZE_HANDLE_VALIDITY_CHECK
         unsigned char GetSystemID()                     { return m_ucSystemID; }
 #endif  X2OPTIMIZE_HANDLE_VALIDITY_CHECK
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+        int     GetSystemKind() const                   { return m_iSystemKind; }	/// June2017 particle system +0xdc ( ctor -1; X2Data sets 2 / 3 on the UI systems, 0 / 1 on the game ones )
+        void    SetSystemKind( int iSystemKind )        { m_iSystemKind = iSystemKind; }
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 
 #ifdef  X2OPTIMIZE_PARTICLE_AND_ETC_INFINITE_LOOP_BUG_FIX
          bool   IsInCriticalLoop() const { return m_bInCriticalLoop; }
@@ -2299,6 +2315,9 @@ private:
 #ifdef  X2OPTIMIZE_HANDLE_VALIDITY_CHECK
         unsigned char                           m_ucSystemID;
 #endif  X2OPTIMIZE_HANDLE_VALIDITY_CHECK
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+        int                                     m_iSystemKind;	/// June2017 +0xdc ( ctor -1 @31cf8a40 )
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 
 #ifdef  X2OPTIMIZE_CULLING_PARTICLE
         static bool                             ms_bParticleCullingEnabled;

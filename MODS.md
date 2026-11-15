@@ -7214,3 +7214,17 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER` (`Always.h`; `#error` without `..._
 No flag, no exe change. `kom.py stage-june june2017_re/char_add/ch0b_stage_list.tsv`: 7,686 June files byte-exact in 29 koms (7,635 new, 49 replaced, 2 identical); the 49 March copies are backed up under `kom_backup_stage_june/20261115_215318` and listed in `june2017_re/char_add/ch0b_replaced.tsv` (data021 1, data033 5 = `Motion_ADD` / `_Common` / `_Field` / `_Lobby` / `Motion_Add_Emotion`, data050 1, data052 6, data063 2, data130 1, data147 6, data148 23, data150 4). New kom **data207** (57 June-only motions). `adopt-june` (bytecode): `DLG_1ST_` / `DLG_2ND_Class_Change_Guide_Add` (new, data034), `Class_Change_Guide_Add` (data034, replaced; backup `20261115_215415`), `DLG_Class_Change_Add_LP` / `_PT` (data034, replaced; backup `20261115_215419`), `DLG_Class_Change_Add_AT` / `_DE` / `_MM` / `_TT` (new, data217). Held for CH1 final, not staged: `Motion_ADD_PT.X`, `Motion_ADD_LP.x` (March's copies stay). Skill icons: June's `DLG_Add_SKILL_ScreenShot_03.TET` lacks the Apocalypse piece (`JUNE_BUGS.md` 744).
 
 **Revert.** Restore the replaced files from the backup folders, `kom.py pack` / `copy` the koms; `data207.kom` and `data217.kom` can be deleted from the game dir if they were not there before. Saves `AddNR40` (uid 200) and `AddLP99` (uid 201) are in `els_db.sql`; the pre-phase snapshot is `db_backup/els_db_20261115_220214_pre_pre_CH0b_add.sql`.
+
+## June engine R9: render small deltas (june-engine R9, 2026-11-15)
+
+Six flags in `Always.h`: `SERV_IRUHADEV_JUNE_RENDER_PARTICLE_ADD_TYPES`, `_PARTICLE_EFFECT_ALPHA_PATHS` (`#error` without `..._JUNE_EFFECT_ALPHA_OPTION`), `_PARTICLE_SEQ_ALPHA`, `_PARTICLE_OUTLINE_CLAMP`, `_RENDER_EFFECT_STATE_LOST`, `_RENDER_SKINMESH_SMALL_LOADS` (`#error` without `..._JUNE_SOUND_AUTO_RELEASE`), plus the temporary `_RENDER_SMALL_DELTAS_DEBUG` (`[JUNE_ENGINE] FX small delta` lines; the R9 review retires it). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.
+- **What changes in game.**
+  - A particle `.txt` mesh render type of `RT_ADD_CARTOON_BLACK_EDGE` / `_COLOR_EDGE` / `RT_ADD_CARTOON` parses (no shipped June file uses them yet).
+  - RHW and skin-mesh particles follow the effect-alpha option (`MY_EFFECT_ALPHA` etc. in `GameOptions.lua`) like the other particle draws.
+  - Mesh and skin-mesh particles of the UI particle systems cap their outline width at 1.2 (every system at 999).
+  - The effect state manager is reset by `CKTDXApp::OnLostDevice`, not by the renderer.
+  - A skin mesh looks its XET up as the id up to the last `.` plus `.XET`, and closes the XET and its textures by pointer.
+  - Sequence alpha `+0x1ac` is multiplied into the four particle draws and stays 1.0 (no writer in June).
+- **Differs from March.** March accepted only four mesh render types, skipped the option in the RHW and skin-mesh draws, had no outline cap, reset the state manager from the renderer, appended `ET` to the id and closed by id.
+- **Files.** `KTDGParticleSystem.h/.cpp` (parser, draws, `m_fSequenceAlphaRate`, `m_iSystemKind`), `X2Data.cpp` (the four Reset functions set the kind), `KTDXApp.cpp` / `KTDGXRenderer.cpp` (lost device), `KTDXDeviceXSkinMesh.cpp` (XET name, close by pointer).
+- **Revert:** comment out the flag(s) (and `_RENDER_SMALL_DELTAS_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Each item reverts on its own.

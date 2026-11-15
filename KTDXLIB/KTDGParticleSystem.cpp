@@ -80,6 +80,9 @@ CKTDGParticleSystem::CKTDGParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice
 #ifdef  X2OPTIMIZE_HANDLE_VALIDITY_CHECK
     m_ucSystemID = ucSystemID & 0x3;
 #endif  X2OPTIMIZE_HANDLE_VALIDITY_CHECK
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+    m_iSystemKind = -1;		/// June2017 31cf8a40
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 
 #ifdef  X2OPTIMIZE_PARTICLE_AND_ETC_INFINITE_LOOP_BUG_FIX
     m_bInCriticalLoop = false;
@@ -2742,6 +2745,9 @@ CKTDGParticleSystem::CParticleEventSequence::CParticleEventSequence( CKTDGPartic
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
 	m_byEffectAlphaCondition	= 0;		/// June2017 31cf795b
 #endif SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+	m_fSequenceAlphaRate		= 1.0f;		/// June2017 31cf7953
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 #ifdef SERV_IRUHADEV_JUNE_PARTICLE_TRACE_INHERIT
 	m_bOutOfDGManager		= false;	/// June2017 31cf7b27
 #endif SERV_IRUHADEV_JUNE_PARTICLE_TRACE_INHERIT
@@ -2910,6 +2916,76 @@ DWORD CKTDGParticleSystem::CParticleEventSequence::ApplyEffectAlphaToColor( DWOR
 	return (DWORD) colorOut;
 }
 #endif SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+static void LogSmallDelta( int iItem, const char* szItem, float fValue )
+{
+	static int s_aiLogCount[ 4 ] = { 0, 0, 0, 0 };
+	if( iItem < 0 || iItem >= 4 || s_aiLogCount[ iItem ] >= 6 )
+		return;
+
+	++s_aiLogCount[ iItem ];
+	KLOG( "ErrorLog.txt" ) << "[JUNE_ENGINE] FX small delta " << szItem << ": " << fValue << fileout;
+}
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+/// June2017 31cf4ed0 @31cf562b / 31cf62a0 @31cf65d0: the colour's alpha times the sequence's +0x1ac float, then D3DXCOLOR -> DWORD
+DWORD CKTDGParticleSystem::CParticleEventSequence::GetColorWithSequenceAlpha( const D3DXCOLOR& color ) const
+{
+	D3DXCOLOR colorOut = color;
+	colorOut.a = m_fSequenceAlphaRate * color.a;
+	return (DWORD) colorOut;
+}
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+namespace _CONST_PARTICLE_R9_
+{
+	const int	iSystemKindUIMajor	= 2;		/// June2017 31ede2d0: X2Data's UI major particle system ( no enum names it )
+	const int	iSystemKindUIMinor	= 3;		/// June2017 31ede39c: the UI minor one
+	const float	fOutlineWideMaxUI	= 1.2f;		/// June2017 3344ce94
+	const float	fOutlineWideMax		= 999.0f;	/// June2017 3344ce90
+}
+using namespace _CONST_PARTICLE_R9_;
+
+/// June2017 31cfe050 after the 700 / 1000 rule ( kept inline in the draws ): min( width, 1.2 ) for the UI systems, else min( width, 999 ); no system, no clamp
+float CKTDGParticleSystem::CParticleEventSequence::ClampOutlineWidth( float fOutLineWide ) const
+{
+	if( NULL == m_pParticleSystem )
+		return fOutLineWide;
+
+	const int iSystemKind = m_pParticleSystem->GetSystemKind();
+	const float fMaxWide = ( iSystemKindUIMajor == iSystemKind || iSystemKindUIMinor == iSystemKind ) ? fOutlineWideMaxUI : fOutlineWideMax;
+	if( fMaxWide <= fOutLineWide )
+	{
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+		if( fMaxWide < fOutLineWide )
+			LogSmallDelta( 3, "outline width clamped from", fOutLineWide );
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+		return fMaxWide;
+	}
+	return fOutLineWide;
+}
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+/// June2017 31ceefb0 ( called @31cf18d1 ): the option's alpha for this sequence's category on a skin-mesh particle's render param
+void CKTDGParticleSystem::CParticleEventSequence::ApplyEffectAlphaToRenderParam( CKTDGXRenderer::RenderParam* pRenderParam ) const
+{
+	const float fEffectAlpha = g_pKTDXApp->GetEffectAlpha( m_byEffectAlphaCondition );
+	if( NULL == pRenderParam || fabs( fEffectAlpha - 1.0f ) <= FLT_EPSILON )
+		return;
+
+	pRenderParam->srcBlend = D3DBLEND_SRCALPHA;
+	if( D3DBLEND_INVSRCCOLOR != pRenderParam->destBlend && D3DBLEND_DESTALPHA != pRenderParam->destBlend )
+		pRenderParam->destBlend = D3DBLEND_INVSRCALPHA;
+	pRenderParam->outLineColor.a *= fEffectAlpha;
+	pRenderParam->color.a *= fEffectAlpha;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+	LogSmallDelta( 2, "skin mesh particle effect alpha", fEffectAlpha );
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+}
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
 CKTDGParticleSystem::CParticleEventSequence::~CParticleEventSequence()
 {
 	ClearAllParticle();
@@ -4058,6 +4134,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE(
 				pVertices->position.y = v4temp.y;
 				pVertices->position.z = v4temp.z;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );	// June 31cf4ed0 @31cf562b
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 				pVertices->tex.x = 0.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 0.0f + pPart->GetTexStage0UV().y;
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
@@ -4074,6 +4153,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE(
 				pVertices->position.y = v4temp.y;
 				pVertices->position.z = v4temp.z;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 				pVertices->tex.x = 0.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 1.0f + pPart->GetTexStage0UV().y;
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
@@ -4090,6 +4172,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE(
 				pVertices->position.y = v4temp.y;
 				pVertices->position.z = v4temp.z;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 				pVertices->tex.x = 1.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 0.0f + pPart->GetTexStage0UV().y;
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
@@ -4114,6 +4199,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE(
 				pVertices->position.y = v4temp.y;
 				pVertices->position.z = v4temp.z;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 				pVertices->tex.x = 1.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 1.0f + pPart->GetTexStage0UV().y;
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
@@ -4663,6 +4751,16 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE_
 				pVertices->position.z = v4temp.z;
 				pVertices->rhw		  = 1.0f;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );	// June 31cf62a0 @31cf65d0
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+				pVertices->color = ApplyEffectAlphaToColor( pVertices->color );	// June 31cf62a0 @31cf67a8-31cf67c0 (vertex 1)
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+				if( 1.0f != g_pKTDXApp->GetEffectAlpha( m_byEffectAlphaCondition ) )
+					LogSmallDelta( 1, "RHW particle effect alpha", g_pKTDXApp->GetEffectAlpha( m_byEffectAlphaCondition ) );
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
 				pVertices->tex.x = 0.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 1.0f + pPart->GetTexStage0UV().y;
 				pVertices++;
@@ -4677,6 +4775,12 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE_
 				pVertices->position.z = v4temp.z;
 				pVertices->rhw		  = 1.0f;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+				pVertices->color = ApplyEffectAlphaToColor( pVertices->color );	// (vertex 2)
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
 				pVertices->tex.x = 0.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 0.0f + pPart->GetTexStage0UV().y;
 				pVertices++;
@@ -4691,6 +4795,12 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE_
 				pVertices->position.z = v4temp.z;
 				pVertices->rhw		  = 1.0f;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+				pVertices->color = ApplyEffectAlphaToColor( pVertices->color );	// (vertex 3; vertices 4 and 5 copy 3 and 1)
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
 				pVertices->tex.x = 1.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 1.0f + pPart->GetTexStage0UV().y;
 				pVertices++;
@@ -4713,6 +4823,12 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRender_VERTEX_PARTICLE_
 				pVertices->position.z = v4temp.z;
 				pVertices->rhw		  = 1.0f;
 				pVertices->color = (DWORD)pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+				pVertices->color = GetColorWithSequenceAlpha( pPart->m_Color );
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+				pVertices->color = ApplyEffectAlphaToColor( pVertices->color );	// (vertex 6)
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
 				pVertices->tex.x = 1.0f + pPart->GetTexStage0UV().x;
 				pVertices->tex.y = 0.0f + pPart->GetTexStage0UV().y;
 				pVertices++;
@@ -4884,6 +5000,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRenderMesh_Draw()
 
 		renderParam.lightPos			= m_LightPos;
 		renderParam.color				= pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+		renderParam.color.a				= m_fSequenceAlphaRate * pPart->m_Color.a;	// June 31cf10c0 @31cf14b5
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 		renderParam.cartoonTexType		= CKTDGXRenderer::CTT_NORMAL;
 		if( renderParam.renderType == CKTDGXRenderer::RT_CARTOON_BLACK_EDGE 
 			|| renderParam.renderType == CKTDGXRenderer::RT_CARTOON_COLOR_EDGE )
@@ -4893,6 +5012,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRenderMesh_Draw()
 				renderParam.fOutLineWide = fDistance / 1000.0f;
 			else
 				renderParam.fOutLineWide = fDistance / 700.0f;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+			renderParam.fOutLineWide = ClampOutlineWidth( renderParam.fOutLineWide );	// June 31cf10c0 @31cf1501 ( 31cfe050 )
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 		}
 		renderParam.bAlphaBlend			= true;
 		renderParam.bZEnable			= m_bZEnable;
@@ -4907,7 +5029,7 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRenderMesh_Draw()
 		renderParam.bAlphaTestEnable = m_bAlphaTest;
 #endif
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
-		// June2017 CParticleEventSequence::OnFrameRenderMesh_Draw 31cf16b0 @31cf1888-31cf18d1, after the render-param fill: the option's alpha for this
+		// June2017 CParticleEventSequence::OnFrameRenderMesh_Draw 31cf10c0 @31cf159d-31cf1601, after the render-param fill: the option's alpha for this
 		// sequence's category (31ceefb0: SRCALPHA / INVSRCALPHA unless the dest blend is INVSRCCOLOR or DESTALPHA, outline and colour alpha multiplied).
 		{
 			const float fEffectAlpha = g_pKTDXApp->GetEffectAlpha( m_byEffectAlphaCondition );
@@ -4988,6 +5110,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRenderMesh_Draw()
 			pRenderParam->renderType		= m_MeshRenderType;
 			pRenderParam->lightPos			= m_LightPos;
 			pRenderParam->color				= pPart->m_Color;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+			pRenderParam->color.a			= m_fSequenceAlphaRate * pPart->m_Color.a;	// June 31cf16b0 @31cf17e2
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
 			pRenderParam->cartoonTexType	= CKTDGXRenderer::CTT_NORMAL;
 			if( pRenderParam->renderType == CKTDGXRenderer::RT_CARTOON_BLACK_EDGE ||
 				pRenderParam->renderType == CKTDGXRenderer::RT_CARTOON_COLOR_EDGE )
@@ -4997,6 +5122,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRenderMesh_Draw()
 					pRenderParam->fOutLineWide = fDistance / 1000.0f;
 				else
 					pRenderParam->fOutLineWide = fDistance / 700.0f;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+				pRenderParam->fOutLineWide = ClampOutlineWidth( pRenderParam->fOutLineWide );	// June 31cf16b0 @31cf1819 ( 31cfe050 )
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 			}
 			pRenderParam->bAlphaBlend		= true;
 			pRenderParam->bZEnable			= m_bZEnable;
@@ -5007,6 +5135,9 @@ void CKTDGParticleSystem::CParticleEventSequence::OnFrameRenderMesh_Draw()
 			pRenderParam->texOffsetStage0	= pPart->GetTexStage0UV();
 			pRenderParam->texOffsetStage1	= pPart->GetTexStage1UV();
 			pRenderParam->texOffsetStage2	= pPart->GetTexStage2UV();
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+			ApplyEffectAlphaToRenderParam( pRenderParam );	// June 31cf16b0 @31cf1888-31cf18d1
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
 
 			for( int i = 0; i < m_DrawCount; i++ )
 			{
@@ -6419,6 +6550,29 @@ bool CKTDGParticleSystem::CParticleEmitterTokenizer::ProcessMeshRenderType(CKTDG
 	{
 		renderType = CKTDGXRenderer::RT_CARTOON_COLOR_EDGE;
 	}	
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_ADD_TYPES
+	else if( TokenIter->m_strValue.compare( "RT_ADD_CARTOON_BLACK_EDGE" ) == 0 )
+	{
+		renderType = CKTDGXRenderer::RT_ADD_CARTOON_BLACK_EDGE;	// June 31cf3430
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+		LogSmallDelta( 0, "particle mesh render type RT_ADD_CARTOON_BLACK_EDGE", (float) renderType );
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+	}
+	else if( TokenIter->m_strValue.compare( "RT_ADD_CARTOON_COLOR_EDGE" ) == 0 )
+	{
+		renderType = CKTDGXRenderer::RT_ADD_CARTOON_COLOR_EDGE;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+		LogSmallDelta( 0, "particle mesh render type RT_ADD_CARTOON_COLOR_EDGE", (float) renderType );
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+	}
+	else if( TokenIter->m_strValue.compare( "RT_ADD_CARTOON" ) == 0 )
+	{
+		renderType = CKTDGXRenderer::RT_ADD_CARTOON;
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+		LogSmallDelta( 0, "particle mesh render type RT_ADD_CARTOON", (float) renderType );
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+	}
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_ADD_TYPES
 	else
 	{
 		throw("Invalid mesh render type!");

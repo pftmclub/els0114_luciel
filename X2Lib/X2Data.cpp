@@ -2340,6 +2340,9 @@ CKTDGParticleSystem* CX2Data::ResetUIMajorParticle( const WCHAR* pFileName )
 #endif  X2OPTIMIZE_HANDLE_VALIDITY_CHECK        
         );
 	m_pUIMajorParticle->OpenScriptFile( pFileName );
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+	m_pUIMajorParticle->SetSystemKind( 2 );		// June 31ede2d0: the system kind +0xdc ( UI major 2, UI minor 3, game major 0, game minor 1; no enum names it )
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 
 	return m_pUIMajorParticle;
 }
@@ -2353,6 +2356,9 @@ CKTDGParticleSystem* CX2Data::ResetUIMinorParticle( const WCHAR* pFileName )
 #endif  X2OPTIMIZE_HANDLE_VALIDITY_CHECK         
         );
 	m_pUIMinorParticle->OpenScriptFile( pFileName );
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+	m_pUIMinorParticle->SetSystemKind( 3 );		// June 31ede39c
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 
 	return m_pUIMinorParticle;
 }
@@ -2366,6 +2372,9 @@ CKTDGParticleSystem* CX2Data::ResetGameMajorParticle( const WCHAR* pFileName )
 #endif  X2OPTIMIZE_HANDLE_VALIDITY_CHECK          
         );
 	m_pGameMajorParticle->OpenScriptFile( pFileName );
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+	m_pGameMajorParticle->SetSystemKind( 0 );	// June 31ede45c
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 
 	return m_pGameMajorParticle;
 }
@@ -2379,6 +2388,9 @@ CKTDGParticleSystem* CX2Data::ResetGameMinorParticle( const WCHAR* pFileName )
 #endif  X2OPTIMIZE_HANDLE_VALIDITY_CHECK          
         );
 	m_pGameMinorParticle->OpenScriptFile( pFileName );
+#ifdef SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+	m_pGameMinorParticle->SetSystemKind( 1 );	// June 31ede51c
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
 
 	return m_pGameMinorParticle;
 }

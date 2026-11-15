@@ -13816,3 +13816,63 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              Needs _LIVE and SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK ( ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE ); CH1q adds the #error guards when it defines it.
 //#define SERV_IRUHADEV_JUNE_CHAR_ADD_DP
 //////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R9 item 1: the particle .txt mesh render type parser also takes RT_ADD_CARTOON_BLACK_EDGE ( 4 ), RT_ADD_CARTOON_COLOR_EDGE ( 5 )
+//              and RT_ADD_CARTOON ( 6 ), June's ProcessMeshRenderType 31cf3430. Others stay "Invalid mesh render type!".
+#define SERV_IRUHADEV_JUNE_RENDER_PARTICLE_ADD_TYPES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R9 item 2: the effect-alpha option reaches the two particle draws it missed ( finishes june-effect C10b-2 ): the RHW vertex
+//              path 31cf62a0 ( @31cf67a8-31cf67c0, all 6 colours ) and the skin-mesh draw 31cf16b0 ( @31cf1888-31cf18d1 ).
+#define SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+#if defined( SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS ) && !defined( SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION )
+#error SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS needs SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION ( ApplyEffectAlphaToColor, the sequence's category byte ), june-engine R9
+#endif SERV_IRUHADEV_JUNE_RENDER_PARTICLE_EFFECT_ALPHA_PATHS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R9 item 3: June's sequence alpha multiplier ( CParticleEventSequence +0x1ac, ctor 1.0 @31cf7953 ) is multiplied into the colour alpha
+//              of the vertex ( 31cf4ed0 @31cf562b ), RHW ( 31cf62a0 @31cf65d0 ), mesh ( 31cf10c0 @31cf14b5 ) and skin-mesh ( 31cf16b0 @31cf17e2 ) draws.
+//              No code in the June exe writes it, so it stays 1.0.
+#define SERV_IRUHADEV_JUNE_RENDER_PARTICLE_SEQ_ALPHA
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R9 item 4: June's outline width 31cfe050 ( mesh and skin-mesh particle draws ): March's 700 / 1000 rule, then min( w, 1.2 ) when the
+//              particle system's +0xdc is 2 or 3 ( X2Data's UI major / minor systems, set after OpenScriptFile ), else min( w, 999 ); no clamp without a system.
+#define SERV_IRUHADEV_JUNE_RENDER_PARTICLE_OUTLINE_CLAMP
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R9 item 5: CKTDGXRenderer::OnLostDevice no longer resets the effect state manager ( June 31d3c090 ); the manager's own lost-device
+//              handler ( June slot 0x24 = 31d184f0, chain slot 1 of CKTDXApp::OnLostDevice 31be66b0 ) runs from CKTDXApp::OnLostDevice instead.
+#define SERV_IRUHADEV_JUNE_RENDER_EFFECT_STATE_LOST
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R9 item 6: the skin mesh's XET name is DeviceID up to the last '.' plus ".XET" ( June Load_LuaData inlined in 31d4f8b0 ), and _UnLoad /
+//              DestroyMeshContainer ( 31d4f2a0 / 31d4e850 ) close the XET and the textures by pointer through the device manager ( 31cdd8d0 ) with a null guard.
+#define SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
+#if defined( SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS ) && !defined( SERV_IRUHADEV_JUNE_SOUND_AUTO_RELEASE )
+#error SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS needs SERV_IRUHADEV_JUNE_SOUND_AUTO_RELEASE ( CKTDXDeviceManager::CloseDeviceByPointer ), june-engine R9
+#endif SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: Short-lived diagnostic for june-engine R9: grep-able "[JUNE_ENGINE] FX small delta ..." lines in ErrorLog.txt, a few per item. Retired by the R9 review.
+#define SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+//////////////////////////////////////////////////////////////////////////

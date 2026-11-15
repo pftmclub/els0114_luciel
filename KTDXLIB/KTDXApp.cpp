@@ -1915,6 +1915,19 @@ HRESULT CKTDXApp::OnLostDevice()
 	if ( m_pDeviceManager != NULL )
 		m_pDeviceManager->BeginFullSync();
 
+#if defined( SERV_IRUHADEV_JUNE_RENDER_EFFECT_STATE_LOST ) && defined( X2OPTIMIZE_SETSHADERCONSTANT )
+	{
+		// June 31be66b0: the state manager is chain slot 1 ( after the DS manager ); its own slot 0x24 ( 31d184f0 ) runs here, CKTDGXRenderer::OnLostDevice no longer resets it
+		extern CKTDGEffectStateManager* g_pEffectStateManager;
+		if( g_pEffectStateManager != NULL )
+		{
+			g_pEffectStateManager->OnLostDevice();
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+			KLOG( "ErrorLog.txt" ) << "[JUNE_ENGINE] FX small delta effect state manager lost device ( own handler )" << fileout;
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_RENDER_EFFECT_STATE_LOST
 	for( UINT i = 0; i < m_vecStageChain.size(); i++ )
 	{
 		if ( m_vecStageChain[i] != NULL )

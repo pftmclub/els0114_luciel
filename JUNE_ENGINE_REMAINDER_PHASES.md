@@ -1649,6 +1649,38 @@ independent). Added by R0b. The items are all mapped in the sweep:
   particles: no collision data, add-rotate matrix rotation). Found through Plasma Cutter's line flying along world +X. R9 does not redo it;
   its play-test may re-check it (funcmap row `31cf9570 (CH3a review)`, JUNE_BUGS 388).
 
+### Phase R9 -- Done
+
+**2026-11-15, Sonnet 5.5 high.** Six flags (one per item; see MODS.md "June engine R9"): `SERV_IRUHADEV_JUNE_RENDER_PARTICLE_ADD_TYPES`, `_PARTICLE_EFFECT_ALPHA_PATHS`,
+`_PARTICLE_SEQ_ALPHA`, `_PARTICLE_OUTLINE_CLAMP`, `SERV_IRUHADEV_JUNE_RENDER_EFFECT_STATE_LOST`, `_RENDER_SKINMESH_SMALL_LOADS`, plus the short-lived
+`SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG` (`[JUNE_ENGINE] FX small delta` lines, 6 per item; the review retires it). 12 funcmap rows `(R9)`; JUNE_BUGS 750.
+
+**What landed**
+1. **RT_ADD_* parse** (`31cf3430`): `RT_ADD_CARTOON_BLACK_EDGE` 4 / `_COLOR_EDGE` 5 / `RT_ADD_CARTOON` 6 (March's enum already had them). A census of June's 72 mesh-bearing
+   particle `.txt` (data036_kom) finds **no file that uses them**: the parse path cannot be seen in game.
+2. **Effect alpha** in the RHW draw (`31cf62a0` @`31cf67a8-31cf67c0`, all 6 colours) and the skin-mesh draw (`31cf16b0` @`31cf1888-31cf18d1`, new
+   `ApplyEffectAlphaToRenderParam` = `31ceefb0`). The mesh-draw comment now cites `31cf10c0` @`31cf159d-31cf1601` (the one deliberate deleted line).
+3. **Sequence alpha `+0x1ac`**: `m_fSequenceAlphaRate`, ctor 1.0, multiplied into the colour alpha of the vertex, RHW, mesh and skin draws. A byte scan of the whole June
+   `.text` finds 5 accesses of `+0x1ac` in the particle range (ctor + the four draws) and no store anywhere else: **no writer exists, it stays 1.0.**
+4. **Outline width** (`31cfe050`): `ClampOutlineWidth` after March's 700 / 1000 rule. **`+0xdc` of the particle system is a "system kind"**: ctor -1 (`31cf8a40`),
+   stored by `CX2Data`'s four Reset functions after `OpenScriptFile` (UI major 2 `31ede2d0`, UI minor 3 `31ede39c`, game major 0 `31ede45c`, game minor 1 `31ede51c`; the ctor ids
+   0 / 1 / 2 / 3 match March's). So the 1.2 cap is for the **UI** systems; everything else 999. Systems built elsewhere (`X2EventScene`) keep -1, as June.
+5. **Effect state manager lost device**: the renderer returns `m_pEffect->OnLostDevice()` alone; the manager's own reset runs at the top of `CKTDXApp::OnLostDevice`
+   (June: chain slot 1, `31c17ed0`; no stage between touches its two ints). June has no `SUCCEEDED( hr )` condition on it.
+6. **Skin-mesh loads**: XET name = id up to the last `.` (the whole id when none) + `.XET`; `_UnLoad` and `DestroyMeshContainer` close the XET / textures by pointer through
+   the device manager (`31cdd8d0`), skipped when it is NULL. March's other `SAFE_CLOSE( m_pXET )` (line 148) is not in June's `_UnLoad` and is untouched.
+
+**Gates** (`finish.py --files <7 files> --with <the 7 flags>`, worktree): flagcheck RESULT PASS for all six flags (ADD_TYPES 0 PASS / 7 OTHER, EFFECT_ALPHA_PATHS 1 / 6,
+OUTLINE_CLAMP 2 / 5, SEQ_ALPHA 1 / 6, EFFECT_STATE_LOST 2 / 5, SKINMESH_SMALL_LOADS 1 / 6; every OTHER row is a peer's flag in a shared file); 1 deleted line (above).
+junediverge RESULT: PASS. **enumscan: FAIL exit 1, not mine:** 3 old `case 104:` / `105:` / `113:` unit-class literals at `X2Data.cpp:3221-3223` in lines I did not touch.
+`SetSystemKind( 2 / 3 / 0 / 1 )` has no enum (a one-line comment says so).
+**Build:** `build.py --deploy`: COALESCED into pid 29828's full build, then
+`DEPLOY OK: X2_offline.exe is 27,020,800 B, dated 2026-11-15 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3, equal to X2/US_SERVICE/x2.exe (2026-11-15 22:24:11); built at main fac2180d + 38 uncommitted code file(s).`
+`EXESTR OK: 3 of 3 found in X2_offline.exe ... md5 49fa44dc...` (`FX small delta`, `RT_ADD_CARTOON_BLACK_EDGE`, `RT_ADD_CARTOON_COLOR_EDGE`); `.XET` wide found.
+
+**Play-test** (hand-off in the reply): only items 2 and 5 are visible; 4 and 6 are log-only; items 1 and 3 cannot fire. Review: `kickoffs/june-engine/R9-review.md` (Opus).
+**Routed, not done:** nothing new. Open question for the user: none.
+
 ## Phase R10 - Skin-anim playback sweep
 
 **Run with:** Opus 5.5 high. No code. Added by R0b: the non-render `CKTDGXSkinAnim` functions (`OnFrameMove` `31d2bd80`, `ChangeAnim`

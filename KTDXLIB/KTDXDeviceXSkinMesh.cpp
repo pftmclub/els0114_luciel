@@ -398,7 +398,16 @@ HRESULT CKTDXDeviceXSkinMesh::_UnLoad()
 #ifndef _KSMTOOL
     if( NULL != g_pKTDXApp || true != g_pKTDXApp->GetAppDestroy() )
 	{
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
+		// June 31d4f2a0 @31d4f438-31d4f443: close by pointer through the device manager, skipped without one
+		if( m_pXET != NULL && g_pKTDXApp->GetDeviceManager() != NULL )
+		{
+			g_pKTDXApp->GetDeviceManager()->CloseDeviceByPointer( m_pXET );
+			m_pXET = NULL;
+		}
+#else SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
 		SAFE_CLOSE( m_pXET );
+#endif SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
 	}
 #endif // #ifndef _KSMTOOL
 
@@ -1393,6 +1402,27 @@ HRESULT CKTDXDeviceXSkinMesh::XSkinMeshProxy::Load_LuaData(DWORD dwParam_)
 	wcscat( XETFileName, m_DeviceID.c_str() );
 	wcscat( XETFileName, L"ET" );
 #endif	CONVERSION_VS
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
+	{
+		// June 31d4f8b0 @31d5736e-31d587a2: DeviceID up to the last '.' ( the whole id without one ) plus ".XET"
+		std::wstring wstrXETName = m_DeviceID.substr( 0, m_DeviceID.rfind( L'.' ) );
+		wstrXETName += L".XET";
+		XETFileName[0] = L'\0';
+#ifdef	CONVERSION_VS
+		wcscat_s( XETFileName, _countof(XETFileName), wstrXETName.c_str() );
+#else	CONVERSION_VS
+		wcscat( XETFileName, wstrXETName.c_str() );
+#endif	CONVERSION_VS
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+		static int s_iXETNameLogCount = 0;
+		if( s_iXETNameLogCount < 6 && ( m_DeviceID + L"ET" ) != wstrXETName )
+		{
+			++s_iXETNameLogCount;
+			KLOG( "ErrorLog.txt" ) << L"[JUNE_ENGINE] FX small delta XET name " << m_DeviceID.c_str() << L" -> " << wstrXETName.c_str() << fileout;
+		}
+#endif SERV_IRUHADEV_JUNE_RENDER_SMALL_DELTAS_DEBUG
+	}
+#endif SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
 	
 	m_pXET = g_pKTDXApp->GetDeviceManager()->OpenXET( XETFileName );
     return m_pXET != NULL ? S_OK : E_FAIL;
@@ -2796,7 +2826,19 @@ HRESULT CKTDXDeviceXSkinMesh::CMultiAnimAllocateHierarchy::DestroyMeshContainer(
 		if( g_pKTDXApp != NULL && g_pKTDXApp->GetAppDestroy() != true )
 		{
 			if( pMC->m_apTextures[ i ] != NULL )
+#ifdef SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
+			{
+				// June 31d4e850 @31d4e8d5-31d4e8fb: close by pointer through the device manager, skipped without one
+				CKTDXDeviceManager* pDeviceManager = g_pKTDXApp->GetDeviceManager();
+				if( pDeviceManager != NULL )
+				{
+					pDeviceManager->CloseDeviceByPointer( pMC->m_apTextures[ i ] );
+					pMC->m_apTextures[ i ] = NULL;
+				}
+			}
+#else SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
 				SAFE_CLOSE( pMC->m_apTextures[ i ] );
+#endif SERV_IRUHADEV_JUNE_RENDER_SKINMESH_SMALL_LOADS
 		}//if
 
 #endif // #ifndef _KSMTOOL
