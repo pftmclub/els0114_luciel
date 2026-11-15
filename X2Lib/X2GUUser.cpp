@@ -17791,7 +17791,7 @@ bool CX2GUUser::IsSkillState( const bool bFuture_ ) const
 #else SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
 	const UserUnitStateData& stateData = ( true == bFuture_ ? m_FutureStateData : m_NowStateData );
 #endif SERV_IRUHADEV_JUNE_SKILL_STATE_PTR
-	return true == stateData.m_bSkillState || true == IsSkillSlotState( stateData.stateID );
+	return true == stateData.m_bSkillState || true == IsSkillSlotState( true == bFuture_ ? GetFutureStateID() : GetNowStateID() );	// char-luciel CH1o3 review: the ids March's two readers tested
 }
 #endif SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH

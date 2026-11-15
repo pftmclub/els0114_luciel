@@ -2616,6 +2616,40 @@ Commit `8b026393 ( code, note, kickoffs )`. Review: `CH1o3-review.md` covers CH1
 - **How to see it in game:** nothing ( every new engine path needs a unit-type-10 unit, a `DUNGEON_SPEECH_LUCIEL` script, tag 4 / 10 / 11 or a set byte; Lu/Ciel is not live ).
 - **Next:** `/x2-phase char-luciel CH1o3 review` ( Opus 5.5 high; covers CH1o2 and CH1o3 ), then `CH1p`.
 
+### CH1o3 - Review (2026-11-15)
+
+Opus 5.5 high. Reviewed CH1o2 `4cd0f5c2` and CH1o3 `8b026393`. **Verdict: pass after one fix.** No new flag, no debug define to retire.
+- **Fix ( `JUNE_USER_SKILL_STATE_BYTE`, `X2GUUser.cpp` `IsSkillState` ):** the slot-table fallback tested the stored entry's `stateID`; it now tests
+  `GetFutureStateID()` / `GetNowStateID()`, the ids March's two readers tested ( under `JUNE_SKILL_STATE_PTR` those are the map keys, not `->second.stateID` ),
+  so "classes that do not set the byte answer as before" holds by construction. June's own test ( byte `+0x11` ) is unchanged.
+- **CH1o2 in Ghidra / raw bytes ( all = June ):** `CanRidingState` `31fd7930`: head = word `+0x7de4` ( `GetUnitCondition( true )` = future, funcmap C9h-4d row ) bounds-checked
+  against the state vector, entry `+0xc` ( = `m_eSkillID`, as `3208e410` reads it ) `> 0` -> false; then vslots 0x438-0x444 and riding `0x4c / 0x4d / 0x4b / 0x51 / 0x52`.
+  March's `0 <= id` + `find` = June's unsigned bounds test ( -1 and unregistered ids pass ). `IsNotCommonMoveState` `31fd7640`: vslots 0x438-0x45c ( 11 tests ) then the
+  riding range. `SetEnableDash` `31fc8540`: vslot 0x440 against 0x174 ( now ) and 0x4f4 ( future ), then `StateChange( 0xe, 1 )` literal ( `USI_WALK` kept ). `PopFrameData`
+  `3206cff0`: vslot 0x438 at both tests. Base getters still return March's constants; `GetDie*StateID` const has no other override or caller ( grep: only `X2GUUser.h`,
+  `X2GULuciel.*` ). Verdict sample: automatic rows 27 / 52 / 60 checked in March ( `X2GUUser.h:3885`, `X2DungeonGame.cpp:2820`, `X2Game.cpp:12371` all call the getters );
+  June-only rows 11 / 16 / 39 ( custom-sit re-play, StateChange `+0x89e0`, emotion hotkeys ) have no March body, owner Stage 10: right.
+- **CH1o3 effect-set tags ( `dis_0x321db1b0.txt` ):** tag 4 = `_ftol2( v ) + count` / `_ftol2( v FIMUL count )` into `+0x84c`, no NEXT loop; tag 10 = protected float `+0x2a4`,
+  stored only when changed, NEXT loop re-reads and re-writes `EBX` ( the main ); tag 11 = `FILD` byte `+0x7a8`, float add / mul, `FISTP` with RC `0xc00` ( chop ), NEXT loop
+  stores `[EDI + 0x7a8]` again. JUNE_BUGS 725 right. Tag 9's `#ifndef` copy is byte-for-byte Elsword's case.
+- **Skill-state byte:** June `3208e430` = `bFuture ? +0x7cb0 : +0x7cbc`, decrypt, return byte `+0x11` ( no slot-table test: the OR is the documented March stand-in ).
+  `m_bSkillState` follows `m_bHyperState`, `Init()` clears, `operator=` copies. Lu's slot tables are the engine's `USI_SPECIAL_ATTACK_*` ids, so the OR adds nothing for Lu.
+  Lu's three stores at June's addresses; the 15 `skill_state_extra` ids have their amendment in CH2a-CH2d / CH3a-CH3c. `ReservedSkillStart` = June `32057c4c`-`cb2`:
+  0x800( 0x524(), `+0x8ea8` ), then 0x764( 0x524(), `movzx` 0x528( 0 ), `+0x8ea8` ): matches.
+- **Win speech:** `3202b9e0` reads key 1 = `LU` ( `c7 6d` ^ `8b 38` ) and key 2 = `CIEL` ( `7b 7a a9 e3` ^ `38 33 ec af` ), breaks on either -1 with one `EndTable` ( the row ),
+  pairs ( LU, CIEL ), and reads `DUNGEON_SPEECH` only in the `else`: = the port ( JUNE_BUGS 724 ). `32009dd0`: unit `+0x867c` -> templet `+0xaf0` type == 10, pairs non-empty,
+  game alive, `rand() % 2` -> game `+0xb54`, row = `rand() % count`, `+0x1c` ( second = CIEL ) when `> 0`; fallback `VICTORY`: = the port. Ctor `@3230770e` stores `EBX` ( 0 ).
+  CH5's amendment names the picture `324ce260` and `ENDING_SPEECH`'s `LUCIEL` set.
+- **Checklist rows:** `32b3a310` calls `3202cba0`, `3202d140`, `3202d3c0`, then `329cc370` ( riding-key wait ) @`32b3a61f`, and vslot 0x6a8 ( `ShownSkillCoolTime` ) @`32b3a6ba`: L260 / L263 / L977 verdicts right.
+- **Gates:** `finish.py --review --commits 4cd0f5c2 8b026393 --with <3 flags> --state X2GULuciel.cpp Luciel_Duo / Luciel_Demonio`: `FINISH RESULT: PASS (10 gates, 0 failed, 2 skipped)`;
+  `DUO_WIN_SPEECH` `4 PASS, 4 OTHER` / PASS, `SKILL_STATE_BYTE` `2 PASS, 6 OTHER` / PASS, `VIRTUAL_HOOKS` `4 PASS, 8 OTHER` / PASS ( 2 deleted = the base die getters made const );
+  every OTHER row is a partner flag's or `_CORE`'s file, or `Always.h`'s other define block; `junediverge` + `--check-all` PASS, `enumscan` exit 0, `stateends` PASS both.
+  `_CORE` alone ( `flagcheck --commits 4cd0f5c2 8b026393 --files X2EffectSet.cpp X2GULuciel.cpp X2GULuciel.h` ): `5 PASS, 0 OTHER, 0 FAIL` / PASS, 9 deleted = CH1o2's 6 ( Lu's const
+  declarations / definitions + comments ) and CH1o3's 3 setter comments. The fix: `finish.py --files X2Lib/X2GUUser.cpp --with <3 flags>`: `FINISH RESULT: PASS (8 gates, 0 failed, 3 skipped)`,
+  1 deleted = the replaced return line ( inside `SKILL_STATE_BYTE`'s own block ).
+- **Compile:** `/Zs` probes of `X2GUUser.cpp` after the fix, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 2 x 0 errors, 0 warnings. Full build skipped: no play-test.
+- **Next:** `/x2-phase char-luciel CH1p` ( Opus 5.5 high; kickoff checked, its dependencies are done ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
