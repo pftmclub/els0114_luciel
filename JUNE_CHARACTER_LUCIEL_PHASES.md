@@ -1743,6 +1743,8 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `S
 - **Compile:** `/Zs` probes of the 9 changed TUs (incl. `X2ServerPacket.cpp`): 0 errors.
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,048,960 B, dated 2026-11-16 04:04:33, md5 8c2dc751abba8b12eb0886bb3d122baf` (built at `2c38224a` + 19
   uncommitted code files); `EXESTR OK: 1 of 1` (`[JUNE_CHAR] LUCIEL DUO STAT ...`, wide).
+- **Commit** `9286ce8d`; `finish.py --range 9286ce8d^..9286ce8d --with SERV_IRUHADEV_JUNE_CHAR_DUO_STAT`: flagcheck PASS (13 PASS, 2 PASS~, 2 DEFINE,
+  0 OTHER, 0 FAIL); junediverge PASS; enumscan the same 191 pre-existing rows.
 - **Play-test:** owed (hand-off: testlu1, Necklace of Vitality on Ciel only, dungeon tag compare).
 
 ## Phase CH1 - Deploy unit: the class core
