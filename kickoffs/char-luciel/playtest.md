@@ -78,3 +78,38 @@ hand, a crash when leaving the field (a dummy item freed twice: send the X2_*.tm
 ### Logs
 [JUNE_CHAR] LUCIEL (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`: `LUCIEL DUO switch` per swap; DU3c adds no lines of its own, so read
 `ErrorLog.txt` for new errors)
+
+## DU5b - The unit viewer's second body: the character window shows the switched body
+
+### Dev console
+none - no item and no command: DU5b only changes which body the character window draws and animates
+
+### Loadout
+n/a - no skills are tested. The checks are the character window (U) and its two switch buttons; no V swap needed.
+
+### Steps
+1. Log in **testlu1** (Lu/Ciel, Duo; the save's form is 1, Ciel). Stay in the village.
+2. Open the character window (U). Look at the body in the window, then wait 5 seconds and watch it idle.
+3. Press the window's switch button, then click the body in the window, then press the button "this window only".
+4. Close the window, enter any battle field, open the window again and press "this window only" twice.
+5. Relog onto **jtLordKnight** and then **jtCodeEmpress**, opening the character window (U) on each.
+
+### Expect
+- Step 2: the window shows **one** body (June's character window never shows Lu and Ciel side by side): Ciel, because the saved form is 1.
+  It plays its lobby wait loop (it moves), it is not frozen in a T-pose.
+- Step 3: each press or click swaps the window to the other body, which also idles. In the village the button and the click also swap the
+  village avatar (DU5's form packet); "this window only" swaps the window alone.
+- Step 4: in the field "this window only" swaps the window body each time; the field character does not change.
+- With DU5b alone Ciel stands **without gear** in the window (all equipment still sits on Lu's body); with DU5b2 in the same build each body
+  wears its own equipment (DU5b2's section).
+- Step 5: both windows look exactly as before (one body, own equipment, idle loop).
+- Nothing new in `ErrorLog.txt`, no crash when the window opens, swaps or closes.
+
+### If not
+Name the step and what you saw: two bodies in the window (the two-body view was not turned off), an empty window or a body that never moves
+after a swap (the shown body is not created or not animated: say which body, Lu or Ciel), the swap changing nothing, or a crash on open / swap
+(send the X2_*.tmp bundle from %TEMP%).
+
+### Logs
+[JUNE_CHAR] LUCIEL (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`: one `LUCIEL DUO FORM unit 166: form a -> b saved, NOT sent` line per
+village swap in step 3; DU5b adds no lines of its own, so read `ErrorLog.txt` for new errors)

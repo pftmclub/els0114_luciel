@@ -45,3 +45,9 @@ March's in `#else`. A function March lacks gets a name in the class's own patter
 Every name (locals and constants too) says what it is in context: no Ghidra address, phase tag or `June` in an identifier.
 Call a March function from June code only if June's namesake does the same; otherwise replace March's definition.
 Run `python tools/junediverge.py --list` before transcribing; a newly found divergent function gets its `june_march_divergent.tsv` row and the replacement in the same commit.
+
+## Split by DU5b (2026-11-16)
+
+DU5b ported the viewer's second body, the switching view and the window / village wiring; June's per-body equipment functions (`UpdateEqip`,
+`AddEqip`, `AddEquipByTID`, `ReplaceEmptyToBasic`, the `[ pos ][ 3 ]` tables) are **DU5b2** (`DU5b2.md`), and the back body (two-body view) is
+DU5c's (amended). The play-test is batched at DU5b2; `DU5b2-review.md` reviews both. June's character window shows one body, not two side by side.

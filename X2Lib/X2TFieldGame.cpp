@@ -6719,7 +6719,19 @@ bool CX2TFieldGame::Handler_EGS_CHANGE_UNIT_FORM_NOT( const KEGS_CHANGE_UNIT_FOR
 	{
 		pUIManager->GetUICharInfo()->SetSwitchingView( bMinorUnitForm );
 		pUIManager->GetUICharInfo()->EquipChanged();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		CX2UnitViewerUI* pUnitViewerUI = pUIManager->GetUICharInfo()->GetUnitViewerUI();
+		if ( NULL != pUnitViewerUI )
+		{
+			// char-luciel DU5b: June 323acfb0 @323ad0fb-323ad1a0
+			for ( int iFxGroup = 0; iFxGroup < 5; ++iFxGroup )
+				pUnitViewerUI->ViewerFxStop( iFxGroup );	// June 31fac190
+			pUnitViewerUI->ApplySwitchingViewFilter( std::vector<CX2Unit::EQIP_POSITION>() );
+			// stand-in: June then reloads the customized lobby motions and plays the custom WAIT ( 31fa8230, 31fa5c90( 0 ) ): the customize system, backlog Stage 12
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		// stand-in: the viewer's effect stops, form filter, lobby motions and custom motion ( 31fac190, 31f94190, 31fa8230, 31fa5c90 ) come with its second body ( DU5b )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	}
 
 	if ( true == pUIManager->GetShow( CX2UIManager::UI_MENU_INVEN ) )

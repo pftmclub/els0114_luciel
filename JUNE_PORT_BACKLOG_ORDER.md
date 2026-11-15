@@ -957,6 +957,8 @@ rule that an unowned June system gets its own stage. What it covers:
 - **Item type 14** is June's `IT_CUSTOM` (1,207 customize items in June's `item.kim`, e.g. skill cut-ins). June-item-kim K2 guards
   it; this stage reads it (june-item-kim K0).
 
+- **The unit viewer's customize pass by body** (found by char-luciel DU5b, 2026-11-16). `31faa150` re-applies the unit's customize map ( CX2Unit `+0xa44`, keys 7 / 8 / 13 / 14 ) for the viewer's shown body ( `+0xd80` ), and `3291d360` (window: `31faa150`, `PlayByMotionType( UVUMT_WAIT )`, `ResetStat( 0 )`; callers `31f1ed70`, `31f23850`, `32400370`) refreshes it; the form NOT ( `323acfb0` ) also reloads the customized lobby motions ( `31fa8230` ) and plays the custom WAIT ( `31fa5c90( 0 )` ), and the cash shop's Lu/Ciel try-on form ( `+0x360` / `+0x364`, read by the viewer's `SetUnit @31faaf04` ) belongs with the try-on preview. DU5b left stand-in lines at each site.
+
 **Depends on:** june-effect C9g-2 (the PlayByMotionType shell and `AnimationNameTable.lua`), Stage 10 (the sit emotions 0x19-0x3b and
 the EmotionData path the sit sets ride on), Stage 2 (UI framework) for the dialogs, and Stage 13 (the June `item.kim`, **done 2026-10-08**: its 1,066 customize items and 1,207 type-14 items now resolve). It can run
 alongside Stages 3-8.

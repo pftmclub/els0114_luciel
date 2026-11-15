@@ -707,6 +707,7 @@ Opus 5.5 high. **Verdict: pass after one hygiene fix** (a missing flag-dependenc
 | DU4 | NESI renumber to June's ids (`NESI_ONEPIECE_FASHION` 20 -> 35, `NESI_END` 21 -> 43, `NESI_MINORUNIT_*`) and the forward-only `X2OfflineDB` migration (user, 2026-11-02; snapshot `db_backup/` first, schema step +1). It retires `SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP` (CharInfo C3) and the `IS_FOR_MINOR_UNIT` stand-in (slot hide by June's ids, `32e22ce0`). Every character's equipment must show identically before and after (relog test on three characters). | `SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER` |
 | DU5 | Two bodies in the character window and the unit viewer (the Stage 8 bullet "The character window's Lu/Ciel and Rose branches", Lu/Ciel half): unit `+0xe40` (setter `3234b8c0`, NOT-apply `323acfb0`) behind `CIM_SWITCHING` / `_ONLY_THIS_DIALOG`, the viewer form byte `+0xd80` / `+0xd81` with `31f93a10` / `31faa150` / `31f94190` / `3291d360`, the MsgProc click switch `3291d390` (replaces the logged stub), OnDropAnyItem `3234f4d0` / `321693b0`, the form packets `0x4d9` / `0x4da` with emulator handlers, both bodies on the creation-screen preview and the select screen (where June shows two and NU4 showed one), and the CharInfo C3 form stand-ins (ResetStat's form, `@3291bf2d`). Rose's weapon UI stays for `char-rose`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW` |
 | DU5b | (split from DU5, 2026-11-15) The unit viewer's second body: `+0xd7c` minor skin, `+0xd80` / `+0xd81` / `+0xd82`, `31f93a10`, `31f94190`, `31faa150`, `3291d360`, `PlayAnim` which = 2; retires DU5's "viewer `+0xd80` read as the window's switch" stand-ins and the NOT's viewer calls. | `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` |
+| DU5b2 | (split from DU5b, 2026-11-16) Each body's equipment in the unit viewer: June's whole `UpdateEqip` `31fa9e60`, `AddEqip` `31f9df40`, `AddEquipByTID` `31f9c640`, `ReplaceEmptyToBasic` `31f9e930` / `31f9cfd0`, `RemoveEqip` / `RemoveAllEquips`; slot tables `[ pos ][ 3 ]` (drops R14e's two stand-ins). | DU5b's |
 | DU5c | (split from DU5) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the village avatar (`323f3290` rest: `323f1490`, the viewer rebuild; `323fa700` / `323fad80`; SD mesh table `31ee3470`). | DU5b's, or `_DUO_AVATAR` |
 | DU5d | (split from DU5) Viewer weapon effects case 10 (`X2UnitViewerUI.cpp:960`, `:6255`, `:8559`, `:8681`) and CH0's checklist viewer rows (CharCustomData, UnitViewerEffectSetTable, `IS_FOR_MINOR_UNIT` slot key, glow). | DU5b's |
 | DU5e | (split from DU5) Each body's numbers: `SetGameStats` second `KStat` `323571c0` + packet fields, the type-10 socket aggregate and the HUD's second gage, the set-socket count `3286a6b0` and the per-body socket record `3271a060`, the window's other-form set sum `@3291bf2d`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` |
@@ -1662,6 +1663,55 @@ Opus 5.5 high. Reviewed `b99ac347` against June in Ghidra / `disasm_range.py` (r
 - **Build:** none (no code change). **Play-test:** none (no fix; DU5's passed). The `LUCIEL DUO FORM` log line was not captured (DU5 note); not asked for, since every
   path it covers matches June byte for byte.
 - **Next:** `/x2-phase char-luciel DU5b` and `/x2-phase char-luciel DU5e` (Opus 5.5 high; no shared files, can run side by side); CH5 (Sonnet 5.5 high) is ready too.
+
+### DU5b - Done (2026-11-16)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (Always.h; `#error` guard: `DUO_VIEW`, `MINOR_UNIT_TEMPLET`, `SEPARATION_MOTION`,
+`UNIT_VIEWER_EFFECT_PLAYER`, all on at that line by the `/Zs` probe). Files: `X2UnitViewerUI.h` (+30), `X2UnitViewerUI.cpp` (+207), `X2UICharInfo.cpp`
+(+27), `X2TFieldGame.cpp` (+12), insert-only. funcmap rows: `grep "(DU5b)" june2017_re/funcmap.tsv` (17). Census (Sonnet, read-only): 141 hits
+of viewer `+0xd7c..+0xd82` / `+0xe40` in 44 functions of `31f8f000-31fb2000`.
+- **What June's character window shows (corrects the kickoff's gate).** The viewer ctor turns the two-body view on (`31fab020 @31fab7c9`:
+  `+0xd81` = 1, `@31fab7d8`: `+0xd82` = 1); the window's `ResetUnitViewerUI` (`329148d0`) runs the form filter `31f94190` and sets `+0xd81` = 0.
+  So the window shows **one** body, the switching view's, and the switch swaps it. Side by side (`31f91020` non-NULL) is the create / select
+  screens' and the cash shop's view: DU5c.
+- **Split (scope rule, one logical change).** June rewrote the viewer's equipment functions whole (`UpdateEqip 31fa9e60`, `AddEqip 31f9df40`,
+  `AddEquipByTID 31f9c640`, `ReplaceEmptyToBasic 31f9e930` / `31f9cfd0`: slot tables `[ pos ][ 3 ]` at `+0x208` / `+0x5b0`, the skin by body,
+  Ciel's copy of a Lu item from the templet's minor id, a try-on mode `+0x118c`, a field-state form filter, class / appearance tests). That
+  is **DU5b2** (kickoff written; four `stage8` rows in `june_march_divergent.tsv`). Until DU5b2 every equip sits on Lu's skin, so Ciel shows
+  bare. The play-test is batched at DU5b2 (`playtest.md` section DU5b).
+- **Members** (`X2UnitViewerUI.h`): `m_pMinorUnitMotion` (+0xd78), `m_pMinorUnitXSkinAnim` (+0xd7c), `m_bSwitchingView` (+0xd80),
+  `m_bEnableDuoView` (+0xd81), `m_bShowDuoBackUnit` (+0xd82); ctor values as June. Viewer `+0xe40` is `m_bFixed` (`SetFixed 31f933c0`,
+  `SetPositionOnScr 31f9a860`): NU0's 11 viewer "other struct?" rows settled; its other 6 rows read the unit's `+0xe40` through `+0x1e0`.
+- **Getters = June (divergent, row added):** `GetXSkinAnim` / `GetXSkinAnimPtr` return the shown body (`31fac3c0` / `31f90ff0` / `31fac430`,
+  `AccessShownXSkinAnim`); `GetBackXSkinAnimPtr` = `31f91020`. Other classes have form 0: unchanged.
+- **SetUnit** (`31faa6f0 @31faaad2-31faae53`): when the main motion changes, Ciel's skin is rebuilt from `m_MinorUnitCommonMotion` (non-empty
+  = June's test, templet +0x1e0) plus the state's lobby / field / emotion motions (June's switch, kept); `+0xd80` = the unit's form before
+  `UpdateEqip` (`@31faaf04`). Stand-ins: Ciel's Cash25 emotion append (`31ee9150( 10, false )`, routed with the main body's, Stage 10); the
+  cash shop's try-on form (`+0x360 / +0x364`) reads 0.
+- **Shown body in March's own functions:** `OnFrameMove`, `GetRenderParam`, `OnFrameRender_Prepare` / `_Draw`, `SetPositionOnScr` take a local
+  reference `m_pXSkinAnim = AccessShownXSkinAnim()` (one line each; it hides the member, so March's ~60 reads there follow June's
+  `31f90ff0`). `OnFrameMove` returns when the shown body is missing (June `31fa8ce0`). Not touched: avatar capture, emotions, the weapon
+  effects (`31f93050` / `31f961a0` case 10 = DU5d).
+- **PlayAnim** = June's head (`31fa3010 @31fa3062-31fa319d`, divergent row): fourth argument `UVPB_MAJOR_UNIT` / `_MINOR_UNIT` / `_BOTH` (no
+  June Enum: a class enum), unit manager + templet test, `ChangeAnim( name, transition, 0 )`, a Ciel miss stops her anim then plays.
+  `PlayByMotionType` passes `UVPB_BOTH` at its 7 calls (`31fa7ef0`).
+- **Switching view:** `SetSwitchingView` (viewer half of `32912c50`) + `UpdateSwitchingView` (`31f93a10`: shown skin colour 1, viewer
+  scale / rotation; back skin colour 0.3, scale x 0.85); `ApplySwitchingViewFilter` (`31f94190`: show / hide the two skins, hide the other
+  body's equips, a kept position stays). Stand-in: the equips' position / scale / colour copies (`31f93710` / `31f93820` / `31f93920`, equip
+  `+0x908` / `+0x914` / `+0x190`, no March members) -> DU5c.
+- **Window and village (DU5's stand-ins retired):** `CX2UICharInfo::SetSwitchingView` sets the viewer first; `ResetStat` and `OnDropAnyItem`
+  read the viewer's `+0xd80`; `EquipChanged` (`3291d2e0 @3291d320`) and `SwitchViewOnlyThisDialog` (`@3291dd74`) run the filter;
+  `ResetUnitViewerUI` runs it and turns the two-body view off (`@32914abf-32914ad8`); the form NOT stops viewer groups 0-4 and runs the filter
+  (`323acfb0 @323ad11e-323ad167`).
+- **Routed (scope rule):** `3291d360` + `31faa150` (customize re-filter by body; callers are equip-change / square-unit paths) and the NOT's
+  `31fa8230` / `31fa5c90( 0 )` -> backlog Stage 12 (customize). `+0xd82` writers (`PlayEmotion 31fa52b0`, `31fa5c90`), the back body's frame
+  move and draw, `31f90fb0` (minor rotation) -> DU5c (kickoff amended).
+- **June bug kept:** JUNE_BUGS 756, the destructor never closes Ciel's motion mesh (`31fab920 @31fac060`): no destructor code.
+- **Gates:** `finish.py --files <5> --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER`: flagcheck PASS (4 PASS, 1 OTHER = `Always.h`, peers'
+  uncommitted blocks), junediverge PASS, enumscan exit 0; stateends / skillicons / luabind n/a. `--range` line below.
+- **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2UnitViewerUI.cpp`, `X2UICharInfo.cpp`, `X2TFieldGame.cpp`: 0 errors each; a flag
+  probe shows `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` on. Full build skipped: no play-test yet (batched at DU5b2).
+- **Play-test deferred:** section DU5b in `kickoffs/char-luciel/playtest.md`, batch at DU5b2. Review: `DU5b2-review.md` covers DU5b + DU5b2.
 
 ## Phase CH1 - Deploy unit: the class core
 

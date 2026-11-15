@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel DU5c` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | DU5b review |
+| Depends on | DU5b2 review (covers DU5b + DU5b2) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's), or a new `SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR` for the square unit if DU5b's review prefers |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL DUO`) |
 | Review | `kickoffs/char-luciel/DU5c-review.md` (Opus 5.5 high; the phase writes it when done) |
@@ -57,3 +57,17 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Fix here, with the select screen's two bodies:** give that unit June's equip size (`NESI_END`) the way June's character-list handler does
   (find June's counterpart of `:11142`; do not invent a size path). Check the other `GetItemMaxNum( ST_E_EQUIP )` loops on units without a reset
   (`X2Unit.cpp:3038`, `:6321`). Play-test: `jtLordKnight` with 163569 shows the Spa Wear alone on the select screen.
+
+## Amended by char-luciel DU5b (2026-11-16): the back body is yours
+
+DU5b gave the viewer Ciel's skin (`m_pMinorUnitXSkinAnim`), the switching view (`m_bSwitchingView`, `UpdateSwitchingView` = `31f93a10`,
+`ApplySwitchingViewFilter` = `31f94190`) and `GetBackXSkinAnimPtr` (`31f91020`, non-NULL only while `m_bEnableDuoView` and `m_bShowDuoBackUnit`:
+the ctor sets both, the character window clears the first). The character window shows one body; the create / select screens and the cash shop
+show both, so these come with this phase:
+- the back body's frame move: `31faa550`'s second `31fa8ce0( t, dt, 0 )` (position = viewer position + ( `+0xd84` + 1.0 ) x ( 50, 0, 70 ), the double 334355b0 and the floats 33732708-33732710 in
+  `31fa8ce0`'s first `param_4 == 0` branch; read the others too) and its draw in `31f974b0` / `31fa00b0` (both read `+0xd81` / `+0xd82`);
+  DU5b's `OnFrameMove` / render alias the shown body only and leave a stand-in line for this;
+- the `+0xd82` writers: `PlayEmotion` `31fa52b0` (8 sites) and `31fa5c90` (3 sites);
+- `31f90fb0` (rotate the minor skin: SelectLuciel's `m_fMinorUnitLobbyRotationY`), `31f99f70`'s back-body move (`SetPositionOnScr`);
+- the equips' position / scale / colour copies by body (`31f93710` / `31f93820` / `31f93920`: equip `+0x908`, `+0x914`, `+0x190`, no March
+  members; find their June readers first) and `31fa4ec0`'s duo sit sets (customize: Stage 12 unless the table rows need it).

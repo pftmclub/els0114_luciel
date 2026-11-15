@@ -87,7 +87,17 @@
 		virtual HRESULT OnResetDevice();
 		virtual HRESULT OnLostDevice();
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		enum UNIT_VIEWER_PLAY_BODY	// char-luciel DU5b: June PlayAnim 31fa3010's fourth argument ( no June Enum )
+		{
+			UVPB_MAJOR_UNIT	= 0,
+			UVPB_MINOR_UNIT	= 1,
+			UVPB_BOTH		= 2,
+		};
+		void PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE playType = CKTDGXSkinAnim::XAP_LOOP, bool bTransition = false, const int iPlayBody_ = UVPB_MAJOR_UNIT );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		void PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE playType = CKTDGXSkinAnim::XAP_LOOP, bool bTransition = false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 		void SetUnit( CX2Unit* pUnit, CX2UnitViewerUI::UNIT_VIEWER_STATE eState = UVS_NONE );
 
@@ -118,8 +128,21 @@
 #endif	NOT_RENDERING_OTHER_EQUIP_POS
 
 		CKTDGXRenderer::RenderParam* GetRenderParam();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5b: June 31fac3c0 / 31f90ff0 return the shown body, Ciel's ( +0xd7c ) while the switching view is on
+		CKTDGXSkinAnim* GetXSkinAnim(){ return AccessShownXSkinAnim().get(); }
+		CKTDGXSkinAnimPtr GetXSkinAnimPtr() { return AccessShownXSkinAnim(); }
+		CKTDGXSkinAnimPtr& AccessShownXSkinAnim() { return true == m_bSwitchingView ? m_pMinorUnitXSkinAnim : m_pXSkinAnim; }	// June 31fac430
+		CKTDGXSkinAnimPtr GetBackXSkinAnimPtr() const;
+		void SetSwitchingView( const bool bSwitchingView_ );
+		bool GetSwitchingView() const { return m_bSwitchingView; }
+		void UpdateSwitchingView();
+		void ApplySwitchingViewFilter( const std::vector<CX2Unit::EQIP_POSITION>& vecKeepEquipPosition_ );
+		void SetEnableDuoView( const bool bEnableDuoView_ ) { m_bEnableDuoView = bEnableDuoView_; }
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		CKTDGXSkinAnim* GetXSkinAnim(){ return m_pXSkinAnim.get(); }
 		CKTDGXSkinAnimPtr GetXSkinAnimPtr() { return m_pXSkinAnim; }
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		void SetLightPos( float x, float y, float z )
 		{ 
 			m_LightPos.x = x;
@@ -291,6 +314,13 @@
         /// - jintaeks on 2009-01-12, 16:12		
 		// dmlee, 2009-03-12 백그라운드 로딩시에 dangling pointer 참조 오류 생기는 문제 때문에 smart poiner로 바꿨습니다.
 		CKTDGXSkinAnimPtr		m_pXSkinAnim;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		CKTDXDeviceXSkinMesh*	m_pMinorUnitMotion;			// char-luciel DU5b: June +0xd78
+		CKTDGXSkinAnimPtr		m_pMinorUnitXSkinAnim;		// June +0xd7c, Ciel's skin
+		bool					m_bSwitchingView;			// June +0xd80, Ciel is the shown body
+		bool					m_bEnableDuoView;			// June +0xd81, the other body is drawn behind ( ctor true, the character window false )
+		bool					m_bShowDuoBackUnit;			// June +0xd82, the back body's emotion gate ( its writers are DU5c's )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		D3DXVECTOR3				m_LightPos;
 
 //{{ robobeg : 2008-10-17

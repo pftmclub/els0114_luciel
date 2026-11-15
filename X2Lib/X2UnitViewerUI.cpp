@@ -57,6 +57,13 @@ CX2UnitViewerUI::CX2UnitViewerUI(void)
 
 	m_pUnit					= NULL;
 	m_pMotion				= NULL;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5b: June ctor 31fab020 @31fab0af / @31fab7c9 / @31fab7d8
+	m_pMinorUnitMotion		= NULL;
+	m_bSwitchingView		= false;
+	m_bEnableDuoView		= true;
+	m_bShowDuoBackUnit		= true;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	//m_pXSkinAnim			= NULL;
 	INIT_VECTOR3( m_LightPos, 1000,1000,1000 );
 
@@ -334,6 +341,12 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 
 	if ( m_pUnit == NULL )
 		return false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	CKTDGXSkinAnimPtr& m_pXSkinAnim = AccessShownXSkinAnim();	// char-luciel DU5b: June 31fa8ce0 moves the shown body ( 31f90ff0 ); the local hides the member
+	if ( NULL == m_pXSkinAnim )
+		return false;
+	// stand-in: the back body's frame move ( 31faa550's second 31fa8ce0 call ) is the create / select screens' ( DU5c )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 #ifdef UNIT_EMOTION
 	EmotionFrameMove();
@@ -1290,6 +1303,9 @@ void CX2UnitViewerUI::NotifyShowObjectChanged()
 
 CKTDGXRenderer::RenderParam* CX2UnitViewerUI::GetRenderParam()
 {	
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	CKTDGXSkinAnimPtr& m_pXSkinAnim = AccessShownXSkinAnim();	// char-luciel DU5b: the shown body ( 31f90ff0 ); the local hides the member
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	if(m_pXSkinAnim != NULL)
 		return m_pXSkinAnim->GetRenderParam();
 	return NULL;
@@ -1304,6 +1320,9 @@ RENDER_HINT   CX2UnitViewerUI::OnFrameRender_Prepare()
 	// June 31f974b0: the base viewer's Prepare runs first
 	CX2BaseUnitViewerUI::OnFrameRender_Prepare();
 #endif SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	CKTDGXSkinAnimPtr& m_pXSkinAnim = AccessShownXSkinAnim();	// char-luciel DU5b: June 31f974b0 draws the shown body; the local hides the member; the back body is DU5c's
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
     if ( !m_sbShow || m_pXSkinAnim == NULL || m_pUnit == NULL)
         return RENDER_HINT_NORENDER;
 
@@ -1473,6 +1492,9 @@ void    CX2UnitViewerUI::OnFrameRender_Draw()
 
 	if(m_pUnit == NULL)
 		return;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	CKTDGXSkinAnimPtr& m_pXSkinAnim = AccessShownXSkinAnim();	// char-luciel DU5b: June 31fa00b0 draws the shown body; the local hides the member; the back body is DU5c's
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 	// 유효하지 않는 frame을 참조하는 부분을 찾기위한 로그추가
 	//WCHAR wszLastErrorLog[255] = {0,};
@@ -2094,13 +2116,33 @@ void    CX2UnitViewerUI::NotifyDGManagerChanged( CKTDGManager& refInManager_ )
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+void CX2UnitViewerUI::PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE playType, bool bTransition, const int iPlayBody_ )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 void CX2UnitViewerUI::PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE playType, bool bTransition )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5b: June 31fa3010 @31fa3062-31fa319d; June's wprintf on a ChangeAnim miss has no console here
+	const bool bCanPlayAnim = ( NULL != g_pData->GetUnitManager() && NULL != m_pUnit && NULL != m_pUnit->GetUnitTemplet() );
+	if ( ( UVPB_BOTH == iPlayBody_ || UVPB_MAJOR_UNIT == iPlayBody_ ) && NULL != m_pXSkinAnim && true == bCanPlayAnim )
+	{
+		m_pXSkinAnim->ChangeAnim( pName, bTransition, 0.f );
+		m_pXSkinAnim->Play( playType );
+	}
+	if ( ( UVPB_BOTH == iPlayBody_ || UVPB_MINOR_UNIT == iPlayBody_ ) && NULL != m_pMinorUnitXSkinAnim && true == bCanPlayAnim )
+	{
+		if ( false == m_pMinorUnitXSkinAnim->ChangeAnim( pName, bTransition, 0.f ) )
+			m_pMinorUnitXSkinAnim->Stop();	// June stops Ciel's anim on a miss, then plays it anyway
+		m_pMinorUnitXSkinAnim->Play( playType );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	if ( m_pXSkinAnim != NULL )
 	{
 		m_pXSkinAnim->ChangeAnim( pName, bTransition );
 		m_pXSkinAnim->Play( playType );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #ifdef SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
 	// June 31fa3010: after the anim the request queue is cleared, the group-0 viewer effects are stopped, and the motion is
 	// looked up (duo 0 = March's only model): a hit queues { set, UNIT_TYPE, UNIT_CLASS, start time, loop }
@@ -2404,6 +2446,60 @@ void CX2UnitViewerUI::SetUnit( CX2Unit* pUnit, CX2UnitViewerUI::UNIT_VIEWER_STAT
 #endif
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5b: June 31faa6f0 @31faaad2-31faae53, Ciel's motion and skin from the templet's minor-unit motions
+		m_pMinorUnitXSkinAnim.reset();
+		if ( false == pTemplet->m_MinorUnitCommonMotion.empty() )
+		{
+			std::vector<wstring> vecMinorUnitMotion;
+			vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitCommonMotion );
+			switch( eState )
+			{
+			case UVS_CASHSHOP:
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitEmotionMotion );
+				break;
+			case UVS_ROOM:
+			case UVS_CREATEUNIT:
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitLobbyMotion );
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitEmotionMotion );
+				break;
+			case UVS_FIELD:
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitFieldMotion );
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitEmotionMotion );
+				break;
+			case UVS_CLASSCHANGE:
+			case UVS_SELECTUNIT:
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitLobbyMotion );
+				break;
+			case UVS_CHARINFO:
+			case UVS_WATCH:
+				break;
+			default:
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitLobbyMotion );
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitEmotionMotion );
+				vecMinorUnitMotion.push_back( pTemplet->m_MinorUnitFieldMotion );
+				break;
+			}
+			// stand-in: June appends Ciel's Cash25 emotion motion here ( 31ee9150( 10, false ) ), routed with the main body's ( backlog Stage 10 )
+
+			CKTDXDeviceXSkinMesh* pMinorUnitMotion = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( vecMinorUnitMotion[0] );
+			SAFE_CLOSE( m_pMinorUnitMotion );
+			m_pMinorUnitMotion = pMinorUnitMotion;
+			m_pMinorUnitXSkinAnim = CKTDGXSkinAnim::CreateSkinAnimPtr();
+			if ( NULL != m_pMinorUnitMotion )
+				m_pMinorUnitXSkinAnim->SetAnimXSkinMesh( m_pMinorUnitMotion, m_pMinorUnitMotion->GetXET() );
+
+			for ( UINT iMotion = 1; iMotion < vecMinorUnitMotion.size(); ++iMotion )
+			{
+				CKTDXDeviceXSkinMesh* pMinorUnitMixMotion = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( vecMinorUnitMotion[iMotion] );
+				if ( NULL != pMinorUnitMixMotion )
+				{
+					m_pMinorUnitXSkinAnim->MixAnim( pMinorUnitMixMotion );
+					SAFE_CLOSE( pMinorUnitMixMotion );
+				}
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #ifdef ELSWORD_SECOND_CLASS_CHANGE
 		SetUnitReForm();
 #endif
@@ -2826,6 +2922,10 @@ void CX2UnitViewerUI::SetUnit( CX2Unit* pUnit, CX2UnitViewerUI::UNIT_VIEWER_STAT
 	InitUpgradeWeaponParticle();	/// 강화 무기 이펙트 초기화
 #endif ADD_UPGRADE_WEAPON_PARTICLE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5b: June @31faaf04-31faaf3e; stand-in: the cash shop's try-on form ( +0x360 / +0x364 ) has no March member and reads 0
+	m_bSwitchingView = ( UVS_CASHSHOP == eState ) ? false : m_pUnit->IsMinorUnitForm();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	UpdateEqip();	
 }
 
@@ -4968,11 +5068,19 @@ void CX2UnitViewerUI::PlayByMotionType( CX2UnitViewerUI::UNIT_VIEWER_UI_MOTION_T
 	case UVUMT_WAIT:
 	case UVUMT_WAIT1:
 	case UVVMT_WAIT2:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_LOOP, bTransition, UVPB_BOTH );	// char-luciel DU5b: June 31fa7ef0 plays both bodies
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_LOOP, bTransition );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		break;
 	case UVUMT_LEVEL_UP:
 		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+			PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition, UVPB_BOTH );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 			PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 			// = March's Eve level-up sound (June 31d414d0( 0, 0 ) on +0xe54)
 			if( CX2Unit::UT_EVE == m_pUnit->GetType() && NULL != m_pSound_Eve_LevelUp )
@@ -4985,19 +5093,39 @@ void CX2UnitViewerUI::PlayByMotionType( CX2UnitViewerUI::UNIT_VIEWER_UI_MOTION_T
 		// name returns false and 31fa7ef0 plays it with the caller's bTransition. June does that lookup before 31fa7ef0's
 		// unit test; the test stays first here. The unit-type 0xa (Lu/Ciel) second play @31fa60dc is inert in March.
 		// No March caller passes HABIT and no March class has a HABIT row (customize / Rose: backlog Stage 12, checklist 7g).
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_ONE_WAIT, wstrAnimName.empty() ? bTransition : false, UVPB_BOTH );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_ONE_WAIT, wstrAnimName.empty() ? bTransition : false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		break;
 	case UVUMT_SIT_READY:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		PlayAnim( L"Emotion_SitReady", CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition, UVPB_BOTH );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		PlayAnim( L"Emotion_SitReady", CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		break;
 	case UVUMT_SIT_WAIT:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		PlayAnim( L"Emotion_SitWait", CKTDGXSkinAnim::XAP_LOOP, bTransition, UVPB_BOTH );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		PlayAnim( L"Emotion_SitWait", CKTDGXSkinAnim::XAP_LOOP, bTransition );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		break;
 	case UVUMT_STANDUP:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		PlayAnim( L"Emotion_StandUp", CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition, UVPB_BOTH );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		PlayAnim( L"Emotion_StandUp", CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		break;
 	default:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition, UVPB_BOTH );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		PlayAnim( wstrAnimName.c_str(), CKTDGXSkinAnim::XAP_ONE_WAIT, bTransition );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		break;
 	}
 }
@@ -8015,6 +8143,9 @@ void CX2UnitViewerUI::SetShowAttribEnchant( bool bShow )
 // 장기적으로 좋지 않으므로 특정 3D 모델을 화면상의 고정 위치에 그려주는 새로운 방법이 필요함.
 void CX2UnitViewerUI::SetPositionOnScr(float x, float y, float z, float scale)	// xyz값은 화면 중앙점으로부터의 offset이다.
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	CKTDGXSkinAnimPtr& m_pXSkinAnim = AccessShownXSkinAnim();	// char-luciel DU5b: June 31f99f70 moves the shown body; the local hides the member; the back body is DU5c's
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	// xyz 값을 화면 Position 기반으로 받게 하고, 그걸 -1~1 좌표로 변환해서 Move해 주자.
 	// 현재 Position 기본은 1024 * 768이다.
 
@@ -8074,6 +8205,82 @@ void CX2UnitViewerUI::SetFixed(bool val)
 	}
 
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+namespace _CONST_UNITVIEWER_DU5B_
+{
+	const float BACK_UNIT_COLOR			= 0.3f;		// June 3345993c
+	const float BACK_UNIT_SCALE_RATE	= 0.85f;	// June 3346f728 ( a double )
+}
+using namespace _CONST_UNITVIEWER_DU5B_;
+
+// char-luciel DU5b: June 31f91020, the body drawn behind ( two-body view only )
+CKTDGXSkinAnimPtr CX2UnitViewerUI::GetBackXSkinAnimPtr() const
+{
+	if ( false == m_bEnableDuoView || false == m_bShowDuoBackUnit )
+		return CKTDGXSkinAnimPtr();
+
+	return ( true == m_bSwitchingView ) ? m_pXSkinAnim : m_pMinorUnitXSkinAnim;
+}
+
+// char-luciel DU5b: June 32912c50's viewer half
+void CX2UnitViewerUI::SetSwitchingView( const bool bSwitchingView_ )
+{
+	m_bSwitchingView = bSwitchingView_;
+	UpdateSwitchingView();
+}
+
+// char-luciel DU5b: June 31f93a10
+void CX2UnitViewerUI::UpdateSwitchingView()
+{
+	CKTDGXSkinAnimPtr pShownXSkinAnim = GetXSkinAnimPtr();
+	if ( NULL != pShownXSkinAnim )
+	{
+		pShownXSkinAnim->GetRenderParam()->color = D3DXCOLOR( 1.f, 1.f, 1.f, 1.f );
+		pShownXSkinAnim->GetMatrix().Scale( GetMatrix().GetScale() );
+		pShownXSkinAnim->GetMatrix().Rotate( GetMatrix().GetRotate() );
+	}
+
+	CKTDGXSkinAnimPtr pBackXSkinAnim = GetBackXSkinAnimPtr();
+	if ( NULL != pBackXSkinAnim )
+	{
+		pBackXSkinAnim->GetRenderParam()->color = D3DXCOLOR( BACK_UNIT_COLOR, BACK_UNIT_COLOR, BACK_UNIT_COLOR, 1.f );
+		pBackXSkinAnim->GetMatrix().Scale( GetMatrix().GetScale() * BACK_UNIT_SCALE_RATE );
+		pBackXSkinAnim->GetMatrix().Rotate( GetMatrix().GetRotate() );
+	}
+	// stand-in: the equips' position, scale and colour copies by body ( 31f93710 / 31f93820 / 31f93920: equip +0x908, +0x914, +0x190 ) have no March members
+}
+
+// char-luciel DU5b: June 31f94190, shows the switching view's body and hides the other body's equips ( a kept position stays )
+void CX2UnitViewerUI::ApplySwitchingViewFilter( const std::vector<CX2Unit::EQIP_POSITION>& vecKeepEquipPosition_ )
+{
+	if ( NULL == m_pXSkinAnim || NULL == m_pMinorUnitXSkinAnim )
+		return;
+
+	m_pXSkinAnim->SetShowObject( false == m_bSwitchingView, m_bSwitchingView );
+	m_pMinorUnitXSkinAnim->SetShowObject( m_bSwitchingView, m_bSwitchingView );
+
+	BOOST_TEST_FOREACH( const ViewEquipMap::value_type&, value, m_ViewEquipMap )
+	{
+		CX2EqipPtr pX2Eqip = value.second;
+		if ( NULL == pX2Eqip )
+			continue;
+
+		bool bKeepShow = false;
+		for ( UINT i = 0; i < vecKeepEquipPosition_.size(); ++i )
+		{
+			if ( vecKeepEquipPosition_[i] != pX2Eqip->GetEqipPos() )
+				continue;
+
+			// June keeps a kept position as it is, except Ciel's weapon while Lu is shown
+			bKeepShow = !( CX2Unit::EP_WEAPON_HAND == vecKeepEquipPosition_[i] && false == m_bSwitchingView && true == pX2Eqip->IsMinorUnitEquip() );
+			break;
+		}
+
+		if ( false == bKeepShow && m_bSwitchingView != pX2Eqip->IsMinorUnitEquip() )
+			pX2Eqip->SetShowObject( false );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 
 #ifdef UNIT_EMOTION

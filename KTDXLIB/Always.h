@@ -13925,3 +13925,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              ( +0x15f8, ReleaseEquipEffectSet( true ) ), which March's destructor left playing. Needs SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET.
 #define SERV_IRUHADEV_JUNE_EQIP_DTOR
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel DU5b: the unit viewer's second body. The viewer builds Ciel's skin from the templet's minor-unit motions
+//              ( 31faa6f0 ) and keeps June's switching view ( +0xd80, set by 32912c50 / 31f93a10 ): its skin getters, frame move and
+//              render take the shown body, PlayByMotionType plays both bodies ( 31fa3010 with 2 ), and the character window shows
+//              only the switching view's body ( 31f94190, the two-body view off as June 329148d0 ). Each body's equipment is DU5b2's.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET ) && defined( SEPARATION_MOTION ) && defined( SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER needs SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ( the form, the window switch ), _MINOR_UNIT_TEMPLET ( Ciel's motions ), SEPARATION_MOTION ( SetUnit's templet ) and SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER ( ViewerFxStop ), char-luciel DU5b
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+//////////////////////////////////////////////////////////////////////////

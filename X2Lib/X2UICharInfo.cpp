@@ -967,7 +967,11 @@ bool CX2UICharInfo::OnDropAnyItem( D3DXVECTOR2 mousePos )
 #ifdef SERV_IRUHADEV_JUNE_CHARINFO_VIEW
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 			g_pData->GetUIManager()->GetUIInventory()->RedirectRingToSecondRingSlot( equipPosition );	// char-luciel DU5: June @32918892
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+			const bool bMinorUnitItem = IsMinorUnitItem( pItem->GetItemTemplet(), NULL != m_pUnitViewerUI && true == m_pUnitViewerUI->GetSwitchingView() );	// char-luciel DU5b: June reads the viewer's +0xd80
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 			const bool bMinorUnitItem = IsMinorUnitItem( pItem->GetItemTemplet(), NULL != m_pUnitViewerUI && true == m_bSwitchingView );	// stand-in: the viewer's +0xd80 is read as the window's switch ( 32912c50 writes both; DU5b )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 			if ( true == g_pData->GetMyUser()->GetSelectUnit()->IsOtherHeadTypeAccessoryWorn( pItem ) )
 			{
 				// char-luciel DU5: June @32918901-32918a7b, the drag is not returned
@@ -1820,6 +1824,11 @@ using namespace _CONST_CHARINFO_C2_;
 
 void CX2UICharInfo::SetSwitchingView( bool bSwitchingView_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5b: June 32912c50 @32912c50-32912c6b, the viewer's switching view first
+	if ( NULL != m_pUnitViewerUI )
+		m_pUnitViewerUI->SetSwitchingView( bSwitchingView_ );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	/// June 32912c50; its viewer flag ( viewer +0xd80, 31f93a10 ) is the Lu/Ciel two-body view, Stage 8
 	m_bSwitchingView = bSwitchingView_;
 
@@ -1850,7 +1859,12 @@ void CX2UICharInfo::SwitchViewOnlyThisDialog()
 {
 	SetSwitchingView( false == m_bSwitchingView );
 	EquipChanged();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	if ( NULL != m_pUnitViewerUI )
+		m_pUnitViewerUI->ApplySwitchingViewFilter( std::vector<CX2Unit::EQIP_POSITION>() );	// char-luciel DU5b: June @3291dd55-3291dd74
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	// stand-in: June's viewer form filter 31f94190 comes with the viewer's second body ( DU5b )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	ResetStat( true );
 	ResetNowEquipUI();
 
@@ -2074,8 +2088,13 @@ void CX2UICharInfo::ResetStat( const bool bUseViewerForm_ /*= false*/ )
 	// June 3291cfb0
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5b: June @3291cfeb-3291d021 reads the viewer's +0xd80
+	const bool bMinorUnitForm = ( true == bUseViewerForm_ && NULL != m_pUnitViewerUI ) ? m_pUnitViewerUI->GetSwitchingView() : pMyUnit->IsMinorUnitForm();
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	// char-luciel DU5: June @3291cfeb-3291d021; stand-in: the viewer's +0xd80 is read as the window's switch ( 32912c50 writes both; DU5b )
 	const bool bMinorUnitForm = ( true == bUseViewerForm_ && NULL != m_pUnitViewerUI ) ? m_bSwitchingView : pMyUnit->IsMinorUnitForm();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	UNREFERENCED_PARAMETER( bUseViewerForm_ );
 	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
@@ -4138,6 +4157,9 @@ void CX2UICharInfo::EquipChanged()
 
 	ResetNowEquipUI();
 	m_pUnitViewerUI->UpdateEqip(true);
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	m_pUnitViewerUI->ApplySwitchingViewFilter( std::vector<CX2Unit::EQIP_POSITION>() );	// char-luciel DU5b: June 3291d2e0 @3291d2fd-3291d320
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	ResetStat();
 
 #ifdef UPGRADE_SKILL_SYSTEM_2013 // 김태환 - 스킬 시스템 변경
@@ -4210,6 +4232,11 @@ void CX2UICharInfo::ResetUnitViewerUI()
 		m_pUnitViewerUI->SetLightPos( UnitviewerLightPos );
 		m_pUnitViewerUI->GetMatrix().Rotate(D3DXToRadian(0),D3DXToRadian(0),D3DXToRadian(0));
 		m_pUnitViewerUI->GetXSkinAnim()->SetApplyMotionOffset( false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5b: June 329148d0 @32914abf-32914ad8, the window shows one body
+		m_pUnitViewerUI->ApplySwitchingViewFilter( std::vector<CX2Unit::EQIP_POSITION>() );
+		m_pUnitViewerUI->SetEnableDuoView( false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	}
 
 
