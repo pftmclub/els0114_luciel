@@ -1916,6 +1916,9 @@ Opus 5.5 high. Reviewed `15a08390` against June (`disasm_range.py`, read-only). 
   stateends / skillicons / luabind not applicable (no states, skills or scripts).
 - **Build:** `/Zs` probes of `X2UICharInfo.cpp` and `X2GULuciel.cpp`: 0 errors. Full build skipped: no play-test (the HP-rate carry shows only with a
   set on the hidden body, the order fix is a last-bit rounding); both ride the next play-test build.
+- **Range gate (`finish.py --range b3f59bba^..b3f59bba --with ..._DUO_SOCKET ..._DUO_SOCKET_DEBUG -v`):** flagcheck `DUO_SOCKET` PASS (2 PASS, 1 OTHER =
+  the `_DEBUG` retire in `Always.h`, 0 FAIL; the 2 deleted lines are DU5f's own lines inside its `#ifdef`: the window comment and the max-MP expression);
+  `_DEBUG` retired (nothing to check); junediverge PASS; enumscan PASS. FINISH RESULT: PASS.
 
 ## Phase CH1 - Deploy unit: the class core
 
