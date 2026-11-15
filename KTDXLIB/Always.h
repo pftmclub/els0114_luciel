@@ -13581,3 +13581,10 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel CH1 play-test fix: CKTDGXSkinAfterImage's ctor reads the origin mesh's center / radius only when the origin anim has a
+//              mesh ( June 3322abc0 ). A model-only weapon mesh ( Lu's Mesh_Lu_Cash_Weapon_Sorted.X ) left it NULL and crashed field entry.
+#define SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH
+//////////////////////////////////////////////////////////////////////////

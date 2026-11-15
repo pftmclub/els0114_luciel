@@ -2766,6 +2766,14 @@ same flagcheck tallies as below, `FINISH RESULT: PASS (9 gates, 0 failed, 3 skip
   Ciel MP + form across the hop, Ciel death clears buffs, win-pose return, relog, one other class's regression walk ).
 - **Play-test:** owed by the user. After it, `CH1-review.md` ( written ) covers this commit and june-state-ids S2 `857b18cd`; CH2a / DU3 / CHN / TU are
   amended from what the play-test shows.
+- **Play-test fix 1 ( field entry crashed ):** the village and the first-entry tutorial ran ( quest 11000 done ), then battlefield 40000 crashed in
+  `CKTDGXSkinAfterImage`'s ctor ( `0xc0000005` reading NULL + 0x74; CrashRpt dump: `CX2GUUser::InitComponent` -> `Weapon::LoadDataForUser` ->
+  `CreateSkinAfterImage` ). Lu's weapon `Mesh_Lu_Cash_Weapon_Sorted.X` ( 41890 ) is model-only, so the weapon anim keeps no mesh and March read its
+  center / radius unguarded. June `3322abc0` tests the origin mesh first ( @`3322af08` `JZ` ). New class-agnostic flag
+  `SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH` ( `Always.h`, `KTDGXSkinAfterImage.cpp` ). The later frame copy is already NULL-safe
+  ( `X2OPTIMIZE_SKIN_ANIM_MESH_CRASH_BUG_FIX`, `KTDX.h:378` ). Gates: flagcheck `1 PASS, 1 DEFINE, 0 FAIL` / PASS, junediverge PASS, enumscan exit 0.
+  `DEPLOY OK: X2_offline.exe is 26,905,600 B, dated 2026-11-15 14:13:15, md5 f509c92055b89741bbfceb8d53258f35, equal to X2/US_SERVICE/x2.exe`.
+  Not seen yet ( the class never reached it ): the creation preview shows Lu only ( DU5's ), the tutorial is March's default ( TU's ).
 
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 

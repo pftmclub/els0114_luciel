@@ -54,8 +54,16 @@ CKTDGXSkinAfterImage::CKTDGXSkinAfterImage( CKTDGXSkinAnim* pOriginAnim, int ima
 		data.fAlpha = 0.0f;
 		m_AfterImageList.push_back( data );
 
+#ifdef SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH
+		if ( NULL != pOriginAnim->GetAnimXSkinMesh() )	// char-luciel CH1: June 3322abc0 @3322af08 skips center / radius for a model-only origin mesh
+		{
+			data.pAnim->SetCenter( pOriginAnim->GetAnimXSkinMesh()->GetCenter() );
+			data.pAnim->SetBoundingRadius( pOriginAnim->GetAnimXSkinMesh()->GetBoundingRadius() );
+		}
+#else SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH
 		data.pAnim->SetCenter( pOriginAnim->GetAnimXSkinMesh()->GetCenter() );
 		data.pAnim->SetBoundingRadius( pOriginAnim->GetAnimXSkinMesh()->GetBoundingRadius() );
+#endif SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH
 		g_pKTDXApp->GetDGManager()->AddObjectChain( data.pAnim );
 	}
 }

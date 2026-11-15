@@ -7125,3 +7125,5 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_
   `SKILL_ID.RNSI_A_LLD_BLUFF = 30304`. data034: June's `DLG_Luciel_CombinationPoint.lua` (new). Both koms packed and copied (backups
   `kom_backup_tools\data034.kom.20261115_132507`, `data036.kom.20261115_132507`).
 - **Revert:** comment out `_LIVE` and `_DUO` (Lu/Ciel then cannot enter a game); data: copy the two backups back.
+- **Play-test fix:** `SERV_IRUHADEV_JUNE_SKIN_AFTER_IMAGE_NULL_MESH` (every unit): an after-image whose origin anim has no mesh (a model-only weapon such as
+  Lu's `Mesh_Lu_Cash_Weapon_Sorted.X`) skips the mesh's center / radius, as June `3322abc0` does, instead of crashing. Revert: comment out the `#define`.
