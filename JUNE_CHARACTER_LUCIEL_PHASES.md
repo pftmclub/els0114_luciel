@@ -3346,6 +3346,43 @@ Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's, no new de
   `m_vecDarkCrescentTargetUnit` ( June `32b177b0`, a Ruinous Impact damage callback ) is CH4a's ( `ch0_class_map.tsv` row, phase CH4a ), so the vector stays empty and Dark Crescent starts with no target ( June behaviour without it ). Retest the chain at CH4a.
 - **Next:** `/x2-phase char-luciel CH2b review` on Opus 5.5 high.
 
+### CH2b - Review (2026-11-15)
+
+Opus 5.5 high. Covers CH2a ( `fe073ac8` ), CH2a2 ( `7997ac26`, `18808960` ) and CH2b ( `ac6dda59` ). **Verdict: pass after one fix.** Files: `X2GULuciel.cpp`, `Always.h`.
+- **Fix ( `_SKILL` ).** `GetSkillCombinationPointCost` ( CH1a, June `32b14f70` ): the Fantasie Impromptu 2nd-movement discount reads June +0x9444 @32b15014
+  ( the state-start skill ), not vslot 0x524; now `m_eStateStartSkillID` under `_SKILL`, CH1a's `GetNowStateSkillID()` in `#else`. Same value unless a state's skill
+  changes after its CommonStateStart; reachable from CH2c ( 30021 / 30023 ).
+- **Byte scan of disp32 +0x9444 over June `.text`: 5 hits.** Writers: ctor @32041de1 ( 0 = `SI_NONE`, = the port's ctor init ), `CX2GUUser::CommonStateStart` @32060cdb
+  ( vslot 0x524 ). Readers: all three in `CX2GULuciel`, Ruinous Impact start @32affca3, cost @32b15014 ( the fix ), Dark Crescent start-future @32b2ac34. None missed.
+  The port writes it in `CX2GULuciel::CommonStateStart` after the base; the base is called unqualified nowhere else in the class ( grep ), so every Lu state writes it.
+- **Checked against June ( capstone `disasm_range.py` ) - all = June:**
+  - Dead Hands EventProcess `32aff850`: animation end, or +0x8c18 ( `m_fEventTime[0].stateChange`, Chung CH2b's proof ) <= now ( `test ah, 0x41` / `jnp`: NaN does not end ),
+    then the cancel chain identical to Power of Oriax `32affcf0` instruction by instruction.
+  - Setter cases: hyper copies as June ( Dead Hands 4 callbacks, Apollyon 3, Oriax 2, Blasting Fear / Backstab EventProcess only; never the Init ). Ruinous Impact start `32affca0`:
+    IsSkillOrUpgrade( +0x9444, 30008 Dead Hands ) else key = slot - 1, loop count 0, then CommonStateStart.
+  - Dark Crescent start-future `32b2ac20`: IsSkillOrUpgrade( +0x9444, 30007 Ruinous Impact ); filters team, slot 94 with AT_SPECIAL ( 1 ), 0 < HP ( NaN passes, as `<= 0` ),
+    boss-raid slot 0x3c8, line LT_NORMAL + enabled, `CanDown( pos, 30.0, 0 x5, 1, 0 )`, distance < 700; pick rule, -1 seed, flip of +0x7e56, position + line +0x28
+    ( `startPos.y` ) + 20.0 ( double ); vector cleared on every path, then CommonStateStartFuture. Same as Arme's `32cd4830` port except the attack type ( Aisha: AT_COMMAND ).
+  - Apollyon FrameMove `32b2b050`: SA 29 / 6 / 2 / 31 / 5 = `SA_SCOPE_ABS` / `ATK_REL` / `EFFECTIVE_COUNT` / `PROJECTILE_RANGE_REL` / `EFFECTIVE_RATE` ( `s0a_templet_keys.tsv` );
+    defaults 0 / 1 / 0 / 1 / 0; the `[esp+0x34]` slot is the size rate for both sets; slot 0x180 = `GetInvincible` ( funcmap 429 / 430 ); `dist < range`; cap at the count;
+    power rate x ( n x step + 1.0 ); memo roll `random <= oriax + rate`; scales n x size + 1.2 ( `3346f488`, a double ) / + 1.0; FX set Y 180 when facing left;
+    Throne Authority 30417 only without the memo sets, SA 149 rate, pass at `rate <= random` ( JUNE_BUGS 740 confirmed ), SA 148 cool-time cut, SA 2 points.
+  - `TryUseSkillWithCombinationPoint` `32b3acf0`: `al` = 0 at every refusal ( @32b3af90 ), 1 @32b3b4f7 after `SpecialAttackNoStageChange` ( vslot 0x810 ) or
+    `StateChangeBySkillID` ( `32aeaa10` ) and `OnSkillUse`. CH2a's use / cooldown debug lines are unaffected.
+  - Constants: 0.7 / 0.2 / 700 / 20.0 / 1.5 / 1.0 / 5e-8 / 1.2 / 180 / 30.0 read from the exe = the port.
+  - CH2a2's `bMarchSlotIndex` arm ( diff of `18808960` ): outermost, Lu added, earlier arms in `#else` intact. CH2a's cases: diff only ( play-tested ).
+- **Minor, not changed:** `CX2GULuciel::IsSkillOrUpgrade` repeats June `31edf560` ( already ported for Eve / Chung ); a shared helper is a cleanup, not a defect.
+- **Debug retired:** `//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` ( bytepatch; the CH2b play-test passed ). `flagcheck ..._SKILL_DEBUG --worktree --files KTDXLIB/Always.h`:
+  1 DEFINE, 0 FAIL, 0 ERROR, the 1 deleted line is the `#define` ( "not #defined" is the retire itself ). CH2c re-enables it for its play-test if it wants the use / cooldown lines.
+- **Gates.** `finish.py --review --commits fe073ac8 7997ac26 18808960 ac6dda59 --with ..._SKILL ..._SKILL_DEBUG -v`: flagcheck `_SKILL` PASS ( 1 PASS, 1 DEFINE, 7 OTHER, 0 FAIL ),
+  junediverge PASS, `--check-all` PASS, enumscan exit 0, `FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped)`. OTHER rows: `.cpp` / `.h` hunks sit inside `_CORE`;
+  `X2GUUser.cpp` sits in the Arme `_CORE` enclosure; `X2BuffFactor.h` = `JUNE_ENUM_NAMES`. Deleted lines: CH2a 1 + 1 ( member rename ), CH2b `.cpp` 10 ( 7 `return;`, the
+  signature, the 2-line `OnSkillUse` if ) and `.h` 2 ( the declaration ), `18808960` 5 ( the staging slip moved back; `7997ac26`'s `tok!` row is that slip ).
+  `stateends.py check X2GULuciel.cpp Luciel_Duo`: 370 tables, 0 STUCK, PASS. This review: `finish.py --files X2Lib/X2GULuciel.cpp --with ..._SKILL`: flagcheck PASS
+  ( 1 PASS ), junediverge PASS, enumscan exit 0, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+- **Build:** `/Zs` probes of `X2GULuciel.cpp` and `X2GUUser.cpp`: exit 0, 0 errors. Full build skipped: no play-test ( the fix's skill is CH2c's ); the next play-test build takes it.
+- **Next:** `/x2-phase char-luciel CH2c` on Sonnet 5.5 high.
+
 ### CH2d20 - Done (2026-11-15)
 
 Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`, `Always.h`. Flags: `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`

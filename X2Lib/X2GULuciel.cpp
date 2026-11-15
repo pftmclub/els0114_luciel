@@ -461,7 +461,12 @@ int CX2GULuciel::GetSkillCombinationPointCost( const CX2SkillTree::SKILL_ID eSki
 	switch ( g_pData->GetSkillTree()->GetUpgradeBaseSkillID( eSkillID_ ) )
 	{
 	case CX2SkillTree::RNSI_SA_LCN_FANTASIE_IMPROMPTU_2ND_MOVEMENT:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+		// char-luciel CH2b review: June @32b15014 reads +0x9444 ( the state-start skill ), not vslot 0x524
+		if ( CX2SkillTree::RNSI_SA_LCG_FANTASIE_IMPROMPTU_1ST_MOVEMENT == g_pData->GetSkillTree()->GetUpgradeBaseSkillID( m_eStateStartSkillID ) )
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 		if ( CX2SkillTree::RNSI_SA_LCG_FANTASIE_IMPROMPTU_1ST_MOVEMENT == g_pData->GetSkillTree()->GetUpgradeBaseSkillID( GetNowStateSkillID() ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 			return static_cast<int>( iCost * FANTASIE_2ND_COST_RATE_AFTER_1ST );
 		return iCost;
 

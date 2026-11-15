@@ -45,6 +45,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §4 L178-181 June-only SKILL_ID members fail silently (52 SI_ 10000-10699 + 143 RNSI_ 30001-3; §7i L436-437 class code multiplies m_fNowStatePowerRate, never the entry; §7ae L713-720 June skill-tree ids with no March class state (reform ids 21000+, RNSI_*); §7ae L729-733 June skill types 14-16 / 17 / 18 named in the class switch; ResetLeftSkillCoolTi.
 - Prefix `LCG` = 38 (also owned by 128). Split in table order with CH2c2.
 
+## Amended by the char-luciel CH2b review (2026-11-15)
+
+- The CH2b review retired `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` ( `//#define` in `Always.h` ). If your play-test needs the `use` / `cooldown` lines, un-comment it ( bytepatch ) and say so in the Done note; the CH2c2 review retires it again.
+- `GetSkillCombinationPointCost` now reads `m_eStateStartSkillID` for Fantasie 2nd movement ( June @32b15014 ): your Fantasie 1st -> 2nd chain gets the discount only when the state that ran CommonStateStart was 1st movement.
+
 ## Amended by char-luciel CH1m (2026-11-15)
 
 - `CX2GULuciel::InitStateCommon` registers `LSI_SA_LCG_ESCHATON` ( 363; Init and EventProcess here, FrameMove `32b2cfc0` is CH2c2's: register the state with all three once CH2c2 lands, or here with FrameMove behind a one-line `body in CH2c2` comment ) in June ( `32b3e8b0`, `ch0_reg.tsv` ), but every callback is this phase's, so CH1m left a `// June 32b3e8b0 @<row> <table> ( id N ): registered by CH2c / CH2c2 with its callbacks` marker at the end of the function. Replace the marker with the full registration ( table, June id, each slot as the `ch0_reg.tsv` row ), then `python june2017_re/char_luciel/ch1m_regcheck.py` must print 0 problems.
