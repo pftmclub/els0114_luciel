@@ -1019,6 +1019,9 @@ poison / fire / cold tick runs (hits in that second are counted too).
 **Hygiene.** `finish.py --files <6 files> --with SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE`: flagcheck 4 PASS, 0 DEFINE, 2 OTHER (`Always.h`: peers' uncommitted
 defines; `DungeonEnum.h`: under `JUNE_ENUM_NAMES`), 0 FAIL, 0 deleted, 0 non-ASCII, 0 EOL, 0 bare `#else` -> `RESULT: PASS`; junediverge `RESULT: PASS`;
 enumscan exit 0. Probes (`/Zs`, US_SERVICE): `X2GUNPC`, `X2GUUser`, `X2DamageManager` 0 errors.
+After commit `a93c5420`: `finish.py --range a93c5420^..a93c5420 --with ..._EXTRA_DAMAGE`: flagcheck 4 PASS, 1 DEFINE, 1 OTHER (`DungeonEnum.h`, `JUNE_ENUM_NAMES`),
+0 FAIL -> `RESULT: PASS`; junediverge PASS; enumscan exit 0; stateends skipped (no skill state registered). `D5-review.md`, dropped by a racing peer commit
+(`833d1d53`), restored in its own commit.
 **Build.** `DEPLOY OK: X2_offline.exe is 27,020,800 B, dated 2026-11-15 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3, equal to X2/US_SERVICE/x2.exe (2026-11-15 22:24:11); built at main fac2180d + 38 uncommitted code file(s).`
 (coalesced: a peer's full build started after the last D5 edit.) `EXESTR OK: 2 of 2 found in X2_offline.exe, 27020800 B, dated 2026-11-15 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3` (the NPC `EDT` and user `EDTTICK` lines).
 
