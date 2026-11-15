@@ -1161,6 +1161,10 @@ half is planned there (C9h-2a/2b/3). Two pieces are not effect work and have no 
 - **The base dash starts' pet getters** (char-chung CH1n2, 2026-11-02). June's `DashStartFuture` / `DashJumpLandingStartFuture` (`31fcbe80` /
   `31fcbe40`) take the pet's state from `32d27830` / `32d27810` (pet `+0x560` / `+0x55c` while pet `+0x5a0` is set, else `+0x4fc` / `+0x4f8`).
   CH1n2 ported both bodies with March's `m_DashState` / `m_JumpLandingState` and a stand-in line; this stage's transformed set replaces them.
+- **The riding die state's StateEnd** (char-luciel CH1 review, 2026-11-15). June registers `USI_RIDING_DIE` ( 0x57 ) with the die StateEnd thunk
+  `329cada0` -> `3202a7d0` ( SIEE 18, then buff clear-all ) for every class ( `ch0_reg.tsv` / `ch1m_reg_by_class.tsv` rows; Lu `32b3e8b0` line 1833 ). March's
+  stand-in in `X2GUUser.cpp` `DoStateEndStart` ( `JUNE_SOCKET_PARITY` / `JUNE_BUFF_DEATH_CLEAR`, june-buff 16-step3b4 ) tests only the two die states, so a unit
+  killed while riding keeps its buffs and plays no SIEE 18. One more `||` under its own flag; play-test: die on a riding pet with a buff on.
 
 ### Stage 18: NPC friendship system (june-effect C9h-5, 2026-10-08)
 

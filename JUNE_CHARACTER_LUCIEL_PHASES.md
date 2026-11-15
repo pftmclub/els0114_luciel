@@ -2829,6 +2829,50 @@ rows, ported ).
   regression walk unchanged. Logs: 14 `LUCIEL` lines ( DATA loads + swaps ), 0 EXCEPTION, ErrorLog clean, UNHANDLED only `E_DISABLE_HB_CHECK_REQ` x4.
   CH1's play-test is complete except Ciel's body and death check ( DU3 ). `CH1-review.md` is next.
 
+### CH1 - Review (2026-11-15)
+
+Opus 5.5 high. Covers CH1 `5e880f3c` + fix `975e8b87`, CH1q `16997120` + fix 2 `4b5106c9`, and june-state-ids S2 `857b18cd`. **Verdict: pass, no code
+change.** Ghidra read-only; listings in the session scratchpad.
+- **Factory:** `3230f470` = `new( 0x98a0 )` + ctor `32b1bd90`, nothing else. Both callers jump through a 12-entry table ( type - 1 ), case 10 = index 9:
+  `322ced00` ( table `322cef10`, block `322cee9c`, call @`322ceeb4` ) returns from each case directly = **`CreateGUUser`**; `322d5bf0` ( table `322d5eb4`, block
+  `322d5d77`, call @`322d5d8f` ) jumps to the shared tail `322d5dd2` ( vslot 0x40 `( 1, -1 )`, 0x198, ... ) like every case = **`AddUserUnitIntruder`**. No
+  case-10-only call. Arguments ( slot, team `+0x10`, script, frame buffer `[g_pMain + 0x120]`, unit `+0x50` ) = the port's order. funcmap row updated.
+- **Switching guide:** ctor @`32307bca` / dtor @`32308957` sit between memorize and Eve recovery ( CH1's note ); the port's `&false`, `0.f` and order match.
+- **`ParseCommonRandomState`:** no class override in June; Lu's calls `ParseCommonRandomStateByUnitClass()` as Aisha / Eve / Ara / Elesis. `GetUnitClassName`
+  ( `X2UISkillTreeNew2015.cpp:5633` ) gives `LUCIEL_DUO` / `_CHILIARCH` / `_ROYAL_GUARD` / `_DIABLURA` / `_DREAD_LORD` / `_NOBLESSE` / `_DEMONIO` for 200 / 37 /
+  38 / 39 / 127 / 128 / 129: the seven keys of `Luciel_Duo.src.lua:597-814`. Note: that helper exists only under `JUNE_CHAR_ARME_LIVE` or `_EVE_LIVE` (both
+  defined); the four classes share the dependency, no guard added.
+- **Die-state ends:** `32b3e8b0` registers 0xc0 `LSI_CIEL_DIE_FRONT` / 0xc1 `_BACK` with End `329cada0` ( `jmp 3202a7d0` ), = `ch0_reg.tsv` rows 185 / 186. The
+  getters ( `X2GULuciel.cpp:8651` ) give Ciel's 192 / 193 while Ciel is active and Lu's 7 / 8 ( = `USI_DIE_*` ) when transformed, so both bodies and the
+  transformed death match; March classes keep the base `USI_DIE_*`. Proof in game is DU3's ( Ciel has no body yet; kickoff amended by CH1q ).
+  **Found, routed:** June also gives `USI_RIDING_DIE` ( 0x57 ) that End for **every** class, and the stand-in misses it: backlog Stage 17 bullet ( not Lu's subject, no crash ).
+- **S2:** bounding at 0x78 / 0x79 / 0x7a, tables `LSI_LU_DAMAGE_BOUNDING_*`, thunks `329cc970` / `980` / `990` / `9a0` / `9b0` -> `329cc0b0` / `150` / `1e0` /
+  `050` / `0c0` ( the shared ones S2 names ) = `InitBoundingStates( "LSI_LU_" )`'s three rows. Wait change: `32b43d10` @`32b44174` pushes 0x82 and thunk
+  `329cb720` ( `jmp 31fc8620` = `WaitStateChangeEventProcess` ) = `InitWaitStateChange`. Shadows gone, guard placed; S2's probes accepted for 110-118.
+- **Data:** staged sha1 of `Luciel_Duo.lua` / `Luciel_Demonio.lua` / `DLG_Luciel_CombinationPoint.lua` = the adopt manifests' `ljconv` sha1, all `1B 4B 4C 81`.
+  `luabind.py check` the three: `RESULT: PASS` ( one June nil, `CT_PARTS_LOOK_TRACKINGT` ). data036 `Enum.lua:12352` `RNSI_A_LLD_BLUFF = 30304` = June `:15069`.
+- **CH1q:** `CreateSkinAfterImage` = June `31f8ace0` ( NULL anim -> 0, else `new( 0x1d4 )` + ctor ). `LoadDataForUser` = `3228d660`: head ( motion
+  `+0x87cc`, eqip `+0x1c0`, templet `+0x198` ), loop of 8, after-image on the normal model `+0x5a4` from the normal anim `+0x544`, colour 0.8 / 1.0, fashion from
+  `+0x194` else the eqip templet, change-weapon via `IsValidUnit` + `+0x91dd` and its clear, `GetEquippingItemByEquipPos( 2, 0, 0 )`, else `GetItem( uid, true )`
+  @`3228ea5a`; the 15 ids 3003 / 3033 / 3303 / 4004 / 4044 / 4404 / 4546 / 4576 / 4657 / 4687 / 4768 / 4798 / 4846 / 4957 / 5068 = the 15 named members; texture
+  name by unit type ( NULL -> 0 ), stride 400; the 4 traces ( 400 / 150, 100 / 50, custom 400 / 150 with stride ), radius x1.5 / x0.5, disable times, tip only
+  untextured, Ara's frames on type 7. June returns nothing; March's three callers ignore the bool. Fix 1 = @`3322af08` ( `[anim + 0x190]` test ). Fix 2: ctor
+  @`3322acaf` writes word 1 at `+0x1d0`; `OnFrameMove` `3322a620` needs `+0x194` and `+0x1d0`; `32b15430` writes `+0x1d0` on both after-images ( states 13 / 194 off ).
+- **Gates:** `finish.py --review --commits 5e880f3c 975e8b87 16997120 4b5106c9 857b18cd --with <7 flags> --skip-flag JUNE_USER_STATE_IDS "guard target"`: flagcheck
+  CORE `7 PASS, 4 DEFINE, 6 OTHER`, DUO `3 / 4 / 7`, LIVE `6 / 4 / 7`, WEAPON_LOAD `3 / 2 / 2`, ADD_NEW_IMAGE `3 / 1 / 0`, NULL_MESH `2 / 3 / 4`, HOOKS
+  `2 / 4 / 11`, all `0 FAIL, 0 ERROR` / PASS; every OTHER row is another flag of this set or the four enclosing `INFO` flags; 51 deleted lines = S2's 48 shadow /
+  inline rows + CH1's 3 `Always.h` lines. junediverge PASS, `--check-all` PASS, enumscan exit 0: `FINISH RESULT: PASS (14 gates, 0 failed, 4 skipped)`. With
+  `JUNE_USER_STATE_IDS` in `--with` every flag read ERROR on S1's `_DEBUG` guard line ( the limit S2's note names ). `stateends.py check X2GULuciel.cpp`
+  `Luciel_Duo` / `Luciel_Demonio`: 0 STUCK, PASS both.
+- **Play-test verdicts** ( CH1 runs 1-2, CH1q runs 1-2 ): create / village / first-entry tutorial pass ( March's quest 11000: TU's ); field entry crash fixed
+  ( CH1q ); walk / jump / dash / combo / dungeon pass; V swap pass ( 16 then 14 swaps logged ); Lu's frozen after-image fixed ( fix 2 ); March regression walk
+  pass; relog / win pose / Ciel MP across the hop have no line of their own in the notes ( the user's "passed" covers them; 2-3 `LUCIEL DATA` loads per run ). **Owed to DU3:** Ciel's body and the Ciel death / buff check. **Not shown by a log:** a point on hit ( the
+  run logged `CP_AMOUNT 0`, no `DUO point` line; only the six ZZZZX / XXXZX / dash-jump XXXXZ finishers carry `HIT_ADD_COMBINATION_POINT` ) and the point row:
+  moved to CH2a's play-test. Cosmetic: the `DATA` line's `script` is empty ( background load keeps no file name ).
+- **Build:** none ( no code change ); last deploy is CH1q fix 2's ( md5 `8ea4a8d4` ).
+- **Kickoffs:** DU3 carries CH1q's amendment; CH2a, CHN, TU amended now. Unblocked: DU3, CHN, TU, CH2a, CH2d20, CH3c20 ( one at a time in `X2GULuciel.*` and in
+  `X2GUUser.*` ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

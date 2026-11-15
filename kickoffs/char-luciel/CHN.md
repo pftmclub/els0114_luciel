@@ -49,3 +49,8 @@ emulator applies the reward through `CX2OfflineQuest::GetChangeUnitClass`.
 - `X2OfflineClassChangeSeed.h`: ticket `ROWS`, `PARENT_ROWS` {200,200} {37,200} {38,200} {39,200} {127,37} {128,38} {129,39}, 39 in
   `SIDE_STEP_CLASSES` (without parent rows the gates read "no row" and do not refuse). `X2OfflineLuaEnumSeed.h`: the 7 `UC_LUCIEL_*` names.
 - `DLG_Class_Change_Luciel_*` (6, named in `X2StateClassChange.cpp:335-374`) are June data217 only; 4 guide dialogs in June data034: CH0b stages them.
+
+## Amended by char-luciel CH1 review (2026-11-15)
+
+- CH1's play-test: a new Lu/Ciel plays, swaps and enters fields and dungeons; Ciel draws no body until DU3, so after a job change check Lu's portrait,
+  motions and tree, and Ciel's by log ( `LUCIEL DATA class <id> ... minor_motion` ) if DU3 has not landed.

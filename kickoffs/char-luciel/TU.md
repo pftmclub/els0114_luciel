@@ -63,3 +63,8 @@ NU0 (2026-11-02), `nu0_jobchange_tutorial.tsv`:
 - The March classes' cases of `325622e0` (and the `X2StateBeginning.cpp` copy), their `DI_DUNGEON_TUTORIAL_*` enums, DungeonData rows, worlds
   624-632 and emulator lists belong to june-dungeons C3y-2. NU0's "TU ports June's whole body, every class" now means: add case 10 (Lu/Ciel)
   to C3y-2's switch, plus Lu/Ciel's own data. If C3y-2 has not landed when this phase runs, stop and run C3y-2 first.
+
+## Amended by char-luciel CH1 review (2026-11-15)
+
+- CH1's play-test: a new Lu/Ciel entering the village ran **March's default first-entry tutorial** ( quest 11000 completed ), not June's dungeon 41240. The
+  hand-off creates a fresh Lu/Ciel and shows June's route replacing it.

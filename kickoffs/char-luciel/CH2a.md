@@ -53,3 +53,12 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1o3 (2026-11-15)
 
 - **Skill-state byte:** June marks some extra states as skill states ( byte `+0x11`, now `UserUnitStateData::m_bSkillState`, flag `SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE` ). In your cases set `stateData.m_bSkillState = true;` on: 266@32b49656, 267@32b49709 ( `ch1n_skill_cases.tsv` column `skill_state_extra`, state id @ June store ). The slot states already get it from CH1n's head.
+
+## Amended by char-luciel CH1 review (2026-11-15)
+
+- **Ciel has no body until DU3** ( every equip is Lu's under the `+0x15d4` stand-in ). If DU3 has not landed, Ciel's skills are judged by their effects,
+  sounds, damage and log lines, and the hand-off says so.
+- **No weapon trail on Lu's skin weapons is June's** ( CH1q: a `UT_SKIN` weapon builds no normal anim, so no after-image and no slash trace ). Do not
+  report it or expect it in the hand-off.
+- **Point on hit, owed from CH1:** add one check to the play-test: Lu's `ZZZZX` ( or `XXXZX`, dash-jump `XXXXZ` ) on a monster gives
+  `[JUNE_CHAR] LUCIEL DUO point: +1 on hit ( HIT_ADD_COMBINATION_POINT )` at most once a second, and the HUD point row fills; the same finishers on Ciel.
