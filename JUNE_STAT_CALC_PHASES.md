@@ -1038,7 +1038,11 @@ monsters (Plingchu G / R 2129 / 2130, Pyurita 2131, Pimpim 2134), not the Altera
   (2651 / 2726 = one frame more or less). Seconds with hits in them read higher, as the note says.
 - Resisted tick: the same monsters resist poison 350 and fire 50, so poison ticks at 30 % of its 1,648 base and fire at 90 %. 0 formula mismatches over 32 `EDT`
   lines; the other 13 are EDT 16 at level -1 (fixed, no tick). ErrorLog: no `JUNE_STATCALC` line, no crash.
-- Open: cold (jtInfinitySword, 71) never attacked; ticks on the player have no reliable source (review / D6).
+- Cold: jtInfinitySword (71) hit 5154-5157 with no `EDT type=8` line, because a cold socket never loads. March's loader (`X2SocketItem.cpp`, the
+  `m_SocketExtraDamage` switch) keeps only EDT 1 / 2 / 3 / 4 / 5 / 6 / 16 / 18, and June's (`32729267`, table `32737230` -> `3273721c` group 0, `+0x324`) keeps the same
+  eight; 8 falls to the default in both. Option 25004 is dead data in June too, so this is not a defect (funcmap row). The cold tick base (60) sits in the same
+  `GetCalcPerDamage` table as poison and fire. Ticks on the player still have no reliable source: review / D6.
+**Play-test: passed** (poison, fire and the resisted tick by log; cold is unreachable through a socket in June as well).
 
 ## Phase D6 - Damage smoke on every ported character, track review
 

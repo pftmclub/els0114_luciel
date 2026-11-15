@@ -293,7 +293,7 @@ Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 /
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| D5 | play-test 2026-11-15: poison + fire ticks = formula, resisted tick lower; cold check owed (jtInfinitySword); then D5 review | Opus 5.5 / high, Opus review | D4 review | `X2GUNPC.*`, `X2GUUser.cpp`, `X2DamageManager.cpp`, `DungeonEnum.h` | `D5.md`, review `D5-review.md` |
+| D5 | **play-test passed** 2026-11-15 (poison + fire ticks = formula, resisted tick lower; a cold socket loads in neither March nor June); D5 review next | Opus 5.5 / high, Opus review | D4 review | `X2GUNPC.*`, `X2GUUser.cpp`, `X2DamageManager.cpp`, `DungeonEnum.h` | `D5.md`, review `D5-review.md` |
 | D6 | blocked (D5 review): damage smoke on every ported character; its review covers D1-D5 and retires `_DEBUG` | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |
 | S0 | ready: stat-sheet and resource map (read-only); runs beside anything | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0.md` |
 | S1 | blocked (S0 review, Stages 7 + 8 closed, D6 review): unit stat core | Opus 5.5 / high, Opus review | S0 review, Stages 7 + 8, D6 review | `X2Stat.*`, `X2Unit.*`, `X2GameUnit.*`, `X2GUUser.*` | `S1.md` |
