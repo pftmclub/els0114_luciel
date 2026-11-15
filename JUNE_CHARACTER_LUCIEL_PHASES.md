@@ -2567,6 +2567,7 @@ No review of its own: the CH1o3 review covers CH1o2. Verdicts: `june2017_re/char
   `JUNE_USER_VIRTUAL_HOOKS` `2 PASS, 2 OTHER, 0 FAIL` / PASS, 2 deleted = the two base die getters made const; `JUNE_CHAR_LUCIEL_CORE` `2 PASS, 2 OTHER` / PASS,
   6 deleted = Lu's two declarations and two definitions + comments; `JUNE_CHAR_ARME_CORE` `4 OTHER` / PASS ( `IsNotCommonMoveState` sits in its block ); `junediverge`
   PASS; `enumscan` exit 0; 0 non-ASCII, 0 EOL, 0 encoding change. Skipped: `stateends` ( no state registered ), `skillicons`, `luabind` ( nothing added or staged ).
+  Commit `4cd0f5c2`; `finish.py --range 4cd0f5c2^..4cd0f5c2`: the same three flagcheck PASS lines, `FINISH RESULT: PASS (8 gates, 0 failed, 3 skipped)`.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GUUser.cpp`, `X2GULuciel.cpp`, `X2GUElsword_SwordMan.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`:
   6 x 0 errors, 0 warnings in the touched files. Flag probe: `SERV_ELSWORD_INFINITY_SWORD`, `FIX_MEDITATION_RUN`, `JUNE_USER_STATE_ID16`, `_CORE`, `HOOKS` all defined in X2Lib.
   Full build skipped: no play-test ( CH1 final's regression walk covers dash, jump, riding, death, emotion on another class ).
