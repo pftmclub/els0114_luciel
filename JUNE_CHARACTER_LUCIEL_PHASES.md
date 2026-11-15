@@ -1708,7 +1708,8 @@ of viewer `+0xd7c..+0xd82` / `+0xe40` in 44 functions of `31f8f000-31fb2000`.
   move and draw, `31f90fb0` (minor rotation) -> DU5c (kickoff amended).
 - **June bug kept:** JUNE_BUGS 756, the destructor never closes Ciel's motion mesh (`31fab920 @31fac060`): no destructor code.
 - **Gates:** `finish.py --files <5> --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER`: flagcheck PASS (4 PASS, 1 OTHER = `Always.h`, peers'
-  uncommitted blocks), junediverge PASS, enumscan exit 0; stateends / skillicons / luabind n/a. `--range` line below.
+  uncommitted blocks), junediverge PASS, enumscan exit 0; stateends / skillicons / luabind n/a. Commit `5b6c5880`; `finish.py --range
+  5b6c5880^..5b6c5880 --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER`: flagcheck PASS (4 PASS, 1 DEFINE, 0 OTHER, 0 FAIL), junediverge PASS, enumscan exit 0.
 - **Compile:** `/Zs` probes (census `cl_cmd`, no PCH) of `X2UnitViewerUI.cpp`, `X2UICharInfo.cpp`, `X2TFieldGame.cpp`: 0 errors each; a flag
   probe shows `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` on. Full build skipped: no play-test yet (batched at DU5b2).
 - **Play-test deferred:** section DU5b in `kickoffs/char-luciel/playtest.md`, batch at DU5b2. Review: `DU5b2-review.md` covers DU5b + DU5b2.
