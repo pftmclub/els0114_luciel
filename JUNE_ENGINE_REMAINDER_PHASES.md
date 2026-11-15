@@ -2384,6 +2384,10 @@ first 10 then every 600th; the review retires it) and `SERV_IRUHADEV_JUNE_EQIP_D
 **Gates** (worktree, `finish.py --files <4 files> --with` the three flags + `JUNE_ENUM_NAMES`): X2Eqip.cpp PASS +233, X2Eqip.h PASS +7,
 X2RidingPetManager.h PASS +3; 0 deleted, 0 non-ASCII, 0 EOL-mismatched. The only ERROR was a peer's uncommitted `Always.h` guard line (line 10175);
 the committed range below is the verdict. junediverge RESULT: PASS (1 allow-listed); enumscan exit 0.
+**Commit `58fbaab4`** (+ `eb5043c5`: drops a duplicate R9 MODS entry the first commit swept in). `finish.py --commits 58fbaab4 --with
+..._EQIP_FRAME_MOVE ..._DEBUG ..._EQIP_DTOR --skip-flag ..._JUNE_ENUM_NAMES` (the one `RPUI_RAKSHASA` line): JUNE_EQIP_FRAME_MOVE PASS (2 PASS,
+1 DEFINE, 1 OTHER = the enum line), JUNE_EQIP_DTOR PASS (1 PASS, 1 DEFINE, 2 OTHER = X2Eqip.h / the enum line); junediverge PASS; enumscan exit 0;
+FINISH RESULT: PASS.
 **Compile:** one-file `/Zs` probe of `X2Eqip.cpp`: 0 errors; probe shows `JUNE_EQIP_FRAME_MOVE`, `_DEBUG`, `JUNE_EQIP_DTOR` on.
 **Build:** `COALESCED` into a peer's full build that started after these edits, then `DEPLOY OK: X2_offline.exe is 27,020,800 B, dated 2026-11-15
 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3`. `EXESTR OK: 2 of 2 found in X2_offline.exe` (`] EQTRACE item `, ` found `).
