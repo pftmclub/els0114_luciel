@@ -13729,3 +13729,11 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG needs SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 #endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM_DEBUG
 //////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R5b: June's per-equip switch on the custom render state in CX2GUUser::CommonFrameMove (32063650 @32065bc1-32065c9f): CRS 3 / 5 / 9 hand the sub-equips the body's render param ( 5 also hides the unit and its after-image ), no state puts them back; CX2SubEquip default render param, CX2GameUnit buff after-image byte
+#define SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+#if defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP ) && !( defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK ) && defined( ATTACH_SKINMESH ) )
+#error SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP needs SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE ( the state pick ), SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( the loop's body anim and AFTER_IMAGE_BODY ), SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK ( SetShowAfterImage ) and ATTACH_SKINMESH ( CX2SubEquip::SetRenderParam ), june-engine R5b
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+//////////////////////////////////////////////////////////////////////////

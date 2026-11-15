@@ -5745,6 +5745,9 @@ public:
 	float		m_fStateCustomRenderEndTime;		/// June +0x8e6c: the state key's end
 	int			m_iStateCustomRenderState;			/// June +0x8e70: the state key's state
 	bool		m_bBuffCustomRenderStateActive;		/// June +0x93d8 ( ctor 0 ): keeps the buff override SPECTOR_WALK; its buff writer is the Ara port's
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+	bool		m_bEquipCustomRenderStateApplied;	/// june-engine R5b: June +0x941c ( ctor 0 ): set while CRS 3 / 5 / 9 give the sub-equips the body's param, the exit path puts them back
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 #ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
 	int			m_iLoggedCustomRenderState;			/// the last state "[JUNE_ENGINE] CRS" logged
 #endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG

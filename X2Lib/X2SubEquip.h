@@ -31,6 +31,10 @@ public:
 	void SetUnitXSkinAnim(CKTDGXSkinAnimPtr pXSkinAnimPtr);
 	void SetJiggle(bool bJiggle, unsigned char fTension);
 	void SetRenderParam( CKTDGXRenderer::RenderParam& pRenderParam );
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+	void SetDefaultRenderParam( const CKTDGXRenderer::RenderParam* pRenderParam );	// june-engine R5b: June 32f08a90
+	void RestoreDefaultRenderParam();	// june-engine R5b: June 32f08a50
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 	bool GetIsSkinMesh() { return m_bSkinMesh; }
 #endif
 
@@ -49,6 +53,9 @@ private:
 
 	CKTDXDeviceXMesh* m_pNormalXMesh;
 	CKTDGXRenderer::RenderParam m_NormalRenderParam;
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+	CKTDGXRenderer::RenderParam m_DefaultRenderParam;	// june-engine R5b: June +0x268 ( both ctors ), what the attach path left in the sub-equip's param
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 
 #ifdef ATTACH_SKINMESH
 	bool					m_bSkinMesh;

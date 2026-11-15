@@ -774,6 +774,9 @@ CX2GUUser::CX2GUUser( int unitIndex, int teamNum,
 , m_fStateCustomRenderEndTime( 0.f )
 , m_iStateCustomRenderState( CRS_NONE )
 , m_bBuffCustomRenderStateActive( false )
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+, m_bEquipCustomRenderStateApplied( false )
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 #ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
 , m_iLoggedCustomRenderState( CRS_NONE )
 #endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_DEBUG
@@ -20824,6 +20827,43 @@ void CX2GUUser::CommonFrameMove()
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 				pCX2Eqip->SetRenderParam( m_fTime, m_fElapsedTime , m_pXSkinAnim->GetRenderParam() );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+				// june-engine R5b: June 32063650 @32065bc1-32065c9f, CRS 3 / 9: the sub-equips take the body's param; 5 also hides the unit; no state: all put back
+				switch ( GetNowCustomRenderState() )
+				{
+				case CRS_SPECTOR_WALK:
+				case CRS_EMOTION_INVISIBLE:
+					m_bEquipCustomRenderStateApplied = true;
+					pCX2Eqip->SetSubEquipRenderParam( pEquipXSkinAnim->GetRenderParam() );
+					break;
+
+				case CRS_INVISIBLE:
+					m_bEquipCustomRenderStateApplied = true;
+					pCX2Eqip->SetSubEquipRenderParam( pEquipXSkinAnim->GetRenderParam() );
+					if ( NULL != m_pAfterImage )	// June has no null test: the first body's after-image is always there
+						m_pAfterImage->SetShowAfterImage( false );
+					DisableAfterImage( true, AIB_ACTIVE_UNIT );
+					SetShowObject( false, false );
+					SetInvisibility( true );
+					break;
+
+				default:
+					if ( true == m_bEquipCustomRenderStateApplied )
+					{
+						if ( i == (int)m_ViewEqipList.size() - 1 )
+						{
+							m_bEquipCustomRenderStateApplied = false;
+							if ( true == m_bAfterImageByBuffCreated )
+								EnableAfterImage( AIB_ACTIVE_UNIT );
+						}
+						pCX2Eqip->RestoreSubEquipRenderParam();
+						SetShowObject( true, false );
+						SetInvisibility( false );
+						UpdateNotRenderingOtherEquipList();
+					}
+					break;
+				}
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 #ifdef SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET
 				// June2017 CommonFrameMove 32063650 @32065d57-32066052: the per-equip CEPE play, after SetRenderParam (32963c80) and
 				// June's DITT_LOOP_ANIM_ITEM_ID (72) block 3295c960 (backlog Stage 11), before OnFrameMove (@32066083). This is the live

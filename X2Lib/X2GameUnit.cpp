@@ -187,6 +187,9 @@ m_fNoSkillTime( 0 )
 , m_ucNumOfBuff( 0 )
 , m_eUnitSlashTraceConditionToDo( CX2UnitSlashTraceManager::STC_NONE )
 , m_pAfterImage( NULL )
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+, m_bAfterImageByBuffCreated( false )
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 , m_pMinorUnitAfterImage( NULL )	// char-luciel DU1d3: June ctor @322a4d18
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
@@ -19573,6 +19576,9 @@ void CX2GameUnit::CreateAndInsertAfterImageByBuff( const KBuffIdentity& BuffIden
 		m_vecAfterImageByBuff.push_back( ptrAfterImageByBuff );
 
 	EnableAfterImage();
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+	m_bAfterImageByBuffCreated = true;	// june-engine R5b: June 3227b220
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 }
 
 /** @function : EraseAfterImageByBuff
@@ -19588,6 +19594,9 @@ void CX2GameUnit::EraseAfterImageByBuff( const KBuffIdentity& BuffIdentity_ )
 	{
 		m_vecAfterImageByBuff.erase( vItr );
 		DisableAfterImage();
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+		m_bAfterImageByBuffCreated = false;	// june-engine R5b: June 3227a2f0
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 	}
 }
 

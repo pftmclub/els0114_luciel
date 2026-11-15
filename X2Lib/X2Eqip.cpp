@@ -3556,6 +3556,31 @@ void	CX2Eqip::AppendAttachedToDeviceList( CKTDXDeviceDataList& listInOut_ ) cons
 
 }//CX2Eqip::AppendAttachedToDeviceList()
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+// june-engine R5b: June 3295a920
+void CX2Eqip::SetSubEquipRenderParam( CKTDGXRenderer::RenderParam* pRenderParam )
+{
+	if( NULL == pRenderParam )
+		return;
+
+	BOOST_TEST_FOREACH( CX2SubEquip*, pSubEquip, m_vecpSubEquip )
+	{
+		if( NULL != pSubEquip && true == pSubEquip->GetIsSkinMesh() )
+			pSubEquip->SetRenderParam( *pRenderParam );
+	}
+}
+
+// june-engine R5b: June 3295a990
+void CX2Eqip::RestoreSubEquipRenderParam()
+{
+	BOOST_TEST_FOREACH( CX2SubEquip*, pSubEquip, m_vecpSubEquip )
+	{
+		if( NULL != pSubEquip )
+			pSubEquip->RestoreDefaultRenderParam();
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+
 // note!! 일단 무기에만 UT_ATTACH_ANIM인 장비에만 붙일 수 있는 것으로 가정하고 만들었습니다. 그외 다른 장비에는 작동 안함
 void CX2Eqip::LoadAttached()
 {
@@ -3899,6 +3924,10 @@ void CX2Eqip::LoadAttached()
 					pSubEquip->GetNormalRenderParam().cullMode		= D3DCULL_NONE;
 				} break;
 			}
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+			// june-engine R5b: June 32961c80 @32962937-32962958, what the attach path left in the param becomes the sub-equip's default
+			pSubEquip->SetDefaultRenderParam( NULL != pSubEquip->GetRenderParam() ? pSubEquip->GetRenderParam() : &pSubEquip->GetNormalRenderParam() );
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 		}
 	}
 

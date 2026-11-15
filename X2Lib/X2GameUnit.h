@@ -5532,6 +5532,9 @@ protected:
 		CKTDGXSkinAfterImage*						m_pAfterImage;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		CKTDGXSkinAfterImage*						m_pMinorUnitAfterImage;	// char-luciel DU1d3: June +0x6758, the second body's after-image
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+		bool										m_bAfterImageByBuffCreated;	// june-engine R5b: June +0x7c80 ( ctor 0 ), 1 after CreateAndInsertAfterImageByBuff, 0 after EraseAfterImageByBuff
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 #ifdef SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY
 		D3DXCOLOR									m_coAfterImageColorByState;	/// June +0x6880: the user state's AFTER_IMAGE_COLOR; EnableAfterImage uses it while no buff after-image is on

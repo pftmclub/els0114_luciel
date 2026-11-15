@@ -111,6 +111,10 @@ class CX2Eqip : public CKTDGObject
         // OnFrameMove 에서 RenderParam 세팅을 분리하여 OnFrameMove 이전에 실행하도록 수정
         HRESULT                 SetRenderParam( double fTime, float fElapsedTime, CKTDGXRenderer::RenderParam* pRenderParam = NULL );
 		void SetRenderParamSpecial( CKTDGXRenderer::RenderParam* pEqipRenderParam );
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+		void SetSubEquipRenderParam( CKTDGXRenderer::RenderParam* pRenderParam );	// june-engine R5b: June 3295a920, the skin-mesh sub-equips take the body's param
+		void RestoreSubEquipRenderParam();	// june-engine R5b: June 3295a990, every sub-equip takes its default param back
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 
         virtual HRESULT			OnFrameMove( double fTime, float fElapsedTime );
 

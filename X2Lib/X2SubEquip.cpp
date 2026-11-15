@@ -203,6 +203,24 @@ void CX2SubEquip::SetJiggle(bool bJiggle, unsigned char fTension)
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+// june-engine R5b: June 32f08a90
+void CX2SubEquip::SetDefaultRenderParam( const CKTDGXRenderer::RenderParam* pRenderParam )
+{
+	if( NULL != pRenderParam )
+		m_DefaultRenderParam = *pRenderParam;
+}
+
+// june-engine R5b: June 32f08a50, the skin anim's param, else the plain mesh's
+void CX2SubEquip::RestoreDefaultRenderParam()
+{
+	CKTDGXRenderer::RenderParam* pRenderParam = GetRenderParam();
+	if( NULL != pRenderParam )
+		*pRenderParam = m_DefaultRenderParam;
+	else
+		m_NormalRenderParam = m_DefaultRenderParam;
+}
+#endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
 void CX2SubEquip::SetRenderParam( CKTDGXRenderer::RenderParam& pRenderParam )
 {
 	if( m_bSkinMesh == true && m_pSkinAnim != NULL )

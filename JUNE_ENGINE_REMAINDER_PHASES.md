@@ -1327,6 +1327,44 @@ deleted), 0 deleted, 0 non-ASCII; junediverge RESULT: PASS; `--check-all` RESULT
 
 **Next:** R5b (Sonnet 5.5 high; kickoff checked).
 
+### Phase R5b -- Done
+
+**2026-11-15, Sonnet 5.5 high.** Flag `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP` (no `_DEBUG`: nothing reaches the block, see below). 6 funcmap rows `(R5b)`
+plus the two R5 rows flipped to PORTED; MODS.md entry; JUNE_BUGS 737. Kickoff `R5b-review.md` written (engine phase, keeps its own review).
+
+**Read in Ghidra first.** The block `32063650 @32065bc1-32065c9f` switches on the per-equip pick (`[esp+0x58]`): 3 and 9 -> `+0x941c` = 1, `3295a920( body param )`;
+5 -> the same, then `3322a9c0( false )` on `+0x6754`, `322720f0( true, 3 )`, `31cfe4a0( false, false )`, `3200a590( true )`; anything else is the exit path and runs
+only while `+0x941c` is 1 (`CMP byte [ebx+0x941c], 1 ; JNZ` @32065bdc). `EDI` = the equip's body anim (`[esp+0x5c]`), `ESI` = the equip, `[esp+0x60]` = the loop index.
+`3295a920` walks the equip's sub-equip list (`+0x8dc`) and, for each with `+0x240` = 1 (skin mesh), `32f08a00` copies the param into the skin anim's. `3295a990` runs `32f08a50`
+on every sub-equip: `GetRenderParam()` (vslot `0x14`) else `+0x198` takes the default `+0x268`. `32f08a90` stores that default; its one caller is `32961c80`
+(March `CX2Eqip::LoadAttached`), at the end of each sub-equip's per-item switch (`@32962937-32962958`, the same place March's `return` on a NULL skin param sits).
+
+**Ported** (June's lines under the flag, nothing deleted):
+- `X2GUUser.cpp` equip loop, after `SetRenderParam`: the switch above, using `GetNowCustomRenderState()`, `SetShowAfterImage`, `DisableAfterImage( true, AIB_ACTIVE_UNIT )`,
+  `SetShowObject( .., false )`, `SetInvisibility`, `UpdateNotRenderingOtherEquipList` (all March's own, each already June's body). June's `+0x941c` = `m_bEquipCustomRenderStateApplied`.
+  A null test on `m_pAfterImage` is added (June has none; its first body's after-image always exists).
+- `X2Eqip`: `SetSubEquipRenderParam` (3295a920), `RestoreSubEquipRenderParam` (3295a990); `LoadAttached` calls `SetDefaultRenderParam` after the per-item switch.
+- `X2SubEquip`: `m_DefaultRenderParam` (+0x268, built by the member's own ctor in both ctors), `SetDefaultRenderParam` (32f08a90), `RestoreDefaultRenderParam` (32f08a50).
+  June's `32f08a00` is March's existing `CX2SubEquip::SetRenderParam`, unchanged.
+- `X2GameUnit`: `m_bAfterImageByBuffCreated` (+0x7c80): set in `CreateAndInsertAfterImageByBuff`, cleared in `EraseAfterImageByBuff` (element found).
+
+**Not ported, identified.** Erase's two `+0x1d1 = 0` writes (on both after-images, `3227a2f0 @3227a37f-3227a393`): the byte has no March member, and a scan of the after-image class
+(`33228000-33232000`) and the game-unit area (`32270000-32280000`) finds no reader or other writer; the funcmap row says so. June's per-item attach switch in `32961c80`
+differs from March's item list (June's own ids); that whole function is R14d's, not this phase's.
+
+**June quirk kept:** JUNE_BUGS 737 (the exit path clears its flag only on the view list's last index; a `continue` there leaves it set). Latent.
+
+**Play-test: none, and no full build.** Nothing in March reaches CRS 3 / 5 / 9 (the buff writers are the Ara / Add class ports; no March state script carries the key; Raven's Power
+Assault is CRS 8, which never sets the flag), and the exit path runs only while the flag is set, so the new block cannot execute in game today. Full build skipped: no play-test;
+the next phase that hands off a play-test builds the whole tree. The block is proved when the Ara CH port (CRS 3 via Specter Walk) or Add (CRS 4 / 6) is play-tested.
+
+**Gates** (worktree, `finish.py --files <9 files> --with ..._CUSTOM_RENDER_STATE_EQUIP`): flagcheck on the flag 7 PASS, 1 PASS~ (blank line), 1 DEFINE, 0 OTHER, 0 FAIL, 0 ERROR;
+other flags found on changed lines (INFO, not run): `JUNE_CHAR_DUO_BODY`, `JUNE_CHAR_TRANSFORM_LINK`, `JUNE_CUSTOM_RENDER_STATE`. junediverge RESULT: PASS. enumscan exit 0.
+stateends / skillicons / luabind skipped: no skill states, icons or Lua. (A peer's retire of `..._EQIP_BASIC_COLLISION_ANIM_DEBUG` sat beside my `Always.h` hunk until `c438025f`.)
+**Compile:** `/Zs` probes (X2Lib US_SERVICE flags, `june2017_re/census.py` command) of `X2GUUser.cpp`, `X2Eqip.cpp`, `X2SubEquip.cpp`, `X2GameUnit.cpp`: 0 errors each; a flag probe in the
+same command line confirms `..._CUSTOM_RENDER_STATE_EQUIP`, `ATTACH_SKINMESH` and `..._TRANSFORM_LINK` are on at the include point of `stdafx.h`.
+**Build:** skipped, no play-test (above). No `EXESTR` line.
+
 ## Phase R6 - SKIN_MESH_RENDER_TYPE
 
 **Run with:** Opus 5.5 high (R0b: map the whole draw, then port), then an Opus review. Flag `SERV_IRUHADEV_JUNE_SKIN_MESH_RENDER_TYPE`. June's cases 1, 2, 4-7

@@ -7165,3 +7165,10 @@ Flag `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE` (`Always.h`; `#error` without `...
 - **Files.** `X2GUUser.h/.cpp` (members, parse, apply, expiry check, equip loop param), `X2RidingPet.cpp`, `X2GURaven.cpp`, `X2GUChung.cpp`, `X2GuEve.cpp`, `X2GULire_ElvenRanger.cpp`, `X2SkillTree.h` / `X2Unit.h` (three June names).
 - **Not ported yet.** CRS 3 / 5 / 9 per-equip switch (R5b), buff writers for Add / Ara and emotion 39 (class ports).
 - **Revert:** comment out `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE` (and its `_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Raven goes back to the held render param stand-in.
+
+## June engine R5b: custom render state, per-equip switch (june-engine R5b, 2026-11-15)
+
+Flag `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP` (`Always.h`; `#error` without `..._JUNE_CUSTOM_RENDER_STATE`, `..._JUNE_CHAR_DUO_BODY`, `..._JUNE_CHAR_TRANSFORM_LINK` and `ATTACH_SKINMESH`). Plan `JUNE_ENGINE_REMAINDER_PHASES.md`.
+- **What changes in game.** Nothing yet. June's per-equip switch in `CX2GUUser::CommonFrameMove` is ported: while a unit's custom render state is SPECTOR_WALK or EMOTION_INVISIBLE its skin-mesh sub-equips take the body's render param; INVISIBLE also hides the unit and its after-image; with no state the sub-equips get their default param back and the unit is shown again. No March state or buff reaches CRS 3 / 5 / 9 (Ara / Add ports), so the block never runs.
+- **Files.** `X2GUUser.h/.cpp` (flag byte + the switch), `X2Eqip.h/.cpp` (`SetSubEquipRenderParam`, `RestoreSubEquipRenderParam`, default capture in `LoadAttached`), `X2SubEquip.h/.cpp` (default render param), `X2GameUnit.h/.cpp` (buff after-image byte).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP`, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
