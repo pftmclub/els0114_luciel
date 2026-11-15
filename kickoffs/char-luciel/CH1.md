@@ -84,3 +84,11 @@ Run of 2026-11-11 (pre-port): `DUO_TYPE.DT_BOTH` / `DT_KEEP` and `SKILL_ID.RNSI_
   returns from the win pose after a dungeon result ( wait change ), and `offline_server.log` shows `JUNE_FX C3d-3 bounding states registered for LSI_LU_`.
 - `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( CH1o, defined ) is live for every class from CH1o on: the regression part of this play-test walks one other class
   ( emotion, a skill, a dash, a jump, a death ) to show nothing changed.
+
+## Amended by char-luciel CH1o2 (2026-11-15)
+
+- **Ciel's death states ( lead ):** the state-end stand-ins in `CX2GUUser` ( `X2GUUser.cpp` ~7731 / ~7741: `SOCKET_PARITY`'s SIEE 18 and `BUFF_DEATH_CLEAR`'s
+  clear-all ) test `USI_DIE_FRONT` / `USI_DIE_BACK`, standing in for June's die StateEnd `3202a7d0`, which June registers on every class's die states. Lu's die
+  ids are 7 / 8 ( match ); Ciel's `LSI_CIEL_DIE_FRONT` / `_BACK` ( 192 / 193 ) do not, so a dying Ciel would keep her buffs. Check whether Lu's InitState rows
+  give Ciel's die states `3202a7d0`; if so, make the stand-in ask `GetDieFrontStateID()` / `GetDieBackStateID()` ( const since CH1o2 ) or register the StateEnd,
+  and add a Ciel death to the play-test ( buffs gone after the revive ).

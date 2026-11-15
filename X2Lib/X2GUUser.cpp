@@ -6424,8 +6424,13 @@ void CX2GUUser::ApplyAcceleratorBuffToGameUnit( const CX2SkillTree::SkillTemplet
 //}}
 {
 	/// GameUnit에서 체크 한 것이 true 인 경우 다시 한번 체크
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	if ( CX2GameUnit::CanApplyBuffToGameUnit()
+		&& GetNowStateID() != GetDieFrontStateID() && GetNowStateID() != GetDieBackStateID() )	// char-luciel CH1o2: June 32045dc0 @3204617d / @320461b3 ( vslots 0x460 / 0x464 )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 	if ( CX2GameUnit::CanApplyBuffToGameUnit() 
 		&& GetNowStateID() != USI_DIE_FRONT && GetNowStateID() != USI_DIE_BACK )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		return true;
 	else
 		return false;	/// GameUnit에서 체크한 것이 false면 바로 false로 리턴 함
@@ -31221,9 +31226,15 @@ bool CX2GUUser::PopFrameData( bool bPopOnce )
 		if( (int)m_ReceiveSyncDataList.size() > m_FrameBufferNum + m_AddFrameBuffer )
 		{
 //#ifdef  SERV_OPTIMIZE_ROBUST_USER_NPC_PACKET_SEND
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+            if ( m_FrameDataNow.syncData.nowState == GetWaitStateID()
+                && m_ReceiveSyncDataList.front().nowState == GetWaitStateID()
+                || bPopOnce == false )	// char-luciel CH1o2: June PopFrameData 3206cff0 @3206d376 / @3206d3ad ( vslot 0x438 )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
             if ( m_FrameDataNow.syncData.nowState == USI_WAIT
                 && m_ReceiveSyncDataList.front().nowState == USI_WAIT 
                 || bPopOnce == false )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
                 bPopAgain = true;
 //#else   SERV_OPTIMIZE_ROBUST_USER_NPC_PACKET_SEND
 //			m_bPopAgain = true;
@@ -33182,10 +33193,17 @@ bool CX2GUUser::CheckDashAngleChangeTime()
 	if ( GetUnit() != NULL )
 	{
 
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		if ( m_FrameDataNow.syncData.nowState == GetDashStateID() ||	// char-luciel CH1o2: June 31ff7700 ( vslots 0x440 / 0x448 / 0x44c / 0x43c )
+			m_FrameDataNow.syncData.nowState == GetDashJumpStateID() ||
+			m_FrameDataNow.syncData.nowState == GetDashJumpLandingStateID() ||
+			m_FrameDataNow.syncData.nowState == GetWalkStateID() )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		if ( m_FrameDataNow.syncData.nowState == USI_DASH ||
 			m_FrameDataNow.syncData.nowState == USI_DASH_JUMP ||
 			m_FrameDataNow.syncData.nowState == USI_DASH_JUMP_LANDING ||
 			m_FrameDataNow.syncData.nowState == USI_WALK )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		{
 			return true;
 		}
@@ -40171,11 +40189,19 @@ void CX2GUUser::SetEnableDash( bool bEnableDash,  CX2GameUnit::ENABLE_DASH_STATE
 
 	if( false == bEnableDash )
 	{
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		if( GetDashStateID() == GetGameUnitState()	// char-luciel CH1o2: June 31fc8540 @31fc8559 / @31fc8586 ( vslot 0x440 )
+#ifdef FIX_MEDITATION_RUN
+			|| GetDashStateID() == GetGameUnitStateFuture()
+#endif FIX_MEDITATION_RUN
+			)
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		if( USI_DASH == GetGameUnitState()
 #ifdef FIX_MEDITATION_RUN
 			|| USI_DASH == GetGameUnitStateFuture()
 #endif FIX_MEDITATION_RUN			
 			)
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		{
 			StateChange( USI_WALK, true );
 		}
@@ -47555,9 +47581,15 @@ bool CX2GUUser::IsDamageState( const bool bFuture_ )
 bool CX2GUUser::IsNotCommonMoveState()
 {
 	const int iNow = GetNowStateID();
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	if( GetWaitStateID() == iNow || GetChargeMpStateID() == iNow || GetWalkStateID() == iNow || GetDashStateID() == iNow || GetDashEndStateID() == iNow	// char-luciel CH1o2: June 31fd7640, vslots 0x438-0x45c
+		|| GetDashJumpStateID() == iNow || GetDashJumpLandingStateID() == iNow || GetJumpReadyStateID() == iNow || GetJumpUpStateID() == iNow
+		|| GetJumpDownStateID() == iNow || GetJumpLandingStateID() == iNow )
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 	if( GetWaitStateID() == iNow || GetChargeMpStateID() == iNow || USI_WALK == iNow || USI_DASH == iNow || USI_DASH_END == iNow
 		|| USI_DASH_JUMP == iNow || USI_DASH_JUMP_LANDING == iNow || USI_JUMP_READY == iNow || USI_JUMP_UP == iNow
 		|| GetJumpDownStateID() == iNow || USI_JUMP_LANDING == iNow )
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		return false;
 
 	if( USI_RIDING_WAIT_HABIT <= iNow && iNow <= USI_RIDING_DASH_JUMP_LANDING )
@@ -51212,6 +51244,26 @@ bool CX2GUUser::RidingPetSpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_U
 
 /*virtual*/ bool CX2GUUser::CanRidingState()
 {
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+	// char-luciel CH1o2: June 31fd7930: not while the next state is a skill state, then the getters 0x438-0x444
+	const int iNextStateID = m_FrameDataFuture.unitCondition.nextState;
+	if ( 0 <= iNextStateID )
+	{
+		const UserUnitStateDataMap::const_iterator itNextState = m_StateList.find( static_cast<UserUnitStateDataMap::key_type>( iNextStateID ) );
+		if ( m_StateList.end() != itNextState && CX2SkillTree::SI_NONE < itNextState->second.m_eSkillID )
+			return false;
+	}
+
+	const int iNowStateID = GetNowStateID();
+	if ( iNowStateID == GetWaitStateID() || iNowStateID == GetWalkStateID() ||
+		 iNowStateID == GetDashStateID() || iNowStateID == GetDashEndStateID() ||
+		 iNowStateID == CX2GUUser::USI_RIDING_WAIT || iNowStateID == CX2GUUser::USI_RIDING_WALK ||
+		 iNowStateID == CX2GUUser::USI_RIDING_WAIT_HABIT || iNowStateID == CX2GUUser::USI_RIDING_DASH ||
+		 iNowStateID == CX2GUUser::USI_RIDING_DASH_END )
+		return true;
+
+	return false;
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 	if ( GetNowStateID() == CX2GUUser::USI_WAIT || GetNowStateID() == CX2GUUser::USI_WALK || 
 		 GetNowStateID() == CX2GUUser::USI_DASH || GetNowStateID() == CX2GUUser::USI_DASH_END || 
 		 GetNowStateID() == CX2GUUser::USI_RIDING_WAIT || GetNowStateID() == CX2GUUser::USI_RIDING_WALK ||
@@ -51220,6 +51272,7 @@ bool CX2GUUser::RidingPetSpecialAttackEventProcess( CX2SkillTree::ACTIVE_SKILL_U
 		return true;
 
 	return false;
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 }
 #endif //RIDING_SYSTEM
 

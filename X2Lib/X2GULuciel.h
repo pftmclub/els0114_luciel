@@ -654,8 +654,8 @@ public:
 	virtual int			GetJumpReadyStateID();	// June 32b4d530 ( vslot 0x450 ) ( base: char-luciel CH1o )
 	virtual int			GetJumpUpStateID();	// June 32b4d570 ( vslot 0x454 ) ( base: char-luciel CH1o )
 	virtual int			GetJumpLandingStateID();	// June 32b4d610 ( vslot 0x45c ) ( base: char-luciel CH1o )
-	virtual int			GetDieFrontStateID();	// June 32b4d650 ( vslot 0x460 ) ( base: char-luciel CH1o )
-	virtual int			GetDieBackStateID();	// June 32b4d690 ( vslot 0x464 ) ( base: char-luciel CH1o )
+	virtual int			GetDieFrontStateID() const;	// char-luciel CH1o2 const: June 32b4d650 ( vslot 0x460 ) ( base: char-luciel CH1o )
+	virtual int			GetDieBackStateID() const;	// char-luciel CH1o2 const: June 32b4d690 ( vslot 0x464 ) ( base: char-luciel CH1o )
 	virtual int			GetDamageGroggyStateID() const;	// June 32b4d6d0 ( vslot 0x468 ), base: DU2
 	virtual int			GetDamageSmallFrontStateID() const;	// June 32b4d710 ( vslot 0x46c )
 	virtual int			GetDamageSmallBackStateID() const;	// June 32b4d750 ( vslot 0x470 )

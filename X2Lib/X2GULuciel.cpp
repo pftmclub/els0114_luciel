@@ -8601,8 +8601,8 @@ bool CX2GULuciel::IsInvasionOfDarkEnergyActive() const
 	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_JUMP_LANDING : LSI_LU_JUMP_LANDING;
 }
 
-// char-luciel CH1k2: June 32b4d650 ( vslot 0x460 ); a transformed unit dies in Lu's state
-/*virtual*/ int CX2GULuciel::GetDieFrontStateID()
+// char-luciel CH1k2: June 32b4d650 ( vslot 0x460 ); a transformed unit dies in Lu's state ( const: CH1o2 )
+/*virtual*/ int CX2GULuciel::GetDieFrontStateID() const
 {
 	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
 		return LSI_LU_DIE_FRONT;
@@ -8610,8 +8610,8 @@ bool CX2GULuciel::IsInvasionOfDarkEnergyActive() const
 	return ( true == IsMinorUnitActive() ) ? LSI_CIEL_DIE_FRONT : LSI_LU_DIE_FRONT;
 }
 
-// char-luciel CH1k2: June 32b4d690 ( vslot 0x464 )
-/*virtual*/ int CX2GULuciel::GetDieBackStateID()
+// char-luciel CH1k2: June 32b4d690 ( vslot 0x464 ) ( const: CH1o2 )
+/*virtual*/ int CX2GULuciel::GetDieBackStateID() const
 {
 	if ( true == IsTransformed( CX2Unit::DT_BOTH ) )
 		return LSI_LU_DIE_BACK;

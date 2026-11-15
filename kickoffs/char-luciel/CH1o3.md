@@ -12,7 +12,7 @@
 ## Read first (and nothing else from the plan doc unless you need it)
 
 ```sh
-python tools/docsection.py JUNE_CHARACTER_LUCIEL_PHASES.md "Rules" "CH1n - Done (2026-11-15)" "CH1o - Done (2026-11-15)" "CH1l3 - Review (2026-11-15)"
+python tools/docsection.py JUNE_CHARACTER_LUCIEL_PHASES.md "Rules" "CH1n - Done (2026-11-15)" "CH1o - Done (2026-11-15)" "CH1o2 - Done (2026-11-15)" "CH1l3 - Review (2026-11-15)"
 ```
 
 and from `kickoffs/char-luciel/CH1o.md` the sections "Amended by CH0 (2026-11-02)" (checklist rows), "Amended by char-luciel CH1l3 review"

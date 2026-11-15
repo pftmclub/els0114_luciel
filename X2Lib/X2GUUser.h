@@ -1812,8 +1812,8 @@ public:
 		virtual int					GetJumpReadyStateID(){ return USI_JUMP_READY; }	// char-luciel CH1o: June user vslot 0x450 ( base 31afa8f0 )
 		virtual int					GetJumpUpStateID(){ return USI_JUMP_UP; }	// char-luciel CH1o: June user vslot 0x454 ( base 3225b3a0 )
 		virtual int					GetJumpLandingStateID(){ return USI_JUMP_LANDING; }	// char-luciel CH1o: June user vslot 0x45c ( base 330de0a0 )
-		virtual int					GetDieFrontStateID(){ return USI_DIE_FRONT; }	// char-luciel CH1o: June user vslot 0x460 ( base 3208de30 )
-		virtual int					GetDieBackStateID(){ return USI_DIE_BACK; }	// char-luciel CH1o: June user vslot 0x464 ( base 33069eb0 )
+		virtual int					GetDieFrontStateID() const { return USI_DIE_FRONT; }	// char-luciel CH1o2 const: June user vslot 0x460 ( base 3208de30 )
+		virtual int					GetDieBackStateID() const { return USI_DIE_BACK; }	// char-luciel CH1o2 const: June user vslot 0x464 ( base 33069eb0 )
 #else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		int							GetWalkStateID(){ return USI_WALK; }
 		int							GetDashStateID(){ return USI_DASH; }
@@ -3442,6 +3442,11 @@ public:
 #ifdef SERV_ELSWORD_INFINITY_SWORD
 	bool IsDashState()
 	{
+#ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
+		// char-luciel CH1o2: June 32b901c0, vslots 0x440 / 0x444 / 0x448 / 0x44c
+		const int iNowStateID = GetNowStateID();
+		return ( GetDashStateID() == iNowStateID || GetDashEndStateID() == iNowStateID || GetDashJumpStateID() == iNowStateID || GetDashJumpLandingStateID() == iNowStateID );
+#else SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		switch( GetNowStateID() )
 		{
 		case USI_DASH:
@@ -3454,6 +3459,7 @@ public:
 		}
 
 		return false;
+#endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 	}	
 #endif
 

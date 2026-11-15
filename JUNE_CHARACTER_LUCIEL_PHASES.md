@@ -2537,6 +2537,42 @@ Opus 5.5 high. Covers CH1m ( `a2312de2` ), CH1n ( `cfe12590` ), CH1o ( `b557510a
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp`, `X2GUUser.cpp`, `X2DamageManager.cpp`, `X2GUNPC.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 8 x 0 errors, no warning in the touched files. Full build skipped: no play-test. No debug define to retire.
 - **Next:** `/x2-phase char-luciel CH1o2` ( Opus 5.5 high; kickoff checked, still valid after S1 / S2 ).
 
+### CH1o2 - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` ( CH1o's, defined; no new flag, no debug define ). Files: `X2GUUser.cpp`, `X2GUUser.h`, `X2GULuciel.cpp`, `X2GULuciel.h`.
+No review of its own: the CH1o3 review covers CH1o2. Verdicts: `june2017_re/char_luciel/ch1o_vcall_sites.tsv`, new column `ch1o2_verdict` ( one line per site, 84 ).
+- **Tally:** 27 routed, 24 automatic ( March already calls the getter ), 21 June-only ( owner named ), 11 on an NPC object ( `CX2GUNPC`'s own slot at the same offset ),
+  1 class code ( Elsword `32b59aa0` ). The scan's function column was wrong for three groups ( CC-padding start heuristic ): the `31fd7350` rows are
+  `IsNotCommonMoveState` `31fd7640`; the `CommonFrameMove` 0x438 rows are `PopFrameData` `3206cff0`; the `ProcessExpListByNpcUnitDie` rows are
+  `CheckQuickSlotItemSpecialAbility` `322fa960`. The verdict column names the real function.
+- **Routed ( `#ifdef` getter `#else` March's constant ):** `IsNotCommonMoveState` ( 8 getters 0x43c-0x45c; 0x438 / 0x458 were already getters ); `CanRidingState`
+  ( base `31fd7930`: June's whole body, which adds the head test "the Future next state is a skill state -> false", `m_StateList.find` on `unitCondition.nextState`
+  so an absent id adds no map entry, then wait / walk / dash / dash end getters and March's five riding ids, 76 / 77 / 75 / 81 / 82 = June's `0x4c 0x4d 0x4b 0x51 0x52` );
+  `CheckDashAngleChangeTime` ( = `31ff7700`: dash, dash jump, dash jump landing, walk; the Aisha levitation case is March's = June's type 2 / state `0x9c` );
+  `SetEnableDash` ( = `31fc8540`: both dash tests; `StateChange( 0xe )` stays `USI_WALK` as June pushes the literal ); `IsDashState` ( `X2GUUser.h`, June `32b901c0` );
+  `PopFrameData` ( both `USI_WAIT` tests; June's third site is its second receive-list form, March has one list ); `CanApplyBuffToGameUnit` ( die front / back ).
+- **Const:** `CanApplyBuffToGameUnit` is `const`, so `GetDieFrontStateID` / `GetDieBackStateID` became `const` in the base ( CH1o's lines, `X2GUUser.h` ) and in Lu's
+  overrides ( `X2GULuciel.h` / `.cpp`, which call only const `IsTransformed` / `IsMinorUnitActive` ). No other caller ( grep ).
+- **Automatic:** `PlayEmotion` ( 4 ), `EmotionFrameMove` ( 2 ), `SetEnterCashShop`, `IsWaitState`, `GetSpecialItemUsableExtraStateID` base, the quick-slot item check ( 8 ),
+  `CX2DungeonGame` ( `X2DungeonGame.cpp:3310`, `:2820` ), `CX2StateTrainingGame` ( `:575` ), and three "my unit's Future state is wait" tests ( `X2UIInventory.cpp:5498`,
+  `X2UIPetInventory.cpp:558`, `X2TitleManager.cpp:950`; which June function is which is not pinned, all three call the getter ).
+- **June-only, routed ( scope rule ):** backlog **Stage 10** ( emotion system ): the emotion hotkeys in four states' `ShortCutKeyProcess` ( 16 sites; the rest of that
+  function stays Stage 9's ), StateChange's `+0x89e0` clear ( both overloads; PlayEmotion writes it @`320443f5` ), June's custom-sit re-play after an equip refresh
+  ( `31f1ed70`; March's `X2StateMenu.cpp:4877` refresh has none ), and June's `PlayEmotion` rewrite around the automatic tests ( vslot 0x4ac, generic charge-MP test
+  `31fd7b60` in place of March's Lire / Aisha / Chung switch: Lu/Ciel get no sit-from-charge until then ). Idle float reset `31fd78a0`: backlog "June's idle timer"
+  bullet ( Chung CH1l30 ). Rose's `IsWaitState` `32ae37f0`: char-rose.
+- **Lead for CH1 final ( `CH1.md` amended ):** the die-state StateEnd stand-ins ( `X2GUUser.cpp` ~7731 / ~7741, `SOCKET_PARITY` / `BUFF_DEATH_CLEAR` ) test `USI_DIE_*`;
+  Ciel's die states are 192 / 193, so a dying Ciel would keep her buffs. Not a getter reader in June ( a registered StateEnd ), so not routed here.
+- **Gates:** `finish.py --files X2Lib/X2GUUser.cpp X2Lib/X2GUUser.h X2Lib/X2GULuciel.cpp X2Lib/X2GULuciel.h`: `FINISH RESULT: PASS (8 gates, 0 failed, 3 skipped)`;
+  `JUNE_USER_VIRTUAL_HOOKS` `2 PASS, 2 OTHER, 0 FAIL` / PASS, 2 deleted = the two base die getters made const; `JUNE_CHAR_LUCIEL_CORE` `2 PASS, 2 OTHER` / PASS,
+  6 deleted = Lu's two declarations and two definitions + comments; `JUNE_CHAR_ARME_CORE` `4 OTHER` / PASS ( `IsNotCommonMoveState` sits in its block ); `junediverge`
+  PASS; `enumscan` exit 0; 0 non-ASCII, 0 EOL, 0 encoding change. Skipped: `stateends` ( no state registered ), `skillicons`, `luabind` ( nothing added or staged ).
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GUUser.cpp`, `X2GULuciel.cpp`, `X2GUElsword_SwordMan.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`:
+  6 x 0 errors, 0 warnings in the touched files. Flag probe: `SERV_ELSWORD_INFINITY_SWORD`, `FIX_MEDITATION_RUN`, `JUNE_USER_STATE_ID16`, `_CORE`, `HOOKS` all defined in X2Lib.
+  Full build skipped: no play-test ( CH1 final's regression walk covers dash, jump, riding, death, emotion on another class ).
+- **How to see it in game:** nothing ( every base getter equals March's constant; Lu/Ciel is not live ).
+- **Next:** `/x2-phase char-luciel CH1o3` ( Opus 5.5 high; kickoff checked, read list gains this note ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change

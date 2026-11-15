@@ -1,203 +1,203 @@
-vslot	site	june_function	funcmap	verdict
-0x2e4	32610dc9	32610da0	?	CH1o: DamageData::NotifyAttackerWhenReset ( SimpleInit )
-0x2e4	32610dd9	32610da0	?	CH1o: DamageData::NotifyAttackerWhenReset ( SimpleInit )
-0x2fc	32610d79	32610cb0	?	char-ara CH1o ( widened to _LIVE by CH1o ); NPC forwarder 3275a410 ported
-0x2fc	32610d89	32610cb0	?	char-ara CH1o ( widened to _LIVE by CH1o ); NPC forwarder 3275a410 ported
-0x2fc	3275a43a	3275a410	CX2GUNPC::DoProcessWhenDamageDataDestroyed (unit vslot 0x2fc)	char-ara CH1o ( widened to _LIVE by CH1o ); NPC forwarder 3275a410 ported
-0x300	3262546d	32625000	CX2DamageManager::UnitToUnit	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0
-0x300	32628652	32625670	CX2DamageManager::MeshToUnit	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0
-0x300	3262f1e6	3262b6e0	CX2DamageManager::EffectToUnit	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0
-0x300	32779046	32778fe0	CX2GUNPC vslot 0x300 ( AdjustDamageDataBeforeDamageReact ): forward to the ally owner	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0
-0x438	31f1f3b8	31f1ed70	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	31fd7664	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	31fd78c4	31fd78a0	none in March: CX2GUUser idle float +0x91b4 reset	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	31fd7985	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	320349ad	320348c0	CX2GUUser::StateChange( int, bool ) (June)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32034c0f	320348c0	CX2GUUser::StateChange( int, bool ) (June)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	320434aa	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32043519	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32043555	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	320436a1	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32044c2a	32044a80	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3204afee	3204ace2	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3204b290	3204ace2	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3206d376	32063650	CX2GUUser::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3206d3ad	32063650	CX2GUUser::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3206d3e3	32063650	CX2GUUser::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3208df02	3208df00	none in March: CX2GUUser vslot 0x4ac (special item usable extra state), base = wait state	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3208e726	3208e710	CX2GUUser::IsWaitState (user vslot 0x520; none in March)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	321a8f47	321a4fe9	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	322fadef	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	322fb308	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3249cb8f	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3249cd0e	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3249ce8a	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3249d00b	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324bcc41	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324bcdc6	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324bcf48	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324bd0cf	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324c31f2	324c3160	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324d3551	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324d36e2	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324d3876	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	324d3a0a	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	325248a3	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32524a6d	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32524c3a	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32524e07	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32703dc7	32703390	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	3277c04a	3277c030	CX2GUNPC::Init(bool,int)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	327ca51a	327ca4e0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	327cae5b	327cadf0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32ae3811	32ae37f0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32b59aea	32b59aa0	CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_EventProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x438	32e20048	32e1f810	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x43c	31fd76bc	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x43c	31fd79be	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x43c	31ff77e0	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x43c	322fae11	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x43c	322fb32a	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x43c	3277c078	3277c030	CX2GUNPC::Init(bool,int)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	31fc8559	31fc8540	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	31fc8586	31fc8540	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	31fd76f7	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	31fd79f7	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	31ff7789	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	322fae2f	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	322fb348	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	327bc040	327b53b0	CX2GUNPC::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x440	32b901e4	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x444	31fd7720	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x444	31fd7a2c	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x444	322fae7c	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x444	322fb395	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x444	32768c36	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x444	32b9021b	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x448	31fd773d	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x448	31ff77a6	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x448	32768c42	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x448	32b90250	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x44c	31fd775a	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x44c	31ff77c3	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x44c	3277ded2	3277cf10	none in March: CX2GUNPC set absolute monster (from stage data)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x44c	32b90285	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x450	31fd7777	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x450	3277dede	3277cf10	none in March: CX2GUNPC set absolute monster (from stage data)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x454	31fd7794	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x454	3275770e	327576e0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x45c	31fd77ce	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x45c	32768b28	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x460	3204617d	32045dc0	CX2GUUser::CanApplyBuffToGameUnit	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x460	32768b34	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x464	320461b3	32045dc0	CX2GUUser::CanApplyBuffToGameUnit	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x464	32768d29	32768c70	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )
-0x51c	3205e0fa	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o
-0x51c	3205e448	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o
-0x51c	3205e4b0	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o
-0x51c	32061996	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o
-0x574	320433d7	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o: PlayEmotion top
-0x580	32061976	32057b80	CX2GUUser::CommonStateStart (slot 497)	none: +0x94c0 has no reader ( write-only )
-0x640	31fe40ab	31fe4030	?	none in March: 31fe4030 riding-off ( Stage 17 )
-0x650	3206c1e6	32063650	CX2GUUser::CommonFrameMove	CH1o: CommonFrameMove SetNowMpFromStoredValue
-0x648	32051059	320506f0	CX2GUUser::CommonStateStartFuture	CH1o: CommonStateStartFuture after DUO_TYPE ( CP_AMOUNT )
-0x570	31ffec9f	31ffe990	CX2GUUser::AddEquipToViewList( CX2Item*, short slotId, bool bForceBasic ) (X2GUUser.cpp:35650)	DU3 ( AddEquipToViewList rewrite )
-0x570	31ffeda1	31ffe990	CX2GUUser::AddEquipToViewList( CX2Item*, short slotId, bool bForceBasic ) (X2GUUser.cpp:35650)	DU3 ( AddEquipToViewList rewrite )
-0x62c	320349cb	320348c0	CX2GUUser::StateChange( int, bool ) (June)	CH1o: StateChange ( false ), PlayEmotion ( true )
-0x62c	320447e9	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o: StateChange ( false ), PlayEmotion ( true )
-0x64c	31fee873	31fee682	?	CH1o: InitComponent / ReInit / CommonFrameMoveFuture
-0x64c	32023c24	32022380	?	CH1o: InitComponent / ReInit / CommonFrameMoveFuture
-0x64c	32062f78	32061bf0	CX2GUUser::CommonFrameMoveFuture (slot 498)	CH1o: InitComponent / ReInit / CommonFrameMoveFuture
-0x5c4	323c54a6	323c5310	?	Stage 10 ( dance )
-0x658	322cc4a9	322cc480	?	none in March: 322cc480 forwarder
-0x740	3201ffec	3201ffb0	none in March: CX2GUUser slot 250 pre-apply hook(BTI)	char-add ( Crest of Time )
-0x744	320074f9	320072d0	none in March: user death-prevention passives	char-add ( Crest of Time; 320072d0 ProcessPassiveReturnFromDeath )
-0x7fc	32969343	32969300	CX2GUEve::SpecialAttackEventProcess (slot 509, vtable 334cfc54)	class-own
-0x7fc	32a07d29	32a07b60	CX2GUAdd::SpecialAttackEventProcess	class-own
-0x7fc	32a67276	32a67230	?	class-own
-0x7fc	32aae093	32aae040	?	class-own
-0x7fc	32b4ee63	32b4ee20	CX2GUEL::SpecialAttackEventProcess (slot 509, vtable 334fae10)	class-own
-0x7fc	32b90c7a	32b90c20	CX2GUAra::SpecialAttackEventProcess (slot 509, vtable 33505b0c)	class-own
-0x7fc	32b998e3	32b99890	CX2GUAra::ComboXXdownXXEventProcess	class-own
-0x7fc	32b9a033	32b99e90	CX2GUAra::ComboDashZpushX_AttackEventProcess	class-own
-0x7fc	32b9eef6	32b9edd0	CX2GUAra::ASI_DASH_COMBO_ALS_X_EventProcess	class-own
-0x7fc	32babc03	32babba0	CX2GUAra::StateChangeOrFPCancel	class-own
-0x7fc	32bad6e6	32bad670	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_EventProcess	class-own
-0x7fc	32bc20b1	32bc1f30	CX2GUAra::ASI_SA_ALH_SWALLOW_ASSAULT_Attack_EventProcess	class-own
-0x7fc	32bc9e9f	32bc9c70	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_UPGRADE_EventProcess	class-own
-0x7fc	32bd87d3	32bd8790	CX2GUChung::SpecialAttackEventProcess (slot 509, vtable 33509e74)	class-own
-0x7fc	32c25b33	32c25af0	CX2GURaven::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own
-0x7fc	32c6a9b3	32c6a970	CX2GULire_ElvenRanger::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own
-0x7fc	32cb97ed	32cb97a0	CX2GUArme_VioletMage::SpecialAttackEventProcess	class-own
-0x7fc	32cf32d3	32cf3290	CX2GUElsword_SwordMan::SpecialAttackEventProcess (slot 509)	class-own
-0x800	32057c74	32057b80	CX2GUUser::CommonStateStart (slot 497)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	3296940c	329693e0	CX2GUEve::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32a1e401	32a1e3c0	CX2GUAdd::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32a71e2c	32a71e00	?	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32ac56a1	32ac54c0	?	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32b525bc	32b52590	CX2GUEL::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32ba67a1	32ba6610	CX2GUAra::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32bee4bc	32bee490	CX2GUChung::SpecialAttackEventProcess part: skill use	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32c25bcc	32c25ba0	CX2GURaven::SpecialAttackUse (user vslot 0x7fc, step 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32ca50dc	32ca50b0	CX2GULire_ElvenRanger::SpecialAttackUse (0x7fc, step 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32ced71d	32ced640	CX2GUArme_VioletMage::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32ced7b1	32ced640	CX2GUArme_VioletMage::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x800	32cf578c	32cf5760	CX2GUElsword_SwordMan::SpecialAttackUse	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )
-0x7f8	32969316	32969300	CX2GUEve::SpecialAttackEventProcess (slot 509, vtable 334cfc54)	class-own
-0x7f8	32a07b79	32a07b60	CX2GUAdd::SpecialAttackEventProcess	class-own
-0x7f8	32a67259	32a67230	?	class-own
-0x7f8	32aae060	32aae040	?	class-own
-0x7f8	32b4ee36	32b4ee20	CX2GUEL::SpecialAttackEventProcess (slot 509, vtable 334fae10)	class-own
-0x7f8	32b99930	32b99890	CX2GUAra::ComboXXdownXXEventProcess	class-own
-0x7f8	32b9a080	32b99e90	CX2GUAra::ComboDashZpushX_AttackEventProcess	class-own
-0x7f8	32b9ef43	32b9edd0	CX2GUAra::ASI_DASH_COMBO_ALS_X_EventProcess	class-own
-0x7f8	32bac17e	32bac120	ASI_SA_ARA_WIND_WEDGE_START.EventProcess	class-own
-0x7f8	32bac20e	32bac1b0	ASI_SA_ARA_PULLING_PIERCE_START.EventProcess	class-own
-0x7f8	32bac29e	32bac240	CX2GUAra::ASI_SA_ASR_SHADOW_RISING_LANDING_EventProcess	class-own
-0x7f8	32bac332	32bac2d0	ASI_SA_ARA_TEMPEST_DANCE_START.EventProcess ASI_SA_ARA_TEMPEST_DANCE_END.EventProcess	class-own
-0x7f8	32bac3fe	32bac3a0	ASI_SA_ARA_SHADOW_KNOT_CATCH.EventProcess	class-own
-0x7f8	32bac48e	32bac430	ASI_A_ARA_TIGER_CLAW_START.EventProcess	class-own
-0x7f8	32bac51e	32bac4c0	ASI_SA_ALH_DOUBLE_COLLISION_START.EventProcess	class-own
-0x7f8	32bac5ae	32bac550	CX2GUAra::ASI_SA_ASD_TURBULENT_WAVE_LOOP_EventProcess	class-own
-0x7f8	32bac642	32bac5e0	CX2GUAra::ASI_SA_ALH_PEERLESSNESS_SLASH_START_EventProcess	class-own
-0x7f8	32bac6a3	32bac5e0	CX2GUAra::ASI_SA_ALH_PEERLESSNESS_SLASH_START_EventProcess	class-own
-0x7f8	32bac72e	32bac6d0	ASI_A_ALH_ROCK_CRASH_FALLING_START.EventProcess	class-own
-0x7f8	32bac7be	32bac760	CX2GUAra::ASI_A_ASD_LOW_BRANDISH_SLIDING_EventProcess	class-own
-0x7f8	32bac84e	32bac7f0	ASI_A_ASD_FALLING_BLOSSOM_Start.EventProcess	class-own
-0x7f8	32bac8de	32bac880	CX2GUAra::ASI_A_ALD_WOLF_CLAW_EventProcess	class-own
-0x7f8	32bacbb3	32bacb50	CX2GUAra::ASI_SA_ALD_HELL_OF_TORNADO_EventProcess	class-own
-0x7f8	32bace0e	32bacdb0	CX2GUAra::ASI_SA_ALD_WOLF_SPEAR_EventProcess	class-own
-0x7f8	32bacea2	32bace40	CX2GUAra::ASI_SA_ALD_FINGER_BULLET_EventProcess	class-own
-0x7f8	32bad002	32bacfa0	CX2GUAra::ASI_SA_ALD_ENERGY_BEAD_EventProcess	class-own
-0x7f8	32bad162	32bad100	CX2GUAra::ASI_SA_ALD_PRISON_SPEAR_EventProcess	class-own
-0x7f8	32bad2c3	32bad260	CX2GUAra::ASI_A_AYR_STEAL_SOUL_EventProcess	class-own
-0x7f8	32bad41e	32bad3c0	CX2GUAra::ASI_A_ALS_VIEW_BETWEEN_EventProcess	class-own
-0x7f8	32bad51d	32bad450	CX2GUAra::ASI_A_ALS_SHAKE_CHAOS_EventProcess	class-own
-0x7f8	32bad5ae	32bad550	CX2GUAra::ASI_A_AA_RAID_ATTACK_EventProcess	class-own
-0x7f8	32bad63e	32bad5e0	CX2GUAra::ASI_SA_ALS_RESTRAINTS_SPECTER_EventProcess	class-own
-0x7f8	32bad75f	32bad670	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_EventProcess	class-own
-0x7f8	32bad7f2	32bad790	CX2GUAra::ASI_SA_ASR_SPECTER_OF_BLADE_EventProcess	class-own
-0x7f8	32bad853	32bad790	CX2GUAra::ASI_SA_ASR_SPECTER_OF_BLADE_EventProcess	class-own
-0x7f8	32bad8de	32bad880	CX2GUAra::ASI_SA_AA_GET_BLOOD_EventProcess	class-own
-0x7f8	32bad96e	32bad910	CX2GUAra::ASI_SA_ASD_CONTINUITY_STRIKE_THROWING_START_EventProcess	class-own
-0x7f8	32bad9fe	32bad9a0	CX2GUAra::ASI_SA_AYR_RESTRICTION_ENERGY_START_EventProcess	class-own
-0x7f8	32bada8e	32bada30	CX2GUAra::ASI_SA_AYR_REVERSE_GRAVITY_FIELD_START_EventProcess	class-own
-0x7f8	32badb1e	32badac0	CX2GUAra::ASI_A_ASD_SWALLOW_ASSAULT_TEETH_START_EventProcess	class-own
-0x7f8	32bc2158	32bc1f30	CX2GUAra::ASI_SA_ALH_SWALLOW_ASSAULT_Attack_EventProcess	class-own
-0x7f8	32bc9f18	32bc9c70	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_UPGRADE_EventProcess	class-own
-0x7f8	32bd87a6	32bd8790	CX2GUChung::SpecialAttackEventProcess (slot 509, vtable 33509e74)	class-own
-0x7f8	32c25b06	32c25af0	CX2GURaven::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own
-0x7f8	32c6a986	32c6a970	CX2GULire_ElvenRanger::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own
-0x7f8	32cb97ba	32cb97a0	CX2GUArme_VioletMage::SpecialAttackEventProcess	class-own
-0x7f8	32cf32a6	32cf3290	CX2GUElsword_SwordMan::SpecialAttackEventProcess (slot 509)	class-own
-0x664	31f1f3e3	31f1ed70	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	31fee2d9	31fee090	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	31fee400	31fee090	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	31ffe944	31ffe920	CX2GUUser::UpdatePassiveAndActiveSkillState (user vslot 0x2c0)	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	320238aa	32022380	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	326cad75	326cad50	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	326d080d	326d0560	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	326d146d	326d1030	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x664	326d76dc	326d72e0	?	automatic: March callers call ResetMaxMP ( now virtual )
-0x848	32059b81	32057b80	CX2GUUser::CommonStateStart (slot 497)	CH1o: CommonStateStart IsActiveBodyChangeReached
-0x668	1375 sites	-	class and engine EventProcess	automatic: March calls StateChangeDashIfPossible ( now virtual )
+vslot	site	june_function	funcmap	verdict	ch1o2_verdict
+0x2e4	32610dc9	32610da0	?	CH1o: DamageData::NotifyAttackerWhenReset ( SimpleInit )	
+0x2e4	32610dd9	32610da0	?	CH1o: DamageData::NotifyAttackerWhenReset ( SimpleInit )	
+0x2fc	32610d79	32610cb0	?	char-ara CH1o ( widened to _LIVE by CH1o ); NPC forwarder 3275a410 ported	
+0x2fc	32610d89	32610cb0	?	char-ara CH1o ( widened to _LIVE by CH1o ); NPC forwarder 3275a410 ported	
+0x2fc	3275a43a	3275a410	CX2GUNPC::DoProcessWhenDamageDataDestroyed (unit vslot 0x2fc)	char-ara CH1o ( widened to _LIVE by CH1o ); NPC forwarder 3275a410 ported	
+0x300	3262546d	32625000	CX2DamageManager::UnitToUnit	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0	
+0x300	32628652	32625670	CX2DamageManager::MeshToUnit	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0	
+0x300	3262f1e6	3262b6e0	CX2DamageManager::EffectToUnit	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0	
+0x300	32779046	32778fe0	CX2GUNPC vslot 0x300 ( AdjustDamageDataBeforeDamageReact ): forward to the ally owner	char-raven CH1o user sites ( widened ); NPC forwarder 32778fe0 + every-unit call: CH3a0	
+0x438	31f1f3b8	31f1ed70	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June re-plays the custom-sit emotion or StateChange( wait ) after an equip refresh ( March X2StateMenu.cpp:4877 has neither ) -> backlog Stage 10
+0x438	31fd7664	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640 ) already calls GetWaitStateID
+0x438	31fd78c4	31fd78a0	none in March: CX2GUUser idle float +0x91b4 reset	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: idle float +0x91b4 reset ( Chung CH1l30 row, backlog "June's idle timer" bullet )
+0x438	31fd7985	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CanRidingState ( base 31fd7930 ), June's whole body ( + the next-state skill test ) under JUNE_USER_VIRTUAL_HOOKS
+0x438	320349ad	320348c0	CX2GUUser::StateChange( int, bool ) (June)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March member: StateChange clears +0x89e0 ( emotion field, PlayEmotion writes it @320443f5 ) unless the next state is the wait getter -> backlog Stage 10
+0x438	32034c0f	320348c0	CX2GUUser::StateChange( int, bool ) (June)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March member: the same +0x89e0 clear in StateChange( int, int, bool ) ( 32034c00 ) -> backlog Stage 10
+0x438	320434aa	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: March PlayEmotion already calls GetWaitStateID; June's rewrite around it ( vslot 0x4ac, generic charge-MP test 31fd7b60 ) is backlog Stage 10's
+0x438	32043519	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: March PlayEmotion already calls GetWaitStateID; June's rewrite around it ( vslot 0x4ac, generic charge-MP test 31fd7b60 ) is backlog Stage 10's
+0x438	32043555	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: March PlayEmotion already calls GetWaitStateID; June's rewrite around it ( vslot 0x4ac, generic charge-MP test 31fd7b60 ) is backlog Stage 10's
+0x438	320436a1	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: March PlayEmotion already calls GetWaitStateID; June's rewrite around it ( vslot 0x4ac, generic charge-MP test 31fd7b60 ) is backlog Stage 10's
+0x438	32044c2a	32044a80	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: CX2GUUser::SetEnterCashShop ( 32044a80 ) leaving the shop already calls StateChange( GetWaitStateID(), true )
+0x438	3204afee	3204ace2	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: CX2GUUser::EmotionFrameMove ( 3204a860 ) default case already calls GetWaitStateID; June's new head is Effect C9h-4's / Stage 10
+0x438	3204b290	3204ace2	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: CX2GUUser::EmotionFrameMove ( 3204a860 ), as above
+0x438	3206d376	32063650	CX2GUUser::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::PopFrameData ( real function 3206cff0, not CommonFrameMove ), GetWaitStateID under JUNE_USER_VIRTUAL_HOOKS
+0x438	3206d3ad	32063650	CX2GUUser::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::PopFrameData ( real function 3206cff0, not CommonFrameMove ), GetWaitStateID under JUNE_USER_VIRTUAL_HOOKS
+0x438	3206d3e3	32063650	CX2GUUser::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed by the same PopFrameData edit: June's second receive-list form ( +0x87a0 vslot 4 ); March has one list ( front() test )
+0x438	3208df02	3208df00	none in March: CX2GUUser vslot 0x4ac (special item usable extra state), base = wait state	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: GetSpecialItemUsableExtraStateID base ( X2GUUser.h ) returns GetWaitStateID()
+0x438	3208e726	3208e710	CX2GUUser::IsWaitState (user vslot 0x520; none in March)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: IsWaitState ( X2GUUser.h, Chung CH1l30 ) calls GetWaitStateID()
+0x438	321a8f47	321a4fe9	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: my unit's Future state vs GetWaitStateID / riding wait; March's three such tests ( X2UIInventory.cpp:5498, X2UIPetInventory.cpp:558, X2TitleManager.cpp:950 ) call the getter ( which June function is which: not pinned )
+0x438	322fadef	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x438	322fb308	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x438	3249cb8f	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	3249cd0e	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	3249ce8a	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	3249d00b	3249c9d0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	324bcc41	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	324bcdc6	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	324bcf48	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	324bd0cf	324bc8e0	CX2StateBattleField::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	324c31f2	324c3160	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: CX2StateTrainingGame ( X2StateTrainingGame.cpp:575, InitPosition then StateChange( GetWaitStateID(), true ) )
+0x438	324d3551	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	324d36e2	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	324d3876	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	324d3a0a	324d2e20	CX2StateDungeonGame::ShortCutKeyProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: June's emotion hotkeys in ShortCutKeyProcess ( 4 per state, SendEmotionId ) -> backlog Stage 10 ( the rest of ShortCutKeyProcess is Stage 9 )
+0x438	325248a3	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	32524a6d	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	32524c3a	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	32524e07	32523dc0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: the same June emotion-hotkey block in a third / fourth state's ShortCutKeyProcess ( state not pinned ) -> backlog Stage 10
+0x438	32703dc7	32703390	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: my unit's Future state vs GetWaitStateID / riding wait; March's three such tests ( X2UIInventory.cpp:5498, X2UIPetInventory.cpp:558, X2TitleManager.cpp:950 ) call the getter ( which June function is which: not pinned )
+0x438	3277c04a	3277c030	CX2GUNPC::Init(bool,int)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( CX2GUNPC::Init )
+0x438	327ca51a	327ca4e0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: CX2DungeonGame ( X2DungeonGame.cpp:3310, InitPosition then StateChange( GetWaitStateID(), true ) )
+0x438	327cae5b	327cadf0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: CX2DungeonGame::TutorialFrameMove ( X2DungeonGame.cpp:2820 ) compares GetWaitStateID()
+0x438	32ae3811	32ae37f0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	no March body: Rose's IsWaitState override ( 32ae37f0 ) -> char-rose
+0x438	32b59aea	32b59aa0	CX2GUEL::ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_EventProcess	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	class code: Elsword ESI_SI_A_EL_ENDURANCE_POWER_ACTIVE_EventProcess; Elsword has no wait override, the class port owns it
+0x438	32e20048	32e1f810	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: my unit's Future state vs GetWaitStateID / riding wait; March's three such tests ( X2UIInventory.cpp:5498, X2UIPetInventory.cpp:558, X2TitleManager.cpp:950 ) call the getter ( which June function is which: not pinned )
+0x43c	31fd76bc	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x43c	31fd79be	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CanRidingState ( base 31fd7930 ), June's whole body ( + the next-state skill test ) under JUNE_USER_VIRTUAL_HOOKS
+0x43c	31ff77e0	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CheckDashAngleChangeTime ( = 31ff7700 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x43c	322fae11	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x43c	322fb32a	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x43c	3277c078	3277c030	CX2GUNPC::Init(bool,int)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( CX2GUNPC::Init )
+0x440	31fc8559	31fc8540	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::SetEnableDash ( = 31fc8540 ), GetDashStateID under JUNE_USER_VIRTUAL_HOOKS; StateChange( 0xe ) stays USI_WALK as June
+0x440	31fc8586	31fc8540	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::SetEnableDash ( = 31fc8540 ), GetDashStateID under JUNE_USER_VIRTUAL_HOOKS; StateChange( 0xe ) stays USI_WALK as June
+0x440	31fd76f7	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x440	31fd79f7	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CanRidingState ( base 31fd7930 ), June's whole body ( + the next-state skill test ) under JUNE_USER_VIRTUAL_HOOKS
+0x440	31ff7789	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CheckDashAngleChangeTime ( = 31ff7700 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x440	322fae2f	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x440	322fb348	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x440	327bc040	327b53b0	CX2GUNPC::CommonFrameMove	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( CX2GUNPC::CommonFrameMove )
+0x440	32b901e4	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsDashState ( X2GUUser.h ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x444	31fd7720	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x444	31fd7a2c	31fd7930	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CanRidingState ( base 31fd7930 ), June's whole body ( + the next-state skill test ) under JUNE_USER_VIRTUAL_HOOKS
+0x444	322fae7c	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x444	322fb395	322f8920	CX2Game::ProcessExpListByNpcUnitDie	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	automatic: real function 322fa960 = CX2Game::CheckQuickSlotItemSpecialAbility ( not ProcessExpListByNpcUnitDie ); its IsQuickSlotSpecialSkillState ( X2Game.cpp ) already calls the getters
+0x444	32768c36	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( DoStateEndStart 32768ac0 )
+0x444	32b9021b	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsDashState ( X2GUUser.h ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x448	31fd773d	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x448	31ff77a6	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CheckDashAngleChangeTime ( = 31ff7700 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x448	32768c42	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( DoStateEndStart 32768ac0 )
+0x448	32b90250	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsDashState ( X2GUUser.h ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x44c	31fd775a	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x44c	31ff77c3	31ff7700	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CheckDashAngleChangeTime ( = 31ff7700 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x44c	3277ded2	3277cf10	none in March: CX2GUNPC set absolute monster (from stage data)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( 3277cf10 set absolute monster )
+0x44c	32b90285	32b901c0	CX2GUUser::IsDashState() (X2Lib/X2GUUser.h:2959, SERV_ELSWORD_INFINITY_SWORD)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsDashState ( X2GUUser.h ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x450	31fd7777	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x450	3277dede	3277cf10	none in March: CX2GUNPC set absolute monster (from stage data)	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( 3277cf10 set absolute monster )
+0x454	31fd7794	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x454	3275770e	327576e0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( 327576e0: the +0x2b4 call of DoStateEndStart )
+0x45c	31fd77ce	31fd7350	CX2GUUser: PhysicProcess_Jumping landing-line helper	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::IsNotCommonMoveState ( real function 31fd7640, not 31fd7350 ), getter under JUNE_USER_VIRTUAL_HOOKS
+0x45c	32768b28	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( DoStateEndStart 32768ac0 )
+0x460	3204617d	32045dc0	CX2GUUser::CanApplyBuffToGameUnit	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CanApplyBuffToGameUnit, GetDie*StateID ( now const ) under JUNE_USER_VIRTUAL_HOOKS
+0x460	32768b34	32768ac0	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( DoStateEndStart 32768ac0 )
+0x464	320461b3	32045dc0	CX2GUUser::CanApplyBuffToGameUnit	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	routed: CX2GUUser::CanApplyBuffToGameUnit, GetDie*StateID ( now const ) under JUNE_USER_VIRTUAL_HOOKS
+0x464	32768d29	32768c70	?	CH1o2: route through the getter ( automatic where March already calls Get<X>StateID )	not a user getter: called on a CX2GUNPC ( its own vtable slot at the same offset ), out of scope ( OnFrameRender_Draw 32768c70 )
+0x51c	3205e0fa	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o	
+0x51c	3205e448	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o	
+0x51c	3205e4b0	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o	
+0x51c	32061996	32057b80	CX2GUUser::CommonStateStart (slot 497)	C3t ( JUNE_HYPER_CUT_IN_TIME ); declaration widened to _LIVE by CH1o	
+0x574	320433d7	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o: PlayEmotion top	
+0x580	32061976	32057b80	CX2GUUser::CommonStateStart (slot 497)	none: +0x94c0 has no reader ( write-only )	
+0x640	31fe40ab	31fe4030	?	none in March: 31fe4030 riding-off ( Stage 17 )	
+0x650	3206c1e6	32063650	CX2GUUser::CommonFrameMove	CH1o: CommonFrameMove SetNowMpFromStoredValue	
+0x648	32051059	320506f0	CX2GUUser::CommonStateStartFuture	CH1o: CommonStateStartFuture after DUO_TYPE ( CP_AMOUNT )	
+0x570	31ffec9f	31ffe990	CX2GUUser::AddEquipToViewList( CX2Item*, short slotId, bool bForceBasic ) (X2GUUser.cpp:35650)	DU3 ( AddEquipToViewList rewrite )	
+0x570	31ffeda1	31ffe990	CX2GUUser::AddEquipToViewList( CX2Item*, short slotId, bool bForceBasic ) (X2GUUser.cpp:35650)	DU3 ( AddEquipToViewList rewrite )	
+0x62c	320349cb	320348c0	CX2GUUser::StateChange( int, bool ) (June)	CH1o: StateChange ( false ), PlayEmotion ( true )	
+0x62c	320447e9	32043380	CX2GUUser::PlayEmotion( EMOTION_TYPE, wstring& )	CH1o: StateChange ( false ), PlayEmotion ( true )	
+0x64c	31fee873	31fee682	?	CH1o: InitComponent / ReInit / CommonFrameMoveFuture	
+0x64c	32023c24	32022380	?	CH1o: InitComponent / ReInit / CommonFrameMoveFuture	
+0x64c	32062f78	32061bf0	CX2GUUser::CommonFrameMoveFuture (slot 498)	CH1o: InitComponent / ReInit / CommonFrameMoveFuture	
+0x5c4	323c54a6	323c5310	?	Stage 10 ( dance )	
+0x658	322cc4a9	322cc480	?	none in March: 322cc480 forwarder	
+0x740	3201ffec	3201ffb0	none in March: CX2GUUser slot 250 pre-apply hook(BTI)	char-add ( Crest of Time )	
+0x744	320074f9	320072d0	none in March: user death-prevention passives	char-add ( Crest of Time; 320072d0 ProcessPassiveReturnFromDeath )	
+0x7fc	32969343	32969300	CX2GUEve::SpecialAttackEventProcess (slot 509, vtable 334cfc54)	class-own	
+0x7fc	32a07d29	32a07b60	CX2GUAdd::SpecialAttackEventProcess	class-own	
+0x7fc	32a67276	32a67230	?	class-own	
+0x7fc	32aae093	32aae040	?	class-own	
+0x7fc	32b4ee63	32b4ee20	CX2GUEL::SpecialAttackEventProcess (slot 509, vtable 334fae10)	class-own	
+0x7fc	32b90c7a	32b90c20	CX2GUAra::SpecialAttackEventProcess (slot 509, vtable 33505b0c)	class-own	
+0x7fc	32b998e3	32b99890	CX2GUAra::ComboXXdownXXEventProcess	class-own	
+0x7fc	32b9a033	32b99e90	CX2GUAra::ComboDashZpushX_AttackEventProcess	class-own	
+0x7fc	32b9eef6	32b9edd0	CX2GUAra::ASI_DASH_COMBO_ALS_X_EventProcess	class-own	
+0x7fc	32babc03	32babba0	CX2GUAra::StateChangeOrFPCancel	class-own	
+0x7fc	32bad6e6	32bad670	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_EventProcess	class-own	
+0x7fc	32bc20b1	32bc1f30	CX2GUAra::ASI_SA_ALH_SWALLOW_ASSAULT_Attack_EventProcess	class-own	
+0x7fc	32bc9e9f	32bc9c70	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_UPGRADE_EventProcess	class-own	
+0x7fc	32bd87d3	32bd8790	CX2GUChung::SpecialAttackEventProcess (slot 509, vtable 33509e74)	class-own	
+0x7fc	32c25b33	32c25af0	CX2GURaven::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own	
+0x7fc	32c6a9b3	32c6a970	CX2GULire_ElvenRanger::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own	
+0x7fc	32cb97ed	32cb97a0	CX2GUArme_VioletMage::SpecialAttackEventProcess	class-own	
+0x7fc	32cf32d3	32cf3290	CX2GUElsword_SwordMan::SpecialAttackEventProcess (slot 509)	class-own	
+0x800	32057c74	32057b80	CX2GUUser::CommonStateStart (slot 497)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	3296940c	329693e0	CX2GUEve::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32a1e401	32a1e3c0	CX2GUAdd::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32a71e2c	32a71e00	?	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32ac56a1	32ac54c0	?	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32b525bc	32b52590	CX2GUEL::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32ba67a1	32ba6610	CX2GUAra::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32bee4bc	32bee490	CX2GUChung::SpecialAttackEventProcess part: skill use	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32c25bcc	32c25ba0	CX2GURaven::SpecialAttackUse (user vslot 0x7fc, step 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32ca50dc	32ca50b0	CX2GULire_ElvenRanger::SpecialAttackUse (0x7fc, step 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32ced71d	32ced640	CX2GUArme_VioletMage::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32ced7b1	32ced640	CX2GUArme_VioletMage::SpecialAttackEventProcess part: skill use (slot 511)	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x800	32cf578c	32cf5760	CX2GUElsword_SwordMan::SpecialAttackUse	class-own; CommonStateStart @32057c74 = ReservedSkillStart ( CH1o3 )	
+0x7f8	32969316	32969300	CX2GUEve::SpecialAttackEventProcess (slot 509, vtable 334cfc54)	class-own	
+0x7f8	32a07b79	32a07b60	CX2GUAdd::SpecialAttackEventProcess	class-own	
+0x7f8	32a67259	32a67230	?	class-own	
+0x7f8	32aae060	32aae040	?	class-own	
+0x7f8	32b4ee36	32b4ee20	CX2GUEL::SpecialAttackEventProcess (slot 509, vtable 334fae10)	class-own	
+0x7f8	32b99930	32b99890	CX2GUAra::ComboXXdownXXEventProcess	class-own	
+0x7f8	32b9a080	32b99e90	CX2GUAra::ComboDashZpushX_AttackEventProcess	class-own	
+0x7f8	32b9ef43	32b9edd0	CX2GUAra::ASI_DASH_COMBO_ALS_X_EventProcess	class-own	
+0x7f8	32bac17e	32bac120	ASI_SA_ARA_WIND_WEDGE_START.EventProcess	class-own	
+0x7f8	32bac20e	32bac1b0	ASI_SA_ARA_PULLING_PIERCE_START.EventProcess	class-own	
+0x7f8	32bac29e	32bac240	CX2GUAra::ASI_SA_ASR_SHADOW_RISING_LANDING_EventProcess	class-own	
+0x7f8	32bac332	32bac2d0	ASI_SA_ARA_TEMPEST_DANCE_START.EventProcess ASI_SA_ARA_TEMPEST_DANCE_END.EventProcess	class-own	
+0x7f8	32bac3fe	32bac3a0	ASI_SA_ARA_SHADOW_KNOT_CATCH.EventProcess	class-own	
+0x7f8	32bac48e	32bac430	ASI_A_ARA_TIGER_CLAW_START.EventProcess	class-own	
+0x7f8	32bac51e	32bac4c0	ASI_SA_ALH_DOUBLE_COLLISION_START.EventProcess	class-own	
+0x7f8	32bac5ae	32bac550	CX2GUAra::ASI_SA_ASD_TURBULENT_WAVE_LOOP_EventProcess	class-own	
+0x7f8	32bac642	32bac5e0	CX2GUAra::ASI_SA_ALH_PEERLESSNESS_SLASH_START_EventProcess	class-own	
+0x7f8	32bac6a3	32bac5e0	CX2GUAra::ASI_SA_ALH_PEERLESSNESS_SLASH_START_EventProcess	class-own	
+0x7f8	32bac72e	32bac6d0	ASI_A_ALH_ROCK_CRASH_FALLING_START.EventProcess	class-own	
+0x7f8	32bac7be	32bac760	CX2GUAra::ASI_A_ASD_LOW_BRANDISH_SLIDING_EventProcess	class-own	
+0x7f8	32bac84e	32bac7f0	ASI_A_ASD_FALLING_BLOSSOM_Start.EventProcess	class-own	
+0x7f8	32bac8de	32bac880	CX2GUAra::ASI_A_ALD_WOLF_CLAW_EventProcess	class-own	
+0x7f8	32bacbb3	32bacb50	CX2GUAra::ASI_SA_ALD_HELL_OF_TORNADO_EventProcess	class-own	
+0x7f8	32bace0e	32bacdb0	CX2GUAra::ASI_SA_ALD_WOLF_SPEAR_EventProcess	class-own	
+0x7f8	32bacea2	32bace40	CX2GUAra::ASI_SA_ALD_FINGER_BULLET_EventProcess	class-own	
+0x7f8	32bad002	32bacfa0	CX2GUAra::ASI_SA_ALD_ENERGY_BEAD_EventProcess	class-own	
+0x7f8	32bad162	32bad100	CX2GUAra::ASI_SA_ALD_PRISON_SPEAR_EventProcess	class-own	
+0x7f8	32bad2c3	32bad260	CX2GUAra::ASI_A_AYR_STEAL_SOUL_EventProcess	class-own	
+0x7f8	32bad41e	32bad3c0	CX2GUAra::ASI_A_ALS_VIEW_BETWEEN_EventProcess	class-own	
+0x7f8	32bad51d	32bad450	CX2GUAra::ASI_A_ALS_SHAKE_CHAOS_EventProcess	class-own	
+0x7f8	32bad5ae	32bad550	CX2GUAra::ASI_A_AA_RAID_ATTACK_EventProcess	class-own	
+0x7f8	32bad63e	32bad5e0	CX2GUAra::ASI_SA_ALS_RESTRAINTS_SPECTER_EventProcess	class-own	
+0x7f8	32bad75f	32bad670	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_EventProcess	class-own	
+0x7f8	32bad7f2	32bad790	CX2GUAra::ASI_SA_ASR_SPECTER_OF_BLADE_EventProcess	class-own	
+0x7f8	32bad853	32bad790	CX2GUAra::ASI_SA_ASR_SPECTER_OF_BLADE_EventProcess	class-own	
+0x7f8	32bad8de	32bad880	CX2GUAra::ASI_SA_AA_GET_BLOOD_EventProcess	class-own	
+0x7f8	32bad96e	32bad910	CX2GUAra::ASI_SA_ASD_CONTINUITY_STRIKE_THROWING_START_EventProcess	class-own	
+0x7f8	32bad9fe	32bad9a0	CX2GUAra::ASI_SA_AYR_RESTRICTION_ENERGY_START_EventProcess	class-own	
+0x7f8	32bada8e	32bada30	CX2GUAra::ASI_SA_AYR_REVERSE_GRAVITY_FIELD_START_EventProcess	class-own	
+0x7f8	32badb1e	32badac0	CX2GUAra::ASI_A_ASD_SWALLOW_ASSAULT_TEETH_START_EventProcess	class-own	
+0x7f8	32bc2158	32bc1f30	CX2GUAra::ASI_SA_ALH_SWALLOW_ASSAULT_Attack_EventProcess	class-own	
+0x7f8	32bc9f18	32bc9c70	CX2GUAra::ASI_SA_ALS_SPECTER_OF_STORM_UPGRADE_EventProcess	class-own	
+0x7f8	32bd87a6	32bd8790	CX2GUChung::SpecialAttackEventProcess (slot 509, vtable 33509e74)	class-own	
+0x7f8	32c25b06	32c25af0	CX2GURaven::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own	
+0x7f8	32c6a986	32c6a970	CX2GULire_ElvenRanger::SpecialAttackEventProcess (vslot 0x7f4, uncarved)	class-own	
+0x7f8	32cb97ba	32cb97a0	CX2GUArme_VioletMage::SpecialAttackEventProcess	class-own	
+0x7f8	32cf32a6	32cf3290	CX2GUElsword_SwordMan::SpecialAttackEventProcess (slot 509)	class-own	
+0x664	31f1f3e3	31f1ed70	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	31fee2d9	31fee090	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	31fee400	31fee090	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	31ffe944	31ffe920	CX2GUUser::UpdatePassiveAndActiveSkillState (user vslot 0x2c0)	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	320238aa	32022380	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	326cad75	326cad50	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	326d080d	326d0560	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	326d146d	326d1030	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x664	326d76dc	326d72e0	?	automatic: March callers call ResetMaxMP ( now virtual )	
+0x848	32059b81	32057b80	CX2GUUser::CommonStateStart (slot 497)	CH1o: CommonStateStart IsActiveBodyChangeReached	
+0x668	1375 sites	-	class and engine EventProcess	automatic: March calls StateChangeDashIfPossible ( now virtual )	
