@@ -2185,6 +2185,41 @@ attack_lines N`. With `attack_lines 0`, the basic mesh carries no hit lines and 
 `basic_item 41876 minor 1 anims 2 attack_lines 2` (the minor-unit branch: Lu's basic weapon -> its Ciel item 41886). No line for Add's dynamos
 (own anim). Note for the review: the debug throttle printed lines 65-85 though it should stop at 60; the review retires the line anyway.
 
+### Phase R14c -- Review
+
+**2026-11-15, Opus 5.5 high. Verdict: PASS, no code change.** Reviewed commit `2dce458c` against June in Ghidra (read-only); debug line retired.
+- **Init** `3295dfa0` @`3295e2a9`-`3295e4de` (disassembly): owner `+0x1b4` NULL, templet `+0xd2` == 0xb (`UT_ROSE`) or 9 (`UT_ADD`) -> past the
+  pair; else the old `+0x584[i]` is deleted first, then `329657d0( templet +0xd5 )` -> `325bb740`, NULL -> past the pair (`3295e4de`). Minor-unit
+  test is flags2 bit 2; its NULL templet jumps to `3295e413` = CreateSkinAnim on the slot's old `+0x5e4` (JUNE_BUGS 734 is right). The model index
+  is `EBP` = `i` in both branches; the Rose / `EP_WEAPON_HAND` 4..7 remap is the dead jump table `3295ee4c`. Calls match the port:
+  `SetAnimXSkinMesh( model, +0x80c, 0 )`, `AddModelXSkinMesh( model, +0x80c, +0x808, +0x804, 0, 1 )` (same XET order as March's normal call),
+  `ChangeAnim( +0x85c, 0, 0.f )`, `Play( 0 )` = `XAP_LOOP`, `+0x31c = 1`. Jiggle: `3295b230` returns 1.5 (`33471a1c`) when the worn item is in
+  DITT 0x1e, else -1.0 (`334380f0`, read from the exe); the `>= 0` test then `SetUnitXSkinAnim( +0x1c0 )`, `+0x844` = 1.5, `+0x840` = 1,
+  `+0x848` = 0 = the port's `IsDivisionItem( DITT_ITEM_ID_JIGGLE_TYPE1 )` + `SetJiggleMesh( true, 1.5f, 0 )` (`JIGGLEBONE_TEST` is on, Always.h 3102).
+- **`329657d0`** jump table decoded from the exe: EP 2 -> `+0xe4`, 6..11 -> `+0xe8..+0xfc`, 36 -> `+0x100`, else 0. March's `EQIP_POSITION`
+  (`EP_WEAPON_HAND` 2, `EP_DEFENCE_HAIR..FOOT` 6..11, `EP_RAVEN_LEFT_ARM` 36) and the UnitTemplet field order give the port's switch exactly.
+- **Frame move** `32964ae0` @`32964f22`: `+0x584[i]` first, only with the unit matrix; vslot 0x14 (unused), scale / rotate (yaw = rot.y, pitch =
+  rot.x, roll = rot.z) / offset `+0x8cc` x unit matrix -> anim `+0x2dc`, then OnFrameMove; then the normal anim. The port copies March's normal
+  block for it. June's scale / rotate take the body byte `+0x15d4` (`32867710` / `328677c0`): that is R14d's (its kickoff step 2 replaces the
+  block). Nothing draws `+0x584`.
+- **Dtor** `329602f0`: inside the `+0x1c0` test, per slot, the attachment's model then `+0x5e4[i]` always removed; the slot loop deletes `+0x544`,
+  `+0x564`, `+0x584`, then closes `+0x5a4`, `+0x5c4`, `+0x5e4`. The port's order is the same (its remove loop sits after March's attachment
+  removal; the unit anim's model list order does not matter).
+- **Collision** `31fd8c00` @`31fd8d40`: 0xb / 9 -> `[+0x544 + 4j]`, else `[+0x584 + 4j]` (= `GetNormalAnim` / `GetBasicItemAnim`); Aisha's
+  `32cc8d30` site is the same shape. Both `#else` branches are Phase S's stand-in, unchanged (insert-only).
+- **Play-test log** (exe md5 df9afaf4): 77 `EQBASIC` lines, all `attack_lines` >= 1; `basic_item` 21 (Aisha), 41 (Eve), 7 (Elsword), 34 (Raven),
+  41450 (Ara), 41876 minor 1 (Ciel): each is the class's UnitTemplet `basicWeaponItemID`. No mesh comparison needed.
+- **Throttle oddity explained** (debug only, now retired): `KLOG( f )` is two statements (`KSuperAssert.h:109`, `KDbgStm.SetLogFilename( f );
+  KDbgStm`), so the braceless `if` gated only the filename; lines past 60 still streamed to whichever file was set last (65-78 and 83-85 reached
+  ErrorLog.txt when it was the last file set). Never put `KLOG` under a braceless `if`.
+
+**Gates** `finish.py --review --commits 2dce458c --with ..._BASIC_COLLISION_ANIM ..._DEBUG -v`: flagcheck `JUNE_EQIP_BASIC_COLLISION_ANIM` RESULT:
+PASS (5 PASS, 1 DEFINE, 1 OTHER, 0 FAIL, 0 ERROR; 0 deleted, 0 non-ASCII, 47 EOL-mismatched = the CRLF `InitAttatchAnim` block, as the Done note
+says); the OTHER is `X2ItemManager.h`'s `DITT_ITEM_ID_JIGGLE_TYPE1 = 30` line, under `JUNE_ENUM_NAMES` (intended, June's value). junediverge RESULT:
+PASS; junediverge `--check-all` RESULT: PASS; enumscan exit 0; FINISH RESULT: PASS. Retire edit (`Always.h` 13727, bytepatch, CP949 / CRLF kept):
+`finish.py --files KTDXLIB/Always.h --with ..._DEBUG`: `retired`, junediverge PASS, enumscan exit 0, FINISH RESULT: PASS.
+**Build skipped: debug retire only.** R14d / R14e kickoffs checked (R14d step 2 already takes over R14c's frame-move block).
+
 ## Phase R14d - June's whole CX2Eqip::OnFrameMove and the DG-chain byte readers
 
 **Run with:** Opus 5.5 high (map, then port), Opus review, user play-test. Added by R14c (2026-11-15). Proposed flag
