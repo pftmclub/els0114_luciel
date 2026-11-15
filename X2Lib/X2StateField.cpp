@@ -1229,6 +1229,10 @@ bool CX2StateField::UIServerEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case EGS_TOGGLE_INVISIBLE_NOT:
 		return Handler_EGS_TOGGLE_INVISIBLE_NOT( hWnd, uMsg, wParam, lParam );
 #endif SERV_INVISIBLE_GM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	case EGS_CHANGE_UNIT_FORM_NOT:
+		return Handler_EGS_CHANGE_UNIT_FORM_NOT( hWnd, uMsg, wParam, lParam );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	}
 
 	return false;
@@ -2424,6 +2428,21 @@ bool CX2StateField::Handler_EGS_TOGGLE_INVISIBLE_NOT( HWND hWnd, UINT uMsg, WPAR
 	return true;
 }
 #endif SERV_INVISIBLE_GM
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June CX2TFieldGame::EventProcess 323bda90 case 0x4da
+bool CX2StateField::Handler_EGS_CHANGE_UNIT_FORM_NOT( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	KSerBuffer* pBuff = (KSerBuffer*)lParam;
+	KEGS_CHANGE_UNIT_FORM_NOT kEvent;
+	DeSerialize( pBuff, &kEvent );
+
+	if( NULL != g_pTFieldGame )
+		g_pTFieldGame->Handler_EGS_CHANGE_UNIT_FORM_NOT( kEvent );
+
+	return true;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 
 
 #ifdef ADDED_RELATIONSHIP_SYSTEM

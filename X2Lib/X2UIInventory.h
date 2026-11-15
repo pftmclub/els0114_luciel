@@ -440,6 +440,9 @@ public:
 	bool ChangeInventoryTab( CX2Inventory::SORT_TYPE sortType );
 	bool SetInventorySort( CX2Inventory::SORT_TYPE sortType, int pageNum = 1 );
 	bool ChangeInventoryTabByUid( UidType iItemUID );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	void RedirectRingToSecondRingSlot( CX2Unit::EQIP_POSITION& eEquipPosition_ ) const;	// char-luciel DU5: June 321693b0
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	bool UpdateInventorySlot();
 
 	void UpdateUIButton();

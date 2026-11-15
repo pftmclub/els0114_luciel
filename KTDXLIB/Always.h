@@ -13791,6 +13791,21 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
+// Description: char-luciel DU5: Lu/Ciel's form in the character window and the village. The window's switch buttons and a click on the
+//              unit send June's form REQ ( 0x4d9, 32916e10 ) in the village and switch only the window elsewhere ( 3291d390, 3291db60 );
+//              the emulator saves the form and answers June's NOT ( 0x4da ), which sets the unit's form ( 3234b8c0 ) and refreshes the
+//              window ( 323acfb0 ). A head-type accessory worn on the same body refuses a drop or right-click ( 3234f4d0, string 39493 );
+//              a ring for a body that already wears one goes to the second ring slot ( 321693b0 ). The window opens on the unit's form.
+//              Also defined in KncWX2Server/Common/ServerDefine.h ( EventID_Client.h / ClientPacket.h precede Always.h ): comment out both.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_CHARINFO_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHARINFO_DLG ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW needs SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ( slot bodies, the saved form ), SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( the form, the command group ) and SERV_IRUHADEV_JUNE_CHARINFO_VIEW / _DLG ( the click and button stubs it replaces ), char-luciel DU5
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
 // Description: June character port ( Add ) Phase CH1a - June-only class-core pieces March's CX2GUAdd lacks ( the state name ANSI_CAN_NOT_ATTACK_JUMP_DOWN and its
 //              EventProcess ), compiled in every build and referenced by nothing until CH1m. Revert: comment out the #define ( JUNE_CHAR_ADD_CORE ).
 #define SERV_IRUHADEV_JUNE_CHAR_ADD_CORE

@@ -4806,3 +4806,9 @@
 // Description: char-luciel CH1a2: KGamePlayStatus carries June's minor-unit gauge ( +0x5a / +0x5e ), the form byte ( +0x62 ) and CAC 6. Also defined in KTDXLIB/Always.h and in X2ServerProtocol_2010.vcxproj (X2TOOL); this second home exists because CommonPacket.h is compiled before Always.h is reachable. Comment out all three together.
 #define SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel DU5: June's form REQ / NOT ( 0x4d9 / 0x4da ) events and packets. Also defined in KTDXLIB/Always.h; this second home exists because EventID_Client.h and ClientPacket.h are compiled before Always.h is reachable. Comment out both together.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+//////////////////////////////////////////////////////////////////////////

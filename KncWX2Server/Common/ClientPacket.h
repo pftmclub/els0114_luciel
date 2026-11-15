@@ -5681,6 +5681,24 @@ DECL_PACKET( EGS_CHANGE_TRANSCENDENTAL_CLASS_NOT )
 };
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_CHANGE
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June 0x4d9 sends one byte ( 32920900( 0x4d9, &form, 1 ) ), 0x4da is read by 320aa0f0: UidType, then Get(char) 33051d30.
+DECL_PACKET( EGS_CHANGE_UNIT_FORM_REQ )
+{
+	char							m_cMinorUnitForm;
+
+	KEGS_CHANGE_UNIT_FORM_REQ() : m_cMinorUnitForm( 0 ) {}
+};
+
+DECL_PACKET( EGS_CHANGE_UNIT_FORM_NOT )
+{
+	UidType							m_iUnitUID;
+	char							m_cMinorUnitForm;
+
+	KEGS_CHANGE_UNIT_FORM_NOT() : m_iUnitUID( 0 ), m_cMinorUnitForm( 0 ) {}
+};
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+
 #ifdef SERV_IRUHADEV_ADMIN_CHEATS
 DECL_PACKET( EGS_ADMIN_ADD_ITEM_REQ )
 {

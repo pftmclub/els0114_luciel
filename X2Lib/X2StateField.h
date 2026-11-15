@@ -144,6 +144,9 @@ public:
 #ifdef SERV_INVISIBLE_GM
 	bool Handler_EGS_TOGGLE_INVISIBLE_NOT( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 #endif SERV_INVISIBLE_GM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	bool Handler_EGS_CHANGE_UNIT_FORM_NOT( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );	// char-luciel DU5: June 323bda90 case 0x4da
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 
 #ifdef SERV_IDENTITY_CONFIRM_POPUP_MESSAGE
 	bool Handler_EGS_IDENTITY_CONFIRM_POPUP_MESSAGE_NOT( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ); // 2011.10.06 lygan_조성욱 // 방침미 알림 팝업 표시용

@@ -800,6 +800,9 @@ private:
 	bool Handler_EGS_UPDATE_PLAY_STATUS_NOT( KOfflineSession& kSes, const KEvent& kEvent );
 	bool Handler_EGS_FIELD_UNIT_SYNC_DATA_NOT( KOfflineSession& kSes, const KEvent& kEvent );
 	bool Handler_EGS_UPDATE_BATTLE_FIELD_USER_POS_NOT( KOfflineSession& kSes, const KEvent& kEvent );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	bool Handler_EGS_CHANGE_UNIT_FORM_REQ( KOfflineSession& kSes, const KEvent& kEvent );	// char-luciel DU5: June 0x4d9, answered with 0x4da
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 
 	//////////////////////////////////////////////////////////////////////////
 	// Handlers_Square.cpp - Cobo Express, the trade square. Not a KOfflineRoom:

@@ -74,6 +74,11 @@ public:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 	bool GetSwitchingView() const { return m_bSwitchingView; }	// char-luciel DU1c: June +0x25a, read by CX2Game's equip ability writers
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	bool Handler_EGS_CHANGE_UNIT_FORM_REQ( const bool bMinorUnitForm_ );	// char-luciel DU5: June 32916e10
+	void SwitchViewOnlyThisDialog();	// char-luciel DU5: June 3291db60 @3291dd2d
+	bool CanSwitchFormInVillage() const;	// char-luciel DU5: June 3291db60 @3291dc9f
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #endif SERV_IRUHADEV_JUNE_CHARINFO_SHOW
 #ifdef SERV_IRUHADEV_JUNE_CHARINFO_VIEW
 	void SetLight( const bool bDarkBackground_ );

@@ -423,4 +423,38 @@ bool CX2OfflineServer::Handler_EGS_UPDATE_BATTLE_FIELD_USER_POS_NOT( KOfflineSes
 	return true;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June 0x4d9; stand-in ( no June server ): the form goes to unit.minor_unit_form ( the select reads it ) and 0x4da answers
+bool CX2OfflineServer::Handler_EGS_CHANGE_UNIT_FORM_REQ( KOfflineSession& kSes, const KEvent& kEvent )
+{
+	KEGS_CHANGE_UNIT_FORM_REQ kReq;
+	if( false == ReadReq( kEvent, kReq ) )
+		return false;
+
+	KOfflineUnitRow kRow;
+	if( 0 == kSes.m_nSelectedUnitUID || false == CX2OfflineDB::Instance()->LoadUnit( kSes.m_nSelectedUnitUID, kRow ) )
+	{
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO FORM REQ %d ignored: no selected unit", (int)kReq.m_cMinorUnitForm );
+		return true;
+	}
+
+	if( CX2Unit::UT_LUCIEL != CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) )
+	{
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO FORM REQ %d ignored: unit %I64d class %d is not Lu/Ciel", (int)kReq.m_cMinorUnitForm, (__int64)kRow.m_nUnitUID, kRow.m_iUnitClass );
+		return true;
+	}
+
+	const int iMinorUnitForm = ( 1 == kReq.m_cMinorUnitForm ) ? 1 : 0;
+	CX2OfflineDB::Instance()->SaveMinorUnitPlayStatus( kRow.m_nUnitUID, kRow.m_iMinorUnitCurMP, iMinorUnitForm );
+	kSes.m_iSavedMinorUnitMP	= kRow.m_iMinorUnitCurMP;
+	kSes.m_iSavedMinorUnitForm	= iMinorUnitForm;
+
+	KEGS_CHANGE_UNIT_FORM_NOT kNot;
+	kNot.m_iUnitUID			= kRow.m_nUnitUID;
+	kNot.m_cMinorUnitForm	= (char)iMinorUnitForm;
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO FORM unit %I64d: form %d -> %d saved, NOT sent", (__int64)kRow.m_nUnitUID, kRow.m_iMinorUnitForm, iMinorUnitForm );
+	return Reply( kSes, EGS_CHANGE_UNIT_FORM_NOT, kNot );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+
 #endif SERV_IRUHADEV_OFFLINE

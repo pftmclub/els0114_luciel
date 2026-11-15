@@ -619,6 +619,9 @@ class CX2ItemManager
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 			DITT_PC_BANG_ONLY_EQUIPMENT												= 77,	// June Enum.lua; the usable test 328825c0 reads it
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+			DITT_ITEM_ID_HEAD_TYPE_ACCESSORY										= 76,	// char-luciel DU5: June Enum.lua; the equip conflict test 3234f4d0 reads it
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 		};
 		// June Enum.lua CONDITION_EQUIP_PLAY_EFFECT_SET (June's own spelling ALWYAS kept)
 		enum CONDITION_EQUIP_PLAY_EFFECT_SET

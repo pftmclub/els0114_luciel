@@ -706,6 +706,10 @@ Opus 5.5 high. **Verdict: pass after one hygiene fix** (a missing flag-dependenc
 | DU3 | June's equip-view rewrite whole (the Stage 8 bullet "June's equip-view rewrite"): `UpdateEquipViewListInfo` `3201b930` with the `slotId` argument on vslot 0x644 for every override (Chung `32bdc750`, Ara `32bc89e0`, Arme `32cc9950`, and Lu/Ciel's), `GetAddItemAndRemoveItemToViewList` `31fd2f00`, `AddEquipToViewList` `31ffe990`, the skin anim `31fd48a0`, `31fd63c0`, `CreateEquip`'s two arguments, the two cosmetic every-class cases (`328825c0`, `32882540`), and the item-templet minor-unit fields (minor-unit item id and flag, Extra keys 10-13, item-type / unit-class guards from K2; checklist 7g). | `SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW` |
 | DU4 | NESI renumber to June's ids (`NESI_ONEPIECE_FASHION` 20 -> 35, `NESI_END` 21 -> 43, `NESI_MINORUNIT_*`) and the forward-only `X2OfflineDB` migration (user, 2026-11-02; snapshot `db_backup/` first, schema step +1). It retires `SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP` (CharInfo C3) and the `IS_FOR_MINOR_UNIT` stand-in (slot hide by June's ids, `32e22ce0`). Every character's equipment must show identically before and after (relog test on three characters). | `SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER` |
 | DU5 | Two bodies in the character window and the unit viewer (the Stage 8 bullet "The character window's Lu/Ciel and Rose branches", Lu/Ciel half): unit `+0xe40` (setter `3234b8c0`, NOT-apply `323acfb0`) behind `CIM_SWITCHING` / `_ONLY_THIS_DIALOG`, the viewer form byte `+0xd80` / `+0xd81` with `31f93a10` / `31faa150` / `31f94190` / `3291d360`, the MsgProc click switch `3291d390` (replaces the logged stub), OnDropAnyItem `3234f4d0` / `321693b0`, the form packets `0x4d9` / `0x4da` with emulator handlers, both bodies on the creation-screen preview and the select screen (where June shows two and NU4 showed one), and the CharInfo C3 form stand-ins (ResetStat's form, `@3291bf2d`). Rose's weapon UI stays for `char-rose`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW` |
+| DU5b | (split from DU5, 2026-11-15) The unit viewer's second body: `+0xd7c` minor skin, `+0xd80` / `+0xd81` / `+0xd82`, `31f93a10`, `31f94190`, `31faa150`, `3291d360`, `PlayAnim` which = 2; retires DU5's "viewer `+0xd80` read as the window's switch" stand-ins and the NOT's viewer calls. | `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` |
+| DU5c | (split from DU5) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the village avatar (`323f3290` rest: `323f1490`, the viewer rebuild; `323fa700` / `323fad80`; SD mesh table `31ee3470`). | DU5b's, or `_DUO_AVATAR` |
+| DU5d | (split from DU5) Viewer weapon effects case 10 (`X2UnitViewerUI.cpp:960`, `:6255`, `:8559`, `:8681`) and CH0's checklist viewer rows (CharCustomData, UnitViewerEffectSetTable, `IS_FOR_MINOR_UNIT` slot key, glow). | DU5b's |
+| DU5e | (split from DU5) Each body's numbers: `SetGameStats` second `KStat` `323571c0` + packet fields, the type-10 socket aggregate and the HUD's second gage, the set-socket count `3286a6b0` and the per-body socket record `3271a060`, the window's other-form set sum `@3291bf2d`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` |
 
 **Done gate:** DU1 / DU2: every other class's play is unchanged (the reviews diff `cl /P`), and a Lu/Ciel's second body follows and syncs once CH1
 lands (CH1's play-test). DU3-DU5: Lu and Ciel each wear their own equipment in the village, in the character window and on the select screen;
@@ -1568,6 +1572,42 @@ the slot-0 caller `3291d9f0`.
   `Always.h`'s retired `CHARINFO_EQUIP_GROUP` define line, 0 FAIL); junediverge PASS; `--check-all` PASS; enumscan exit 1 on 190 rows, **0 on DU4's
   330 added lines** (`git diff -U0` intersect). stateends / skillicons / luabind are n/a (no skill states, skills or June script).
 - Full build skipped: no play-test (no code change).
+
+### DU5 - Done (2026-11-15)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW` (defined; second home `ServerDefine.h` + `SECOND_HOMES`; `#error` guard: `NESI_RENUMBER`,
+`DUO_BODY`, `CHARINFO_VIEW`, `CHARINFO_DLG`, all ON at that line by a probe). Rows: funcmap `(DU5)` (15), JUNE_BUGS 749. **Split** (the amendments made
+DU5 four phases' work): DU5b viewer second body, DU5c create / select / village avatar, DU5d viewer effects + CH0 viewer rows, DU5e each body's numbers
+(table above; `DU5.md` "Split by DU5"; kickoffs written).
+- **Packets** (`EventID_Client.h`, `ClientPacket.h/.cpp`): `EGS_CHANGE_UNIT_FORM_REQ` { char } (June 0x4d9, one byte, `32916e10`, no ACK) and
+  `EGS_CHANGE_UNIT_FORM_NOT` { UidType, char } (0x4da, reader `320aa0f0` = UidType + Get(char)). Agit 0x4fd and Rose's index on 0x4d9 not ported.
+- **Emulator** (`Handlers_Field.cpp`, labelled stand-in): a Lu/Ciel's form goes to `unit.minor_unit_form` (the column the unit select reads into the
+  gage data, which sets the unit's form) and the session cache; the NOT comes back. Log `[JUNE_CHAR] LUCIEL DUO FORM unit <uid>: form a -> b saved, NOT sent`.
+- **Unit:** `CX2Unit::SetMinorUnitForm` = `3234b8c0` (store, then a shown inventory is shown again: vslot 8 = `SetShow`, `32194ed0`);
+  `IsOtherHeadTypeAccessoryWorn` = `3234f4d0` (division group 76 `DITT_ITEM_ID_HEAD_TYPE_ACCESSORY`, registered under the flag; another position,
+  same body by the item owner's form).
+- **Village:** `CX2StateField` dispatches the NOT to `CX2TFieldGame::Handler_EGS_CHANGE_UNIT_FORM_NOT` = `323acfb0` (type 10 only; `-1` = no change;
+  my unit: window `SetSwitchingView( result )` + `EquipChanged`, inventory `SetInventorySort( sort, page )` = `321969e0`). `CX2SquareUnit::SetMinorUnitForm`
+  = `323f3290`'s head (unit form, command group `3234d930`, returns the unit's form). Stand-ins: the SD mesh / viewer rebuild and `323fa700` / `323fad80`
+  (DU5c), the viewer calls (DU5b), the pet list viewer `328f3550` (June-only window), Rose `323ffda0` (char-rose).
+- **Window** (`X2UICharInfo.cpp`): the click (`3291d390 @3291d4a2-3291d622`) and the buttons (`3291db60 @3291dc9f-3291ddd1`) replace the three logged
+  stubs: in the village (June state 0xe = `XS_VILLAGE_MAP`) the REQ with `!form`, gated by `CanSwitchFormInVillage` (square unit not emoting
+  `+0x608`, foot on a line `+0x49c` = `m_bFootOnLine`); elsewhere `SwitchViewOnlyThisDialog` (only the window switches; June's local lines).
+  `SetShow` opens on the unit's form (`@3291e636`, `@3291ea14`); `ResetStat( true )` reads the shown body (`@3291cfeb`).
+- **Drop / right-click:** `OnDropAnyItem` = `32918410 @32918837-32918bb9`: ring remap before the slot search, an anyone accessory takes the shown body,
+  a second head-type accessory on that body is refused with string 39493 (`KTDGUIOKMsgBox`, return false, no drag return), and the final test
+  keeps a minor-unit item off Lu's slots. Right-click `@321aeb3e` (conflict) and `@321aebf3` (ring remap). `RedirectRingToSecondRingSlot` = `321693b0`.
+  `DrawSlotMouseOverImage` `32913b90 @32913d3e`: the dragged item's slot by `IsMinorUnitEquipItem` (JUNE_BUGS 749: a bag item's slot number counts).
+- **Stand-in kept:** June reads the viewer's `+0xd80` in `ResetStat` / `OnDropAnyItem`; DU5 reads the window's `m_bSwitchingView` (`32912c50` writes both
+  from one value). The viewer member comes with DU5b. The window's other-form set sum (`@3291bf2d`) is DU5e's.
+- **Gates:** `finish.py --files <21 files> --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW`: flagcheck PASS (13 PASS, 6 PASS~, 1 DEFINE = `ServerDefine.h`,
+  1 OTHER = `Always.h` peers' uncommitted blocks; 0 FAIL); junediverge PASS; enumscan exit 1 on 190 rows, **0 on DU5's added lines** (`git diff -U0`
+  intersect); stateends / skillicons / luabind n/a.
+- **Compile:** `/Zs` probes of the 9 changed `.cpp` (incl. `X2ServerPacket.cpp` for the serializers): 9 x 0 errors; flag probe: the flag and its four
+  dependencies ON in X2Lib.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,020,800 B, dated 2026-11-15 22:24:18, md5 49fa44dc1524480474d0ac42dc78c1d3` (built at `fac2180d` + 38
+  uncommitted code files: a peer's coalesced build had already linked DU5's files); `EXESTR OK: 2 of 2` (`[JUNE_CHAR] LUCIEL DUO FORM unit ...` and
+  `... FORM REQ %d ignored: no selected unit`, wide).
 
 ## Phase CH1 - Deploy unit: the class core
 

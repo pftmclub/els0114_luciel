@@ -6691,6 +6691,47 @@ bool CX2TFieldGame::Handler_EGS_TOGGLE_INVISIBLE_NOT( KEGS_TOGGLE_INVISIBLE_NOT&
 }
 #endif SERV_INVISIBLE_GM
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June 323acfb0, a Lu/Ciel's square unit takes the form; for my unit the shown window and inventory follow
+bool CX2TFieldGame::Handler_EGS_CHANGE_UNIT_FORM_NOT( const KEGS_CHANGE_UNIT_FORM_NOT& kEvent_ )
+{
+	CX2SquareUnit* pSquareUnit = GetSquareUnitByUID( kEvent_.m_iUnitUID );
+	if ( NULL == pSquareUnit || NULL == pSquareUnit->GetUnit() )
+		return true;
+
+	// stand-in: a Rose ( UT_ROSE ) takes her weapon index here ( 323ffda0 ), char-rose
+	if ( CX2Unit::UT_LUCIEL != pSquareUnit->GetUnit()->GetType() )
+		return true;
+
+	bool bMinorUnitForm = false;
+	if ( -1 != kEvent_.m_cMinorUnitForm )
+	{
+		bMinorUnitForm = pSquareUnit->SetMinorUnitForm( 1 == kEvent_.m_cMinorUnitForm );
+		// stand-in: June then replays the square unit's sit / stand set and state ( 323fa700, 323fad80 ) for the new mesh ( DU5c )
+	}
+
+	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
+	if ( NULL == pMyUnit || pMyUnit->GetUID() != kEvent_.m_iUnitUID )
+		return true;
+
+	CX2UIManager* pUIManager = g_pData->GetUIManager();
+	if ( true == pUIManager->GetShow( CX2UIManager::UI_MENU_CHARINFO ) )
+	{
+		pUIManager->GetUICharInfo()->SetSwitchingView( bMinorUnitForm );
+		pUIManager->GetUICharInfo()->EquipChanged();
+		// stand-in: the viewer's effect stops, form filter, lobby motions and custom motion ( 31fac190, 31f94190, 31fa8230, 31fa5c90 ) come with its second body ( DU5b )
+	}
+
+	if ( true == pUIManager->GetShow( CX2UIManager::UI_MENU_INVEN ) )
+	{
+		CX2UIInventory* pUIInventory = pUIManager->GetUIInventory();
+		pUIInventory->SetInventorySort( pUIInventory->GetSortType(), pUIInventory->GetNowInvenSortTypePageNum() );	// June 321969e0
+	}
+	// stand-in: June refreshes the pet list's unit viewer ( 328f3550 ), a June-only window
+	return true;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+
 #ifdef SERV_ITEM_ACTION_BY_DBTIME_SETTING // 2012.12.12 lygan_조성욱 // 석근이 작업 리뉴얼 ( DB에서 실시간 값 반영, 교환, 제조 쪽도 적용 )
 void CX2TFieldGame::SendTimeControlItemListTalk()
 {

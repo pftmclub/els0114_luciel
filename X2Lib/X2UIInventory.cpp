@@ -5871,6 +5871,28 @@ bool CX2UIInventory::OnDropAnyItem( D3DXVECTOR2 mousePos )
 
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June 321693b0, a ring for a body that wears one and has the second ring slot free goes to that slot
+void CX2UIInventory::RedirectRingToSecondRingSlot( CX2Unit::EQIP_POSITION& eEquipPosition_ ) const
+{
+	if ( CX2Unit::EP_AC_RING != eEquipPosition_ )
+		return;
+	if ( NULL == g_pData || NULL == g_pData->GetMyUser() || NULL == g_pData->GetMyUser()->GetSelectUnit() )
+		return;
+
+	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
+	bool bMinorUnitBody = pMyUnit->IsMinorUnitForm();
+	if ( NULL != g_pData->GetUIManager() && NULL != g_pData->GetUIManager()->GetUICharInfo() && true == g_pData->GetUIManager()->GetUICharInfo()->GetShow() )
+		bMinorUnitBody = g_pData->GetUIManager()->GetUICharInfo()->GetSwitchingView();
+
+	const CX2Inventory& kInventory = pMyUnit->GetInventory();
+	const CX2Item* pRing = kInventory.GetEquippingItemByEquipPos( CX2Unit::EP_AC_RING, false, bMinorUnitBody );
+	const CX2Item* pSecondRing = kInventory.GetEquippingItemByEquipPos( CX2Unit::EP_AC_TEMP4, false, bMinorUnitBody );
+	if ( NULL != pRing && NULL == pSecondRing )
+		eEquipPosition_ = CX2Unit::EP_AC_TEMP4;
+}
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 bool CX2UIInventory::OnRClickedItem( D3DXVECTOR2 mousePos )
 {
 	// 마우스업된 위치가 인벤 안일 경우
@@ -6263,6 +6285,14 @@ bool CX2UIInventory::OnRClickedItem( D3DXVECTOR2 mousePos )
 
 				//{{ 09.06.02 태완 : 악세사리 류의 경우에는 fashion 조건 체크를 하지 않도록 예외처리 :
 				// 악세사리이면서 패션템인 아이템이 장착되지 않는 것 때문에
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+				if ( true == pUnit->IsOtherHeadTypeAccessoryWorn( pItem ) )
+				{
+					// char-luciel DU5: June 321abd20 @321aeb3e-321aee54, refused with string 39493
+					g_pMain->KTDGUIOKMsgBox( D3DXVECTOR2( -999, -999 ), GET_STRING( 39493 ), g_pMain->GetNowState() );
+					return false;
+				}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 				// char-luciel DU4: June @321aeb5a-321aec39, the slot's body must be the item's; a onepiece slot with an anyone item takes the shown body
 				bool bSlotMinorUnitBody = pItemSlotEquip->GetIsForMinorUnit();
@@ -6271,8 +6301,15 @@ bool CX2UIInventory::OnRClickedItem( D3DXVECTOR2 mousePos )
 				if ( bSlotMinorUnitBody != bTargetMinorUnitBody )
 					continue;
 #endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+				CX2Unit::EQIP_POSITION eTargetEquipPosition = pkItemTemplet->GetEqipPosition();
+				RedirectRingToSecondRingSlot( eTargetEquipPosition );	// char-luciel DU5: June @321aebf3
+				if ( pItemSlotEquip->GetEquipPos() == eTargetEquipPosition &&
+					( pItem->GetItemTemplet()->GetItemType() == CX2Item::IT_ACCESSORY || pItemSlotEquip->GetFashion() == pkItemTemplet->GetFashion() ) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
  				if ( pItemSlotEquip->GetEquipPos() == pkItemTemplet->GetEqipPosition() &&
  					(pItem->GetItemTemplet()->GetItemType() == CX2Item::IT_ACCESSORY || pItemSlotEquip->GetFashion() == pkItemTemplet->GetFashion()) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 				{
 					if(false == g_pData->GetUIManager()->GetShow(CX2UIManager::UI_MENU_CHARINFO))
 					{

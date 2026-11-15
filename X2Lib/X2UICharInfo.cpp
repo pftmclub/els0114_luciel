@@ -134,6 +134,23 @@ namespace _CONST_CHARINFO_C4_
 }
 using namespace _CONST_CHARINFO_C4_;
 #endif SERV_IRUHADEV_JUNE_CHARINFO_VIEW
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+namespace _CONST_CHARINFO_DU5_
+{
+	// char-luciel DU5: June 32918410 @329188a6-329188ee, an anyone accessory takes the shown body, a fashion or accessory its minor-unit flag's
+	bool IsMinorUnitItem( const CX2Item::ItemTemplet* pItemTemplet_, const bool bShownMinorUnitBody_ )
+	{
+		if ( CX2Item::UC_ANYONE == pItemTemplet_->GetUseCondition() && CX2Item::IT_ACCESSORY == pItemTemplet_->GetItemType() )
+			return bShownMinorUnitBody_;
+
+		if ( true == pItemTemplet_->GetFashion() || CX2Item::IT_ACCESSORY == pItemTemplet_->GetItemType() )
+			return pItemTemplet_->GetIsForMinorUnit();
+
+		return false;
+	}
+}
+using namespace _CONST_CHARINFO_DU5_;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 HRESULT CX2UICharInfo::OnFrameMove( double fTime, float fElapsedTime )
 {
 
@@ -388,9 +405,26 @@ bool CX2UICharInfo::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam 
 
 			if ( m_bUnitClicked == true && m_bUnitClickedForSwitching == false )
 			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+				// char-luciel DU5: June 3291d390 @3291d4bc-3291d622, the village asks the server, elsewhere only the window switches
+				CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
+				if ( m_pUnitViewerUI != NULL && pMyUnit != NULL && pMyUnit->GetType() == CX2Unit::UT_LUCIEL )
+				{
+					if ( g_pMain->GetNowStateID() == CX2Main::XS_VILLAGE_MAP )
+					{
+						if ( true == CanSwitchFormInVillage() )
+							Handler_EGS_CHANGE_UNIT_FORM_REQ( false == pMyUnit->IsMinorUnitForm() );
+					}
+					else
+					{
+						SwitchViewOnlyThisDialog();
+					}
+				}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 				/// stand-in: June switches the Lu/Ciel form here ( 32916e10 / 32916e40 / 32912c50 ), Stage 8
 				if ( m_pUnitViewerUI != NULL && m_pUnitViewerUI->GetUnit() != NULL && m_pUnitViewerUI->GetUnit()->GetType() == CX2Unit::UT_LUCIEL )
 					CX2OfflineLog::Server( L"[JUNE_CHARINFO] STUB unit click switching -> Stage 8" );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 			}
 
 			m_bUnitClickedForSwitching = false;
@@ -931,7 +965,18 @@ bool CX2UICharInfo::OnDropAnyItem( D3DXVECTOR2 mousePos )
 		{
 			CX2Unit::EQIP_POSITION equipPosition = kInventory.GetItem( *m_DraggingItemUID )->GetItemTemplet()->GetEqipPosition();
 #ifdef SERV_IRUHADEV_JUNE_CHARINFO_VIEW
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+			g_pData->GetUIManager()->GetUIInventory()->RedirectRingToSecondRingSlot( equipPosition );	// char-luciel DU5: June @32918892
+			const bool bMinorUnitItem = IsMinorUnitItem( pItem->GetItemTemplet(), NULL != m_pUnitViewerUI && true == m_bSwitchingView );	// stand-in: the viewer's +0xd80 is read as the window's switch ( 32912c50 writes both; DU5b )
+			if ( true == g_pData->GetMyUser()->GetSelectUnit()->IsOtherHeadTypeAccessoryWorn( pItem ) )
+			{
+				// char-luciel DU5: June @32918901-32918a7b, the drag is not returned
+				g_pMain->KTDGUIOKMsgBox( D3DXVECTOR2( -999, -999 ), GET_STRING( 39493 ), g_pMain->GetNowState() );
+				return false;
+			}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 			const bool bMinorUnitItem = IsMinorUnitItem( kInventory.GetItem( *m_DraggingItemUID )->GetItemTemplet() );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #endif SERV_IRUHADEV_JUNE_CHARINFO_VIEW
 
 			for ( int i = 0; i < (int)m_SlotList.size(); i++ )
@@ -962,8 +1007,17 @@ bool CX2UICharInfo::OnDropAnyItem( D3DXVECTOR2 mousePos )
 		return false;
 
 	//{{ 태완 : 패션 악세사리 장착 예외처리
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	// char-luciel DU5: June @32918b2f-32918bb9, the ring position again, and a slot of Lu's never takes a minor-unit item
+	CX2Unit::EQIP_POSITION eDropEquipPosition = pItem->GetItemTemplet()->GetEqipPosition();
+	g_pData->GetUIManager()->GetUIInventory()->RedirectRingToSecondRingSlot( eDropEquipPosition );
+	if ( pItemSlot->GetEquipPos() == eDropEquipPosition &&
+		( pItem->GetItemTemplet()->GetItemType() == CX2Item::IT_ACCESSORY || pItemSlot->GetFashion() == pItem->GetItemTemplet()->GetFashion() ) &&
+		( true == pItemSlot->GetIsForMinorUnit() || false == pItem->GetItemTemplet()->GetIsForMinorUnit() ) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	if ( pItemSlot->GetEquipPos() == pItem->GetItemTemplet()->GetEqipPosition() &&
 		(pItem->GetItemTemplet()->GetItemType() == CX2Item::IT_ACCESSORY || pItemSlot->GetFashion() == pItem->GetItemTemplet()->GetFashion() ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	{
 		if ( pItemSlot == *m_pSlotBeforeDragging )
 		{
@@ -1167,12 +1221,26 @@ bool CX2UICharInfo::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case UASCM_ACHIEVEMENT_OPEN:
 		CX2OfflineLog::Server( L"[JUNE_CHARINFO] STUB UASCM_ACHIEVEMENT_OPEN -> Stage 31" );
 		return true;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	case CIM_SWITCHING:
+		{
+			// char-luciel DU5: June 3291db60 @3291dc9f-3291dd2a, the server answers with the form NOT
+			CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
+			if ( true == CanSwitchFormInVillage() && NULL != pMyUnit && CX2Unit::UT_LUCIEL == pMyUnit->GetType() )
+				Handler_EGS_CHANGE_UNIT_FORM_REQ( false == pMyUnit->IsMinorUnitForm() );
+		}
+		return true;
+	case CIM_SWITCHING_ONLY_THIS_DIALOG:
+		SwitchViewOnlyThisDialog();
+		return true;
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	case CIM_SWITCHING:
 		CX2OfflineLog::Server( L"[JUNE_CHARINFO] STUB CIM_SWITCHING -> Stage 8" );
 		return true;
 	case CIM_SWITCHING_ONLY_THIS_DIALOG:
 		CX2OfflineLog::Server( L"[JUNE_CHARINFO] STUB CIM_SWITCHING_ONLY_THIS_DIALOG -> Stage 8" );
 		return true;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	case CIM_WEAPON_CHANGE_REVOLVER:
 		CX2OfflineLog::Server( L"[JUNE_CHARINFO] STUB CIM_WEAPON_CHANGE_REVOLVER -> Stage 8" );
 		return true;
@@ -1313,8 +1381,12 @@ void CX2UICharInfo::SetShow(bool val)
 			}
 		}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+		SetSwitchingView( pSelectUnit->IsMinorUnitForm() );	// char-luciel DU5: June 3291df90 @3291e60d-3291e636
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 		/// stand-in: Lu/Ciel not ported, the form byte ( unit +0xe40 ) is 0
 		SetSwitchingView( false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 
 		ResetStat();
 		ResetNowEquipUI();
@@ -1393,10 +1465,17 @@ void CX2UICharInfo::SetShow(bool val)
 		/// stand-in: June also hides the account achievement window ( g_pData +0x5c8 ) here, not ported ( Stage 31 )
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	if ( m_bShow == true )
+	{
+		SetSwitchingView( g_pData->GetMyUser()->GetSelectUnit()->IsMinorUnitForm() );	// char-luciel DU5: June 3291df90 @3291e9fb-3291ea14
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	if ( m_bShow == true )
 	{
 		SetSwitchingView( false );
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	else
 	{
 		for ( int i = 0; i < (int)m_SlotList.size(); i++ )
@@ -1756,6 +1835,42 @@ void CX2UICharInfo::SetSwitchingView( bool bSwitchingView_ )
 	}
 }
 #endif SERV_IRUHADEV_JUNE_CHARINFO_SHOW
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June 32916e10, fire-and-forget ( no ACK; the emulator answers with the NOT )
+bool CX2UICharInfo::Handler_EGS_CHANGE_UNIT_FORM_REQ( const bool bMinorUnitForm_ )
+{
+	KEGS_CHANGE_UNIT_FORM_REQ kPacket;
+	kPacket.m_cMinorUnitForm = static_cast<char>( bMinorUnitForm_ );
+	g_pData->GetServerProtocol()->SendPacket( EGS_CHANGE_UNIT_FORM_REQ, kPacket );
+	return true;
+}
+
+// char-luciel DU5: June 3291db60 @3291dd2d-3291ddd1 ( the same lines in 3291d390 @3291d57b ), only the window shows the other body
+void CX2UICharInfo::SwitchViewOnlyThisDialog()
+{
+	SetSwitchingView( false == m_bSwitchingView );
+	EquipChanged();
+	// stand-in: June's viewer form filter 31f94190 comes with the viewer's second body ( DU5b )
+	ResetStat( true );
+	ResetNowEquipUI();
+
+	CX2UIInventory* pUIInventory = g_pData->GetUIManager()->GetUIInventory();
+	if ( NULL != pUIInventory && true == pUIInventory->GetShow() )
+		pUIInventory->SetShow( true );
+}
+
+// char-luciel DU5: June 3291db60 @3291dc9f-3291dccb ( and 3291d390 @3291d4bc ), no switch while the square unit emotes or is off the ground
+bool CX2UICharInfo::CanSwitchFormInVillage() const
+{
+	if ( NULL == g_pTFieldGame || NULL == g_pTFieldGame->GetMyUnit() )
+		return true;
+
+	if ( CX2Unit::ET_NONE != g_pTFieldGame->GetMyUnit()->GetNowEmotionId() )
+		return false;
+
+	return g_pTFieldGame->GetMyUnit()->GetFootOnLine();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #ifdef SERV_IRUHADEV_JUNE_CHARINFO_VIEW
 void CX2UICharInfo::SetLight( const bool bDarkBackground_ )
 {
@@ -1957,9 +2072,15 @@ using namespace _CONST_CHARINFO_C3_;
 void CX2UICharInfo::ResetStat( const bool bUseViewerForm_ /*= false*/ )
 {
 	// June 3291cfb0
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
+	// char-luciel DU5: June @3291cfeb-3291d021; stand-in: the viewer's +0xd80 is read as the window's switch ( 32912c50 writes both; DU5b )
+	const bool bMinorUnitForm = ( true == bUseViewerForm_ && NULL != m_pUnitViewerUI ) ? m_bSwitchingView : pMyUnit->IsMinorUnitForm();
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	UNREFERENCED_PARAMETER( bUseViewerForm_ );
 	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();
 	const bool bMinorUnitForm = false;		// stand-in: Lu/Ciel not ported ( my unit +0xe40, or the viewer's +0xd80 when bUseViewerForm_ )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 
 	CX2SocketItem::SocketData socketData = GetMyFormSocketData( bMinorUnitForm );
 
@@ -4166,7 +4287,11 @@ void CX2UICharInfo::DrawSlotMouseOverImage()
 			{
 				CX2Unit::EQIP_POSITION equipPosition = pItemTemplet->GetEqipPosition();
 #ifdef SERV_IRUHADEV_JUNE_CHARINFO_VIEW
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+				const bool bMinorUnitItem = kInventory.IsMinorUnitEquipItem( *m_DraggingItemUID );	// char-luciel DU5: June 32913b90 @32913d3e
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 				const bool bMinorUnitItem = false;		// stand-in: June 3286a350 tests whether the dragged item sits in a minor-unit equip slot ( Lu/Ciel not ported )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #endif SERV_IRUHADEV_JUNE_CHARINFO_VIEW
 
 				for ( int i = 0; i < (int)m_SlotList.size(); i++ )

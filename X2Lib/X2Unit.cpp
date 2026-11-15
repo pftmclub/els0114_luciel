@@ -6293,4 +6293,46 @@ void CX2Unit::UpdateSkillTreeCommandGroup( const int iCommandGroup_ )
 	// stand-in: June then refreshes Lu/Ciel's portrait ( 328dcba0 ), character material ( checklist )
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June 3234b8c0, the store, then a shown inventory is shown again
+void CX2Unit::SetMinorUnitForm( const bool bMinorUnitForm_ )
+{
+	m_bMinorUnitForm = bMinorUnitForm_;
+
+	if( NULL == g_pData || NULL == g_pData->GetUIManager() )
+		return;
+	CX2UIInventory* pUIInventory = g_pData->GetUIManager()->GetUIInventory();
+	if( NULL != pUIInventory && true == pUIInventory->GetShow() )
+		pUIInventory->SetShow( true );
+}
+
+// char-luciel DU5: June 3234f4d0, a head-type accessory worn at another position on the dropped item's body
+bool CX2Unit::IsOtherHeadTypeAccessoryWorn( CX2Item* pItem_ ) const
+{
+	if( NULL == pItem_ || NULL == pItem_->GetItemTemplet() || CX2Item::IT_ACCESSORY != pItem_->GetItemTemplet()->GetItemType() )
+		return false;
+
+	CX2ItemManager* pItemManager = g_pData->GetItemManager();
+	if( NULL == pItemManager || false == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_HEAD_TYPE_ACCESSORY, pItem_->GetItemTemplet()->GetItemID() ) )
+		return false;
+
+	const CX2Inventory& kInventory = GetInventory();
+	for( int iSlot = 0; iSlot < kInventory.GetItemMaxNum( CX2Inventory::ST_E_EQUIP ); ++iSlot )
+	{
+		CX2Item* pWornItem = kInventory.GetItem( CX2Inventory::ST_E_EQUIP, iSlot );
+		if( NULL == pWornItem || NULL == pWornItem->GetItemTemplet() )
+			continue;
+		if( pWornItem->GetItemTemplet()->GetEqipPosition() == pItem_->GetItemTemplet()->GetEqipPosition() )
+			continue;
+		if( false == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_HEAD_TYPE_ACCESSORY, pWornItem->GetItemTemplet()->GetItemID() ) )
+			continue;
+
+		const CX2Unit* pOwnerUnit = ( NULL != pItem_->GetOwnerUnit() ) ? pItem_->GetOwnerUnit() : this;	// June reads the item's owner +0xc4 with no NULL test
+		if( kInventory.IsMinorUnitEquipItem( pWornItem->GetUID() ) == pOwnerUnit->IsMinorUnitForm() )
+			return true;
+	}
+	return false;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #endif //SERV_BALANCE_FINALITY_SKILL_EVENT

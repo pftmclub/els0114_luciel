@@ -243,7 +243,11 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5 | ready (DU4 review passed 2026-11-15): two bodies in the character window / unit viewer, form packets `0x4d9` / `0x4da` | Opus 5.5 / high, Opus review, user play-test | DU4 review | `X2UICharInfo.*`, `X2UnitViewerUI.*`, `Handlers_*` | `DU5.md` |
+| DU5 | play-test owed (built 2026-11-15): form packets + emulator, window switch (click / buttons / opening form), head-accessory conflict, second ring; rest split to DU5b-DU5e | Opus 5.5 / high, Opus review, user play-test | DU4 review | `X2UICharInfo.*`, `X2UIInventory.*`, `X2TFieldGame.*`, `Handlers_Field.cpp` | `DU5.md` |
+| DU5b | blocked (DU5 review): the unit viewer's second body in the character window | Opus 5.5 / high, Opus review, user play-test | DU5 review | `X2UnitViewerUI.*`, `X2UICharInfo.*` | `DU5b.md` |
+| DU5c | blocked (DU5b review): both bodies on the create / select screens, the village avatar by form | Opus 5.5 / high, Opus review, user play-test | DU5b review | `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2SquareUnit.*` | `DU5c.md` |
+| DU5d | blocked (DU5b review): viewer weapon effects case 10, CH0's viewer checklist rows | Opus 5.5 / high, Opus review, user play-test | DU5b review | `X2UnitViewerUI.cpp`, `X2SlotItem.cpp` | `DU5d.md` |
+| DU5e | blocked (DU5 review): each body's numbers (second game stat, socket aggregate, set count, HUD second gage) | Opus 5.5 / high, Opus review, user play-test | DU5 review | `X2Unit.*`, `X2SocketItem.*`, `CommonPacket.h`, `X2Offline*` | `DU5e.md` |
 | CH2c | play-test passed 2026-11-15 (A slot; B slot owed to CH2c2's test): Soul Extortion only (the other 6 Royal Guard cases wait for CH2c2's callbacks) | Sonnet 5.5 / high, no review of its own (CH2c2 review covers it), user play-test | CH2b review | `X2GULuciel.*` | `CH2c.md` |
 | CH2c2 | ready (CH2c committed 2026-11-15; kickoff amended: owns 6 setter cases + StateEnd / Eschaton FrameMove): Royal Guard (38) skills part 2 | Sonnet 5.5 / high, Opus review (also covers CH2c), user play-test | CH2c | `X2GULuciel.*` | `CH2c2.md` |
 | CH2d | blocked (CH2c2 review): Diablura (39) skills part 1 | Sonnet 5.5 / high, no review of its own (CH2d2 review covers it), user play-test | CH2c2 review | `X2GULuciel.*` | `CH2d.md` |

@@ -115,3 +115,12 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
 - **The viewer's basic left arm:** March's `CX2UnitViewerUI::ReplaceEmptyToBasic()` fills `EP_RAVEN_LEFT_ARM` from `m_RavenLeftArmItemID`
   (ch0_overheat.tsv LEFTARM row 46: June counterpart not located). R14e did not touch it; locate June's viewer basic-equip fill with DU5's viewer
   equip build and port it whole if it differs.
+
+## Split by DU5 (2026-11-15)
+
+DU5 ported the form packets, the emulator, the unit setter, the window's switch (click, buttons, opening form), the drop / right-click conflict
+and the second ring, and the drag highlight. The rest went to its own sub-phases, each with its kickoff:
+- **DU5b** the unit viewer's second body (`+0xd7c..+0xd82`, `31f93a10`, `31f94190`, `31faa150`, `3291d360`) and the viewer "other struct?" rows.
+- **DU5c** both bodies on the create / select screens and the village avatar (`323f3290` rest, `323f1490`, `31ee3470`).
+- **DU5d** viewer weapon effects case 10 (`:960`, `:6255`, `:8559`, `:8681`) and the CH0 checklist rows above.
+- **DU5e** each body's numbers: the DU1c, DU1c2, DU1d3b, CH1a0 and DU3c amendments above, and the window's other-form set sum (`@3291bf2d`).

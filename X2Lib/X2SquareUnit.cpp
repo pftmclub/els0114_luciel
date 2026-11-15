@@ -3168,6 +3168,21 @@ void CX2SquareUnit::PhysicProcess()
 		m_bFootOnLine = false;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+// char-luciel DU5: June 323f3290, the unit's form and my skill window's command group; returns the unit's form
+bool CX2SquareUnit::SetMinorUnitForm( const bool bMinorUnitForm_ )
+{
+	if ( NULL == m_pUnit )
+		return false;
+
+	m_pUnit->SetMinorUnitForm( bMinorUnitForm_ );
+	const bool bUnitMinorUnitForm = m_pUnit->IsMinorUnitForm();
+	// stand-in: the SD mesh by form ( 323f1490 ) and the viewer's rebuild ( @323f331e-323f3479 ) are the village avatar's ( DU5c )
+	m_pUnit->UpdateSkillTreeCommandGroup( true == bMinorUnitForm_ ? 1 : 0 );	// command group 1 = Ciel's ( no Enum entry )
+	return bUnitMinorUnitForm;
+}
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 bool CX2SquareUnit::CanDown_LUA()
 {
 	if(m_bTFieldUnit == false)

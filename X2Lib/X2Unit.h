@@ -820,7 +820,12 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 #endif SERV_IRUHADEV_JUNE_EQIP_BASIC_COLLISION_ANIM
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 		bool			IsMinorUnitForm() const						{ return m_bMinorUnitForm; }	// char-luciel DU1: June unit +0xe40, 1 = Ciel; the writer 3234b8c0 is DU5's
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+		void			SetMinorUnitForm( const bool bMinorUnitForm_ );	// char-luciel DU5: June 3234b8c0
+		bool			IsOtherHeadTypeAccessoryWorn( CX2Item* pItem_ ) const;	// char-luciel DU5: June 3234f4d0
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 		void			SetMinorUnitForm( const bool bMinorUnitForm_ )	{ m_bMinorUnitForm = bMinorUnitForm_; }	// char-luciel DU1b: June 3234b8c0's store; stand-in: its inventory refresh is DU5's
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 		void			UpdateSkillTreeCommandGroup( const int iCommandGroup_ );	// char-luciel DU1b: June 3234d930
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
 
