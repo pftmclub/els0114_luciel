@@ -52,3 +52,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - The Altar of Evil data member `m_AltarOfEvilData.m_fDuration` is now `m_fMpCostPerEffectSet` ( June `32b35600` pays it with `FlushMp` per altar, eight altars at most ); the two Death Touch handles are `m_hDeathTouchBeamEffect` / `m_hDeathTouchTargetEffect`
   ( `+0x97b8` / `+0x97bc`, damage effect handles, CH1a's single `m_uidDeathTouchUnit` was wrong ). `ClearDeathTouch` ( `32b349f0` ), `PlayAltarOfEvilEffectSet` ( `32b35600` ) and `FrameMoveDeathTouchEffect` ( `32b34a90` ) exist: call them, do not rewrite them.
+
+## Amended by char-luciel CH2d20 (2026-11-15)
+
+- The transform window is whole ( `CX2TransformSkillSlotUI`, `X2GUUser.h` / `.cpp`, flag `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK` ). The transform start ( `32b43910` / `32b43b10` ) calls,
+  by March name: `new CX2TransformSkillSlotUI()` ( `3200f380` ), `SetSlotSkill( iSlot, eSkillID, iSkillLevel )` ( `31fdc4c0` ), `SetShow( bShow )` ( `31fe2b80` ),
+  `SetTransformEndTexture( wstrFile, wstrKey )` ( `31fd4930` ); before every delete `ReleaseDialog()` ( `31fd03f0`, already in the three Lu/Ciel delete sites ).
+  The user's wrappers are `HasTransformSkillSlotUI` ( `31fd0380` ), `GetShowTransformSkillSlotUI` ( `31fd03b0` ), `SetShowTransformSkillSlotUI` ( `31fe3c90` ); the UI manager
+  menu is `CX2UIManager::UI_TRANSFORM_SKILL_SLOT` ( June 44 ). The per-frame cool-time count, the menu toggles and the training-F6 reset are hooked ( `LUCIEL_LIVE` ): do not add them again.

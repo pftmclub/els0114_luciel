@@ -543,9 +543,20 @@ public:
 	bool CanUseSlot( const int iSlot_ );								/// June 3200f680
 	int GetSelectedSlot() const { return m_iSelectedSlot; }
 	void ClearSelectedSlot() { m_iSelectedSlot = -1; }
+	CX2TransformSkillSlotUI();											/// char-luciel CH2d20: June 3200f380
+	void ReleaseDialog();												/// char-luciel CH2d20: June 31fd03f0, called before every delete
+	void SetSlotSkill( const int iSlot_, const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ );	/// char-luciel CH2d20: June 31fdc4c0
+	void SetShow( const bool bShow_ );									/// char-luciel CH2d20: June 31fe2b80
+	void SetTransformEndTexture( const std::wstring& wstrFileName_, const std::wstring& wstrKey_ );	/// char-luciel CH2d20: June 31fd4930
+	void OnFrameMove( const float fElapsedTime_ );						/// char-luciel CH2d20: June 3200f7a0
+	bool IsDialogValid() const { return m_hDlgTransformSkillSlot != NULL; }	/// char-luciel CH2d20: inlined in June 31fd0380
+	bool GetShow() const;												/// char-luciel CH2d20: inlined in June 31fd03b0
 
 private:
 	void SetCoolTimeShow( const int iSlot_, const bool bShow_ );		/// June 31fc9df0
+	void UpdateSkillSlotString();										/// char-luciel CH2d20: June 31fdfb20
+	void UpdateSlotGuideDescPos();										/// char-luciel CH2d20: June 31fe12f0
+	void SetSkillUIType( const bool bIsTypeA_ );						/// char-luciel CH2d20: June 31fe2b10
 
 	CKTDGUIDialogHandle	m_hDlgTransformSkillSlot;					/// +0x00 DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua
 	float				m_afCoolTime[TRANSFORM_SKILL_SLOT_NUM];		/// +0x08
@@ -2532,6 +2543,9 @@ public:
 		virtual int GetTransformedSkillStateID( const CX2SkillTree::SKILL_ID eSkillID_ ) { UNREFERENCED_PARAMETER( eSkillID_ ); return 0; }	/// char-luciel CH1a0: June vslot 0x57c ( base 330f9c30 ); Lu/Ciel's 32ae9c00 is CH1l's
 		CX2TransformSkillSlotUI* GetTransformSkillSlotUI() const { return m_pTransformSkillSlotUI; }
 		void RestoreHeadBySkinAnim( CKTDGXSkinAnimPtr pXSkinAnim_ );				/// char-luciel CH1a4: June 31fdc9d0
+		bool HasTransformSkillSlotUI() const;										/// char-luciel CH2d20: June 31fd0380
+		bool GetShowTransformSkillSlotUI() const;									/// char-luciel CH2d20: June 31fd03b0
+		void SetShowTransformSkillSlotUI( const bool bShow_ );						/// char-luciel CH2d20: June 31fe3c90
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
 

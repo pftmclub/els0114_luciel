@@ -3229,6 +3229,35 @@ No review of its own ( the CH2b review covers it; the debug define stays on unti
 - **Play-test 1 (2026-11-15, failed):** the user saw the wrong skill cast on both characters ( Nether Shredder played Soul Infest, Soul Infest Evil Claw, Hunting Prey Nether Shredder; it changed every time ) and cool times not kept. The logs show the setter cases and the equip pairs right and `ownerState` matching the key for the casts they pair, so the cause is not found; use-time lines are missing. **Routed: `CH2a2` ( Opus, `kickoffs/char-luciel/CH2a2.md` ), CH2b waits for it.**
 - **Next:** `/x2-phase char-luciel CH2a2` on Opus 5.5 high.
 
+### CH2d20 - Done (2026-11-15)
+
+Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`, `Always.h`. Flags: `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`
+( the window, the user wrappers, the `UI_MENU` member ) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ( the hooks inside March functions; new `Always.h` guard: `_LIVE` needs
+`TRANSFORM_LINK` ). Review: `kickoffs/char-luciel/CH2d20-review.md`. Commit: see git log `char-luciel Phase CH2d20`. funcmap: `grep "(CH2d20)"` ( 16 rows ).
+- **The window `CX2TransformSkillSlotUI` is whole** ( every June function on it, all read in Ghidra + capstone, constants by `charport_consts.py` ):
+  ctor `3200f380` ( dialog `DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua` on the now state, shown, a `CX2TransFormSkillSlotData` in `SlotB0-2` ), `ReleaseDialog` `31fd03f0`
+  ( `SAFE_DELETE_DIALOG`; the window has no destructor ), `SetSlotSkill` `31fdc4c0`, `SetShow` `31fe2b80` ( shown: hot keys, slot guides, UI type position ),
+  `SetTransformEndTexture` `31fd4930`, `OnFrameMove` `3200f7a0` ( cool-time count, `STR_ID_2632` seconds, cover when cooling or unaffordable ), and the three
+  helpers `UpdateSkillSlotString` `31fdfb20`, `UpdateSlotGuideDescPos` `31fe12f0`, `SetSkillUIType` `31fe2b10`: these three are March's
+  `CX2RidingPetSkillSlot` bodies with the skill keys ( `GAMEACTION_SKILL1-4` ), the same 12 / 0.5 / 297 guide offset, and type B at ( -297, -615 ).
+- **CH0's row for `31fd4930` was wrong:** "when the dialog handle is invalid" read `31d41d90` as a validity test; it is `operator==( handle, NULL )` and the body runs when that
+  is false. June mixes the four handle comparisons ( `31d41cd0` / `d10` `!=`, `d50` / `d90` `==` ); every body runs on a valid handle.
+- **User wrappers:** `HasTransformSkillSlotUI` `31fd0380`, `GetShowTransformSkillSlotUI` `31fd03b0`, `SetShowTransformSkillSlotUI` `31fe3c90`.
+- **Hooks ( `_LIVE` ):** `CX2GUUser::OnFrameMove` @`32070133` ( after SIEE 15: window and either transformed byte -> `OnFrameMove( GetElapsedTime() )`, June reads
+  user +0x2b0 ); `CX2UIManager::ToggleUI` case 44 @`32158eab` ( falls to the shared tail, no observer test ) and `GetShow` case 44 @`3215277d`; `CX2StateMenu::SetShowDlgMenu`
+  `324617c0` ( my unit's window takes the skill slot's place; hidden on the else / hide branches ); `CX2Game::KeyProcess` training F6 @`322f7b41` ( Demonio only, after March's
+  `ChargeMpAndEtcInTrainingGame`; June's whole F5 / F6 / F7 block stays backlog Stage 2, bullet amended ).
+- **`UI_MENU`:** June menu 44 is the last before its end ( 45, `32153450` loops 3..0x2c ). March numbers the enum differently ( enumprobe: `UI_RIDING_SKILL_SLOT` 33,
+  `UI_MENU_END` 34 ), so `UI_TRANSFORM_SKILL_SLOT` is appended after `UI_RIDING_SKILL_SLOT`; June has no Lua name for it. `UI_MENU_END` only bounds the `CloseAll` /
+  open-test loops and the LU menu sentinels: nothing persists it.
+- **Lu/Ciel stand-ins replaced:** the three window deletes ( dtor, `EndTransformedForm`, ReInit ) call `ReleaseDialog()` first ( `X2GULuciel.cpp`, inside `_CORE` ).
+- **Not ported, with reason:** `325290f0` ( `CX2StatePVPGame::OnFrameMove`'s per-frame skill-slot / window toggle ): offline has no PvP. Nothing creates the window yet
+  ( CH2d2 / CH3c2: kickoffs amended with the March names ), so every hook is inert in play.
+- **JUNE_BUGS** 731 ( the pet inventory open test counts a shown window as an open menu ), 732 ( training F6 resets only Demonio, not Diablura ).
+- **Compile:** `/Zs` probes ( census `cl_cmd` ) of `X2GUUser.cpp`, `X2UIManager.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`: 5 x 0 errors; `cl /P` shows every
+  new block live ( both cases, the wrappers, the frame hook, the F6 line ). Full build skipped: no play-test.
+- **Gates:** see the range block below ( the worktree run was polluted by two peers' uncommitted hunks in `Always.h` / `X2GUUser.*` ).
+
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 
 | Sub-phase | Scope |

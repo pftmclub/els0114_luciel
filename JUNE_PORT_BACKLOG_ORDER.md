@@ -247,7 +247,7 @@ the rule (`JUNE_ENGINE_REMAINDER_PHASES.md` "Scope audit (2026-10-20)"):
   destruction, starts vigor, state 2, point +4800 (`3348be28`). Rena `32cb6290( 1 )` (case 3 `UT_LIRE`; Raven has no case, char-raven CH0), Chung cannon balls and extra balls +1, Ara `32a31a00` + 1,
   Add `329e20e0` + 1 (vslot `0x6f4`), Lu/Ciel `32a327a0`, Rose `31e4f680( 100.0 )`, Ain `32a31d50( 8000.0 )` + `32a6f2d0`. March: F5 / F6 only, F6 =
   `ChargeMpAndEtcInTrainingGame` with Chung / Ara / Add overrides (`X2Game.cpp:5775-5800`). Every class; port the block and `322ed400` whole
-  (funcmap row `322ed400`), with stand-ins for the classes not ported yet.
+  (funcmap row `322ed400`), with stand-ins for the classes not ported yet. Lu/Ciel's Demonio transform-window reset ( `@322f7b41` ) is in ( char-luciel CH2d20 ).
 - **Per-state immunity lists** (pilot-char-revamp CH1m, 2026-10-21). June `31fdaaa0`, called from `CX2GUUser::CommonStateStart` `@32057e68`, reads
   `IMMUNITY_LIST_AT_THIS_STATE` (ints into user `+0x8638`) and `IMMUNITY_EDT_LIST_AT_THIS_STATE` (`+0x8648`); March has neither key. Find the
   readers of `+0x8638 / +0x8648` (buff and extra-damage paths) and port the function with them. Aisha's June script has the EDT key in 12 states.

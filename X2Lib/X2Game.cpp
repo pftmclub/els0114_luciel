@@ -5824,6 +5824,11 @@ void CX2Game::KeyProcess()
 				if( g_pKTDXApp->GetDIManager()->Getkeyboard()->GetKeyState(DIK_F6) == TRUE )
 				{
 					pMyGUUser->ChargeMpAndEtcInTrainingGame();		
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+					// char-luciel CH2d20: June 322f7170 @322f7b41, training F6 also clears Demonio's transform window cool times
+					if( CX2Unit::UC_LUCIEL_DEMONIO == pMyGUUser->GetUnitClass() )
+						pMyGUUser->ApplyTransformSkillCoolTime( 0.f, false );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 
 #ifdef SHOW_ATTACK_BOX_DUMMY
 					if( NULL != GetMajorXMeshPlayer() )

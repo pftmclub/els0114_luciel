@@ -188,7 +188,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 
 	if ( NULL != m_pTransformSkillSlotUI )
 	{
-		// stand-in: CH2d20 adds the window's dialog release ( 31fd03f0 ) before this delete
+		m_pTransformSkillSlotUI->ReleaseDialog();	// char-luciel CH2d20: June 31fd03f0
 		SAFE_DELETE( m_pTransformSkillSlotUI );
 	}
 
@@ -638,7 +638,7 @@ void CX2GULuciel::EndTransformedForm( const int iForm_, const bool bByDie_ )
 		{
 			if ( NULL != m_pTransformSkillSlotUI )
 			{
-				// stand-in: CH2d20 adds the window's dialog release ( 31fd03f0 ) before this delete
+				m_pTransformSkillSlotUI->ReleaseDialog();	// char-luciel CH2d20: June 31fd03f0
 				SAFE_DELETE( m_pTransformSkillSlotUI );
 			}
 
@@ -8531,7 +8531,7 @@ using namespace _CONST_LUCIEL_CH1K2_;
 
 	if ( NULL != m_pTransformSkillSlotUI )
 	{
-		// stand-in: CH2d20 adds the window's dialog release ( 31fd03f0 ) before this delete, as in the destructor
+		m_pTransformSkillSlotUI->ReleaseDialog();	// char-luciel CH2d20: June 31fd03f0
 		SAFE_DELETE( m_pTransformSkillSlotUI );
 	}
 

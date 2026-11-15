@@ -137,6 +137,9 @@ public:
 #ifdef RIDING_SYSTEM
 		UI_RIDING_SKILL_SLOT,
 #endif //RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
+		UI_TRANSFORM_SKILL_SLOT,	// char-luciel CH2d20: June menu 44, the last before June's end ( 45 ); March numbers UI_MENU differently
+#endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 
         UI_MENU_END,
     };

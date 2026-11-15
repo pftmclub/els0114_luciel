@@ -8545,6 +8545,11 @@ HRESULT CX2GUUser::OnFrameMove( double fTime, float fElapsedTime )
 	/// (June 3206eaf0 @32070125-12e, right after the riding-key wait)
 	ProcessSocketEffectEx( CX2SocketItem::SIEE_ALWAYS_PLAY_EFFECT_SET, this, 0, NULL );
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	// char-luciel CH2d20: June @32070133, the transform window counts its cool times while either body is transformed
+	if( NULL != m_pTransformSkillSlotUI && ( true == m_bFirstUnitTransformed || true == m_bMinorUnitTransformed ) )
+		m_pTransformSkillSlotUI->OnFrameMove( GetElapsedTime() );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 
 	return S_OK;
 }
@@ -25795,6 +25800,225 @@ bool CX2TransformSkillSlotUI::CanUseSlot( const int iSlot_ )
 
 	const int iSkillLevel = GetSlotSkillLevel( static_cast<UINT>( iSlot_ ) );
 	return ( g_pX2Game->GetMyUnit()->GetActualMPConsume( eSkillID, iSkillLevel ) <= g_pX2Game->GetMyUnit()->GetNowMp() );
+}
+
+// char-luciel CH2d20: June 3200f380, DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua shown, a transform slot data in each of SlotB0-2
+CX2TransformSkillSlotUI::CX2TransformSkillSlotUI() : m_iSelectedSlot( -1 )
+{
+	m_afCoolTime[0] = m_afCoolTime[1] = m_afCoolTime[2] = 0.f;
+
+	m_hDlgTransformSkillSlot = new CKTDGUIDialog( g_pMain->GetNowState(), L"DLG_LUCIEL_TRANSFORM_SKILL_SLOT.lua", 0.07f, 0 );
+	if( m_hDlgTransformSkillSlot != NULL )
+	{
+		g_pKTDXApp->GetDGManager()->GetDialogManager()->AddDlg( m_hDlgTransformSkillSlot );
+		m_hDlgTransformSkillSlot->SetShow( true );
+		m_hDlgTransformSkillSlot->SetEnable( true );
+
+		const WCHAR* const apwszSlotName[TRANSFORM_SKILL_SLOT_NUM] = { L"SlotB0", L"SlotB1", L"SlotB2" };
+		for( int iSlot = 0; iSlot < TRANSFORM_SKILL_SLOT_NUM; ++iSlot )
+		{
+			CKTDGUISlot* pSlot = static_cast<CKTDGUISlot*>( m_hDlgTransformSkillSlot->GetControl( apwszSlotName[iSlot] ) );
+			if( NULL != pSlot )
+				pSlot->SetSlotData( new CX2TransFormSkillSlotData() );
+		}
+	}
+}
+
+// char-luciel CH2d20: June 31fd03f0, June calls it before every delete of the window ( it has no destructor )
+void CX2TransformSkillSlotUI::ReleaseDialog()
+{
+	SAFE_DELETE_DIALOG( m_hDlgTransformSkillSlot );
+}
+
+// char-luciel CH2d20: June 31fdc4c0, SlotB<iSlot_>'s slot data takes the skill and its level
+void CX2TransformSkillSlotUI::SetSlotSkill( const int iSlot_, const CX2SkillTree::SKILL_ID eSkillID_, const int iSkillLevel_ )
+{
+	if( m_hDlgTransformSkillSlot == NULL )
+		return;
+
+	CKTDGUISlot* pSlot = static_cast<CKTDGUISlot*>( m_hDlgTransformSkillSlot->GetControl( GET_REPLACED_STRING( ( STR_ID_3738, "Li", std::wstring( L"SlotB" ), iSlot_ ) ) ) );
+	if( NULL == pSlot || NULL == pSlot->GetSlotData() )
+		return;
+
+	CX2TransFormSkillSlotData* pSlotData = static_cast<CX2TransFormSkillSlotData*>( pSlot->GetSlotData() );
+	pSlotData->m_eSkillID		= eSkillID_;
+	pSlotData->m_iSkillLevel	= iSkillLevel_;
+	pSlotData->m_bDataUpdated	= true;
+}
+
+// char-luciel CH2d20: June 31fe2b80, showing it first refreshes the hot keys, the slot guides and the skill UI type's position
+void CX2TransformSkillSlotUI::SetShow( const bool bShow_ )
+{
+	if( m_hDlgTransformSkillSlot == NULL )
+		return;
+
+	if( true == bShow_ )
+	{
+		UpdateSkillSlotString();
+		UpdateSlotGuideDescPos();
+		SetSkillUIType( g_pMain->GetGameOption().GetIsSkillUITypeA() );
+	}
+
+	m_hDlgTransformSkillSlot->SetShow( bShow_ );
+	m_hDlgTransformSkillSlot->SetEnable( bShow_ );
+}
+
+// char-luciel CH2d20: June 31fd4930, the first picture of the "TransFormEnd" static
+void CX2TransformSkillSlotUI::SetTransformEndTexture( const std::wstring& wstrFileName_, const std::wstring& wstrKey_ )
+{
+	if( m_hDlgTransformSkillSlot == NULL )
+		return;
+
+	CKTDGUIStatic* pStaticTransformEnd = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"TransFormEnd" ) );
+	if( NULL != pStaticTransformEnd && NULL != pStaticTransformEnd->GetPicture( 0 ) )
+		pStaticTransformEnd->GetPicture( 0 )->SetTex( wstrFileName_.c_str(), wstrKey_.c_str() );
+}
+
+// char-luciel CH2d20: June 3200f7a0, counts the cool times down, writes the seconds and covers a slot that cools or that my MP cannot pay
+void CX2TransformSkillSlotUI::OnFrameMove( const float fElapsedTime_ )
+{
+	for( int iSlot = 0; iSlot < TRANSFORM_SKILL_SLOT_NUM; ++iSlot )
+	{
+		if( 0.f < m_afCoolTime[iSlot] )
+		{
+			m_afCoolTime[iSlot] -= fElapsedTime_;
+			if( m_afCoolTime[iSlot] < 0.f )
+				m_afCoolTime[iSlot] = 0.f;
+
+			CKTDGUIStatic* pStaticCoolTime = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"CoolTime" ) );
+			if( NULL != pStaticCoolTime )
+			{
+				if( 0.f < m_afCoolTime[iSlot] )
+					pStaticCoolTime->SetString( iSlot, GET_REPLACED_STRING( ( STR_ID_2632, "i", static_cast<int>( m_afCoolTime[iSlot] + 0.5 ) ) ) );
+				else
+					pStaticCoolTime->SetString( iSlot, L"" );
+			}
+		}
+
+		if( false == ( m_afCoolTime[iSlot] <= 0.f ) || false == CanUseSlot( iSlot ) )	// June's x87 test: a NaN cool time also covers the slot
+		{
+			if( m_hDlgTransformSkillSlot != NULL )
+			{
+				CKTDGUIStatic* pStaticCoolTimeCover = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"Skill_CoolTime" ) );
+				if( NULL != pStaticCoolTimeCover && NULL != pStaticCoolTimeCover->GetPicture( iSlot ) )
+					pStaticCoolTimeCover->GetPicture( iSlot )->SetShow( true );
+			}
+		}
+		else if( m_hDlgTransformSkillSlot != NULL )
+		{
+			CKTDGUIStatic* pStaticCoolTimeCover = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"Skill_CoolTime" ) );
+			if( NULL != pStaticCoolTimeCover )
+			{
+				if( NULL != pStaticCoolTimeCover->GetPicture( iSlot ) )
+					pStaticCoolTimeCover->GetPicture( iSlot )->SetShow( false );
+
+				CKTDGUIStatic* pStaticCoolTime = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"CoolTime" ) );
+				if( NULL != pStaticCoolTime )
+					pStaticCoolTime->SetString( iSlot, L"" );
+			}
+		}
+	}
+}
+
+// char-luciel CH2d20: inlined in June 31fd03b0
+bool CX2TransformSkillSlotUI::GetShow() const
+{
+	if( m_hDlgTransformSkillSlot != NULL )
+		return m_hDlgTransformSkillSlot->GetShow();
+
+	return false;
+}
+
+// char-luciel CH2d20: June 31fdfb20, the four hot-key labels from the key pad ( skill slots 1-4 )
+void CX2TransformSkillSlotUI::UpdateSkillSlotString()
+{
+	if( m_hDlgTransformSkillSlot == NULL || NULL == g_pMain->GetKeyPad() )
+		return;
+
+	CKTDGUIStatic* pStaticHotKey = static_cast<CKTDGUIStatic*>( m_hDlgTransformSkillSlot->GetControl( L"SkillHotKey" ) );
+	if( NULL == pStaticHotKey )
+		return;
+
+	if( NULL != pStaticHotKey->GetString( 0 ) )
+		pStaticHotKey->GetString( 0 )->msg = g_pMain->GetKeyPad()->GetKeyString( GAMEACTION_SKILL1 );
+	if( NULL != pStaticHotKey->GetString( 1 ) )
+		pStaticHotKey->GetString( 1 )->msg = g_pMain->GetKeyPad()->GetKeyString( GAMEACTION_SKILL2 );
+	if( NULL != pStaticHotKey->GetString( 2 ) )
+		pStaticHotKey->GetString( 2 )->msg = g_pMain->GetKeyPad()->GetKeyString( GAMEACTION_SKILL3 );
+	if( NULL != pStaticHotKey->GetString( 3 ) )
+		pStaticHotKey->GetString( 3 )->msg = g_pMain->GetKeyPad()->GetKeyString( GAMEACTION_SKILL4 );
+}
+
+// char-luciel CH2d20: June 31fe12f0, skill UI type B puts each slot's guide text beside it, type A at its default place
+void CX2TransformSkillSlotUI::UpdateSlotGuideDescPos()
+{
+	if( m_hDlgTransformSkillSlot == NULL )
+		return;
+
+	WCHAR wszSlotName[10] = {0,};
+	for( int iSlot = 0; iSlot <= TRANSFORM_SKILL_SLOT_NUM; ++iSlot )	// June walks SlotB0-SlotB3 on the three-slot window
+	{
+		StringCchPrintf( wszSlotName, 10, L"SlotB%d", iSlot );
+		CKTDGUISlot* pSlot = static_cast<CKTDGUISlot*>( m_hDlgTransformSkillSlot->GetControl( wszSlotName ) );
+		if( NULL == pSlot )
+			continue;
+
+		D3DXVECTOR2 vOffsetPos( 0, 0 );
+		if( false == g_pMain->GetGameOption().GetIsSkillUITypeA() )
+		{
+			const wstring wstrGuideDesc = pSlot->GetGuideDesc();
+			CKTDGFontManager::CUKFont* pGuideDescFont = g_pKTDXApp->GetDGManager()->GetDialogManager()->GetUKFont( 2 );
+			const float fGuideDescWidth = static_cast<float>( pGuideDescFont->GetWidth( wstrGuideDesc.c_str() ) / g_pKTDXApp->GetResolutionScaleX() ) + 12;
+
+			vOffsetPos.x = - ( fGuideDescWidth / 2.f ) - 297;
+			vOffsetPos.y = pSlot->GetSize().y;
+
+			pSlot->SetGuideDescLT( true );
+		}
+		else
+		{
+			pSlot->SetGuideDescLT( false );
+		}
+		pSlot->SetGuideDescOffsetPos( vOffsetPos );
+	}
+}
+
+// char-luciel CH2d20: June 31fe2b10, skill UI type B moves the window to ( -297, -615 ), then the slot guides follow
+void CX2TransformSkillSlotUI::SetSkillUIType( const bool bIsTypeA_ )
+{
+	if( m_hDlgTransformSkillSlot == NULL )
+		return;
+
+	D3DXVECTOR2 vSlotPos( 0, 0 );
+	if( false == bIsTypeA_ )
+	{
+		vSlotPos.x = -297.f;
+		vSlotPos.y = -615.f;
+	}
+	m_hDlgTransformSkillSlot->SetPos( vSlotPos );
+	UpdateSlotGuideDescPos();
+}
+
+// char-luciel CH2d20: June 31fd0380, the transform window exists and holds its dialog
+bool CX2GUUser::HasTransformSkillSlotUI() const
+{
+	return ( NULL != m_pTransformSkillSlotUI && true == m_pTransformSkillSlotUI->IsDialogValid() );
+}
+
+// char-luciel CH2d20: June 31fd03b0
+bool CX2GUUser::GetShowTransformSkillSlotUI() const
+{
+	if( NULL == m_pTransformSkillSlotUI )
+		return false;
+
+	return m_pTransformSkillSlotUI->GetShow();
+}
+
+// char-luciel CH2d20: June 31fe3c90, the UI manager's UI_TRANSFORM_SKILL_SLOT toggle
+void CX2GUUser::SetShowTransformSkillSlotUI( const bool bShow_ )
+{
+	if( NULL != m_pTransformSkillSlotUI )
+		m_pTransformSkillSlotUI->SetShow( bShow_ );
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK
 #ifdef SERV_IRUHADEV_JUNE_WAIT_STATE_CHANGE

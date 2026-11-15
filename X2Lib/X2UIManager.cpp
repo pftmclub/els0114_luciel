@@ -1677,6 +1677,14 @@ bool CX2UIManager::GetShow(UI_MENU menuInx)
 		}
 		break;
 #endif //RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	case UI_TRANSFORM_SKILL_SLOT:	// char-luciel CH2d20: June 321524d0 case 44 @3215277d
+		{
+			if( NULL != g_pX2Game && NULL != g_pX2Game->GetMyUnit() )
+				return g_pX2Game->GetMyUnit()->GetShowTransformSkillSlotUI();
+		}
+		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 
 	default:
 		return false;
@@ -2539,6 +2547,14 @@ bool CX2UIManager::ToggleUI(UI_MENU menuInx, bool forOpen, UidType arg)
 		}
 		break;
 #endif //RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+	case UI_TRANSFORM_SKILL_SLOT:	// char-luciel CH2d20: June 32158070 case 44 @32158eab, no observer test, falls to the shared tail
+		{
+			if( NULL != g_pX2Game && NULL != g_pX2Game->GetMyUnit() )
+				g_pX2Game->GetMyUnit()->SetShowTransformSkillSlotUI( forOpen );
+		}
+		break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 	case UI_MENU_GUILD:
 		//길드창과 커뮤니티창을 분리할 예정이므로 버튼 먼저 분리
 		//이후에 길드창과 커뮤니티창 분리 되면 손봐줘야됨..

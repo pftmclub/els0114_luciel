@@ -47,3 +47,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1l3 (2026-11-15)
 
 - `RegisterDesperadoTarget` ( `32b18060` ) pushes each target with its float time set to the raw word -1 ( a NaN, JUNE_BUGS 720 ); the Desperado frame move reads `m_vecDesperadoTarget` as June does ( no clamp or compare on that time unless June has one ).
+
+## Amended by char-luciel CH2d20 (2026-11-15)
+
+- The transform window is whole ( `CX2TransformSkillSlotUI`, `X2GUUser.h` / `.cpp`, flag `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK` ). The transform start ( `32b43910` / `32b43b10` ) calls,
+  by March name: `new CX2TransformSkillSlotUI()` ( `3200f380` ), `SetSlotSkill( iSlot, eSkillID, iSkillLevel )` ( `31fdc4c0` ), `SetShow( bShow )` ( `31fe2b80` ),
+  `SetTransformEndTexture( wstrFile, wstrKey )` ( `31fd4930` ); before every delete `ReleaseDialog()` ( `31fd03f0`, already in the three Lu/Ciel delete sites ).
+  The user's wrappers are `HasTransformSkillSlotUI` ( `31fd0380` ), `GetShowTransformSkillSlotUI` ( `31fd03b0` ), `SetShowTransformSkillSlotUI` ( `31fe3c90` ); the UI manager
+  menu is `CX2UIManager::UI_TRANSFORM_SKILL_SLOT` ( June 44 ). The per-frame cool-time count, the menu toggles and the training-F6 reset are hooked ( `LUCIEL_LIVE` ): do not add them again.

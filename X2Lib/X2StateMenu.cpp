@@ -3657,10 +3657,22 @@ void CX2StateMenu::SetShowDlgMenu(bool val)
 				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_SKILL_SLOT, false);
 				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_RIDING_SKILL_SLOT, g_pData->GetUIManager()->GetShowRidingPetSkillslot());
 			}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+			// char-luciel CH2d20: June 324617c0 @32461888, my unit's transform window takes the skill slot's place
+			else if( NULL != g_pX2Game && NULL != g_pX2Game->GetMyUnit() && true == g_pX2Game->GetMyUnit()->HasTransformSkillSlotUI() )
+			{
+				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_TRANSFORM_SKILL_SLOT, g_pData->GetUIManager()->GetShowSkillslot());
+				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_RIDING_SKILL_SLOT, false);
+				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_SKILL_SLOT, false);
+			}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 			else
 			{
 				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_SKILL_SLOT, g_pData->GetUIManager()->GetShowSkillslot());
 				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_RIDING_SKILL_SLOT, false);
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+				g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_TRANSFORM_SKILL_SLOT, false);	// char-luciel CH2d20: June @32461991
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 			}
 #else
 			g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_SKILL_SLOT, g_pData->GetUIManager()->GetShowSkillslot() );
@@ -3680,6 +3692,9 @@ void CX2StateMenu::SetShowDlgMenu(bool val)
 #ifdef RIDING_SYSTEM
 			g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_RIDING_SKILL_SLOT, false);
 #endif //RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+			g_pData->GetUIManager()->ToggleUI(CX2UIManager::UI_TRANSFORM_SKILL_SLOT, false);	// char-luciel CH2d20: June @32461a42
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
 		}
 	}
 #else
