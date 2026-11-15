@@ -2332,6 +2332,68 @@ the R14c kickoff. Proposed flag `SERV_IRUHADEV_JUNE_INIT_EQIP` (one per function
   LEFTARM rows; funcmap `(Raven CH4c)`.
 
 
+### Phase R14e -- Done
+
+**Landed (2026-11-15, Opus 5.5).** Two flags in `KTDXLIB/Always.h`, one per function; March's bodies stay in `#else`.
+- `SERV_IRUHADEV_JUNE_INIT_EQIP`: `CX2GUUser::InitEqip` = June `32024510` (`X2Lib/X2GUUser.cpp`). It runs `UpdateEqip( true )`, then makes the
+  weapon objects (EP 2 index 0, EP 37 index 1) with their slash colours, calls `UpdateNotRenderingOtherEquipList` (`3201c3a0`, direct call), then
+  `UpdateEquipCollisionData( m_ViewEqipList )` (vslot 0x638). Last, with a game, `UseItemSpecialAbility` runs per equip: a fashion or accessory
+  item counts when its inventory body (`IsMinorUnitEquipItem`, `3286a350`) equals `m_bMinorUnitActive` (`+0x8e90`); any other item counts only if it
+  is not a minor-unit equip (`+0x15d4`). For every non-Lu/Ciel unit that is March's result.
+  The live March body already skipped its own one-piece / nasod-hand / AC-arm passes (`FIX_ARA_ONE_PIECE_FOR_BERSERK` is on, `cl /P`). So
+  in play the Raven left arm was already June's (`3201c3a0`, D1-3d). What changed: the body filter, the templet source (the equip's own), and the
+  item-particle split below.
+- `SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY`: `CX2UnitViewerUI::UpdateEquipSlotVisibility` = June `31f94360` (`X2Lib/X2UnitViewerUI.cpp`).
+  The pairing is confirmed: `+0xe70` = `m_bEnableEquipSlotVisibilityUpdate`, `+0x1fc` = `m_ViewEquipMap`, `+0x208` / `+0x5b0` = normal / fashion
+  UIDs `[39][3]`, `+0x958` = visible `[39][3]`, and body = equip `+0x15d4`. The character window now hides slots by the equips' division groups
+  instead of March's id lists, in this order:
+  - the SET1 / SET2 face-accessory walk;
+  - the one-piece run (DITT 1002 34 95 94 35 36 37 38 39 98 74 40 41 1001 64 106, limit 2 bodies for `UT_LUCIEL`);
+  - the nasod hand (DITT 47 hides `EP_RAVEN_LEFT_ARM`, body from the inventory slot);
+  - hand (DITT 44);
+  - the hair / face run (31 32 33 42 43 65), then the face-1 / face-2 slot flags and the per-body passes;
+  - the second ring (`3234fe90` gives slot 28, which is hidden);
+  - the apply loop.
+- Helper `_CONST_UNITVIEWER_R14E_::IsFashionOrUncovered` (June's repeated test). New funcmap rows `(R14e)`: `32024510`, `31f94360`, `3295bc90`,
+  `3286a230`. `june_march_divergent.tsv` rows for both functions now say "ported under". `ch0_overheat.tsv` LEFTARM rows 50 / 51 are done.
+
+**Stand-ins (each a one-line `stand-in:` comment):**
+- **Main weapon particles.** June creates item-attached particles in `InitEqip` for the second weapon only. Main-weapon particles moved into
+  `CX2Eqip` `32961c80` (case 2 of its position switch), and March's equip switch lacks that case. March's EP 2 particle loop therefore stays inside
+  the June body. 45 June weapons carry such particles. Routed to R14d: its kickoff is amended to delete this loop when it ports `32961c80`'s
+  switch.
+- **`3295bc90`.** June uses an appearance item's original templet for the ability. March's `CX2Eqip` has no appearance item.
+- **One viewer body.** March's viewer has one fashion / normal UID table, so bodies 1-2 read "no fashion" and the apply loop runs body 0.
+  Routed to char-luciel DU5, kickoff amended. The same amendment carries the viewer's `ReplaceEmptyToBasic( EP_RAVEN_LEFT_ARM, ... )` fill: it is
+  not in either ported function, and its June counterpart was not located.
+
+**June quirks kept verbatim:**
+- JUNE_BUGS 743: the hair / face passes act on the first qualifying equip of any kind, and two blocks clear slot 0.
+- A nasod-hand pass with no unit reuses the last body (comment).
+- The `NULL`-templet early return skips the apply loop.
+- Guards added only where June would crash: a `NULL` equip in InitEqip, and `m_pUnit` in the ring and Lu/Ciel tests.
+
+**Gates.** `python tools/finish.py --files X2Lib/X2GUUser.cpp X2Lib/X2UnitViewerUI.cpp KTDXLIB/Always.h --with SERV_IRUHADEV_JUNE_INIT_EQIP SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY`:
+```
+  other flags (not run, --with)      INFO     JUNE_CHAR_DUO_BODY, JUNE_CHAR_EQUIP_VIEW  (found on the changed lines; not this change's)
+  flagcheck JUNE_INIT_EQIP           PASS     RESULT: PASS   files: 1 PASS, 1 DEFINE, 1 OTHER (other flags), 0 FAIL
+  flagcheck JUNE_VIEWER_EQUIP_VISIBILITY PASS RESULT: PASS   files: 1 PASS, 1 DEFINE, 1 OTHER (other flags), 0 FAIL
+  junediverge                        PASS     RESULT: PASS
+  enumscan                           PASS     exit 0
+FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped: stateends / skillicons / luabind, no skill states, skills or June scripts)
+```
+- Each flag's OTHER row is the other flag's file.
+- The INFO flags are the `#error` guard targets.
+- Probe: `cl /Zs` on both files, 0 errors. `cl /P` shows the June branches live: viewer 29 helper hits, InitEqip 1.
+- **Full build blocked, not deployed:** `build.py --deploy` (2026-11-15 21:54, log `.build/logs/20261115-215446`) failed only in char-luciel
+  DU5's uncommitted `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW` edits (X2UICharInfo 18, X2SquareUnit 8, X2StateField 3, X2TFieldGame 3, X2UIInventory 2
+  errors); 0 in R14e's files. The play-test waits for the next `DEPLOY OK`; this code is on disk, so any later build carries it.
+- No strings were added, so there is no `exestr` gate.
+
+**How to see it in game:** see the play-test below. Raven `ravbe` wearing Perkisas gloves 287266 has no left arm in the U window too (that id is in June's
+group 47, not in March's three ids). `jtLordKnight` wearing Spa Wear 163569 has the onepiece alone in the U window (group 35 hides hair, top,
+bottom, gloves, shoes, face-1, earring). Every other equip shows as before.
+
 ## Phase R13 - World object mesh render
 
 **Run with:** Opus 5.5 high (map, then port), then an Opus review and a user play-test. Flag `SERV_IRUHADEV_JUNE_RENDER_WORLD_MESH`.

@@ -105,3 +105,13 @@ NU0 (2026-11-02), `nu0_equip_nesi.tsv` rows `DU5`, `nu0_duo_engine.tsv` rows `DU
   and ( `EP_AC_TEMP4`, body ) free -> `EP_AC_TEMP4`). Port it here for the drop (`3234f4d0` / `321693b0`) **and** call it from the right-click equip
   loop (`@321aebf3`), whose remaining June tests (PvP, `3234e750`, `328823d0`, `32350de0`, `3234f4d0`, `328825c0`) are the `OnRClickedItem` divergence
   row (Stage 9); the emulator already takes a ring in slot 41 / 42.
+
+## Amended by june-engine R14e (2026-11-15)
+
+- **The viewer's slot visibility is June's (`31f94360`, `SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY`) with one body.** It computes a per-body table
+  (`[EP_END][3]`, body = equip `IsMinorUnitEquip()`), but March's viewer keeps one fashion / normal UID table (`m_ViewEquipFashion` /
+  `m_ViewEquipNormal`, June `+0x5b0` / `+0x208` are `[39][3]`), so bodies 1-2 read "no fashion item" and the apply loop runs body 0 only (two
+  `stand-in` comments in `X2UnitViewerUI.cpp`). When DU5 gives the viewer both bodies, widen those tables and drop both stand-ins.
+- **The viewer's basic left arm:** March's `CX2UnitViewerUI::ReplaceEmptyToBasic()` fills `EP_RAVEN_LEFT_ARM` from `m_RavenLeftArmItemID`
+  (ch0_overheat.tsv LEFTARM row 46: June counterpart not located). R14e did not touch it; locate June's viewer basic-equip fill with DU5's viewer
+  equip build and port it whole if it differs.

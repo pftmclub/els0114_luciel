@@ -13754,3 +13754,21 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP reads slot 20 as the onepiece; with SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER it is Ciel's hair slot, char-luciel DU4
 #endif SERV_IRUHADEV_JUNE_CHARINFO_EQUIP_GROUP
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R14e. CX2GUUser::InitEqip = June 32024510: weapon / second-weapon objects, UpdateNotRenderingOtherEquipList,
+//              the collision lists, then the item abilities per body ( fashion and accessories for the active body, the rest for the main
+//              body ). The main weapon's attached particles stay here until R14d ports CX2Eqip 32961c80's case. Revert: comment out.
+#define SERV_IRUHADEV_JUNE_INIT_EQIP
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: june-engine R14e. CX2UnitViewerUI::UpdateEquipSlotVisibility = June 31f94360: the character window hides slots by the
+//              equips' division groups ( RenderDivisionItemTemplet.lua ) instead of March's hard-coded id lists: one-piece avatars,
+//              hair / face accessories, the Raven left arm for a nasod hand ( DITT 47 ), the second ring. Revert: comment out.
+#define SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
+//////////////////////////////////////////////////////////////////////////

@@ -5440,6 +5440,122 @@ void CX2GUUser::InitMotion()
 
 void CX2GUUser::InitEqip()
 {
+#ifdef SERV_IRUHADEV_JUNE_INIT_EQIP
+#if !defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) || !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) || !defined( X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING )
+#error SERV_IRUHADEV_JUNE_INIT_EQIP needs SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW, SERV_IRUHADEV_JUNE_CHAR_DUO_BODY and X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING
+#endif
+	// june-engine R14e: June 32024510
+	UpdateEqip( true );
+
+	for( int i = 0; i < (int)m_ViewEqipList.size(); i++ )
+	{
+		CX2EqipPtr pEquip = m_ViewEqipList[i];
+		if( NULL == pEquip )
+			continue;	// June reads the templet without a NULL test
+
+		pEquip->SetManagerObject( this );
+		if( IsRecursivelyManagedByDGManager() )
+			g_pKTDXApp->GetDGManager()->AddObjectChain( pEquip.get() );
+
+		const CX2Item::ItemTemplet* pItemTemplet = pEquip->GetItemTemplet();
+		if( NULL == pItemTemplet )
+			continue;
+
+		switch( pItemTemplet->GetEqipPosition() )
+		{
+		case CX2Unit::EP_WEAPON_HAND:
+			{
+				CX2GameUnit::Weapon* pWeapon = CX2GameUnit::Weapon::CreateWeapon( *this );
+				pWeapon->m_iWeaponIndex		= 0;
+				pWeapon->m_pUserWeaponEquip	= pEquip;
+				pWeapon->m_bUseSlashTrace	= true;
+				if( NULL != GetUnit() )
+				{
+					pItemTemplet->GetSlashTraceColors( pWeapon->m_coSlashTrace, pWeapon->m_coSlashTraceTip
+						, pWeapon->m_coSlashTraceHyper, pWeapon->m_coSlashTraceTipHyper, GetUnit()->GetType() );
+				}
+				m_vecpWeapon.push_back( pWeapon );
+
+				// stand-in: June attaches these in CX2Eqip 32961c80 ( case EP_WEAPON_HAND ), March's equip does not until R14d
+				if( NULL != g_pX2Game && NULL != g_pX2Game->GetMajorParticle() )
+				{
+					const unsigned uNumParticle = pItemTemplet->GetNumAttachedParticleData();
+					for( UINT j = 0; j < uNumParticle; j++ )
+					{
+						const wchar_t* pwszParticleName = L"";
+						const wchar_t* pwszBoneName = L"";
+						pItemTemplet->GetAttachedParticleData( j, &pwszParticleName, &pwszBoneName );
+						CKTDGParticleSystem::CParticleEventSequence* pSeq =
+							g_pX2Game->GetMajorParticle()->CreateSequence( (CKTDGObject*) this, pwszParticleName, D3DXVECTOR3( 0, 0, 0 ) );
+						if( NULL != pSeq )
+							AttachWeaponParticle( pWeapon->m_iWeaponIndex, true, pwszBoneName, pSeq->GetHandle() );
+					}
+				}
+			} break;
+
+		case CX2Unit::EP_WEAPON_SECOND:
+			{
+				CX2GameUnit::Weapon* pWeapon = CX2GameUnit::Weapon::CreateWeapon( *this );
+				pWeapon->m_iWeaponIndex		= 1;
+				pWeapon->m_pUserWeaponEquip	= pEquip;
+				pWeapon->m_bUseSlashTrace	= true;
+				if( NULL != GetUnit() )
+				{
+					pItemTemplet->GetSlashTraceColors( pWeapon->m_coSlashTrace, pWeapon->m_coSlashTraceTip
+						, pWeapon->m_coSlashTraceHyper, pWeapon->m_coSlashTraceTipHyper, GetUnit()->GetType() );
+				}
+				m_vecpWeapon.push_back( pWeapon );
+
+				if( NULL != g_pX2Game && NULL != g_pX2Game->GetMajorParticle() )
+				{
+					const unsigned uNumParticle = pItemTemplet->GetNumAttachedParticleData();
+					for( UINT j = 0; j < uNumParticle; j++ )
+					{
+						const wchar_t* pwszParticleName = L"";
+						const wchar_t* pwszBoneName = L"";
+						pItemTemplet->GetAttachedParticleData( j, &pwszParticleName, &pwszBoneName );
+						CKTDGParticleSystem::CParticleEventSequence* pSeq =
+							g_pX2Game->GetMajorParticle()->CreateSequence( (CKTDGObject*) this, pwszParticleName, D3DXVECTOR3( 0, 0, 0 ) );
+						if( NULL != pSeq )
+							AttachWeaponParticle( pWeapon->m_iWeaponIndex, true, pwszBoneName, pSeq->GetHandle() );
+					}
+				}
+			} break;
+
+		default:
+			break;
+		}
+	}
+
+	CX2GUUser::UpdateNotRenderingOtherEquipList();
+	UpdateEquipCollisionData( m_ViewEqipList );
+
+	if( NULL != g_pX2Game )
+	{
+		for( int i = 0; i < (int)m_ViewEqipList.size(); i++ )
+		{
+			CX2EqipPtr pEquip = m_ViewEqipList[i];
+			if( NULL == pEquip )
+				continue;
+
+			const CX2Item::ItemTemplet* pItemTemplet = pEquip->GetItemTemplet();
+			if( NULL == pItemTemplet )
+				continue;
+
+			// June 32024a35: a fashion or accessory item counts for the active body, any other item for the main body only
+			if( CX2Item::IT_ACCESSORY != pItemTemplet->GetItemType() && false == pItemTemplet->GetFashion() )
+			{
+				if( true == pEquip->IsMinorUnitEquip() )
+					continue;
+			}
+			else if( GetUnit()->GetInventory().IsMinorUnitEquipItem( pEquip->GetItemUID() ) != m_bMinorUnitActive )
+				continue;
+
+			// stand-in: June 3295bc90 swaps in an appearance item's own templet; March's equips carry no appearance item
+			g_pX2Game->UseItemSpecialAbility( pItemTemplet, this );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_INIT_EQIP
 
 #ifndef EFFECT_TOOL
 	#ifdef EQUIP_STRIP_TEST
@@ -6056,6 +6172,7 @@ void CX2GUUser::InitEqip()
 		}
 	}
 	//}} dmlee 2008.04.11 - 장착 캐시 아이템 ability
+#endif SERV_IRUHADEV_JUNE_INIT_EQIP
 
 }
 

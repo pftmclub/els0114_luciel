@@ -3628,9 +3628,757 @@ void CX2UnitViewerUI::InitEquipVisibility()
 }
 
 
+#ifdef SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
+namespace _CONST_UNITVIEWER_R14E_
+{
+	// June 31f94360's slot test: the equip is fashion, or no fashion item covers its position on that body
+	inline bool IsFashionOrUncovered( const CX2Item::ItemTemplet* pItemTemplet_, const UidType ( &aFashionUID_ )[CX2Unit::EP_END][3], int iBody_ )
+	{
+		return true == pItemTemplet_->GetFashion() || 0 == aFashionUID_[ pItemTemplet_->GetEqipPosition() ][ iBody_ ];
+	}
+}
+using namespace _CONST_UNITVIEWER_R14E_;
+#endif SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
 void CX2UnitViewerUI::UpdateEquipSlotVisibility()
 {
 	KTDXPROFILE();
+#ifdef SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
+#if !defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) || !defined( SERV_NEW_ONE_PIECE_AVATAR_SLOT )
+#error SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY needs SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW and SERV_NEW_ONE_PIECE_AVATAR_SLOT
+#endif
+	// june-engine R14e: June 31f94360
+	if( false == m_bEnableEquipSlotVisibilityUpdate )
+		return;
+
+	CX2ItemManager* pItemManager = g_pData->GetItemManager();
+
+	bool abVisible[CX2Unit::EP_END][3];
+	memset( abVisible, 1, sizeof( abVisible ) );
+
+	// stand-in: March's viewer keeps one body's slot table until char-luciel DU5, so bodies 1 and 2 read no fashion item
+	UidType aFashionUID[CX2Unit::EP_END][3];
+	memset( aFashionUID, 0, sizeof( aFashionUID ) );
+	for( int iPos = 0; iPos < CX2Unit::EP_END; iPos++ )
+		aFashionUID[iPos][0] = m_ViewEquipFashion[iPos];
+
+	const bool bLuciel = ( NULL != m_pUnit && NULL != m_pUnit->GetUnitTemplet() && CX2Unit::UT_LUCIEL == m_pUnit->GetType() );
+	const int iBodyCount = ( true == bLuciel ? 2 : 1 );
+
+	bool abDrawFaceAccessorySet1[3]		= { false, false, false };
+	bool abOnePieceAvatarCheck[3]		= { false, false, false };
+	bool abNotRenderingHairItem[3]		= { false, false, false };
+	bool abRenderingHairAndFace1[3]		= { false, false, false };
+	bool abRenderingHairOnePiece[3]		= { false, false, false };
+	bool bSet2Hidden = false;
+	int iBody = 0;
+	int iCount = 0;
+	ViewEquipMap::iterator it;
+
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_DRAW_FACE_ACC_WITH_NO_ONE_PEACE_AVATAR_SET1, it->second->GetItemID() ) )
+			abDrawFaceAccessorySet1[iBody] = true;
+	}
+
+	// June restarts the walk for SET2, then again for the SET1 item it shows
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+		if( 0 < it->first && false == abOnePieceAvatarCheck[iBody]
+			&& true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_DRAW_FACE_ACC_WITH_NO_ONE_PEACE_AVATAR_SET1, it->second->GetItemID() )
+			&& NULL != it->second->GetItemTemplet() )
+			break;
+	}
+	if( it != m_ViewEquipMap.end() )
+	{
+		for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+		{
+			iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+			if( 0 < it->first && false == abOnePieceAvatarCheck[iBody]
+				&& true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NO_DRAW_FACE_ACC_WITH_NO_ONE_PEACE_AVATAR_SET2, it->second->GetItemID() )
+				&& NULL != it->second->GetItemTemplet() )
+			{
+				abVisible[ it->second->GetItemTemplet()->GetEqipPosition() ][iBody] = false;
+				bSet2Hidden = true;
+				for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+				{
+					iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+					if( 0 < it->first && false == abOnePieceAvatarCheck[iBody]
+						&& true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_DRAW_FACE_ACC_WITH_NO_ONE_PEACE_AVATAR_SET1, it->second->GetItemID() )
+						&& NULL != it->second->GetItemTemplet() )
+					{
+						abVisible[ it->second->GetItemTemplet()->GetEqipPosition() ][iBody] = true;
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR, it->second->GetItemID() ) )
+			abNotRenderingHairItem[iBody] = true;
+	}
+
+	// June returns before the show pass when an equip has no templet
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+		const int iItemID = it->second->GetItemID();
+		const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_RENDERING_HAIR, iItemID ) )
+		{
+			abRenderingHairOnePiece[iBody] = true;
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abOnePieceAvatarCheck[iBody] = true;
+				if( true == abNotRenderingHairItem[iBody] )
+				{
+					abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+					abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = abNotRenderingHairItem[iBody];	// June reads a copy of the flag just tested: always true
+				}
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_AC_BODY, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_ARM, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_ARM][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_FACE1, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_FACE1_FACE2, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_FACE_FACE2_FACE3, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FACE][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abVisible[CX2Unit::EP_NONE][iBody] = false;	// June writes slot 0 too
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_HAIR_AND_ALL_ACCESSORY, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_AC_ARM][iBody] = false;
+				abVisible[CX2Unit::EP_AC_NECKLESS][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_RENDERING_HAIR_AND_FACE1, iItemID ) )
+		{
+			abRenderingHairAndFace1[iBody] = true;
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_RENDERING_HAIR_NOT_FACE1, iItemID ) )
+		{
+			abRenderingHairOnePiece[iBody] = true;
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_ONLY_RENDERING_HAIR_AND_FACE, iItemID ) )
+		{
+			abRenderingHairOnePiece[iBody] = true;
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_AC_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_AC_ARM][iBody] = false;
+				abVisible[CX2Unit::EP_AC_NECKLESS][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_ONLY_RENDERING_HAIR_AND_FACE_FACE2_FACE3, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_AC_ARM][iBody] = false;
+				abVisible[CX2Unit::EP_AC_NECKLESS][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_ONLY_RENDERING_WEAPON, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_FACE][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_AC_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_AC_ARM][iBody] = false;
+				abVisible[CX2Unit::EP_AC_NECKLESS][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abVisible[CX2Unit::EP_AC_TEMP4][iBody] = false;	// June EP_AC_RING2
+				abVisible[CX2Unit::EP_AC_RING][iBody] = false;
+				abVisible[CX2Unit::EP_RAVEN_LEFT_ARM][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_NONE][iBody] = false;	// June writes slot 0 too
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_RENDERING_BODY, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_NECKLESS][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abOnePieceAvatarCheck[iBody] = true;
+				break;	// June ends the walk here without counting
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PIECE_AVATAR_NOT_RENDERING_ALL_FACE_ACCESSARY, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_ONE_PICE_AVATAR_NOT_RENDERING_FACE_AND_ALL_FACE_ACCESSARY, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_DEFENCE_FACE][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_LEG][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FOOT][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_BODY][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abOnePieceAvatarCheck[iBody] = true;
+				if( iBodyCount <= ++iCount )
+					break;
+			}
+		}
+	}
+
+	// June 31f952c3: the left arm hides for a nasod-hand item, the body read from the inventory slot ( no unit: the last body above )
+	bool bNasodHandHidden = false;
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		if( NULL != m_pUnit )
+			iBody = ( true == m_pUnit->GetInventory().IsMinorUnitEquipItem( it->first ) ? 1 : 0 );
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_NASOD_HAND, it->second->GetItemID() )
+			&& true == abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] )
+		{
+			const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+			{
+				abVisible[CX2Unit::EP_RAVEN_LEFT_ARM][iBody] = false;
+				bNasodHandHidden = true;
+				break;
+			}
+		}
+	}
+
+	if( false == bNasodHandHidden )
+	{
+		for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+		{
+			iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+			if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAND, it->second->GetItemID() ) )
+			{
+				const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+				if( NULL == pItemTemplet )
+					return;
+				if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) )
+				{
+					abVisible[CX2Unit::EP_DEFENCE_HAND][iBody] = false;
+					break;
+				}
+			}
+		}
+	}
+
+	iCount = 0;
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+		const int iItemID = it->second->GetItemID();
+		const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+
+		if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2_FACE3, iItemID ) )
+		{
+			if( false == abOnePieceAvatarCheck[iBody] )
+			{
+				if( NULL == pItemTemplet )
+					return;
+				if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) || CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() )
+				{
+					abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+					abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+					abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+					abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+					break;
+				}
+			}
+		}
+		else if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2, iItemID ) )
+		{
+			if( NULL == pItemTemplet )
+				return;
+			if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) || CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() )
+			{
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				break;
+			}
+		}
+		else if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR, iItemID ) )
+		{
+			if( true == abOnePieceAvatarCheck[iBody] )
+			{
+				if( true == abDrawFaceAccessorySet1[iBody] )
+					abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				else
+					abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+			}
+			else
+			{
+				if( NULL == pItemTemplet )
+					return;
+				if( false == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) && CX2Item::IT_ACCESSORY != pItemTemplet->GetItemType() )
+					continue;
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+			}
+			if( iBodyCount <= ++iCount )
+				break;
+		}
+		else if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE2_FACE3, iItemID ) )
+		{
+			if( true == abOnePieceAvatarCheck[iBody] )
+			{
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+			}
+			else
+			{
+				if( NULL == pItemTemplet )
+					return;
+				if( false == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) && CX2Item::IT_ACCESSORY != pItemTemplet->GetItemType() )
+					continue;
+				abVisible[CX2Unit::EP_DEFENCE_FACE][iBody] = false;
+				abVisible[CX2Unit::EP_NONE][iBody] = false;	// June writes slot 0 too
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+			}
+			if( iBodyCount <= ++iCount )
+				break;
+		}
+		else if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE1_FACE3, iItemID ) && false == bSet2Hidden )
+		{
+			if( true == abOnePieceAvatarCheck[iBody] )
+			{
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+			}
+			else
+			{
+				if( NULL == pItemTemplet )
+					return;
+				if( false == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) && CX2Item::IT_ACCESSORY != pItemTemplet->GetItemType() )
+					continue;
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_FACE][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_NONE][iBody] = false;	// June writes slot 0 too
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+			}
+			if( iBodyCount <= ++iCount )
+				break;
+		}
+		else if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_AND_ALL_FACE_ACCESSARY, iItemID ) )
+		{
+			if( true == abOnePieceAvatarCheck[iBody] )
+			{
+				abVisible[CX2Unit::EP_AC_FACE1][iBody] = false;
+			}
+			else
+			{
+				if( NULL == pItemTemplet )
+					return;
+				if( false == IsFashionOrUncovered( pItemTemplet, aFashionUID, iBody ) && CX2Item::IT_ACCESSORY != pItemTemplet->GetItemType() )
+					continue;
+				abVisible[CX2Unit::EP_AC_FACE3][iBody] = false;
+				abVisible[CX2Unit::EP_DEFENCE_HAIR][iBody] = false;
+				abVisible[CX2Unit::EP_AC_FACE2][iBody] = false;
+				abVisible[CX2Unit::EP_AC_TEMP3][iBody] = false;	// June EP_AC_EARRING
+			}
+			if( iBodyCount <= ++iCount )
+				break;
+		}
+	}
+
+	bool abFace1HairItem[3]			= { false, false, false };
+	bool abFace1FaceItem[3]			= { false, false, false };
+	bool abFace2HairItem[3]			= { false, false, false };
+	bool abFace2FaceItem[3]			= { false, false, false };
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		iBody = ( true == it->second->IsMinorUnitEquip() ? 1 : 0 );
+		const int iItemID = it->second->GetItemID();
+		const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+		if( NULL == pItemTemplet )
+			return;
+
+		if( CX2Unit::EP_AC_FACE1 == pItemTemplet->GetEqipPosition() )
+		{
+			if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR, iItemID )
+				|| true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE2_FACE3, iItemID )
+				|| true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_DRAW_FACE_ACC_WITH_NO_ONE_PEACE_AVATAR_SET1, iItemID ) )
+			{
+				abFace1HairItem[iBody] = true;
+			}
+			else if( true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE2_FACE3, iItemID ) )
+			{
+				abFace1FaceItem[iBody] = true;
+				abFace1HairItem[iBody] = true;
+			}
+		}
+		else if( CX2Unit::EP_AC_FACE2 == pItemTemplet->GetEqipPosition()
+			&& true == pItemManager->IsDivisionItem( CX2ItemManager::DITT_ITEM_ID_NOT_RENDERING_HAIR_FACE_FACE1_FACE3, iItemID ) )
+		{
+			abFace2HairItem[iBody] = true;
+			abFace2FaceItem[iBody] = true;
+		}
+	}
+
+	// June 31f95960: these passes test any equip, with body 0's then body 1's fashion slots, and share one count
+	iCount = 0;
+	for( int iPassBody = 0; iPassBody < 2; iPassBody++ )
+	{
+		if( 1 == iPassBody && false == bLuciel )
+			break;
+
+		if( true == abOnePieceAvatarCheck[iPassBody] && false == abRenderingHairAndFace1[iPassBody] )
+		{
+			for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+			{
+				const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+				if( NULL == pItemTemplet )
+					return;
+				if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iPassBody ) || CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() )
+				{
+					abVisible[CX2Unit::EP_DEFENCE_HAIR][iPassBody] = false;
+					if( true == abFace1HairItem[iPassBody] )
+						abVisible[CX2Unit::EP_AC_FACE1][iPassBody] = false;
+					if( true == abFace2HairItem[iPassBody] )
+						abVisible[CX2Unit::EP_AC_FACE2][iPassBody] = false;
+					if( iBodyCount <= ++iCount )
+						break;
+				}
+			}
+		}
+		else if( true == abFace1HairItem[iPassBody] )
+		{
+			for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+			{
+				const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+				if( NULL == pItemTemplet )
+					return;
+				if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iPassBody ) || CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() )
+				{
+					abVisible[CX2Unit::EP_DEFENCE_HAIR][iPassBody] = false;
+					abVisible[CX2Unit::EP_AC_FACE1][iPassBody] = true;
+					abVisible[CX2Unit::EP_AC_FACE2][iPassBody] = false;
+					abVisible[CX2Unit::EP_DEFENCE_FACE][iPassBody] = ( false == abFace1FaceItem[iPassBody] );
+					if( iBodyCount <= ++iCount )
+						break;
+				}
+			}
+		}
+		else if( true == abFace2HairItem[iPassBody] )
+		{
+			for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+			{
+				const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+				if( NULL == pItemTemplet )
+					return;
+				if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iPassBody ) || CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() )
+				{
+					abVisible[CX2Unit::EP_DEFENCE_HAIR][iPassBody] = false;
+					abVisible[CX2Unit::EP_AC_FACE1][iPassBody] = false;
+					abVisible[CX2Unit::EP_AC_FACE2][iPassBody] = true;
+					abVisible[CX2Unit::EP_DEFENCE_FACE][iPassBody] = ( false == abFace2FaceItem[iPassBody] );
+					if( iBodyCount <= ++iCount )
+						break;
+				}
+			}
+		}
+
+		if( true == abRenderingHairOnePiece[iPassBody] )
+		{
+			for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+			{
+				const CX2Item::ItemTemplet* pItemTemplet = it->second->GetItemTemplet();
+				if( NULL == pItemTemplet )
+					return;
+				if( true == IsFashionOrUncovered( pItemTemplet, aFashionUID, iPassBody ) || CX2Item::IT_ACCESSORY == pItemTemplet->GetItemType() )
+				{
+					abVisible[CX2Unit::EP_DEFENCE_HAIR][iPassBody] = true;
+					if( iBodyCount <= ++iCount )
+						break;
+				}
+			}
+		}
+	}
+
+	// June 31f95e8b: a ring worn in a second-ring slot hides that slot
+	for( it = m_ViewEquipMap.begin(); it != m_ViewEquipMap.end(); ++it )
+	{
+		if( 0 >= it->first || NULL == it->second->GetItemTemplet() || NULL == m_pUnit )
+			continue;
+		const CX2Item* pItem = m_pUnit->GetInventory().GetItem( it->first );
+		int iEquipPosition = it->second->GetItemTemplet()->GetEqipPosition();
+		if( NULL != g_pData->GetMyUser() && NULL != g_pData->GetMyUser()->GetSelectUnit() )
+			g_pData->GetMyUser()->GetSelectUnit()->AdjustEquipPositionForSecondRing( pItem, iEquipPosition );
+		if( CX2Unit::EP_AC_TEMP4 == iEquipPosition )	// June EP_AC_RING2
+			abVisible[CX2Unit::EP_AC_TEMP4][ true == it->second->IsMinorUnitEquip() ? 1 : 0 ] = false;
+	}
+
+	// stand-in: June walks bodies 0-2 here; March's viewer has body 0's slot table only ( char-luciel DU5 )
+	for( int iPos = 0; iPos < CX2Unit::EP_END; iPos++ )
+	{
+		CX2EqipPtr pEquipFashion;
+		CX2EqipPtr pEquipNormal;
+
+		if( 0 != m_ViewEquipFashion[iPos] )
+		{
+			ViewEquipMap::iterator itFind = m_ViewEquipMap.find( m_ViewEquipFashion[iPos] );
+			if( itFind == m_ViewEquipMap.end() )
+				m_ViewEquipFashion[iPos] = 0;
+			else
+				pEquipFashion = itFind->second;
+		}
+		if( 0 != m_ViewEquipNormal[iPos] )
+		{
+			ViewEquipMap::iterator itFind = m_ViewEquipMap.find( m_ViewEquipNormal[iPos] );
+			if( itFind == m_ViewEquipMap.end() )
+				m_ViewEquipNormal[iPos] = 0;
+			else
+				pEquipNormal = itFind->second;
+		}
+
+		if( true == abVisible[iPos][0] )
+		{
+			if( NULL != pEquipFashion )
+				pEquipFashion->SetShowObject( true );
+			if( NULL != pEquipNormal )
+				pEquipNormal->SetShowObject( NULL == pEquipFashion );
+		}
+		else
+		{
+			if( NULL != pEquipFashion )
+				pEquipFashion->SetShowObject( false );
+			if( NULL != pEquipNormal )
+				pEquipNormal->SetShowObject( false );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
 
 	if( false == m_bEnableEquipSlotVisibilityUpdate )
 		return; 
@@ -4146,6 +4894,7 @@ void CX2UnitViewerUI::UpdateEquipSlotVisibility()
 			}
 		}
 	}
+#endif SERV_IRUHADEV_JUNE_VIEWER_EQUIP_VISIBILITY
 }
 #endif	NOT_RENDERING_OTHER_EQUIP_POS
 
