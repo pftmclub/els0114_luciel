@@ -2578,7 +2578,7 @@ No review of its own: the CH1o3 review covers CH1o2. Verdicts: `june2017_re/char
 
 Opus 5.5 high. Two new class-agnostic flags, both **defined**: `SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE` ( `#error` without `JUNE_SOCKET_PARITY`; `_CORE` now `#error`s without it ) and
 `SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH` ( `#error` without `JUNE_CHAR_UNIT_TYPE_RANGE` ); the effect-set cases and Lu's code under `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`. No debug define.
-Commit `@COMMIT@`. Review: `CH1o3-review.md` covers CH1o2 and CH1o3. funcmap: `grep "(CH1o3)" june2017_re/funcmap.tsv` ( 6 rows ). `JUNE_BUGS.md` 724, 725.
+Commit `8b026393 ( code, note, kickoffs )`. Review: `CH1o3-review.md` covers CH1o2 and CH1o3. funcmap: `grep "(CH1o3)" june2017_re/funcmap.tsv` ( 6 rows ). `JUNE_BUGS.md` 724, 725.
 - **Effect-set tags ( `X2EffectSet.cpp` `ApplyDamageEffectModifiers`, June `321db1b0`, table `321dbc60` ):** 4 @`321db477` = CEffect `+0x84c` `m_DamageTime` ( funcmap AttackResult row ):
   add `( int )v + count` ( `_ftol2` ), else `( int )( v * count )` ( `FIMUL` ), no NEXT loop ( CH1f2's `EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT` is this hit count ); 10 @`321db7cf` =
   `m_ExtraDamage.m_Damage` ( protected float ), `v + x` / `v * x`; 11 @`321db91a` = `m_RelateSkillData.m_byteSkillIndex`, float math, chop rounding ( `FISTP`, RC 0xc00 ).
@@ -2609,7 +2609,7 @@ Commit `@COMMIT@`. Review: `CH1o3-review.md` covers CH1o2 and CH1o3. funcmap: `g
   `stateends` PASS both. `_CORE` run directly ( `--files X2EffectSet.cpp X2GULuciel.cpp X2GULuciel.h` ): `3 PASS, 0 FAIL` / PASS, 3 deleted = the three Lu setter comment lines rewritten
   ( "+0x11 store is IsSkillSlotState", "word +0x10 = 0x101", "routed to CH1o" ). With `_CORE` as a partner, flagcheck stops on CH1a's own `#if defined( _LIVE ) && !defined( _CORE )` ( `Always.h:13430`,
   unevaluable, as CH1o noted ), so `_CORE` is not a `--with` partner; my `_CORE` guard is nested `#ifndef` / `#ifdef` for the same reason. 0 non-ASCII, 0 EOL, 0 encoding change.
-  Range: @RANGE@
+  Range: `finish.py --range 8b026393^..8b026393` ( same flags ): the same two flagcheck PASS lines, `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`; `_CORE --range`: `3 PASS, 0 FAIL` / PASS.
 - **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GUUser.cpp`, `X2GULuciel.cpp`, `X2EffectSet.cpp`, `X2Game.cpp`, `X2StateDungeonGame.cpp` ( the speech caller ), `X2GUChung.cpp`, plain and
   `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 12 x 0 errors, 0 warnings in the touched files ( the first `X2GUUser.cpp` run caught `m_NowStateData` under `JUNE_SKILL_STATE_PTR`: fixed to the iterators ).
   The `#error` guards compile, so `JUNE_SOCKET_PARITY` and `JUNE_CHAR_UNIT_TYPE_RANGE` are defined there. Full build skipped: no play-test.

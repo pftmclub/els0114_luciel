@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel CH1o3 review` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | CH1o3 done (its Done note names its commit); CH1o2 `4cd0f5c2` |
+| Depends on | CH1o3 done (`8b026393`); CH1o2 `4cd0f5c2` |
 | Flag | `SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS` (CH1o2), `SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE` and `SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH` (CH1o3, defined, class-agnostic), `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE`, `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` (`//#define`) |
 | Log tag | none (no play-test) |
 
@@ -31,7 +31,7 @@ Review the two phases' commits:
   March's path unchanged for other classes, `CX2Game::m_iWinSpeechForm` zeroed in the ctor ( @`3230770e` ). The CH5 amendment names the two routed readers.
 - **Checklist rows:** L260 / L263 / L977 verdicts in the note match `32b3a310`.
 
-Hygiene is one command: `python tools/finish.py --review --commits 4cd0f5c2 <CH1o3 commits> --with SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
+Hygiene is one command: `python tools/finish.py --review --commits 4cd0f5c2 8b026393 --with SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE SERV_IRUHADEV_JUNE_CHAR_DUO_WIN_SPEECH
 SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS --state X2Lib/X2GULuciel.cpp Luciel_Duo --state X2Lib/X2GULuciel.cpp Luciel_Demonio`. Paste its block;
 explain every OTHER row and deleted line with `-v`.
 
