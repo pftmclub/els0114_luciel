@@ -100,7 +100,7 @@ vslot	site	june_function	funcmap	verdict
 0x580	32061976	32057b80	CX2GUUser::CommonStateStart (slot 497)	none: +0x94c0 has no reader ( write-only )
 0x640	31fe40ab	31fe4030	?	none in March: 31fe4030 riding-off ( Stage 17 )
 0x650	3206c1e6	32063650	CX2GUUser::CommonFrameMove	CH1o: CommonFrameMove SetNowMpFromStoredValue
-0x648	32051059	32050230	CX2GUUser::CommonStateStart	CH1o: CommonStateStartFuture after DUO_TYPE ( CP_AMOUNT )
+0x648	32051059	320506f0	CX2GUUser::CommonStateStartFuture	CH1o: CommonStateStartFuture after DUO_TYPE ( CP_AMOUNT )
 0x570	31ffec9f	31ffe990	CX2GUUser::AddEquipToViewList( CX2Item*, short slotId, bool bForceBasic ) (X2GUUser.cpp:35650)	DU3 ( AddEquipToViewList rewrite )
 0x570	31ffeda1	31ffe990	CX2GUUser::AddEquipToViewList( CX2Item*, short slotId, bool bForceBasic ) (X2GUUser.cpp:35650)	DU3 ( AddEquipToViewList rewrite )
 0x62c	320349cb	320348c0	CX2GUUser::StateChange( int, bool ) (June)	CH1o: StateChange ( false ), PlayEmotion ( true )

@@ -2512,6 +2512,31 @@ No debug define. Review: `CH1o-review.md` covers CH1m, CH1n, CH1o. funcmap: `gre
 - **How to see it in game:** nothing ( every base equals March; Lu/Ciel is not live ).
 - **Next:** `/x2-phase char-luciel CH1o review` ( Opus 5.5 high ), then `CH1o2`.
 
+### CH1o - Review (2026-11-15)
+
+Opus 5.5 high. Covers CH1m ( `a2312de2` ), CH1n ( `cfe12590` ), CH1o ( `b557510a` ); read against June S2 ( `857b18cd`, Lu on the shared state ids ). **Verdict: pass, no code change; two locator fixes in docs.**
+- **CH1o bases ( Ghidra / raw exe, all = June = March ):** `GetWaitStateID` `3208ddd0` ( riding vslot 0x200 ? 0x4c : `+0x4088` ); the ten getters return 14 / 19 / 20 / 21 / 22 / 15 / 16 / 18 / 7 / 8
+  ( `31b052e0`, `3208ddf0`, `330dcd70`, `330ddfe0`, `3208de00`, `31afa8f0`, `3225b3a0`, `330de0a0`, `3208de30`, `33069eb0` ) = `june_user_state_ids.tsv` C++ values ( `USI_RIDING_WAIT` 76 );
+  `CanPlayEmotion` `32ec5990` `mov al,1`; 0x62c / 0x648 / 0x848 / 0x2e4 empty ( `3208ddc0` ret 4, `33093ad0` ret 8, `31f3f070` ); `SetShowViewListAndUpdate` `31fca010` = vslot 0x63c( b ) then 0x630 when b ( both virtual in March );
+  `SyncFutureMpFromGage` `31fe9da0` ( compare, then store ); `SetNowMpFromStoredValue` `31fceed0` ( `+0x813c` -> vslot 0xf8 ); `GetSkinAnimByForm` `31fd48a0` ( 1 -> `+0x8e88`, else `+0x87d4` ); `NotifyAttackerWhenReset` `32610da0` ( `+0xc` owner -> vslot 0x2e4 ).
+  June's four NPC vtables ( `334b8084` ... ) keep 0x2e4 = empty base, so no NPC forwarder is owed ( unlike 0x2fc / 0x300 ). Lu's vtable `334f06fc` overrides every one of the slots.
+- **Hook sites ( 2 of the kickoff's, spot-checked in Ghidra ):** StateChange @`320349cb` sits after the force-down flush and the wait-id reset, before `IsLocalUnit` ( vslot 0x19c ) = March's line;
+  PlayEmotion @`320433d7` gate returns false ( `32043dc8` `xor al,al` ), @`320447e9` `SetHandEquipShow( true )` is joined by both the avatar-sound and the `PlayEmotionSound` ( @`3204452f` ) paths = after March's if / else.
+  Also read: CommonStateStartFuture @`32051042`-`32051063` ( `CP_AMOUNT` default 0, call 0x648( duo, cp ) ). June's other StateChange calls there ( `31fe0bb0` emotion setter, `+0x89e0` ) are DU1d3b's ( routed ).
+- **CH1n:** the four written cases = listing `32b46580` @`32b4677d`-`32b469d6` and @`32b4a731`-`32b4a7fc`: table names ( `334f7c18` ... `334f7b58`, `334f5358` / `334f49b4` ), callbacks ( `32b4c1a0` init on 208 only, `329ccd90` / `329cba40`, `329ccda0` / `329ccdb0` ),
+  hyper copies 0x34-0x48 only, extra ids 264 / 265 / 463 / 263, skill id 208 / raw / raw / 900, `+0x11` only on 265. Slot tables `334ed540` / `554` / `568` / `57c` = 50-58 / 51-59 / 60-68 / 61-69 = the C++ `USI_SPECIAL_ATTACK_*` ( S1 ).
+- **CH1m:** `ch1m_regcheck.py` re-run on today's tree ( after S2 ): `matched 337 registrations, 0 problems` ( later-phase slots CH2b 11, CH2c 2, CH2c2 1, CH3b 3 ); spot-checks in the listings: `USI_HYPER_MODE` @`32b3fb00` ( StartFuture / Start / FrameMove thunk `32bd5f20` = vslot 0x600 / EventProcess / End ), `LSI_RIDING_WAIT` 76 @`32b42d5d` ( 3 callbacks ),
+  Demonio `LSI_BOUNDING_TARGET_LU_COMMAND_XXXXXXX_Z_START` 519 @`32b4424d` ( StartFuture `32b4ddd0`, EventProcess `32b4b5a0` ): all = the code.
+- **JUNE_BUGS:** 722 / 723 match ( 723: `32b0fa20` @`32b0fa82` stores arg 2 into `+0x96bc` when `32206450` returns 0 ). 721's content matches but its "listing rows 1611 / 1631 / 1649" pointed at other rows: now @`32b4249b` / @`32b425b8` / @`32b426b6`.
+- **Doc fix:** `ch1o_vcall_sites.tsv` row 0x648 @`32051059` named `32050230 CommonStateStart`; it is `320506f0 CommonStateStartFuture` ( the code and JUNE_BUGS 723 were right ). CH1o2 names each row's function itself.
+- **Name grep:** no March user class declares any of the 22 names ( 10 getters + `GetWaitStateID` + the 11 hooks ); same-name hits are `CX2GUNPC::GetWaitStateID` ( not a `CX2GUUser` ) and `CX2UIUnit::GetWaitStateID` ( UI ). `X2GULuciel.h` b557510a `+39 / -39` = 37 comment-only lines and the two renames ( 0x2e4, 0x648 ).
+- **Gates:** `finish.py --review --commits a2312de2 cfe12590 b557510a --state ... Luciel_Duo / Luciel_Demonio -v`: `junediverge` PASS, `junediverge --check-all` PASS, `enumscan` exit 0, `stateends` PASS both, `FINISH RESULT: FAIL` on 15 flagchecks only:
+  every enclosing flag of the chains ( 8 class `_LIVE`, `DUO_BODY`, `ENUM_NAMES`, ... ) is checked alone, so the other phase flag's lines in b557510a read as flag-off diffs ( CH1o's known limit: one flag at a time, no partner `--with` ), and the `_CORE` run crashes on a peer `#if` ( `X2GUUser.cpp:29435`, Unevaluable ).
+  Direct paired runs instead: `HOOKS --with _LIVE --range b557510a^..b557510a` `5 PASS, 1 DEFINE, 4 OTHER, 0 FAIL` / PASS; `_LIVE --with HOOKS` `7 PASS, 1 DEFINE, 2 OTHER, 0 FAIL`, only "not #defined" ( INERT until CH1 final );
+  `_CORE` `a2312de2` / `cfe12590` `2 PASS` each / PASS; `_CORE` `b557510a` ( class files ) `2 PASS`, 44 deleted = comments and the two renames / PASS. Every run: 0 non-ASCII, 0 EOL, 0 encoding change.
+- **Compile:** `/Zs` probes ( census `cl_cmd`, no PCH ) of `X2GULuciel.cpp`, `X2GUUser.cpp`, `X2DamageManager.cpp`, `X2GUNPC.cpp`, plain and `/DSERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE`: 8 x 0 errors, no warning in the touched files. Full build skipped: no play-test. No debug define to retire.
+- **Next:** `/x2-phase char-luciel CH1o2` ( Opus 5.5 high; kickoff checked, still valid after S1 / S2 ).
+
 ## Phase CHN - Job change (Aisha's CH-N template, every Lu/Ciel job class)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CLASS_CHANGE`, sub-tag `JOB`. June's class-change
