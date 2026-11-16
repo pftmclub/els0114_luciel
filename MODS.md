@@ -7302,6 +7302,13 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` (no new define); `..._LUCIEL_SKILL_D
 - **Differs from March.** March had no Lu/Ciel. `JUNE_BUGS` 776-777 ( Sinister Mind's fly state and Desperado's shot states skip CommonEventProcess ). The skill-state byte ( `m_bSkillState` ) is set on the Rapid Impact / Punisher / Rapid Fury Ciel states.
 - **Revert:** back out the commit `char-luciel Phase CH3c` ( every hunk is insert-only inside `_SKILL`, plus the seven setter cases ); `LuDnA` / `LuDnB` ( units 228 / 229 ) are test characters only.
 
+## Stage 8 Lu/Ciel, CH3c2: Demonio skills, part 2 (char-luciel CH3c2, 2026-11-16)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` (no new define); `SERV_IRUHADEV_JUNE_ENUM_NAMES` for `BFI_BUFF_TRANSCENDENCE` ( 790 ) and `BFI_DEBUFF_DESPERADO_MOVE_BRAKE_ADD` ( 792 ); `..._LUCIEL_SKILL_DEBUG` stays on for the play-test, the CH3c2 review retires it. Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH3c2 - Done".
+- **What changes in game.** Desperado shoots ( lock effect on every target, a shot per target with its pitch, the move brake debuff at 5 targets ), Abyss Sniping aims and fires ( up / attack / down by the pitch to one enemy in front ), Demonic Rush runs its two states, Rapid Impact's move attack steps beside the unit it hit, and Transcendence is castable: the form's wait / walk / jump / combo Z and X, Shadow Fury ( MP back from the damage taken ), Shrewd Cutter ( a lock-on hop between targets, up to 11 attacks ) and Silent Rage all have their event processes.
+- **Differs from March.** March had no Lu/Ciel. `JUNE_BUGS` 781-782 ( Desperado's hyper state has no start function; its lock effect handle lives in the target entry's time word ). `m_vecAbyssSnipingTarget` is a vector of unit pointers now ( CH1 declared ints ).
+- **Revert:** back out the commit `char-luciel Phase CH3c2` ( every hunk is insert-only inside `_SKILL` and `JUNE_ENUM_NAMES`, plus the three setter cases pasted from CH3c's held list and nine `body in CH3c2` comments turned into registrations ); `LuDnA` / `LuDnB` ( units 228 / 229 ) are test characters only.
+
 ## june-asset-port P2: 15 new kom numbers (2026-11-16)
 
 Data only, no client source, no flag (the exe is P1's, `SERV_IRUHADEV_KOM_MOUNT_DEBUG` on). Plan `JUNE_ASSET_PORT_PHASES.md` "Phase P2 - Done"; list `june2017_re/P2_stage_plan.tsv`.

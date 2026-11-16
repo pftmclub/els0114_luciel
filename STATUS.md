@@ -240,7 +240,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | CH3c | done 2026-11-16 (play-test passed after the frame-move fix a6edaf9d): Demonio (129) skills part 1, 7 cases registered, Transcendence / Abyss Sniping / Demonic Rush held for CH3c2; user play-test | Sonnet 5.5 / high, no review of its own (CH3c2 review covers it) | CH3b review, CH1i2, DU1 review | `X2GULuciel.*` | `CH3c.md` |
-| CH3c2 | ready (CH3c done): Demonio (129) skills part 2 + the 3 held cases (`ch3c_held_cases.txt`) | Sonnet 5.5 / high, Opus review (also covers CH3c), user play-test | CH3c, CH3c20 review (done) | `X2GULuciel.*` | `CH3c2.md` |
+| CH3c2 | code done 2026-11-16, user play-test owed: Demonio (129) 35 callbacks (Desperado, Abyss Sniping, Demonic Rush, Transcendence form, Rapid Impact move attack) + the 3 held cases landed | Sonnet 5.5 / high, Opus review (`CH3c2-review.md`, also covers CH3c), user play-test | CH3c, CH3c20 review (done) | `X2GULuciel.*` | `CH3c2.md` |
 | CH3d | blocked (CH3c2 review): hyper actives + transcendence rows, both bodies' cut-ins | Opus 5.5 / high, Opus review, user play-test | CH3c2 review | `X2GULuciel.*`, `X2GUUser.cpp`, data koms | `CH3d.md` |
 | CH6 | blocked: scans rerun + user walk incl. creation, tutorial, job change and the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH3d, CH4c, CH5, TU reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, "Template for Stage 8", `stage8-plan` -> `char-rose` | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |

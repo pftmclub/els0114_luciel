@@ -1515,6 +1515,42 @@ protected:
 	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_StateStart();	// June 32ae9660
 	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateStart();	// June 32ae96e0
 	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart();	// June 32ae9900
+	// char-luciel CH3c2: Demonio ( 129 ) skills part 2
+	void				AimAtNextDesperadoTarget();	// June 32b14030
+	void				LSI_SA_LDN_DESPERADO_StateStart();	// June 32b16fc0
+	void				LSI_SA_LDN_DESPERADO_ATTACK_END_StateStart();	// June 32b17040
+	void				LSI_SA_LDN_DESPERADO_ATTACK_READY_StateStart();	// June 32b31e90
+	void				LSI_SA_LDN_DESPERADO_FrameMove();	// June 32b135e0
+	void				LSI_SA_LDN_DESPERADO_ATTACK_FrameMove();	// June 32b32090, the up and down shot states too
+	void				LSI_SA_LDN_ABYSS_SNIPING_READY_EventProcess();	// June 32b0ed50
+	void				LSI_SA_LDN_ABYSS_SNIPING_UP_EventProcess();	// June 32b0ee00, the attack and down states too
+	void				LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove();	// June 32b172d0
+	void				LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove();	// June 32b36d90, the attack and down states too
+	void				LSI_SA_LDN_DEMONIC_RUSH_START_EventProcess();	// June 32b0ee40
+	void				LSI_SA_LDN_DEMONIC_RUSH_LAST_EventProcess();	// June 32b0ee80
+	void				LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture();	// June 32b32550, the male state too
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStartFuture();	// June 32b43b10
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStart();	// June 32b43ce0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_EventProcess();	// June 32b07eb0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_StateEnd();	// June 32b3a2f0
+	void				LSI_SA_LDN_TRANSCENDENCE_END_EventProcess();	// June 32b07ef0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT_EventProcess();	// June 32b33480
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK_EventProcess();	// June 32b336a0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY_EventProcess();	// June 32b13730
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING_EventProcess();	// June 32b338c0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP_EventProcess();	// June 32b13860
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X_EventProcess();	// June 32b06fb0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX_EventProcess();	// June 32b072f0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_EventProcess();	// June 32b07630
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_EventProcess();	// June 32b076d0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_EventProcess();	// June 32b07780
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_StateStart();	// June 32b07a40
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_EventProcess();	// June 32b07ac0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture();	// June 32b07b20, the B state too
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess();	// June 32b15290, the B state too
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture();	// June 32b33bf0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess();	// June 32b07c30, the Shrewd Cutter end and Silent Rage states too
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateEnd();	// June 32b33b00
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 	// char-luciel CH4a: the passives and the delegates InitPassiveSkillState pushes ( thunks 32b4cd90 .. 32b4e720 )
@@ -1668,7 +1704,7 @@ protected:
 	bool								m_bStableDarkEnergyLocked;			// +0x9860
 	D3DXVECTOR3							m_vAbyssSnipingAimPosition;			// +0x9864
 	D3DXVECTOR2							m_vAbyssSnipingAimRange;			// +0x9870
-	std::vector<int>					m_vecAbyssSnipingTarget;			// +0x9878
+	std::vector<CX2GameUnit*>			m_vecAbyssSnipingTarget;			// +0x9878: char-luciel CH3c2: June stores the enemy unit pointers ( 32b172d0 )
 	float								m_fCombinationPointOverflowCoolTime;	// +0x9888
 	int									m_iDamageEffectIndex;				// +0x988c: June's ctor leaves it unset
 	std::vector<SDamageEffectHitCount>	m_vecDamageEffectHitCount;			// +0x9890

@@ -20947,6 +20947,903 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 	SetEquippedSkillLevel( CX2SkillTree::SI_NONE, true );	// June 31fc9f80
 }
 
+// char-luciel CH3c2: Demonio ( 129 ) skills part 2 ( Desperado, Abyss Sniping, Demonic Rush, Rapid Impact's move attack, the Transcendence form )
+namespace _CONST_LUCIEL_CH3C2_
+{
+	const float		DESPERADO_TARGET_COUNT_TIME						= 0.659f;	// June 32b135e0 ( 334f03d8 )
+	const float		DESPERADO_DEFAULT_NEED_TARGET_COUNT				= 5.f;		// June 32b135e0 ( 33443804 )
+	const float		DESPERADO_SHOT_EVENT_TIME						= 0.001f;	// June 32b32090 ( 33431564 )
+	const float		DESPERADO_AIM_UP_CLAMP_VALUE					= 30.f;		// June 32b32090 ( 334ed3f8 )
+	const double	DESPERADO_SHOT_OFFSET_Y							= 100.0;	// June 32b32090 ( 3342f360 )
+	const float		ABYSS_SNIPING_AIM_EVENT_TIME					= 0.01f;	// June 32b172d0 ( 33437810 )
+	const float		ABYSS_SNIPING_LOOP_EVENT_TIME					= 0.05f;	// June 32b36d90 ( 33436704 )
+	const float		ABYSS_SNIPING_DEFAULT_RANGE						= 700.f;	// June 32b172d0 ( 3344cea0 )
+	const float		ABYSS_SNIPING_DEFAULT_ANGLE						= 35.f;		// June 32b172d0 ( 3345b364, 33491d64 is its negative )
+	const float		ABYSS_SNIPING_CONE_DEGREE						= 180.f;	// June 32b172d0 ( 3344d398 )
+	const float		ABYSS_SNIPING_AIM_BAND_VALUE					= 5.f;		// June 32b0ed50 / 32b172d0 / 32b36d90 ( 33443804, 33476cd8 is its negative )
+	const double	ABYSS_SNIPING_AIM_POINT_OFFSET_Y				= 100.0;	// June 32b172d0 ( 3342f360 )
+	const double	ABYSS_SNIPING_LOOP_OFFSET_Y						= 100.0;	// June 32b36d90 ( 3342f360 )
+	const WCHAR*	TRANSCENDENCE_TRANSFORM_END_TEXTURE_KEY			= L"LUCIEL_LDN_LOCK";	// June 32b43b10 ( 334f55c4 )
+	const int		TRANSFORM_XXX_LOOP_MAX_COUNT					= 7;		// June 32b076d0
+	const float		SHREWD_CUTTER_LOCK_ON_PVE_RANGE					= 1200.f;	// June 32b07a40
+	const float		SHREWD_CUTTER_LOCK_ON_PVP_RANGE					= 700.f;	// June 32b07a40
+	const double	SHREWD_CUTTER_ATTACK_HEIGHT						= 20.0;		// June 32b07b20
+	const int		SHREWD_CUTTER_MAX_ATTACK_COUNT					= 11;		// June 32b15290 ( 0xb )
+	const float		SHREWD_CUTTER_GROUND_PROBE_RADIUS				= 30.f;		// June 32b33bf0 ( 334ed3f8 )
+}
+using namespace _CONST_LUCIEL_CH3C2_;
+
+// char-luciel CH3c2: June 32b14030 ( the class map's `helper` ): from the shot count on, the first target that is still alive is aimed at ( dead ones are skipped ); the aim value is the pitch of the line to it
+void CX2GULuciel::AimAtNextDesperadoTarget()
+{
+	while ( m_iDesperadoAttackCount < static_cast<int>( m_vecDesperadoTarget.size() ) )
+	{
+		CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( m_vecDesperadoTarget[m_iDesperadoAttackCount].m_GameUnitKey.m_uidGameUnit, m_vecDesperadoTarget[m_iDesperadoAttackCount].m_GameUnitKey.m_eGameUnitType );
+		if ( NULL != pTargetUnit && 0.f < pTargetUnit->GetNowHp() )
+		{
+			const D3DXVECTOR3 vAimDegree = GetDirVecToDegree( pTargetUnit->GetPos( false ) - GetPos( false ) );
+			m_fDesperadoAttackTime = vAimDegree.z;
+			m_fDesperadoAimDegreeX = 0.f;	// June @32b14152-32b14176: the degree is copied, then the first two words are cleared again
+			m_fDesperadoAimDegreeY = 0.f;
+			return;
+		}
+
+		++m_iDesperadoAttackCount;
+	}
+}
+
+// char-luciel CH3c2: June 32b16fc0 ( thunk 32b4d330 )
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_StateStart()
+{
+	m_iDesperadoAttackCount = 0;
+	m_iDesperadoMaxAttackCount = 0;
+	m_vecDesperadoTarget.clear();
+	m_fDesperadoAimDegreeX = 0.f;
+	m_fDesperadoAimDegreeY = 0.f;
+	m_fDesperadoAttackTime = 0.f;
+
+	CommonStateStart();
+}
+
+// char-luciel CH3c2: June 32b17040 ( thunk 32b4d340 )
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_END_StateStart()
+{
+	m_iDesperadoAttackCount = 0;
+	m_iDesperadoMaxAttackCount = 0;
+	m_vecDesperadoTarget.clear();
+
+	CommonStateStart();
+}
+
+// char-luciel CH3c2: June 32b31e90 ( thunk 32b4e340 ): every target gets the lock effect set ( its handle is kept in the entry's time word, JUNE_BUGS 782 ), then the first live one is aimed at
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_READY_StateStart()
+{
+	CommonStateStart();
+
+	for ( int iIndex = 0; iIndex < static_cast<int>( m_vecDesperadoTarget.size() ); ++iIndex )
+	{
+		CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( m_vecDesperadoTarget[iIndex].m_GameUnitKey.m_uidGameUnit, m_vecDesperadoTarget[iIndex].m_GameUnitKey.m_eGameUnitType );
+		if ( NULL != pTargetUnit )
+		{
+			const CX2EffectSet::Handle hLockEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDN_DESPERADO_Lock", this, pTargetUnit, false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+			*reinterpret_cast<CX2EffectSet::Handle*>( &m_vecDesperadoTarget[iIndex].m_fTime ) = hLockEffectSet;
+		}
+	}
+
+	AimAtNextDesperadoTarget();
+}
+
+// char-luciel CH3c2: June 32b135e0 ( thunk 32b4ce20 ): at 0.659 s the targets are counted; with at least the learned hit count ( 5 by default ) every target gets the move brake debuff
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( DESPERADO_TARGET_COUNT_TIME ) )
+	{
+		m_iDesperadoMaxAttackCount = static_cast<int>( m_vecDesperadoTarget.size() );
+
+		float fNeedTargetCount = DESPERADO_DEFAULT_NEED_TARGET_COUNT;
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_HIT_COUNT_1, GetNowStateSkillID(), true, fNeedTargetCount );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL desperado targets %d need %d brake %d", m_iDesperadoMaxAttackCount, static_cast<int>( fNeedTargetCount ), static_cast<int>( m_iDesperadoMaxAttackCount >= static_cast<int>( fNeedTargetCount ) ) );	// char-luciel CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+		if ( m_iDesperadoMaxAttackCount >= static_cast<int>( fNeedTargetCount ) )
+		{
+			for ( int iIndex = 0; iIndex < m_iDesperadoMaxAttackCount; ++iIndex )
+			{
+				CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( m_vecDesperadoTarget[iIndex].m_GameUnitKey.m_uidGameUnit, m_vecDesperadoTarget[iIndex].m_GameUnitKey.m_eGameUnitType );
+				if ( NULL != pTargetUnit )
+					pTargetUnit->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_DESPERADO_MOVE_BRAKE_ADD, 1, this, 0, false );	// 7ai arguments
+			}
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3c2: June 32b32090 ( thunk 32b4e350, the up and down shot states register it too ): at 0.001 s the shot's target swaps its lock effect set for the lock-shot one ( power = the skill's power
+// times the target count times the learned count rate ), the shot effect set is played with its pitch clamped to 30 / -20 ( flat between ) and a 100 up / down offset, then the next live target is aimed at
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( DESPERADO_SHOT_EVENT_TIME ) )
+	{
+		float fPowerRate = GetPowerRate() * m_iDesperadoMaxAttackCount;
+		float fCountRate = 1.f;
+		if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_EFFECTIVE_COUNT, GetNowStateSkillID(), true, fCountRate ) )
+			fPowerRate = fCountRate * fPowerRate;
+
+		if ( m_iDesperadoAttackCount < static_cast<int>( m_vecDesperadoTarget.size() ) )
+		{
+			CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( m_vecDesperadoTarget[m_iDesperadoAttackCount].m_GameUnitKey.m_uidGameUnit, m_vecDesperadoTarget[m_iDesperadoAttackCount].m_GameUnitKey.m_eGameUnitType );
+			if ( NULL != pTargetUnit )
+			{
+				g_pX2Game->GetEffectSet()->StopEffectSet( *reinterpret_cast<CX2EffectSet::Handle*>( &m_vecDesperadoTarget[m_iDesperadoAttackCount].m_fTime ) );
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDN_DESPERADO_Lock_Shot", this, pTargetUnit, false, fPowerRate, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+			}
+		}
+
+		const CX2EffectSet::Handle hShotEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDN_DESPERADO_SHOT_FX", this, NULL, false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+		CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hShotEffectSet );
+		if ( NULL != pEffectSetInstance )
+		{
+			D3DXVECTOR3 vShotOffset( 0.f, 0.f, 0.f );
+			if ( m_fDesperadoAttackTime > DESPERADO_AIM_UP_VALUE )
+			{
+				m_fDesperadoAttackTime = DESPERADO_AIM_UP_CLAMP_VALUE;
+				vShotOffset.y = static_cast<float>( 0.f + DESPERADO_SHOT_OFFSET_Y );
+			}
+			else if ( DESPERADO_AIM_DOWN_VALUE > m_fDesperadoAttackTime )
+			{
+				m_fDesperadoAttackTime = DESPERADO_AIM_DOWN_VALUE;
+				vShotOffset.y = static_cast<float>( 0.f - DESPERADO_SHOT_OFFSET_Y );
+			}
+			else
+			{
+				m_fDesperadoAttackTime = 0.f;	// June @324bb: inside the band the stored pitch becomes 0
+			}
+
+			pEffectSetInstance->m_vRotationDegree.x = m_fDesperadoAimDegreeX;
+			pEffectSetInstance->m_vRotationDegree.y = m_fDesperadoAimDegreeY;
+			pEffectSetInstance->m_vRotationDegree.z = m_fDesperadoAttackTime;
+			pEffectSetInstance->m_vInstancePositionOffset = vShotOffset;
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL desperado shot %d of %d power %.2f pitch %.1f effect %d", m_iDesperadoAttackCount + 1, static_cast<int>( m_vecDesperadoTarget.size() ), fPowerRate, m_fDesperadoAttackTime, static_cast<int>( NULL != pEffectSetInstance ) );	// char-luciel CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+		++m_iDesperadoAttackCount;
+		AimAtNextDesperadoTarget();
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3c2: June 32b0ed50 ( thunk 32b4c660 ): the animation end picks the state by the aim pitch ( up when above 5 and below the up range, down when below -5 and above the down range,
+// the attack state otherwise, and with no target )
+void CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_READY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( false == m_vecAbyssSnipingTarget.empty() )
+		{
+			if ( ABYSS_SNIPING_AIM_BAND_VALUE < m_vAbyssSnipingAimPosition.z && m_vAbyssSnipingAimRange.x > m_vAbyssSnipingAimPosition.z )
+				StateChange( LSI_SA_LDN_ABYSS_SNIPING_UP );
+			else if ( -ABYSS_SNIPING_AIM_BAND_VALUE > m_vAbyssSnipingAimPosition.z && m_vAbyssSnipingAimRange.y < m_vAbyssSnipingAimPosition.z )
+				StateChange( LSI_SA_LDN_ABYSS_SNIPING_DOWN );
+			else
+				StateChange( LSI_SA_LDN_ABYSS_SNIPING_ATTACK );
+		}
+		else
+		{
+			StateChange( LSI_SA_LDN_ABYSS_SNIPING_ATTACK );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b0ee00 ( thunk 32b4c670, the attack and down states register it too )
+void CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_UP_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		StateChange( LSI_SA_LDN_ABYSS_SNIPING_END );
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b0ee40 ( thunk 32b4c680 )
+void CX2GULuciel::LSI_SA_LDN_DEMONIC_RUSH_START_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		StateChange( LSI_SA_LDN_DEMONIC_RUSH_LAST );
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b0ee80 ( thunk 32b4c690 )
+void CX2GULuciel::LSI_SA_LDN_DEMONIC_RUSH_LAST_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		StateChange( ( true == m_FrameDataFuture.unitCondition.bFootOnLine ) ? LSI_SA_LDN_DEMONIC_RUSH_LANDING : LSI_SA_LDN_DEMONIC_RUSH_LAST );
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b172d0 ( thunk 32b4d350 ): at 0.01 s the learned range ( 700 ) and pitch bounds ( 35 / -35 ) are read, one enemy in the 180 degree cone is taken, its pitch is the aim
+// value; above 5 / below -5 the aim point is 100 under / over its position, then the pitch is taken again
+void CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( ABYSS_SNIPING_AIM_EVENT_TIME ) )
+	{
+		const CX2SkillTree::SKILL_ID eSkillID = GetNowStateSkillID();
+
+		float fRange = ABYSS_SNIPING_DEFAULT_RANGE;
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_SCOPE_ABS, eSkillID, true, fRange );	// June SA 0x1d
+		float fAngleUp = ABYSS_SNIPING_DEFAULT_ANGLE;
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_SCOPE_ABS_Y, eSkillID, true, fAngleUp );	// June SA 0x9e
+		m_vAbyssSnipingAimRange.x = fAngleUp;
+		float fAngleDown = -ABYSS_SNIPING_DEFAULT_ANGLE;
+		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_SCOPE_ABS_Z, eSkillID, true, fAngleDown );	// June SA 0x9f
+		m_vAbyssSnipingAimRange.y = fAngleDown;
+
+		std::vector<CX2GameUnit*> vecEnemyUnit;
+		CollectEnemyUnitsInCone( vecEnemyUnit, 1, fRange, fAngleDown, fAngleUp, true, ABYSS_SNIPING_CONE_DEGREE, false );
+		m_vecAbyssSnipingTarget = vecEnemyUnit;
+
+		if ( true == m_vecAbyssSnipingTarget.empty() )
+		{
+			m_vAbyssSnipingAimPosition = D3DXVECTOR3( 0.f, 0.f, 0.f );
+		}
+		else
+		{
+			CX2GameUnit* pTargetUnit = m_vecAbyssSnipingTarget[0];
+			if ( NULL == pTargetUnit )
+			{
+				CommonFrameMove();
+				return;
+			}
+
+			m_vAbyssSnipingAimPosition = GetDirVecToDegree( pTargetUnit->GetPos( false ) - GetPos( false ) );
+
+			D3DXVECTOR3 vAimPos = pTargetUnit->GetPos( false );
+			if ( ABYSS_SNIPING_AIM_BAND_VALUE < m_vAbyssSnipingAimPosition.z )
+				vAimPos.y = static_cast<float>( pTargetUnit->GetPos( false ).y - ABYSS_SNIPING_AIM_POINT_OFFSET_Y );
+			else if ( -ABYSS_SNIPING_AIM_BAND_VALUE > m_vAbyssSnipingAimPosition.z )
+				vAimPos.y = static_cast<float>( pTargetUnit->GetPos( false ).y + ABYSS_SNIPING_AIM_POINT_OFFSET_Y );
+
+			m_vAbyssSnipingAimPosition = GetDirVecToDegree( vAimPos - GetPos( false ) );
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL abyss sniping aim target %d pitch %.1f range up %.1f down %.1f", static_cast<int>( false == m_vecAbyssSnipingTarget.empty() ), m_vAbyssSnipingAimPosition.z, m_vAbyssSnipingAimRange.x, m_vAbyssSnipingAimRange.y );	// char-luciel CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3c2: June 32b36d90 ( thunk 32b4e3d0, the attack and down states register it too ): at 0.05 s the loop effect set is played and pitched like the aim ( clamped into the learned bounds
+// when not 0, a 100 up / down offset above 5 / below -5 ); the stored yaw is cleared
+void CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimer( ABYSS_SNIPING_LOOP_EVENT_TIME ) )
+	{
+		const CX2EffectSet::Handle hLoopEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDN_ABYSS_SNIPING_LOOP", this, NULL, false, -1.f, -1.f, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+		CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hLoopEffectSet );
+		if ( NULL != pEffectSetInstance )
+		{
+			D3DXVECTOR3 vLoopOffset( 0.f, 0.f, 0.f );
+			if ( 0.f != m_vAbyssSnipingAimPosition.z )
+			{
+				if ( m_vAbyssSnipingAimRange.x < m_vAbyssSnipingAimPosition.z )
+					m_vAbyssSnipingAimPosition.z = m_vAbyssSnipingAimRange.x;
+				else if ( m_vAbyssSnipingAimRange.y > m_vAbyssSnipingAimPosition.z )
+					m_vAbyssSnipingAimPosition.z = m_vAbyssSnipingAimRange.y;
+			}
+
+			if ( ABYSS_SNIPING_AIM_BAND_VALUE < m_vAbyssSnipingAimPosition.z )
+				vLoopOffset.y = static_cast<float>( 0.f + ABYSS_SNIPING_LOOP_OFFSET_Y );
+			else if ( -ABYSS_SNIPING_AIM_BAND_VALUE > m_vAbyssSnipingAimPosition.z )
+				vLoopOffset.y = static_cast<float>( 0.f - ABYSS_SNIPING_LOOP_OFFSET_Y );
+
+			m_vAbyssSnipingAimPosition.y = 0.f;	// June @32b37011: the x87 stack's zero is stored, not the offset
+			pEffectSetInstance->m_vRotationDegree.x = m_vAbyssSnipingAimPosition.x;
+			pEffectSetInstance->m_vRotationDegree.y = m_vAbyssSnipingAimPosition.y;
+			pEffectSetInstance->m_vRotationDegree.z = m_vAbyssSnipingAimPosition.z;
+			pEffectSetInstance->m_vInstancePositionOffset = vLoopOffset;
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3c2: June 32b43b10 ( thunk 32b4e750 ): the Altar of Evil's start ( 32b43910 ) with the Transcendence skill, buff factor and end picture key: the sound list clears, the form's buff starts,
+// my unit shows the linked skills' window
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStartFuture()
+{
+	m_vecSoundPlayData.clear();
+
+	SetTransformBuffFactorToSelf( BFI_BUFF_TRANSCENDENCE, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LDN_TRANSCENDENCE, false, 0, true ) );
+
+	if ( true == IsMyUnit() )
+	{
+		if ( NULL == m_pTransformSkillSlotUI )
+			m_pTransformSkillSlotUI = new CX2TransformSkillSlotUI();
+
+		if ( NULL != m_pTransformSkillSlotUI )
+		{
+			for ( int iSlot = 0; iSlot < CX2TransformSkillSlotUI::TRANSFORM_SKILL_SLOT_NUM; ++iSlot )
+			{
+				const CX2SkillTree::SKILL_ID eLinkedSkillID = GetTransformedSkillID( iSlot );
+				m_pTransformSkillSlotUI->SetSlotSkill( iSlot, eLinkedSkillID, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( eLinkedSkillID, false, 0, true ) );
+			}
+
+			m_pTransformSkillSlotUI->SetShow( true );
+			m_pTransformSkillSlotUI->SetTransformEndTexture( TRANSFORM_END_TEXTURE_FILE, TRANSCENDENCE_TRANSFORM_END_TEXTURE_KEY );
+		}
+	}
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH3c2: June 32b43ce0 ( thunk 32b4e760 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStart()
+{
+	SetTransformBuffFactorToSelf( BFI_BUFF_TRANSCENDENCE, GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LDN_TRANSCENDENCE, false, 0, true ) );
+
+	CommonStateStart();
+}
+
+// char-luciel CH3c2: June 32b07eb0 ( thunk 32b4c630 ): the animation end ends the skill
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b3a2f0 ( thunk 32b4e640 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_StateEnd()
+{
+	EndTransformedForm( 1, false );
+
+	CommonStateEnd();
+}
+
+// char-luciel CH3c2: June 32b07ef0 ( thunk 32b4c640 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_END_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b33480 ( thunk 32b4e370 ): the Altar of Evil's wait ( 32b31260 ) in the Transcendence form: the double step is tested before the walk, the buff is Transcendence's
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.pureUp )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b336a0 ( thunk 32b4e380 ): the Altar of Evil's walk ( 32b31480 ) in the Transcendence form: the double step and the hyper mode come before the walk's stop test, Z and X
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
+	{
+		StateChangeDashIfPossible();
+	}
+	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
+	else if ( false == m_InputData.pureRight && false == m_InputData.pureLeft )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == m_InputData.pureUp )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b13730 ( thunk 32b4ce30 ): the Altar of Evil's jump ready ( 32b133d0 ) in the Transcendence form: Z / X / the rise start the jump states, each with the jump speed
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) || true == IsFourthSkillSlotKeyPressedOnce() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.oneZ )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == m_InputData.oneX )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == CheckTransformSkillSlotKey() )
+	{
+		StateChangeToTransformSkill();
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() || true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b338c0 ( thunk 32b4e390 ): the Altar of Evil's jump landing ( 32b316a0 ) in the Transcendence form
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_InputData.pureUp )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
+		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
+	}
+	else if ( true == m_InputData.oneDown
+		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
+	}
+	ELSE_IF_KEY_PRESSED_AT_SKIP_POINT_ZXCAS
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b13860 ( thunk 32b4ce40 ): the form's buff gone ends the form; the ground lands ( the event flag sets the can-not-jump time ); in the air the held direction keeps the walk speed
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+			m_fCanNotJumpTime = TRANSFORM_JUMP_CAN_NOT_JUMP_TIME;
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( ( true == m_InputData.pureRight && true == m_FrameDataFuture.syncData.bIsRight )
+		|| ( true == m_InputData.pureLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
+	{
+		m_PhysicParam.nowSpeed.x = GetWalkSpeed();	// June 32b13860: the walk speed times m_fRunJumpSpeedRate, which GetWalkSpeed includes
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b06fb0 ( thunk 32b4c5a0 ): X of the form's combo: off the line the jump-down state starts and the position drops 30; the buff gone ends the form;
+// the animation end waits; X in the key window continues to XX
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+	}
+	else if ( GetXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= GetXSkinAnimFuture()->GetNowAnimationTime() && true == m_InputData.oneX )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b072f0 ( thunk 32b4c5b0 ): XX continues to the XXX ready state ( byte-equal to X's but the next state )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX_EventProcess()
+{
+	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY );	// char-luciel CH3c2: June calls the base, not the form mapper
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+	}
+	else if ( GetXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= GetXSkinAnimFuture()->GetNowAnimationTime() && true == m_InputData.oneX )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b07630 ( thunk 32b4c5c0 ): the form's buff gone ends the form; the animation end loops while X is held, else ends the combo
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( ( true == m_InputData.pureX ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b076d0 ( thunk 32b4c5d0 ): no detonation by state; the form's buff gone ends the form; the animation end loops up to 7 times while X is held, else ends the combo
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_EventProcess()
+{
+	SetNoDetonationByState( true );
+
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_InputData.pureX && m_usStateLoopCount < TRANSFORM_XXX_LOOP_MAX_COUNT )
+		{
+			++m_usStateLoopCount;
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP );	// char-luciel CH3c2: June calls the base, not the form mapper
+		}
+		else
+		{
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b07780 ( thunk 32b4c5e0 ): the form's buff gone ends the form; the animation end waits; then the cancel chain
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b07a40 ( thunk 32b4c600 ): the linked skill pays its MP and cool time; the lock-on ranges are 1200 ( PvE ) / 700 ( PvP ) around my position and the attack count restarts
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_StateStart()
+{
+	CommonStateStart();
+	ApplyTransformSkillCost();
+	SetEquippedSkillLevel( CX2SkillTree::SI_NONE, true );	// June 31fc9f80
+
+	m_ptrShrewdCutterLockOn->SetPveRange( SHREWD_CUTTER_LOCK_ON_PVE_RANGE );
+	m_ptrShrewdCutterLockOn->SetPvpRange( SHREWD_CUTTER_LOCK_ON_PVP_RANGE );
+	m_ptrShrewdCutterLockOn->SetSafePos( GetPos( false ) );
+	m_ptrShrewdCutterLockOn->ProcessLockOn( this );
+	m_iShrewdCutterAttackCount = 0;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL shrewd cutter start lock %d", static_cast<int>( m_ptrShrewdCutterLockOn->CheckLockOnUnit() ) );	// char-luciel CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+}
+
+// char-luciel CH3c2: June 32b07ac0 ( thunk 32b4c610 ): the animation end attacks the locked-on target, else becomes visible again and ends
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_ptrShrewdCutterLockOn->CheckLockOnUnit() )
+		{
+			m_ptrShrewdCutterLockOn->ResetLockOnUnit();
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A );	// char-luciel CH3c2: June calls the base, not the form mapper
+		}
+		else
+		{
+			SetInvisibility( false );
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b07b20 ( thunk 32b4c620, the B state registers it too ): turns to face the target when it is behind ( the dot product of the earlier direction and the xz line to it ),
+// then stands 20 above it
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture()
+{
+	const D3DXVECTOR3 vMyDir = m_FrameDataNowBefore.unitCondition.dirVector;
+	const D3DXVECTOR3 vMyPos = GetPos( false );
+	const D3DXVECTOR3 vDestPos = m_ptrShrewdCutterLockOn->GetDestPos();
+	D3DXVECTOR3 vTargetDir = vDestPos - vMyPos;
+	vTargetDir.y = 0.f;
+
+	if ( D3DXVec3Dot( &vMyDir, &vTargetDir ) < 0.f )
+	{
+		m_FrameDataFuture.unitCondition.dirDegree.y = static_cast<float>( m_FrameDataFuture.unitCondition.dirDegree.y + TRANSFORM_TURN_DEGREE );
+		m_FrameDataFuture.unitCondition.bAttackerFront = true;
+		m_FrameDataFuture.syncData.bIsRight = !m_FrameDataFuture.syncData.bIsRight;
+	}
+
+	m_FrameDataFuture.syncData.position.x = vDestPos.x;
+	m_FrameDataFuture.syncData.position.y = static_cast<float>( vDestPos.y + SHREWD_CUTTER_ATTACK_HEIGHT );
+	m_FrameDataFuture.syncData.position.z = vDestPos.z;
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH3c2: June 32b15290 ( thunk 32b4cfa0, the B state registers it too ): the animation end counts the attack; below 11 the lock-on is processed and the next attack state is the other
+// one of A / B while a target is locked, else the end state
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		++m_iShrewdCutterAttackCount;
+		if ( m_iShrewdCutterAttackCount < SHREWD_CUTTER_MAX_ATTACK_COUNT )
+		{
+			m_ptrShrewdCutterLockOn->ProcessLockOn( this );
+			if ( true == m_ptrShrewdCutterLockOn->CheckLockOnUnit() )
+			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+				CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL shrewd cutter attack %d next %s", m_iShrewdCutterAttackCount, ( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A == GetNowStateID() ) ? L"B" : L"A" );	// char-luciel CH3c2
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+				CX2GUUser::StateChange( ( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A == GetNowStateID() ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A );	// char-luciel CH3c2: June calls the base, not the form mapper
+			}
+			else
+			{
+				CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+			}
+		}
+		else
+		{
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END );	// char-luciel CH3c2: June calls the base, not the form mapper
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b33bf0 ( thunk 32b4e3b0 ): the future position is the land position; a unit not standing on an enabled normal line goes back to the lock-on's safe position ( 45 higher ) and
+// the second end state starts
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	if ( NULL != g_pX2Game && NULL != g_pX2Game->GetWorld() && NULL != g_pX2Game->GetWorld()->GetLineMap() )
+	{
+		int iLineIndex = 0;	// June @32b33c70: a zeroed local
+		m_FrameDataFuture.syncData.position = GetLandPos( true );
+
+		if ( NULL != m_ptrShrewdCutterLockOn )
+		{
+			CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+			if ( true == pLineMap->CanDown( GetPos( false ), SHREWD_CUTTER_GROUND_PROBE_RADIUS, NULL, NULL, &iLineIndex, false, false, true, false ) )
+			{
+				const CKTDGLineMap::LineData* pLineData = pLineMap->GetLineData( iLineIndex );
+				if ( NULL != pLineData && CKTDGLineMap::LT_NORMAL == pLineData->lineType && true == pLineData->bEnable )
+					return;
+			}
+
+			const D3DXVECTOR3 vSafePos = m_ptrShrewdCutterLockOn->GetSafePos();
+			m_FrameDataFuture.syncData.position.x = vSafePos.x;
+			m_FrameDataFuture.syncData.position.y = static_cast<float>( vSafePos.y + TRANSFORM_LANDING_FALL_DISTANCE );
+			m_FrameDataFuture.syncData.position.z = vSafePos.z;
+			CX2GUUser::StateChange( TRANSFORM_SHREWD_CUTTER_END_SECOND_STATE_ID );	// char-luciel CH3c2: June calls the base, not the form mapper
+		}
+	}
+}
+
+// char-luciel CH3c2: June 32b07c30 ( thunk 32b4c5f0, Shrewd Cutter end and Silent Rage register it too ): the animation end waits on the line or falls; then the cancel chain
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( ( true == m_FrameDataFuture.unitCondition.bFootOnLine ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c2: June calls the base, not the form mapper
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c2: June 32b33b00 ( thunk 32b4e3a0 ): the damage taken during the skill comes back as MP ( shown as a recovery )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateEnd()
+{
+	CommonStateEnd();
+
+	UpNowMp( m_fShadowFuryAccumulatedDamage );
+	if ( NULL != g_pX2Game )
+		g_pX2Game->DisplayAddMPInformation( m_fShadowFuryAccumulatedDamage, GetPos( false ), GetDirVector() );
+}
+
+// char-luciel CH3c2: June 32b32550 ( thunk 32b4e450, the male state registers it too ): the unit that made me its target gives a stand point beside it, the side opposite its facing first ( I face as it does ),
+// else the other side ( I keep my facing ), else its own position; the point lands on a normal enabled line or the move is not made; the pending combination points are paid
+void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( GetMakeTargetUnitUID(), GetMakeTargetGameUnitType() );
+	if ( NULL != pTargetUnit )
+	{
+		const D3DXVECTOR3 vTargetPos = pTargetUnit->GetPos( true );
+		D3DXVECTOR3 vStandPos = GetPos( false );
+		const bool bTargetRight = pTargetUnit->GetIsRight();
+		bool bStandRight = bTargetRight;
+		CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+		const float fStandDistance = static_cast<float>( pTargetUnit->GetUnitWidth( false ) * BOUNDING_TARGET_UNIT_WIDTH_RATE + GetUsefulValueFuture( 0, 0 ) );
+
+		if ( false == pLineMap->GetFixedDistancePositionForWeaponTaker( &vTargetPos, fStandDistance, false == bTargetRight, vStandPos ) )
+		{
+			if ( false == pLineMap->GetFixedDistancePositionForWeaponTaker( &vTargetPos, fStandDistance, bTargetRight, vStandPos ) )
+				vStandPos = vTargetPos;
+
+			bStandRight = GetIsRight();
+		}
+
+		vStandPos.y = vTargetPos.y;
+		int iLandLineIndex = -1;
+		vStandPos = pLineMap->GetLandPosition( vStandPos, true, BOUNDING_TARGET_LAND_RADIUS, &iLandLineIndex );
+
+		const CKTDGLineMap::LineData* pLandLineData = pLineMap->GetLineData( iLandLineIndex );
+		if ( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
+		{
+			m_FrameDataFuture.syncData.position = vStandPos;
+			m_FrameDataFuture.syncData.bIsRight = bStandRight;
+		}
+	}
+
+	UpCombinationPoint( m_iPendingCombinationPoint );
+	m_iPendingCombinationPoint = 0;
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
@@ -21177,8 +22074,8 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 			{
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO", normalStateData.stateID );
 				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_Init );	// June 32b4b230
-				// June 32b4d330 ( Start ): LSI_SA_LDN_DESPERADO_StateStart, body in CH3c2
-				// June 32b4ce20 ( FrameMove ): LSI_SA_LDN_DESPERADO_FrameMove, body in CH3c2
+				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_StateStart );	// June 32b4d330
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_FrameMove );	// June 32b4ce20
 				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_EventProcess );	// June 32b4c480
 
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO", hyperStateData.stateID );
@@ -21189,35 +22086,35 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_READY;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_READY", stateData.stateID );
-				// June 32b4e340 ( Start ): LSI_SA_LDN_DESPERADO_ATTACK_READY_StateStart, body in CH3c2
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_READY_StateStart );	// June 32b4e340
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_READY_EventProcess );	// June 32b4c490
 				m_StateList[stateData.stateID] = stateData;
 
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK", stateData.stateID );
-				// June 32b4e350 ( FrameMove ): LSI_SA_LDN_DESPERADO_ATTACK_FrameMove, body in CH3c2
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_FrameMove );	// June 32b4e350
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_EventProcess );	// June 32b4c4a0
 				m_StateList[stateData.stateID] = stateData;
 
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_END;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_END", stateData.stateID );
-				// June 32b4d340 ( Start ): LSI_SA_LDN_DESPERADO_ATTACK_END_StateStart, body in CH3c2
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_END_StateStart );	// June 32b4d340
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
 				m_StateList[stateData.stateID] = stateData;
 
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_UP;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_UP", stateData.stateID );
-				// June 32b4e350 ( FrameMove ): LSI_SA_LDN_DESPERADO_ATTACK_FrameMove, body in CH3c2
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_FrameMove );	// June 32b4e350
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_EventProcess );	// June 32b4c4a0
 				m_StateList[stateData.stateID] = stateData;
 
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_DOWN;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_DOWN", stateData.stateID );
-				// June 32b4e350 ( FrameMove ): LSI_SA_LDN_DESPERADO_ATTACK_FrameMove, body in CH3c2
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_FrameMove );	// June 32b4e350
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_EventProcess );	// June 32b4c4a0
 				m_StateList[stateData.stateID] = stateData;
 			} break;
@@ -21285,7 +22182,7 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				stateData.Init();
 				stateData.stateID					= LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK;
 				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK", stateData.stateID );
-				// June 32b4e450 ( StartFuture slot, June's own name StateStart ): 32b32550, body in CH3c2
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture );	// June 32b4e450
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess );	// June 32b4c770
 				m_StateList[stateData.stateID] = stateData;
 
@@ -21300,7 +22197,7 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				stateData.stateID					= LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK;
 				m_LuaManager.MakeTableReference( "LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK", stateData.stateID );
 				stateData.m_bSkillState				= true;	// June @32b4a05c byte +0x11
-				// June 32b4e450 ( StartFuture slot ): 32b32550, body in CH3c2
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture );	// June 32b4e450
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess );	// June 32b4c770
 				m_StateList[stateData.stateID] = stateData;
 			} break;
@@ -21343,6 +22240,351 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				m_LuaManager.MakeTableReference( "LSI_A_LDN_RAPID_FURY_CIEL", stateData.stateID );
 				stateData.m_bSkillState				= true;	// June @32b4a35c byte +0x11
 				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_RAPID_FURY_LU_Init );	// June 32b4b520 ( the delegate maker 32b4c9f0 fills the Init slot, +0x18 )
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_TRANSCENDENCE:	// char-luciel CH3c: June @32b487cf ( ids 30049 / 30080 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_Init );	// June 32b4b250
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_EventProcess );	// June 32b4c4e0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStartFuture );	// June 32b4e750
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStart );	// June 32b4e760
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_EventProcess );	// June 32b4c4f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT_EventProcess );	// June 32b4e370
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, WalkFrameMoveFuture );	// June 329cadf0 > 31fd23e0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK_EventProcess );	// June 32b4e380
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY_EventProcess );	// June 32b4ce30
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );	// June 329cae00 > 31fd2470
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP_EventProcess );	// June 32b4b260
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );	// June 329cae00 > 31fd2470
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN_EventProcess );	// June 32b4c500
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, JumpLandingStart );	// June 329cae20 > 31fc7f30
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING_EventProcess );	// June 32b4e390
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashStartFuture );	// June 329cc580 > 329cc1f0
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, DashStart );	// June 329cae30 > 31fc7fa0
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, DashFrameMoveFuture );	// June 329cae40 > 31fd25e0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_EventProcess );	// June 32b4e300 ( Lu's form shares it )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_END", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, DashEndStartFuture );	// June 32b4aa90 > 31fd2680
+				// June 32b4aaa0 > 31fc7fc0 ( StateStart ): = CommonStateStart, which an empty slot runs
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_END_FrameMove );	// June 32b4cbe0 > 32b0fef0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END_EventProcess );	// June 32b4e310 ( Lu's form shares it )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashJumpStartFuture );	// June 32a2b990 > 31fc7f50
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, DashJumpStart );	// June 32a2b9a0 > 31fcbdf0
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, DashJumpFrameMoveFuture );	// June 32a2b9b0 > 31fd2520
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_EventProcess );	// June 32b4ce00 ( Lu's form shares it )
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GUUser, DashJumpEndFuture );	// June 32a2b9c0 > 31fc7f80
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashJumpLandingStartFuture );	// June 329cae70 > 31fcbe40
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, JumpLandingStart );	// June 329cae20 > 31fc7f30
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING_EventProcess );	// June 32b4e320 ( Lu's form shares it )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_EventProcess );	// June 32b4c510
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP_EventProcess );	// June 32b4ce40
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING_EventProcess );	// June 32b4c520
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_EventProcess );	// June 32b4c530
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP_EventProcess );	// June 32b4c540
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LANDING", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING_EventProcess );	// June 32b4c550 ( byte-equal to the jump Z landing's 32b4c520 )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z_EventProcess );	// June 32b4c560
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_EventProcess );	// June 32b4c570
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_StateEndFuture );	// June 32b4b270
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ_EventProcess );	// June 32b4c580
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_StateEndFuture );	// June 32b4b270
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ_EventProcess );	// June 32b4c590
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X_EventProcess );	// June 32b4c5a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX_EventProcess );	// June 32b4c5b0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_StateStart );	// June 32b4b280
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_EventProcess );	// June 32b4c5c0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_EventProcess );	// June 32b4c5d0
+				stateData.StateEnd					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_StateEnd );	// June 32b4b290
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_StateStart );	// June 32b4b2a0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_EventProcess );	// June 32b4c5e0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b48e15 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_Init );	// June 32b4b2b0
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateStart );	// June 32b4b2c0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess );	// June 32b4c5f0
+				stateData.StateEnd					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateEnd );	// June 32b4e3a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b48e60 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_Init );	// June 32b4b2d0
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_StateStart );	// June 32b4c600
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_EventProcess );	// June 32b4c610
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture );	// June 32b4c620
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess );	// June 32b4cfa0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture );	// June 32b4c620
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess );	// June 32b4cfa0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture );	// June 32b4e3b0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess );	// June 32b4c5f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= TRANSFORM_SHREWD_CUTTER_END_SECOND_STATE_ID;	// June @32b48f1e: the Shrewd Cutter end table again
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess );	// June 32b4c5f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b48f71 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_Init );	// June 32b4b2e0
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart );	// June 32b4b2f0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess );	// June 32b4c5f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				const bool bTranscendedUnit = ( NULL != GetUnit() && 0 != GetUnit()->GetUnitData().m_iUnitClassTran );	// June 32070d40 @32b48fd0
+				stateData.stateID					= ( true == bTranscendedUnit ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE_TR : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE;
+				m_LuaManager.MakeTableReference( ( true == bTranscendedUnit ) ? "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE_TR" : "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, HyperModeStartFuture );	// June 329caf10
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, HyperModeStart );	// June 329caef0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, HyperModeFrameMove );	// June 32bd5f20
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, HyperModeEventProcess );	// June 329caf00
+				stateData.StateEnd					= SET_CB_FUNC( CX2GUUser, HyperModeEnd );	// June 329cc5a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_THROW_ITEM;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_THROW_ITEM", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateStart );	// June 329cb120
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMoveFuture );	// June 329cb130
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMove );	// June 329cb140
+				stateData.OnCameraMove				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_CameraMove );	// June 329cb150
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_EventProcess );	// June 329cb160
+				stateData.StateEnd					= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateEnd );	// June 329cb170
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_EventProcess );	// June 32b4c630
+				stateData.StateEnd					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_StateEnd );	// June 32b4e640
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_END_EventProcess );	// June 32b4c640
+				m_StateList[stateData.stateID] = stateData;
+
+				m_ptrShrewdCutterLockOn = SLockOnSystem::CreateLockOnSystem();	// June @32b490e0-32b49108: the temp is moved in and released
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_ABYSS_SNIPING:	// char-luciel CH3c: June @32b492fa ( id 30059 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_READY", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_READY_Init );	// June 32b4b350
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove );	// June 32b4d350
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_READY_EventProcess );	// June 32b4c660
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_READY", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_UP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_UP", stateData.stateID );
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove );	// June 32b4e3d0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_UP_EventProcess );	// June 32b4c670
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_ATTACK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_ATTACK", stateData.stateID );
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove );	// June 32b4e3d0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_UP_EventProcess );	// June 32b4c670
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_DOWN;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_DOWN", stateData.stateID );
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove );	// June 32b4e3d0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_UP_EventProcess );	// June 32b4c670
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_DEMONIC_RUSH:	// char-luciel CH3c: June @32b49443 ( id 30060 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_START", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DEMONIC_RUSH_START_Init );	// June 32b4b360
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DEMONIC_RUSH_START_EventProcess );	// June 32b4c680
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_START", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DEMONIC_RUSH_LAST;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_LAST", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DEMONIC_RUSH_LAST_EventProcess );	// June 32b4c690
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DEMONIC_RUSH_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_LANDING", stateData.stateID );
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
 				m_StateList[stateData.stateID] = stateData;
 			} break;

@@ -1080,6 +1080,12 @@ enum BUFF_FACTOR_ID
 	BFI_DEBUFF_SUPPRESSION_OBLIVION       = 529,	// June's Enum.lua; Oblivion's debuff on a unit it does not execute
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-16 // char-luciel CH3c2
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_BUFF_TRANSCENDENCE                = 790,	// June's Enum.lua; the Transcendence transformed form's buff
+	BFI_DEBUFF_DESPERADO_MOVE_BRAKE_ADD   = 792,	// June's Enum.lua; Desperado's move brake on every target when the shot count is reached
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 

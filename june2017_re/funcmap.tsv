@@ -12522,3 +12522,38 @@ viewer+0xd84 (DU5d2 fix)	CX2UnitViewerUI::m_fBackUnitOffsetRate	confirmed	Char L
 31fc9430 (CH1d0)	CX2GUUser::SetSyncDataPos( const D3DXVECTOR3& vPos, bool bFuture )	confirmed	Char Add CH1d0: new under JUNE_CHAR_ADD_CORE ( inline, X2GUUser.h ): bFuture == 1 -> m_FrameDataFuture.syncData.position ( +0x7e3c ), else m_FrameDataNow ( +0x80dc )
 31edf5a0 (CH1d0)	CX2Data::IsUpgradedSkill( CX2SkillTree::SKILL_ID ) const	confirmed	Char Add CH1d0: new under JUNE_CHAR_ADD_CORE ( inline, X2Data.h ): m_pSkillTree ( +0x50 ) ? CX2SkillTree::IsUpgradedSkill 32206d00 : false; ECX = g_pData ( 33775860 )
 3226e310 (CH1d0)	CX2GameUnit::DecreaseCoolTime( float& fCoolTime ) const	confirmed	Char Add CH1d0: new under JUNE_CHAR_ADD_CORE. 0 < t ( NaN no ): t -= m_fElapsedTime ( +0x2b0 ); t <= 0 -> t = 0, true; else false
+32b14030 (CH3c2)	CX2GULuciel::AimAtNextDesperadoTarget	PORTED	Char Luciel CH3c2: from the shot count on, the first target still alive is aimed at ( GetNowHp > 0 ); the aim pitch is m_fDesperadoAttackTime, the yaw and roll are cleared
+32b16fc0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_DESPERADO_StateStart	PORTED	Char Luciel CH3c2: clears the shot counters, the target list and the aim, then CommonStateStart
+32b17040 (CH3c2)	CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_END_StateStart	PORTED	Char Luciel CH3c2: clears the shot counters and the target list, then CommonStateStart
+32b31e90 (CH3c2)	CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_READY_StateStart	PORTED	Char Luciel CH3c2: lock effect set on every target ( handle kept in the entry time word, JUNE_BUGS 782 ), then the first live target is aimed at
+32b135e0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_DESPERADO_FrameMove	PORTED	Char Luciel CH3c2: at 0.659 s the target count is stored; at or above the learned SA_HIT_COUNT_1 ( 5 ) every target gets BFI 792
+32b32090 (CH3c2)	CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_FrameMove	PORTED	Char Luciel CH3c2: at 0.001 s: lock effect stops, lock-shot effect on the target ( power x count x SA_EFFECTIVE_COUNT ), shot effect set with pitch clamp 30 / -20 and a 100 offset, next target; also the up and down shot states
+32b0ed50 (CH3c2)	CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_READY_EventProcess	PORTED	Char Luciel CH3c2: animation end picks UP ( 5 < pitch < range up ), DOWN ( -5 > pitch > range down ) or ATTACK
+32b0ee00 (CH3c2)	CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_UP_EventProcess	PORTED	Char Luciel CH3c2: animation end -> END; also the attack and down states
+32b172d0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove	PORTED	Char Luciel CH3c2: at 0.01 s: SA 29 / 158 / 159 ( 700 / 35 / -35 ) -> one enemy in a 180 degree cone, pitch to it is the aim value, +-100 aim point when beyond 5 / -5
+32b36d90 (CH3c2)	CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove	PORTED	Char Luciel CH3c2: at 0.05 s the loop effect set, rotated by the aim ( pitch clamped into the learned bounds when not 0 ) with a 100 offset; the stored yaw is cleared; also the attack and down states
+32b0ee40 (CH3c2)	CX2GULuciel::LSI_SA_LDN_DEMONIC_RUSH_START_EventProcess	PORTED	Char Luciel CH3c2: animation end -> LAST
+32b0ee80 (CH3c2)	CX2GULuciel::LSI_SA_LDN_DEMONIC_RUSH_LAST_EventProcess	PORTED	Char Luciel CH3c2: animation end -> LANDING on the line, LAST in the air
+32b32550 (CH3c2)	CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture	PORTED	Char Luciel CH3c2: stand point beside the make target ( opposite side first ), landed on a normal enabled line or no move; UpCombinationPoint( pending ); both bodies
+32b43b10 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStartFuture	PORTED	Char Luciel CH3c2: the Altar of Evil start with BFI 790 / skill 30049 / end key LUCIEL_LDN_LOCK
+32b43ce0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStart	PORTED	Char Luciel CH3c2: the form buff factor, CommonStateStart
+32b07eb0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_EventProcess	PORTED	Char Luciel CH3c2: animation end -> TRANSCENDENCE_END ( base StateChange )
+32b3a2f0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_StateEnd	PORTED	Char Luciel CH3c2: EndTransformedForm( 1, false ), CommonStateEnd
+32b07ef0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_END_EventProcess	PORTED	Char Luciel CH3c2: animation end -> LU_WAIT
+32b33480 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT_EventProcess	PORTED	Char Luciel CH3c2: the Altar of Evil wait ( 32b31260 ) with the Transcendence buff and the double step tested before the walk
+32b336a0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK_EventProcess	PORTED	Char Luciel CH3c2: the Altar of Evil walk ( 32b31480 ) with the double step and hyper mode before the stop test
+32b13730 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY_EventProcess	PORTED	Char Luciel CH3c2: the Altar of Evil jump ready ( 32b133d0 ) with the Transcendence ids
+32b338c0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING_EventProcess	PORTED	Char Luciel CH3c2: the Altar of Evil jump landing ( 32b316a0 ) with the Transcendence ids
+32b13860 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP_EventProcess	PORTED	Char Luciel CH3c2: buff gone ends the form; the ground lands ( event flag sets the can-not-jump time 0.2 ); walk speed kept in the air
+32b06fb0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X_EventProcess	PORTED	Char Luciel CH3c2: off the line JUMP_DOWN and y - 30; buff; animation end WAIT; X in the key window continues to XX; cancel chain
+32b072f0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX_EventProcess	PORTED	Char Luciel CH3c2: the X listing with XXX_READY as the next state
+32b07630 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_EventProcess	PORTED	Char Luciel CH3c2: animation end -> LOOP while X is held, else END
+32b076d0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_EventProcess	PORTED	Char Luciel CH3c2: SetNoDetonationByState( true ); animation end loops up to 7 times while X is held, else END
+32b07780 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_EventProcess	PORTED	Char Luciel CH3c2: buff; animation end WAIT; cancel chain
+32b07a40 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_StateStart	PORTED	Char Luciel CH3c2: linked skill cost; lock-on ranges 1200 / 700, safe pos = my position, ProcessLockOn, attack count 0
+32b07ac0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_EventProcess	PORTED	Char Luciel CH3c2: animation end: locked -> ATTACK_A, else visible again and END
+32b07b20 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture	PORTED	Char Luciel CH3c2: turns to face a target behind ( dot of the earlier direction and the xz line < 0 ), stands 20 above it; also the B state
+32b15290 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess	PORTED	Char Luciel CH3c2: animation end counts; below 11 and locked -> the other of A / B, else END; also the B state
+32b33bf0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture	PORTED	Char Luciel CH3c2: future position = land position; off an enabled normal line the lock-on safe position ( +45 ) and state 499
+32b07c30 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess	PORTED	Char Luciel CH3c2: animation end WAIT on the line / JUMP_DOWN; cancel chain; also the Shrewd Cutter end and Silent Rage states
+32b33b00 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateEnd	PORTED	Char Luciel CH3c2: CommonStateEnd; UpNowMp( accumulated damage ) and DisplayAddMPInformation
