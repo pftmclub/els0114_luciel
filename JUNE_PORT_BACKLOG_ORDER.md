@@ -1396,6 +1396,9 @@ walking up to the door does nothing (user, E1d play-test: "just the door").
 **Depends on:** atlas E1d (done). Touches `X2TFieldGame.*`, `X2LocationManager.*`, `DLG_Map_Village.lua`, `X2Lib/Offline/`; not alongside
 another session in `X2TFieldGame.*`.
 
+**Planned 2026-11-16 (user request):** plan `june-spa`, `JUNE_SPA_PHASES.md` + `kickoffs/june-spa/` + the `june-spa` STATUS block. S0 map and
+design, S1 data, S2 code-event table and doors, S3 soak buff, S4 Pporu, S5 rock-scissors-paper (if S0 keeps it), Z.
+
 ### Stage 25: June fonts and text rendering (user, 2026-10-17)
 
 The user's report: March's UI text looks like it has no anti-aliasing, and they want June's fonts. The "no anti-aliasing" part is

@@ -162,7 +162,7 @@ Decision answered 2026-11-11 (plan "Open decisions"): 1 stat rows for all seven 
 ## june-backlog - backlog stage planning briefs (`JUNE_PORT_BACKLOG_ORDER.md`)
 Branch `main` · plan: `JUNE_PORT_BACKLOG_ORDER.md` · each row is a read-only planning session (Ghidra read-only, no code, no build) that writes a new phased plan and its own STATUS block; each row is started with `/x2-phase new-plan <plan key>` (the key is in the row); the skill reads the row's brief first.
 
-Done: stage2-plan, stage3-plan, stage4-plan, stage29-plan, stage5-plan, stage6-plan, stage34-plan, stage35-plan, stage23-plan (2026-11-12 -> plan `field-rewards`), stage33-plan (2026-11-12 -> plan `june-stat-calc`; damage track moved ahead by the user), stage41-plan (2026-11-15 -> plan `june-state-ids`).
+Done: stage2-plan, stage3-plan, stage4-plan, stage29-plan, stage5-plan, stage6-plan, stage34-plan, stage35-plan, stage23-plan (2026-11-12 -> plan `field-rewards`), stage33-plan (2026-11-12 -> plan `june-stat-calc`; damage track moved ahead by the user), stage41-plan (2026-11-15 -> plan `june-state-ids`), Stage 24 (no brief; planned 2026-11-16 at the user's request -> plan `june-spa`).
 
 | Phase | State | Model | Needs | Touches | Kickoff |
 |---|---|---|---|---|---|
@@ -262,6 +262,21 @@ Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 /
 | R1 | blocked (S4): MP and awakening gain on hit and on hit taken, absorb | Opus 5.5 / high, Opus review | S4 review | `X2GameUnit.*`, `X2GUUser.*`, `X2DamageEffect.*` | `R1.md` |
 | R1b | blocked (R1): MP cost (GetActualMPConsume + June's buff reader), ResetMPChangeRate, SetMPChangeRateValue | Opus 5.5 / high, Opus review | R1 review | `X2GUUser.*`, `X2GageData.*`, class MP blocks | `R1b.md` |
 | Z | blocked (R1b review): close | Sonnet 5.5 / medium | R1b review, D6 review | `MODS.md`, backlog, STATUS archive | `Z.md` |
+
+## june-spa - June spa villages (Ruben 1500, Ranox 1501): doors, soaking buff, Pporu game
+Plan `JUNE_SPA_PHASES.md` - branch `main` - log tag `[JUNE_SPA]` (`offline_server.log`) - flags `SERV_IRUHADEV_JUNE_SPA_*` (`_ENTRY`, `_BUFF`, `_PPORU`, `_RPS`, + `_DEBUG`), `SERV_IRUHADEV_OFFLINE_CODE_EVENTS`, `SERV_IRUHADEV_OFFLINE_SPA_BUFF` - kickoffs `kickoffs/june-spa/` - map `june2017_re/spa/spa_map.tsv` - backlog Stage 24 - created 2026-11-16 - **Seam: S2** (S1 batches into S2's play-test).
+
+**Scope:** walk into either spa through June's door, soak for June's notice / effect / 20-minute buff (emulator answer = user-approved stand-in), the Pporu click game, the wisp's rock-scissors-paper (if S0 keeps it), and back out. Code event 31 (`CEI_SPA_ON_OFF`) comes from a new save-DB code-event table. S2-S5 edit `X2TFieldGame.*`: one at a time, not beside another session in that file. Spa avatars -> Stage 11, menu icon -> Stage 9, achievements -> Stage 31.
+
+| Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
+|---|---|---|---|---|---|
+| S0 | **ready**: spa map (every June spa function, events 0x637-0x639, Pporu, RPS, `SpaData`), emulator + login design, live-DB ask; user answers Decisions | Opus 5.5 / xhigh | - (read-only, runs beside anything) | `june2017_re/spa/spa_map.tsv`, funcmap rows (`Spa S24`), plan doc, kickoffs | `S0.md` |
+| S1 | blocked (S0): spa data and assets (village / house / NPC / map / world rows, world luas, NPC UI luas, sounds, xet); pack + copy; play-test batched into S2 | Sonnet 5.5 / high; review in S2's | S0; one packer at a time with june-dungeons W3d | data034 / 036 / 037 / 040 / 217 core Lua, adopted June files, koms | `S1.md` |
+| S2 | blocked (S1): code-event table + login send + `elsdb.py code-event`, door / exit prompts, enter / leave, Ruben omissions; seam play-test | Opus 5.5 / high, Opus review | S1 | `X2TFieldGame.*`, `X2LocationManager.cpp`, `X2Main.cpp`, `X2FieldMapBase.cpp`, `Offline/X2OfflineDB.*`, `Offline/Handlers_*`, `tools/elsdb.py` | `S2.md`, `S2-review.md` |
+| S3 | blocked (S2 review + 0x637 decision): spa type by line, soak timer, 0x637-0x639, notice + `EffectSet_SPA_Buff`, emulator buff grant | Opus 5.5 / high, Opus review | S2 review | `X2TFieldGame.*`, `KncWX2Server/Common` packets, `Offline/Handlers_*` | `S3.md`, `S3-review.md` |
+| S4 | blocked (S3 review): the Pporu object (TFG `+0x624`), its UI, sound, NPC click | Opus 5.5 / high, Opus review | S3 review | `X2TFieldGame.*`, new Pporu class files, `X2Lib_2010.vcxproj` | `S4.md`, `S4-review.md` |
+| S5 | blocked (S4 review; deleted if S0 routes RPS): the wisp NPC's rock-scissors-paper + emulator stand-in | Opus 5.5 / high, Opus review | S4 review | per S0's map | `S5.md`, `S5-review.md` |
+| Z | blocked (every review): retire `_DEBUG`, MODS.md, backlog Stage 24 closed, archive | Sonnet 5.5 / medium | every S review | `Always.h`, `MODS.md`, backlog, STATUS archive | `Z.md` |
 
 ## Other plans (no STATUS rows)
 
