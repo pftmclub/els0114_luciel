@@ -568,6 +568,14 @@ boss-common-2	secret	*	41271	*	700009	Sacrificed Adventurer's Top Piece	IT_DEFEN
 boss-common-3	secret	*	41271	*	700010	Sacrificed Adventurer's Bottom Piece	IT_DEFENCE	IG_ELITE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[3]
 boss-common-4	secret	*	41271	*	700013	Sacrificed Adventurer's Accessory	IT_ACCESSORY	IG_ELITE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[4]
 boss-common-5	secret	*	41271	*	700014	Sacrificed Adventurer's Weapon	IT_WEAPON	IG_ELITE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[5]
+secret-cube	secret	*	*	*	111610	Ancient Golden Cube	IT_SPECIAL	IG_ELITE	DropTable 33190 x 948 i111610
+secret-supply.109945	secret	*	*	*	109945	Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 3280 weight 20
+secret-supply.109955	secret	*	*	*	109955	Advanced Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 3280 weight 5
+secret-supply.130047	secret	*	*	*	130047	El Shard (Mystery)	IT_SPECIAL	IG_NORMAL	studio group 3280 weight 2
+secret-supply.130081	secret	*	*	*	130081	Weapon Enhancement Stone Lv.5	IT_SPECIAL	IG_NORMAL	studio group 3280 weight 8
+secret-supply.130082	secret	*	*	*	130082	Weapon Enhancement Stone Lv.6	IT_SPECIAL	IG_NORMAL	studio group 3280 weight 5
+secret-supply.130090	secret	*	*	*	130090	Armor Enhancement Stone Lv.5	IT_SPECIAL	IG_NORMAL	studio group 3280 weight 30
+secret-supply.130091	secret	*	*	*	130091	Armor Enhancement Stone Lv.6	IT_SPECIAL	IG_NORMAL	studio group 3280 weight 30
 stone-magic.109945	*	*	*	*	109945	Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 4015 weight 80
 stone-magic.109955	*	*	*	*	109955	Advanced Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 4015 weight 20
 stone-bundle.109945	*	*	*	*	109945	Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 4090 weight 17
@@ -639,3 +647,4 @@ static-common	*	*	*	*	99812	Stella's Powder Mix	IT_MATERIAL	IG_NORMAL	StaticDrop
 static-region	*	*	*	*	99823	Crumbly Meat	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024 (Sander's pair; no Lanox / Elysion pair in item.kim)
 static-region	*	*	*	*	99824	Cactus Stem	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024 (Sander's pair; no Lanox / Elysion pair in item.kim)
 static-box	*	*	*	*	111069	Gorgeous Jeweled Box	IT_SPECIAL	IG_RARE	StaticDropTable 33250 i111069
+static-secret-box	*	*	*	*	111068	Lavish Gold Box	IT_SPECIAL	IG_RARE	StaticDropTable 33190 / 33191 i111068

@@ -357,6 +357,40 @@ row counts and `check` passes on the dry output; no row is written to the server
 **How to see it.** Log: `[DROP_STANDIN] loaded: 412 dungeon row(s) over 39 key(s), 58 field row(s) over 7 field(s), 46 static row(s), 67 group(s)`; per-kill lines; no `no reward row` for 33330-33352 / 33870-33902 / 40035-40037.
 **Play-test:** deferred to the end of the plan (user 2026-11-16); R5 may start without it.
 
+### Phase R5 - Done (2026-11-16)
+
+**What landed.** `tools/droptable.py` only (no client code, no flag): secret rows are generated now. Template = the studio's Velder secret rows (R1's `ref` lines, now real
+sheet lines): `mob` 33190 / 33191 x 459, `mob-minor` x 944 / 980, boss x 948 / 984, `mob-card` x 460. Each Velder-only item takes the target's entry item (`BOSS_DROP_ITEM.COMMON`)
+at the same position: 111926 = COMMON[1], g3220 / g3230 = COMMON[3] / [4]; hell's g3240 / g3250 / g3260 / g3210 = COMMON[2..5]; the two Velder crafting items 78331 / 111700 =
+COMMON[1] / [2] (hell: COMMON[1]); slots landing on one entry item add up, so every role keeps the studio row's total. Generic parts stay: Ancient Golden Cube 111610 (pool
+`secret-cube`, 26 studio keys use it), group 3280 (magic + enhancement stones, pool `secret-supply.<id>`, equal to the studio's odds). Static row per key = 33190 / 33191's (99809-99812 at 3,
+111068 at 0.3). Tool changes: `eff_role` (a secret stage boss below MONSTER_GRADE=1 is paid as a `mob`, as Elder 33030 x 534), secret keys skip the studio's key-0 rows (CHEST 20,
+CHEST_MONSTER 29: left to the wildcard), pool match is the exact key for secret (hell key - 1 is not its common list), `simulate` baseline = Velder 33190 / 33191.
+Block regenerated as the union (`gen --only all`, scope line now `all`): 498 dungeon rows / 43 keys (+86: 33260 33, 33261 27, 41270 13, 41271 13), 58 field rows, 50 static rows (+4), 67 groups. BOM + CRLF intact, insertions only
+(the one removed line per file is the block's own `-- scope:` comment). `pools --check` YES, `rates --check` YES (635 lines), `droptable.py check` PASS (rows 556, static 50).
+
+**Fairness gate (`simulate`, items per kill against the Velder rows).**
+| key | mob | mob-minor | boss | note |
+|---|---|---|---|---|
+| 33260 Hamel common | 0.74 | n/a | 1.00 | per clear: boss-item 10.00 (x3 30.0) |
+| 33261 Hamel hell | 1.12 | n/a | 1.00 | boss-item 11.11 (x3 33.3) |
+| 41270 Ranox common | 0.77 | 1.00 | 1.00 | card 0.22, boss-item 4.25 |
+| 41271 Ranox hell | 1.15 | 1.00 | 1.00 | card 0.22, boss-item 7.02 |
+Only the two common `mob` figures are outside 15 %, and the generated row equals the template exactly (5.1 % = 459): the baseline average includes Velder's 924 / 925 / 926
+(25 spawns, 14.13 %: boss reagent 111926 at 9 % on top) and the carded 460 / 462; those rows are Velder-specific, no mark tells them apart, not copied.
+Hell `mob` 1.12 / 1.15 = baseline mix of 935 / 936 / 976 (10 / 5 / 10 %).
+
+**Pack.** `stage-server` DropTable.lua md5 0b9b8386 (1,078,444 B), StaticDropTable.lua md5 2caa1589 (49,836 B); `PACK OK data036` (2 changed); `COPY OK data036` md5 75cba10aaf3e646b5e4833ce5f81eb71.
+**Build.** Full build skipped: no code change, no play-test now. Deployed exe is R3's loader build: `EXESTR OK` `[DROP_STANDIN]` (wide x3, X2_offline.exe md5 f87b25c6). Gates: `finish.py --no-flag "data-only"`: PASS.
+
+**Secret keys whose studio rows name monsters the June script no longer spawns (report only, nothing changed).** 33031 Elder hell 535-543, 956; 33040 Besma common 550, 552; 33041 Besma hell 555-563;
+33050 Altera common 579, 580; 33051 Altera hell 565, 582-586, 588-590; 33191 Velder hell 459, 460, 462, 962-971, 977, 980 (the template source); 41270 Ranox common 4014-4018 (Halloween event
+monsters, left as they are). Besma / Altera NORMAL-HARD-EXPERT 30290-30292, 32900-32902 have no studio rows at all (retired, outside scope).
+
+**How to see it.** Log: `[DROP_STANDIN] loaded: 498 dungeon row(s) over 43 key(s), 58 field row(s) over 7 field(s), 50 static row(s), 67 group(s)`; per-kill lines; no `no reward row` for 33260 / 33261 / 41270 / 41271.
+**Play-test:** deferred to the end of the plan (user 2026-11-16). Units level 99 band (no NPC `LEVEL`, party-scaled); look for the entry items: Hamel common 133537 Guardian Stone Fragments, 133535 Bethbite, 117418 / 117419
+Ancient Guardian Gloves / Shoes; Hamel / Ranox hell 154066 Barrier's Fragment, 700009 / 700010 / 700013 / 700014 Sacrificed Adventurer's top / bottom / accessory / weapon; Ranox common = Hamel common's four.
+
 ### Phase R2 - Done (2026-11-16)
 
 **What landed.** Flags `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` and `_DEBUG` (end of `Always.h`; `_DEBUG` is on for R3's play-test and retires in

@@ -514,6 +514,7 @@ GROUP_FIRST, GROUP_LAST = 20000, 20999          # the reserved range (Rules 3); 
 DIFF_STEP = {"NORMAL": 0, "HARD": 1, "EXPERT": 2}
 ROLE_PRIORITY = ["final-boss", "stage-boss", "field-boss", "mob", "field-mob", "mob-minor", "box"]   # one row per (key, NPC): first wins
 NO_ROW_ROLES = ("none", "unknown")
+KEEP_WILDCARD_REGIONS = ("secret",)     # the studio's key-0 rows (CHEST 20, CHEST_MONSTER 29) already answer these dungeons: no row of their own
 GEN_REGIONS = ("lanox", "elysion", "secret")
 POOL_COLS = ["pool", "region", "band", "key", "npc", "item_id", "name", "type", "grade", "source"]
 SHEET_COLS = ["kind", "region", "role", "diff", "pool", "exp", "ed", "ed_property", "prob", "inner", "source"]
@@ -573,8 +574,18 @@ def fmt_list(entries):
     return "{ " + "".join("{ %d, %s }," % e for e in entries) + "}"
 
 
+def eff_role(region, role, marks):
+    """The role a census NPC is paid as: a secret dungeon's stage boss below MONSTER_GRADE=1 is a mob (the studio's secret rows pay only
+    the grade-1 boss; Elder 33030 x 534, its stage boss, carries a mob-sized row)."""
+    if region == "secret" and role == "stage-boss" and "MONSTER_GRADE=1" not in marks.split(";"):
+        return "mob"
+    return role
+
+
 def pool_items(pools, name, region, level, key, base, npc):
     """The items of pool `name` that apply to this dungeon / field and NPC, in file order, an id once."""
+    if region == "secret":
+        base = key                                  # a hell dungeon's entry list is its own, never the common list of key - 1
     seen, out = set(), []
     for p in pools:
         if p["pool"] != name or p["region"] not in (region, "*") or not band_has(p["band"], level):
@@ -673,12 +684,16 @@ def gen_blocks(only, keys, census, pools, sheet, drop_text, static_text):
         diff = rows[0]["diff"] if kind == "dungeon" else "FIELD"
         base = key - DIFF_STEP.get(diff, 0) if kind == "dungeon" else key
         level = max([int(r["level"]) for r in rows if r["level"].isdigit() and r["role"] not in NO_ROW_ROLES + ("box",)] or [0])
-        npcs = collections.OrderedDict()
+        npcs, wild = collections.OrderedDict(), set()
         for r in rows:
-            npcs.setdefault(int(r["npc_id"]), []).append(r["role"])
+            npcs.setdefault(int(r["npc_id"]), []).append(eff_role(region, r["role"], r["marks"]))
+            if r["state"] == "wildcard" and region in KEEP_WILDCARD_REGIONS:
+                wild.add(int(r["npc_id"]))
         studio = smon if kind == "dungeon" else sfld
         made = 0
         for npc in sorted(npcs):
+            if npc in wild:
+                continue
             roles = set(npcs[npc])
             if len(roles - set(NO_ROW_ROLES)) > 1:
                 st["mixed_roles"] += 1
@@ -1137,6 +1152,9 @@ def build_pools(reg, items, census):
             boss_pools(reg, key, region, add)
     for key in keys.get("secret", ([], []))[0]:
         boss_pools(reg, key, "secret", add)
+    add("secret-cube", "secret", "*", "*", "*", 111610, "DropTable 33190 x 948 i111610")
+    for i, wt in studio()["groups"][3280]:
+        add("secret-supply.%d" % i, "secret", "*", "*", "*", i, "studio group 3280 weight %s" % _fmt(wt))
     # flattened studio groups (unequal weights) and the equal-weight ones kept whole
     for gid, pool in ((4015, "stone-magic"), (4090, "stone-bundle"), (6002, "box-food"), (6004, "box-fruit")):
         for i, wt in studio()["groups"][gid]:
@@ -1168,6 +1186,7 @@ def build_pools(reg, items, census):
     for i in STATIC_REGION_SANDER:
         add("static-region", "*", "*", "*", "*", i, "StaticDropTable 33250 / 40024 (Sander's pair; no Lanox / Elysion pair in item.kim)")
     add("static-box", "*", "*", "*", "*", 111069, "StaticDropTable 33250 i111069")
+    add("static-secret-box", "*", "*", "*", "*", 111068, "StaticDropTable 33190 / 33191 i111068")
     return rows, left_out
 
 
@@ -1233,7 +1252,23 @@ DECISIONS = [
     ("set-pools", "user 2026-11-16 (R1 decision 5): both region sets on every boss, as Behemoth Heart's two sets"),
     ("set-top-gloves", "user 2026-11-16 (R1 decision 6): stage bosses add set tops / gloves at DropTable 33230-33232 x 1215 values"),
 ]
-SECRET_REF = [("NORMAL", 33190, [459, 460, 944, 948]), ("HARD", 33191, [459, 460, 980, 984])]   # common / hell = the census diffs
+SECRET_TEMPLATES = [("mob", {"NORMAL": 459, "HARD": 459}), ("mob-minor", {"NORMAL": 944, "HARD": 980}),
+                    ("stage-boss", {"NORMAL": 948, "HARD": 984}), ("final-boss", {"NORMAL": 948, "HARD": 984}),
+                    ("mob-card", {"NORMAL": 460, "HARD": 460})]
+# Velder case -> (kind, pool). The entry list of Velder's DungeonData is COMMON = [111926, 133535, 117392, 117393] (hell: the Hamel / Ranox list),
+# so each Velder-only item takes the target's entry item at the same position: 111926 = COMMON[1], the dungeon set's gloves / shoes
+# (g3220 / g3230) = COMMON[3] / [4]; hell's four set groups (g3240, g3250, g3260, g3210, in the row's order) = COMMON[2..5]. Velder's two crafting
+# materials, 78331 (alchemy item) and 111700 (Green Bethbite), take the list's materials COMMON[1] / [2] (hell: its only material, COMMON[1], which
+# then carries 111926 + 111700). A row's slots that land on one entry item add up, so each role keeps the studio row's total.
+SECRET_CASES = {
+    "NORMAL": {"i111926": ("item", "boss-common-1"), "i111700": ("item", "boss-common-2"), "i78331": ("item", "boss-common-1"), "i111610": ("item", "secret-cube"),
+               "g3280": ("flat", "secret-supply"), "g3220": ("item", "boss-common-3"), "g3230": ("item", "boss-common-4")},
+    "HARD": {"i111926": ("item", "boss-common-1"), "i111700": ("item", "boss-common-1"), "i111610": ("item", "secret-cube"),
+             "g3280": ("flat", "secret-supply"), "g3240": ("item", "boss-common-2"), "g3250": ("item", "boss-common-3"),
+             "g3260": ("item", "boss-common-4"), "g3210": ("item", "boss-common-5")},
+}
+SECRET_CARD_CASES = {"i78671": ("item", "card")}
+SECRET_BASE = {"NORMAL": 33190, "HARD": 33191}      # the studio secret dungeon whose rows are the template (common / hell = the census diffs)
 REGION_ROWS = ("lanox", "elysion")
 
 
@@ -1293,14 +1328,43 @@ def build_sheet():
                     if any(l["kind"] == "static" and l["pool"] == pool and l["diff"] == diff and l["region"] == region for l in lines):
                         continue
                     line("static", region, "*", diff, pool, prob=fmt_prob(have[c]), source="StaticDropTable %s %d %s %s" % (kind, key, c, _fmt(have[c])))
-    # secret dungeons: the studio's Velder secret rows, as `ref` lines gen ignores; R5 maps them onto each dungeon's own entry items
-    for diff, key, npcs in SECRET_REF:
-        for npc in npcs:
+    for diff, key in SECRET_BASE.items():                   # the secret dungeons' static row: the four cooking goods + the secret box
+        have = dict(("i%d" % i, p) for i, p in st["static"].get(("dungeon", key), []))
+        for c, pool in [("i%d" % i, "static-common") for i in STATIC_COMMON] + [("i111068", "static-secret-box")]:
+            if c not in have:
+                problems.append("static dungeon %d has no %s" % (key, c))
+            elif not any(l["kind"] == "static" and l["pool"] == pool and l["diff"] == diff and l["region"] == "secret" for l in lines):
+                line("static", "secret", "*", diff, pool, prob=fmt_prob(have[c]), source="StaticDropTable dungeon %d %s %s" % (key, c, _fmt(have[c])))
+    # secret dungeons: the studio's Velder secret rows, each Velder-only item replaced by the entry-list item at the same position
+    for role, npcs in SECRET_TEMPLATES:
+        for diff, npc in npcs.items():
+            key = SECRET_BASE[diff]
+            if (key, npc) not in st["mon"]:
+                problems.append("secret %s: no studio row %d x %d" % (role, key, npc))
+                continue
             exp, ed, edp, have = studio_row("mon", key, npc)
-            line("ref", "secret", "npc %d" % npc, diff, "-", exp=exp, ed=ed, edp=edp, source="DropTable %d x %d Exp / ED / EDProperty" % (key, npc))
+            if role != "mob-card":
+                line("param", "secret", role, diff, "-", exp=exp, ed=ed, edp=edp, source="DropTable %d x %d Exp / ED / EDProperty" % (key, npc))
+            want = SECRET_CARD_CASES if role == "mob-card" else SECRET_CASES[diff]
+            acc = collections.OrderedDict()                     # pool -> [probability, sources]: slots that land on one entry item add up
             for c, p in have.items():
-                line("ref", "secret", "npc %d" % npc, diff, ("studio-group:" if c[0] == "g" else "studio-item:") + c[1:], prob=fmt_prob(p),
-                     source="DropTable %d x %d %s %s" % (key, npc, c, _fmt(p)))
+                if role == "mob-card" and c not in want:
+                    continue                                    # 460's other cases equal 459's
+                if c not in want:
+                    problems.append("secret %s %s: studio case %d x %d %s has no mapping" % (role, diff, key, npc, c))
+                    continue
+                src = "DropTable %d x %d %s %s" % (key, npc, c, _fmt(p))
+                if want[c][0] == "item":
+                    slot = acc.setdefault(want[c][1], [0.0, []])
+                    slot[0] += p
+                    slot[1].append(src)
+                else:
+                    for i, wt in st["groups"][int(c[1:])]:
+                        slot = acc.setdefault("%s.%d" % (want[c][1], i), [0.0, []])
+                        slot[0] += p * wt / 100.0
+                        slot[1].append("%s x group %s weight %s" % (src, c[1:], _fmt(wt)))
+            for pool, (p, srcs) in acc.items():
+                line("item", "secret", role, diff, pool, prob=fmt_prob(p), source=" + ".join(srcs))
     for topic, why in DECISIONS:
         line("decision", "*", "-", "-", topic, source=why)
     return lines, problems
@@ -1416,9 +1480,9 @@ def simulate_stand_in(key, census, pools, sheet):
     rows, kind, region, diff, level, base = key_info(census, key)
     out, roles, ed, notes = collections.Counter(), collections.defaultdict(lambda: [0.0, 0.0, 0.0]), 0.0, collections.Counter()
     for r in rows:
-        if r["role"] in NO_ROW_ROLES:
+        if r["role"] in NO_ROW_ROLES or (r["state"] == "wildcard" and region in KEEP_WILDCARD_REGIONS):
             continue
-        cnt, role = float(r["count"]), r["role"]
+        cnt, role = float(r["count"]), eff_role(region, r["role"], r["marks"])
         par = pick(sheet, "param", region, role, diff)
         if not par:
             notes["spawns with no param line (role %s)" % role] += cnt
@@ -1436,6 +1500,8 @@ def simulate_stand_in(key, census, pools, sheet):
                 x = cnt * (len(its) if l["kind"] == "item" else 1) * float(l["prob"]) / 100.0
                 out[category(l["pool"])] += x
                 got += x
+        if region == "secret" and role == "stage-boss":
+            role = "final-boss"
         roles[role][0] += cnt
         roles[role][1] += got
         roles[role][2] += cnt * float(par[0]["ed"] or 0)
@@ -1443,7 +1509,7 @@ def simulate_stand_in(key, census, pools, sheet):
     return out, roles, notes, (kind, region, diff, level)
 
 
-def simulate_studio(key, census, items, tab):
+def simulate_studio(key, census, items, tab, secret=False):
     out, roles = collections.Counter(), collections.defaultdict(lambda: [0.0, 0.0, 0.0])
     for r in census:
         if int(r["key"]) != key or r["role"] in NO_ROW_ROLES:
@@ -1451,6 +1517,14 @@ def simulate_studio(key, census, items, tab):
         npc = int(r["npc_id"]) if r["npc_id"].isdigit() else None
         row = next((k for k in ((key, npc), (0, npc)) if k in studio()[tab]), None)
         cnt, role = float(r["count"]), r["role"]
+        if secret:
+            role = eff_role("secret", role, r["marks"])
+            if role in ("stage-boss", "final-boss"):
+                role = "final-boss"                 # the studio's secret rows pay one boss row (Velder hell pays its stage-4 boss, not the last)
+                if row is None:
+                    continue
+            elif row is None:
+                continue                            # a spawn the studio gave no row has nothing to compare
         if row is None:
             roles[role][0] += cnt
             continue
@@ -1479,7 +1553,9 @@ def cmd_simulate(a):
             continue
         out, roles, notes, (kind, region, diff, level) = simulate_stand_in(key, census, pools, sheet)
         bkey, btab = (40024, "fld") if kind == "field" else (DIFF3.get(diff, 33250), "mon")
-        bout, broles = simulate_studio(bkey, census, items, btab)
+        if region == "secret":
+            bkey = SECRET_BASE[diff]
+        bout, broles = simulate_studio(bkey, census, items, btab, region == "secret")
         name = next(r["key_name"] for r in census if int(r["key"]) == key)
         print("== %d %s (%s %s, NPC lv %d) against %d" % (key, name, region, diff, level, bkey))
         print("   per clear  " + "  ".join("%s %.2f (x%d %.2f; base %.2f)" % (c, out[c], n, out[c] * n, bout[c]) for c in CATEGORIES if out[c] or bout[c]))
@@ -1491,6 +1567,9 @@ def cmd_simulate(a):
             bs, bit, be = broles.get(role, [0, 0, 0])
             if not bs and s:                            # no such role in the baseline's census: its template row alone
                 tpl = next(((tb, d, npc) for rl, tb, d, npc, cs in RATE_TEMPLATES if rl == role), None)
+                if region == "secret":                  # the secret dungeons' own template rows, not Behemoth Heart's
+                    sn = dict(SECRET_TEMPLATES).get(role, {}).get(diff)
+                    tpl = ("mon", {diff: SECRET_BASE[diff]}, sn) if sn else None
                 if tpl and (tpl[1].get(diff, -1), tpl[2]) in studio()[tpl[0]]:
                     _, e2, _, cases = studio_row(tpl[0], tpl[1][diff], tpl[2])
                     bs, bit, be = 1.0, sum(cases.values()) / 100.0, float(e2 or 0)

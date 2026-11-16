@@ -534,43 +534,101 @@ static	lanox	*	FIELD	static-common				4		StaticDropTable field 40024 i99809 4
 static	lanox	*	FIELD	static-region				2.1		StaticDropTable field 40024 i99823 2.10
 static	elysion	*	FIELD	static-common				4		StaticDropTable field 40024 i99809 4
 static	elysion	*	FIELD	static-region				2.1		StaticDropTable field 40024 i99823 2.10
-ref	secret	npc 459	NORMAL	-	1	17	100			DropTable 33190 x 459 Exp / ED / EDProperty
-ref	secret	npc 459	NORMAL	studio-item:78331				1.8		DropTable 33190 x 459 i78331 1.80
-ref	secret	npc 459	NORMAL	studio-item:111700				1.3		DropTable 33190 x 459 i111700 1.30
-ref	secret	npc 459	NORMAL	studio-group:3280				2		DropTable 33190 x 459 g3280 2
-ref	secret	npc 460	NORMAL	-	1	17	100			DropTable 33190 x 460 Exp / ED / EDProperty
-ref	secret	npc 460	NORMAL	studio-item:78671				0.43		DropTable 33190 x 460 i78671 0.43
-ref	secret	npc 460	NORMAL	studio-item:78331				1.8		DropTable 33190 x 460 i78331 1.80
-ref	secret	npc 460	NORMAL	studio-item:111700				1.3		DropTable 33190 x 460 i111700 1.30
-ref	secret	npc 460	NORMAL	studio-group:3280				2		DropTable 33190 x 460 g3280 2
-ref	secret	npc 944	NORMAL	-	0	17	100			DropTable 33190 x 944 Exp / ED / EDProperty
-ref	secret	npc 944	NORMAL	studio-group:3280				0.5		DropTable 33190 x 944 g3280 0.50
-ref	secret	npc 948	NORMAL	-	1	17	100			DropTable 33190 x 948 Exp / ED / EDProperty
-ref	secret	npc 948	NORMAL	studio-item:111926				9		DropTable 33190 x 948 i111926 9
-ref	secret	npc 948	NORMAL	studio-item:111610				4		DropTable 33190 x 948 i111610 4
-ref	secret	npc 948	NORMAL	studio-item:78331				1.8		DropTable 33190 x 948 i78331 1.80
-ref	secret	npc 948	NORMAL	studio-item:111700				1.3		DropTable 33190 x 948 i111700 1.30
-ref	secret	npc 948	NORMAL	studio-group:3280				25		DropTable 33190 x 948 g3280 25
-ref	secret	npc 948	NORMAL	studio-group:3220				0.2		DropTable 33190 x 948 g3220 0.20
-ref	secret	npc 948	NORMAL	studio-group:3230				0.2		DropTable 33190 x 948 g3230 0.20
-ref	secret	npc 459	HARD	-	1	17	100			DropTable 33191 x 459 Exp / ED / EDProperty
-ref	secret	npc 459	HARD	studio-item:111700				5		DropTable 33191 x 459 i111700 5
-ref	secret	npc 459	HARD	studio-group:3280				2		DropTable 33191 x 459 g3280 2
-ref	secret	npc 460	HARD	-	1	17	100			DropTable 33191 x 460 Exp / ED / EDProperty
-ref	secret	npc 460	HARD	studio-item:78671				0.43		DropTable 33191 x 460 i78671 0.43
-ref	secret	npc 460	HARD	studio-item:111700				5		DropTable 33191 x 460 i111700 5
-ref	secret	npc 460	HARD	studio-group:3280				2		DropTable 33191 x 460 g3280 2
-ref	secret	npc 980	HARD	-	0	17	100			DropTable 33191 x 980 Exp / ED / EDProperty
-ref	secret	npc 980	HARD	studio-group:3280				1		DropTable 33191 x 980 g3280 1
-ref	secret	npc 984	HARD	-	1	17	100			DropTable 33191 x 984 Exp / ED / EDProperty
-ref	secret	npc 984	HARD	studio-item:111926				22		DropTable 33191 x 984 i111926 22
-ref	secret	npc 984	HARD	studio-item:111610				4		DropTable 33191 x 984 i111610 4
-ref	secret	npc 984	HARD	studio-item:111700				5		DropTable 33191 x 984 i111700 5
-ref	secret	npc 984	HARD	studio-group:3280				25		DropTable 33191 x 984 g3280 25
-ref	secret	npc 984	HARD	studio-group:3240				0.5		DropTable 33191 x 984 g3240 0.50
-ref	secret	npc 984	HARD	studio-group:3250				0.2		DropTable 33191 x 984 g3250 0.20
-ref	secret	npc 984	HARD	studio-group:3260				0.2		DropTable 33191 x 984 g3260 0.20
-ref	secret	npc 984	HARD	studio-group:3210				0.5		DropTable 33191 x 984 g3210 0.50
+static	secret	*	NORMAL	static-common				3		StaticDropTable dungeon 33190 i99809 3
+static	secret	*	NORMAL	static-secret-box				0.3		StaticDropTable dungeon 33190 i111068 0.30
+static	secret	*	HARD	static-common				3		StaticDropTable dungeon 33191 i99809 3
+static	secret	*	HARD	static-secret-box				0.3		StaticDropTable dungeon 33191 i111068 0.30
+param	secret	mob	NORMAL	-	1	17	100			DropTable 33190 x 459 Exp / ED / EDProperty
+item	secret	mob	NORMAL	boss-common-1				1.8		DropTable 33190 x 459 i78331 1.80
+item	secret	mob	NORMAL	boss-common-2				1.3		DropTable 33190 x 459 i111700 1.30
+item	secret	mob	NORMAL	secret-supply.109945				0.4		DropTable 33190 x 459 g3280 2 x group 3280 weight 20
+item	secret	mob	NORMAL	secret-supply.109955				0.1		DropTable 33190 x 459 g3280 2 x group 3280 weight 5
+item	secret	mob	NORMAL	secret-supply.130047				0.04		DropTable 33190 x 459 g3280 2 x group 3280 weight 2
+item	secret	mob	NORMAL	secret-supply.130081				0.16		DropTable 33190 x 459 g3280 2 x group 3280 weight 8
+item	secret	mob	NORMAL	secret-supply.130082				0.1		DropTable 33190 x 459 g3280 2 x group 3280 weight 5
+item	secret	mob	NORMAL	secret-supply.130090				0.6		DropTable 33190 x 459 g3280 2 x group 3280 weight 30
+item	secret	mob	NORMAL	secret-supply.130091				0.6		DropTable 33190 x 459 g3280 2 x group 3280 weight 30
+param	secret	mob	HARD	-	1	17	100			DropTable 33191 x 459 Exp / ED / EDProperty
+item	secret	mob	HARD	boss-common-1				5		DropTable 33191 x 459 i111700 5
+item	secret	mob	HARD	secret-supply.109945				0.4		DropTable 33191 x 459 g3280 2 x group 3280 weight 20
+item	secret	mob	HARD	secret-supply.109955				0.1		DropTable 33191 x 459 g3280 2 x group 3280 weight 5
+item	secret	mob	HARD	secret-supply.130047				0.04		DropTable 33191 x 459 g3280 2 x group 3280 weight 2
+item	secret	mob	HARD	secret-supply.130081				0.16		DropTable 33191 x 459 g3280 2 x group 3280 weight 8
+item	secret	mob	HARD	secret-supply.130082				0.1		DropTable 33191 x 459 g3280 2 x group 3280 weight 5
+item	secret	mob	HARD	secret-supply.130090				0.6		DropTable 33191 x 459 g3280 2 x group 3280 weight 30
+item	secret	mob	HARD	secret-supply.130091				0.6		DropTable 33191 x 459 g3280 2 x group 3280 weight 30
+param	secret	mob-minor	NORMAL	-	0	17	100			DropTable 33190 x 944 Exp / ED / EDProperty
+item	secret	mob-minor	NORMAL	secret-supply.109945				0.1		DropTable 33190 x 944 g3280 0.50 x group 3280 weight 20
+item	secret	mob-minor	NORMAL	secret-supply.109955				0.025		DropTable 33190 x 944 g3280 0.50 x group 3280 weight 5
+item	secret	mob-minor	NORMAL	secret-supply.130047				0.01		DropTable 33190 x 944 g3280 0.50 x group 3280 weight 2
+item	secret	mob-minor	NORMAL	secret-supply.130081				0.04		DropTable 33190 x 944 g3280 0.50 x group 3280 weight 8
+item	secret	mob-minor	NORMAL	secret-supply.130082				0.025		DropTable 33190 x 944 g3280 0.50 x group 3280 weight 5
+item	secret	mob-minor	NORMAL	secret-supply.130090				0.15		DropTable 33190 x 944 g3280 0.50 x group 3280 weight 30
+item	secret	mob-minor	NORMAL	secret-supply.130091				0.15		DropTable 33190 x 944 g3280 0.50 x group 3280 weight 30
+param	secret	mob-minor	HARD	-	0	17	100			DropTable 33191 x 980 Exp / ED / EDProperty
+item	secret	mob-minor	HARD	secret-supply.109945				0.2		DropTable 33191 x 980 g3280 1 x group 3280 weight 20
+item	secret	mob-minor	HARD	secret-supply.109955				0.05		DropTable 33191 x 980 g3280 1 x group 3280 weight 5
+item	secret	mob-minor	HARD	secret-supply.130047				0.02		DropTable 33191 x 980 g3280 1 x group 3280 weight 2
+item	secret	mob-minor	HARD	secret-supply.130081				0.08		DropTable 33191 x 980 g3280 1 x group 3280 weight 8
+item	secret	mob-minor	HARD	secret-supply.130082				0.05		DropTable 33191 x 980 g3280 1 x group 3280 weight 5
+item	secret	mob-minor	HARD	secret-supply.130090				0.3		DropTable 33191 x 980 g3280 1 x group 3280 weight 30
+item	secret	mob-minor	HARD	secret-supply.130091				0.3		DropTable 33191 x 980 g3280 1 x group 3280 weight 30
+param	secret	stage-boss	NORMAL	-	1	17	100			DropTable 33190 x 948 Exp / ED / EDProperty
+item	secret	stage-boss	NORMAL	boss-common-1				10.8		DropTable 33190 x 948 i111926 9 + DropTable 33190 x 948 i78331 1.80
+item	secret	stage-boss	NORMAL	secret-cube				4		DropTable 33190 x 948 i111610 4
+item	secret	stage-boss	NORMAL	boss-common-2				1.3		DropTable 33190 x 948 i111700 1.30
+item	secret	stage-boss	NORMAL	secret-supply.109945				5		DropTable 33190 x 948 g3280 25 x group 3280 weight 20
+item	secret	stage-boss	NORMAL	secret-supply.109955				1.25		DropTable 33190 x 948 g3280 25 x group 3280 weight 5
+item	secret	stage-boss	NORMAL	secret-supply.130047				0.5		DropTable 33190 x 948 g3280 25 x group 3280 weight 2
+item	secret	stage-boss	NORMAL	secret-supply.130081				2		DropTable 33190 x 948 g3280 25 x group 3280 weight 8
+item	secret	stage-boss	NORMAL	secret-supply.130082				1.25		DropTable 33190 x 948 g3280 25 x group 3280 weight 5
+item	secret	stage-boss	NORMAL	secret-supply.130090				7.5		DropTable 33190 x 948 g3280 25 x group 3280 weight 30
+item	secret	stage-boss	NORMAL	secret-supply.130091				7.5		DropTable 33190 x 948 g3280 25 x group 3280 weight 30
+item	secret	stage-boss	NORMAL	boss-common-3				0.2		DropTable 33190 x 948 g3220 0.20
+item	secret	stage-boss	NORMAL	boss-common-4				0.2		DropTable 33190 x 948 g3230 0.20
+param	secret	stage-boss	HARD	-	1	17	100			DropTable 33191 x 984 Exp / ED / EDProperty
+item	secret	stage-boss	HARD	boss-common-1				27		DropTable 33191 x 984 i111926 22 + DropTable 33191 x 984 i111700 5
+item	secret	stage-boss	HARD	secret-cube				4		DropTable 33191 x 984 i111610 4
+item	secret	stage-boss	HARD	secret-supply.109945				5		DropTable 33191 x 984 g3280 25 x group 3280 weight 20
+item	secret	stage-boss	HARD	secret-supply.109955				1.25		DropTable 33191 x 984 g3280 25 x group 3280 weight 5
+item	secret	stage-boss	HARD	secret-supply.130047				0.5		DropTable 33191 x 984 g3280 25 x group 3280 weight 2
+item	secret	stage-boss	HARD	secret-supply.130081				2		DropTable 33191 x 984 g3280 25 x group 3280 weight 8
+item	secret	stage-boss	HARD	secret-supply.130082				1.25		DropTable 33191 x 984 g3280 25 x group 3280 weight 5
+item	secret	stage-boss	HARD	secret-supply.130090				7.5		DropTable 33191 x 984 g3280 25 x group 3280 weight 30
+item	secret	stage-boss	HARD	secret-supply.130091				7.5		DropTable 33191 x 984 g3280 25 x group 3280 weight 30
+item	secret	stage-boss	HARD	boss-common-2				0.5		DropTable 33191 x 984 g3240 0.50
+item	secret	stage-boss	HARD	boss-common-3				0.2		DropTable 33191 x 984 g3250 0.20
+item	secret	stage-boss	HARD	boss-common-4				0.2		DropTable 33191 x 984 g3260 0.20
+item	secret	stage-boss	HARD	boss-common-5				0.5		DropTable 33191 x 984 g3210 0.50
+param	secret	final-boss	NORMAL	-	1	17	100			DropTable 33190 x 948 Exp / ED / EDProperty
+item	secret	final-boss	NORMAL	boss-common-1				10.8		DropTable 33190 x 948 i111926 9 + DropTable 33190 x 948 i78331 1.80
+item	secret	final-boss	NORMAL	secret-cube				4		DropTable 33190 x 948 i111610 4
+item	secret	final-boss	NORMAL	boss-common-2				1.3		DropTable 33190 x 948 i111700 1.30
+item	secret	final-boss	NORMAL	secret-supply.109945				5		DropTable 33190 x 948 g3280 25 x group 3280 weight 20
+item	secret	final-boss	NORMAL	secret-supply.109955				1.25		DropTable 33190 x 948 g3280 25 x group 3280 weight 5
+item	secret	final-boss	NORMAL	secret-supply.130047				0.5		DropTable 33190 x 948 g3280 25 x group 3280 weight 2
+item	secret	final-boss	NORMAL	secret-supply.130081				2		DropTable 33190 x 948 g3280 25 x group 3280 weight 8
+item	secret	final-boss	NORMAL	secret-supply.130082				1.25		DropTable 33190 x 948 g3280 25 x group 3280 weight 5
+item	secret	final-boss	NORMAL	secret-supply.130090				7.5		DropTable 33190 x 948 g3280 25 x group 3280 weight 30
+item	secret	final-boss	NORMAL	secret-supply.130091				7.5		DropTable 33190 x 948 g3280 25 x group 3280 weight 30
+item	secret	final-boss	NORMAL	boss-common-3				0.2		DropTable 33190 x 948 g3220 0.20
+item	secret	final-boss	NORMAL	boss-common-4				0.2		DropTable 33190 x 948 g3230 0.20
+param	secret	final-boss	HARD	-	1	17	100			DropTable 33191 x 984 Exp / ED / EDProperty
+item	secret	final-boss	HARD	boss-common-1				27		DropTable 33191 x 984 i111926 22 + DropTable 33191 x 984 i111700 5
+item	secret	final-boss	HARD	secret-cube				4		DropTable 33191 x 984 i111610 4
+item	secret	final-boss	HARD	secret-supply.109945				5		DropTable 33191 x 984 g3280 25 x group 3280 weight 20
+item	secret	final-boss	HARD	secret-supply.109955				1.25		DropTable 33191 x 984 g3280 25 x group 3280 weight 5
+item	secret	final-boss	HARD	secret-supply.130047				0.5		DropTable 33191 x 984 g3280 25 x group 3280 weight 2
+item	secret	final-boss	HARD	secret-supply.130081				2		DropTable 33191 x 984 g3280 25 x group 3280 weight 8
+item	secret	final-boss	HARD	secret-supply.130082				1.25		DropTable 33191 x 984 g3280 25 x group 3280 weight 5
+item	secret	final-boss	HARD	secret-supply.130090				7.5		DropTable 33191 x 984 g3280 25 x group 3280 weight 30
+item	secret	final-boss	HARD	secret-supply.130091				7.5		DropTable 33191 x 984 g3280 25 x group 3280 weight 30
+item	secret	final-boss	HARD	boss-common-2				0.5		DropTable 33191 x 984 g3240 0.50
+item	secret	final-boss	HARD	boss-common-3				0.2		DropTable 33191 x 984 g3250 0.20
+item	secret	final-boss	HARD	boss-common-4				0.2		DropTable 33191 x 984 g3260 0.20
+item	secret	final-boss	HARD	boss-common-5				0.5		DropTable 33191 x 984 g3210 0.50
+item	secret	mob-card	NORMAL	card				0.43		DropTable 33190 x 460 i78671 0.43
+item	secret	mob-card	HARD	card				0.43		DropTable 33191 x 460 i78671 0.43
 decision	*	-	-	boss-class						user 2026-11-16 (R1 decision 1): class-blind; every listed character weapon can drop for anyone, no emulator filter
 decision	*	-	-	stone-level						item.kim text (R1 decision 2, no choice left): Lv.7 for L72 / L76 / L80 (71-81), Lv.8 for L82 / L87 (81-90)
 decision	*	-	-	field-boss						user 2026-11-16 (R1 decision 3): EXP + ED only, as DropTable field 40024 x 5124
