@@ -1607,7 +1607,10 @@ fix; peers' files built in too). No new strings (the fix logs nothing; `SHEET em
 S3 kickoff: Depends now names this review and its play-test.
 Range gate (`finish.py --range 37663a7b^..37663a7b --with EQUIP_STAT`): flagcheck `RESULT: PASS` (1 PASS, 0 OTHER), junediverge `RESULT: PASS`,
 enumscan exit 0, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
-Play-test owed: testlu1 with 62119 equipped, `SHEET window` total = `SHEET emu` game, `weapon=0`.
+**Play-test (user, 2026-11-16): 62119's icon is greyed and it cannot be equipped.** That is June: `EqipAbility` `3234f5c0` calls
+`CanEquipAsParts` `3234e750`, which needs `templet +4 & 0xf00` != 0 (March's `CX2Unit::CanEquipAsParts` tests `UT_NONE` the same way). The earlier
+"62119 equipped" state came from the save (the item was already in the weapon slot at select). So the window-vs-emulator case is reachable only
+by a save edit; the fix covers it, and S2's Cobo-weapon result (window = `SHEET emu` = `SHEET game`) stands for normal play. Owes nothing.
 
 ## Phase Z - Close
 
