@@ -7309,6 +7309,14 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` (no new define); `SERV_IRUHADEV_JUNE
 - **Differs from March.** March had no Lu/Ciel. `JUNE_BUGS` 781-782 ( Desperado's hyper state has no start function; its lock effect handle lives in the target entry's time word ). `m_vecAbyssSnipingTarget` is a vector of unit pointers now ( CH1 declared ints ).
 - **Revert:** back out the commit `char-luciel Phase CH3c2` ( every hunk is insert-only inside `_SKILL` and `JUNE_ENUM_NAMES`, plus the three setter cases pasted from CH3c's held list and nine `body in CH3c2` comments turned into registrations ); `LuDnA` / `LuDnB` ( units 228 / 229 ) are test characters only.
 
+## Stage 8 Lu/Ciel, CH3d: hyper actives and transcendence rows (char-luciel CH3d, 2026-11-16)
+
+Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` (no new define; a guard now requires `..._RAVEN_SKILL` for `SetInvisibility`), new `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND` and `SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN`; `..._LUCIEL_SKILL_DEBUG` on for the play-test, the CH3d review retires it. Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH3d - Done".
+- **What changes in game.** Dread Lord, Noblesse and Demonio can equip their hyper actives ( Descent Darkness, Castle of Abaddon, Diabolic Disaster and the enhanced ids ); Diabolic Disaster hides the unit from 0.09 s to 6.9 s of the animation. The three classes may transcend offline ( `TranscendCheck` ), their transcended pictures come from June's rows ( Lu's `_1` / Ciel's `_2` pieces by image type ), the level-70 transcendence guide pops up ( `LevelUpEvent.lua` TYPE8 ), and the awakening cut-in follows the active body ( `m_MinorUnitHyperCutIn` ) and Demonio's two transformed forms ( `_Trans` names ).
+- **Data.** `data036_kom/LevelUpEvent.lua` ( core-list BOM source ): June's Lu/Ciel row appended as TYPE8 ( March's compacted numbering ), ledger refreshed, data036 packed and copied ( backup `kom_backup_tools/data036.kom.20261116_165832` ).
+- **Differs from March.** March had no Lu/Ciel.
+- **Revert:** back out the commit `char-luciel Phase CH3d` ( insert-only hunks ) and restore `LevelUpEvent.lua` from the data036 backup; units 223-226 / 228-229 are test characters ( transcendence set by `CH3d_save.sql` ).
+
 ## june-asset-port P2: 15 new kom numbers (2026-11-16)
 
 Data only, no client source, no flag (the exe is P1's, `SERV_IRUHADEV_KOM_MOUNT_DEBUG` on). Plan `JUNE_ASSET_PORT_PHASES.md` "Phase P2 - Done"; list `june2017_re/P2_stage_plan.tsv`.

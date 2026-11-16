@@ -13678,6 +13678,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) || !defined( SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS ) )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE, SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE and SERV_IRUHADEV_JUNE_USER_SKILL_USE_HELPERS ( m_iChosenSkillID ), char-luciel CH2a
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) && !defined( SERV_IRUHADEV_JUNE_CHAR_RAVEN_SKILL )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL needs SERV_IRUHADEV_JUNE_CHAR_RAVEN_SKILL ( CX2GUUser::SetInvisibility, Diabolic Disaster ), char-luciel CH3d
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
@@ -13687,6 +13690,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG	// retired by the char-luciel CH2d2 review ( 2026-11-16 )
 //#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG	// char-luciel CH3a: on again for the play-test; retired by the char-luciel CH3b review ( 2026-11-16 )
 //#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG // char-luciel CH3c: on again for the play-test; retired by the char-luciel CH3c2 review ( 2026-11-16 )
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG	// char-luciel CH3d: on again for the play-test; the CH3d review retires it
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
@@ -14205,4 +14209,26 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              mount, logged once at the first LoadDataFile after LockMassFileMap (use-time, so ErrorLog.txt keeps them). Every asset wave's log
 //              check reads them; retired (commented out) by june-asset-port P12.
 #define SERV_IRUHADEV_KOM_MOUNT_DEBUG
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel CH3d - Dread Lord ( 127 ), Noblesse ( 128 ) and Demonio ( 129 ) join the transcendence allow-list ( TranscendCheck )
+//              and the transcended class pictures ( June's rows mix Lu's _1 and Ciel's _2 pieces by image type, read from June's row pushes ).
+//              Log [JUNE_TRANSCEND] IMAGE. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE and SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND ( the allow-list chain it extends )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel CH3d - CX2GUUser::ShowHyperSkillCutInByScript ( June 32014fc0 @320150c1 ): the second body's awakening cut-in
+//              ( m_MinorUnitHyperCutIn ) and Demonio's transformed-form ones ( m_HyperCutIn_Trans / m_MinorUnitHyperCutIn_Trans ), checklist 7t.
+//              Log [JUNE_CHAR] LUCIEL UI hyper cut-in. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN ) && ( !defined( SERV_IRUHADEV_JUNE_HYPER_CUT_IN_TIME ) || !defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) || !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_DUO ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN needs _JUNE_HYPER_CUT_IN_TIME ( the templet names ), _CHAR_DUO_BODY ( IsMinorUnitActive ), _CHAR_LUCIEL_DUO ( the class header ), _JUNE_ENUM_NAMES ( its states ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN
 //////////////////////////////////////////////////////////////////////////

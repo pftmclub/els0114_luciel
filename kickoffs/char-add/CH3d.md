@@ -51,3 +51,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - Skill ids: 6: 29600 RNSI_HA_ALP_DOOMS_DAY, 29601 RNSI_HA_AMM_APOCALYPSE, 29602 RNSI_HA_ADE_PARANOIA, 29603 RNSI_HA_ALP_DOOMS_DAY_UPGRADE, 29604 RNSI_HA_AMM_APOCALYPSE_UPGRADE, 29605 RNSI_HA_ADE_PARANOIA_UPGRADE.
 - Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L242, L309, L314, L359, L733, L789, L997, L117, L178, L600, L727, L787, L865, L971.
 - Hyper actives: 29600 / 29603 Doom's Day (122), 29601 / 29604 Apocalypse (123, spawn via CH2b0), 29602 / 29605 (126). Transcendence: `TranscendCheck` (`Handlers_Quest.cpp:1416-1451`) has no Add block; the transcend image prefix (`X2Data.cpp:3054-3091`) has no Add arm; Add's `+0x3c` readers `329e23a0`, `329e6f30` (L997).
+
+## Amended by char-luciel CH3d (2026-11-16)
+
+- `LevelUpEvent.lua`'s transcendence table ends at TYPE8 now ( Lu/Ciel ): append Add's June row as **TYPE9**. `TranscendCheck` has a `_LUCIEL_TRANSCEND` block after Elesis's; put Add's after it.

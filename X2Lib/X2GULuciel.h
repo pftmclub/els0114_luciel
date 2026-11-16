@@ -1551,6 +1551,14 @@ protected:
 	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture();	// June 32b33bf0
 	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess();	// June 32b07c30, the Shrewd Cutter end and Silent Rage states too
 	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateEnd();	// June 32b33b00
+	// char-luciel CH3d: the hyper actives
+	void				LSI_HA_LLD_DESCENT_DARKNESS_Init();	// June 32ae8540
+	void				LSI_HA_LCN_CASTLE_OF_ABADDON_Init();	// June 32ae8630
+	void				LSI_HA_LDN_DIABOLIC_DISASTER_Init();	// June 32ae99f0
+	void				LSI_HA_LLD_DESCENT_DARKNESS_EventProcess();	// June 32b02420
+	void				LSI_HA_LCN_CASTLE_OF_ABADDON_EventProcess();	// June 32b02630, 32b02420's listing
+	void				LSI_HA_LDN_DIABOLIC_DISASTER_FrameMove();	// June 32b07f30
+	void				LSI_HA_LDN_DIABOLIC_DISASTER_StateEnd();	// June 32ae9b20
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 	// char-luciel CH4a: the passives and the delegates InitPassiveSkillState pushes ( thunks 32b4cd90 .. 32b4e720 )

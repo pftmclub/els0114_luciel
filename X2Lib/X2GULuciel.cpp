@@ -21844,6 +21844,158 @@ void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
 	m_iPendingCombinationPoint = 0;
 }
 
+// char-luciel CH3d: the hyper actives ( Descent Darkness, Castle of Abaddon, Diabolic Disaster )
+namespace _CONST_LUCIEL_CH3D_
+{
+	const float		DIABOLIC_DISASTER_HIDE_TIME				= 0.09f;	// June 32b07f30: both bodies hide at this animation time
+	const float		DIABOLIC_DISASTER_SHOW_TIME				= 6.9f;		// June 32b07f30: and show again here
+}
+using namespace _CONST_LUCIEL_CH3D_;
+
+// char-luciel CH3d: June 32ae8540, the preload ( thunk 32b4b530 )
+void CX2GULuciel::LSI_HA_LLD_DESCENT_DARKNESS_Init()
+{
+	XSkinMeshReadyInBackground( L"LLD_DESCENT_DARKNESS_MainDummy.X" );
+	TextureReadyInBackground( L"smoke02.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"SI_HA_LLD_DESCENT_DARKNESS_HAMMER_BoneLHand.X" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	TextureReadyInBackground( L"WhiteImage.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare03_Big.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+}
+
+// char-luciel CH3d: June 32ae8630, the preload ( thunk 32b4b540 )
+void CX2GULuciel::LSI_HA_LCN_CASTLE_OF_ABADDON_Init()
+{
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XSkinMeshReadyInBackground( L"LCN_CASTLE_OF_ABADDON_DoorStart.X" );
+	XSkinMeshReadyInBackground( L"LCN_CASTLE_OF_ABADDON_MainDummy.X" );
+	XSkinMeshReadyInBackground( L"LCN_CASTLE_OF_ABADDON_Sentence04.X" );
+	XSkinMeshReadyInBackground( L"LCN_CASTLE_OF_ABADDON_Spear.X" );
+	XSkinMeshReadyInBackground( L"LCN_CASTLE_OF_ABADDON_SpearCross.X" );
+	XSkinMeshReadyInBackground( L"LCN_CASTLE_OF_ABADDON_SpearProjectile.X" );
+	XSkinMeshReadyInBackground( L"LCN_CASTLE_OF_ABADDON_SpearStart.X" );
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XMeshReadyInBackground( L"Maximumcanon_Mesh02.Y" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+	TextureReadyInBackground( L"smoke02.dds" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon.X" );
+	XMeshReadyInBackground( L"LCG_Weapon_Attack.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_CrossY.Y" );
+	XSkinMeshReadyInBackground( L"LD_Attack_Cross01.X" );
+}
+
+// char-luciel CH3d: June 32ae99f0, the preload ( thunk 32b4b550 )
+void CX2GULuciel::LSI_HA_LDN_DIABOLIC_DISASTER_Init()
+{
+	TextureReadyInBackground( L"Black_pulse.dds" );
+	TextureReadyInBackground( L"CTT_SA_TACTICAL_FIELD_circleField.dds" );
+	TextureReadyInBackground( L"Condense_Light01.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x200x50.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	XMeshReadyInBackground( L"Eltrion2p_S2EX_Ready_Sign.Y" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	TextureReadyInBackground( L"Finish_Effect01.dds" );
+	TextureReadyInBackground( L"GuideArrow02.dds" );
+	XMeshReadyInBackground( L"LDB_ALTAROFEVIL_Body.Y" );
+	XMeshReadyInBackground( L"LDB_ALTAROFEVIL_Body_Ciel.Y" );
+	XMeshReadyInBackground( L"LDN_DIABOLIC_DISASTER_BlackHole.Y" );
+	XMeshReadyInBackground( L"LDN_DIABOLIC_DISASTER_BlackHole_1.Y" );
+	XMeshReadyInBackground( L"LDN_DIABOLIC_DISASTER_BlackHole_2.Y" );
+	XMeshReadyInBackground( L"LDN_DIABOLIC_DISASTER_Hole_Impact.Y" );
+	XSkinMeshReadyInBackground( L"Motion_Ciel_LDN_Evil.X" );
+	XSkinMeshReadyInBackground( L"Motion_Lu_LDB_Evil.x" );
+	XSkinMeshReadyInBackground( L"Position_LDN_DIABOLIC_DISASTER.X" );
+	XSkinMeshReadyInBackground( L"SI_SA_SBH_BLAZE_WING_01.X" );
+	TextureReadyInBackground( L"ScreenLayer_Black.dds" );
+	TextureReadyInBackground( L"White_Pulse01.dds" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning02.Y" );
+	TextureReadyInBackground( L"secretVelder_alchemystBoss_magicAttackC_circleLine.dds" );
+	TextureReadyInBackground( L"secretVelder_alchemystBoss_magicAttackE_waveBlack.dds" );
+}
+
+// char-luciel CH3d: June 32b02420 ( thunk 32b4c7c0 ): the animation end goes to the wait or the fall, then dash / walk / skill / awakening
+void CX2GULuciel::LSI_HA_LLD_DESCENT_DARKNESS_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3d: June 32b02630 ( thunk 32b4c7d0 ), byte for byte 32b02420's listing
+void CX2GULuciel::LSI_HA_LCN_CASTLE_OF_ABADDON_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3d: June 32b07f30 ( thunk 32b4c7e0 ): June times the hide on Lu's own animation ( +0x87d4 ), not the active body's
+void CX2GULuciel::LSI_HA_LDN_DIABOLIC_DISASTER_FrameMove()
+{
+	if ( true == m_pXSkinAnim->EventTimerOneshot( DIABOLIC_DISASTER_HIDE_TIME ) )
+	{
+		SetInvisibility( true );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL diabolic disaster hide body %c", ( true == IsMinorUnitActive() ? L'C' : L'L' ) );	// char-luciel CH3d
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+	if ( true == m_pXSkinAnim->EventTimerOneshot( DIABOLIC_DISASTER_SHOW_TIME ) )
+	{
+		SetInvisibility( false );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL diabolic disaster show body %c", ( true == IsMinorUnitActive() ? L'C' : L'L' ) );	// char-luciel CH3d
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3d: June 32ae9b20 ( thunk 32b4b560 )
+void CX2GULuciel::LSI_HA_LDN_DIABOLIC_DISASTER_StateEnd()
+{
+	SetInvisibility( false );
+	CommonStateEnd();
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
@@ -23749,6 +23901,43 @@ void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
 				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_CIEL_END", stateData.stateID );
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cd4a0 > 329cba60
 				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_HA_LLD_DESCENT_DARKNESS:	// char-luciel CH3d: June @32b4a59b ( ids 30601 / 30603 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_HA_LLD_DESCENT_DARKNESS", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_HA_LLD_DESCENT_DARKNESS_Init );	// June 32b4ca10 > 32b4b530
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_HA_LLD_DESCENT_DARKNESS_EventProcess );	// June 32b4ca30 > 32b4c7c0
+
+				m_LuaManager.MakeTableReference( "LSI_HA_LLD_DESCENT_DARKNESS", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_HA_LCN_CASTLE_OF_ABADDON:	// char-luciel CH3d: June @32b4a611 ( ids 30602 / 30604 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_HA_LCN_CASTLE_OF_ABADDON", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_HA_LCN_CASTLE_OF_ABADDON_Init );	// June 32b4ca50 > 32b4b540
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_HA_LCN_CASTLE_OF_ABADDON_EventProcess );	// June 32b4ca70 > 32b4c7d0
+
+				m_LuaManager.MakeTableReference( "LSI_HA_LCN_CASTLE_OF_ABADDON", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_HA_LDN_DIABOLIC_DISASTER:	// char-luciel CH3d: June @32b4a687 ( ids 30605 / 30606 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_HA_LDN_DIABOLIC_DISASTER", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_HA_LDN_DIABOLIC_DISASTER_Init );	// June 32b4ca90 > 32b4b550
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_HA_LDN_DIABOLIC_DISASTER_FrameMove );	// June 32b4cab0 > 32b4c7e0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cd4a0 > 329cba60 > 31fcc9d0
+				normalStateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_HA_LDN_DIABOLIC_DISASTER_StateEnd );	// June 32b4cad0 > 32b4b560
+
+				m_LuaManager.MakeTableReference( "LSI_HA_LDN_DIABOLIC_DISASTER", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+				hyperStateData.StateEnd				= normalStateData.StateEnd;
 			} break;
 
 		default:

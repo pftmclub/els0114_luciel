@@ -48513,6 +48513,24 @@ bool CX2GUUser::IsChangeWorldColorNow()
 	wstring wstrCutInName = pUnitTemplet->m_HyperCutIn;
 	if ( true == m_bBerserkHyperCutIn && false == pUnitTemplet->m_BerserkCutIn.empty() )
 		wstrCutInName = pUnitTemplet->m_BerserkCutIn;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN
+	// char-luciel CH3d: June @320150c1, the second body's cut-in, then Demonio's two transformed-form awakenings ( vslot 0x260 = +0x8e90, 320761a0 = the future state )
+	if ( true == IsMinorUnitActive() && false == pUnitTemplet->m_MinorUnitHyperCutIn.empty() )
+		wstrCutInName = pUnitTemplet->m_MinorUnitHyperCutIn;
+	if ( CX2Unit::UT_LUCIEL == pUnitTemplet->m_UnitType && CX2Unit::UC_LUCIEL_DEMONIO == pUnitTemplet->m_UnitClass )
+	{
+		const int iFutureStateID = GetFutureStateID();
+		if ( false == IsMinorUnitActive() )
+		{
+			if ( CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_HYPER_MODE_TR == iFutureStateID && false == pUnitTemplet->m_HyperCutIn_Trans.empty() )
+				wstrCutInName = pUnitTemplet->m_HyperCutIn_Trans;
+		}
+		else if ( CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE_TR == iFutureStateID && false == pUnitTemplet->m_MinorUnitHyperCutIn_Trans.empty() )
+			wstrCutInName = pUnitTemplet->m_MinorUnitHyperCutIn_Trans;
+	}
+	if ( CX2Unit::UT_LUCIEL == pUnitTemplet->m_UnitType )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL UI hyper cut-in class %d body %c state %d name %s", static_cast<int>( pUnitTemplet->m_UnitClass ), ( true == IsMinorUnitActive() ? L'C' : L'L' ), GetFutureStateID(), wstrCutInName.c_str() );	// char-luciel CH3d
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN
 
 	const SkillCutIn hyperCutIn( wstrCutInName );
 	ActiveSkillShow( L"Dummy1_Rhand", hyperCutIn.fileName.c_str(), hyperCutIn.vSize, hyperCutIn.vPosition, false, bOnlyLight_ );

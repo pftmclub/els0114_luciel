@@ -3215,6 +3215,41 @@ void CX2Data::SetServerCurrentTime( wstring wstrTime )
 	// June's image table keeps a second file / piece pair per class ( record +0x38 / +0x54 ); read off the static initializer for the classes whose port
 	// is in: Aisha's EM ( 104 ), VP ( 105 ) and DW ( 113 ), the image types that have a pair ( 160by160, gray, 50by50, 20by20, gauge, party ). Dungeon clear is the same
 	// picture; the class initial has none; the unit slot is the character select's ( Stage 9 ).
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND
+	// char-luciel CH3d: June's rows ( @3337366f - @333a36bd ) mix Lu's ( _1 ) and Ciel's ( _2 ) picture by image type, spelt as the sheets spell them
+	if( CX2Unit::UC_LUCIEL_DREAD_LORD == eUnitClass || CX2Unit::UC_LUCIEL_NOBLESSE == eUnitClass || CX2Unit::UC_LUCIEL_DEMONIO == eUnitClass )
+	{
+		const int iLucielRow = ( CX2Unit::UC_LUCIEL_DREAD_LORD == eUnitClass ) ? 0 : ( ( CX2Unit::UC_LUCIEL_NOBLESSE == eUnitClass ) ? 1 : 2 );
+		static const WCHAR* const s_aLucielLarge[]		= { L"TR_D_LORD_1E", L"TR_N_OBLESSE_2", L"TR_D_EMONIO_1" };
+		static const WCHAR* const s_aLucielLargeGray[]	= { L"TR_D_LORD_2_GRAY", L"TR_N_OBLESSE_2_GRAY", L"TR_D_EMONIO_2_GRAY" };
+		static const WCHAR* const s_aLucielGage[]		= { L"TR_D_LORD_1", L"TR_N_OBLESSE_1", L"TR_D_EMONIO_1" };
+		static const WCHAR* const s_aLucielMedium[]		= { L"TR_D_LORD_1_MEDIUM", L"TR_N_OBLESSE_1_MEDIUM", L"TR_D_EMONIO_1MEDIUM" };
+		static const WCHAR* const s_aLucielIcon[]		= { L"TR_D_LORD_1_ICON", L"TR_N_OBLESSE_1_ICON", L"TR_D_EMONIO_1_ICON" };
+		static const WCHAR* const s_aLucielParty[]		= { L"TR_D_LORD_1_PARTY", L"TR_N_OBLESSE_1_PARTY", L"TR_D_EMONIO_1_PARTY" };
+		static const WCHAR* const s_aLucielSlot[]		= { L"list_TR_D_LORD_2", L"list_TR_N_OBLESSE_1", L"list_TR_D_EMONIO_2" };
+		static const WCHAR* const s_aLucielSlotGray[]	= { L"list_TR_D_LORD_1_GRAY", L"list_TR_N_OBLESSE_1_GRAY", L"list_TR_D_EMONIO_1_GRAY" };
+		switch( eImageType )
+		{
+		case CIT_160by160:		fileName = L"DLG_UI_Common_Texture103_NEW.tga";		pieceName = s_aLucielLarge[iLucielRow];		break;
+		case CIT_160by160Gray:	fileName = L"DLG_UI_Common_Texture103_GRAY.tga";	pieceName = s_aLucielLargeGray[iLucielRow];	break;
+		case CIT_MyGage:		fileName = L"DLG_UI_Common_Texture102_NEW.tga";		pieceName = s_aLucielGage[iLucielRow];		break;
+		case CIT_50by50:		fileName = L"DLG_UI_Common_Texture100_NEW.tga";		pieceName = s_aLucielMedium[iLucielRow];	break;
+		case CIT_20by20:		fileName = L"DLG_UI_Common_Texture100_NEW.tga";		pieceName = s_aLucielIcon[iLucielRow];		break;
+		case CIT_Party:			fileName = L"DLG_UI_Common_Texture100_NEW.tga";		pieceName = s_aLucielParty[iLucielRow];		break;
+#ifdef SERV_IRUHADEV_JUNE_TRANSCEND_IMAGE
+		case CIT_UnitSlot:		fileName = L"DLG_UI_Common_Texture_GUI_character_01.tga";		pieceName = s_aLucielSlot[iLucielRow];		break;
+		case CIT_UnitSlotGray:	fileName = L"DLG_UI_Common_Texture_GUI_character_01_gray.tga";	pieceName = s_aLucielSlotGray[iLucielRow];	break;
+#endif SERV_IRUHADEV_JUNE_TRANSCEND_IMAGE
+		default:				return true;
+		}
+#ifdef SERV_IRUHADEV_JUNE_TRANSCEND_IMAGE
+		static std::set<int> s_setLucielLogged;
+		if( true == s_setLucielLogged.insert( static_cast<int>( eUnitClass ) * 16 + static_cast<int>( eImageType ) ).second )
+			CX2OfflineLog::Server( L"[JUNE_TRANSCEND] IMAGE class %d type %d -> %s / %s", static_cast<int>( eUnitClass ), static_cast<int>( eImageType ), fileName.c_str(), pieceName.c_str() );
+#endif SERV_IRUHADEV_JUNE_TRANSCEND_IMAGE
+		return true;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND
 	const WCHAR* pwszPrefix = NULL;
 	switch( eUnitClass )
 	{

@@ -1446,6 +1446,10 @@ int CX2OfflineServer::TranscendCheck( const KOfflineUnitRow& kRow ) const
 	// char-elesis CH3d: Elesis's second jobs may transcend
 	if( CX2Unit::UC_ELESIS_GRAND_MASTER != kRow.m_iUnitClass && CX2Unit::UC_ELESIS_BLAZING_HEART != kRow.m_iUnitClass && CX2Unit::UC_ELESIS_CRIMSON_AVENGER != kRow.m_iUnitClass )
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_TRANSCEND
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND
+	// char-luciel CH3d: Lu/Ciel's second jobs may transcend
+	if( CX2Unit::UC_LUCIEL_DREAD_LORD != kRow.m_iUnitClass && CX2Unit::UC_LUCIEL_NOBLESSE != kRow.m_iUnitClass && CX2Unit::UC_LUCIEL_DEMONIO != kRow.m_iUnitClass )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND
 	if( CX2Unit::UC_ARME_ELEMENTAL_MASTER != kRow.m_iUnitClass && CX2Unit::UC_ARME_VOID_PRINCESS != kRow.m_iUnitClass && CX2Unit::UC_ARME_DIMENSION_WITCH != kRow.m_iUnitClass
 		&& CX2Unit::UC_EVE_CODE_NEMESIS != kRow.m_iUnitClass && CX2Unit::UC_EVE_CODE_EMPRESS != kRow.m_iUnitClass && CX2Unit::UC_EVE_BATTLE_SERAPH != kRow.m_iUnitClass )
 		return s_iErrTranscendCannot;
