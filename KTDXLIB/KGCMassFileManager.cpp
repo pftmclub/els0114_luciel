@@ -430,11 +430,84 @@ void KGCMassFileManager::AddDataDirectory( const std::string& strDirectory, bool
 			m_dwDataDirectoryStamp = 1;
 	}
 }//KGCMassFileManager::AddDataDirectory()
+#ifdef SERV_IRUHADEV_KOM_MOUNT_DEBUG
+// june-asset-port P1: [KOM_MOUNT] per-kom counters, written once at the first LoadDataFile after LockMassFileMap (use-time lines reach ErrorLog.txt)
+namespace _CONST_KOMMOUNT_P1_
+{
+	struct SKomMountRecord
+	{
+		std::string		m_strKomName;
+		int				m_iFileCount;
+		int				m_iRegisteredCount;
+		double			m_fMountMs;
+	};
+
+	// PROCESS_MEMORY_COUNTERS_EX spelled out (PrivateUsage), so an older psapi.h still builds
+	struct SKomMountProcessMemory
+	{
+		DWORD		cb;
+		DWORD		PageFaultCount;
+		SIZE_T		PeakWorkingSetSize;
+		SIZE_T		WorkingSetSize;
+		SIZE_T		QuotaPeakPagedPoolUsage;
+		SIZE_T		QuotaPagedPoolUsage;
+		SIZE_T		QuotaPeakNonPagedPoolUsage;
+		SIZE_T		QuotaNonPagedPoolUsage;
+		SIZE_T		PagefileUsage;
+		SIZE_T		PeakPagefileUsage;
+		SIZE_T		PrivateUsage;
+	};
+
+	static std::vector<SKomMountRecord>	g_vecKomMountRecord;
+	static int							g_iKomMountPrivateMB = -1;
+	static volatile LONG				g_lKomMountLogged = 0;
+
+	static double GetKomMountNowMs()
+	{
+		LARGE_INTEGER liFreq, liNow;
+		QueryPerformanceFrequency( &liFreq );
+		QueryPerformanceCounter( &liNow );
+		return (double)liNow.QuadPart * 1000.0 / (double)liFreq.QuadPart;
+	}
+
+	static void SampleKomMountMemory()
+	{
+		SKomMountProcessMemory pmc;
+		ZeroMemory( &pmc, sizeof(pmc) );
+		pmc.cb = sizeof(pmc);
+		if( GetProcessMemoryInfo( GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc) ) )
+			g_iKomMountPrivateMB = (int)( pmc.PrivateUsage / ( 1024 * 1024 ) );
+	}
+
+	static void LogKomMountOnce()
+	{
+		if( g_lKomMountLogged != 0 )
+			return;
+		if( InterlockedExchange( &g_lKomMountLogged, 1 ) != 0 )
+			return;
+
+		int iEntries = 0;
+		double fTotalMs = 0.0;
+		for( size_t i = 0; i < g_vecKomMountRecord.size(); ++i )
+		{
+			const SKomMountRecord& rec = g_vecKomMountRecord[i];
+			KLOG( "ErrorLog.txt" ) << "[KOM_MOUNT] " << rec.m_strKomName.c_str() << " files=" << rec.m_iFileCount << " registered=" << rec.m_iRegisteredCount << " ms=" << (int)( rec.m_fMountMs + 0.5 ) << fileout;
+			iEntries += rec.m_iFileCount;
+			fTotalMs += rec.m_fMountMs;
+		}
+		KLOG( "ErrorLog.txt" ) << "[KOM_MOUNT] total koms=" << (int)g_vecKomMountRecord.size() << " entries=" << iEntries << " ms=" << (int)( fTotalMs + 0.5 ) << " private=" << g_iKomMountPrivateMB << fileout;
+	}
+}
+using namespace _CONST_KOMMOUNT_P1_;
+#endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 
 //#ifdef	X2OPTIMIZE_REMOVE_MASS_FILE_MANAGER_LOCK
 void		KGCMassFileManager::LockMassFileMap()
 {
 	m_bLockMassFileMap = true;
+#ifdef SERV_IRUHADEV_KOM_MOUNT_DEBUG
+	SampleKomMountMemory();		// june-asset-port P1: private memory after the last mount
+#endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 }
 //#endif	X2OPTIMIZE_REMOVE_MASS_FILE_MANAGER_LOCK
 
@@ -476,6 +549,10 @@ KGCMassFileManager::CMassFile* KGCMassFileManager::AddMassFile(const std::string
 //	CSLock locker( m_csFileManager );
 //#endif	X2OPTIMIZE_REMOVE_MASS_FILE_MANAGER_LOCK
 
+#ifdef SERV_IRUHADEV_KOM_MOUNT_DEBUG
+	const double fKomMountStartMs = GetKomMountNowMs();
+	int iKomMountRegisteredCount = 0;
+#endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 	CMassFile* pMassFile = new CMassFile();
 	if( !pMassFile->LoadMassFile(strKomFileName.c_str()) )
 	{
@@ -530,6 +607,10 @@ KGCMassFileManager::CMassFile* KGCMassFileManager::AddMassFile(const std::string
 #else SERV_IRUHADEV_KOM_LONG_NAMES
 		MassFileMap::_Pairib ib = m_mapMassFile.insert( MassFileMap::value_type( Info.strFileName, sFileIndex ) );
 #endif SERV_IRUHADEV_KOM_LONG_NAMES
+#ifdef SERV_IRUHADEV_KOM_MOUNT_DEBUG
+		if( ib.second == true )
+			++iKomMountRegisteredCount;
+#endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 
 		if( ib.second == false )
 		{
@@ -606,6 +687,23 @@ KGCMassFileManager::CMassFile* KGCMassFileManager::AddMassFile(const std::string
 	fclose(fp);
 #endif
 
+#ifdef SERV_IRUHADEV_KOM_MOUNT_DEBUG
+	{
+		// a kom that returned NULL above (load failure, duplicate name) never gets here, so it is absent from the log
+		std::string strKomMountName;
+		ConvertWCHARToChar( strKomMountName, strKomFileName.c_str() );
+		const size_t iKomMountSlash = strKomMountName.find_last_of( "/\\" );
+		if( iKomMountSlash != std::string::npos )
+			strKomMountName = strKomMountName.substr( iKomMountSlash + 1 );
+
+		SKomMountRecord kRecord;
+		kRecord.m_strKomName		= strKomMountName;
+		kRecord.m_iFileCount		= (int)pMassFile->GetFileCount();
+		kRecord.m_iRegisteredCount	= iKomMountRegisteredCount;
+		kRecord.m_fMountMs			= GetKomMountNowMs() - fKomMountStartMs;
+		g_vecKomMountRecord.push_back( kRecord );
+	}
+#endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 	//*/
 	return pMassFile;
 }//KGCMassFileManager::AddMassFile()
@@ -908,6 +1006,10 @@ KGCMassFileManager::CMassFile::MASSFILE_MEMBERFILEINFO_PTR  KGCMassFileManager::
     if ( bRealData && bKeepCompressedData )
         retInfo.dwFlag |= MFI_COMPRESSEDDATA;
 #endif  X2OPTIMIZE_ENCRYPT_AFTER_COMPRESS
+#ifdef SERV_IRUHADEV_KOM_MOUNT_DEBUG
+	if( m_bLockMassFileMap == true )
+		LogKomMountOnce();		// june-asset-port P1: first lookup after the last mount
+#endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 	MakeUpperCase( strFileName );
 
 #ifdef MASS_FILE_FIRST

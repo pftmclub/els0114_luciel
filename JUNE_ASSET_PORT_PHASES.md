@@ -325,6 +325,33 @@ Next: `/x2-phase june-asset-port P1` on Sonnet 5.5 high (builds the exe, hands o
 
 **Done gate:** a `[KOM_MOUNT]` line for every live kom; the comparator is clean; the baseline numbers are recorded.
 
+## Phase P1 - Done (2026-11-16, Sonnet 5.5 high; flag `SERV_IRUHADEV_KOM_MOUNT_DEBUG`, on; built and deployed, awaiting the user's play-test)
+
+**What landed.** `KTDXLIB/KGCMassFileManager.cpp` (CP949, `bytepatch.py`, 102 inserted lines, no deletion) and `KTDXLIB/Always.h` (8 lines):
+- `AddMassFile` starts a QueryPerformanceCounter timer, counts the `m_mapMassFile.insert` calls that succeed (both the long-name and the original branch),
+  and, only at the successful end, pushes `{kom base name, GetFileCount(), registered, mount ms}` into a file-local vector. A kom that returns NULL earlier (load
+  failure, or the duplicate path that deletes the kom) never gets there, so it is **absent** from the log, not logged as mounted.
+- `LockMassFileMap` (called once after the last mount, `X2Main.cpp:1477`) samples `PrivateUsage` (`GetProcessMemoryInfo`; `Psapi.lib` is already linked by `KTDXCommonFunc.h`).
+- `LoadDataFile` calls `LogKomMountOnce()` once the map is locked: one `[KOM_MOUNT] <kom>.kom files=N registered=N ms=N` line per kom, then
+  `[KOM_MOUNT] total koms=N entries=N ms=N private=<MB>`, through `KLOG("ErrorLog.txt")` at use-time (mount-time lines are lost, memory `errorlog-loses-mount-time-lines`).
+  After the first call the cost is one volatile read. Nothing per frame.
+- Names: helpers and structs sit in a named `_CONST_KOMMOUNT_P1_` namespace plus `using namespace`; no anonymous namespace, no `June`, no phase tag in an identifier.
+- **Comparator:** `python tools/logs.py --kom-mount` (new): every live kom (kom.py's index of `elstools inspect`) has a line, `files == inspect`, `registered == files`,
+  the total line agrees; prints `KOM_MOUNT CHECK: PASS|FAIL` and the baseline numbers. Tested on a synthetic log: all-good PASS; a missing kom, a short `registered`
+  and a wrong total each FAIL.
+
+**Gates.** `finish.py --files KTDXLIB/KGCMassFileManager.cpp KTDXLIB/Always.h --with KOM_MOUNT_DEBUG`: flagcheck PASS (`files: 1 PASS, 0 DEFINE.. 1 OTHER` = the other
+flags' lines in Always.h, none mine), junediverge PASS, enumscan PASS, 0 deleted / 0 non-ASCII / 0 EOL-mismatched inserted lines.
+`DEPLOY OK: X2_offline.exe is 27,199,488 B, dated 2026-11-16 15:03:03, md5 b525d2f18f70b977cf430339d5627662` (build: KTDXLIB 64 s, X2Lib 592 s, both PCHs touched
+because `Always.h` changed).
+`EXESTR OK: 5 of 5 found in X2_offline.exe` (`[KOM_MOUNT] `, ` files=`, ` registered=`, `total koms=`, ` private=`).
+
+**How to see it in game.** Boot and walk one village, close the game normally, then "check logs": `python tools/logs.py --kom-mount`. Expected: 243 lines with
+`registered == files`, a total line, **no** duplicate-name MessageBox at boot, `existfileinfo.txt` not grown.
+
+**Still owed (after the play-test):** the baseline numbers (koms, entries, mount ms, private MB) go here, and P2's kickoff compares against them. The debug define stays on
+through P2-P10 (every wave's log check reads it); P12 retires it. Review: `kickoffs/june-asset-port/P1-review.md` (written).
+
 ## Phase P2 - New kom numbers (rewritten 2026-11-16; was "Pilot: 5 new kom numbers" plus P3's 61)
 
 **Run with:** Sonnet 5.5 high.

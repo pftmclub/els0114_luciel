@@ -57,7 +57,7 @@ Plan `JUNE_ASSET_PORT_PHASES.md` (brought up to date 2026-11-16: "Amended 2026-1
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| P1 | ready (P0 done 2026-11-16): `[KOM_MOUNT]` diagnostic, builds the exe, boot-to-village play-test | Sonnet 5.5 / high, then user play-test | P0 | `KTDXLIB/KGCMassFileManager.cpp`, `KTDXLIB/Always.h`, `tools/logs.py` | `P1.md` |
+| P1 | play-test (built + deployed 2026-11-16, exe md5 b525d2f1; user owes: boot, walk one village, close the game, say "check logs") | Sonnet 5.5 / high, then user play-test | P0 (done) | `KTDXLIB/KGCMassFileManager.cpp`, `KTDXLIB/Always.h`, `tools/logs.py` | `P1.md` |
 | P1 review | waiting (P1) | Sonnet 5.5 / high | P1 | review (P1 files only if a fix) | `P1-review.md` |
 | P2 | waiting (P1 review): the 15 June kom numbers with no live archive (rewritten 2026-11-16; 243 of 258 are live) | Sonnet 5.5 / high, then user play-test | P1 review | new `kom_contents/data169,170,...,datai026,032_kom`, game dir koms | `P2.md` |
 | P3 | retired 2026-11-16 (merged into P2; GodBeast Fire moved to P4) | - | - | - | `P3.md` (stub) |

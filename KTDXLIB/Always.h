@@ -14186,3 +14186,11 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT needs the range pair, June's GetEqipStat / IsUsableEquip / equip groups / viewer form, June's EDT values, the sixth socket level and the transcendence class
 #endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: june-asset-port P1 - debug: per-kom [KOM_MOUNT] counters (files, registered, mount ms) and the process private memory after the last
+//              mount, logged once at the first LoadDataFile after LockMassFileMap (use-time, so ErrorLog.txt keeps them). Every asset wave's log
+//              check reads them; retired (commented out) by june-asset-port P12.
+#define SERV_IRUHADEV_KOM_MOUNT_DEBUG
+//////////////////////////////////////////////////////////////////////////

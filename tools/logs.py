@@ -4,6 +4,7 @@
     python tools/logs.py --tag JUNE_BUFF          # + every line containing [JUNE_BUFF]
     python tools/logs.py --grep "BBT (75|91)"     # + lines matching a regex (combine with --tag)
     python tools/logs.py --tag JUNE_BUFF --files errorlog,server --max 400
+    python tools/logs.py --kom-mount              # june-asset-port: every live kom has a [KOM_MOUNT] line, files == inspect, registered == files
 
 The header answers the questions that used to take three round trips:
   * which exe is deployed (md5, time) and whether it is still what tools/build.py deployed;
@@ -82,8 +83,49 @@ def run_start(key, path, text):
     return None
 
 
+def kom_mount_check(errorlog):
+    """june-asset-port P1 comparator: every live kom has a `[KOM_MOUNT] <kom> files=N registered=N ms=N` line, files == the kom's entry
+    count (elstools inspect, via kom.py's live index), registered == files. A kom the client deleted (duplicate name) or never mounted is
+    an absent line. Returns the number of problems."""
+    sys.path.insert(0, os.path.join(TRUNK, "tools"))
+    import kom as komtool
+    komtool.live_names()                       # refreshes the per-kom name index for any changed live kom
+    with open(komtool.LIVE_CACHE, "r", encoding="utf-8") as f:
+        live = {fn[:-4].lower(): len(ent["names"]) for fn, ent in json.load(f).items()}
+    seen, total = {}, None
+    for m in re.finditer(r"\[KOM_MOUNT\] (\S+?)\.kom files=(\d+) registered=(\d+) ms=(\d+)", errorlog):
+        seen[m.group(1).lower()] = (int(m.group(2)), int(m.group(3)), int(m.group(4)))
+    m = re.search(r"\[KOM_MOUNT\] total koms=(\d+) entries=(\d+) ms=(\d+) private=(-?\d+)", errorlog)
+    if m:
+        total = tuple(int(x) for x in m.groups())
+    problems = []
+    for stem in sorted(live):
+        if stem not in seen:
+            problems.append("%s: live kom with no [KOM_MOUNT] line (never mounted, or deleted at mount: duplicate name?)" % stem)
+            continue
+        files, reg, _ms = seen[stem]
+        if files != live[stem]:
+            problems.append("%s: files=%d but the live kom has %d entries" % (stem, files, live[stem]))
+        if reg != files:
+            problems.append("%s: registered=%d of files=%d (%d name(s) already registered by an earlier kom)" % (stem, reg, files, files - reg))
+    for stem in sorted(set(seen) - set(live)):
+        problems.append("%s: logged but not in the game dir" % stem)
+    print("\n== [KOM_MOUNT] comparator: %d live koms, %d lines%s" % (len(live), len(seen), "" if total else "; NO total line (the run never reached a LoadDataFile after the mount, or the exe lacks P1)"))
+    if total:
+        print("   total koms=%d entries=%d mount_ms=%d private_MB=%d  (baseline numbers for the plan's Done notes)" % total)
+        if total[0] != len(seen):
+            problems.append("total line says %d koms, %d per-kom lines found" % (total[0], len(seen)))
+    for pr in problems[:40]:
+        print("   PROBLEM " + pr)
+    if len(problems) > 40:
+        print("   ... and %d more" % (len(problems) - 40))
+    print("KOM_MOUNT CHECK: %s" % ("PASS (every live kom: files == inspect, registered == files)" if not problems and total else "FAIL (%d problem(s))" % max(len(problems), 1)))
+    return len(problems) + (0 if total else 1)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--kom-mount", action="store_true", help="june-asset-port: compare the [KOM_MOUNT] lines with every live kom (files == inspect, registered == files)")
     ap.add_argument("--tag", help="bracket tag without brackets, e.g. JUNE_BUFF")
     ap.add_argument("--grep", help="regex")
     ap.add_argument("--files", help="comma list of: %s (default %s)" % (",".join(FILES), ",".join(DEFAULT_GREP_FILES)))
@@ -158,6 +200,11 @@ def main():
     census = [l for l in srv.splitlines() if "CENSUS" in l]
     if census:
         print("server: census lines present (clean exit)")
+
+    if a.kom_mount:
+        bad = kom_mount_check(texts.get("errorlog", ""))
+        if not (a.tag or a.grep):
+            return 1 if bad else 0
 
     # ---- grep
     if not (a.tag or a.grep):
