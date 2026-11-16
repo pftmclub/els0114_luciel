@@ -28,6 +28,7 @@ Port the map's `phase = S1b` rows whole (June's body inside March's function, Ma
   dodge roll's index offset in the four collision paths (@326253e2 / @326285b9 / @3262b2fe / @3262f11a): an NPC defender whose stat byte
   `+0xe8` is set rolls `SRO_HIT_DODGE` + the attacker's (or NPC attacker's owner's) `GetRandomInt( 0 )`. The byte is 1 only when the NPC's
   stat came from an ExtraNPCStat row (`323752f0`, called by the fetch `32384d10`); the port knows that from `CX2UnitManager::m_mapExtraNPCStat`.
+  S0 review: a Lua-bound bool setter `324050d0` (bound @31e32825) also writes `[ecx + 0xe8]`; name its class first and port it if it is this byte.
 - **The ability map `32358970`** (`CX2Unit +0xaac`, table `g_pData +0x5a4` `32608cb0`, UI `3260a360` / `3260ceb0`): identify the packet
   that fills it and the table's loader. If it is server data, close the row as June's absent value 0 (memory design-missing-june-pieces);
   if the table is client data, port it with every reader the map lists (keys 1 / 2 / 4 / 5 / 6 / 11 / 13-16).

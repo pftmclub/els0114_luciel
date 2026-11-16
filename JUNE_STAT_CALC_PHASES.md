@@ -1129,7 +1129,7 @@ the exe this session (`funcdis.py` / `disasm_range.py` / Ghidra). New addresses:
 
 **What the map now says (state of the 39 rows).** June 15, mixed 12, March 7, absent 3 (Stat [9] / [10], the ability map, user
 `+0x94a0`), unknown 1 (awakening gain on hit), n/a 1 (the server-side base stat). By phase: S1 5, S1b 4, S2 4, S3 5, S4 8, R1 5,
-R1b 4, nothing left 4. Already June and only re-read later: the option-data
+R1b 4, nothing left 4 (review: S3 4, S4 9). Already June and only re-read later: the option-data
 template `320839e0`, `GetEqipStat`, `ResetMaxMP`, the character window, the per-hit MP refresh, the four buff member functions, the
 Time and ChangeAttackByType `SetFactor`s, `GetActualMPConsume`'s base, regen's gage tick, and the six `GetSkillMpDecreaseRate` sites.
 
@@ -1177,6 +1177,42 @@ with June's buff reader `32039a50`, `ResetMPChangeRate`, `SetMPChangeRateValue`)
 
 Not ported, routed: none outside this plan. Class lines met here (Chung Deadly Chaser's dropped accuracy block, Raven's 24406 id) ride
 with June's whole `CalcHitDodgePercent` in S1b and are named in its hand-off for char-chung / char-raven.
+
+### Phase S0 - Review (2026-11-16)
+
+**Verdict: pass after map fixes.** No client code, no flag (no flagcheck); full build skipped: no play-test. Fixes are in
+`statcalc_map.tsv` (13 rows) and one `funcmap.tsv` row.
+
+- **Coverage:** every Scope item has a row (rows 41-79) with a state, a March site and readers. The Done note's tallies hold (June 15,
+  mixed 12, March 7, absent 3, unknown 1, n/a 1). The phase counts change once: row 55 (`320839e0`) moves S3 -> S4, because S4 owns both of
+  its leftovers (divergence row 39 and the fallbacks). Now S3 has 4 rows and S4 has 9.
+- **Exe spot-checks** (`funcdis.py`, constants read from the PE):
+  - Pass: `320839e0` = `X2BuffTemplet.h:1206-1244` op by op. SWAP, the bl lift, (FIX + option) + RELATION, the curve's 4th argument, the
+    modifier when PERCENT >= 1, the > 0 product with the excess path, and a NaN going to 0 (as `max`).
+  - Pass: `GetDamageDecrement` `3291eb50` and `322a8b60` = the port. 39.35f / 258.65f are widened to double, the curve is rounded to
+    float, the clamp is 0 .. 99.99f, and a NaN passes both tests.
+  - Pass: `ResetMaxHP` `31feba70` = row 45. Note added: 0.7 is `0.7f` widened (3344af88), and the x 0.7 / x 1.5 `SetMaxHp` call goes to
+    the unit (31e8cdc0), not the gage.
+  - **Fixed: `31fd9100`** matches row 72, with the resize @3204f428 and the call @32047d55. One error: the roll index is `8 + n`, where n
+    counts the rolls already made in the call (@31fd91cb). It is not `8 + i`, because a skipped entry does not advance it. Map row 72 and
+    the funcmap row are corrected.
+  - `+0xe8`: @32375304 is the only imm-1 write to `[reg + 0xe8]` in `.text`, and 323850dd (in `32384d10`) is the only call to 323752f0.
+    Lead for S1b: a Lua-bound bool setter `324050d0` (bound @31e32825) also writes `[ecx + 0xe8]` on an unidentified object. S1b names it
+    before porting (row 78).
+- **Corrections confirmed** by `flagprobe.py`: `SERV_BALANCE_FINALITY_SKILL_EVENT` is ON, and so are the six classes' `_PASSIVE` flags and
+  `_SKILL_MP_DECREASE_RATE`. All six June `GetSkillMpDecreaseRate` calls sit in the live branch of each class's `GetActualMPConsume`.
+  Aisha's (9255) and Elsword's (30733) sit in the `#else` of their `_PASSIVE` flag.
+- **Reader lists** (grep):
+  - Row 45: 2302 is in `ReInit`, not `InitComponent`. Fixed.
+  - Row 74: the live user caller is X2GUUser.cpp:10777 (under `_JUNE_DAMAGE_REACT_ORDER`; 10302 is its dead twin). The NPC caller
+    X2GUNPC.cpp:10386 was missing. Added.
+  - Row 72: the second caller, 15746 `ProcessAttackResult`, was added.
+  - Row 73: `ResetMPChangeRate` has 32 more live callers (`StateChange`, mana recovery, and the Aisha / Eve / Rena charge states). All are
+    listed now.
+- **Split:** each row's note now names its own phase. 9 notes still said S1 / S3 / R1 after the S1b / R1b split (rows 45, 47, 54, 56, 66,
+  67, 75, 78, 79). Every `March` / `mixed` / `absent` / `unknown` row has a phase. The S1-R1b kickoffs name their rows, and STATUS has a
+  row for each phase. The S1 kickoff still fits.
+- Still the user's: decision 1 above (where the designed attack range lives), needed before S1.
 
 ## Phases S1-S4, R1 - Stat sheet and resource gain (after Stages 7 and 8)
 
