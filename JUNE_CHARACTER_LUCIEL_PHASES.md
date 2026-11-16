@@ -2015,6 +2015,41 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's). Files: `X2Uni
   (`MOTION_CIEL_LDN_EVIL.XET` among many classes' XETs at game load) are a load-time batch, not this phase. Next: `DU5d-review.md`.
 - **Save:** `testlu1` (166) normal weapon 62119 set to +13, fire attribute (`attrib0` 1); backup `db_backup\els_db_20261116_100555_pre_sql.sql`.
 
+### DU5d - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed `0ebcfdff` against June in Ghidra / `disasm_range.py` / `charport_consts.py`. Verdict: **pass, no code change** (flag
+`SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER`; no debug define to retire).
+- **`InitWeaponTrace` = `31f9a2a0`:** bodies 0-2 (`local_8c < 3`); fashion UID tested as a 64-bit pair (`+0x5e0 / +0x5e4 + body x 8`), then the
+  normal one (`+0x238`); a fashion UID that misses the map does nothing (no fall-back to the normal one), as the port's `continue`; templet test
+  `31f90b00`; 8 models of `CX2Eqip +0x544` (`GetNormalAnim`) into `+0xdc8` / `+0xde8` / `+0xe08`, absent model -> 0; trace names by unit type 6
+  (`ATTACK_SPHERE3_Back01`) = March's `GetWeaponTraceStartAndEndName`; the line frames only with `+0x1e0` set, after the trace loop: model 0 type 7
+  `END0` / `START0_FRONT`, type 10 `END0` / `START0_LWeapon` -> `+0xecc` / `+0xed0`; model 1 type 10 `END0` / `START0_RWeapon` -> `+0xefc` / `+0xf00`;
+  none reset when absent. One frame set, the last body with a weapon wins (DU5d's correction of the DU5b2 amendment stands).
+- **`31f93050`:** empty / -1 fire list, `+0x1e8` NULL or no instance -> return; `CanShowWeaponEffect`; `+0xd80 == 1` -> ( `+0xdc8` - `+0xde8` ) x 0.5
+  (qword `3342ebc8`) + `+0xde8` = ( START - END ) x 0.5 + END; else `Bone_RFinger2` on `[ +0x1e8 ]`; emit 10 (`3344a51c`), hidden 0. OnFrameMove
+  jump table `31fa9e38` entry 7 (type 10) = `31fa9731` -> `31f93050`.
+- **`31f961a0` case 10:** jump table `31f96868` entry 9 = `31f96536`; Lu: ECX = `[ +0x1e8 ]` (set before the switch) `Bone_RFinger2`, rates 15 / 30 /
+  60 / 25 / 15; Ciel `@31f96603`: ECX = `[ +0xd7c ]`, `Dummy1_Rhand` (`3345bb58`), shares `@31f96471`'s 15 / 30 / 60 / 25 / 15.
+- **`31f92910` case 10:** first group, as the port's added label.
+- **`31f9a900 @31f9b488`:** handles from the load sequence: 1 EDI, 2 EBX, 3 `[0x1c]`, 4 `[0x10]`, 5 EBP, 6 `[0x14]`, 7 `[0x18]`, 8 `[0x28]`,
+  9 `[0x24]`, 10 `[0x20]` (ESP-adjusted for the two pending pushes); h1-h4 tested first; state `+0xf14` (= `m_eUnitViewerState`) 10 or 1. In all four
+  branches the first vector (stack `0x44` / `0x50` by branch) goes to 1 2 5 6 9 and the other to 3 4 7 8 10: Lu fingers on `[ +0x1e8 ]` (R first,
+  second group emits 0); Ciel in the cash shop `Dummy3_RWeapon` / `Dummy4_LWeapon` on `[ +0xd7c ]` (all 10); Ciel's form (unit `+0xe40` =
+  `IsMinorUnitForm`) the `+0xecc..+0xed0` midpoint first and `+0xefc..+0xf00` second (all 10), a NULL among the four -> `@31f9ad60` timer > 2.0
+  (qword `33437820`) -> `31f9a2a0`; else Lu fingers. The 5-10 test follows the first four placements, as the port. `+0xd80` other than 0 / 1 in the
+  state branch: June does nothing; the port's `bool` cannot hold one. State 10 stays a literal with its comment (March's enum ends at `UVS_WATCH` 8;
+  no June Enum entry).
+- **Effect-set duo argument:** `@31fa3219` and `@31fa92e9`: `CMP [ +0xd80 ], 1` / `SETE` pushed as the duo argument = `DT_MINOR` (1) when Ciel is
+  shown, `DT_MAJOR` (0) else.
+- **Flag-off = March:** `cl /P` of `X2UnitViewerUI.cpp` at `0ebcfdff` and `0ebcfdff^` with every `#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` made
+  `#if 0`: 369,083 lines each, identical after `__LINE__` / FOREACH-counter digits. The header's three hunks sit wholly inside the flag.
+- **Gates:** `finish.py --review --commits 0ebcfdff --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER -v`: `FINISH RESULT: PASS (7 gates, 0 failed, 3
+  skipped)`; flagcheck 1 PASS, 1 PASS~ (3 blank / marker lines outside the flag), 0 OTHER, 0 FAIL; the 10 deleted lines are DU5b2's two stand-in
+  hunks and their markers (March's lines stay whole in the `#else`); junediverge and `--check-all` PASS; enumscan exit 0; INFO
+  `JUNE_CHARINFO_VIEW_ATTRIB_ENCHANT`, `JUNE_DIVERGE_UPGRADE_WEAPON_PARTICLE`, `JUNE_UNIT_VIEWER_EFFECT_PLAYER` (enclosing, not this change's).
+- **Build:** full build skipped: no play-test (no code change; DU5d's play-test passed on `65ccb63e`).
+- Next: DU5d2 waits for june-engine R14f.
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;
