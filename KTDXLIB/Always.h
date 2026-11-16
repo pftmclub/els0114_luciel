@@ -14091,7 +14091,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-16
 // Description: char-luciel CH3a0 - temporary [JUNE_CHAR] LUCIEL SUMMON lines ( a summon's setup, a summon hit handed to its owner, at most once a
 //              second ) for the play-test; the CH3a0 review retires it. Revert: comment out the #define ( JUNE_CHAR_LUCIEL_SUMMON_DEBUG ).
-#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON ) && defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG

@@ -55,6 +55,16 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - **Skill-state byte:** June marks some extra states as skill states ( byte `+0x11`, now `UserUnitStateData::m_bSkillState`, flag `SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE` ). In your cases set `stateData.m_bSkillState = true;` on: 377@32b49a4b, 575@32b4a25e ( `ch1n_skill_cases.tsv` column `skill_state_extra`, state id @ June store ). The slot states already get it from CH1n's head.
 
+## Amended by char-luciel CH3a0 review (2026-11-16)
+
+- **Summon Darkness spawn:** `LSI_SA_LLD_SUMMON_DARKNESS_FrameMove` (`32b2f3f0`) calls the helper `32b20260` once (`@32b2f48b`). The helper zeroes user
+  `+0x9664`, reads skill 30013's templet (no templet or `+0x867c` null: nothing), skips the spawn when `3227baf0( 0x1da )` is true (identify it), else picks
+  `NUI_SI_SA_LLD_SUMMON_DARKNESS` (1906) or, when `322cc1a0` (`GetIsNowPVPCorrectionGame()`, junediverge idiom) is true, `NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP`
+  (1937), and calls `CreateNPCReq` (`31f8b010` `@32b20486`; argument order in its funcmap row) in Chung's shape (`X2GUChung.cpp:17128`: level 0, `NAT_ALLY`,
+  `GetUnitUID()`), position from vslot 0x138, its first argument vslot 0x198's result; after it, when vslot 0x198 is true, `322de5d0( 0 )` on the game.
+  Read the listing, not the decompile (Ghidra's is garbled here).
+  CH3a0 already set up both ids in `SetUserSummonedNPCInfo` (flags 0x40, skill 30013); the hand-off's log line is the `use` line plus the NPC appearing.
+
 ## Amended by char-luciel CH2d2 review (2026-11-16)
 
 - **Owed by CH2d2 ( passed by sight, never logged ):** in your play-test also cast one Diablura skill from skill page 2 ( keys Q W E R, `LuDbA` ) and one upgrade on `LuDbB` ( 30076 / 30077 / 30219 / 30220 ), plus the Altar of Evil form's X X X ( the altars fire ); the `use` line of each is enough.

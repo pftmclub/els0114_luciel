@@ -4497,6 +4497,30 @@ Opus 5.5. Lu/Ciel's summoned NPCs exist and are set up as June does; Lu has no s
   `hit npc 384 -> owner 19 unit type 5` (EFFECT_TO_UNIT site). No packet EXCEPTION. One crash in the first Eve run was the console's stale `jU` (Lu's freed unit; the dump
   faults in Lua's `GetPos` binder from `CX2GameEdit::ExecCommand`, no phase code on the stack); a fresh `jU` on Eve ran clean. The 1906 `set` line fell in the earlier log run.
 
+### CH3a0 - Review (2026-11-16)
+
+Opus 5.5. **Pass, no code change.** Reviewed `ca2afe20` against June in Ghidra (read-only) and the exe bytes.
+- **`3230c1a0`:** 0x772 `@3230ca56` / 0x791 `@3230cb79` -> `3230cd2d` flags 0x40; 0x774 `@3230ca40` -> `3230cb47` flags 1, then `31e4d0e0` (unit type) == 0xa ->
+  user `+0x9690` = NPC `+0x270`; 0x8dd / 0x8de through the byte table `3230d15c` (index 0xba / 0xbb -> entry 6) -> `3230cd3a` flags 0x50; all rate 1.0 into the
+  shared tail `3230ca6d` (March's). `31fcf520`: 0x772 / 0x791 -> 0x753d (30013), 0x774 -> 0x7540 (30016), 0x8dd / 0x8de -> 0x7565 (30053) = the port's skills.
+  `UT_LUCIEL` = 10.
+- **`322ece70` flag 0x10:** inside the templet test, after scale x power rate, `!0x20` then `0x10`: scale x `+0x4074`, both rels = `+0x4068`, then both x `+0x4064`
+  (`@322ed0a4`-`322ed0e4`); the rels start at 1.0 (`FLD1 @322ecfc6`, `FST [esp+0x18]` / `[esp+0x20]`). March's `fStatAtkRate_` is `GetStatAtkRateOfSummoned()`
+  (`X2Game.cpp:17502`, the `+0x4064` member), so `fAtkRateBase * fStatAtkRate_` = June. Ctor: `FSTP [esi+0x4074] @322a4351`, the same 1.0 as `+0x4068`.
+- **`32778fe0`:** DD, AI `+0x7c98`, type `+0x38` == 1, `32fe2daa` dynamic_cast, `+0x80` == 0, game vslot 0xc8 `( +0x78, +0x7c, 0 )`, that unit's 0x300 = the port
+  (`GetNPCAI` = `m_pAI`, `GetAllyUnitType` / `GetAllyUnitUID`). Sites `@3262546d` / `@3262f1e6` / `@32628652`: the attacker's vslot 0x300, no type test. Every
+  override (`X2GUUser.h` 3 bases, Lire, Raven, Ara, Luciel, `CX2GUNPC`) takes `CX2DamageManager::DamageData*`, so the base virtual is overridden, no signature change;
+  flag-off is March's `GUT_USER` block in `#else`.
+- **Data:** the five `NPCTemplet.lua` rows equal `june_src_fixed/data037_kom/NPCTemplet.src.lua` (EOL-normalised), June's order; data036 `Enum.lua` 1906 / 1908 /
+  1937 / 2269 / 2270 = June's `Enum.src.lua`; live `data036.kom` / `data037.kom` md5 `3c141682` / `fff26354` = the packed ones; `ledger --check`, `core --check` PASS.
+- **Gates:** `finish.py --review --commits ca2afe20 --with <4 flags> --lua <5 scripts> -v`: `FINISH RESULT: PASS (9 gates, 0 failed, 2 skipped)`; flagcheck
+  `_LUCIEL_SUMMON` 3 PASS, 1 DEFINE, 6 OTHER; `_ADJUST_BY_OWNER` 4 PASS, 1 DEFINE, 5 OTHER; `_PASSIVE_RATE` 3 PASS, 1 DEFINE, 6 OTHER; 0 FAIL, 0 deleted lines.
+  Every OTHER row is a partner flag's file (the three flags share the commit) or `JUNE_ENUM_NAMES` (`X2UnitManager.h`). junediverge + `--check-all` PASS, enumscan
+  exit 0, luabind PASS; stateends / skillicons skipped (no state, no skill).
+- **Logs:** the latest run has Eve's `hit npc 384 -> owner 19 unit type 5` (x7), 0 EXCEPTION, 0 unbound; Lu's lines were read in CH3a0's check (above).
+- **Retired:** `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG` commented out in `Always.h`. Build skipped: debug retire only.
+- **CH3a kickoff amended:** Summon Darkness's spawn shape (FrameMove helper `32b20260`, 1906 / 1937 by `GetIsNowPVPCorrectionGame`, `CreateNPCReq` `@32b20486`).
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, Opus review, user play-test.
