@@ -6709,7 +6709,7 @@ bool CX2TFieldGame::Handler_EGS_CHANGE_UNIT_FORM_NOT( const KEGS_CHANGE_UNIT_FOR
 		bMinorUnitForm = pSquareUnit->SetMinorUnitForm( 1 == kEvent_.m_cMinorUnitForm );
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 #ifdef RIDING_SYSTEM
-		pSquareUnit->InitWaitMotion();	// char-luciel DU5c: June 323acfb0 @323ad02c-323ad038, 323fa700 then 323fad80
+		pSquareUnit->InitWaitMotion();	// char-luciel DU5c: June 323acfb0 @323ad05e-323ad06b, 323fa700 then 323fad80
 #endif RIDING_SYSTEM
 		pSquareUnit->StateStart();
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR

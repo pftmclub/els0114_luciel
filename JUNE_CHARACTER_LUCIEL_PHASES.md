@@ -1839,6 +1839,40 @@ line by a `/Zs` flag probe, `RIDING_SYSTEM` on too). Files: `X2SquareUnit.cpp` (
 - **Play-test:** village switch (window button, Ciel <-> Lu) changes the avatar and its SD mesh, a relog keeps it; field / room viewers unchanged for
   other classes. Review: `DU5c-review.md`.
 
+### DU5c - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed `b7dfce78` against June's listing (`disasm_range.py`, read-only). **Verdict: pass after one citation fix, no behaviour change.**
+- **SD table:** `333a3d20` fills `3372c1e8` with 26 wstrings ( 0x1c each ); all 26 equal `SD_MESH_FILE_NAME` with their case ( Elsword `_SD_Content.X`,
+  Arme / Eve / Add spa `.x`, `Mesh_ARA_` spa, Rose / Ain `Contnet10` ). `31ee3470`: `0 < type`, spa `<= 1`, entry `( type x 2 + spa ) x 0x1c`, no upper
+  bound ( the port's `UT_END` bound is unreachable ). Ctor `@323f8bb1-323f8c94`: only with `g_pData +0x268`, spa = `+0x64 - 1500 <= 1`
+  ( `VMI_SPA_RUBEN` / `_RANOX` ), type = templet `+0xaf0` field 0, `OpenXSkinMesh( name, L"Bip01" )` = March's default argument. March's switch in `#else`.
+- **`323f1490`:** type 10 only; Ciel / Lu names `334944e4` / `3346a00c`, spa `334944a8` / `33469fd4`; close `+0x520` only when the device manager
+  exists, delete `+0x51c`, open, `CreateSkinAnim`, `+0x2b4` = 1 ( `SetApplyMotionOffset` ), `SetAnimXSkinMesh`, `AddModelXSkinMesh`, then an inline
+  `SetShowObject( false )` ( `+0x172` = 0, vslot 0x28 when it was shown ) = the port. The log line is the port's own.
+- **`323fea90` head:** `+0x192` = 1, form = unit `+0xe40`, `323f1490( form, templet type )` when a templet, `3234d930( form == 1 )`, then InitSystem /
+  InitViewer / InitState / InitParticle / InitWaitMotion ( `323f3660`, `323f7380`, `323f59f0`, `323edea0`, `323fa700` ). June reads `+0xe40` before its
+  unit test; the port reads it after (same result with a unit).
+- **`323f3290`:** SD mesh with unit `+0xe40` after `3234b8c0`, command group from the argument. Viewer: `L"LobbyWait"` ( `3346f4dc` ) and play type 0
+  ( `XAP_LOOP` ); the shown skin ( `321f2e40` ) `+0x228` / `+0x2a8` = `m_NowAnimName` / `m_PlayType`; `+0xd80` = argument raw; `UpdateEqip` `31fa9e60`; not
+  `GetShowObject()` ( manager test and `+0x172` ) -> vslot 0x28, the slot June's inline `SetShowObject` calls = `NotifyShowObjectChanged`;
+  `ChangeAnim( name, 0, 0.0 )` + `Play( type )` on the re-read shown skin. = the port.
+- **`323acfb0` replays:** type 10, form != -1: `323f3290`, `323fa700`, `323fad80` at `@323ad057-323ad06b`. `323fa700` = InitWaitMotion ( Init's last
+  call ), `323fad80` = StateStart ( `BeginTable( state name )` first ). The `public:` toggle around `StateStart` changes nothing else.
+  **Fix:** the Done note, the `X2TFieldGame.cpp:6712` comment and the funcmap row cited `@323ad02c-323ad038` ( June's templet / type test ); the
+  comment and the row now say `@323ad05e-323ad06b`.
+- **`323f7380 @323f740a-323f7417`:** `+0xd81` = 0, `+0x118c` = 1 before `SetUnit( unit, 3 )` = the port. **`31ed46e0`:** `@31ed480c-31ed4815` the slot
+  viewer ( `+0x54`; June tests it for NULL, March already returned at `X2Room.cpp:1473` on a NULL viewer ); `@31ed4845-31ed489b` UI 0x19 shown, target
+  UID = the packet's -> viewer `+0xf4` ( my unit jumps past it, as March's other-unit branch ) = the port.
+- **Flag-off = March:** `cl /P` of `X2SquareUnit.cpp`, `X2TFieldGame.cpp`, `X2Room.cpp` at `b7dfce78` with the `#define` commented out vs `b7dfce78^`:
+  `X2Room.cpp` identical; the other two differ by one `__LINE__` value each ( a `FOREACH` temporary, an error-log line number ). Flag-on differs only
+  in DU5c's hunks.
+- **Gates:** `finish.py --review --commits b7dfce78 --with SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR -v`: `FINISH RESULT: PASS (7 gates, 0 failed, 3 skipped)`;
+  flagcheck 5 PASS + 1 DEFINE, 0 OTHER, 0 deleted; junediverge PASS, `--check-all` PASS; enumscan exit 0; stateends / skillicons / luabind n/a.
+  INFO: `DUO_VIEW`, `DUO_VIEWER`, `UNIT_TYPE_RANGE`, `JUNE_ENUM_NAMES` ( the `#error` guard's needs and the enclosing block ).
+- **Build:** `/Zs` probe of `X2TFieldGame.cpp`: 0 errors. Full build skipped: the fix is one comment; the deployed exe ( md5 `2f5527f0...` ) is DU5c's
+  code unchanged.
+- **Play-test:** still owed ( the logs predate the DU5c deploy ); DU5c's checks are handed off with this review.
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;

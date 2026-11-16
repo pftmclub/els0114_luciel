@@ -239,7 +239,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5c | **user play-test** (2026-11-16): the village avatar by form (SD mesh table + form switch, viewer rebuild, NOT replays); create / select split to DU5c2; then review | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2SquareUnit.*`, `X2TFieldGame.cpp`, `X2Room.cpp`, `X2UnitViewerUI.h` | `DU5c.md`, `DU5c-review.md` |
+| DU5c | **user play-test** (review pass 2026-11-16, one comment-address fix): the village avatar by form (SD mesh by form, viewer rebuild, NOT replays); create / select in DU5c2 | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2SquareUnit.*`, `X2TFieldGame.cpp`, `X2Room.cpp`, `X2UnitViewerUI.h` | `DU5c.md`, `DU5c-review.md` |
 | DU5c2 | **ready** (split from DU5c 2026-11-16): both bodies on the create / select screens, the viewer's back body, `CX2Eqip::SetFixed`, R14e onepiece | Opus 5.5 / high, Opus review, user play-test | DU5c | `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2UnitViewerUI.*`, `X2Eqip.cpp` | `DU5c2.md` |
 | DU5d | **ready** (DU5b2 review pass 2026-11-16; after DU5c, same viewer file): viewer weapon effects case 10, CH0's viewer checklist rows | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2UnitViewerUI.cpp`, `X2SlotItem.cpp` | `DU5d.md` |
 | CH2d | play-test passed 2026-11-16, logs read ( Land Crasher + Bloodlust ); reviewed with CH2d2 ( pass after 2 fixes ); page 2 casts ride with the CH2d2 review play-test | Sonnet 5.5 / high, no review of its own (CH2d2 review covers it), user play-test | CH2c2 review | `X2GULuciel.*` | `CH2d.md` |
