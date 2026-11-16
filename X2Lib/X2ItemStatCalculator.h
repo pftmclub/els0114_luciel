@@ -71,9 +71,19 @@ public:
 		CalculateItemStat( sRealStatData_, pItemTemplet_, CX2SocketItem::ms_KDummyItemStatRelLVData, eUnitType_, eUnitClass_ );
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+	// june-stat-calc S2: June 328d6f60 takes the unit's level for an item with no use level
+	void CalculateItemStat( OUT CX2Item::KItemFormatStatData& sRealStatData_, IN const CX2Item::ItemTemplet* pItemTemplet_,
+							IN const CX2SocketItem::KItemStatRelLVData& sStatRelLVData_ = CX2SocketItem::ms_KDummyItemStatRelLVData,
+							IN CX2Unit::UNIT_TYPE eUnitType_ = CX2Unit::UT_NONE, IN CX2Unit::UNIT_CLASS eUnitClass_ = CX2Unit::UC_NONE, IN const int iUnitLevel_ = 0 );
+	// june-stat-calc S2: June 328d6d70
+	void CalculateItemStatAtUnitLevel( OUT CX2Item::KItemFormatStatData& sRealStatData_, IN const CX2Item::ItemTemplet* pItemTemplet_, IN const int iUnitLevel_,
+							IN const CX2SocketItem::KItemStatRelLVData& sStatRelLVData_, IN CX2Unit::UNIT_TYPE eUnitType_, IN CX2Unit::UNIT_CLASS eUnitClass_ );
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	void CalculateItemStat( OUT CX2Item::KItemFormatStatData& sRealStatData_, IN const CX2Item::ItemTemplet* pItemTemplet_,
 							IN const CX2SocketItem::KItemStatRelLVData& sStatRelLVData_ = CX2SocketItem::ms_KDummyItemStatRelLVData,
 							IN CX2Unit::UNIT_TYPE eUnitType_ = CX2Unit::UT_NONE, IN CX2Unit::UNIT_CLASS eUnitClass_ = CX2Unit::UC_NONE );
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	void SetUnitData( CX2Unit::UNIT_TYPE eUnitType_, CX2Unit::UNIT_CLASS eUnitClass_ );
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_CHANGE
 	void SetUnitClassTran( int iUnitClassTran_ );		// June 328d6f40's third argument: stored ( T5 reads it ), the cache cleared

@@ -33,3 +33,4 @@ X2GUUser.cpp	CX2GUUser::CommonFrameMove	CommonFrameMove_TimedEvent	routed to bac
 *	*	ResetEqip	routed: char-luciel DU3c ports June's ResetEqip 32355e40 ( conflict skip, templet / use-type tests, 3234da60 ); char-luciel DU3b found it
 X2Eqip.cpp	CX2Eqip::LoadAttached	AttachParticle	routed: june-engine R6c ports June's AttachParticle 32960ad0 with the particle group; R14f's LoadAttached 32961c80 calls March's meanwhile ( kickoff R14f )
 X2GUUser.cpp	CX2GUUser::ProcessAfterSetBuffFactor	GT_PVP	June 3204dcd0 @3204deb0 -> 322cc180: GetGameType() - 1 == 0 (type 1 only), char-luciel CH4b
+X2Item.cpp	IsSocketStatInGame	GT_PVP	June 328842f0 @32884753-32884761: vslot 0x10c, cmp eax, 1, jne skips a PvP-only socket (type 1 only); june-stat-calc S2

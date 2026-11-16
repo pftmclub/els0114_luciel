@@ -3175,7 +3175,14 @@ void CX2UICharInfo::UpdateResistanceStatUI(const CX2SocketItem::SocketData& sock
 	// 속성저항
 	const int iMaxResistance = 500;
 	WCHAR wszBuffer[MAX_PATH] = {0, };	
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+	// june-stat-calc S2: June 32916160 passes the shown body's group ( the viewer's +0xd80, else my unit's form )
+	CX2Unit* pResistUnit = g_pData->GetMyUser()->GetSelectUnit();
+	const bool bResistMinorUnitForm = ( NULL != m_pUnitViewerUI ) ? m_pUnitViewerUI->GetSwitchingView() : pResistUnit->IsMinorUnitForm();
+	const CX2Stat::EnchantStat& enchantStat = pResistUnit->GetEnchantStat( true, m_bShowDungeonOption, m_bShowPVPOption, true == bResistMinorUnitForm ? CX2Unit::DT_MINOR : CX2Unit::DT_MAJOR );
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	const CX2Stat::EnchantStat& enchantStat = g_pData->GetMyUser()->GetSelectUnit()->GetEnchantStat( true, m_bShowDungeonOption, m_bShowPVPOption );//캐릭터창 UI의 던전, 대전용 옵션 영향 받도록 수정
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	
 	// 불
 	int iDefResistance = static_cast<int>( enchantStat.m_fDefBlaze ) ;

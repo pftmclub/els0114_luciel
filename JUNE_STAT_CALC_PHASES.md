@@ -1494,6 +1494,62 @@ UNIT_STAT `RESULT: PASS` (1 PASS, 1 PASS~ one blank line outside the flag, 1 DEF
 luabind: no skill states, skills or June scripts). `flagcheck JUNE_ENUM_NAMES --range 51715265^..51715265 --files X2Lib/X2PVPRoom.h`: `RESULT: PASS`.
 Build: none (no code change, no play-test). `_STATCALC_DEBUG` stays on for S2 (Z retires it). S2 kickoff checked: Depends now names this review.
 
+### Phase S2 - Done (2026-11-16)
+
+Flag `SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT` (`Always.h`, guard on Always.h-only flags); `_STATCALC_DEBUG` stays on. Commit: `git log --grep
+"june-stat-calc Phase S2:"`. Each item = June, read in the exe this session; map rows: 4 S2 rows -> `June`, one new S4 row; funcmap rows tagged
+`StatCalc S33 S2`; divergence rows: GetStat -> `replace` done, new GetEnchantStat / IsShowDungeonOnly / IsShowPvpOnly / CalculateItemStat (done),
+GetIEchantedItemLevel (`stage33`, S4).
+
+**What landed.**
+- `CX2Item::GetStat` `328842f0` / `GetEnchantStat` `32882630` (`X2Item.cpp`), whole: the unit is the owner (`+0xc4`) or my selected unit; its
+  level (`+0xb4`) feeds the calculator. A PvP-equip item or one of 22 ids (`334c0cb8`) uses the unit-level form `328d6d70`; others the cached
+  `328d6f60` with type / class 0 (the calculator's key; only the uncached enchant path passes the owner's templet type / class). A weapon or
+  armour piece is recomputed with its socket levels, gets **range = (float)( atk x damage_range x 0.01f )** (@32882841), then the scale at
+  `abs( added + effective level )` (JUNE_BUGS 778). Sockets: dungeon-only needs game type 2 / 3 (June's 5 has no Enum entry) and `+0x18c` =
+  `GetDungeonType`; PvP-only type 1 (allow row); June's `+0x8c` / `+0x9c` / set-gated `+0xac` vectors are Stage 16 (stand-in comment).
+- `CX2ItemStatCalculator`: the cached form takes the unit's level for a use-level-0, non-NoEquip item (@328d71ac; not in the cache key,
+  JUNE_BUGS 779); `CalculateItemStatAtUnitLevel` = `328d6d70` (no templet fallback, no cache).
+- `CX2Unit::GetEnchantStat` `32358df0`, whole (4th argument = equip group, default `DT_MAJOR`): usable test, group test, June's 45-case defence
+  switch (75 / 110 / 135; March had 12 cases), June's show tests (`IsShowDungeonOnly` `32357940`: a `+0x18c` socket never counts, off the option
+  a dungeon-only socket does not count; `IsShowPvpOnly` `323579e0` the same; both replace March's, their only caller) on templet / socket / random /
+  title / set options; pet aura, passive, Dragon Breath (`g_pData +0x330` = 3289f3b0) as March; the resonance term `32358970( 4 )` = 0 (Stage 30).
+  Callers: CharInfo's resist UI passes the shown body's group (June 32916160); Elesis (@32b8119a, group 0) takes the default.
+- `GetEqipStat` (re-read with June's GetStat, rule 3) and both `GetSetIDNPartsNum`: `IsUsableEquip` (`328825c0` whole) replaces the
+  endurance-only test; `328823d0` (appearance templet) needs the item's appearance id, which March's item data lacks: stand-in true (Stage 16).
+- **S1's range premise corrected (rule 3).** S1 read "June's client never derives range": `32882630` does, per item. So the base stat carries
+  no range now (S1's `AddBaseWeaponRange` in `MakeUnitInfoFromRow` / `PushLevelUp` compiled out); the window's range = equip range.
+- **Emulator** (`X2OfflineInventory.cpp`): `GetEquippedItemStat` computes each item as the two client bodies with this character's class and
+  level (a `CX2Item` built from the row: effective level, appraisal, socket levels); `SumEquippedItemStat` = `GetEqipStat( false, group )`
+  (fashion always, a normal item usable and not PvP-equip); the game stat takes hp / attack / defence and the range of every weapon and armour.
+- The testlu1 lead (S1: `equip=0/7/6/...` with a +13 weapon = the templet's own stat): June also takes type / class from the calculator's key on
+  the cached path, so June's body alone does not explain it; the `ITEMSTAT` line names the unit and level each weapon was computed for.
+
+**Proof.** `python june2017_re/statcalc/emu_equip_stat.py`: `EMU_EQUIP_STAT: 96 resist sets ( 45 EDT cases in the port ), 300 range sets, 133
+enchant sets, 0 mismatch(es) -> PASS` (Unicorn: June's switch @32358efa-32359588 against the port's switch parsed from `X2Unit.cpp`, the range
+@328827f9-32882867 and the scale @3288297a-328829a0). /Zs probes 0 errors: `X2Item.cpp`, `X2ItemStatCalculator.cpp`, `X2Unit.cpp`,
+`X2UICharInfo.cpp`, `Offline/X2OfflineInventory.cpp`, `X2OfflineServer.cpp`, `Handlers_Room.cpp`, and the callers `X2GUEL.cpp`, `X2UIWatch.cpp`,
+`X2ItemSlotManager.cpp`. flagprobe: `EQUIP_STAT` / `DEBUG` ON.
+
+**Gates** (`finish.py --files <12 files> --with EQUIP_STAT DEBUG -v`): flagcheck EQUIP_STAT `RESULT: PASS` (9 PASS, 1 PASS~ one blank line outside
+the flag, 1 DEFINE, 0 OTHER, 0 deleted); junediverge `RESULT: PASS` (one allow row: June's PvP-only test is type 1 only, @32884753-32884761);
+enumscan exit 1 on 190 pre-existing rows, 0 on lines this phase changed (diff-line check). The 38 EOL-mismatched lines are LF lines beside CRLF
+anchors in the mixed-EOL sources. stateends / skillicons / luabind: not applicable. A first build failed on this phase's own guard
+(`SERV_NEW_ITEM_SYSTEM_2013_05` is not in `Always.h`); fixed at once.
+Build: `DEPLOY OK: X2_offline.exe is 27,192,832 B, dated 2026-11-16 14:51:34, md5 9e0bda3c359d7701fc1033ce3149fdac, equal to X2/US_SERVICE/x2.exe
+(2026-11-16 14:51:26); built at main 7eb699dc + 23 uncommitted code file(s)` (peers' files built in too). `EXESTR OK: 2 of 2 found in X2_offline.exe,
+27192832 B, dated 2026-11-16 14:51:34, md5 9e0bda3c359d7701fc1033ce3149fdac` (ITEMSTAT, RESIST). `Handlers_Room.cpp`'s 4-line S2 hunk (the SHEET emu range call) went in with field-rewards R2's commit `c3b7e545` (it staged
+the whole file); a range gate of this phase adds `--commits c3b7e545` for that file.
+
+**Debug lines** (`[JUNE_STATCALC]`): `ITEMSTAT` (a weapon's item stat: unit, level, unit-level item, appraised, enchant, atk / range / def / hp;
+1 / s), `RESIST` (each `GetEnchantStat` update: group, the two UI options, six resists; 1 / s); S1's `SHEET` lines carry the range change.
+
+**Not ported, routed.** `GetIEchantedItemLevel` `32883890` (tooltip item level; June's effective level and routed calculator) -> S4 (kickoff
+amended). Socket option data's range stays with S3. Play-test units: testlu1 and jtVoidPrincess set to level 99 (backup
+`db_backup/els_db_20261116_144140_pre_s2-before-lv99.sql`).
+
+Play-test: below; review `kickoffs/june-stat-calc/S2-review.md`.
+
 ## Phase Z - Close
 
 **Scope.** `MODS.md` complete, the map has no `March` / `mixed` / `unknown` row, `tools/data/june_diverge_allow.tsv` holds no `stage33`

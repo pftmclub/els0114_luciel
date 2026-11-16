@@ -622,11 +622,20 @@ using namespace _CONST_OFFLINE_SERVER_S1B_;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	// char-luciel DU5e stand-in: Lu's stat counts her slots and the shared ones only ( CX2Unit::GetEqipStat group 0 ), every other class every slot
 	const int iEquipGroup = ( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) ) ? 0 : 2;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+	if( true == pInven->Load( kRow.m_nUnitUID ) )
+	{
+		// june-stat-calc S2 stand-in: each item as June's client computes it, and every weapon and armour piece's range
+		pInven->AddEquippedStat( kOut, iEquipGroup, kRow.m_iUnitClass, kRow.m_iLevel );
+		pInven->AddEquippedWeaponRange( kOut, iEquipGroup, kRow.m_iUnitClass, kRow.m_iLevel );
+	}
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	if( true == pInven->Load( kRow.m_nUnitUID ) )
 		pInven->AddEquippedStat( kOut, iEquipGroup );
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	AddBaseWeaponRange( kRow, kOut );	// june-stat-calc S1: the game stat carries the weapon range ( the same group test )
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	if( true == pInven->Load( kRow.m_nUnitUID ) )
 		pInven->AddEquippedStat( kOut );
@@ -647,11 +656,20 @@ using namespace _CONST_OFFLINE_SERVER_S1B_;
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	CX2OfflineInventory* pInven = CX2OfflineInventory::Instance();
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+	if( true == pInven->Load( kRow.m_nUnitUID ) )
+	{
+		// june-stat-calc S2 stand-in: Ciel's slots and the shared ones, each item as June's client computes it
+		pInven->AddEquippedStat( kOut, 1, kRow.m_iUnitClass, kRow.m_iLevel );
+		pInven->AddEquippedWeaponRange( kOut, 1, kRow.m_iUnitClass, kRow.m_iLevel );
+	}
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	if( true == pInven->Load( kRow.m_nUnitUID ) )
 		pInven->AddEquippedStat( kOut, 1 );
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	pInven->AddEquippedWeaponRange( kOut, 1, kRow.m_iUnitClass );	// june-stat-calc S1: Ciel's slots and the shared ones
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 	KStat kMajor;
 	MakeGameStat( kRow, kMajor );
@@ -1222,7 +1240,11 @@ bool CX2OfflineServer::EnsureAccount( KOfflineSession& kSes, const std::wstring&
 	// gear is known - MakeDefaultUnitInfo only had the class and the level.
 	MakeGameStat( kRow, kOut.m_kGameStat );
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+	// june-stat-calc S2: no range in the base stat; June's client adds each item's range in GetEnchantStat ( 32882630 )
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	AddBaseWeaponRange( kRow, kOut.m_kStat );	// june-stat-calc S1
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
 
@@ -1324,7 +1346,11 @@ void CX2OfflineServer::PushLevelUp( KOfflineSession& kSes, UidType nUnitUID )
 	CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel,
 												 kNot.m_kBaseStat );
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+	// june-stat-calc S2: no range in the base stat ( June 32882630 adds it per item )
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 	AddBaseWeaponRange( kRow, kNot.m_kBaseStat );	// june-stat-calc S1
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	MakeGameStat( kRow, kNot.m_kGameStat );
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT

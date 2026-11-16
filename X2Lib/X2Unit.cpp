@@ -2316,10 +2316,15 @@ CX2Stat::Stat CX2Unit::GetEqipStat( const bool bWithPvpEquip_, const int iEquipG
 			continue;
 
 		/// 328825c0: June's usable test ( expiry, endurance, the item-manager list 0x4d ); March has the endurance part, the rest is Stage 16
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+		if ( false == pItem->IsUsableEquip() )
+			continue;	// june-stat-calc S2: June 328825c0 whole
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 #ifdef REAL_TIME_ELSWORD
 		if ( pItem->GetItemData().m_PeriodType == CX2Item::PT_ENDURANCE && pItem->GetItemData().m_Endurance <= 0 )
 			continue;
 #endif REAL_TIME_ELSWORD
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 		const int iGroup = GetInventory().GetEquipGroup( pItem->GetUID() );
 		if ( 2 != iEquipGroup_ && 2 != iGroup && iGroup != iEquipGroup_ )
@@ -2396,6 +2401,202 @@ CX2Stat::Stat CX2Unit::GetEqipStat() const
 // UI출력용 스탯 계산 할 때만 사용하는 매개변수
 // @bShowDungeonOptionUI_ : 던전용 스탯 보여줄지 여부
 // @bShowPvpOptionUI : 대전용 스탯 보여줄지 여부
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+namespace _CONST_UNIT_S2_
+{
+	const int EAR_DOUBLE_MASTER_VALUE = 135;	// June 3348ffd8: a doubled master attribute's resist ( no Enum entry )
+}
+using namespace _CONST_UNIT_S2_;
+
+// june-stat-calc S2: June 32358df0
+const CX2Stat::EnchantStat& CX2Unit::GetEnchantStat( bool bUpdate /*= true*/, bool bShowDungeonOptionUI_ /*= false*/, bool bShowPvpOptionUI_ /*= false*/, const int iEquipGroup_ /*= DT_MAJOR*/ )
+{
+	if( false == bUpdate )
+		return m_EnchantStat;
+
+	m_EnchantStat.Init();
+
+	for( UINT i = 0; i < m_UnitData.m_NowEqipItemUIDList.size(); i++ )
+	{
+		CX2Item* pItem = m_UnitData.m_Inventory.GetItem( m_UnitData.m_NowEqipItemUIDList[i] );
+		if( NULL == pItem || false == pItem->IsUsableEquip() )
+			continue;
+
+		const CX2Item::ItemTemplet* pItemTemplet = pItem->GetItemTemplet();
+		if( NULL == pItemTemplet )
+			continue;
+
+		const int iGroup = m_UnitData.m_Inventory.GetEquipGroup( pItem->GetUID() );
+		if( DT_BOTH != iGroup && iEquipGroup_ != iGroup )
+			continue;
+
+		if( CX2Item::IT_DEFENCE == pItemTemplet->GetItemType() )
+		{
+			switch( g_pData->GetEnchantItem()->GetExtraDamageType( pItem->GetItemData().m_EnchantedAttribute ) )
+			{
+			case CX2DamageManager::EDT_ENCHANT_BLAZE:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_PIERCING:	m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_SHOCK:	m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_SNATCH:	m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_MASTER:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_MASTER:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_MASTER:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_MASTER_PIERCING:	m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_MASTER_SHOCK:	m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_MASTER_SNATCH:	m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_DOUBLE_MASTER:	m_EnchantStat.m_fDefBlaze += EAR_DOUBLE_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_DOUBLE_MASTER:	m_EnchantStat.m_fDefWater += EAR_DOUBLE_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_DOUBLE_MASTER:	m_EnchantStat.m_fDefNature += EAR_DOUBLE_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_MASTER_PIERCING:	m_EnchantStat.m_fDefWind += EAR_DOUBLE_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_MASTER_SHOCK:	m_EnchantStat.m_fDefLight += EAR_DOUBLE_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_MASTER_SNATCH:	m_EnchantStat.m_fDefDark += EAR_DOUBLE_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_PIERCING:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_SHOCK:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_SNATCH:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_PIERCING:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_SHOCK:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_SNATCH:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_PIERCING:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_SHOCK:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_SNATCH:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_BLAZE_PIERCING:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_BLAZE_SHOCK:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_BLAZE_SNATCH:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_FROZEN_PIERCING:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_FROZEN_SHOCK:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_FROZEN_SNATCH:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_POISON_PIERCING:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_POISON_SHOCK:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_DOUBLE_POISON_SNATCH:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_MASTER_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_DOUBLE_PIERCING:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_DOUBLE_SHOCK:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_BLAZE_DOUBLE_SNATCH:	m_EnchantStat.m_fDefBlaze += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_DOUBLE_PIERCING:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_DOUBLE_SHOCK:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_FROZEN_DOUBLE_SNATCH:	m_EnchantStat.m_fDefWater += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_DOUBLE_PIERCING:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefWind += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_DOUBLE_SHOCK:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefLight += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			case CX2DamageManager::EDT_ENCHANT_POISON_DOUBLE_SNATCH:	m_EnchantStat.m_fDefNature += CX2EnchantItem::EAR_VALUE; m_EnchantStat.m_fDefDark += CX2EnchantItem::EAR_MASTER_VALUE;	break;
+			default:
+				break;
+			}
+		}
+
+		unsigned uiNumSocketOption = pItemTemplet->GetNumSocketOption();
+		for( UINT j = 0; j < uiNumSocketOption; j++ )
+		{
+			const int iSocketID = pItemTemplet->GetSocketOption( j );
+			const CX2SocketItem::SocketData* pSocketData = g_pData->GetSocketItem()->GetSocketData( iSocketID );
+			if( NULL != pSocketData && true == IsShowDungeonOnly( pSocketData->m_iDungeonOnlyType, pSocketData->m_bDungeonOnly, bShowDungeonOptionUI_ ) && true == IsShowPvpOnly( pSocketData->m_bPVPOnly, bShowPvpOptionUI_ ) )
+				AddEchantStatFromSocket( iSocketID );
+		}
+
+		BOOST_FOREACH( int iSocketID, pItem->GetItemData().m_SocketOption )
+		{
+			const CX2SocketItem::SocketData* pSocketData = g_pData->GetSocketItem()->GetSocketData( iSocketID );
+			if( NULL != pSocketData && true == IsShowDungeonOnly( pSocketData->m_iDungeonOnlyType, pSocketData->m_bDungeonOnly, bShowDungeonOptionUI_ ) && true == IsShowPvpOnly( pSocketData->m_bPVPOnly, bShowPvpOptionUI_ ) )
+				AddEchantStatFromSocket( iSocketID );
+		}
+
+		BOOST_FOREACH( int iSocketID, pItem->GetItemData().m_vecRandomSocket )
+		{
+			const CX2SocketItem::SocketData* pSocketData = g_pData->GetSocketItem()->GetSocketData( iSocketID );
+			if( NULL != pSocketData && true == IsShowDungeonOnly( pSocketData->m_iDungeonOnlyType, pSocketData->m_bDungeonOnly, bShowDungeonOptionUI_ ) && true == IsShowPvpOnly( pSocketData->m_bPVPOnly, bShowPvpOptionUI_ ) )
+				AddEchantStatFromSocket( iSocketID );
+		}
+		// stand-in: June's item socket vectors +0x8c / +0x9c and the set-gated +0xac are not in March's item data ( Stage 16 )
+	}
+
+	if( NULL != g_pData->GetTitleManager()->GetTitleInfo( GetTitleId() ) )
+	{
+		BOOST_FOREACH( int iSocketID, g_pData->GetTitleManager()->GetTitleInfo( GetTitleId() )->m_vecSocketOption )
+		{
+			const CX2SocketItem::SocketData* pSocketData = g_pData->GetSocketItem()->GetSocketData( iSocketID );
+			if( NULL != pSocketData && true == IsShowDungeonOnly( pSocketData->m_iDungeonOnlyType, pSocketData->m_bDungeonOnly, bShowDungeonOptionUI_ ) && true == IsShowPvpOnly( pSocketData->m_bPVPOnly, bShowPvpOptionUI_ ) )
+				AddEchantStatFromSocket( iSocketID );
+		}
+	}
+
+#ifdef PET_AURA_SKILL
+	KPetInfo *pPetInfo = GetPetInfo();
+	if( g_pData != NULL && g_pData->GetPetManager() != NULL && g_pData->GetPetManager()->GetMyPet() != NULL && pPetInfo != NULL )
+	{
+		if( (float)pPetInfo->m_sSatiety / CX2PetManager::MAX_OF_SATIETY >= CX2PetManager::SATIETY_RATIO_TO_BE_ABLE_TO_APPLY_AURA )
+		{
+#ifdef SERV_PETID_DATA_TYPE_CHANGE
+			CX2PetManager::PetTemplet *pPetTemplet = g_pData->GetPetManager()->GetPetTemplet( (CX2PetManager::PET_UNIT_ID)pPetInfo->m_iPetID );
+#else SERV_PETID_DATA_TYPE_CHANGE
+			CX2PetManager::PetTemplet *pPetTemplet = g_pData->GetPetManager()->GetPetTemplet( (CX2PetManager::PET_UNIT_ID)pPetInfo->m_cPetID );
+#endif SERV_PETID_DATA_TYPE_CHANGE
+			int iStep = pPetTemplet->m_vecPetStatus[pPetInfo->m_cEvolutionStep];
+			if( pPetTemplet != NULL && iStep > 0 )
+			{
+				for( int i = 0; i < iStep; ++i )
+				{
+					const std::vector<int>& vecAuraSkillOptionTemp = pPetTemplet->m_vecAuraSkillOption[ i ];
+					for( UINT j = 0; j < vecAuraSkillOptionTemp.size(); ++j )
+						AddEchantStatFromSocket( vecAuraSkillOptionTemp[j] );
+				}
+			}
+		}
+	}
+#endif PET_AURA_SKILL
+
+	map<int,int> mapSetIDNParts;
+	GetSetIDNPartsNum( mapSetIDNParts );
+	vector< int > vecSetItemOptions;
+	for( map<int,int>::iterator it = mapSetIDNParts.begin(); it != mapSetIDNParts.end(); it++ )
+		g_pData->GetItemManager()->GetSetItemOptions( it->first, it->second, vecSetItemOptions );
+
+	BOOST_FOREACH( int iSocketID, vecSetItemOptions )
+	{
+		const CX2SocketItem::SocketData* pSocketData = g_pData->GetSocketItem()->GetSocketData( iSocketID );
+		if( NULL != pSocketData && true == IsShowDungeonOnly( pSocketData->m_iDungeonOnlyType, pSocketData->m_bDungeonOnly, bShowDungeonOptionUI_ ) && true == IsShowPvpOnly( pSocketData->m_bPVPOnly, bShowPvpOptionUI_ ) )
+			AddEchantStatFromSocket( iSocketID );
+	}
+
+#ifdef CHUNG_FIRST_CLASS_CHANGE
+	UpdateEnchantStatFromPassiveSkill();
+	m_EnchantStat += GetEnchantStatFromPassiveSkill();
+#endif CHUNG_FIRST_CLASS_CHANGE
+
+#ifdef SERV_INSERT_GLOBAL_SERVER
+	AddEnchantStatFromDragonBreath( m_EnchantStat );
+#endif SERV_INSERT_GLOBAL_SERVER
+	// stand-in: June adds the resonance ability 32358970( 4 ) to all six; with no resonance system it is 0 ( Stage 30 )
+
+	if( m_EnchantStat.m_fDefBlaze > CX2EnchantItem::EAR_MAX_VALUE )
+		m_EnchantStat.m_fDefBlaze = CX2EnchantItem::EAR_MAX_VALUE;
+	if( m_EnchantStat.m_fDefWater > CX2EnchantItem::EAR_MAX_VALUE )
+		m_EnchantStat.m_fDefWater = CX2EnchantItem::EAR_MAX_VALUE;
+	if( m_EnchantStat.m_fDefNature > CX2EnchantItem::EAR_MAX_VALUE )
+		m_EnchantStat.m_fDefNature = CX2EnchantItem::EAR_MAX_VALUE;
+	if( m_EnchantStat.m_fDefWind > CX2EnchantItem::EAR_MAX_VALUE )
+		m_EnchantStat.m_fDefWind = CX2EnchantItem::EAR_MAX_VALUE;
+	if( m_EnchantStat.m_fDefLight > CX2EnchantItem::EAR_MAX_VALUE )
+		m_EnchantStat.m_fDefLight = CX2EnchantItem::EAR_MAX_VALUE;
+	if( m_EnchantStat.m_fDefDark > CX2EnchantItem::EAR_MAX_VALUE )
+		m_EnchantStat.m_fDefDark = CX2EnchantItem::EAR_MAX_VALUE;
+
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+	{
+		static DWORD s_dwLastResistTick = 0;
+		const DWORD dwResistTick = ::GetTickCount();
+		if( dwResistTick - s_dwLastResistTick >= 1000 )
+		{
+			s_dwLastResistTick = dwResistTick;
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] RESIST unit=%d group=%d dungeonUI=%d pvpUI=%d resist=%d/%d/%d/%d/%d/%d",
+				static_cast<int>( GetClass() ), iEquipGroup_, bShowDungeonOptionUI_ ? 1 : 0, bShowPvpOptionUI_ ? 1 : 0,
+				static_cast<int>( m_EnchantStat.m_fDefBlaze ), static_cast<int>( m_EnchantStat.m_fDefWater ), static_cast<int>( m_EnchantStat.m_fDefNature ),
+				static_cast<int>( m_EnchantStat.m_fDefWind ), static_cast<int>( m_EnchantStat.m_fDefLight ), static_cast<int>( m_EnchantStat.m_fDefDark ) );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+	return m_EnchantStat;
+}
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 const CX2Stat::EnchantStat& CX2Unit::GetEnchantStat( bool bUpdate /*= true*/, bool bShowDungeonOptionUI_ /*= false*/, bool bShowPvpOptionUI_ /*= false */)
 {
 	if( false == bUpdate )
@@ -2645,6 +2846,7 @@ const CX2Stat::EnchantStat& CX2Unit::GetEnchantStat( bool bUpdate /*= true*/, bo
 
 	return m_EnchantStat;
 }
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 
 void CX2Unit::AddEchantStatFromSocket( int iSocketOptionID )
@@ -3145,10 +3347,15 @@ void CX2Unit::GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum )
                 )
 			{
 				//{{ kimhc // 실시간 엘소드 중 실시간 내구도 감소
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+				if ( false == pItem->IsUsableEquip() )
+					continue;	// june-stat-calc S2: June 328825c0 whole
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 #ifdef REAL_TIME_ELSWORD
 				if ( pItem->GetItemData().m_PeriodType == CX2Item::PT_ENDURANCE && pItem->GetItemData().m_Endurance <= 0 )
 					continue;
 #endif REAL_TIME_ELSWORD
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 				//}} kimhc // 실시간 엘소드 중 실시간 내구도 감소
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET
@@ -3190,10 +3397,15 @@ void CX2Unit::GetSetIDNPartsNum( map<int,int>& mapSetIDNPartsNum, const int iEqu
 		CX2Item* pItem = kInventory.GetItem( CX2Inventory::ST_E_EQUIP, i );
 		if ( NULL == pItem || NULL == pItem->GetItemTemplet() )
 			continue;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+		if ( false == pItem->IsUsableEquip() )
+			continue;	// june-stat-calc S2: June 328825c0 whole
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 #ifdef REAL_TIME_ELSWORD
 		if ( pItem->GetItemData().m_PeriodType == CX2Item::PT_ENDURANCE && pItem->GetItemData().m_Endurance <= 0 )
 			continue;
 #endif REAL_TIME_ELSWORD
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		if ( CX2Unit::UC_NONE != pItem->GetItemTemplet()->GetUnitClass() &&
 			false == GetX2UnitClassCompatibility( m_UnitData.m_UnitClass, pItem->GetItemTemplet()->GetUnitClass() ) )
 			continue;
@@ -5437,6 +5649,28 @@ void CX2Unit::UnitData::ClearPremiumBuffInfo()
 			 bShowDungeonOptionUI_ ( UI용 인자, 
 									true 라면 현재 위치가 던전이 아니더라도 true)
 */
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+// june-stat-calc S2: June 32357940 ( socket +0x18c, +0x190 ); its game-type tail runs only for a flag byte other than 0 / 1, and both June callers pass 0 / 1
+bool CX2Unit::IsShowDungeonOnly( const int iDungeonOnlyType_, bool bDungeonOnlyItem_, bool bShowDungeonOptionUI_ /*= false*/ )
+{
+	if ( 0 != iDungeonOnlyType_ )
+		return false;
+
+	if ( true == bShowDungeonOptionUI_ )
+		return true;
+
+	return false == bDungeonOnlyItem_;
+}
+
+// june-stat-calc S2: June 323579e0; the same tail as June 32357940
+bool CX2Unit::IsShowPvpOnly( bool bPvpOnlyItem_, bool bShowPvpOptionUI_ /*= false*/ )
+{
+	if ( true == bShowPvpOptionUI_ )
+		return true;
+
+	return false == bPvpOnlyItem_;
+}
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 bool CX2Unit::IsShowDungeonOnly( bool bDungeonOnlyItem_, bool bShowDungeonOptionUI_ /*= false */)
 {
 	//UI용 옵션, 던전용 스탯을 보도록 설정했다면 무조건 보여주기
@@ -5494,6 +5728,7 @@ bool CX2Unit::IsShowPvpOnly( bool bPvpOnlyItem_, bool bShowPvpOptionUI_ /*= fals
 		break;
 	}
 }
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 #ifdef RIDING_SYSTEM
 /** @function 	: 

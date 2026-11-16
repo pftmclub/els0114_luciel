@@ -14163,3 +14163,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG needs SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 #endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: june-stat-calc S2 - June's item, equipment and resist stat: CX2Item::GetStat (328842f0) and GetEnchantStat (32882630: the
+//              unit's level for an item with no use level, the unit-level calculator for PvP-equip and listed items, the weapon range from
+//              damage_range, the effective enchant level), the calculator's level rule (328d6f60) and unit-level form (328d6d70),
+//              CX2Unit::GetEnchantStat (32358df0: equip group, usable test, June's resist table and socket filters), the usable test in
+//              GetEqipStat / GetSetIDNPartsNum, and the emulator's matching item stat (the base stat no longer carries the range).
+#define SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT ) && !( defined( SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT ) && defined( SERV_IRUHADEV_JUNE_SKILL_STAT_GETTERS ) && defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) && defined( SERV_IRUHADEV_JUNE_ENCHANT_PARITY ) && defined( SERV_IRUHADEV_JUNE_SOCKET_PARITY ) && defined( SERV_IRUHADEV_JUNE_ITEM_KIM ) && defined( SERV_IRUHADEV_JUNE_TRANSCEND_CHANGE ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT needs the range pair, June's GetEqipStat / IsUsableEquip / equip groups / viewer form, June's EDT values, the sixth socket level and the transcendence class
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+//////////////////////////////////////////////////////////////////////////

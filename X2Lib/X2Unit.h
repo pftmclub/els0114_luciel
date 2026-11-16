@@ -1021,7 +1021,11 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 #endif	NEW_CHARACTER_CHUNG
 		//}} kimhc // 2010.12.20 //  2010-12-23 New Character CHUNG
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+		const CX2Stat::EnchantStat& GetEnchantStat( bool bUpdate = true , bool bShowDungeonOptionUI_ = false, bool bShowPvpOptionUI_ = false, const int iEquipGroup_ = DT_MAJOR );	// june-stat-calc S2: June 32358df0
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		const CX2Stat::EnchantStat& GetEnchantStat( bool bUpdate = true , bool bShowDungeonOptionUI_ = false, bool bShowPvpOptionUI_ = false );
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 		void AddEchantStatFromSocket( int iSocketOptionID );
 
@@ -1438,8 +1442,13 @@ class CX2Unit : public CKTDXDeviceHolder, public CX2Unit_PreHeader
 		void SetSumOfItemLevel( int iSumOfItemLevel_ ) { m_iSumOfItemLevel = iSumOfItemLevel_; }
 
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+		bool			IsShowDungeonOnly( const int iDungeonOnlyType_, bool bDungeonOnlyItem_, bool bShowDungeonOptionUI_ = false );	// june-stat-calc S2: June 32357940
+		bool			IsShowPvpOnly( bool bPvpOnlyItem_, bool bShowPvpOptionUI_ = false );
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		bool			IsShowDungeonOnly( bool bDungeonOnlyItem_, bool bShowDungeonOptionUI_ = false );
 		bool			IsShowPvpOnly( bool bPvpOnlyItem_, bool bShowPvpOptionUI_ = false );
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		
 		//UnitData*					m_pUnitData;
         UnitData					m_UnitData;

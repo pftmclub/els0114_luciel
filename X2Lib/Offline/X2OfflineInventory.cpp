@@ -495,6 +495,122 @@ int CX2OfflineInventory::AddEquippedWeaponRange( IN OUT KStat& kInOut, const int
 }
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+// june-stat-calc S2 stand-in ( no June server ): one item as June's client computes it with this character as the owner ( 328842f0 / 32882630 )
+bool CX2OfflineInventory::GetEquippedItemStat( OUT CX2Stat::Stat& kOut, const KOfflineItemRow& kRow, const int iUnitClass, const int iUnitLevel ) const
+{
+	kOut = CX2Stat::Stat();
+	if( NULL == g_pData )
+		return false;
+
+	KInventoryItemInfo kInfo;
+	MakeItemInfo( kRow, kInfo );
+	const CX2Item::ItemData kItemData( kInfo );
+	CX2Item kItem( kItemData, NULL );
+	const CX2Item::ItemTemplet* pTemplet = kItem.GetItemTemplet();
+	if( NULL == pTemplet )
+		return false;
+
+	const CX2Unit::UNIT_TYPE eUnitType = static_cast<CX2Unit::UNIT_TYPE>( CX2OfflineStatTable::UnitTypeOf( iUnitClass ) );
+	const CX2Unit::UNIT_CLASS eUnitClass = static_cast<CX2Unit::UNIT_CLASS>( iUnitClass );
+	const bool bUnitLevelStatItem = CX2Item::IsUnitLevelStatItem( pTemplet );
+	CX2ItemStatCalculator& kCalculator = g_pData->GetItemStatCalculator();
+
+	// GetStat: no socket level
+	CX2SocketItem::KItemStatRelLVData kItemStatRelLVData;
+	CX2Item::KItemFormatStatData kCalculateStat;
+	if( true == bUnitLevelStatItem )
+		kCalculator.CalculateItemStatAtUnitLevel( kCalculateStat, pTemplet, iUnitLevel, kItemStatRelLVData, eUnitType, eUnitClass );
+	else
+		kCalculator.CalculateItemStat( kCalculateStat, pTemplet, kItemStatRelLVData, eUnitType, eUnitClass, iUnitLevel );
+	kCalculateStat.AddToStat( kOut );
+
+	// GetEnchantStat: a weapon or armour piece again with its socket levels, then its range, then the enchant scale
+	if( true == pTemplet->GetFashion() || ( CX2Item::IT_WEAPON != pTemplet->GetItemType() && CX2Item::IT_DEFENCE != pTemplet->GetItemType() ) )
+		return true;
+
+	if( true == kItem.GetIsEvaluation() )
+		kCalculator.GetSocketOptionStatRelLV( kItemStatRelLVData, kItem.GetItemData(), pTemplet );
+	CX2Item::KItemFormatStatData kEnchantStat;
+	if( true == bUnitLevelStatItem )
+		kCalculator.CalculateItemStatAtUnitLevel( kEnchantStat, pTemplet, iUnitLevel, kItemStatRelLVData, eUnitType, eUnitClass );
+	else
+		kCalculator.CalculateItemStat( kEnchantStat, pTemplet, kItemStatRelLVData, eUnitType, eUnitClass, iUnitLevel );
+	kEnchantStat.AssignToStat( kOut );
+	kOut.m_fAtkPhysicRange	= CX2Item::GetDamageRangeStat( kOut.m_fAtkPhysic, pTemplet );
+	kOut.m_fAtkMagicRange	= CX2Item::GetDamageRangeStat( kOut.m_fAtkMagic, pTemplet );
+
+	const int iEnchantIndex = abs( kItem.GetEffectiveEnchantLevel() );
+	if( static_cast<unsigned int>( iEnchantIndex ) < sizeof( ENCHANT_STAT_SCALE ) )
+		kOut.MultiplyStat( ENCHANT_STAT_SCALE[ iEnchantIndex ] );
+	return true;
+}
+
+// june-stat-calc S2 stand-in: CX2Unit::GetEqipStat( false, group ) over the saved slots ( June 3234e210: fashion always, a normal item usable and not PvP-equip )
+CX2Stat::Stat CX2OfflineInventory::SumEquippedItemStat( const int iEquipGroup, const int iUnitClass, const int iUnitLevel, OUT int& iWeaponItemID ) const
+{
+	CX2Stat::Stat kSum;
+	iWeaponItemID = 0;
+	for( int iSlot = 0; iSlot < GetSlotSize( CX2Inventory::ST_E_EQUIP ); ++iSlot )
+	{
+		const UidType nItemUID = GetItemUID( CX2Inventory::ST_E_EQUIP, iSlot );
+		if( 0 == nItemUID )
+			continue;
+
+		const int iSlotGroup = GetEquipGroupOfSlot( iSlot );
+		if( 2 != iEquipGroup && 2 != iSlotGroup && iSlotGroup != iEquipGroup )
+			continue;
+
+		const KOfflineItemRow* pRow = FindRow( nItemUID );
+		if( NULL == pRow )
+			continue;
+
+		const CX2Item::ItemTemplet* pTemplet = Templet( pRow->m_iItemID );
+		if( NULL == pTemplet )
+			continue;
+
+		if( false == pTemplet->GetFashion() )
+		{
+			KInventoryItemInfo kInfo;
+			MakeItemInfo( *pRow, kInfo );
+			const CX2Item::ItemData kItemData( kInfo );
+			const CX2Item kItem( kItemData, NULL );
+			if( false == kItem.IsUsableEquip() || true == pTemplet->GetPvpEquip() )
+				continue;
+		}
+
+		CX2Stat::Stat kItemStat;
+		if( false == GetEquippedItemStat( kItemStat, *pRow, iUnitClass, iUnitLevel ) )
+			continue;
+
+		kSum.AddStat( kItemStat );
+		if( false == pTemplet->GetFashion() && CX2Unit::EP_WEAPON_HAND == pTemplet->GetEqipPosition() )
+			iWeaponItemID = pRow->m_iItemID;
+	}
+	return kSum;
+}
+
+void CX2OfflineInventory::AddEquippedStat( IN OUT KStat& kInOut, const int iEquipGroup, const int iUnitClass, const int iUnitLevel ) const
+{
+	int iWeaponItemID = 0;
+	const CX2Stat::Stat kSum = SumEquippedItemStat( iEquipGroup, iUnitClass, iUnitLevel, iWeaponItemID );
+	kInOut.m_fBaseHP	+= kSum.m_fBaseHP;
+	kInOut.m_iAtkPhysic	+= (int)kSum.m_fAtkPhysic;
+	kInOut.m_iAtkMagic	+= (int)kSum.m_fAtkMagic;
+	kInOut.m_iDefPhysic	+= (int)kSum.m_fDefPhysic;
+	kInOut.m_iDefMagic	+= (int)kSum.m_fDefMagic;
+}
+
+int CX2OfflineInventory::AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup, const int iUnitClass, const int iUnitLevel ) const
+{
+	int iWeaponItemID = 0;
+	const CX2Stat::Stat kSum = SumEquippedItemStat( iEquipGroup, iUnitClass, iUnitLevel, iWeaponItemID );
+	kInOut.m_iAtkPhysicRange	+= (int)kSum.m_fAtkPhysicRange;
+	kInOut.m_iAtkMagicRange		+= (int)kSum.m_fAtkMagicRange;
+	return iWeaponItemID;
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+
 //////////////////////////////////////////////////////////////////////////
 
 bool CX2OfflineInventory::Load( UidType nUnitUID )

@@ -1,5 +1,8 @@
 #include "StdAfx.h"
 #include ".\x2item.h"
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+#include "Offline/X2OfflineLog.h"	// june-stat-calc S2: the ITEMSTAT line
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG
 
 
 
@@ -224,6 +227,121 @@ int CX2Item::GetSocketOptionNum() const
 }
 
 // UI에 정보 표시 목적으로만 사용해야함
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+// june-stat-calc S2: helpers of June 328842f0 / 32882630
+namespace _CONST_ITEM_S2_
+{
+	const int UNIT_LEVEL_STAT_ITEM_ID[] =	// June 334c0cb8: items always computed at the unit's level ( a table of ids )
+	{
+		100003738, 100003739, 100003740, 100003741, 100003742, 100003743, 100003744, 100003745, 100003746, 100003747, 100003748,
+		100005577, 100005578, 100005579, 100005580, 100005581, 100005582, 100005583, 100005584, 100005585, 100005586, 100005587,
+	};
+	const double DAMAGE_RANGE_PERCENT_RATE = 0.01f;	// June @3288284a: fld qword 334436a0 ( 0.01f widened )
+
+	// June: the item's owner unit ( +0xc4 ), else my selected unit ( g_pData +0x68 +0x90 )
+	CX2Unit* GetStatUnit( CX2Unit* pOwnerUnit_ )
+	{
+		if ( NULL != pOwnerUnit_ )
+			return pOwnerUnit_;
+
+		if ( NULL != g_pData->GetMyUser() )
+			return g_pData->GetMyUser()->GetSelectUnit();
+		return NULL;
+	}
+
+	bool IsSocketStatInGame( const CX2SocketItem::SocketData* pSocketData_ )
+	{
+		if ( true == pSocketData_->m_bDungeonOnly )
+		{
+			if ( NULL == g_pX2Game )
+				return false;
+
+			switch ( g_pX2Game->GetGameType() )
+			{
+			case CX2Game::GT_DUNGEON:
+			case CX2Game::GT_BATTLE_FIELD:
+				break;	// June also takes game type 5 ( no Enum entry, no March game )
+			default:
+				return false;
+			}
+
+			if ( 0 != pSocketData_->m_iDungeonOnlyType && g_pX2Game->GetDungeonType() != pSocketData_->m_iDungeonOnlyType )
+				return false;
+		}
+
+		if ( true == pSocketData_->m_bPVPOnly && ( NULL == g_pX2Game || CX2Game::GT_PVP != g_pX2Game->GetGameType() ) )
+			return false;
+		return true;
+	}
+
+	void AddSocketStatInGame( IN OUT CX2Stat::Stat& stat_, const int iSocketID_ )
+	{
+		const CX2SocketItem::SocketData* pSocketData = g_pData->GetSocketItem()->GetSocketData( iSocketID_ );
+		if ( NULL != pSocketData && true == IsSocketStatInGame( pSocketData ) )
+			stat_.AddStat( pSocketData->m_Stat, true );
+	}
+}
+using namespace _CONST_ITEM_S2_;
+
+/*static*/ bool CX2Item::IsUnitLevelStatItem( const ItemTemplet* pItemTemplet_ )
+{
+	if ( true == pItemTemplet_->GetPvpEquip() )
+		return true;
+
+	for ( int i = 0; i < static_cast<int>( ARRAY_SIZE( UNIT_LEVEL_STAT_ITEM_ID ) ); ++i )
+	{
+		if ( UNIT_LEVEL_STAT_ITEM_ID[i] == pItemTemplet_->GetItemID() )
+			return true;
+	}
+	return false;
+}
+
+/*static*/ float CX2Item::GetDamageRangeStat( const float fAtk_, const ItemTemplet* pItemTemplet_ )
+{
+	return static_cast<float>( static_cast<double>( fAtk_ ) * pItemTemplet_->GetDamageRange() * DAMAGE_RANGE_PERCENT_RATE );
+}
+
+// june-stat-calc S2: June 328842f0
+CX2Stat::Stat CX2Item::GetStat( bool bIncludeSocketOption /*= false*/, const int iAddEnchantLevel_ /*= 0*/ )
+{
+	CX2Stat::Stat stat;
+	if( NULL == m_pItemTemplet )
+		return stat;
+
+	CX2SocketItem::KItemStatRelLVData kItemStatRelLVData;
+	CX2Item::KItemFormatStatData kCalculateStat;
+	const CX2Unit* pStatUnit = GetStatUnit( m_pOwnerUnit );
+	if ( true == IsUnitLevelStatItem( m_pItemTemplet ) )
+	{
+		if ( NULL != pStatUnit )
+			g_pData->GetItemStatCalculator().CalculateItemStatAtUnitLevel( kCalculateStat, m_pItemTemplet, static_cast<int>( pStatUnit->GetUnitData().m_Level ),
+				kItemStatRelLVData, CX2Unit::UT_NONE, CX2Unit::UC_NONE );
+	}
+	else
+	{
+		const int iUnitLevel = ( NULL != pStatUnit ) ? static_cast<int>( pStatUnit->GetUnitData().m_Level ) : 0;
+		g_pData->GetItemStatCalculator().CalculateItemStat( kCalculateStat, m_pItemTemplet, kItemStatRelLVData, CX2Unit::UT_NONE, CX2Unit::UC_NONE, iUnitLevel );
+	}
+	kCalculateStat.AddToStat( stat );
+
+	GetEnchantStat( stat, iAddEnchantLevel_ );
+
+	if( true == bIncludeSocketOption )
+	{
+		BOOST_FOREACH( int iSocketID, m_kItemData.m_SocketOption )
+			AddSocketStatInGame( stat, iSocketID );
+
+		const DWORD dwNumSO = m_pItemTemplet->GetNumSocketOption();
+		for( UINT i = 0; i < dwNumSO; i++ )
+			AddSocketStatInGame( stat, m_pItemTemplet->GetSocketOption( i ) );
+
+		BOOST_FOREACH( int iSocketID, m_kItemData.m_vecRandomSocket )
+			AddSocketStatInGame( stat, iSocketID );
+		// stand-in: June's item socket vectors +0x8c / +0x9c and the set-gated +0xac are not in March's item data ( Stage 16 )
+	}
+	return stat;
+}
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 CX2Stat::Stat CX2Item::GetStat( bool bIncludeSocketOption /*= false*/ )
 {
 	CX2Stat::Stat stat;
@@ -323,6 +441,7 @@ CX2Stat::Stat CX2Item::GetStat( bool bIncludeSocketOption /*= false*/ )
 
 	return stat;
 }
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 #ifdef SERV_UPGRADE_TRADE_SYSTEM // 김태환
 /// 접두어 출력 여부 추가
@@ -668,6 +787,63 @@ bool CX2Item::IsUsableEquip() const
 	@param : 강화가 적용된 스탯을 저장할 레퍼런스
 	@return : 강화가 적용될 수 없는 아이템은 false, 적용될 수 있는 아이템은 true
 */
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+// june-stat-calc S2: June 32882630
+bool CX2Item::GetEnchantStat( OUT CX2Stat::Stat& stat_, const int iAddEnchantLevel_ /*= 0*/ ) const
+{
+	if ( true == m_pItemTemplet->GetFashion() ||
+		( CX2Item::IT_WEAPON != m_pItemTemplet->GetItemType() && CX2Item::IT_DEFENCE != m_pItemTemplet->GetItemType() ) )
+		return false;
+
+	CX2SocketItem::KItemStatRelLVData kItemStatRelLVData;
+	if( true == GetIsEvaluation() )
+		g_pData->GetItemStatCalculator().GetSocketOptionStatRelLV( kItemStatRelLVData, m_kItemData, m_pItemTemplet );
+
+	CX2Item::KItemFormatStatData kCalculateStat;
+	const CX2Unit* pStatUnit = GetStatUnit( m_pOwnerUnit );
+	if ( true == IsUnitLevelStatItem( m_pItemTemplet ) )
+	{
+		if ( NULL != pStatUnit )
+		{
+			const CX2Unit::UnitTemplet* pUnitTemplet = pStatUnit->GetUnitTemplet();
+			g_pData->GetItemStatCalculator().CalculateItemStatAtUnitLevel( kCalculateStat, m_pItemTemplet, static_cast<int>( pStatUnit->GetUnitData().m_Level ),
+				kItemStatRelLVData, NULL != pUnitTemplet ? pUnitTemplet->m_UnitType : CX2Unit::UT_NONE, NULL != pUnitTemplet ? pUnitTemplet->m_UnitClass : CX2Unit::UC_NONE );
+		}
+	}
+	else
+	{
+		const int iUnitLevel = ( NULL != pStatUnit ) ? static_cast<int>( pStatUnit->GetUnitData().m_Level ) : 0;
+		g_pData->GetItemStatCalculator().CalculateItemStat( kCalculateStat, m_pItemTemplet, kItemStatRelLVData, CX2Unit::UT_NONE, CX2Unit::UC_NONE, iUnitLevel );
+	}
+
+	kCalculateStat.AssignToStat( stat_ );
+	stat_.m_fAtkPhysicRange	= GetDamageRangeStat( stat_.m_fAtkPhysic, m_pItemTemplet );
+	stat_.m_fAtkMagicRange	= GetDamageRangeStat( stat_.m_fAtkMagic, m_pItemTemplet );
+
+	// June @3288297a: abs( added + effective level ), bounded by the table's size in bytes as March's ITEM_RECOVERY_TEST arm ( JUNE_BUGS )
+	const int iEnchantIndex = abs( iAddEnchantLevel_ + GetEffectiveEnchantLevel() );
+	if ( static_cast<unsigned int>( iEnchantIndex ) < sizeof( ENCHANT_STAT_SCALE ) )
+		stat_.MultiplyStat( ENCHANT_STAT_SCALE[ iEnchantIndex ] );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+	if ( CX2Unit::EP_WEAPON_HAND == m_pItemTemplet->GetEqipPosition() )
+	{
+		static DWORD s_dwLastItemStatTick = 0;
+		const DWORD dwItemStatTick = ::GetTickCount();
+		if ( dwItemStatTick - s_dwLastItemStatTick >= 1000 )
+		{
+			s_dwLastItemStatTick = dwItemStatTick;
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] ITEMSTAT item=%d owner=%d unit=%d lv=%d unitlevelitem=%d evaluated=%d enchant=%d atk=%d/%d range=%d/%d def=%d/%d hp=%d",
+				m_pItemTemplet->GetItemID(), NULL != m_pOwnerUnit ? 1 : 0, NULL != pStatUnit ? static_cast<int>( pStatUnit->GetClass() ) : -1,
+				NULL != pStatUnit ? static_cast<int>( pStatUnit->GetUnitData().m_Level ) : -1, IsUnitLevelStatItem( m_pItemTemplet ) ? 1 : 0,
+				GetIsEvaluation() ? 1 : 0, iAddEnchantLevel_ + GetEffectiveEnchantLevel(),
+				static_cast<int>( stat_.m_fAtkPhysic ), static_cast<int>( stat_.m_fAtkMagic ), static_cast<int>( stat_.m_fAtkPhysicRange ),
+				static_cast<int>( stat_.m_fAtkMagicRange ), static_cast<int>( stat_.m_fDefPhysic ), static_cast<int>( stat_.m_fDefMagic ), static_cast<int>( stat_.m_fBaseHP ) );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+	return true;
+}
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 bool CX2Item::GetEnchantStat( OUT CX2Stat::Stat& stat_ ) const
 {
 	// 강화에 의한 기본 stat의 증가
@@ -728,6 +904,7 @@ bool CX2Item::GetEnchantStat( OUT CX2Stat::Stat& stat_ ) const
 
 	return false;
 }
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 /** @function : GetIEchantedItemLevel
 	@brief : 강화에 의해서 증가된 아이템 레벨을 구함(기본 아이템 레벨은 포함 안됨)

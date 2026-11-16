@@ -126,6 +126,14 @@ public:
 	/// june-stat-calc S1 stand-in: adds the equipped weapon's attack range to the KStat range pair; returns the weapon's item id ( 0: none )
 	int		AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup, const int iUnitClass ) const;
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+	/// june-stat-calc S2 stand-in ( no June server ): each item as June's client computes it ( 328842f0 / 32882630 ) for this character's
+	/// class and level; AddEquippedStat adds hp / attack / defence, AddEquippedWeaponRange the range of every weapon and armour piece
+	void	AddEquippedStat( IN OUT KStat& kInOut, const int iEquipGroup, const int iUnitClass, const int iUnitLevel ) const;
+	int		AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup, const int iUnitClass, const int iUnitLevel ) const;
+	bool	GetEquippedItemStat( OUT CX2Stat::Stat& kOut, const KOfflineItemRow& kRow, const int iUnitClass, const int iUnitLevel ) const;
+	CX2Stat::Stat	SumEquippedItemStat( const int iEquipGroup, const int iUnitClass, const int iUnitLevel, OUT int& iWeaponItemID ) const;
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 	//////////////////////////////////////////////////////////////////////////
 	// writes. Each fills vecChanged with one entry per touched slot, in the

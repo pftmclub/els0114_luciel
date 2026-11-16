@@ -842,8 +842,15 @@ public:
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+        CX2Stat::Stat   GetStat( bool bIncludeSocketOption = false, const int iAddEnchantLevel_ = 0 );	// june-stat-calc S2: June 328842f0
+        bool            GetEnchantStat( OUT CX2Stat::Stat& stat_, const int iAddEnchantLevel_ = 0 ) const;	// june-stat-calc S2: June 32882630
+        static bool     IsUnitLevelStatItem( const ItemTemplet* pItemTemplet_ );	// june-stat-calc S2: June's PvP-equip or 334c0cb8 test
+        static float    GetDamageRangeStat( const float fAtk_, const ItemTemplet* pItemTemplet_ );	// june-stat-calc S2: June @32882841
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
         CX2Stat::Stat   GetStat( bool bIncludeSocketOption = false );
         bool            GetEnchantStat( OUT CX2Stat::Stat& stat_ ) const;
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		int             GetIEchantedItemLevel() const;    /// 강화와 관련하여 증가된 아이템 레벨
 #ifdef SERV_NEW_ITEM_SYSTEM_2013_05
 		CX2Stat::Stat   GetStat( IN CX2Unit::UNIT_TYPE eUnitType_, IN CX2Unit::UNIT_CLASS eUnitClass_ );

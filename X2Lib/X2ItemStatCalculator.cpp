@@ -237,9 +237,15 @@ bool CX2ItemStatCalculator::InvalideDataCheck() const
 			 ->스탯연동 추가 레벨이 0일 경우 일반 아이템으로 판단하고, 
 			   item.lua에 설정된 스탯으로 넘겨줌
 			   */
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+void CX2ItemStatCalculator::CalculateItemStat( OUT CX2Item::KItemFormatStatData& sRealStatData_, IN const CX2Item::ItemTemplet* pItemTemplet_ ,
+												IN const CX2SocketItem::KItemStatRelLVData& sStatRelLVData_ /*= CX2SocketItem::ms_KDummyItemStatRelLVData*/,
+												IN CX2Unit::UNIT_TYPE eUnitType_ /*= CX2Unit::UT_NONE*/, IN CX2Unit::UNIT_CLASS eUnitClass_ /*= CX2Unit::UC_NONE*/, IN const int iUnitLevel_ /*= 0*/ )
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 void CX2ItemStatCalculator::CalculateItemStat( OUT CX2Item::KItemFormatStatData& sRealStatData_, IN const CX2Item::ItemTemplet* pItemTemplet_ ,
 												IN const CX2SocketItem::KItemStatRelLVData& sStatRelLVData_ /*= CX2SocketItem::ms_KDummyItemStatRelLVData*/,
 												IN CX2Unit::UNIT_TYPE eUnitType_ /*= CX2Unit::UT_NONE*/, IN CX2Unit::UNIT_CLASS eUnitClass_ /*= CX2Unit::UC_NONE*/ )
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 {
 	if( NULL == pItemTemplet_ )
 		return;
@@ -303,7 +309,14 @@ void CX2ItemStatCalculator::CalculateItemStat( OUT CX2Item::KItemFormatStatData&
 		}
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_ENGINE
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+		// june-stat-calc S2: June @328d71ac, the use level, or the unit's level when it is 0 and the item is not NoEquip ( not in the cache key, JUNE_BUGS )
+		int iItemLevel = pItemTemplet_->GetUseLevel();
+		if ( 0 == iItemLevel && false == pItemTemplet_->GetNoEquip() )
+			iItemLevel = iUnitLevel_;
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		int iItemLevel = pItemTemplet_->GetUseLevel();  
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 
 		// 얻은 정보를 토대로 계산하기
 		CalculateRealStatData(sRealStatData_, sClassStatTable, sCharStatTable, 
@@ -336,6 +349,44 @@ void CX2ItemStatCalculator::CalculateItemStat( OUT CX2Item::KItemFormatStatData&
 	}
 }
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+// june-stat-calc S2: June 328d6d70, the stat at the unit's level with no templet-stat fallback and no cache ( PvP-equip and listed items )
+void CX2ItemStatCalculator::CalculateItemStatAtUnitLevel( OUT CX2Item::KItemFormatStatData& sRealStatData_, IN const CX2Item::ItemTemplet* pItemTemplet_, IN const int iUnitLevel_,
+	IN const CX2SocketItem::KItemStatRelLVData& sStatRelLVData_, IN CX2Unit::UNIT_TYPE eUnitType_, IN CX2Unit::UNIT_CLASS eUnitClass_ )
+{
+	if( NULL == pItemTemplet_ )
+		return;
+
+	if( CX2Unit::UT_NONE == eUnitType_ || CX2Unit::UC_NONE == eUnitClass_ )
+	{
+		eUnitType_ = m_eUnitType;
+		eUnitClass_ = m_eUnitClass;
+	}
+
+	CX2SocketItem::KItemStatRelLVData kStatRelationAddLV;
+	kStatRelationAddLV.AddStat( sStatRelLVData_ );
+	const CX2Item::KItemFormatStatRelLVData& kItemTempletStatRelationLV = pItemTemplet_->GetStatRelLVData();
+	kStatRelationAddLV.m_fBaseHPRelLV		+= static_cast<float>( kItemTempletStatRelationLV.m_byBaseHPRelLV );
+	kStatRelationAddLV.m_fAtkPhysicRelLV	+= static_cast<float>( kItemTempletStatRelationLV.m_byAtkPhysicRelLV );
+	kStatRelationAddLV.m_fAtkMagicRelLV		+= static_cast<float>( kItemTempletStatRelationLV.m_byAtkMagicRelLV );
+	kStatRelationAddLV.m_fDefPhysicRelLV	+= static_cast<float>( kItemTempletStatRelationLV.m_byDefPhysicRelLV );
+	kStatRelationAddLV.m_fDefMagicRelLV		+= static_cast<float>( kItemTempletStatRelationLV.m_byDefMagicRelLV );
+	kStatRelationAddLV.m_fAllStatRelLV		+= static_cast<float>( kItemTempletStatRelationLV.m_byAllStatRelLV );
+
+	CX2Item::KItemFormatStatData sCharStatTable, sClassStatTable, sEqipStatTable;
+	GetStatDataTable( eUnitType_, eUnitClass_, pItemTemplet_->GetEqipPosition(), sCharStatTable, sClassStatTable, sEqipStatTable );
+#ifdef SERV_IRUHADEV_JUNE_TRANSCEND_ENGINE
+	if( 0 != m_iUnitClassTran && 70 <= pItemTemplet_->GetUseLevel() )		// June 328d6c90 @328d6d2d
+	{
+		map< CX2Unit::EQIP_POSITION, CX2Item::KItemFormatStatData >::const_iterator itEqip = m_mapTranscendEqipStatDataTable.find( pItemTemplet_->GetEqipPosition() );
+		if( m_mapTranscendEqipStatDataTable.end() != itEqip )
+			sEqipStatTable = itEqip->second;
+	}
+#endif SERV_IRUHADEV_JUNE_TRANSCEND_ENGINE
+
+	CalculateRealStatData( sRealStatData_, sClassStatTable, sCharStatTable, sEqipStatTable, iUnitLevel_, kStatRelationAddLV );
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 /** @function : GetStatDataTable
 	@brief : 스크립트로부터 파싱한 정보를 토대로 스탯테이블 설정
 */
