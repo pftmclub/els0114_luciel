@@ -2099,6 +2099,7 @@ Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's: viewer, equip
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,159,552 B, dated 2026-11-16 11:50:04, md5 dc655e7b67f7b84d92c5e37548fb4a8d, equal to X2/US_SERVICE/x2.exe
   (2026-11-16 11:49:57); built at main 3e9fa56d + 17 uncommitted code file(s).` (this phase's 9 and peers' in-progress files; every edited
   `.obj` is newer than its source). No exestr line: no string added.
+- **Commit** `990fc1e3`; `finish.py --range 990fc1e3^..990fc1e3` (same flags): DUO_LOBBY / DUO_VIEWER / SKILL_CLASS_POPUP PASS with the tallies above, junediverge PASS, enumscan the same 229 older rows (none on a changed line).
 - **Not done here:** MODS.md's R14f entry still lists the viewer `SetFixed` as "not ported yet"; MODS.md has a peer's uncommitted edits, so char-luciel Z
   updates that line. Review: `DU5d2-review.md`.
 
