@@ -4155,6 +4155,11 @@ funcmap `grep "(CH2d3)"` ( 6 rows ). Review: `CH2d2-review.md` ( covers CH2d, CH
   `CX2GUUser::StateChange`, each tagged. Kickoffs `CH3c.md` / `CH3c2.md` amended ( Ciel's form functions, same rule ). Gates ( `finish.py --files` both, `--with` `_CORE`
   `_SKILL` `TRANSFORM_LINK` `_SKILL_DEBUG` ): PASS, 73 deleted lines = the 73 replaced calls. `DEPLOY OK: X2_offline.exe is 27,078,144 B, dated 2026-11-16 07:40:27,
   md5 6c73c32629bf335a1ab8a6f83ffad842` ( main 306a6b95 + 3 uncommitted ); `EXESTR OK: 1 of 1` ( the trace line ).
+- **Play-test 2 ( 2026-11-16, user: all checks passed; logs 07:51-07:54 on the 07:40 deploy, clean exit, 0 EXCEPTION ):** 2 casts of Altar of Evil ( 30043 ), each
+  `transform form start form 0 swapped 1 anim EVIL_Ru_Wait` and `transform form end form 0 die 0 transformed 1 swapped 1 window 1`; the trace shows the form's own states
+  in play: WALK 425, JUMP_UP 427, DASH 430, DASH_JUMP 432, JUMP_X 435, COMBO_Z 436, COMBO_X 440, DEATH_TOUCH 446, MORTAL_FEAR 447, DARK_PLASMA 448, END 452;
+  `death touch beam` x1. **Not in the logs:** `altar projectile` ( the XXX combo was not reached ), the upgrade 30077 / `LuDbB` and page 2: the CH2d2 review's play-test
+  takes them. The trace and the other `_SKILL_DEBUG` lines stay on; the CH2d2 review retires them.
 - **How to see it in game:** the hand-off in the closing message ( `LuDbA` / `LuDbB`, keys S and W, the form's end on key C and at the buff's end ). Logs:
   `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
 
