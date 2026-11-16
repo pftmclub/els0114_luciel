@@ -9,6 +9,7 @@
 --   Noblesse:   Soul Lock 30057, Magdonic Cannon 30058, Rain of Chaos 30084, Soul Spread 30305
 --   Demonio:    Abyss Sniping 30059, Demonic Rush 30060, Abyss Extinction 30085, Rapid Fury 30306
 -- Page 2 ( Demonio only ): Altar of Evil 30043 on A and Q, Transcendence 30049 on S and W ( the two forms whose awakening shows the _Trans cut-in ).
+-- Both forms' linked skills are learned: Death Touch / Mortal Fear / Dark Plasma 30044-30046 ( added after the play-test: without them the Altar window is empty ), Shadow Fury / Shrewd Cutter / Silent Rage 30050-30052.
 
 DELETE FROM unit_skill_page WHERE unit_uid IN ( 223, 224, 225, 226, 228, 229 );
 UPDATE unit_skill SET slot = -1 WHERE unit_uid IN ( 223, 224, 225, 226, 228, 229 );
@@ -24,6 +25,8 @@ INSERT OR REPLACE INTO unit_skill ( unit_uid, skill_id, level, slot, csp ) VALUE
  ( 228, 30043, 1, -1, 0 ), ( 228, 30049, 1, -1, 0 ), ( 229, 30043, 1, -1, 0 ), ( 229, 30049, 1, -1, 0 ),
  ( 228, 30050, 1, -1, 0 ), ( 228, 30051, 1, -1, 0 ), ( 228, 30052, 1, -1, 0 ),
  ( 229, 30050, 1, -1, 0 ), ( 229, 30051, 1, -1, 0 ), ( 229, 30052, 1, -1, 0 ),
+ ( 228, 30044, 1, -1, 0 ), ( 228, 30045, 1, -1, 0 ), ( 228, 30046, 1, -1, 0 ),
+ ( 229, 30044, 1, -1, 0 ), ( 229, 30045, 1, -1, 0 ), ( 229, 30046, 1, -1, 0 ),
  ( 228, 30421, 1, -1, 0 ), ( 229, 30421, 1, -1, 0 );
 
 INSERT INTO unit_skill_page ( unit_uid, page, slot, skill_id ) VALUES
