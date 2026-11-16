@@ -1103,6 +1103,23 @@ retires `SERV_IRUHADEV_JUNE_STATCALC_DEBUG` (build not awaited).
 **Done gate.** Every character's sheet passes or its failure is routed (a class block to its port, a formula row back to a D phase);
 no damage row in the map is `March` or `mixed`.
 
+### Phase D6 - Done (sheets written 2026-11-16; play-tests in progress)
+
+**Sonnet 5.5 / high. No code, no flag, no build** (full build skipped: the D5 exe md5 49fa44dc is the deployed one). Sheets: `kickoffs/june-stat-calc/playtest.md`
+(`python tools/playtest.py check june-stat-calc`: 8 PASS), one per closed port, handed over one at a time: Elsword (Lord Knight), Aisha (Dimension Witch), Rena
+(Grand Archer), Raven (Blade Master), Eve (Code Empress), Chung (Tactical Trooper), Ara (Yama Raja), Elesis (Grand Master). Add and Lu/Ciel are not closed ports: no sheet.
+
+**Save** (backup `db_backup/els_db_20261116_084455_pre_d6-before.sql`): 16 level-99 transcended units made with `createchar.py --no-gear`, then `elsdb.py additem --equip`
+of the top +10 gear (Apocalypse Type weapon, 4th Dimension armour) and the loadout in slots 0-3 and 4-6(7): `D6<Name>S` uid 204 / 206 / 208 / 210 / 212 / 214 / 216 / 218
+(three weapon sockets of option 20 or, for the magic classes Aisha and Eve, 120 (+400 attack), three armour sockets per piece of 220 or 620 (+100 defence)); `D6<Name>N`
+the next uid, no sockets. Skill ids were read from June's `NewSkillTempletVer2.src.lua` (types 6 active, 13 hyper active, 14 / 15 / 16 special active grades).
+
+**Level-damage hits are not on the sheets:** D2b proved no player-reachable skill takes the level-damage path in June's data (`emu_final_damage_b.py` is the proof).
+**Map gate:** the one damage row still `March`, `dodge roll index offset (NPC stat byte +0xe8)`, is routed to S1b by the S0 review.
+**Throttle:** the debug lines print once a second per attacker / monster pair, so the sheets say to pause 2 s between hit kinds; the log does not name normal vs command.
+
+**Results per character:** (filled in as each sheet is run).
+
 ## Phase S0 - Stat-sheet and resource map (read-only)
 
 **Scope.** The stat and resource rows of the map: base stats by level, `SetKStat` `323571c0` (two 7-value sets), `SetGameStat`
