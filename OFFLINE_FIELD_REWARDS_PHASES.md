@@ -345,6 +345,18 @@ row counts and `check` passes on the dry output; no row is written to the server
 **How to see it.** Log tag `DROP_STANDIN`: expect `loaded:` 174 / 33 / 22 / 28 (per the loader's wording), per-kill lines, and no `no reward row` for keys 33270-33322 / 40029-40032.
 **Play-test PASSED 2026-11-16 (user accepted the one-kill result).** `loaded:` 174 / 33 / 22 / 28; field 40029 mobs EXP 12591 / ED 2712; 33272 mobs EXP 9111 / ED 3486; boss 1686 EXP 109332 / ED 44424, items 130047 + 70058 + 99811; `no reward row` empty. No Kenta entry-list item on the one kill (0.6-3 %), accepted; fields 40030-40032 not walked. The debug define stays on until the R6 review.
 
+### Phase R4 - Done (2026-11-16)
+
+**What landed.** `gen` for Lanox + Elysion together (`--keys` over both regions: `--only elysion` alone rewrites the block and drops R3's rows, so every later rows phase regenerates the union). Elysion adds 238 dungeon rows (21 keys), 25 field rows (3 fields), 24 static rows, 39 groups; the block now holds 412 / 39 keys, 58 / 7 fields, 46 static, 67 groups. BOM + CRLF intact, insertions only. `droptable.py check` PASS (rows 470, static 46, groups 67). Tool fix: `block_scope` returned an unhashable set, so `check` crashed on a `--keys` block (now a frozenset; `tools/droptable.py`, one line).
+
+**Fairness gate (`simulate`, 21 keys + 3 fields).** `mob` 0.94-1.00, `mob-minor` 1.00, `final-boss` 1.00-1.06, `box` 1.00, fields `field-mob` 1.00 (= Sander Field 03). Only Expert `stage-boss` is above 15 %: 1.17 on 33332 / 33342 / 33352 / 33872 / 33882 / 33892 / 33902 (R1 decision 6, tops / gloves, as R3). 35 further keys in the scope list have no census spawns (no dungeon rows).
+
+**Pack.** `stage-server` DropTable.lua md5 a470fcfb (1,049,706 B), StaticDropTable.lua md5 279a740c (49,188 B); `PACK OK data036` (2 changed); `COPY OK data036` md5 61e982139fac9600d541cf00bdfd2780.
+**Build.** Full build skipped: no code change; deployed exe is R3's (`DEPLOY OK` md5 b525d2f1, `EXESTR OK` for `[DROP_STANDIN]` from R3). Gates: `finish.py --no-flag "data-only"`.
+
+**How to see it.** Log: `[DROP_STANDIN] loaded: 412 dungeon row(s) over 39 key(s), 58 field row(s) over 7 field(s), 46 static row(s), 67 group(s)`; per-kill lines; no `no reward row` for 33330-33352 / 33870-33902 / 40035-40037.
+**Play-test:** pending.
+
 ### Phase R2 - Done (2026-11-16)
 
 **What landed.** Flags `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` and `_DEBUG` (end of `Always.h`; `_DEBUG` is on for R3's play-test and retires in

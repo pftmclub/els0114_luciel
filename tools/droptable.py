@@ -835,7 +835,7 @@ def parse_block_groups(blk):
 
 def block_scope(block):
     m = re.search(r"^-- scope: (\w+)(?:; keys: ([0-9,]+))?$", block, re.M)
-    return (m.group(1), parse_keys(m.group(2))) if m else (None, None)
+    return (m.group(1), frozenset(parse_keys(m.group(2)) or ())) if m else (None, None)
 
 
 def cmd_check(a):
