@@ -779,6 +779,7 @@ enumscan                       PASS
 - The `_DP` FAIL is its only complaint, "not #defined" ( `//#define`, `Always.h:13951`, by design until CH1q; `finish.py` marks only `_LIVE` flags INERT ), as in the CH1d0 review. OTHER rows: `X2GUAdd.h` belongs to `_CORE` ( the members and enum names ), `X2SkillTree.h` to `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( `RNSI_P_ADE_TRANSCENDENCE` ).
 - Fix: `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h KTDXLIB/Always.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE --skip-flag JUNE_CHAR_ADD_DP`: `_CORE` PASS ( `files: 3 PASS` ), `_LIVE` FAIL only on "not #defined" ( `files: 2 PASS, 1 OTHER, 0 FAIL` ), `junediverge` PASS, `enumscan` PASS. Its 11 deleted lines are the replaced CH1d2 lines themselves ( 9 inside the `_LIVE` bodies, 2 `_CORE` member lines ); March's `#else` text and the flag-off build are unchanged.
 - One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off, with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`, and with `_LIVE` + `_DP`.
+- Range `finish.py --range f7d63563^..f7d63563` ( same `--with` / `--skip-flag` ): `_CORE` PASS ( `files: 3 PASS` ), `_LIVE` FAIL only on "not #defined" ( `files: 2 PASS, 1 OTHER, 0 FAIL`, the same 9 replaced lines ), `junediverge` PASS, `enumscan` PASS. Commit `f7d63563`.
 - Full build skipped: no play-test ( `_LIVE` is off ). No `_DEBUG` define for these phases.
 
 **Nothing to play-test.** Next: `/x2-phase char-add CH1e` ( Sonnet 5.5 high; kickoff ready ).
