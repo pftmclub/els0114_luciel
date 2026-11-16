@@ -33,3 +33,13 @@ Read the play-test's `[JUNE_CHAR] LUCIEL SKILL` lines ( CH3a's and CH3b's: `fant
 `shadow bolt spawn / stacks / control state`, `twilight judgement start / reattack`, `summon familiar`, `soul spread loops` ). Retire
 `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` ( comment out the define: no build ). Fix clear transcription errors under the same flag; hand design decisions back to
 the user. Write "CH3b - Review" into the plan doc, update the STATUS rows ( CH3a / CH3b done; CH3c ready ), check `kickoffs/char-luciel/CH3c.md`, and commit.
+
+## From the CH3b play-test ( user: all passed, 2026-11-16; logs read )
+
+- **Not seen in the logs:** `LuNoA` page 1 ( the base Swift Smash, Spectral Spear, Shadow Bolt, Twilight Judgement ); any B-bank ( Q W E R ) cast; Swift Smash from Ciel ( JUNE_BUGS 773 );
+  Shadow Bolt control states 408, 410 .. 413; Soul Spread from Lu; Summon Familiar with a partner ( no second player offline ). Judge them by code against June; if you want a
+  play-test first, write the checks into the hand-off before retiring `_SKILL_DEBUG`.
+- **ErrorLog:** 129 lines `ErrorEnum(381)` from `CKTDXDeviceSound::Update3DPosition` ( `KTDXDeviceSound.cpp:934`, FMOD result 47 ), one per frame, for `LU_SP_SHADOWBOLT03` ( 48 ),
+  `CIEL_LCN_MAGDONICCANNON_HIT` ( 40 ), `LUCIEL_SP_SUMMONFAMILIAR02` ( 30 ), `LU_SP_SPECTRALSPEAR02` ( 6 ), `LU_LCN_SOULLOCK_HIT` ( 3 ), `LUCIEL_LCN_SOULSPREAD_HIT` ( 2 ). All six files exist
+  in `data223`. CH3a's play-test had none. Find the cause ( a 3D sound update on a stopped channel in the damage-effect / effect-set sound path
+  `SERV_IRUHADEV_JUNE_DAMAGEEFFECT_SOUND`, or a sound played as 2D ) and say whether it is CH3b's or an engine phase's; do not fix engine code under `_SKILL`.
