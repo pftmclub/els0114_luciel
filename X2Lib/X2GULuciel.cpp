@@ -17710,7 +17710,7 @@ void CX2GULuciel::LSI_SA_LDB_NIGHTMARE_TARGET_StateStartFuture()
 // char-luciel CH2d2: June 32b13360 ( thunk 32b4cde0 ): the voice plays once, at 0.285 s
 void CX2GULuciel::LSI_SA_LDB_NIGHTMARE_TARGET_FrameMove()
 {
-	if ( true == GetXSkinAnimPtr()->EventTimer( NIGHTMARE_VOICE_TIME ) && false == m_bNightmareTargetHit )
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( NIGHTMARE_VOICE_TIME ) && false == m_bNightmareTargetHit )	// char-luciel CH2d2 review: June tests the oneshot timer ( +0x24c ) first
 	{
 		m_bNightmareTargetHit = true;
 		PlaySound( L"LuVoice_Nightmare02.ogg" );
@@ -18359,7 +18359,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_StateStart()
 // char-luciel CH2d2: June 32b318e0 ( thunk 32b4e330 ): at 0.847 s the beam arm, the link and its attack start on the nearest enemy in front, which the buff then marks
 void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_FrameMove()
 {
-	if ( true == GetXSkinAnimPtr()->EventTimer( DEATH_TOUCH_BEAM_TIME ) )
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( DEATH_TOUCH_BEAM_TIME ) )	// char-luciel CH2d2 review: June tests the oneshot timer ( +0x24c ) first
 	{
 		float fAbilityValue = DEATH_TOUCH_DEFAULT_SEARCH_RANGE;
 		TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_PROJECTILE_RANGE_REL, GetNowStateSkillID(), true, fAbilityValue );	// June SA 0x1f
@@ -18496,7 +18496,7 @@ void CX2GULuciel::LSI_A_LDB_F_ABYSS_STRIKE_EventProcess()
 // char-luciel CH2d2: June 32b38140 ( thunk 32b4e570 ): at the first frame the dummy effect set plays and the second use's time starts
 void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_FrameMove()
 {
-	if ( true == GetXSkinAnimPtr()->EventTimer( PHANTOM_RUSH_EFFECT_SET_TIME ) )
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( PHANTOM_RUSH_EFFECT_SET_TIME ) )	// char-luciel CH2d2 review: June tests the oneshot timer ( +0x24c ) first
 	{
 		ResetPhantomRushReady();
 		m_hPhantomRushEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDB_PHANTOM_RUSH_Lu_Dummy", this );
@@ -18509,7 +18509,7 @@ void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_FrameMove()
 // char-luciel CH2d2: June 32b38340 ( thunk 32b4e590, registered in the FrameMove slot ): the same listing with Ciel's dummy effect set
 void CX2GULuciel::LSI_A_LDB_M_PHANTOM_RUSH_FrameMove()
 {
-	if ( true == GetXSkinAnimPtr()->EventTimer( PHANTOM_RUSH_EFFECT_SET_TIME ) )
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( PHANTOM_RUSH_EFFECT_SET_TIME ) )	// char-luciel CH2d2 review: June tests the oneshot timer ( +0x24c ) first
 	{
 		ResetPhantomRushReady();
 		m_hPhantomRushEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDB_PHANTOM_RUSH_Ciel_Dummy", this );
@@ -18549,9 +18549,9 @@ void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture()
 		const CKTDGLineMap::LineData* pLandLineData = g_pX2Game->GetWorld()->GetLineMap()->GetLineData( iLandLineIndex );
 		if ( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
 		{
-			D3DXVECTOR3 vFloorPos;
+			const bool bCanDown = g_pX2Game->GetWorld()->GetLineMap()->CanDown( vStandPos, PHANTOM_RUSH_STAND_LAND_RADIUS, &vStandPos, NULL, NULL, false, false, true, false );	// char-luciel CH2d2 review: June's out pointer is the stand position itself ( @32b3883f ), a landing moves it
 			D3DXVECTOR3 vResultPos = vStandPos;
-			if ( true != g_pX2Game->GetWorld()->GetLineMap()->CanDown( vStandPos, PHANTOM_RUSH_STAND_LAND_RADIUS, &vFloorPos, NULL, NULL, false, false, true, false ) )
+			if ( true != bCanDown )
 			{
 				D3DXVECTOR3 vNearestPos;
 				if ( -1 != g_pX2Game->GetWorld()->GetLineMap()->GetNearestLine( vStandPos, &vNearestPos, false ) )

@@ -4197,6 +4197,40 @@ funcmap `grep "(CH2d3)"` ( 6 rows ). Review: `CH2d2-review.md` ( covers CH2d, CH
 - **How to see it in game:** the hand-off in the closing message ( `LuDbA` / `LuDbB`, keys S and W, the form's end on key C and at the buff's end ). Logs:
   `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
 
+### CH2d2 - Review (2026-11-16)
+
+Opus 5.5 high. Covers CH2d ( `6d84c3d5` ), CH2d2 ( `95f548ff` ) and CH2d3 ( `c466ca67`, `77c59f35` ). **Verdict: pass after two fixes** ( flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL`, `X2GULuciel.cpp` only ).
+- **Fix 1, four timers are `EventTimerOneshot` in June:** Nightmare target voice ( `32b13360` ), Death Touch beam ( `32b318e0` ), both Phantom Rush frame moves ( `32b38140`, `32b38340` ) test the
+  oneshot timer `+0x24c` < t before `EventTimer` `31d28e10` ( Death Touch: `fcom double 0.847` at `334f2cd0` ). CH2d2 wrote plain `EventTimer` ( the CH1f2 review's slip again ). Every timer the three
+  commits added was swept: these four are all of them.
+- **Fix 2, Phantom Rush target start ( `32b38540` ):** June passes the stand position itself as `CanDown`'s out pointer ( `lea edx, [esp + 0xac]` @32b3883f after 6 pushes = the stand position at
+  `esp + 0x94`, read for the by-value position right after ), and on success stores that ( @32b38c17 ). March's `CanDown` writes the landing point to the out pointer when it touches a line, so June
+  stands the unit on the floor point; the port wrote it to a dead `vFloorPos` and stored the unmoved stand position. Now `&vStandPos`. The scan fallback reads the same variable, as June.
+- **Checked = June ( Ghidra / listings, not decompile alone ):**
+  - Setter cases by hand: Nightmare ( hyper copies StartFuture + EventProcess only; target state StartFuture / FrameMove / EventProcess ), Abyss Strike ( 459: skill byte `+0x11` ), Phantom Rush ( hyper copies
+    Init + FrameMove + EventProcess; 460 / 462 through `32b4e5a0` -> `32b4e580`; 461 FrameMove through `32b4e5c0` -> `32b4e590` in slot `+0x38`, skill byte; EP `329cd4a0` -> `329cba60` ). Altar of Evil:
+    446-448 skill byte, 449 / 450 one registration picked by `32070d40` ( unit `+0x867c` -> `+0x3c` transcended ), THROW_ITEM / END / END tables.
+  - Nightmare target start ( `32b30ec0` ): behind the target ( `!right` ), then in front, else on it; my facing when the first failed; y = target y; `GetLandPosition` gives only the line index ( the store
+    reads the stand position ); `LT_NORMAL` + enabled. `32b17c20` = `32b178b0` ( 871 bytes, only the local tail jumps differ ).
+  - Death Touch: SA `0x1f` ( default 800 ), `0x90` into the same value ( JUNE_BUGS 760 ), SA `1` ( default 10 ); ARM at my bone, Linking_Attack at the target, Link at my bone; handles `+0x97b8` link /
+    `+0x97bc` linking attack, unit type `+0x97b0`, uid `+0x97a8`; vslot 0x21c `( 786, creator 0, level 1, 0, 0 )` = March order `( BFI, 1, NULL, 0, false )`.
+  - `SetTransformBuffFactorToSelf` ( `32b3e720` ): `SetFinalizerValue( BFT_TIME, 0.5, 1 )` only in a PvP-correction game, vslot 0x524 skill id into 0x770, `SetGameUnitBuffFactor( this, -1, true )`, no can-apply.
+  - `CreateAltarOfEvilProjectile` ( `32b358b0` ): cone ( range `+0x974c`, -180 / 180, facing, 180, no invincible skip ), option test `3241d2a0( 2 )` = `OL_LOW`, land y `+0x80c4`, lock-on `+0x938` user / `+0x940` NPC.
+  - Form WAIT ( `32b31260` ): foot, buff 763 / fourth key, Z, X, linked key, walk, double, up ( jump speed, +30 ), `TryHyperModeStateChange( LSI_LU_HYPER_MODE )`, down ( the two `CanDown` = the inlined
+    line-index wrapper ); walk before the double step = JUNE_BUGS 758. Phantom Rush's nearest-line scan = March's `GetNearestLine` ( disabled / wall / monster road skipped, `<=`, 9999999 start, same projection ).
+- **Gates ( review, `finish.py --review --commits 6d84c3d5 95f548ff c466ca67 77c59f35 --with _LIVE _SKILL JUNE_ENUM_NAMES _SKILL_DEBUG TRANSFORM_LINK -v` ):** junediverge PASS, `--check-all` PASS, enumscan exit 0;
+  flagcheck per flag 0 FAIL, but FINISH `FAIL` from 1 `ERROR` each: `Always.h` @10175, a compound `#if defined( ..._SKILL_USE_HELPERS ) && !defined( ...ENUM_NAMES )` the tool cannot evaluate, beside CH2d's
+  debug-define toggle ( the same tool limit CH2d's note records ); not a finding. OTHER rows: `X2GULuciel.h` ( `_CORE` declarations ), `X2BuffFactor.h` ( `JUNE_ENUM_NAMES` ), `X2GUUser.h` ( `TRANSFORM_LINK` ),
+  `X2UISkillTreeNew2015.cpp` ( `_LIVE` ), `77c59f35` `X2GULuciel.cpp` ( `_CORE` bodies whose `StateChange` calls became the base's ). Deleted lines: `CheckTransformSkillSlotKey` void -> bool ( 5 + 1 ),
+  `X2GULuciel.h` 4 ( the `#endif` moved below CH2d's declarations, the CH1l helper lines re-added under it ), the "wait for CH2d2" comment, 72 + 1 replaced `StateChange` calls.
+- **Gates ( the fix, `finish.py --files X2GULuciel.cpp --with _SKILL _SKILL_DEBUG --state X2GULuciel.cpp Luciel_Demonio` ):** FINISH RESULT PASS ( 6 gates, 2 skipped: icons, luabind ); flagcheck `_SKILL` PASS
+  ( 6 deleted lines = the 6 replaced lines ), junediverge PASS, enumscan exit 0, stateends PASS.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,080,704 B, dated 2026-11-16 08:10:15, md5 ea24d4fdd30b80483c67fc2dcdc230d8, equal to X2/US_SERVICE/x2.exe (2026-11-16 08:10:06); built at main b7dfce78 + 3 uncommitted code file(s).`
+  ( peers' `Always.h` / `X2TFieldGame.cpp` built in ). No exestr line: the fixes add no string.
+- **`_SKILL_DEBUG`:** stays on for this review's play-test ( the second Phantom Rush use and the altar projectile have never logged ); retired after the logs are read, in a commit with no build.
+- **Play-test owed:** the closing message ( `LuDbA` / `LuDbB`, page 1 and page 2, the form's XXX combo, Phantom Rush twice ). Logs: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
+- **Next:** CH3a0 and CH4a are ready ( their kickoffs checked ); CH4a edits `X2GULuciel.*`, so it waits for this review's debug retire.
+
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 
 | Sub-phase | Scope |
