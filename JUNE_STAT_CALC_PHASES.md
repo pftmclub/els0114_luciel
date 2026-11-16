@@ -1658,7 +1658,8 @@ flagprobe: `_STATCALC_SOCKET` / `_DEBUG` ON.
 
 **Gates** (`finish.py --files <5 files> --with _STATCALC_SOCKET _STATCALC_DEBUG -v`): flagcheck `RESULT: PASS` (3 PASS, 1 PASS~ = one blank line
 before the new functions, 1 DEFINE, 0 OTHER, 0 deleted, 0 non-ASCII); junediverge `RESULT: PASS`; enumscan exit 0; `FINISH RESULT: PASS (6 gates, 0
-failed, 3 skipped)` (no skill states, skills or June scripts).
+failed, 3 skipped)` (no skill states, skills or June scripts). Range gate (`finish.py --range cffe3cab^..cffe3cab --with ...`): flagcheck
+`RESULT: PASS` (3 PASS, 1 PASS~, 1 DEFINE, 0 OTHER), junediverge `RESULT: PASS`, enumscan exit 0, `FINISH RESULT: PASS`.
 Build: `DEPLOY OK: X2_offline.exe is 27,238,400 B, dated 2026-11-16 16:18:45, md5 107a47da43b99d42f7016726a2a7c497, equal to X2/US_SERVICE/x2.exe
 (2026-11-16 16:18:37); built at main 69ab5cfd + 6 uncommitted code file(s)` (peers' files built in too). `EXESTR OK: 1 of 1 found in X2_offline.exe,
 27238400 B, dated 2026-11-16 16:18:45, md5 107a47da43b99d42f7016726a2a7c497` (the MPUP line).
