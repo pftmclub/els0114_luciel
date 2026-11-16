@@ -7316,3 +7316,9 @@ Data only, no client source, no flag (the exe is P1's, `SERV_IRUHADEV_KOM_MOUNT_
 - **Left out:** `Npc_All_Ariel_Face_Talk_Dark.txt` (0 bytes in June; elstools cannot pack an empty entry) stays with P8b (`txt-review`).
 - **Revert:** delete the 15 `dataNNN.kom` / `dataiNNN.kom` from the game dir (they are new, no earlier file existed) and the 15 `kom_contents/<kom>_kom` dirs plus `<kom>_packed.kom`.
 - **Proof:** `python tools/logs.py --kom-mount` after a boot: 258 koms, `KOM_MOUNT CHECK: PASS`; 0 KEM_ERROR; `existfileinfo.txt` unchanged (md5 64e18d8b).
+
+### asset-port P4a (2026-11-16): June-only files into data001-150 (92 existing koms, 9,429 files)
+- 9,411 census rows (`route=P4a`) + 18 earlier-staged June files that were never live (data003 x3, data004 x12, data049 x3). Biggest: data130 2,152, data023 1,732, data016 837, data104 648, data078 501, data141 333 (15 are GodBeast Fire), data002 235. Types: dds 3,033, ogg 2,624, tga 1,305, y 1,303, x 589, xet 373, tet 178, fx 3.
+- Left out: `Velder_Field_001.dds`, `Velder_Field_003.dds` (data101): 0 bytes in June, elstools cannot pack an empty entry. Also `RidingPet_GodBeast_Fire.lua` replaced in data037 by June's bytecode (`adopt-june`).
+- **Revert:** live koms from `kom_backup_tools\dataNNN.kom.<stamp>` (newest per kom); staged tree is all new files (`june2017_re/P4a_stage_plan.tsv` lists them), delete them from `kom_contents/dataNNN_kom` + manifest, repack.
+- **Proof:** `python tools/logs.py --kom-mount` after a boot: 258 koms, `KOM_MOUNT CHECK: PASS`, 0 KEM_ERROR, `existfileinfo.txt` unchanged.

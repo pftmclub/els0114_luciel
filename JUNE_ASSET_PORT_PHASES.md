@@ -468,6 +468,18 @@ names it.
 - **Inert Scaleform** files go in the same waves.
 - **Play-test per wave:** boot and walk one village, one field and one dungeon whose koms are in the wave. P2's gate applies.
 
+## Phase P4a - Done (2026-11-16, Sonnet 5.5 medium; data only, no client source; play-test owed)
+
+**What landed.** June-only files in data001-150: **9,429 files in 92 existing koms** (`june2017_re/P4a_stage_plan.tsv`, `MODS.md` entry). Wave list = 9,411 census rows (route P4a, size > 0) + 18 earlier-staged June files that were in the staging dirs but never live (data003 x3, data004 x12, data049 x3; each `verify-staged` OK).
+- **Left out:** `Velder_Field_001.dds`, `Velder_Field_003.dds` (data101), 0 bytes in June (same pack limit as P2). Not held names.
+- **Routes ticked:** june-engine `XEnvBoxRenderer.fx`, `XHeatShimmerRenderer.fx`, `XRenderer_X2TOOL.fx` (data041), `13Gang_Protect.tga` (data045); GodBeast Fire files (data140 / 141); costume-shop rows.
+
+**Gates.** 1 `stage-june`: 92 koms, 9,411 staged (all new, 0 replaced), 0 refused. 2 `verify-staged`: 9,411 then 15 + 3 OK, 0 problems. 3 `pack --wave` x92: `PACK OK` + `WAVE GATE OK`, every kom `-0 removed`, 0 unexplained `~changed` (data049: 76 recompression only). 4 `dupcheck`: `DUPCHECK OK: 0 duplicate names` (196,296 names), repeated after the copy. 5 `copy`: 92 koms live, 55 `COPY OK` this pass + 37 earlier (25 of them were identical already).
+**Tool bug (not fixed):** `kom.py copy <many>` stops after the first kom that is "already identical"; copy one kom per call. Peers' stale stagings show up as wave-gate "added entries not on the list": add them to the list after `verify-staged`.
+**GodBeast Fire:** `adopt-june data037 RidingPet_GodBeast_Fire.lua` OK (`june_adopt_20261116_162132.tsv`), `pack data037` PACK OK (~1 changed). **data037 COPY OK** (14,435,865 B, 3,001 entries, md5 8c5ecf3a) after the game closed.
+**Census re-run:** June kom numbers with no live archive 0; P4a rows left 2 (the zero-byte files); P4b 12,748, P4c 14,467 unchanged.
+**Build:** no build: data only (exe is P1's). `finish.py` not run: no client source changed.
+
 ## Phase P5 - Collision key forecast
 
 **Run with:** Opus 5.5 high. No build. Opus phase: delegate the mechanical reads and scans (census greps, loader parsers' test runs,
