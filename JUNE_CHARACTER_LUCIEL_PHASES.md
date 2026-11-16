@@ -4838,6 +4838,8 @@ Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h`, `JUNE_BUGS.md` ( 781-782 ), `M
 - **Play-test hand-off:** in the message that closes the session. Logs to read: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
 - **Fix after the first play-test ( 2026-11-16 ):** the transform skill window never showed. My registration script matched the slot word `Start` before `StartFuture`, so six registrations went into the `StateStart` slot: the Transcendence start future ( it builds the window; the later start line overwrote it ), Shrewd Cutter attack A / B and end, Rapid Impact's move attack ( both bodies ). All six are `StateStartFuture` now; `stateends` PASS ( 0 STUCK ).
   `DEPLOY OK: X2_offline.exe is 27,238,400 B, dated 2026-11-16 16:19:29, md5 d135c422eac62224ee8f33605b8569d1`.
+  **Play-test ( 2026-11-16, user ): works; logs read ( run after the 16:19 deploy ):** ErrorLog 0 lines, no unbound Lua name; Abyss Sniping ( aim target 1, pitch 0 ), Demonic Rush, Desperado ( 2 targets: shots 1 and 2 of 2, effect 1 ), Transcendence form twice ( window shown, `window 1` at the end ), Shrewd Cutter ( lock 1, attacks 1-10 alternating B / A, the 11 cap ), Rapid Impact move attack ( body C ).
+  **Not seen:** Desperado with 5 or more targets ( brake 0 ), a non-zero pitch for Desperado and Abyss Sniping, Q W E R bank, LuDnB, Transcendence cast from Lu's body ( all form casts were body C ). The review judges them by code.
 
 ## Phase CH4 - Passives and class mechanics
 
