@@ -1,0 +1,579 @@
+# field-rewards rate sheet (percent per kill; columns: see tools/droptable.py above gen_blocks), written by droptable.py rates from the studio rows each source names; a line whose source starts 'user <date>' is a user decision and survives a rewrite
+kind	region	role	diff	pool	exp	ed	ed_property	prob	inner	source
+param	lanox	mob	NORMAL	-	1	16	100			DropTable 33250 x 1382 Exp / ED / EDProperty
+group	lanox	mob	NORMAL	gear-weapon-normal				0.4		DropTable 33250 x 1382 g181 0.40
+group	lanox	mob	NORMAL	gear-weapon-rare				0.08		DropTable 33250 x 1382 g182 0.08
+group	lanox	mob	NORMAL	gear-armour-normal				0.4		DropTable 33250 x 1382 g184 0.40
+group	lanox	mob	NORMAL	gear-top-rare				0.4		DropTable 33250 x 1382 g185 0.40
+group	lanox	mob	NORMAL	gear-bottom-rare				0.4		DropTable 33250 x 1382 g187 0.40
+group	lanox	mob	NORMAL	gear-gloves-rare				0.4		DropTable 33250 x 1382 g189 0.40
+group	lanox	mob	NORMAL	gear-shoes-rare				0.4		DropTable 33250 x 1382 g191 0.40
+item	lanox	mob	NORMAL	stone-enh-weapon				0.21		DropTable 33250 x 1382 g4005 0.60 x group 4005 weight 35
+item	lanox	mob	NORMAL	stone-enh-armour				0.39		DropTable 33250 x 1382 g4005 0.60 x group 4005 weight 65
+item	lanox	mob	NORMAL	stone-magic.109945				0.48		DropTable 33250 x 1382 g4015 0.60 x group 4015 weight 80
+item	lanox	mob	NORMAL	stone-magic.109955				0.12		DropTable 33250 x 1382 g4015 0.60 x group 4015 weight 20
+param	elysion	mob	NORMAL	-	1	16	100			DropTable 33250 x 1382 Exp / ED / EDProperty
+group	elysion	mob	NORMAL	gear-weapon-normal				0.4		DropTable 33250 x 1382 g181 0.40
+group	elysion	mob	NORMAL	gear-weapon-rare				0.08		DropTable 33250 x 1382 g182 0.08
+group	elysion	mob	NORMAL	gear-armour-normal				0.4		DropTable 33250 x 1382 g184 0.40
+group	elysion	mob	NORMAL	gear-top-rare				0.4		DropTable 33250 x 1382 g185 0.40
+group	elysion	mob	NORMAL	gear-bottom-rare				0.4		DropTable 33250 x 1382 g187 0.40
+group	elysion	mob	NORMAL	gear-gloves-rare				0.4		DropTable 33250 x 1382 g189 0.40
+group	elysion	mob	NORMAL	gear-shoes-rare				0.4		DropTable 33250 x 1382 g191 0.40
+item	elysion	mob	NORMAL	stone-enh-weapon				0.21		DropTable 33250 x 1382 g4005 0.60 x group 4005 weight 35
+item	elysion	mob	NORMAL	stone-enh-armour				0.39		DropTable 33250 x 1382 g4005 0.60 x group 4005 weight 65
+item	elysion	mob	NORMAL	stone-magic.109945				0.48		DropTable 33250 x 1382 g4015 0.60 x group 4015 weight 80
+item	elysion	mob	NORMAL	stone-magic.109955				0.12		DropTable 33250 x 1382 g4015 0.60 x group 4015 weight 20
+param	lanox	mob	HARD	-	1	16	100			DropTable 33251 x 1382 Exp / ED / EDProperty
+group	lanox	mob	HARD	gear-weapon-normal				0.4		DropTable 33251 x 1382 g181 0.40
+group	lanox	mob	HARD	gear-weapon-rare				0.08		DropTable 33251 x 1382 g182 0.08
+group	lanox	mob	HARD	gear-armour-normal				0.4		DropTable 33251 x 1382 g184 0.40
+group	lanox	mob	HARD	gear-top-rare				0.4		DropTable 33251 x 1382 g185 0.40
+group	lanox	mob	HARD	gear-bottom-rare				0.4		DropTable 33251 x 1382 g187 0.40
+group	lanox	mob	HARD	gear-gloves-rare				0.4		DropTable 33251 x 1382 g189 0.40
+group	lanox	mob	HARD	gear-shoes-rare				0.4		DropTable 33251 x 1382 g191 0.40
+item	lanox	mob	HARD	stone-enh-weapon				0.21		DropTable 33251 x 1382 g4005 0.60 x group 4005 weight 35
+item	lanox	mob	HARD	stone-enh-armour				0.39		DropTable 33251 x 1382 g4005 0.60 x group 4005 weight 65
+item	lanox	mob	HARD	stone-magic.109945				0.48		DropTable 33251 x 1382 g4015 0.60 x group 4015 weight 80
+item	lanox	mob	HARD	stone-magic.109955				0.12		DropTable 33251 x 1382 g4015 0.60 x group 4015 weight 20
+param	elysion	mob	HARD	-	1	16	100			DropTable 33251 x 1382 Exp / ED / EDProperty
+group	elysion	mob	HARD	gear-weapon-normal				0.4		DropTable 33251 x 1382 g181 0.40
+group	elysion	mob	HARD	gear-weapon-rare				0.08		DropTable 33251 x 1382 g182 0.08
+group	elysion	mob	HARD	gear-armour-normal				0.4		DropTable 33251 x 1382 g184 0.40
+group	elysion	mob	HARD	gear-top-rare				0.4		DropTable 33251 x 1382 g185 0.40
+group	elysion	mob	HARD	gear-bottom-rare				0.4		DropTable 33251 x 1382 g187 0.40
+group	elysion	mob	HARD	gear-gloves-rare				0.4		DropTable 33251 x 1382 g189 0.40
+group	elysion	mob	HARD	gear-shoes-rare				0.4		DropTable 33251 x 1382 g191 0.40
+item	elysion	mob	HARD	stone-enh-weapon				0.21		DropTable 33251 x 1382 g4005 0.60 x group 4005 weight 35
+item	elysion	mob	HARD	stone-enh-armour				0.39		DropTable 33251 x 1382 g4005 0.60 x group 4005 weight 65
+item	elysion	mob	HARD	stone-magic.109945				0.48		DropTable 33251 x 1382 g4015 0.60 x group 4015 weight 80
+item	elysion	mob	HARD	stone-magic.109955				0.12		DropTable 33251 x 1382 g4015 0.60 x group 4015 weight 20
+param	lanox	mob	EXPERT	-	1	16	100			DropTable 33252 x 1382 Exp / ED / EDProperty
+group	lanox	mob	EXPERT	gear-weapon-normal				0.4		DropTable 33252 x 1382 g181 0.40
+group	lanox	mob	EXPERT	gear-weapon-rare				0.08		DropTable 33252 x 1382 g182 0.08
+group	lanox	mob	EXPERT	gear-armour-normal				0.4		DropTable 33252 x 1382 g184 0.40
+group	lanox	mob	EXPERT	gear-top-rare				0.4		DropTable 33252 x 1382 g185 0.40
+group	lanox	mob	EXPERT	gear-bottom-rare				0.4		DropTable 33252 x 1382 g187 0.40
+group	lanox	mob	EXPERT	gear-gloves-rare				0.4		DropTable 33252 x 1382 g189 0.40
+group	lanox	mob	EXPERT	gear-shoes-rare				0.4		DropTable 33252 x 1382 g191 0.40
+item	lanox	mob	EXPERT	stone-enh-weapon				0.21		DropTable 33252 x 1382 g4005 0.60 x group 4005 weight 35
+item	lanox	mob	EXPERT	stone-enh-armour				0.39		DropTable 33252 x 1382 g4005 0.60 x group 4005 weight 65
+item	lanox	mob	EXPERT	stone-magic.109945				0.48		DropTable 33252 x 1382 g4015 0.60 x group 4015 weight 80
+item	lanox	mob	EXPERT	stone-magic.109955				0.12		DropTable 33252 x 1382 g4015 0.60 x group 4015 weight 20
+param	elysion	mob	EXPERT	-	1	16	100			DropTable 33252 x 1382 Exp / ED / EDProperty
+group	elysion	mob	EXPERT	gear-weapon-normal				0.4		DropTable 33252 x 1382 g181 0.40
+group	elysion	mob	EXPERT	gear-weapon-rare				0.08		DropTable 33252 x 1382 g182 0.08
+group	elysion	mob	EXPERT	gear-armour-normal				0.4		DropTable 33252 x 1382 g184 0.40
+group	elysion	mob	EXPERT	gear-top-rare				0.4		DropTable 33252 x 1382 g185 0.40
+group	elysion	mob	EXPERT	gear-bottom-rare				0.4		DropTable 33252 x 1382 g187 0.40
+group	elysion	mob	EXPERT	gear-gloves-rare				0.4		DropTable 33252 x 1382 g189 0.40
+group	elysion	mob	EXPERT	gear-shoes-rare				0.4		DropTable 33252 x 1382 g191 0.40
+item	elysion	mob	EXPERT	stone-enh-weapon				0.21		DropTable 33252 x 1382 g4005 0.60 x group 4005 weight 35
+item	elysion	mob	EXPERT	stone-enh-armour				0.39		DropTable 33252 x 1382 g4005 0.60 x group 4005 weight 65
+item	elysion	mob	EXPERT	stone-magic.109945				0.48		DropTable 33252 x 1382 g4015 0.60 x group 4015 weight 80
+item	elysion	mob	EXPERT	stone-magic.109955				0.12		DropTable 33252 x 1382 g4015 0.60 x group 4015 weight 20
+param	lanox	mob-minor	NORMAL	-	1	16	100			DropTable 33250 x 1415 Exp / ED / EDProperty
+group	lanox	mob-minor	NORMAL	gear-weapon-normal				0.2		DropTable 33250 x 1415 g181 0.20
+group	lanox	mob-minor	NORMAL	gear-weapon-rare				0.04		DropTable 33250 x 1415 g182 0.04
+group	lanox	mob-minor	NORMAL	gear-armour-normal				0.2		DropTable 33250 x 1415 g184 0.20
+group	lanox	mob-minor	NORMAL	gear-top-rare				0.2		DropTable 33250 x 1415 g185 0.20
+group	lanox	mob-minor	NORMAL	gear-bottom-rare				0.2		DropTable 33250 x 1415 g187 0.20
+group	lanox	mob-minor	NORMAL	gear-gloves-rare				0.2		DropTable 33250 x 1415 g189 0.20
+group	lanox	mob-minor	NORMAL	gear-shoes-rare				0.2		DropTable 33250 x 1415 g191 0.20
+item	lanox	mob-minor	NORMAL	stone-enh-weapon				0.105		DropTable 33250 x 1415 g4005 0.30 x group 4005 weight 35
+item	lanox	mob-minor	NORMAL	stone-enh-armour				0.195		DropTable 33250 x 1415 g4005 0.30 x group 4005 weight 65
+item	lanox	mob-minor	NORMAL	stone-magic.109945				0.24		DropTable 33250 x 1415 g4015 0.30 x group 4015 weight 80
+item	lanox	mob-minor	NORMAL	stone-magic.109955				0.06		DropTable 33250 x 1415 g4015 0.30 x group 4015 weight 20
+param	elysion	mob-minor	NORMAL	-	1	16	100			DropTable 33250 x 1415 Exp / ED / EDProperty
+group	elysion	mob-minor	NORMAL	gear-weapon-normal				0.2		DropTable 33250 x 1415 g181 0.20
+group	elysion	mob-minor	NORMAL	gear-weapon-rare				0.04		DropTable 33250 x 1415 g182 0.04
+group	elysion	mob-minor	NORMAL	gear-armour-normal				0.2		DropTable 33250 x 1415 g184 0.20
+group	elysion	mob-minor	NORMAL	gear-top-rare				0.2		DropTable 33250 x 1415 g185 0.20
+group	elysion	mob-minor	NORMAL	gear-bottom-rare				0.2		DropTable 33250 x 1415 g187 0.20
+group	elysion	mob-minor	NORMAL	gear-gloves-rare				0.2		DropTable 33250 x 1415 g189 0.20
+group	elysion	mob-minor	NORMAL	gear-shoes-rare				0.2		DropTable 33250 x 1415 g191 0.20
+item	elysion	mob-minor	NORMAL	stone-enh-weapon				0.105		DropTable 33250 x 1415 g4005 0.30 x group 4005 weight 35
+item	elysion	mob-minor	NORMAL	stone-enh-armour				0.195		DropTable 33250 x 1415 g4005 0.30 x group 4005 weight 65
+item	elysion	mob-minor	NORMAL	stone-magic.109945				0.24		DropTable 33250 x 1415 g4015 0.30 x group 4015 weight 80
+item	elysion	mob-minor	NORMAL	stone-magic.109955				0.06		DropTable 33250 x 1415 g4015 0.30 x group 4015 weight 20
+param	lanox	mob-minor	HARD	-	1	16	100			DropTable 33251 x 1415 Exp / ED / EDProperty
+group	lanox	mob-minor	HARD	gear-weapon-normal				0.2		DropTable 33251 x 1415 g181 0.20
+group	lanox	mob-minor	HARD	gear-weapon-rare				0.04		DropTable 33251 x 1415 g182 0.04
+group	lanox	mob-minor	HARD	gear-armour-normal				0.2		DropTable 33251 x 1415 g184 0.20
+group	lanox	mob-minor	HARD	gear-top-rare				0.2		DropTable 33251 x 1415 g185 0.20
+group	lanox	mob-minor	HARD	gear-bottom-rare				0.2		DropTable 33251 x 1415 g187 0.20
+group	lanox	mob-minor	HARD	gear-gloves-rare				0.2		DropTable 33251 x 1415 g189 0.20
+group	lanox	mob-minor	HARD	gear-shoes-rare				0.2		DropTable 33251 x 1415 g191 0.20
+item	lanox	mob-minor	HARD	stone-enh-weapon				0.105		DropTable 33251 x 1415 g4005 0.30 x group 4005 weight 35
+item	lanox	mob-minor	HARD	stone-enh-armour				0.195		DropTable 33251 x 1415 g4005 0.30 x group 4005 weight 65
+item	lanox	mob-minor	HARD	stone-magic.109945				0.24		DropTable 33251 x 1415 g4015 0.30 x group 4015 weight 80
+item	lanox	mob-minor	HARD	stone-magic.109955				0.06		DropTable 33251 x 1415 g4015 0.30 x group 4015 weight 20
+param	elysion	mob-minor	HARD	-	1	16	100			DropTable 33251 x 1415 Exp / ED / EDProperty
+group	elysion	mob-minor	HARD	gear-weapon-normal				0.2		DropTable 33251 x 1415 g181 0.20
+group	elysion	mob-minor	HARD	gear-weapon-rare				0.04		DropTable 33251 x 1415 g182 0.04
+group	elysion	mob-minor	HARD	gear-armour-normal				0.2		DropTable 33251 x 1415 g184 0.20
+group	elysion	mob-minor	HARD	gear-top-rare				0.2		DropTable 33251 x 1415 g185 0.20
+group	elysion	mob-minor	HARD	gear-bottom-rare				0.2		DropTable 33251 x 1415 g187 0.20
+group	elysion	mob-minor	HARD	gear-gloves-rare				0.2		DropTable 33251 x 1415 g189 0.20
+group	elysion	mob-minor	HARD	gear-shoes-rare				0.2		DropTable 33251 x 1415 g191 0.20
+item	elysion	mob-minor	HARD	stone-enh-weapon				0.105		DropTable 33251 x 1415 g4005 0.30 x group 4005 weight 35
+item	elysion	mob-minor	HARD	stone-enh-armour				0.195		DropTable 33251 x 1415 g4005 0.30 x group 4005 weight 65
+item	elysion	mob-minor	HARD	stone-magic.109945				0.24		DropTable 33251 x 1415 g4015 0.30 x group 4015 weight 80
+item	elysion	mob-minor	HARD	stone-magic.109955				0.06		DropTable 33251 x 1415 g4015 0.30 x group 4015 weight 20
+param	lanox	mob-minor	EXPERT	-	1	16	100			DropTable 33252 x 1415 Exp / ED / EDProperty
+group	lanox	mob-minor	EXPERT	gear-weapon-normal				0.2		DropTable 33252 x 1415 g181 0.20
+group	lanox	mob-minor	EXPERT	gear-weapon-rare				0.04		DropTable 33252 x 1415 g182 0.04
+group	lanox	mob-minor	EXPERT	gear-armour-normal				0.2		DropTable 33252 x 1415 g184 0.20
+group	lanox	mob-minor	EXPERT	gear-top-rare				0.2		DropTable 33252 x 1415 g185 0.20
+group	lanox	mob-minor	EXPERT	gear-bottom-rare				0.2		DropTable 33252 x 1415 g187 0.20
+group	lanox	mob-minor	EXPERT	gear-gloves-rare				0.2		DropTable 33252 x 1415 g189 0.20
+group	lanox	mob-minor	EXPERT	gear-shoes-rare				0.2		DropTable 33252 x 1415 g191 0.20
+item	lanox	mob-minor	EXPERT	stone-enh-weapon				0.105		DropTable 33252 x 1415 g4005 0.30 x group 4005 weight 35
+item	lanox	mob-minor	EXPERT	stone-enh-armour				0.195		DropTable 33252 x 1415 g4005 0.30 x group 4005 weight 65
+item	lanox	mob-minor	EXPERT	stone-magic.109945				0.24		DropTable 33252 x 1415 g4015 0.30 x group 4015 weight 80
+item	lanox	mob-minor	EXPERT	stone-magic.109955				0.06		DropTable 33252 x 1415 g4015 0.30 x group 4015 weight 20
+param	elysion	mob-minor	EXPERT	-	1	16	100			DropTable 33252 x 1415 Exp / ED / EDProperty
+group	elysion	mob-minor	EXPERT	gear-weapon-normal				0.2		DropTable 33252 x 1415 g181 0.20
+group	elysion	mob-minor	EXPERT	gear-weapon-rare				0.04		DropTable 33252 x 1415 g182 0.04
+group	elysion	mob-minor	EXPERT	gear-armour-normal				0.2		DropTable 33252 x 1415 g184 0.20
+group	elysion	mob-minor	EXPERT	gear-top-rare				0.2		DropTable 33252 x 1415 g185 0.20
+group	elysion	mob-minor	EXPERT	gear-bottom-rare				0.2		DropTable 33252 x 1415 g187 0.20
+group	elysion	mob-minor	EXPERT	gear-gloves-rare				0.2		DropTable 33252 x 1415 g189 0.20
+group	elysion	mob-minor	EXPERT	gear-shoes-rare				0.2		DropTable 33252 x 1415 g191 0.20
+item	elysion	mob-minor	EXPERT	stone-enh-weapon				0.105		DropTable 33252 x 1415 g4005 0.30 x group 4005 weight 35
+item	elysion	mob-minor	EXPERT	stone-enh-armour				0.195		DropTable 33252 x 1415 g4005 0.30 x group 4005 weight 65
+item	elysion	mob-minor	EXPERT	stone-magic.109945				0.24		DropTable 33252 x 1415 g4015 0.30 x group 4015 weight 80
+item	elysion	mob-minor	EXPERT	stone-magic.109955				0.06		DropTable 33252 x 1415 g4015 0.30 x group 4015 weight 20
+item	lanox	mob-card	NORMAL	card				0.3		DropTable 33250 x 1378 i78776 0.30
+item	elysion	mob-card	NORMAL	card				0.3		DropTable 33250 x 1378 i78776 0.30
+item	lanox	mob-card	HARD	card				0.3		DropTable 33251 x 1378 i78776 0.30
+item	elysion	mob-card	HARD	card				0.3		DropTable 33251 x 1378 i78776 0.30
+item	lanox	mob-card	EXPERT	card				0.3		DropTable 33252 x 1378 i78776 0.30
+item	elysion	mob-card	EXPERT	card				0.3		DropTable 33252 x 1378 i78776 0.30
+param	lanox	stage-boss	NORMAL	-	1	17	100			DropTable 33250 x 1387 Exp / ED / EDProperty
+group	lanox	stage-boss	NORMAL	gear-weapon-rare				0.53		DropTable 33250 x 1387 g182 0.53
+group	lanox	stage-boss	NORMAL	gear-weapon-elite				1.23		DropTable 33250 x 1387 g183 1.23
+group	lanox	stage-boss	NORMAL	gear-top-rare				0.11		DropTable 33250 x 1387 g185 0.11
+group	lanox	stage-boss	NORMAL	gear-top-elite				2.52		DropTable 33250 x 1387 g186 2.52
+group	lanox	stage-boss	NORMAL	gear-bottom-rare				0.11		DropTable 33250 x 1387 g187 0.11
+group	lanox	stage-boss	NORMAL	gear-bottom-elite				2.52		DropTable 33250 x 1387 g188 2.52
+group	lanox	stage-boss	NORMAL	gear-gloves-rare				0.11		DropTable 33250 x 1387 g189 0.11
+group	lanox	stage-boss	NORMAL	gear-gloves-elite				2.52		DropTable 33250 x 1387 g190 2.52
+group	lanox	stage-boss	NORMAL	gear-shoes-rare				0.11		DropTable 33250 x 1387 g191 0.11
+group	lanox	stage-boss	NORMAL	gear-shoes-elite				2.52		DropTable 33250 x 1387 g192 2.52
+item	lanox	stage-boss	NORMAL	stone-bundle.109945				3.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 17
+item	lanox	stage-boss	NORMAL	stone-bundle.109955				1.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 7
+item	lanox	stage-boss	NORMAL	stone-bundle.130047				10.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 52
+item	lanox	stage-boss	NORMAL	stone-bundle.enh-weapon				1.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 7
+item	lanox	stage-boss	NORMAL	stone-bundle.enh-armour				3.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 17
+item	lanox	stage-boss	NORMAL	card				0.3		DropTable 33250 x 1387 i78777 0.30
+item	lanox	stage-boss	NORMAL	set-bottom				1		DropTable 33250 x 1387 g1162 1
+item	lanox	stage-boss	NORMAL	set-shoes				1.5		DropTable 33250 x 1387 g1164 1.50
+param	elysion	stage-boss	NORMAL	-	1	17	100			DropTable 33250 x 1387 Exp / ED / EDProperty
+group	elysion	stage-boss	NORMAL	gear-weapon-rare				0.53		DropTable 33250 x 1387 g182 0.53
+group	elysion	stage-boss	NORMAL	gear-weapon-elite				1.23		DropTable 33250 x 1387 g183 1.23
+group	elysion	stage-boss	NORMAL	gear-top-rare				0.11		DropTable 33250 x 1387 g185 0.11
+group	elysion	stage-boss	NORMAL	gear-top-elite				2.52		DropTable 33250 x 1387 g186 2.52
+group	elysion	stage-boss	NORMAL	gear-bottom-rare				0.11		DropTable 33250 x 1387 g187 0.11
+group	elysion	stage-boss	NORMAL	gear-bottom-elite				2.52		DropTable 33250 x 1387 g188 2.52
+group	elysion	stage-boss	NORMAL	gear-gloves-rare				0.11		DropTable 33250 x 1387 g189 0.11
+group	elysion	stage-boss	NORMAL	gear-gloves-elite				2.52		DropTable 33250 x 1387 g190 2.52
+group	elysion	stage-boss	NORMAL	gear-shoes-rare				0.11		DropTable 33250 x 1387 g191 0.11
+group	elysion	stage-boss	NORMAL	gear-shoes-elite				2.52		DropTable 33250 x 1387 g192 2.52
+item	elysion	stage-boss	NORMAL	stone-bundle.109945				3.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 17
+item	elysion	stage-boss	NORMAL	stone-bundle.109955				1.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 7
+item	elysion	stage-boss	NORMAL	stone-bundle.130047				10.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 52
+item	elysion	stage-boss	NORMAL	stone-bundle.enh-weapon				1.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 7
+item	elysion	stage-boss	NORMAL	stone-bundle.enh-armour				3.4		DropTable 33250 x 1387 g4090 20 x group 4090 weight 17
+item	elysion	stage-boss	NORMAL	card				0.3		DropTable 33250 x 1387 i78777 0.30
+item	elysion	stage-boss	NORMAL	set-bottom				1		DropTable 33250 x 1387 g1162 1
+item	elysion	stage-boss	NORMAL	set-shoes				1.5		DropTable 33250 x 1387 g1164 1.50
+param	lanox	stage-boss	HARD	-	1	17	100			DropTable 33251 x 1387 Exp / ED / EDProperty
+group	lanox	stage-boss	HARD	gear-weapon-rare				0.53		DropTable 33251 x 1387 g182 0.53
+group	lanox	stage-boss	HARD	gear-weapon-elite				1.23		DropTable 33251 x 1387 g183 1.23
+group	lanox	stage-boss	HARD	gear-top-rare				0.11		DropTable 33251 x 1387 g185 0.11
+group	lanox	stage-boss	HARD	gear-top-elite				2.52		DropTable 33251 x 1387 g186 2.52
+group	lanox	stage-boss	HARD	gear-bottom-rare				0.11		DropTable 33251 x 1387 g187 0.11
+group	lanox	stage-boss	HARD	gear-bottom-elite				2.52		DropTable 33251 x 1387 g188 2.52
+group	lanox	stage-boss	HARD	gear-gloves-rare				0.11		DropTable 33251 x 1387 g189 0.11
+group	lanox	stage-boss	HARD	gear-gloves-elite				2.52		DropTable 33251 x 1387 g190 2.52
+group	lanox	stage-boss	HARD	gear-shoes-rare				0.11		DropTable 33251 x 1387 g191 0.11
+group	lanox	stage-boss	HARD	gear-shoes-elite				2.52		DropTable 33251 x 1387 g192 2.52
+item	lanox	stage-boss	HARD	stone-bundle.109945				3.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 17
+item	lanox	stage-boss	HARD	stone-bundle.109955				1.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 7
+item	lanox	stage-boss	HARD	stone-bundle.130047				10.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 52
+item	lanox	stage-boss	HARD	stone-bundle.enh-weapon				1.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 7
+item	lanox	stage-boss	HARD	stone-bundle.enh-armour				3.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 17
+item	lanox	stage-boss	HARD	card				0.3		DropTable 33251 x 1387 i78777 0.30
+item	lanox	stage-boss	HARD	set-bottom				1.5		DropTable 33251 x 1387 g1162 1.50
+item	lanox	stage-boss	HARD	set-shoes				2.25		DropTable 33251 x 1387 g1164 2.25
+param	elysion	stage-boss	HARD	-	1	17	100			DropTable 33251 x 1387 Exp / ED / EDProperty
+group	elysion	stage-boss	HARD	gear-weapon-rare				0.53		DropTable 33251 x 1387 g182 0.53
+group	elysion	stage-boss	HARD	gear-weapon-elite				1.23		DropTable 33251 x 1387 g183 1.23
+group	elysion	stage-boss	HARD	gear-top-rare				0.11		DropTable 33251 x 1387 g185 0.11
+group	elysion	stage-boss	HARD	gear-top-elite				2.52		DropTable 33251 x 1387 g186 2.52
+group	elysion	stage-boss	HARD	gear-bottom-rare				0.11		DropTable 33251 x 1387 g187 0.11
+group	elysion	stage-boss	HARD	gear-bottom-elite				2.52		DropTable 33251 x 1387 g188 2.52
+group	elysion	stage-boss	HARD	gear-gloves-rare				0.11		DropTable 33251 x 1387 g189 0.11
+group	elysion	stage-boss	HARD	gear-gloves-elite				2.52		DropTable 33251 x 1387 g190 2.52
+group	elysion	stage-boss	HARD	gear-shoes-rare				0.11		DropTable 33251 x 1387 g191 0.11
+group	elysion	stage-boss	HARD	gear-shoes-elite				2.52		DropTable 33251 x 1387 g192 2.52
+item	elysion	stage-boss	HARD	stone-bundle.109945				3.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 17
+item	elysion	stage-boss	HARD	stone-bundle.109955				1.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 7
+item	elysion	stage-boss	HARD	stone-bundle.130047				10.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 52
+item	elysion	stage-boss	HARD	stone-bundle.enh-weapon				1.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 7
+item	elysion	stage-boss	HARD	stone-bundle.enh-armour				3.4		DropTable 33251 x 1387 g4090 20 x group 4090 weight 17
+item	elysion	stage-boss	HARD	card				0.3		DropTable 33251 x 1387 i78777 0.30
+item	elysion	stage-boss	HARD	set-bottom				1.5		DropTable 33251 x 1387 g1162 1.50
+item	elysion	stage-boss	HARD	set-shoes				2.25		DropTable 33251 x 1387 g1164 2.25
+param	lanox	stage-boss	EXPERT	-	1	17	100			DropTable 33252 x 1387 Exp / ED / EDProperty
+group	lanox	stage-boss	EXPERT	gear-weapon-rare				0.53		DropTable 33252 x 1387 g182 0.53
+group	lanox	stage-boss	EXPERT	gear-weapon-elite				1.23		DropTable 33252 x 1387 g183 1.23
+group	lanox	stage-boss	EXPERT	gear-top-rare				0.11		DropTable 33252 x 1387 g185 0.11
+group	lanox	stage-boss	EXPERT	gear-top-elite				2.52		DropTable 33252 x 1387 g186 2.52
+group	lanox	stage-boss	EXPERT	gear-bottom-rare				0.11		DropTable 33252 x 1387 g187 0.11
+group	lanox	stage-boss	EXPERT	gear-bottom-elite				2.52		DropTable 33252 x 1387 g188 2.52
+group	lanox	stage-boss	EXPERT	gear-gloves-rare				0.11		DropTable 33252 x 1387 g189 0.11
+group	lanox	stage-boss	EXPERT	gear-gloves-elite				2.52		DropTable 33252 x 1387 g190 2.52
+group	lanox	stage-boss	EXPERT	gear-shoes-rare				0.11		DropTable 33252 x 1387 g191 0.11
+group	lanox	stage-boss	EXPERT	gear-shoes-elite				2.52		DropTable 33252 x 1387 g192 2.52
+item	lanox	stage-boss	EXPERT	stone-bundle.109945				3.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 17
+item	lanox	stage-boss	EXPERT	stone-bundle.109955				1.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 7
+item	lanox	stage-boss	EXPERT	stone-bundle.130047				10.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 52
+item	lanox	stage-boss	EXPERT	stone-bundle.enh-weapon				1.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 7
+item	lanox	stage-boss	EXPERT	stone-bundle.enh-armour				3.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 17
+item	lanox	stage-boss	EXPERT	card				0.3		DropTable 33252 x 1387 i78777 0.30
+item	lanox	stage-boss	EXPERT	set-bottom				1.8		DropTable 33252 x 1387 g1162 1.80
+item	lanox	stage-boss	EXPERT	set-shoes				2.7		DropTable 33252 x 1387 g1164 2.70
+param	elysion	stage-boss	EXPERT	-	1	17	100			DropTable 33252 x 1387 Exp / ED / EDProperty
+group	elysion	stage-boss	EXPERT	gear-weapon-rare				0.53		DropTable 33252 x 1387 g182 0.53
+group	elysion	stage-boss	EXPERT	gear-weapon-elite				1.23		DropTable 33252 x 1387 g183 1.23
+group	elysion	stage-boss	EXPERT	gear-top-rare				0.11		DropTable 33252 x 1387 g185 0.11
+group	elysion	stage-boss	EXPERT	gear-top-elite				2.52		DropTable 33252 x 1387 g186 2.52
+group	elysion	stage-boss	EXPERT	gear-bottom-rare				0.11		DropTable 33252 x 1387 g187 0.11
+group	elysion	stage-boss	EXPERT	gear-bottom-elite				2.52		DropTable 33252 x 1387 g188 2.52
+group	elysion	stage-boss	EXPERT	gear-gloves-rare				0.11		DropTable 33252 x 1387 g189 0.11
+group	elysion	stage-boss	EXPERT	gear-gloves-elite				2.52		DropTable 33252 x 1387 g190 2.52
+group	elysion	stage-boss	EXPERT	gear-shoes-rare				0.11		DropTable 33252 x 1387 g191 0.11
+group	elysion	stage-boss	EXPERT	gear-shoes-elite				2.52		DropTable 33252 x 1387 g192 2.52
+item	elysion	stage-boss	EXPERT	stone-bundle.109945				3.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 17
+item	elysion	stage-boss	EXPERT	stone-bundle.109955				1.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 7
+item	elysion	stage-boss	EXPERT	stone-bundle.130047				10.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 52
+item	elysion	stage-boss	EXPERT	stone-bundle.enh-weapon				1.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 7
+item	elysion	stage-boss	EXPERT	stone-bundle.enh-armour				3.4		DropTable 33252 x 1387 g4090 20 x group 4090 weight 17
+item	elysion	stage-boss	EXPERT	card				0.3		DropTable 33252 x 1387 i78777 0.30
+item	elysion	stage-boss	EXPERT	set-bottom				1.8		DropTable 33252 x 1387 g1162 1.80
+item	elysion	stage-boss	EXPERT	set-shoes				2.7		DropTable 33252 x 1387 g1164 2.70
+param	lanox	final-boss	NORMAL	-	1	17	100			DropTable 33250 x 1411 Exp / ED / EDProperty
+group	lanox	final-boss	NORMAL	gear-weapon-rare				0.53		DropTable 33250 x 1411 g182 0.53
+group	lanox	final-boss	NORMAL	gear-weapon-elite				1.23		DropTable 33250 x 1411 g183 1.23
+group	lanox	final-boss	NORMAL	gear-top-rare				0.11		DropTable 33250 x 1411 g185 0.11
+group	lanox	final-boss	NORMAL	gear-top-elite				2.52		DropTable 33250 x 1411 g186 2.52
+group	lanox	final-boss	NORMAL	gear-bottom-rare				0.11		DropTable 33250 x 1411 g187 0.11
+group	lanox	final-boss	NORMAL	gear-bottom-elite				2.52		DropTable 33250 x 1411 g188 2.52
+group	lanox	final-boss	NORMAL	gear-gloves-rare				0.11		DropTable 33250 x 1411 g189 0.11
+group	lanox	final-boss	NORMAL	gear-gloves-elite				2.52		DropTable 33250 x 1411 g190 2.52
+group	lanox	final-boss	NORMAL	gear-shoes-rare				0.11		DropTable 33250 x 1411 g191 0.11
+group	lanox	final-boss	NORMAL	gear-shoes-elite				2.52		DropTable 33250 x 1411 g192 2.52
+item	lanox	final-boss	NORMAL	stone-bundle.109945				3.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 17
+item	lanox	final-boss	NORMAL	stone-bundle.109955				1.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 7
+item	lanox	final-boss	NORMAL	stone-bundle.130047				10.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 52
+item	lanox	final-boss	NORMAL	stone-bundle.enh-weapon				1.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 7
+item	lanox	final-boss	NORMAL	stone-bundle.enh-armour				3.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 17
+item	lanox	final-boss	NORMAL	jewel-box				0.07		DropTable 33250 x 1411 i113276 0.07
+item	lanox	final-boss	NORMAL	boss-common-1				0.6		DropTable 33250 x 1411 g2127 0.60
+item	lanox	final-boss	NORMAL	boss-common-2				3		DropTable 33250 x 1411 g2128 3
+item	lanox	final-boss	NORMAL	boss-common-3				0.6		DropTable 33250 x 1411 g2129 0.60
+group	lanox	final-boss	NORMAL	set-weapon-1				2		DropTable 33250 x 1411 g1160 2
+group	lanox	final-boss	NORMAL	set-weapon-2				2		DropTable 33250 x 1411 g1170 2
+param	elysion	final-boss	NORMAL	-	1	17	100			DropTable 33250 x 1411 Exp / ED / EDProperty
+group	elysion	final-boss	NORMAL	gear-weapon-rare				0.53		DropTable 33250 x 1411 g182 0.53
+group	elysion	final-boss	NORMAL	gear-weapon-elite				1.23		DropTable 33250 x 1411 g183 1.23
+group	elysion	final-boss	NORMAL	gear-top-rare				0.11		DropTable 33250 x 1411 g185 0.11
+group	elysion	final-boss	NORMAL	gear-top-elite				2.52		DropTable 33250 x 1411 g186 2.52
+group	elysion	final-boss	NORMAL	gear-bottom-rare				0.11		DropTable 33250 x 1411 g187 0.11
+group	elysion	final-boss	NORMAL	gear-bottom-elite				2.52		DropTable 33250 x 1411 g188 2.52
+group	elysion	final-boss	NORMAL	gear-gloves-rare				0.11		DropTable 33250 x 1411 g189 0.11
+group	elysion	final-boss	NORMAL	gear-gloves-elite				2.52		DropTable 33250 x 1411 g190 2.52
+group	elysion	final-boss	NORMAL	gear-shoes-rare				0.11		DropTable 33250 x 1411 g191 0.11
+group	elysion	final-boss	NORMAL	gear-shoes-elite				2.52		DropTable 33250 x 1411 g192 2.52
+item	elysion	final-boss	NORMAL	stone-bundle.109945				3.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 17
+item	elysion	final-boss	NORMAL	stone-bundle.109955				1.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 7
+item	elysion	final-boss	NORMAL	stone-bundle.130047				10.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 52
+item	elysion	final-boss	NORMAL	stone-bundle.enh-weapon				1.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 7
+item	elysion	final-boss	NORMAL	stone-bundle.enh-armour				3.4		DropTable 33250 x 1411 g4090 20 x group 4090 weight 17
+item	elysion	final-boss	NORMAL	jewel-box				0.07		DropTable 33250 x 1411 i113276 0.07
+item	elysion	final-boss	NORMAL	boss-common-1				0.6		DropTable 33250 x 1411 g2127 0.60
+item	elysion	final-boss	NORMAL	boss-common-2				3		DropTable 33250 x 1411 g2128 3
+item	elysion	final-boss	NORMAL	boss-common-3				0.6		DropTable 33250 x 1411 g2129 0.60
+group	elysion	final-boss	NORMAL	set-weapon-1				2		DropTable 33250 x 1411 g1160 2
+group	elysion	final-boss	NORMAL	set-weapon-2				2		DropTable 33250 x 1411 g1170 2
+param	lanox	final-boss	HARD	-	1	17	100			DropTable 33251 x 1411 Exp / ED / EDProperty
+group	lanox	final-boss	HARD	gear-weapon-rare				0.53		DropTable 33251 x 1411 g182 0.53
+group	lanox	final-boss	HARD	gear-weapon-elite				1.23		DropTable 33251 x 1411 g183 1.23
+group	lanox	final-boss	HARD	gear-top-rare				0.11		DropTable 33251 x 1411 g185 0.11
+group	lanox	final-boss	HARD	gear-top-elite				2.52		DropTable 33251 x 1411 g186 2.52
+group	lanox	final-boss	HARD	gear-bottom-rare				0.11		DropTable 33251 x 1411 g187 0.11
+group	lanox	final-boss	HARD	gear-bottom-elite				2.52		DropTable 33251 x 1411 g188 2.52
+group	lanox	final-boss	HARD	gear-gloves-rare				0.11		DropTable 33251 x 1411 g189 0.11
+group	lanox	final-boss	HARD	gear-gloves-elite				2.52		DropTable 33251 x 1411 g190 2.52
+group	lanox	final-boss	HARD	gear-shoes-rare				0.11		DropTable 33251 x 1411 g191 0.11
+group	lanox	final-boss	HARD	gear-shoes-elite				2.52		DropTable 33251 x 1411 g192 2.52
+item	lanox	final-boss	HARD	stone-bundle.109945				3.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 17
+item	lanox	final-boss	HARD	stone-bundle.109955				1.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 7
+item	lanox	final-boss	HARD	stone-bundle.130047				10.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 52
+item	lanox	final-boss	HARD	stone-bundle.enh-weapon				1.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 7
+item	lanox	final-boss	HARD	stone-bundle.enh-armour				3.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 17
+item	lanox	final-boss	HARD	jewel-box				0.07		DropTable 33251 x 1411 i113276 0.07
+item	lanox	final-boss	HARD	boss-common-1				0.9		DropTable 33251 x 1411 g2127 0.90
+item	lanox	final-boss	HARD	boss-common-2				4.5		DropTable 33251 x 1411 g2128 4.50
+item	lanox	final-boss	HARD	boss-common-3				0.9		DropTable 33251 x 1411 g2129 0.90
+group	lanox	final-boss	HARD	set-weapon-1				3		DropTable 33251 x 1411 g1160 3
+group	lanox	final-boss	HARD	set-weapon-2				3		DropTable 33251 x 1411 g1170 3
+param	elysion	final-boss	HARD	-	1	17	100			DropTable 33251 x 1411 Exp / ED / EDProperty
+group	elysion	final-boss	HARD	gear-weapon-rare				0.53		DropTable 33251 x 1411 g182 0.53
+group	elysion	final-boss	HARD	gear-weapon-elite				1.23		DropTable 33251 x 1411 g183 1.23
+group	elysion	final-boss	HARD	gear-top-rare				0.11		DropTable 33251 x 1411 g185 0.11
+group	elysion	final-boss	HARD	gear-top-elite				2.52		DropTable 33251 x 1411 g186 2.52
+group	elysion	final-boss	HARD	gear-bottom-rare				0.11		DropTable 33251 x 1411 g187 0.11
+group	elysion	final-boss	HARD	gear-bottom-elite				2.52		DropTable 33251 x 1411 g188 2.52
+group	elysion	final-boss	HARD	gear-gloves-rare				0.11		DropTable 33251 x 1411 g189 0.11
+group	elysion	final-boss	HARD	gear-gloves-elite				2.52		DropTable 33251 x 1411 g190 2.52
+group	elysion	final-boss	HARD	gear-shoes-rare				0.11		DropTable 33251 x 1411 g191 0.11
+group	elysion	final-boss	HARD	gear-shoes-elite				2.52		DropTable 33251 x 1411 g192 2.52
+item	elysion	final-boss	HARD	stone-bundle.109945				3.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 17
+item	elysion	final-boss	HARD	stone-bundle.109955				1.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 7
+item	elysion	final-boss	HARD	stone-bundle.130047				10.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 52
+item	elysion	final-boss	HARD	stone-bundle.enh-weapon				1.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 7
+item	elysion	final-boss	HARD	stone-bundle.enh-armour				3.4		DropTable 33251 x 1411 g4090 20 x group 4090 weight 17
+item	elysion	final-boss	HARD	jewel-box				0.07		DropTable 33251 x 1411 i113276 0.07
+item	elysion	final-boss	HARD	boss-common-1				0.9		DropTable 33251 x 1411 g2127 0.90
+item	elysion	final-boss	HARD	boss-common-2				4.5		DropTable 33251 x 1411 g2128 4.50
+item	elysion	final-boss	HARD	boss-common-3				0.9		DropTable 33251 x 1411 g2129 0.90
+group	elysion	final-boss	HARD	set-weapon-1				3		DropTable 33251 x 1411 g1160 3
+group	elysion	final-boss	HARD	set-weapon-2				3		DropTable 33251 x 1411 g1170 3
+param	lanox	final-boss	EXPERT	-	1	17	100			DropTable 33252 x 1411 Exp / ED / EDProperty
+group	lanox	final-boss	EXPERT	gear-weapon-rare				0.53		DropTable 33252 x 1411 g182 0.53
+group	lanox	final-boss	EXPERT	gear-weapon-elite				1.23		DropTable 33252 x 1411 g183 1.23
+group	lanox	final-boss	EXPERT	gear-top-rare				0.11		DropTable 33252 x 1411 g185 0.11
+group	lanox	final-boss	EXPERT	gear-top-elite				2.52		DropTable 33252 x 1411 g186 2.52
+group	lanox	final-boss	EXPERT	gear-bottom-rare				0.11		DropTable 33252 x 1411 g187 0.11
+group	lanox	final-boss	EXPERT	gear-bottom-elite				2.52		DropTable 33252 x 1411 g188 2.52
+group	lanox	final-boss	EXPERT	gear-gloves-rare				0.11		DropTable 33252 x 1411 g189 0.11
+group	lanox	final-boss	EXPERT	gear-gloves-elite				2.52		DropTable 33252 x 1411 g190 2.52
+group	lanox	final-boss	EXPERT	gear-shoes-rare				0.11		DropTable 33252 x 1411 g191 0.11
+group	lanox	final-boss	EXPERT	gear-shoes-elite				2.52		DropTable 33252 x 1411 g192 2.52
+item	lanox	final-boss	EXPERT	stone-bundle.109945				3.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 17
+item	lanox	final-boss	EXPERT	stone-bundle.109955				1.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 7
+item	lanox	final-boss	EXPERT	stone-bundle.130047				10.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 52
+item	lanox	final-boss	EXPERT	stone-bundle.enh-weapon				1.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 7
+item	lanox	final-boss	EXPERT	stone-bundle.enh-armour				3.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 17
+item	lanox	final-boss	EXPERT	jewel-box				0.07		DropTable 33252 x 1411 i113276 0.07
+item	lanox	final-boss	EXPERT	boss-common-1				1.1		DropTable 33252 x 1411 g2127 1.10
+item	lanox	final-boss	EXPERT	boss-common-2				5.4		DropTable 33252 x 1411 g2128 5.40
+item	lanox	final-boss	EXPERT	boss-common-3				1.1		DropTable 33252 x 1411 g2129 1.10
+group	lanox	final-boss	EXPERT	set-weapon-1				3.6		DropTable 33252 x 1411 g1160 3.60
+group	lanox	final-boss	EXPERT	set-weapon-2				3.6		DropTable 33252 x 1411 g1170 3.60
+param	elysion	final-boss	EXPERT	-	1	17	100			DropTable 33252 x 1411 Exp / ED / EDProperty
+group	elysion	final-boss	EXPERT	gear-weapon-rare				0.53		DropTable 33252 x 1411 g182 0.53
+group	elysion	final-boss	EXPERT	gear-weapon-elite				1.23		DropTable 33252 x 1411 g183 1.23
+group	elysion	final-boss	EXPERT	gear-top-rare				0.11		DropTable 33252 x 1411 g185 0.11
+group	elysion	final-boss	EXPERT	gear-top-elite				2.52		DropTable 33252 x 1411 g186 2.52
+group	elysion	final-boss	EXPERT	gear-bottom-rare				0.11		DropTable 33252 x 1411 g187 0.11
+group	elysion	final-boss	EXPERT	gear-bottom-elite				2.52		DropTable 33252 x 1411 g188 2.52
+group	elysion	final-boss	EXPERT	gear-gloves-rare				0.11		DropTable 33252 x 1411 g189 0.11
+group	elysion	final-boss	EXPERT	gear-gloves-elite				2.52		DropTable 33252 x 1411 g190 2.52
+group	elysion	final-boss	EXPERT	gear-shoes-rare				0.11		DropTable 33252 x 1411 g191 0.11
+group	elysion	final-boss	EXPERT	gear-shoes-elite				2.52		DropTable 33252 x 1411 g192 2.52
+item	elysion	final-boss	EXPERT	stone-bundle.109945				3.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 17
+item	elysion	final-boss	EXPERT	stone-bundle.109955				1.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 7
+item	elysion	final-boss	EXPERT	stone-bundle.130047				10.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 52
+item	elysion	final-boss	EXPERT	stone-bundle.enh-weapon				1.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 7
+item	elysion	final-boss	EXPERT	stone-bundle.enh-armour				3.4		DropTable 33252 x 1411 g4090 20 x group 4090 weight 17
+item	elysion	final-boss	EXPERT	jewel-box				0.07		DropTable 33252 x 1411 i113276 0.07
+item	elysion	final-boss	EXPERT	boss-common-1				1.1		DropTable 33252 x 1411 g2127 1.10
+item	elysion	final-boss	EXPERT	boss-common-2				5.4		DropTable 33252 x 1411 g2128 5.40
+item	elysion	final-boss	EXPERT	boss-common-3				1.1		DropTable 33252 x 1411 g2129 1.10
+group	elysion	final-boss	EXPERT	set-weapon-1				3.6		DropTable 33252 x 1411 g1160 3.60
+group	elysion	final-boss	EXPERT	set-weapon-2				3.6		DropTable 33252 x 1411 g1170 3.60
+item	lanox	final-boss	NORMAL	boss-class				0.5		DropTable 33250 x 1387 g2130 0.50
+item	elysion	final-boss	NORMAL	boss-class				0.5		DropTable 33250 x 1387 g2130 0.50
+item	lanox	final-boss	HARD	boss-class				0.75		DropTable 33251 x 1387 g2130 0.75
+item	elysion	final-boss	HARD	boss-class				0.75		DropTable 33251 x 1387 g2130 0.75
+item	lanox	final-boss	EXPERT	boss-class				0.9		DropTable 33252 x 1387 g2130 0.90
+item	elysion	final-boss	EXPERT	boss-class				0.9		DropTable 33252 x 1387 g2130 0.90
+item	lanox	stage-boss	NORMAL	set-top				0.6		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33230 x 1215 g1161 0.60
+item	lanox	stage-boss	NORMAL	set-gloves				1		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33230 x 1215 g1163 1
+item	elysion	stage-boss	NORMAL	set-top				0.6		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33230 x 1215 g1161 0.60
+item	elysion	stage-boss	NORMAL	set-gloves				1		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33230 x 1215 g1163 1
+item	lanox	stage-boss	HARD	set-top				1		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33231 x 1215 g1161 1
+item	lanox	stage-boss	HARD	set-gloves				1.5		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33231 x 1215 g1163 1.50
+item	elysion	stage-boss	HARD	set-top				1		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33231 x 1215 g1161 1
+item	elysion	stage-boss	HARD	set-gloves				1.5		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33231 x 1215 g1163 1.50
+item	lanox	stage-boss	EXPERT	set-top				1.2		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33232 x 1215 g1161 1.20
+item	lanox	stage-boss	EXPERT	set-gloves				1.8		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33232 x 1215 g1163 1.80
+item	elysion	stage-boss	EXPERT	set-top				1.2		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33232 x 1215 g1161 1.20
+item	elysion	stage-boss	EXPERT	set-gloves				1.8		user 2026-11-16 (R1 decision 6: add set tops / gloves): DropTable 33232 x 1215 g1163 1.80
+param	lanox	box	NORMAL	-	1	16	100			DropTable 33250 x 20 Exp / ED / EDProperty
+item	lanox	box	NORMAL	box-food.70000				12		DropTable 33250 x 20 g6002 30 x group 6002 weight 40
+item	lanox	box	NORMAL	box-food.70010				9		DropTable 33250 x 20 g6002 30 x group 6002 weight 30
+item	lanox	box	NORMAL	box-food.70020				6		DropTable 33250 x 20 g6002 30 x group 6002 weight 20
+item	lanox	box	NORMAL	box-food.70070				3		DropTable 33250 x 20 g6002 30 x group 6002 weight 10
+item	lanox	box	NORMAL	box-fruit.70030				18		DropTable 33250 x 20 g6004 30 x group 6004 weight 60
+item	lanox	box	NORMAL	box-fruit.70040				6		DropTable 33250 x 20 g6004 30 x group 6004 weight 20
+item	lanox	box	NORMAL	box-fruit.70050				6		DropTable 33250 x 20 g6004 30 x group 6004 weight 20
+group	lanox	box	NORMAL	box-buff				20		DropTable 33250 x 20 g6005 20
+group	lanox	box	NORMAL	box-potion				20		DropTable 33250 x 20 g6006 20
+param	elysion	box	NORMAL	-	1	16	100			DropTable 33250 x 20 Exp / ED / EDProperty
+item	elysion	box	NORMAL	box-food.70000				12		DropTable 33250 x 20 g6002 30 x group 6002 weight 40
+item	elysion	box	NORMAL	box-food.70010				9		DropTable 33250 x 20 g6002 30 x group 6002 weight 30
+item	elysion	box	NORMAL	box-food.70020				6		DropTable 33250 x 20 g6002 30 x group 6002 weight 20
+item	elysion	box	NORMAL	box-food.70070				3		DropTable 33250 x 20 g6002 30 x group 6002 weight 10
+item	elysion	box	NORMAL	box-fruit.70030				18		DropTable 33250 x 20 g6004 30 x group 6004 weight 60
+item	elysion	box	NORMAL	box-fruit.70040				6		DropTable 33250 x 20 g6004 30 x group 6004 weight 20
+item	elysion	box	NORMAL	box-fruit.70050				6		DropTable 33250 x 20 g6004 30 x group 6004 weight 20
+group	elysion	box	NORMAL	box-buff				20		DropTable 33250 x 20 g6005 20
+group	elysion	box	NORMAL	box-potion				20		DropTable 33250 x 20 g6006 20
+param	lanox	box	HARD	-	1	16	100			DropTable 33251 x 20 Exp / ED / EDProperty
+item	lanox	box	HARD	box-food.70000				12		DropTable 33251 x 20 g6002 30 x group 6002 weight 40
+item	lanox	box	HARD	box-food.70010				9		DropTable 33251 x 20 g6002 30 x group 6002 weight 30
+item	lanox	box	HARD	box-food.70020				6		DropTable 33251 x 20 g6002 30 x group 6002 weight 20
+item	lanox	box	HARD	box-food.70070				3		DropTable 33251 x 20 g6002 30 x group 6002 weight 10
+item	lanox	box	HARD	box-fruit.70030				18		DropTable 33251 x 20 g6004 30 x group 6004 weight 60
+item	lanox	box	HARD	box-fruit.70040				6		DropTable 33251 x 20 g6004 30 x group 6004 weight 20
+item	lanox	box	HARD	box-fruit.70050				6		DropTable 33251 x 20 g6004 30 x group 6004 weight 20
+group	lanox	box	HARD	box-buff				20		DropTable 33251 x 20 g6005 20
+group	lanox	box	HARD	box-potion				20		DropTable 33251 x 20 g6006 20
+param	elysion	box	HARD	-	1	16	100			DropTable 33251 x 20 Exp / ED / EDProperty
+item	elysion	box	HARD	box-food.70000				12		DropTable 33251 x 20 g6002 30 x group 6002 weight 40
+item	elysion	box	HARD	box-food.70010				9		DropTable 33251 x 20 g6002 30 x group 6002 weight 30
+item	elysion	box	HARD	box-food.70020				6		DropTable 33251 x 20 g6002 30 x group 6002 weight 20
+item	elysion	box	HARD	box-food.70070				3		DropTable 33251 x 20 g6002 30 x group 6002 weight 10
+item	elysion	box	HARD	box-fruit.70030				18		DropTable 33251 x 20 g6004 30 x group 6004 weight 60
+item	elysion	box	HARD	box-fruit.70040				6		DropTable 33251 x 20 g6004 30 x group 6004 weight 20
+item	elysion	box	HARD	box-fruit.70050				6		DropTable 33251 x 20 g6004 30 x group 6004 weight 20
+group	elysion	box	HARD	box-buff				20		DropTable 33251 x 20 g6005 20
+group	elysion	box	HARD	box-potion				20		DropTable 33251 x 20 g6006 20
+param	lanox	box	EXPERT	-	1	16	100			DropTable 33252 x 20 Exp / ED / EDProperty
+item	lanox	box	EXPERT	box-food.70000				12		DropTable 33252 x 20 g6002 30 x group 6002 weight 40
+item	lanox	box	EXPERT	box-food.70010				9		DropTable 33252 x 20 g6002 30 x group 6002 weight 30
+item	lanox	box	EXPERT	box-food.70020				6		DropTable 33252 x 20 g6002 30 x group 6002 weight 20
+item	lanox	box	EXPERT	box-food.70070				3		DropTable 33252 x 20 g6002 30 x group 6002 weight 10
+item	lanox	box	EXPERT	box-fruit.70030				18		DropTable 33252 x 20 g6004 30 x group 6004 weight 60
+item	lanox	box	EXPERT	box-fruit.70040				6		DropTable 33252 x 20 g6004 30 x group 6004 weight 20
+item	lanox	box	EXPERT	box-fruit.70050				6		DropTable 33252 x 20 g6004 30 x group 6004 weight 20
+group	lanox	box	EXPERT	box-buff				20		DropTable 33252 x 20 g6005 20
+group	lanox	box	EXPERT	box-potion				20		DropTable 33252 x 20 g6006 20
+param	elysion	box	EXPERT	-	1	16	100			DropTable 33252 x 20 Exp / ED / EDProperty
+item	elysion	box	EXPERT	box-food.70000				12		DropTable 33252 x 20 g6002 30 x group 6002 weight 40
+item	elysion	box	EXPERT	box-food.70010				9		DropTable 33252 x 20 g6002 30 x group 6002 weight 30
+item	elysion	box	EXPERT	box-food.70020				6		DropTable 33252 x 20 g6002 30 x group 6002 weight 20
+item	elysion	box	EXPERT	box-food.70070				3		DropTable 33252 x 20 g6002 30 x group 6002 weight 10
+item	elysion	box	EXPERT	box-fruit.70030				18		DropTable 33252 x 20 g6004 30 x group 6004 weight 60
+item	elysion	box	EXPERT	box-fruit.70040				6		DropTable 33252 x 20 g6004 30 x group 6004 weight 20
+item	elysion	box	EXPERT	box-fruit.70050				6		DropTable 33252 x 20 g6004 30 x group 6004 weight 20
+group	elysion	box	EXPERT	box-buff				20		DropTable 33252 x 20 g6005 20
+group	elysion	box	EXPERT	box-potion				20		DropTable 33252 x 20 g6006 20
+param	lanox	field-mob	FIELD	-	1	16	100			DropTable field 40024 x 5143 Exp / ED / EDProperty
+group	lanox	field-mob	FIELD	gear-weapon-normal				0.28		DropTable field 40024 x 5143 g181 0.28
+group	lanox	field-mob	FIELD	gear-weapon-rare				0.06		DropTable field 40024 x 5143 g182 0.06
+group	lanox	field-mob	FIELD	gear-armour-normal				0.28		DropTable field 40024 x 5143 g184 0.28
+group	lanox	field-mob	FIELD	gear-top-rare				0.28		DropTable field 40024 x 5143 g185 0.28
+group	lanox	field-mob	FIELD	gear-bottom-rare				0.28		DropTable field 40024 x 5143 g187 0.28
+group	lanox	field-mob	FIELD	gear-gloves-rare				0.28		DropTable field 40024 x 5143 g189 0.28
+group	lanox	field-mob	FIELD	gear-shoes-rare				0.28		DropTable field 40024 x 5143 g191 0.28
+item	lanox	field-mob	FIELD	stone-enh-weapon				0.21		DropTable field 40024 x 5143 g4005 0.60 x group 4005 weight 35
+item	lanox	field-mob	FIELD	stone-enh-armour				0.39		DropTable field 40024 x 5143 g4005 0.60 x group 4005 weight 65
+item	lanox	field-mob	FIELD	stone-magic.109945				0.48		DropTable field 40024 x 5143 g4015 0.60 x group 4015 weight 80
+item	lanox	field-mob	FIELD	stone-magic.109955				0.12		DropTable field 40024 x 5143 g4015 0.60 x group 4015 weight 20
+param	elysion	field-mob	FIELD	-	1	16	100			DropTable field 40024 x 5143 Exp / ED / EDProperty
+group	elysion	field-mob	FIELD	gear-weapon-normal				0.28		DropTable field 40024 x 5143 g181 0.28
+group	elysion	field-mob	FIELD	gear-weapon-rare				0.06		DropTable field 40024 x 5143 g182 0.06
+group	elysion	field-mob	FIELD	gear-armour-normal				0.28		DropTable field 40024 x 5143 g184 0.28
+group	elysion	field-mob	FIELD	gear-top-rare				0.28		DropTable field 40024 x 5143 g185 0.28
+group	elysion	field-mob	FIELD	gear-bottom-rare				0.28		DropTable field 40024 x 5143 g187 0.28
+group	elysion	field-mob	FIELD	gear-gloves-rare				0.28		DropTable field 40024 x 5143 g189 0.28
+group	elysion	field-mob	FIELD	gear-shoes-rare				0.28		DropTable field 40024 x 5143 g191 0.28
+item	elysion	field-mob	FIELD	stone-enh-weapon				0.21		DropTable field 40024 x 5143 g4005 0.60 x group 4005 weight 35
+item	elysion	field-mob	FIELD	stone-enh-armour				0.39		DropTable field 40024 x 5143 g4005 0.60 x group 4005 weight 65
+item	elysion	field-mob	FIELD	stone-magic.109945				0.48		DropTable field 40024 x 5143 g4015 0.60 x group 4015 weight 80
+item	elysion	field-mob	FIELD	stone-magic.109955				0.12		DropTable field 40024 x 5143 g4015 0.60 x group 4015 weight 20
+param	lanox	field-boss	FIELD	-	1	17	100			DropTable field 40024 x 5124 Exp / ED / EDProperty
+param	elysion	field-boss	FIELD	-	1	17	100			DropTable field 40024 x 5124 Exp / ED / EDProperty
+param	lanox	box	FIELD	-	0	16	100			DropTable field 40024 x 20 Exp / ED / EDProperty
+item	lanox	box	FIELD	box-food.70000				24		DropTable field 40024 x 20 g6002 60 x group 6002 weight 40
+item	lanox	box	FIELD	box-food.70010				18		DropTable field 40024 x 20 g6002 60 x group 6002 weight 30
+item	lanox	box	FIELD	box-food.70020				12		DropTable field 40024 x 20 g6002 60 x group 6002 weight 20
+item	lanox	box	FIELD	box-food.70070				6		DropTable field 40024 x 20 g6002 60 x group 6002 weight 10
+group	lanox	box	FIELD	box-field-potion				40		DropTable field 40024 x 20 g6008 40
+param	elysion	box	FIELD	-	0	16	100			DropTable field 40024 x 20 Exp / ED / EDProperty
+item	elysion	box	FIELD	box-food.70000				24		DropTable field 40024 x 20 g6002 60 x group 6002 weight 40
+item	elysion	box	FIELD	box-food.70010				18		DropTable field 40024 x 20 g6002 60 x group 6002 weight 30
+item	elysion	box	FIELD	box-food.70020				12		DropTable field 40024 x 20 g6002 60 x group 6002 weight 20
+item	elysion	box	FIELD	box-food.70070				6		DropTable field 40024 x 20 g6002 60 x group 6002 weight 10
+group	elysion	box	FIELD	box-field-potion				40		DropTable field 40024 x 20 g6008 40
+static	lanox	*	NORMAL	static-common				4.3		StaticDropTable dungeon 33250 i99809 4.30
+static	lanox	*	NORMAL	static-region				3		StaticDropTable dungeon 33250 i99823 3
+static	lanox	*	NORMAL	static-box				0.3		StaticDropTable dungeon 33250 i111069 0.30
+static	elysion	*	NORMAL	static-common				4.3		StaticDropTable dungeon 33250 i99809 4.30
+static	elysion	*	NORMAL	static-region				3		StaticDropTable dungeon 33250 i99823 3
+static	elysion	*	NORMAL	static-box				0.3		StaticDropTable dungeon 33250 i111069 0.30
+static	lanox	*	HARD	static-common				4.3		StaticDropTable dungeon 33251 i99809 4.30
+static	lanox	*	HARD	static-region				3		StaticDropTable dungeon 33251 i99823 3
+static	lanox	*	HARD	static-box				0.3		StaticDropTable dungeon 33251 i111069 0.30
+static	elysion	*	HARD	static-common				4.3		StaticDropTable dungeon 33251 i99809 4.30
+static	elysion	*	HARD	static-region				3		StaticDropTable dungeon 33251 i99823 3
+static	elysion	*	HARD	static-box				0.3		StaticDropTable dungeon 33251 i111069 0.30
+static	lanox	*	EXPERT	static-common				4.3		StaticDropTable dungeon 33252 i99809 4.30
+static	lanox	*	EXPERT	static-region				3		StaticDropTable dungeon 33252 i99823 3
+static	lanox	*	EXPERT	static-box				0.3		StaticDropTable dungeon 33252 i111069 0.30
+static	elysion	*	EXPERT	static-common				4.3		StaticDropTable dungeon 33252 i99809 4.30
+static	elysion	*	EXPERT	static-region				3		StaticDropTable dungeon 33252 i99823 3
+static	elysion	*	EXPERT	static-box				0.3		StaticDropTable dungeon 33252 i111069 0.30
+static	lanox	*	FIELD	static-common				4		StaticDropTable field 40024 i99809 4
+static	lanox	*	FIELD	static-region				2.1		StaticDropTable field 40024 i99823 2.10
+static	elysion	*	FIELD	static-common				4		StaticDropTable field 40024 i99809 4
+static	elysion	*	FIELD	static-region				2.1		StaticDropTable field 40024 i99823 2.10
+ref	secret	npc 459	NORMAL	-	1	17	100			DropTable 33190 x 459 Exp / ED / EDProperty
+ref	secret	npc 459	NORMAL	studio-item:78331				1.8		DropTable 33190 x 459 i78331 1.80
+ref	secret	npc 459	NORMAL	studio-item:111700				1.3		DropTable 33190 x 459 i111700 1.30
+ref	secret	npc 459	NORMAL	studio-group:3280				2		DropTable 33190 x 459 g3280 2
+ref	secret	npc 460	NORMAL	-	1	17	100			DropTable 33190 x 460 Exp / ED / EDProperty
+ref	secret	npc 460	NORMAL	studio-item:78671				0.43		DropTable 33190 x 460 i78671 0.43
+ref	secret	npc 460	NORMAL	studio-item:78331				1.8		DropTable 33190 x 460 i78331 1.80
+ref	secret	npc 460	NORMAL	studio-item:111700				1.3		DropTable 33190 x 460 i111700 1.30
+ref	secret	npc 460	NORMAL	studio-group:3280				2		DropTable 33190 x 460 g3280 2
+ref	secret	npc 944	NORMAL	-	0	17	100			DropTable 33190 x 944 Exp / ED / EDProperty
+ref	secret	npc 944	NORMAL	studio-group:3280				0.5		DropTable 33190 x 944 g3280 0.50
+ref	secret	npc 948	NORMAL	-	1	17	100			DropTable 33190 x 948 Exp / ED / EDProperty
+ref	secret	npc 948	NORMAL	studio-item:111926				9		DropTable 33190 x 948 i111926 9
+ref	secret	npc 948	NORMAL	studio-item:111610				4		DropTable 33190 x 948 i111610 4
+ref	secret	npc 948	NORMAL	studio-item:78331				1.8		DropTable 33190 x 948 i78331 1.80
+ref	secret	npc 948	NORMAL	studio-item:111700				1.3		DropTable 33190 x 948 i111700 1.30
+ref	secret	npc 948	NORMAL	studio-group:3280				25		DropTable 33190 x 948 g3280 25
+ref	secret	npc 948	NORMAL	studio-group:3220				0.2		DropTable 33190 x 948 g3220 0.20
+ref	secret	npc 948	NORMAL	studio-group:3230				0.2		DropTable 33190 x 948 g3230 0.20
+ref	secret	npc 459	HARD	-	1	17	100			DropTable 33191 x 459 Exp / ED / EDProperty
+ref	secret	npc 459	HARD	studio-item:111700				5		DropTable 33191 x 459 i111700 5
+ref	secret	npc 459	HARD	studio-group:3280				2		DropTable 33191 x 459 g3280 2
+ref	secret	npc 460	HARD	-	1	17	100			DropTable 33191 x 460 Exp / ED / EDProperty
+ref	secret	npc 460	HARD	studio-item:78671				0.43		DropTable 33191 x 460 i78671 0.43
+ref	secret	npc 460	HARD	studio-item:111700				5		DropTable 33191 x 460 i111700 5
+ref	secret	npc 460	HARD	studio-group:3280				2		DropTable 33191 x 460 g3280 2
+ref	secret	npc 980	HARD	-	0	17	100			DropTable 33191 x 980 Exp / ED / EDProperty
+ref	secret	npc 980	HARD	studio-group:3280				1		DropTable 33191 x 980 g3280 1
+ref	secret	npc 984	HARD	-	1	17	100			DropTable 33191 x 984 Exp / ED / EDProperty
+ref	secret	npc 984	HARD	studio-item:111926				22		DropTable 33191 x 984 i111926 22
+ref	secret	npc 984	HARD	studio-item:111610				4		DropTable 33191 x 984 i111610 4
+ref	secret	npc 984	HARD	studio-item:111700				5		DropTable 33191 x 984 i111700 5
+ref	secret	npc 984	HARD	studio-group:3280				25		DropTable 33191 x 984 g3280 25
+ref	secret	npc 984	HARD	studio-group:3240				0.5		DropTable 33191 x 984 g3240 0.50
+ref	secret	npc 984	HARD	studio-group:3250				0.2		DropTable 33191 x 984 g3250 0.20
+ref	secret	npc 984	HARD	studio-group:3260				0.2		DropTable 33191 x 984 g3260 0.20
+ref	secret	npc 984	HARD	studio-group:3210				0.5		DropTable 33191 x 984 g3210 0.50
+decision	*	-	-	boss-class						user 2026-11-16 (R1 decision 1): class-blind; every listed character weapon can drop for anyone, no emulator filter
+decision	*	-	-	stone-level						item.kim text (R1 decision 2, no choice left): Lv.7 for L72 / L76 / L80 (71-81), Lv.8 for L82 / L87 (81-90)
+decision	*	-	-	field-boss						user 2026-11-16 (R1 decision 3): EXP + ED only, as DropTable field 40024 x 5124
+decision	*	-	-	henir-defence						default kept (R1 decision 4): Henir 38100 and Defence 38300-38302 get no stand-in rows
+decision	*	-	-	set-pools						user 2026-11-16 (R1 decision 5): both region sets on every boss, as Behemoth Heart's two sets
+decision	*	-	-	set-top-gloves						user 2026-11-16 (R1 decision 6): stage bosses add set tops / gloves at DropTable 33230-33232 x 1215 values

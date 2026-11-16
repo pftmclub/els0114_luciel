@@ -265,6 +265,49 @@ Elysion craft materials and monster cards in item.kim by recipe and name. Run `s
 **Done gate.** Both sheets committed; every pool item resolves in item.kim; every rate line has a `source`; the `simulate` figures and
 the four decisions are in the Done note and the hand-off; STATUS row `decision`. Full build skipped: no play-test.
 
+### Phase R1 - Done (2026-11-16)
+
+**What landed.** `tools/droptable.py pools` / `rates` / `simulate` and the two `gen` inputs, written straight in R2's columns (no adapter: `gen --only lanox
+--dry-run` reads them: 174 dungeon rows over 18 keys, 33 field rows, 22 static rows, 28 groups, no row over 100 %; Elysion 238 / 25 / 24 / 41). No client
+code, no Lua, no flag; full build skipped: no play-test. `finish.py --files tools/droptable.py --no-flag ...`: `FINISH RESULT: PASS (4 gates, 0 failed, 4 skipped)`.
+- `tools/data/drop_item_pools.tsv`, 639 rows / 447 items, every one usable in the staged item.kim (no fashion, cash, PC-bang, "Cannot use" or event text; 0 left
+  out). Region gear: the ladder blocks L72 / L76 (Lanox) and L80 / L82 / L87 (Elysion), 12 classes each, NORMAL / RARE / ELITE; band = the tier nearest the
+  key's NPC level, a tie up (Lanox 0-73 / 74-99, Elysion 0-80 / 81-84 / 85-99). Sets: Hidden Flare 3900 + Roaring Berserker 4015, Enchanted Diceon 4521 +
+  Hernacyd Guard 5212 (12 weapons each). Boss items: each key's `BOSS_DROP_ITEM` (COMMON by position, the class lists as `boss-class`), secret keys too.
+  Cards: 25 in-scope NPCs whose templet NAME names a `Monster Card` (`Volcanic Flare` 78948 matches no NPC). Static: 99809-99812 + Sander's 99823 / 99824
+  (item.kim has no Lanox / Elysion "Cooking Good"; `Star Fruit` 700018 is not one) + `Gorgeous Jeweled Box` 111069; BH's `Demon's Runic Core` 117303 is
+  left out ("cannot be used anymore").
+- `tools/data/drop_rate_sheet.tsv`, 577 lines; every value read from the row its `source` names (`rates --check`: YES). Templates: `mob` 33250-33252 x 1382,
+  `mob-minor` x 1415, `mob-card` x 1378 (0.3), `stage-boss` x 1387, `final-boss` x 1411, `box` x 20, `field-mob` 40024 x 5143, `field-boss` x 5124, field box
+  40024 x 20, statics 33250-33252 / 40024. Hard / Expert are the studio's own rows (boss lines x1.5 / x1.8, 0.6 -> 1.1 on Expert; gear and stones unchanged).
+  Unequal-weight studio groups (4005, 4015, 4090, 6002, 6004) are written as one `item` line per member at outer x weight / 100 (same odds: one lottery,
+  one case); equal ones stay `group` lines. Stones: Lv.6 -> the tier's level from the stones' own item.kim text (Lv.7 71-81, Lv.8 81-90).
+- Placement differences from BH, on purpose: the class weapons (BH: 2 per stage boss at 0.5) are one `boss-class` line on the final boss (same total per
+  clear; a role line reaches every NPC of the role); BH's 1409 set weapons at 0.5 are not copied (no role tells 1409 apart); both sets' bottoms / shoes ride one
+  `set-bottom` / `set-shoes` line each. Secret dungeons: `ref` lines (the Velder secret rows 33190 / 33191 x 459, 460, 944 / 980, 948 / 984), which `gen` ignores;
+  R5 turns them into lines with each dungeon's entry items.
+
+**Decisions (user 2026-11-16, `decision` lines in the sheet).** 1 boss weapons class-blind (no code). 2 stone level: the data answers it, no choice asked.
+3 field bosses EXP + ED only. 4 Henir / Defence stay out (default kept, not asked). Asked in addition: 5 both region sets on every boss (as BH's two sets);
+6 set tops / gloves added on stage bosses at Karuso Village's 33230-33232 x 1215 values (0.6 / 1.0, Hard 1.0 / 1.5, Expert 1.2 / 1.8; source `user 2026-11-16`).
+
+**Simulate.** The plan's per-clear 15 % gate measures dungeon size and boss count, not rates (BH has 6 boss kills a clear, Burned Forest Normal 1), so the gate
+is per role: items per kill of each role against the same role in BH (same difficulty) or Sander Field 03; per-clear figures are printed beside it.
+| key | mob | mob-minor | stage-boss | final-boss | box | per clear, one draw (x3 boost) |
+|---|---|---|---|---|---|---|
+| 33270 Burned Forest N | 0.99 | 1.16 | - | 1.00 | 1.00 | gear 2.75 (8.25), stone 1.47, card 0.23, set 0.04, boss 0.04 |
+| 33272 Burned Forest E | 0.99 | 1.16 | 1.17 | 1.13 | 1.00 | gear 2.87 (8.62), stone 1.67, set 0.22, boss 0.14 |
+| 33880 Adrian N | 0.95 | 1.00 | 1.09 | 1.00 | - | gear 1.62 (4.87), stone 1.07, card 0.02, set 0.12 |
+| 33882 Adrian E | 0.95 | 1.00 | 1.17 | 1.08 | - | gear 1.62, stone 1.07, set 0.22, boss 0.11 |
+| 40029 Lanox field 1 | field-mob 1.00, field-boss 0 = 0 | | | | - | gear 0.64 (1.93), stone 0.44 |
+| 40035 Elysion field 1 | field-mob 1.00, field-boss 0 = 0 | | | | 1.00 | gear 0.80 (2.40), stone 0.55 |
+All 46 Lanox / Elysion keys: 168 role checks pass; the over-15 % ones are explained: Expert stage bosses 1.17 = decision 6's tops / gloves; `mob-minor` 1.16
+(6 keys, Burned Forest / Ashes Village) = `gen` adds the full 0.3 `mob-card` line to a carded minor, while BH's halved rows carry no card.
+
+**For R3 / R5.** CHEST 20 already has the studio wildcard row 0 x 20 (33 / 33 / 34); `gen` gives it a specific row in BH's shape (30 / 30 / 20 / 20), ELSION_CHEST
+2176 has none today. Census `mob` NPCs with an internal name (dummies / triggers, up to 8 spawns a key, Elysion mostly) get rows; harmless if never killed.
+NPC 29 `CHEST_MONSTER` in the secret dungeons is census `mob`, but the studio treats it as a chest (0 x 29 = food 100 %): R5 leaves it to the wildcard.
+
 ## Phase R2 - Loader flag and generator
 
 **Scope.**

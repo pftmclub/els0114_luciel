@@ -1,0 +1,641 @@
+# field-rewards item pools, written by tools/droptable.py pools (OFFLINE_FIELD_REWARDS_PHASES.md R1) - do not hand-edit
+pool	region	band	key	npc	item_id	name	type	grade	source
+gear-weapon-normal	lanox	0-73	*	*	10720100	Radiant Fire Sword	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720200	Radiant Fire Staff	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720300	Radiant Fire Bow	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720400	Radiant Fire Blade	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720500	Radiant Fire Drone	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720600	Radiant Fire Cannon	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720700	Radiant Fire Spear	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720800	Radiant Fire Claymore	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10720900	Radiant Fire Dynamo	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10721000	Shiny Flame Dual Weapon	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10721100	Radiant Fire Guns	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-normal	lanox	0-73	*	*	10721200	Radiant Fire Pendulum	IT_WEAPON	IG_NORMAL	item.kim 10720000-10721999 use_level 72, one per class
+gear-armour-normal	lanox	0-73	*	*	10720000	Radiant Fire Top Piece	IT_DEFENCE	IG_NORMAL	item.kim 10720000-10721999 use_level 72
+gear-armour-normal	lanox	0-73	*	*	10720010	Radiant Fire Bottom Piece	IT_DEFENCE	IG_NORMAL	item.kim 10720000-10721999 use_level 72
+gear-armour-normal	lanox	0-73	*	*	10720020	Radiant Fire Gloves	IT_DEFENCE	IG_NORMAL	item.kim 10720000-10721999 use_level 72
+gear-armour-normal	lanox	0-73	*	*	10720030	Radiant Fire Shoes	IT_DEFENCE	IG_NORMAL	item.kim 10720000-10721999 use_level 72
+gear-weapon-rare	lanox	0-73	*	*	10720101	Intermediate Radiant Fire Sword	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720201	Intermediate Radiant Fire Staff	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720301	Intermediate Radiant Fire Bow	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720401	Intermediate Radiant Fire Blade	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720501	Intermediate Radiant Fire Drone	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720601	Intermediate Radiant Fire Cannon	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720701	Intermediate Radiant Fire Spear	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720801	Intermediate Radiant Fire Claymore	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10720901	Intermediate Radiant Fire Dynamo	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10721001	Intermediate Shiny Flame Dual Weapon	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10721101	Intermediate Radiant Fire Guns	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-rare	lanox	0-73	*	*	10721201	Intermediate Radiant Fire Pendulum	IT_WEAPON	IG_RARE	item.kim 10720000-10721999 use_level 72, one per class
+gear-top-rare	lanox	0-73	*	*	10720001	Intermediate Radiant Fire Top Piece	IT_DEFENCE	IG_RARE	item.kim 10720000-10721999 use_level 72
+gear-bottom-rare	lanox	0-73	*	*	10720011	Intermediate Radiant Fire Bottom Piece	IT_DEFENCE	IG_RARE	item.kim 10720000-10721999 use_level 72
+gear-gloves-rare	lanox	0-73	*	*	10720021	Intermediate Radiant Fire Gloves	IT_DEFENCE	IG_RARE	item.kim 10720000-10721999 use_level 72
+gear-shoes-rare	lanox	0-73	*	*	10720031	Intermediate Radiant Fire Shoes	IT_DEFENCE	IG_RARE	item.kim 10720000-10721999 use_level 72
+gear-weapon-elite	lanox	0-73	*	*	10720102	Advanced Radiant Fire Sword	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720202	Advanced Radiant Fire Staff	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720302	Advanced Radiant Fire Bow	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720402	Advanced Radiant Fire Blade	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720502	Advanced Radiant Fire Drone	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720602	Advanced Radiant Fire Cannon	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720702	Advanced Radiant Fire Spear	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720802	Advanced Radiant Fire Claymore	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10720902	Advanced Radiant Fire Dynamo	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10721002	Advanced Shiny Flame Dual Weapon	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10721102	Advanced Radiant Fire Guns	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-weapon-elite	lanox	0-73	*	*	10721202	Advanced Radiant Fire Pendulum	IT_WEAPON	IG_ELITE	item.kim 10720000-10721999 use_level 72, one per class
+gear-top-elite	lanox	0-73	*	*	10720002	Advanced Radiant Fire Top Piece	IT_DEFENCE	IG_ELITE	item.kim 10720000-10721999 use_level 72
+gear-bottom-elite	lanox	0-73	*	*	10720012	Advanced Radiant Fire Bottom Piece	IT_DEFENCE	IG_ELITE	item.kim 10720000-10721999 use_level 72
+gear-gloves-elite	lanox	0-73	*	*	10720022	Advanced Radiant Fire Gloves	IT_DEFENCE	IG_ELITE	item.kim 10720000-10721999 use_level 72
+gear-shoes-elite	lanox	0-73	*	*	10720032	Advanced Radiant Fire Shoes	IT_DEFENCE	IG_ELITE	item.kim 10720000-10721999 use_level 72
+stone-enh-weapon	lanox	0-73	*	*	130083	Weapon Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	item.kim: Lv.7 is for lv 71-81 (studio group 4005 holds Lv.6)
+stone-enh-armour	lanox	0-73	*	*	130092	Armor Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	item.kim: Lv.7 is for lv 71-81 (studio group 4005 holds Lv.6)
+gear-weapon-normal	lanox	74-99	*	*	10760100	Exploding Flame Sword	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760200	Exploding Flame Staff	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760300	Exploding Flame Bow	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760400	Exploding Flame Blade	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760500	Exploding Flame Drone	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760600	Exploding Flame Cannon	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760700	Exploding Flame Spear	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760800	Exploding Flame Claymore	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10760900	Exploding Flame Dynamo	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10761000	Exploding Flame Dual Weapon	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10761100	Exploding Flame Guns	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-normal	lanox	74-99	*	*	10761200	Exploding Flame Pendulum	IT_WEAPON	IG_NORMAL	item.kim 10760000-10761999 use_level 76, one per class
+gear-armour-normal	lanox	74-99	*	*	10760000	Exploding Flame Top Piece	IT_DEFENCE	IG_NORMAL	item.kim 10760000-10761999 use_level 76
+gear-armour-normal	lanox	74-99	*	*	10760010	Exploding Flame Bottom Piece	IT_DEFENCE	IG_NORMAL	item.kim 10760000-10761999 use_level 76
+gear-armour-normal	lanox	74-99	*	*	10760020	Exploding Flame Gloves	IT_DEFENCE	IG_NORMAL	item.kim 10760000-10761999 use_level 76
+gear-armour-normal	lanox	74-99	*	*	10760030	Exploding Flame Shoes	IT_DEFENCE	IG_NORMAL	item.kim 10760000-10761999 use_level 76
+gear-weapon-rare	lanox	74-99	*	*	10760101	Intermediate Exploding Flame Sword	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760201	Intermediate Exploding Flame Staff	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760301	Intermediate Exploding Flame Bow	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760401	Intermediate Exploding Flame Blade	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760501	Intermediate Exploding Flame Drone	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760601	Intermediate Exploding Flame Cannon	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760701	Intermediate Exploding Flame Spear	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760801	Intermediate Exploding Flame Claymore	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10760901	Intermediate Exploding Flame Dynamo	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10761001	Intermediate Exploding Flame Dual Weapon	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10761101	Intermediate Exploding Flame Guns	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-rare	lanox	74-99	*	*	10761201	Intermediate Exploding Flame Pendulum	IT_WEAPON	IG_RARE	item.kim 10760000-10761999 use_level 76, one per class
+gear-top-rare	lanox	74-99	*	*	10760001	Intermediate Exploding Flame Top Piece	IT_DEFENCE	IG_RARE	item.kim 10760000-10761999 use_level 76
+gear-bottom-rare	lanox	74-99	*	*	10760011	Intermediate Exploding Flame Bottom Piece	IT_DEFENCE	IG_RARE	item.kim 10760000-10761999 use_level 76
+gear-gloves-rare	lanox	74-99	*	*	10760021	Intermediate Exploding Flame Gloves	IT_DEFENCE	IG_RARE	item.kim 10760000-10761999 use_level 76
+gear-shoes-rare	lanox	74-99	*	*	10760031	Intermediate Exploding Flame Shoes	IT_DEFENCE	IG_RARE	item.kim 10760000-10761999 use_level 76
+gear-weapon-elite	lanox	74-99	*	*	10760102	Advanced Exploding Flame Sword	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760202	Advanced Exploding Flame Staff	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760302	Advanced Exploding Flame Bow	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760402	Advanced Exploding Flame Blade	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760502	Advanced Exploding Flame Drone	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760602	Advanced Exploding Flame Cannon	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760702	Advanced Exploding Flame Spear	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760802	Advanced Exploding Flame Claymore	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10760902	Advanced Exploding Flame Dynamo	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10761002	Advanced Exploding Flame Dual Weapon	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10761102	Advanced Exploding Flame Guns	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-weapon-elite	lanox	74-99	*	*	10761202	Advanced Exploding Flame Pendulum	IT_WEAPON	IG_ELITE	item.kim 10760000-10761999 use_level 76, one per class
+gear-top-elite	lanox	74-99	*	*	10760002	Advanced Exploding Flame Top Piece	IT_DEFENCE	IG_ELITE	item.kim 10760000-10761999 use_level 76
+gear-bottom-elite	lanox	74-99	*	*	10760012	Advanced Exploding Flame Bottom Piece	IT_DEFENCE	IG_ELITE	item.kim 10760000-10761999 use_level 76
+gear-gloves-elite	lanox	74-99	*	*	10760022	Advanced Exploding Flame Gloves	IT_DEFENCE	IG_ELITE	item.kim 10760000-10761999 use_level 76
+gear-shoes-elite	lanox	74-99	*	*	10760032	Advanced Exploding Flame Shoes	IT_DEFENCE	IG_ELITE	item.kim 10760000-10761999 use_level 76
+stone-enh-weapon	lanox	74-99	*	*	130083	Weapon Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	item.kim: Lv.7 is for lv 71-81 (studio group 4005 holds Lv.6)
+stone-enh-armour	lanox	74-99	*	*	130092	Armor Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	item.kim: Lv.7 is for lv 71-81 (studio group 4005 holds Lv.6)
+set-top	lanox	*	*	*	117551	Hidden Flare Top Piece	IT_DEFENCE	IG_RARE	item.kim set 3900
+set-bottom	lanox	*	*	*	117552	Hidden Flare Bottom Piece	IT_DEFENCE	IG_RARE	item.kim set 3900
+set-gloves	lanox	*	*	*	117553	Hidden Flare Gloves	IT_DEFENCE	IG_RARE	item.kim set 3900
+set-shoes	lanox	*	*	*	117554	Hidden Flare Shoes	IT_DEFENCE	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117561	Hidden Flare Sword	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117562	Hidden Flare Staff	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117563	Hidden Flare Bow	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117564	Hidden Flare Blade	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117565	Hidden Flare Drone	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117566	Hidden Flare Cannon	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117567	Hidden Flare Spear	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117568	Hidden Flare Claymore	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117569	Hidden Flare Dynamo	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117673	Hidden Flare Dual Weapon	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117898	Hidden Flare Guns	IT_WEAPON	IG_RARE	item.kim set 3900
+set-weapon-1	lanox	*	*	*	117952	Hidden Flare Pendulum	IT_WEAPON	IG_RARE	item.kim set 3900
+set-top	lanox	*	*	*	117675	Roaring Berserker Top Piece	IT_DEFENCE	IG_RARE	item.kim set 4015
+set-bottom	lanox	*	*	*	117676	Roaring Berserker Bottom Piece	IT_DEFENCE	IG_RARE	item.kim set 4015
+set-gloves	lanox	*	*	*	117677	Roaring Berserker Gloves	IT_DEFENCE	IG_RARE	item.kim set 4015
+set-shoes	lanox	*	*	*	117678	Roaring Berserker Shoes	IT_DEFENCE	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117679	Roaring Berserker Sword	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117680	Roaring Berserker Staff	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117681	Roaring Berserker Bow	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117682	Roaring Berserker Blade	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117683	Roaring Berserker Drone	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117684	Roaring Berserker Cannon	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117685	Roaring Berserker Spear	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117686	Roaring Berserker Claymore	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117687	Roaring Berserker Dynamo	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117688	Roaring Berserker Dual Weapon	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117899	Roaring Berserker Guns	IT_WEAPON	IG_RARE	item.kim set 4015
+set-weapon-2	lanox	*	*	*	117953	Roaring Berserker Pendulum	IT_WEAPON	IG_RARE	item.kim set 4015
+boss-common-1	lanox	*	33270	*	30329	Kenta's Fiery Headpiece	IT_ACCESSORY	IG_ELITE	DungeonData 33270 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33270	*	30330	Kenta's Petit Pattern	IT_ACCESSORY	IG_ELITE	DungeonData 33270 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33270	*	30331	Kenta's Fiery Bracelet	IT_ACCESSORY	IG_ELITE	DungeonData 33270 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	lanox	*	33271	*	30329	Kenta's Fiery Headpiece	IT_ACCESSORY	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33271	*	30330	Kenta's Petit Pattern	IT_ACCESSORY	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33271	*	30331	Kenta's Fiery Bracelet	IT_ACCESSORY	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33271	*	30337	Crystallized Bow of Fire	IT_WEAPON	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.RENA
+boss-class	lanox	*	33271	*	30338	Crystallized Long Sword of Fire	IT_WEAPON	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.RAVEN
+boss-class	lanox	*	33271	*	30341	Crystallized Spear of Fire	IT_WEAPON	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.ARA
+boss-class	lanox	*	33271	*	30342	Crystallized Claymore of Fire	IT_WEAPON	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.ELESIS
+boss-class	lanox	*	33271	*	30343	Crystallized Dynamo of Fire	IT_WEAPON	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.ADD
+boss-class	lanox	*	33271	*	30353	Crystallized Fire Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.LUCIEL
+boss-class	lanox	*	33271	*	30443	Crystallized Fire Guns	IT_WEAPON	IG_ELITE	DungeonData 33271 BOSS_DROP_ITEM.ROSE
+boss-common-1	lanox	*	33272	*	30329	Kenta's Fiery Headpiece	IT_ACCESSORY	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33272	*	30330	Kenta's Petit Pattern	IT_ACCESSORY	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33272	*	30331	Kenta's Fiery Bracelet	IT_ACCESSORY	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33272	*	30337	Crystallized Bow of Fire	IT_WEAPON	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.RENA
+boss-class	lanox	*	33272	*	30338	Crystallized Long Sword of Fire	IT_WEAPON	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.RAVEN
+boss-class	lanox	*	33272	*	30341	Crystallized Spear of Fire	IT_WEAPON	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.ARA
+boss-class	lanox	*	33272	*	30342	Crystallized Claymore of Fire	IT_WEAPON	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.ELESIS
+boss-class	lanox	*	33272	*	30343	Crystallized Dynamo of Fire	IT_WEAPON	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.ADD
+boss-class	lanox	*	33272	*	30353	Crystallized Fire Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.LUCIEL
+boss-class	lanox	*	33272	*	30443	Crystallized Fire Guns	IT_WEAPON	IG_ELITE	DungeonData 33272 BOSS_DROP_ITEM.ROSE
+boss-common-1	lanox	*	33280	*	30332	Sdeing's Steel Anvil	IT_ACCESSORY	IG_ELITE	DungeonData 33280 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33280	*	30333	Sdeing's Steel Shoulder	IT_ACCESSORY	IG_ELITE	DungeonData 33280 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33280	*	30334	Sdeing's Thick Beard	IT_ACCESSORY	IG_ELITE	DungeonData 33280 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33280	*	30587	Crystallized Pendulum of Fire	IT_WEAPON	IG_ELITE	DungeonData 33280 BOSS_DROP_ITEM.AIN
+boss-common-1	lanox	*	33281	*	30332	Sdeing's Steel Anvil	IT_ACCESSORY	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33281	*	30333	Sdeing's Steel Shoulder	IT_ACCESSORY	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33281	*	30334	Sdeing's Thick Beard	IT_ACCESSORY	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33281	*	30335	Sword of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.ELSWORD
+boss-class	lanox	*	33281	*	30336	Staff of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.AISHA
+boss-class	lanox	*	33281	*	30339	Drone of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.EVE
+boss-class	lanox	*	33281	*	30340	Cannon of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.CHUNG
+boss-class	lanox	*	33281	*	30587	Crystallized Pendulum of Fire	IT_WEAPON	IG_ELITE	DungeonData 33281 BOSS_DROP_ITEM.AIN
+boss-common-1	lanox	*	33282	*	30332	Sdeing's Steel Anvil	IT_ACCESSORY	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33282	*	30333	Sdeing's Steel Shoulder	IT_ACCESSORY	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33282	*	30334	Sdeing's Thick Beard	IT_ACCESSORY	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33282	*	30335	Sword of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.ELSWORD
+boss-class	lanox	*	33282	*	30336	Staff of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.AISHA
+boss-class	lanox	*	33282	*	30339	Drone of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.EVE
+boss-class	lanox	*	33282	*	30340	Cannon of the Steel Anvil	IT_WEAPON	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.CHUNG
+boss-class	lanox	*	33282	*	30587	Crystallized Pendulum of Fire	IT_WEAPON	IG_ELITE	DungeonData 33282 BOSS_DROP_ITEM.AIN
+boss-common-1	lanox	*	33290	*	30354	Sirena's Jewel Brooch	IT_ACCESSORY	IG_ELITE	DungeonData 33290 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33290	*	30355	Sirena's Jewel Tiara	IT_ACCESSORY	IG_ELITE	DungeonData 33290 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33290	*	30356	Sirena's Authority	IT_ACCESSORY	IG_ELITE	DungeonData 33290 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	lanox	*	33291	*	30354	Sirena's Jewel Brooch	IT_ACCESSORY	IG_ELITE	DungeonData 33291 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33291	*	30355	Sirena's Jewel Tiara	IT_ACCESSORY	IG_ELITE	DungeonData 33291 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33291	*	30356	Sirena's Authority	IT_ACCESSORY	IG_ELITE	DungeonData 33291 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	lanox	*	33292	*	30354	Sirena's Jewel Brooch	IT_ACCESSORY	IG_ELITE	DungeonData 33292 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33292	*	30355	Sirena's Jewel Tiara	IT_ACCESSORY	IG_ELITE	DungeonData 33292 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33292	*	30356	Sirena's Authority	IT_ACCESSORY	IG_ELITE	DungeonData 33292 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	lanox	*	33300	*	30357	Ignia's Earrings	IT_ACCESSORY	IG_ELITE	DungeonData 33300 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33300	*	30358	Ignia's Spear	IT_ACCESSORY	IG_ELITE	DungeonData 33300 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33300	*	30359	Ignia's Battle Bracelet	IT_ACCESSORY	IG_ELITE	DungeonData 33300 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	lanox	*	33301	*	30357	Ignia's Earrings	IT_ACCESSORY	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33301	*	30358	Ignia's Spear	IT_ACCESSORY	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33301	*	30359	Ignia's Battle Bracelet	IT_ACCESSORY	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33301	*	30366	Red Lava Demon Sword	IT_WEAPON	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.ELSWORD
+boss-class	lanox	*	33301	*	30367	Red Lava Demon Staff	IT_WEAPON	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.AISHA
+boss-class	lanox	*	33301	*	30368	Red Lava Demon Bow	IT_WEAPON	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.RENA
+boss-class	lanox	*	33301	*	30373	Red Lava Demon Claymore	IT_WEAPON	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.ELESIS
+boss-class	lanox	*	33301	*	30375	Red Lava Demon Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.LUCIEL
+boss-class	lanox	*	33301	*	30536	Red Lava Demon Guns	IT_WEAPON	IG_ELITE	DungeonData 33301 BOSS_DROP_ITEM.ROSE
+boss-common-1	lanox	*	33302	*	30357	Ignia's Earrings	IT_ACCESSORY	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33302	*	30358	Ignia's Spear	IT_ACCESSORY	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33302	*	30359	Ignia's Battle Bracelet	IT_ACCESSORY	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33302	*	30366	Red Lava Demon Sword	IT_WEAPON	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.ELSWORD
+boss-class	lanox	*	33302	*	30367	Red Lava Demon Staff	IT_WEAPON	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.AISHA
+boss-class	lanox	*	33302	*	30368	Red Lava Demon Bow	IT_WEAPON	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.RENA
+boss-class	lanox	*	33302	*	30373	Red Lava Demon Claymore	IT_WEAPON	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.ELESIS
+boss-class	lanox	*	33302	*	30375	Red Lava Demon Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.LUCIEL
+boss-class	lanox	*	33302	*	30536	Red Lava Demon Guns	IT_WEAPON	IG_ELITE	DungeonData 33302 BOSS_DROP_ITEM.ROSE
+boss-common-1	lanox	*	33310	*	30360	Ifritan's Commander Restraint	IT_ACCESSORY	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33310	*	30361	Ifritan's Golden Talons	IT_ACCESSORY	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33310	*	30362	Ifritan's Sealed Shackles	IT_ACCESSORY	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33310	*	30369	Blue Lava Demon Blade	IT_WEAPON	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.RAVEN
+boss-class	lanox	*	33310	*	30370	Blue Lava Demon Drone	IT_WEAPON	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.EVE
+boss-class	lanox	*	33310	*	30371	Blue Lava Demon Cannon	IT_WEAPON	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.CHUNG
+boss-class	lanox	*	33310	*	30372	Blue Lava Demon Spear	IT_WEAPON	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.ARA
+boss-class	lanox	*	33310	*	30374	Blue Lava Demon Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.ADD
+boss-class	lanox	*	33310	*	30588	Red Lava Demon Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33310 BOSS_DROP_ITEM.AIN
+boss-common-1	lanox	*	33311	*	30360	Ifritan's Commander Restraint	IT_ACCESSORY	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33311	*	30361	Ifritan's Golden Talons	IT_ACCESSORY	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33311	*	30362	Ifritan's Sealed Shackles	IT_ACCESSORY	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33311	*	30369	Blue Lava Demon Blade	IT_WEAPON	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.RAVEN
+boss-class	lanox	*	33311	*	30370	Blue Lava Demon Drone	IT_WEAPON	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.EVE
+boss-class	lanox	*	33311	*	30371	Blue Lava Demon Cannon	IT_WEAPON	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.CHUNG
+boss-class	lanox	*	33311	*	30372	Blue Lava Demon Spear	IT_WEAPON	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.ARA
+boss-class	lanox	*	33311	*	30374	Blue Lava Demon Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.ADD
+boss-class	lanox	*	33311	*	30588	Red Lava Demon Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33311 BOSS_DROP_ITEM.AIN
+boss-common-1	lanox	*	33312	*	30360	Ifritan's Commander Restraint	IT_ACCESSORY	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33312	*	30361	Ifritan's Golden Talons	IT_ACCESSORY	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33312	*	30362	Ifritan's Sealed Shackles	IT_ACCESSORY	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.COMMON[3]
+boss-class	lanox	*	33312	*	30369	Blue Lava Demon Blade	IT_WEAPON	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.RAVEN
+boss-class	lanox	*	33312	*	30370	Blue Lava Demon Drone	IT_WEAPON	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.EVE
+boss-class	lanox	*	33312	*	30371	Blue Lava Demon Cannon	IT_WEAPON	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.CHUNG
+boss-class	lanox	*	33312	*	30372	Blue Lava Demon Spear	IT_WEAPON	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.ARA
+boss-class	lanox	*	33312	*	30374	Blue Lava Demon Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.ADD
+boss-class	lanox	*	33312	*	30588	Red Lava Demon Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33312 BOSS_DROP_ITEM.AIN
+boss-common-1	lanox	*	33320	*	30363	Scar's Savage Mantle	IT_ACCESSORY	IG_ELITE	DungeonData 33320 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33320	*	30364	Scar's Sharp Shoulder Blade	IT_ACCESSORY	IG_ELITE	DungeonData 33320 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33320	*	30365	Scar's Broken Horn	IT_ACCESSORY	IG_ELITE	DungeonData 33320 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	lanox	*	33321	*	30363	Scar's Savage Mantle	IT_ACCESSORY	IG_ELITE	DungeonData 33321 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33321	*	30364	Scar's Sharp Shoulder Blade	IT_ACCESSORY	IG_ELITE	DungeonData 33321 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33321	*	30365	Scar's Broken Horn	IT_ACCESSORY	IG_ELITE	DungeonData 33321 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	lanox	*	33322	*	30363	Scar's Savage Mantle	IT_ACCESSORY	IG_ELITE	DungeonData 33322 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	lanox	*	33322	*	30364	Scar's Sharp Shoulder Blade	IT_ACCESSORY	IG_ELITE	DungeonData 33322 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	lanox	*	33322	*	30365	Scar's Broken Horn	IT_ACCESSORY	IG_ELITE	DungeonData 33322 BOSS_DROP_ITEM.COMMON[3]
+gear-weapon-normal	elysion	0-80	*	*	10800100	Steel Demon Soldier Sword	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800200	Steel Demon Soldier Staff	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800300	Steel Demon Soldier Bow	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800400	Steel Demon Soldier Blade	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800500	Steel Demon Soldier Drone	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800600	Steel Demon Soldier Cannon	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800700	Steel Demon Soldier Spear	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800800	Steel Demon Soldier Claymore	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10800900	Steel Demon Soldier Dynamo	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10801000	Steel Demon Soldier Dual Weapon	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10801060	Steel Demon Soldier Guns	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-normal	elysion	0-80	*	*	10801200	Steel Demon Soldier Pendulum	IT_WEAPON	IG_NORMAL	item.kim 10800000-10801999 use_level 80, one per class
+gear-armour-normal	elysion	0-80	*	*	10800000	Steel Demon Soldier Top Piece	IT_DEFENCE	IG_NORMAL	item.kim 10800000-10801999 use_level 80
+gear-armour-normal	elysion	0-80	*	*	10800010	Steel Demon Soldier Bottom Piece	IT_DEFENCE	IG_NORMAL	item.kim 10800000-10801999 use_level 80
+gear-armour-normal	elysion	0-80	*	*	10800020	Steel Demon Soldier Gloves	IT_DEFENCE	IG_NORMAL	item.kim 10800000-10801999 use_level 80
+gear-armour-normal	elysion	0-80	*	*	10800030	Steel Demon Soldier Shoes	IT_DEFENCE	IG_NORMAL	item.kim 10800000-10801999 use_level 80
+gear-weapon-rare	elysion	0-80	*	*	10800101	Intermediate Steel Demon Corps Sword	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800201	Intermediate Steel Demon Corps Staff	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800301	Intermediate Steel Demon Corps Bow	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800401	Intermediate Steel Demon Corps Blade	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800501	Intermediate Steel Demon Corps Drone	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800601	Intermediate Steel Demon Corps Cannon	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800701	Intermediate Steel Demon Corps Spear	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800801	Intermediate Steel Demon Corps Claymore	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10800901	Intermediate Steel Demon Corps Dynamo	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10801001	Intermediate Steel Demon Corps Dual Weapon	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10801061	Intermediate Steel Demon Soldier Guns	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-rare	elysion	0-80	*	*	10801201	Intermediate Steel Demon Soldier Pendulum	IT_WEAPON	IG_RARE	item.kim 10800000-10801999 use_level 80, one per class
+gear-top-rare	elysion	0-80	*	*	10800001	Intermediate Steel Demon Corps Top Piece	IT_DEFENCE	IG_RARE	item.kim 10800000-10801999 use_level 80
+gear-bottom-rare	elysion	0-80	*	*	10800011	Intermediate Steel Demon Corps Bottom Piece	IT_DEFENCE	IG_RARE	item.kim 10800000-10801999 use_level 80
+gear-gloves-rare	elysion	0-80	*	*	10800021	Intermediate Steel Demon Corps Gloves	IT_DEFENCE	IG_RARE	item.kim 10800000-10801999 use_level 80
+gear-shoes-rare	elysion	0-80	*	*	10800031	Intermediate Steel Demon Corps Shoes	IT_DEFENCE	IG_RARE	item.kim 10800000-10801999 use_level 80
+gear-weapon-elite	elysion	0-80	*	*	10800102	Advanced Steel Demon Soldier Sword	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800202	Advanced Steel Demon Soldier Staff	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800302	Advanced Steel Demon Soldier Bow	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800402	Advanced Steel Demon Soldier Blade	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800502	Advanced Steel Demon Soldier Drone	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800602	Advanced Steel Demon Soldier Cannon	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800702	Advanced Steel Demon Soldier Spear	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800802	Advanced Steel Demon Soldier Claymore	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10800902	Advanced Steel Demon Soldier Dynamo	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10801002	Advanced Steel Demon Soldier Dual Weapon	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10801062	Advanced Steel Demon Soldier Guns	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-weapon-elite	elysion	0-80	*	*	10801202	Advanced Steel Demon Soldier Pendulum	IT_WEAPON	IG_ELITE	item.kim 10800000-10801999 use_level 80, one per class
+gear-top-elite	elysion	0-80	*	*	10800002	Advanced Steel Demon Soldier Top Piece	IT_DEFENCE	IG_ELITE	item.kim 10800000-10801999 use_level 80
+gear-bottom-elite	elysion	0-80	*	*	10800012	Advanced Steel Demon Soldier Bottom Piece	IT_DEFENCE	IG_ELITE	item.kim 10800000-10801999 use_level 80
+gear-gloves-elite	elysion	0-80	*	*	10800022	Advanced Steel Demon Soldier Gloves	IT_DEFENCE	IG_ELITE	item.kim 10800000-10801999 use_level 80
+gear-shoes-elite	elysion	0-80	*	*	10800032	Advanced Steel Demon Soldier Shoes	IT_DEFENCE	IG_ELITE	item.kim 10800000-10801999 use_level 80
+stone-enh-weapon	elysion	0-80	*	*	130083	Weapon Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	item.kim: Lv.7 is for lv 71-81 (studio group 4005 holds Lv.6)
+stone-enh-armour	elysion	0-80	*	*	130092	Armor Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	item.kim: Lv.7 is for lv 71-81 (studio group 4005 holds Lv.6)
+gear-weapon-normal	elysion	81-84	*	*	10801020	Atlas Commander Sword	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801024	Atlas Commander Staff	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801028	Atlas Commander Bow	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801032	Atlas Commander Blade	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801036	Atlas Commander Drone	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801040	Atlas Commander Cannon	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801044	Atlas Commander Spear	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801048	Atlas Commander Claymore	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801052	Atlas Commander Dynamo	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801056	Atlas Commander Dual Weapon	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10801064	Atlas Combat Guns	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-normal	elysion	81-84	*	*	10821200	Atlas Commander Pendulum	IT_WEAPON	IG_NORMAL	item.kim 10801000-10821999 use_level 82, one per class
+gear-armour-normal	elysion	81-84	*	*	10801004	Atlas Commander Top Piece	IT_DEFENCE	IG_NORMAL	item.kim 10801000-10821999 use_level 82
+gear-armour-normal	elysion	81-84	*	*	10801008	Atlas Commander Bottom Piece	IT_DEFENCE	IG_NORMAL	item.kim 10801000-10821999 use_level 82
+gear-armour-normal	elysion	81-84	*	*	10801012	Atlas Commander Gloves	IT_DEFENCE	IG_NORMAL	item.kim 10801000-10821999 use_level 82
+gear-armour-normal	elysion	81-84	*	*	10801016	Atlas Commander Shoes	IT_DEFENCE	IG_NORMAL	item.kim 10801000-10821999 use_level 82
+gear-weapon-rare	elysion	81-84	*	*	10801021	Intermediate Atlas Commander Sword	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801025	Intermediate Atlas Commander Staff	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801029	Intermediate Atlas Commander Bow	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801033	Intermediate Atlas Commander Blade	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801037	Intermediate Atlas Commander Drone	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801041	Intermediate Atlas Commander Cannon	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801045	Intermediate Atlas Commander Spear	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801049	Intermediate Atlas Commander Claymore	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801053	Intermediate Atlas Commander Dynamo	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801057	Intermediate Atlas Commander Dual Weapon	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10801065	Intermediate Atlas Combat Guns	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-rare	elysion	81-84	*	*	10821201	Intermediate Atlas Commander Pendulum	IT_WEAPON	IG_RARE	item.kim 10801000-10821999 use_level 82, one per class
+gear-top-rare	elysion	81-84	*	*	10801005	Intermediate Atlas Commander Top Piece	IT_DEFENCE	IG_RARE	item.kim 10801000-10821999 use_level 82
+gear-bottom-rare	elysion	81-84	*	*	10801009	Intermediate Atlas Commander Bottom Piece	IT_DEFENCE	IG_RARE	item.kim 10801000-10821999 use_level 82
+gear-gloves-rare	elysion	81-84	*	*	10801013	Intermediate Atlas Commander Gloves	IT_DEFENCE	IG_RARE	item.kim 10801000-10821999 use_level 82
+gear-shoes-rare	elysion	81-84	*	*	10801017	Intermediate Atlas Commander Shoes	IT_DEFENCE	IG_RARE	item.kim 10801000-10821999 use_level 82
+gear-weapon-elite	elysion	81-84	*	*	10801022	Advanced Atlas Commander Sword	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801026	Advanced Atlas Commander Staff	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801030	Advanced Atlas Commander Bow	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801034	Advanced Atlas Commander Blade	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801038	Advanced Atlas Commander Drone	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801042	Advanced Atlas Commander Cannon	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801046	Advanced Atlas Commander Spear	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801050	Advanced Atlas Commander Claymore	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801054	Advanced Atlas Commander Dynamo	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801058	Advanced Atlas Commander Dual Weapon	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10801066	Advanced Atlas Combat Guns	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-weapon-elite	elysion	81-84	*	*	10821202	Advanced Atlas Commander Pendulum	IT_WEAPON	IG_ELITE	item.kim 10801000-10821999 use_level 82, one per class
+gear-top-elite	elysion	81-84	*	*	10801006	Advanced Atlas Commander Top Piece	IT_DEFENCE	IG_ELITE	item.kim 10801000-10821999 use_level 82
+gear-bottom-elite	elysion	81-84	*	*	10801010	Advanced Atlas Commander Bottom Piece	IT_DEFENCE	IG_ELITE	item.kim 10801000-10821999 use_level 82
+gear-gloves-elite	elysion	81-84	*	*	10801014	Advanced Atlas Commander Gloves	IT_DEFENCE	IG_ELITE	item.kim 10801000-10821999 use_level 82
+gear-shoes-elite	elysion	81-84	*	*	10801018	Advanced Atlas Commander Shoes	IT_DEFENCE	IG_ELITE	item.kim 10801000-10821999 use_level 82
+stone-enh-weapon	elysion	81-84	*	*	130084	Weapon Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	item.kim: Lv.8 is for lv 81-90 (studio group 4005 holds Lv.6)
+stone-enh-armour	elysion	81-84	*	*	130093	Armor Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	item.kim: Lv.8 is for lv 81-90 (studio group 4005 holds Lv.6)
+gear-weapon-normal	elysion	85-99	*	*	10851020	Elysion Guard's Sword	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851024	Elysion Guard's Staff	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851028	Elysion Guard's Bow	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851032	Elysion Guard's Blade	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851036	Elysion Guard's Drone	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851040	Elysion Guard's Cannon	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851044	Elysion Guard's Spear	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851048	Elysion Guard's Claymore	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851052	Elysion Guard's Dynamo	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851056	Elysion Guard's Dual Weapon	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10851064	Elysion Guard's Guns	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-normal	elysion	85-99	*	*	10871200	Elysion Guard Pendulum	IT_WEAPON	IG_NORMAL	item.kim 10851000-10871999 use_level 87, one per class
+gear-armour-normal	elysion	85-99	*	*	10851004	Elysion Guard's Top Piece	IT_DEFENCE	IG_NORMAL	item.kim 10851000-10871999 use_level 87
+gear-armour-normal	elysion	85-99	*	*	10851008	Elysion Guard's Bottom Piece	IT_DEFENCE	IG_NORMAL	item.kim 10851000-10871999 use_level 87
+gear-armour-normal	elysion	85-99	*	*	10851012	Elysion Guard's Gloves	IT_DEFENCE	IG_NORMAL	item.kim 10851000-10871999 use_level 87
+gear-armour-normal	elysion	85-99	*	*	10851016	Elysion Guard's Shoes	IT_DEFENCE	IG_NORMAL	item.kim 10851000-10871999 use_level 87
+gear-weapon-rare	elysion	85-99	*	*	10851021	Intermediate Elysion Guard's Sword	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851025	Intermediate Elysion Guard's Staff	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851029	Intermediate Elysion Guard's Bow	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851033	Intermediate Elysion Guard's Blade	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851037	Intermediate Elysion Guard's Drone	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851041	Intermediate Elysion Guard's Cannon	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851045	Intermediate Elysion Guard's Spear	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851049	Intermediate Elysion Guard's Claymore	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851053	Intermediate Elysion Guard's Dynamo	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851057	Intermediate Elysion Guard's Dual Weapon	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10851065	Intermediate Elysion Guard's Guns	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-rare	elysion	85-99	*	*	10871201	Intermediate Elysion Guard Pendulum	IT_WEAPON	IG_RARE	item.kim 10851000-10871999 use_level 87, one per class
+gear-top-rare	elysion	85-99	*	*	10851005	Intermediate Elysion Guard's Top Piece	IT_DEFENCE	IG_RARE	item.kim 10851000-10871999 use_level 87
+gear-bottom-rare	elysion	85-99	*	*	10851009	Intermediate Elysion Guard's Bottom Piece	IT_DEFENCE	IG_RARE	item.kim 10851000-10871999 use_level 87
+gear-gloves-rare	elysion	85-99	*	*	10851013	Intermediate Elysion Guard's Gloves	IT_DEFENCE	IG_RARE	item.kim 10851000-10871999 use_level 87
+gear-shoes-rare	elysion	85-99	*	*	10851017	Intermediate Elysion Guard's Shoes	IT_DEFENCE	IG_RARE	item.kim 10851000-10871999 use_level 87
+gear-weapon-elite	elysion	85-99	*	*	10851022	Advanced Elysion Guard's Sword	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851026	Advanced Elysion Guard's Staff	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851030	Advanced Elysion Guard's Bow	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851034	Advanced Elysion Guard's Blade	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851038	Advanced Elysion Guard's Drone	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851042	Advanced Elysion Guard's Cannon	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851046	Advanced Elysion Guard's Spear	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851050	Advanced Elysion Guard's Claymore	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851054	Advanced Elysion Guard's Dynamo	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851058	Advanced Elysion Guard's Dual Weapon	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10851066	Advanced Elysion Guard's Guns	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-weapon-elite	elysion	85-99	*	*	10871202	Advanced Elysion Guard Pendulum	IT_WEAPON	IG_ELITE	item.kim 10851000-10871999 use_level 87, one per class
+gear-top-elite	elysion	85-99	*	*	10851006	Advanced Elysion Guard's Top Piece	IT_DEFENCE	IG_ELITE	item.kim 10851000-10871999 use_level 87
+gear-bottom-elite	elysion	85-99	*	*	10851010	Advanced Elysion Guard's Bottom Piece	IT_DEFENCE	IG_ELITE	item.kim 10851000-10871999 use_level 87
+gear-gloves-elite	elysion	85-99	*	*	10851014	Advanced Elysion Guard's Gloves	IT_DEFENCE	IG_ELITE	item.kim 10851000-10871999 use_level 87
+gear-shoes-elite	elysion	85-99	*	*	10851018	Advanced Elysion Guard's Shoes	IT_DEFENCE	IG_ELITE	item.kim 10851000-10871999 use_level 87
+stone-enh-weapon	elysion	85-99	*	*	130084	Weapon Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	item.kim: Lv.8 is for lv 81-90 (studio group 4005 holds Lv.6)
+stone-enh-armour	elysion	85-99	*	*	130093	Armor Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	item.kim: Lv.8 is for lv 81-90 (studio group 4005 holds Lv.6)
+set-top	elysion	*	*	*	117740	Enchanted Diceon Top Piece	IT_DEFENCE	IG_RARE	item.kim set 4521
+set-bottom	elysion	*	*	*	117741	Enchanted Diceon Bottom Piece	IT_DEFENCE	IG_RARE	item.kim set 4521
+set-gloves	elysion	*	*	*	117742	Enchanted Diceon Gloves	IT_DEFENCE	IG_RARE	item.kim set 4521
+set-shoes	elysion	*	*	*	117743	Enchanted Diceon Shoes	IT_DEFENCE	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117744	Enchanted Diceon Sword	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117745	Enchanted Diceon Staff	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117746	Enchanted Diceon Bow	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117747	Enchanted Diceon Blade	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117748	Enchanted Diceon Drone	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117749	Enchanted Diceon Cannon	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117750	Enchanted Diceon Spear	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117751	Enchanted Diceon Claymore	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117752	Enchanted Diceon Dynamo	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117753	Enchanted Diceon Dual Weapon	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117901	Diceon Enchanted Guns	IT_WEAPON	IG_RARE	item.kim set 4521
+set-weapon-1	elysion	*	*	*	117954	Diceon Enchanted Pendulum	IT_WEAPON	IG_RARE	item.kim set 4521
+set-top	elysion	*	*	*	117903	Hernacyd Guard Top Piece	IT_DEFENCE	IG_RARE	item.kim set 5212
+set-bottom	elysion	*	*	*	117904	Hernacyd Guard Bottom Piece	IT_DEFENCE	IG_RARE	item.kim set 5212
+set-gloves	elysion	*	*	*	117905	Hernacyd Guard Gloves	IT_DEFENCE	IG_RARE	item.kim set 5212
+set-shoes	elysion	*	*	*	117906	Hernacyd Guard Shoes	IT_DEFENCE	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117907	Hernacyd Guard Sword	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117908	Hernacyd Guard Staff	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117909	Hernacyd Guard Bow	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117910	Hernacyd Guard Blade	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117911	Hernacyd Guard Drone	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117912	Hernacyd Guard Cannon	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117913	Hernacyd Guard Spear	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117914	Hernacyd Guard Claymore	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117915	Hernacyd Guard Dynamo	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117916	Hernacyd Guard Dual Weapon	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117917	Hernacyd Guard Guns	IT_WEAPON	IG_RARE	item.kim set 5212
+set-weapon-2	elysion	*	*	*	117955	Hernasid Guard Pendulum	IT_WEAPON	IG_RARE	item.kim set 5212
+boss-common-1	elysion	*	33330	*	30426	Dekal's Monocle	IT_ACCESSORY	IG_ELITE	DungeonData 33330 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33330	*	30427	Dekal's Dicetium Examiner	IT_ACCESSORY	IG_ELITE	DungeonData 33330 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33330	*	30428	Dekal's Hand Drone	IT_ACCESSORY	IG_ELITE	DungeonData 33330 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33330	*	30418	Atlas Dicetium Bow	IT_WEAPON	IG_ELITE	DungeonData 33330 BOSS_DROP_ITEM.RENA
+boss-class	elysion	*	33330	*	30420	Atlas Dicetium Drone	IT_WEAPON	IG_ELITE	DungeonData 33330 BOSS_DROP_ITEM.EVE
+boss-class	elysion	*	33330	*	30424	Atlas Dicetium Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33330 BOSS_DROP_ITEM.ADD
+boss-common-1	elysion	*	33331	*	30426	Dekal's Monocle	IT_ACCESSORY	IG_ELITE	DungeonData 33331 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33331	*	30427	Dekal's Dicetium Examiner	IT_ACCESSORY	IG_ELITE	DungeonData 33331 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33331	*	30428	Dekal's Hand Drone	IT_ACCESSORY	IG_ELITE	DungeonData 33331 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33331	*	30418	Atlas Dicetium Bow	IT_WEAPON	IG_ELITE	DungeonData 33331 BOSS_DROP_ITEM.RENA
+boss-class	elysion	*	33331	*	30420	Atlas Dicetium Drone	IT_WEAPON	IG_ELITE	DungeonData 33331 BOSS_DROP_ITEM.EVE
+boss-class	elysion	*	33331	*	30424	Atlas Dicetium Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33331 BOSS_DROP_ITEM.ADD
+boss-common-1	elysion	*	33332	*	30426	Dekal's Monocle	IT_ACCESSORY	IG_ELITE	DungeonData 33332 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33332	*	30427	Dekal's Dicetium Examiner	IT_ACCESSORY	IG_ELITE	DungeonData 33332 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33332	*	30428	Dekal's Hand Drone	IT_ACCESSORY	IG_ELITE	DungeonData 33332 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33332	*	30418	Atlas Dicetium Bow	IT_WEAPON	IG_ELITE	DungeonData 33332 BOSS_DROP_ITEM.RENA
+boss-class	elysion	*	33332	*	30420	Atlas Dicetium Drone	IT_WEAPON	IG_ELITE	DungeonData 33332 BOSS_DROP_ITEM.EVE
+boss-class	elysion	*	33332	*	30424	Atlas Dicetium Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33332 BOSS_DROP_ITEM.ADD
+boss-common-1	elysion	*	33340	*	30429	Surveillan Tracker Wingz	IT_ACCESSORY	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33340	*	30430	Surveillan Tracker Mask	IT_ACCESSORY	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33340	*	30431	Surveillan Dicetium Pendant	IT_ACCESSORY	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33340	*	30416	Atlas Dicetium Sword	IT_WEAPON	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.ELSWORD
+boss-class	elysion	*	33340	*	30421	Atlas Dicetium Cannon	IT_WEAPON	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.CHUNG
+boss-class	elysion	*	33340	*	30425	Atlas Dicetium Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.LUCIEL
+boss-class	elysion	*	33340	*	30444	Atlas Dicetium Guns	IT_WEAPON	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.ROSE
+boss-class	elysion	*	33340	*	30590	Atlas Dicetium Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33340 BOSS_DROP_ITEM.AIN
+boss-common-1	elysion	*	33341	*	30429	Surveillan Tracker Wingz	IT_ACCESSORY	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33341	*	30430	Surveillan Tracker Mask	IT_ACCESSORY	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33341	*	30431	Surveillan Dicetium Pendant	IT_ACCESSORY	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33341	*	30416	Atlas Dicetium Sword	IT_WEAPON	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.ELSWORD
+boss-class	elysion	*	33341	*	30421	Atlas Dicetium Cannon	IT_WEAPON	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.CHUNG
+boss-class	elysion	*	33341	*	30425	Atlas Dicetium Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.LUCIEL
+boss-class	elysion	*	33341	*	30444	Atlas Dicetium Guns	IT_WEAPON	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.ROSE
+boss-class	elysion	*	33341	*	30590	Atlas Dicetium Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33341 BOSS_DROP_ITEM.AIN
+boss-common-1	elysion	*	33342	*	30429	Surveillan Tracker Wingz	IT_ACCESSORY	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33342	*	30430	Surveillan Tracker Mask	IT_ACCESSORY	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33342	*	30431	Surveillan Dicetium Pendant	IT_ACCESSORY	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33342	*	30416	Atlas Dicetium Sword	IT_WEAPON	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.ELSWORD
+boss-class	elysion	*	33342	*	30421	Atlas Dicetium Cannon	IT_WEAPON	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.CHUNG
+boss-class	elysion	*	33342	*	30425	Atlas Dicetium Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.LUCIEL
+boss-class	elysion	*	33342	*	30444	Atlas Dicetium Guns	IT_WEAPON	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.ROSE
+boss-class	elysion	*	33342	*	30590	Atlas Dicetium Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33342 BOSS_DROP_ITEM.AIN
+boss-common-1	elysion	*	33350	*	30432	Maya's Dicetium Belt	IT_ACCESSORY	IG_ELITE	DungeonData 33350 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33350	*	30433	Maya's Commander Crown	IT_ACCESSORY	IG_ELITE	DungeonData 33350 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33350	*	30434	Maya's Core Symbol	IT_ACCESSORY	IG_ELITE	DungeonData 33350 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33350	*	30417	Atlas Dicetium Staff	IT_WEAPON	IG_ELITE	DungeonData 33350 BOSS_DROP_ITEM.AISHA
+boss-class	elysion	*	33350	*	30419	Atlas Dicetium Blade	IT_WEAPON	IG_ELITE	DungeonData 33350 BOSS_DROP_ITEM.RAVEN
+boss-class	elysion	*	33350	*	30422	Atlas Dicetium Spear	IT_WEAPON	IG_ELITE	DungeonData 33350 BOSS_DROP_ITEM.ARA
+boss-class	elysion	*	33350	*	30423	Atlas Dicetium Claymore	IT_WEAPON	IG_ELITE	DungeonData 33350 BOSS_DROP_ITEM.ELESIS
+boss-common-1	elysion	*	33351	*	30432	Maya's Dicetium Belt	IT_ACCESSORY	IG_ELITE	DungeonData 33351 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33351	*	30433	Maya's Commander Crown	IT_ACCESSORY	IG_ELITE	DungeonData 33351 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33351	*	30434	Maya's Core Symbol	IT_ACCESSORY	IG_ELITE	DungeonData 33351 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33351	*	30417	Atlas Dicetium Staff	IT_WEAPON	IG_ELITE	DungeonData 33351 BOSS_DROP_ITEM.AISHA
+boss-class	elysion	*	33351	*	30419	Atlas Dicetium Blade	IT_WEAPON	IG_ELITE	DungeonData 33351 BOSS_DROP_ITEM.RAVEN
+boss-class	elysion	*	33351	*	30422	Atlas Dicetium Spear	IT_WEAPON	IG_ELITE	DungeonData 33351 BOSS_DROP_ITEM.ARA
+boss-class	elysion	*	33351	*	30423	Atlas Dicetium Claymore	IT_WEAPON	IG_ELITE	DungeonData 33351 BOSS_DROP_ITEM.ELESIS
+boss-common-1	elysion	*	33352	*	30432	Maya's Dicetium Belt	IT_ACCESSORY	IG_ELITE	DungeonData 33352 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33352	*	30433	Maya's Commander Crown	IT_ACCESSORY	IG_ELITE	DungeonData 33352 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33352	*	30434	Maya's Core Symbol	IT_ACCESSORY	IG_ELITE	DungeonData 33352 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33352	*	30417	Atlas Dicetium Staff	IT_WEAPON	IG_ELITE	DungeonData 33352 BOSS_DROP_ITEM.AISHA
+boss-class	elysion	*	33352	*	30419	Atlas Dicetium Blade	IT_WEAPON	IG_ELITE	DungeonData 33352 BOSS_DROP_ITEM.RAVEN
+boss-class	elysion	*	33352	*	30422	Atlas Dicetium Spear	IT_WEAPON	IG_ELITE	DungeonData 33352 BOSS_DROP_ITEM.ARA
+boss-class	elysion	*	33352	*	30423	Atlas Dicetium Claymore	IT_WEAPON	IG_ELITE	DungeonData 33352 BOSS_DROP_ITEM.ELESIS
+boss-common-1	elysion	*	33870	*	30563	Mark of Dominance	IT_ACCESSORY	IG_ELITE	DungeonData 33870 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33870	*	30564	Dark Stained Wings (Top Piece)	IT_ACCESSORY	IG_ELITE	DungeonData 33870 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33870	*	30565	Dark Stained Wings (Bottom Piece)	IT_ACCESSORY	IG_ELITE	DungeonData 33870 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33870	*	30591	Elysion's Hernasid Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33870 BOSS_DROP_ITEM.AIN
+boss-common-1	elysion	*	33871	*	30563	Mark of Dominance	IT_ACCESSORY	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33871	*	30564	Dark Stained Wings (Top Piece)	IT_ACCESSORY	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33871	*	30565	Dark Stained Wings (Bottom Piece)	IT_ACCESSORY	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33871	*	30552	Elysion's Hernacyd Sword	IT_WEAPON	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.ELSWORD
+boss-class	elysion	*	33871	*	30554	Elysion's Hernacyd Bow	IT_WEAPON	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.RENA
+boss-class	elysion	*	33871	*	30556	Elysion's Hernacyd Drone	IT_WEAPON	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.EVE
+boss-class	elysion	*	33871	*	30558	Elysion's Hernacyd Spear	IT_WEAPON	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.ARA
+boss-class	elysion	*	33871	*	30591	Elysion's Hernasid Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33871 BOSS_DROP_ITEM.AIN
+boss-common-1	elysion	*	33872	*	30563	Mark of Dominance	IT_ACCESSORY	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33872	*	30564	Dark Stained Wings (Top Piece)	IT_ACCESSORY	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33872	*	30565	Dark Stained Wings (Bottom Piece)	IT_ACCESSORY	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33872	*	30552	Elysion's Hernacyd Sword	IT_WEAPON	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.ELSWORD
+boss-class	elysion	*	33872	*	30554	Elysion's Hernacyd Bow	IT_WEAPON	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.RENA
+boss-class	elysion	*	33872	*	30556	Elysion's Hernacyd Drone	IT_WEAPON	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.EVE
+boss-class	elysion	*	33872	*	30558	Elysion's Hernacyd Spear	IT_WEAPON	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.ARA
+boss-class	elysion	*	33872	*	30591	Elysion's Hernasid Pendulum	IT_WEAPON	IG_ELITE	DungeonData 33872 BOSS_DROP_ITEM.AIN
+boss-common-1	elysion	*	33880	*	30566	Herbaon's Circlet	IT_ACCESSORY	IG_ELITE	DungeonData 33880 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33880	*	30567	Herbaon's Talisman	IT_ACCESSORY	IG_ELITE	DungeonData 33880 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33880	*	30568	PooPang's Tail	IT_ACCESSORY	IG_ELITE	DungeonData 33880 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	elysion	*	33881	*	30566	Herbaon's Circlet	IT_ACCESSORY	IG_ELITE	DungeonData 33881 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33881	*	30567	Herbaon's Talisman	IT_ACCESSORY	IG_ELITE	DungeonData 33881 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33881	*	30568	PooPang's Tail	IT_ACCESSORY	IG_ELITE	DungeonData 33881 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33881	*	30553	Elysion's Hernacyd Staff	IT_WEAPON	IG_ELITE	DungeonData 33881 BOSS_DROP_ITEM.AISHA
+boss-class	elysion	*	33881	*	30557	Elysion's Hernacyd Cannon	IT_WEAPON	IG_ELITE	DungeonData 33881 BOSS_DROP_ITEM.CHUNG
+boss-class	elysion	*	33881	*	30559	Elysion's Hernacyd Claymore	IT_WEAPON	IG_ELITE	DungeonData 33881 BOSS_DROP_ITEM.ELESIS
+boss-class	elysion	*	33881	*	30560	Elysion's Hernacyd Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33881 BOSS_DROP_ITEM.ADD
+boss-common-1	elysion	*	33882	*	30566	Herbaon's Circlet	IT_ACCESSORY	IG_ELITE	DungeonData 33882 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33882	*	30567	Herbaon's Talisman	IT_ACCESSORY	IG_ELITE	DungeonData 33882 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33882	*	30568	PooPang's Tail	IT_ACCESSORY	IG_ELITE	DungeonData 33882 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33882	*	30553	Elysion's Hernacyd Staff	IT_WEAPON	IG_ELITE	DungeonData 33882 BOSS_DROP_ITEM.AISHA
+boss-class	elysion	*	33882	*	30557	Elysion's Hernacyd Cannon	IT_WEAPON	IG_ELITE	DungeonData 33882 BOSS_DROP_ITEM.CHUNG
+boss-class	elysion	*	33882	*	30559	Elysion's Hernacyd Claymore	IT_WEAPON	IG_ELITE	DungeonData 33882 BOSS_DROP_ITEM.ELESIS
+boss-class	elysion	*	33882	*	30560	Elysion's Hernacyd Dynamo	IT_WEAPON	IG_ELITE	DungeonData 33882 BOSS_DROP_ITEM.ADD
+boss-common-1	elysion	*	33890	*	30569	Black Sun	IT_ACCESSORY	IG_ELITE	DungeonData 33890 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33890	*	30570	Solace's Dark Red Mask	IT_ACCESSORY	IG_ELITE	DungeonData 33890 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33890	*	30571	Wings of the Black Storm	IT_ACCESSORY	IG_ELITE	DungeonData 33890 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33890	*	30555	Elysion's Hernacyd Blade	IT_WEAPON	IG_ELITE	DungeonData 33890 BOSS_DROP_ITEM.RAVEN
+boss-class	elysion	*	33890	*	30561	Elysion's Hernacyd Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33890 BOSS_DROP_ITEM.LUCIEL
+boss-class	elysion	*	33890	*	30562	Elysion's Hernacyd Guns	IT_WEAPON	IG_ELITE	DungeonData 33890 BOSS_DROP_ITEM.ROSE
+boss-common-1	elysion	*	33891	*	30569	Black Sun	IT_ACCESSORY	IG_ELITE	DungeonData 33891 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33891	*	30570	Solace's Dark Red Mask	IT_ACCESSORY	IG_ELITE	DungeonData 33891 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33891	*	30571	Wings of the Black Storm	IT_ACCESSORY	IG_ELITE	DungeonData 33891 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33891	*	30555	Elysion's Hernacyd Blade	IT_WEAPON	IG_ELITE	DungeonData 33891 BOSS_DROP_ITEM.RAVEN
+boss-class	elysion	*	33891	*	30561	Elysion's Hernacyd Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33891 BOSS_DROP_ITEM.LUCIEL
+boss-class	elysion	*	33891	*	30562	Elysion's Hernacyd Guns	IT_WEAPON	IG_ELITE	DungeonData 33891 BOSS_DROP_ITEM.ROSE
+boss-common-1	elysion	*	33892	*	30569	Black Sun	IT_ACCESSORY	IG_ELITE	DungeonData 33892 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33892	*	30570	Solace's Dark Red Mask	IT_ACCESSORY	IG_ELITE	DungeonData 33892 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33892	*	30571	Wings of the Black Storm	IT_ACCESSORY	IG_ELITE	DungeonData 33892 BOSS_DROP_ITEM.COMMON[3]
+boss-class	elysion	*	33892	*	30555	Elysion's Hernacyd Blade	IT_WEAPON	IG_ELITE	DungeonData 33892 BOSS_DROP_ITEM.RAVEN
+boss-class	elysion	*	33892	*	30561	Elysion's Hernacyd Dual Weapon	IT_WEAPON	IG_ELITE	DungeonData 33892 BOSS_DROP_ITEM.LUCIEL
+boss-class	elysion	*	33892	*	30562	Elysion's Hernacyd Guns	IT_WEAPON	IG_ELITE	DungeonData 33892 BOSS_DROP_ITEM.ROSE
+boss-common-1	elysion	*	33900	*	30574	Rubenian Resonance Stone	IT_ACCESSORY	IG_ELITE	DungeonData 33900 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33900	*	30575	Sun of Light	IT_ACCESSORY	IG_ELITE	DungeonData 33900 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33900	*	30576	Resonance Earrings	IT_ACCESSORY	IG_ELITE	DungeonData 33900 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	elysion	*	33901	*	30574	Rubenian Resonance Stone	IT_ACCESSORY	IG_ELITE	DungeonData 33901 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33901	*	30575	Sun of Light	IT_ACCESSORY	IG_ELITE	DungeonData 33901 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33901	*	30576	Resonance Earrings	IT_ACCESSORY	IG_ELITE	DungeonData 33901 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	elysion	*	33902	*	30574	Rubenian Resonance Stone	IT_ACCESSORY	IG_ELITE	DungeonData 33902 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	elysion	*	33902	*	30575	Sun of Light	IT_ACCESSORY	IG_ELITE	DungeonData 33902 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	elysion	*	33902	*	30576	Resonance Earrings	IT_ACCESSORY	IG_ELITE	DungeonData 33902 BOSS_DROP_ITEM.COMMON[3]
+boss-common-1	secret	*	33260	*	133537	Guardian Stone Fragments	IT_MATERIAL	IG_RARE	DungeonData 33260 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	secret	*	33260	*	133535	Bethbite	IT_MATERIAL	IG_NORMAL	DungeonData 33260 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	secret	*	33260	*	117418	Ancient Guardian Gloves	IT_DEFENCE	IG_ELITE	DungeonData 33260 BOSS_DROP_ITEM.COMMON[3]
+boss-common-4	secret	*	33260	*	117419	Ancient Guardian Shoes	IT_DEFENCE	IG_ELITE	DungeonData 33260 BOSS_DROP_ITEM.COMMON[4]
+boss-common-1	secret	*	33261	*	154066	Barrier's Fragment	IT_MATERIAL	IG_RARE	DungeonData 33261 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	secret	*	33261	*	700009	Sacrificed Adventurer's Top Piece	IT_DEFENCE	IG_ELITE	DungeonData 33261 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	secret	*	33261	*	700010	Sacrificed Adventurer's Bottom Piece	IT_DEFENCE	IG_ELITE	DungeonData 33261 BOSS_DROP_ITEM.COMMON[3]
+boss-common-4	secret	*	33261	*	700013	Sacrificed Adventurer's Accessory	IT_ACCESSORY	IG_ELITE	DungeonData 33261 BOSS_DROP_ITEM.COMMON[4]
+boss-common-5	secret	*	33261	*	700014	Sacrificed Adventurer's Weapon	IT_WEAPON	IG_ELITE	DungeonData 33261 BOSS_DROP_ITEM.COMMON[5]
+boss-common-1	secret	*	41270	*	133537	Guardian Stone Fragments	IT_MATERIAL	IG_RARE	DungeonData 41270 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	secret	*	41270	*	133535	Bethbite	IT_MATERIAL	IG_NORMAL	DungeonData 41270 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	secret	*	41270	*	117418	Ancient Guardian Gloves	IT_DEFENCE	IG_ELITE	DungeonData 41270 BOSS_DROP_ITEM.COMMON[3]
+boss-common-4	secret	*	41270	*	117419	Ancient Guardian Shoes	IT_DEFENCE	IG_ELITE	DungeonData 41270 BOSS_DROP_ITEM.COMMON[4]
+boss-common-1	secret	*	41271	*	154066	Barrier's Fragment	IT_MATERIAL	IG_RARE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[1]
+boss-common-2	secret	*	41271	*	700009	Sacrificed Adventurer's Top Piece	IT_DEFENCE	IG_ELITE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[2]
+boss-common-3	secret	*	41271	*	700010	Sacrificed Adventurer's Bottom Piece	IT_DEFENCE	IG_ELITE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[3]
+boss-common-4	secret	*	41271	*	700013	Sacrificed Adventurer's Accessory	IT_ACCESSORY	IG_ELITE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[4]
+boss-common-5	secret	*	41271	*	700014	Sacrificed Adventurer's Weapon	IT_WEAPON	IG_ELITE	DungeonData 41271 BOSS_DROP_ITEM.COMMON[5]
+stone-magic.109945	*	*	*	*	109945	Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 4015 weight 80
+stone-magic.109955	*	*	*	*	109955	Advanced Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 4015 weight 20
+stone-bundle.109945	*	*	*	*	109945	Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 4090 weight 17
+stone-bundle.109955	*	*	*	*	109955	Advanced Magic Stone	IT_SPECIAL	IG_NORMAL	studio group 4090 weight 7
+stone-bundle.130047	*	*	*	*	130047	El Shard (Mystery)	IT_SPECIAL	IG_NORMAL	studio group 4090 weight 52
+box-food.70000	*	*	*	*	70000	Egg	IT_OUTLAY	IG_NORMAL	studio group 6002 weight 40
+box-food.70010	*	*	*	*	70010	Seasoned chicken	IT_OUTLAY	IG_NORMAL	studio group 6002 weight 30
+box-food.70020	*	*	*	*	70020	Smoked turkey	IT_OUTLAY	IG_NORMAL	studio group 6002 weight 20
+box-food.70070	*	*	*	*	70070	Roasted mutton	IT_OUTLAY	IG_NORMAL	studio group 6002 weight 10
+box-fruit.70030	*	*	*	*	70030	Blueberry	IT_OUTLAY	IG_NORMAL	studio group 6004 weight 60
+box-fruit.70040	*	*	*	*	70040	Pear	IT_OUTLAY	IG_NORMAL	studio group 6004 weight 20
+box-fruit.70050	*	*	*	*	70050	Pineapple	IT_OUTLAY	IG_NORMAL	studio group 6004 weight 20
+stone-bundle.enh-weapon	lanox	0-73	*	*	130083	Weapon Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 weapon stone at the tier's level (Lv.7)
+stone-bundle.enh-armour	lanox	0-73	*	*	130092	Armor Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 armour stone at the tier's level (Lv.7)
+stone-bundle.enh-weapon	lanox	74-99	*	*	130083	Weapon Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 weapon stone at the tier's level (Lv.7)
+stone-bundle.enh-armour	lanox	74-99	*	*	130092	Armor Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 armour stone at the tier's level (Lv.7)
+stone-bundle.enh-weapon	elysion	0-80	*	*	130083	Weapon Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 weapon stone at the tier's level (Lv.7)
+stone-bundle.enh-armour	elysion	0-80	*	*	130092	Armor Enhancement Stone Lv.7	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 armour stone at the tier's level (Lv.7)
+stone-bundle.enh-weapon	elysion	81-84	*	*	130084	Weapon Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 weapon stone at the tier's level (Lv.8)
+stone-bundle.enh-armour	elysion	81-84	*	*	130093	Armor Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 armour stone at the tier's level (Lv.8)
+stone-bundle.enh-weapon	elysion	85-99	*	*	130084	Weapon Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 weapon stone at the tier's level (Lv.8)
+stone-bundle.enh-armour	elysion	85-99	*	*	130093	Armor Enhancement Stone Lv.8	IT_SPECIAL	IG_NORMAL	studio group 4090's Lv.6 armour stone at the tier's level (Lv.8)
+box-buff	*	*	*	*	77330	Oryed's Fury	IT_OUTLAY	IG_NORMAL	studio group 6005 (equal weights)
+box-buff	*	*	*	*	77340	Dryad's Fury	IT_OUTLAY	IG_NORMAL	studio group 6005 (equal weights)
+box-buff	*	*	*	*	77350	Raul's Fury	IT_OUTLAY	IG_NORMAL	studio group 6005 (equal weights)
+box-buff	*	*	*	*	77360	Illipia's Touch	IT_OUTLAY	IG_NORMAL	studio group 6005 (equal weights)
+box-potion	*	*	*	*	77280	Giant's Potion	IT_OUTLAY	IG_NORMAL	studio group 6006 (equal weights)
+box-potion	*	*	*	*	77290	Sprinter's Potion	IT_OUTLAY	IG_NORMAL	studio group 6006 (equal weights)
+box-potion	*	*	*	*	77300	Dwarf's Potion	IT_OUTLAY	IG_NORMAL	studio group 6006 (equal weights)
+box-potion	*	*	*	*	77320	Awakening Potion	IT_OUTLAY	IG_NORMAL	studio group 6006 (equal weights)
+box-field-potion	*	*	*	*	77280	Giant's Potion	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+box-field-potion	*	*	*	*	77290	Sprinter's Potion	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+box-field-potion	*	*	*	*	77300	Dwarf's Potion	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+box-field-potion	*	*	*	*	77320	Awakening Potion	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+box-field-potion	*	*	*	*	77330	Oryed's Fury	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+box-field-potion	*	*	*	*	77340	Dryad's Fury	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+box-field-potion	*	*	*	*	77350	Raul's Fury	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+box-field-potion	*	*	*	*	77360	Illipia's Touch	IT_OUTLAY	IG_NORMAL	studio group 6008 (equal weights)
+card	*	*	*	1683	78939	Monster Card 'Angry Gripig'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1683's templet NAME
+card	*	*	*	1684	78940	Monster Card 'Angry Dryad'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1684's templet NAME
+card	*	*	*	1689	78942	Monster Card 'Steel Messenger'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1689's templet NAME
+card	*	*	*	1691	78941	Monster Card 'X2 Death Machine'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1691's templet NAME
+card	*	*	*	1884	78947	Monster Card 'Entranced Murloch'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1884's templet NAME
+card	*	*	*	1903	78954	Monster Card 'Steel Lava Berserker'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1903's templet NAME
+card	*	*	*	1928	78954	Monster Card 'Steel Lava Berserker'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1928's templet NAME
+card	*	*	*	1910	78951	Monster Card 'Entranced Demon Jin'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1910's templet NAME
+card	*	*	*	1911	78952	Monster Card 'Enslaved Demon In'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1911's templet NAME
+card	*	*	*	1916	78954	Monster Card 'Steel Lava Berserker'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1916's templet NAME
+card	*	*	*	1922	78951	Monster Card 'Entranced Demon Jin'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1922's templet NAME
+card	*	*	*	1923	78952	Monster Card 'Enslaved Demon In'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 1923's templet NAME
+card	*	*	*	2095	78961	Monster Card 'Bomeba'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2095's templet NAME
+card	*	*	*	2092	78959	Monster Card 'Plingchu'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2092's templet NAME
+card	*	*	*	2093	78959	Monster Card 'Plingchu'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2093's templet NAME
+card	*	*	*	2094	78960	Monster Card 'Alboko Furyta'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2094's templet NAME
+card	*	*	*	2152	78965	Monster Card 'CODE_B_Futer'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2152's templet NAME
+card	*	*	*	2151	78964	Monster Card 'CODE_B_Libya'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2151's templet NAME
+card	*	*	*	2150	78963	Monster Card 'CODE_B_Templar'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2150's templet NAME
+card	*	*	*	2262	78983	Monster Card 'Hernacyd Lance'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2262's templet NAME
+card	*	*	*	2271	78984	Monster Card 'MangPang'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2271's templet NAME
+card	*	*	*	2223	78954	Monster Card 'Steel Lava Berserker'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2223's templet NAME
+card	*	*	*	2222	78953	Monster Card 'Steel Lava Champion'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2222's templet NAME
+card	*	*	*	2239	78951	Monster Card 'Entranced Demon Jin'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2239's templet NAME
+card	*	*	*	2240	78952	Monster Card 'Enslaved Demon In'	IT_QICK_SLOT	IG_RARE	item.kim card named for NPC 2240's templet NAME
+jewel-box	*	*	*	*	113276	Ancient Jewelry Box	IT_SPECIAL	IG_ELITE	DropTable 33250 x 1411 i113276
+static-common	*	*	*	*	99809	Whole Grain Flour	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024
+static-common	*	*	*	*	99810	Ruve Herb	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024
+static-common	*	*	*	*	99811	Aqua	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024
+static-common	*	*	*	*	99812	Stella's Powder Mix	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024
+static-region	*	*	*	*	99823	Crumbly Meat	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024 (Sander's pair; no Lanox / Elysion pair in item.kim)
+static-region	*	*	*	*	99824	Cactus Stem	IT_MATERIAL	IG_NORMAL	StaticDropTable 33250 / 40024 (Sander's pair; no Lanox / Elysion pair in item.kim)
+static-box	*	*	*	*	111069	Gorgeous Jeweled Box	IT_SPECIAL	IG_RARE	StaticDropTable 33250 i111069

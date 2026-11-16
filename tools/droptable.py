@@ -21,7 +21,13 @@ registry and enum reads reuse june2017_re/dungeon_registry_census.py. Roles (a s
   field    field-boss  its spawn group has IS_BOSS_MONSTER_GROUP, or is named by the field's BATTLE_FIELD_MIDDLE_BOSS_INFO
            box / none  as above, and DROP = FALSE is none
            field-mob   DROP = TRUE
-Later phases add: pools, simulate (R1).
+
+  python tools/droptable.py pools [--check]                         item pools -> tools/data/drop_item_pools.tsv (R1)
+  python tools/droptable.py rates [--check]                         rate sheet -> tools/data/drop_rate_sheet.tsv (R1)
+  python tools/droptable.py simulate <key> [<key> ...]              expected items per clear and per role kill against the studio baseline (R1)
+
+pools / rates / simulate (R1) write and read the two `gen` inputs in its columns (see above `gen_blocks`); every rate line is copied from the
+studio row its source names (`rates --check` re-reads each one), the pools come from item.kim and each dungeon's BOSS_DROP_ITEM.
 
   python tools/droptable.py gen   [--only lanox|elysion|secret|all] [--keys 33270,33271] [--dry-run] [--out-dir DIR]
   python tools/droptable.py check [--drop-file F --static-file F]
@@ -927,9 +933,595 @@ def add_gen_paths(p):
     p.add_argument("--static-file", default=os.path.join(SERVER_DIR, "StaticDropTable.lua"))
 
 
+# --- item pools, rate sheet, simulate (R1) ---------------------------------------------------------------------------------------
+# R1 writes the two inputs `gen` reads, in the columns described above `gen_blocks` (POOL_COLS / SHEET_COLS). A studio group whose inner
+# weights differ is written as one `item` line per member at outer x weight / 100 (one lottery picks one case, so the odds are the same);
+# a group of equal weights stays a `group` line. Every value is read from the studio row its `source` names; `rates --check` re-reads them.
+R1_POOLS = os.path.join(DATA, "drop_item_pools.tsv")
+R1_SHEET = os.path.join(DATA, "drop_rate_sheet.tsv")
+R1_POOL_COLS = ["pool", "region", "band", "key", "npc", "item_id", "name", "type", "grade", "source"]
+R1_SHEET_COLS = ["kind", "region", "role", "diff", "pool", "exp", "ed", "ed_property", "prob", "inner", "source"]
+
+# Region gear ladder (item.kim 10LL....): (tier, first id, last id, NPC-level band); a tier is the items in the range at that use_level.
+# Band: the tier nearest the key's NPC level, a tie to the higher tier (Lanox 70-73 -> L72, 74-76 -> L76, as the plan's Design table).
+# Sets: the region's two RARE sets (the studio's Sander bosses carry two RARE sets, 2810 + 2814).
+REGION_DATA = collections.OrderedDict([
+    ("lanox", dict(tiers=[(72, 10720000, 10721999, "0-73"), (76, 10760000, 10761999, "74-99")], sets=[3900, 4015])),
+    ("elysion", dict(tiers=[(80, 10800000, 10801999, "0-80"), (82, 10801000, 10821999, "81-84"), (87, 10851000, 10871999, "85-99")],
+                     sets=[4521, 5212])),
+])
+R1_GRADES = [("normal", "IG_NORMAL"), ("rare", "IG_RARE"), ("elite", "IG_ELITE")]
+R1_ARMOUR = [("top", "EP_DEFENCE_BODY"), ("bottom", "EP_DEFENCE_LEG"), ("gloves", "EP_DEFENCE_HAND"), ("shoes", "EP_DEFENCE_FOOT")]
+STATIC_COMMON = [99809, 99810, 99811, 99812]          # the four cooking goods of every studio static row
+STATIC_REGION_SANDER = [99823, 99824]                 # Sander's pair; item.kim has no Lanox / Elysion 'Cooking Good' pair
+BOSS_LIST_ORDER = ["COMMON", "ELSWORD", "AISHA", "RENA", "RAVEN", "EVE", "CHUNG", "ARA", "ELESIS", "ADD", "LUCIEL", "ROSE", "AIN"]
+EXCLUDE_TEXT = ("(Cannot use)", "Cannot be used", "(Event)", "[Event]")
+DIFF3 = collections.OrderedDict([("NORMAL", 33250), ("HARD", 33251), ("EXPERT", 33252)])
+
+
+class Items:
+    """item.kim (the staged June kim); strings decoded on demand."""
+    F = ["item_type", "item_grade", "use_level", "unit_class", "eqip_position", "set_id", "fashion", "shop_price_type", "is_pc_bang"]
+
+    def __init__(self):
+        import kim
+        self.m = kim
+        self.k = kim.Kim("staged")
+        self.era = self.k.L["era"]
+        self.rows = {}
+        for i in self.k.ids():
+            r = self.k.raw(i)
+            self.rows[i] = (r, {f: kim.field_values(self.k, r, f, decode_strings=False)[0] for f in self.F})
+
+    def has(self, i):
+        return i in self.rows
+
+    def get(self, i, f):
+        r, d = self.rows[i]
+        return d[f] if f in d else self.m.field_values(self.k, r, f)[0]
+
+    def label(self, i, f):
+        v = self.get(i, f)
+        return self.m.enum_label(f, v, self.era) or str(v)
+
+    def bad(self, i):
+        """-> why an item may not enter a pool (not in item.kim, fashion, cash, PC-bang, 'Cannot use' / event text), or ''."""
+        if not self.has(i):
+            return "not in item.kim"
+        if self.get(i, "fashion"):
+            return "fashion"
+        if self.label(i, "shop_price_type") == "SPT_CASH":
+            return "cash"
+        if self.get(i, "is_pc_bang"):
+            return "pc-bang"
+        text = (self.get(i, "name") + " " + self.get(i, "desc")).lower()
+        hit = [t for t in EXCLUDE_TEXT if t.lower() in text]
+        return "text '%s'" % hit[0] if hit else ""
+
+    def find(self, pred):
+        return [i for i, (r, d) in sorted(self.rows.items()) if pred(i, d)]
+
+    def by_name(self, name):
+        return [i for i in self.find(lambda i, d: not d["fashion"]) if self.get(i, "name") == name]
+
+
+def ascii_text(s):
+    return s.encode("ascii", "replace").decode("ascii")
+
+
+def stone_levels(items):
+    """-> {stone level: (weapon id, armour id, lo, hi)} from the stones' own item.kim text ('Levels 61-70', 'level 71~81')."""
+    out = {}
+    for lv in range(1, 10):
+        w, a = items.by_name("Weapon Enhancement Stone Lv.%d" % lv), items.by_name("Armor Enhancement Stone Lv.%d" % lv)
+        m = re.search(r"[Ll]evels?\s+(\d+)\s*[-~]\s*(\d+)", items.get(w[0], "desc")) if len(w) == 1 and len(a) == 1 else None
+        if m:
+            out[lv] = (w[0], a[0], int(m.group(1)), int(m.group(2)))
+    return out
+
+
+def boss_lists(reg, key):
+    """-> [(list name, [item ids])] of the dungeon's BOSS_DROP_ITEM: COMMON first, then the per-character lists."""
+    _, f = reg.dd[key]
+    found = dict((n, [int(x) for x in re.findall(r"\d+=(\d+)", v)])
+                 for n, v in re.findall(r"([A-Z_]+)=\{([^{}]*)\}", f.get("BOSS_DROP_ITEM", "")))
+    return [(n, found[n]) for n in BOSS_LIST_ORDER if found.get(n)] + \
+           [(n, v) for n, v in sorted(found.items()) if n not in BOSS_LIST_ORDER and v]
+
+
+def card_items(items):
+    """-> {lower-case monster name: card id} for every usable 'Monster Card' item."""
+    out = {}
+    for i in items.find(lambda i, d: not d["fashion"]):
+        nm = items.get(i, "name")
+        if nm.startswith("Monster Card") and not items.bad(i):
+            m = re.match(r"Monster Card\s*[-:]?\s*['‘’\"“”]?(.*?)['‘’\"“”]?\s*$", nm)
+            out.setdefault(m.group(1).strip().lower(), i)
+    return out
+
+
+def region_keys():
+    """-> {region: (dungeon keys, field keys)} from SCOPE."""
+    out = collections.OrderedDict()
+    for _, label, dk, fk in SCOPE:
+        d, f = out.setdefault(region_of(label), ([], []))
+        d += dk
+        f += fk
+    return out
+
+
+# --- studio rows ----------------------------------------------------------------------------------------------------------------
+_STUDIO = {}
+
+
+def studio():
+    """-> groups {id: [(item, weight)]}, mon / fld {(key, npc): (fields, [(item, p)], [(group, p)])}, static {(kind, key): [(item, p)]}.
+    Rows from the staged data036 files (census proves them equal to the loose copies); AddToGroup's positional args from the loose text."""
+    if _STUDIO:
+        return _STUDIO
+
+    def lst(sub, key):
+        return [(int(r["1"]), float(r["2"])) for k, i, r in sub if k == key and "1" in r]
+    mon, fld, static = {}, {}, {}
+    for meth, f, sub in calls(kc("data036", "DropTable.lua"), "deep"):
+        if meth == "AddMonsterDropInfo":
+            mon[(int(f["DungeonID"]), int(f["MonsterID"]))] = (f, lst(sub, "DropItemList"), lst(sub, "DropGroupList"))
+        elif meth == "AddBattleFieldNpcDropInfo":
+            fld[(int(f["BattleFieldID"]), int(f["MonsterID"]))] = (f, lst(sub, "DropItemList"), lst(sub, "DropGroupList"))
+    for meth, f, sub in calls(kc("data036", "StaticDropTable.lua"), "deep"):
+        if meth in ("AddStaticDropInfo", "AddBattleFieldStaticDropInfo"):
+            static[("field", int(f["BattleFieldID"])) if "BattleFieldID" in f else ("dungeon", int(f["DungeonID"]))] = lst(sub, "DropItemList")
+    groups = collections.defaultdict(list)
+    with open(os.path.join(SERVER_DIR, "DropTable.lua"), encoding="utf-8-sig", errors="replace") as fh:
+        for m in re.finditer(r"^\s*DropTable:AddToGroup\(\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)", fh.read(), re.M):
+            groups[int(m.group(1))].append((int(m.group(2)), float(m.group(3))))
+    _STUDIO.update(groups=groups, mon=mon, fld=fld, static=static)
+    return _STUDIO
+
+
+def studio_row(tab, key, npc):
+    """-> (exp, ed, ed_property, {'i<id>' | 'g<id>': p}) of one studio row."""
+    f, il, gl = studio()[tab][(key, npc)]
+    cases = collections.OrderedDict([("i%d" % i, p) for i, p in il] + [("g%d" % g, p) for g, p in gl])
+    return f.get("Exp"), f.get("ED"), f.get("EDProperty"), cases
+
+
+def equal_weights(gid):
+    ws = {w for _, w in studio()["groups"].get(gid, [])}
+    return len(ws) == 1 and abs(sum(w for _, w in studio()["groups"][gid]) - 100) < 1e-6
+
+
+# --- pools ----------------------------------------------------------------------------------------------------------------------
+def build_pools(reg, items, census):
+    rows, left_out = [], []
+
+    def add(pool, region, band, key, npc, i, source):
+        why = items.bad(i)
+        if why:
+            left_out.append("%s %s %s %s %s: %s" % (pool, region, band, key, i, why))
+            return
+        rows.append(dict(pool=pool, region=region, band=band, key=key, npc=npc, item_id=i, name=ascii_text(items.get(i, "name")),
+                         type=items.label(i, "item_type"), grade=items.label(i, "item_grade"), source=source))
+
+    levels = stone_levels(items)
+    keys = region_keys()
+    for region, R in REGION_DATA.items():
+        for tier, lo, hi, band in R["tiers"]:
+            ids = items.find(lambda i, d: lo <= i <= hi and d["use_level"] == tier and not d["fashion"])
+            src = "item.kim %d-%d use_level %d" % (lo, hi, tier)
+            for gname, glabel in R1_GRADES:
+                for i in ids:
+                    if items.label(i, "item_grade") == glabel and items.label(i, "eqip_position") == "EP_WEAPON_HAND":
+                        add("gear-weapon-%s" % gname, region, band, "*", "*", i, src + ", one per class")
+                for aname, apos in R1_ARMOUR:
+                    for i in ids:
+                        if items.label(i, "item_grade") == glabel and items.label(i, "eqip_position") == apos:
+                            add("gear-armour-normal" if gname == "normal" else "gear-%s-%s" % (aname, gname), region, band, "*", "*", i, src)
+            slv = [lv for lv, (_, _, a, b) in sorted(levels.items()) if a <= tier <= b]
+            if not slv:
+                left_out.append("%s L%d: no enhancement stone covers the tier" % (region, tier))
+                continue
+            w, a, slo, shi = levels[slv[0]]
+            for i, why in ((w, "weapon"), (a, "armour")):
+                add("stone-enh-%s" % why, region, band, "*", "*", i, "item.kim: Lv.%d is for lv %d-%d (studio group 4005 holds Lv.6)" % (slv[0], slo, shi))
+        for n, sid in enumerate(R["sets"], 1):
+            members = items.find(lambda i, d: d["set_id"] == sid and not d["fashion"])
+            for i in members:
+                pos = items.label(i, "eqip_position")
+                if pos == "EP_WEAPON_HAND":
+                    add("set-weapon-%d" % n, region, "*", "*", "*", i, "item.kim set %d" % sid)
+                for aname, apos in R1_ARMOUR:
+                    if pos == apos:
+                        add("set-%s" % aname, region, "*", "*", "*", i, "item.kim set %d" % sid)
+        for key in keys[region][0]:
+            boss_pools(reg, key, region, add)
+    for key in keys.get("secret", ([], []))[0]:
+        boss_pools(reg, key, "secret", add)
+    # flattened studio groups (unequal weights) and the equal-weight ones kept whole
+    for gid, pool in ((4015, "stone-magic"), (4090, "stone-bundle"), (6002, "box-food"), (6004, "box-fruit")):
+        for i, wt in studio()["groups"][gid]:
+            if gid == 4090 and i in [levels[6][0], levels[6][1]]:
+                continue                                        # the bundle's Lv.6 stones become the tier's own (below)
+            add("%s.%d" % (pool, i), "*", "*", "*", "*", i, "studio group %d weight %s" % (gid, _fmt(wt)))
+    for region, R in REGION_DATA.items():
+        for tier, lo, hi, band in R["tiers"]:
+            slv = [lv for lv, (_, _, a, b) in sorted(levels.items()) if a <= tier <= b][0]
+            for kind, idx in (("weapon", 0), ("armour", 1)):
+                add("stone-bundle.enh-%s" % kind, region, band, "*", "*", levels[slv][idx],
+                    "studio group 4090's Lv.6 %s stone at the tier's level (Lv.%d)" % (kind, slv))
+    for gid, pool in ((6005, "box-buff"), (6006, "box-potion"), (6008, "box-field-potion")):
+        for i, wt in studio()["groups"][gid]:
+            add(pool, "*", "*", "*", "*", i, "studio group %d (equal weights)" % gid)
+    cards = card_items(items)
+    scope = {int(k) for _, _, dk, fk in SCOPE for k in dk + fk}
+    seen = set()
+    for r in census:
+        if int(r["key"]) not in scope or r["role"] in NO_ROW_ROLES + ("box",) or r["npc_id"] in seen:
+            continue
+        c = cards.get(r["npc"].strip().lower())
+        if c:
+            seen.add(r["npc_id"])
+            add("card", "*", "*", "*", r["npc_id"], c, "item.kim card named for NPC %s's templet NAME" % r["npc_id"])
+    add("jewel-box", "*", "*", "*", "*", 113276, "DropTable 33250 x 1411 i113276")
+    for i in STATIC_COMMON:
+        add("static-common", "*", "*", "*", "*", i, "StaticDropTable 33250 / 40024")
+    for i in STATIC_REGION_SANDER:
+        add("static-region", "*", "*", "*", "*", i, "StaticDropTable 33250 / 40024 (Sander's pair; no Lanox / Elysion pair in item.kim)")
+    add("static-box", "*", "*", "*", "*", 111069, "StaticDropTable 33250 i111069")
+    return rows, left_out
+
+
+def boss_pools(reg, key, region, add):
+    if key not in reg.dd:
+        return
+    for name, ids in boss_lists(reg, key):
+        for n, i in enumerate(ids, 1):
+            if name == "COMMON":
+                add("boss-common-%d" % n, region, "*", key, "*", i, "DungeonData %d BOSS_DROP_ITEM.COMMON[%d]" % (key, n))
+            else:
+                add("boss-class", region, "*", key, "*", i, "DungeonData %d BOSS_DROP_ITEM.%s" % (key, name))
+
+
+# --- rate sheet -----------------------------------------------------------------------------------------------------------------
+# role -> [(table, {diff: studio key}, studio NPC, {case: (kind, pool)})]. Each case is copied as written: a `group` case keeps its outer
+# probability; an `item` case of a one-item studio group or a fixed item keeps its value; `flat` spreads an unequal-weight studio group
+# over its pool members (pool prefix + '.' + item id) at outer x weight / 100.
+GEAR_MOB = [("g181", "group", "gear-weapon-normal"), ("g182", "group", "gear-weapon-rare"), ("g184", "group", "gear-armour-normal"),
+            ("g185", "group", "gear-top-rare"), ("g187", "group", "gear-bottom-rare"), ("g189", "group", "gear-gloves-rare"),
+            ("g191", "group", "gear-shoes-rare"), ("g4005", "enh", "stone-enh"), ("g4015", "flat", "stone-magic")]
+GEAR_BOSS = [("g182", "group", "gear-weapon-rare"), ("g183", "group", "gear-weapon-elite"),
+             ("g185", "group", "gear-top-rare"), ("g186", "group", "gear-top-elite"), ("g187", "group", "gear-bottom-rare"),
+             ("g188", "group", "gear-bottom-elite"), ("g189", "group", "gear-gloves-rare"), ("g190", "group", "gear-gloves-elite"),
+             ("g191", "group", "gear-shoes-rare"), ("g192", "group", "gear-shoes-elite"), ("g4090", "flat", "stone-bundle")]
+RATE_TEMPLATES = [
+    ("mob", "mon", DIFF3, 1382, GEAR_MOB),
+    ("mob-minor", "mon", DIFF3, 1415, GEAR_MOB),
+    ("mob-card", "mon", DIFF3, 1378, [("i78776", "item", "card")]),
+    ("stage-boss", "mon", DIFF3, 1387, GEAR_BOSS + [("i78777", "item", "card"), ("g1162", "item", "set-bottom"), ("g1164", "item", "set-shoes")]),
+    # boss-class: the studio spreads the 8 character weapons over 4 stage bosses at 0.5 each (1387-1389, 1409); one line on the final boss
+    # gives the same total per clear, since a role line reaches every NPC of the role
+    ("final-boss", "mon", DIFF3, 1411, GEAR_BOSS + [("i113276", "item", "jewel-box"), ("g2127", "item", "boss-common-1"),
+                                                    ("g2128", "item", "boss-common-2"), ("g2129", "item", "boss-common-3"),
+                                                    ("g1160", "group", "set-weapon-1"), ("g1170", "group", "set-weapon-2")]),
+    ("final-boss", "mon", DIFF3, 1387, [("g2130", "item", "boss-class")]),
+    # user 2026-11-16 (R1 decision 6): stage bosses also drop each set's top and gloves at Karuso Village's stage-boss values
+    ("stage-boss", "mon", collections.OrderedDict([("NORMAL", 33230), ("HARD", 33231), ("EXPERT", 33232)]), 1215,
+     [("g1161", "item", "set-top"), ("g1163", "item", "set-gloves")]),
+    ("box", "mon", DIFF3, 20, [("g6002", "flat", "box-food"), ("g6004", "flat", "box-fruit"), ("g6005", "group", "box-buff"),
+                               ("g6006", "group", "box-potion")]),
+    ("field-mob", "fld", {"FIELD": 40024}, 5143, GEAR_MOB),
+    ("field-boss", "fld", {"FIELD": 40024}, 5124, []),
+    ("box", "fld", {"FIELD": 40024}, 20, [("g6002", "flat", "box-food"), ("g6008", "group", "box-field-potion")]),
+]
+STATIC_TEMPLATES = [
+    ("dungeon", DIFF3, [("i%d" % i, "static-common") for i in STATIC_COMMON] + [("i%d" % i, "static-region") for i in STATIC_REGION_SANDER] +
+     [("i111069", "static-box")]),
+    ("field", {"FIELD": 40024}, [("i%d" % i, "static-common") for i in STATIC_COMMON] + [("i%d" % i, "static-region") for i in STATIC_REGION_SANDER]),
+]
+# Studio cases of a template row left out on purpose: 1387's boss weapons go to the final boss (one `boss-class` line), its second set's
+# pieces are covered by the same `set-bottom` / `set-shoes` lines (the pools hold both sets); the 1387 row read for the final boss's
+# `boss-class` line copies only that case; 1378 (a carded mob) gives only its card, its other cases equal 1382's.
+NOT_COPIED = {("stage-boss", 1387): {"g2130", "g2137", "g1172", "g1174"}, ("final-boss", 1387): "*", ("mob-card", 1378): "*",
+              ("stage-boss", 1215): "*"}
+USER_TEMPLATES = {("stage-boss", 1215): "user 2026-11-16 (R1 decision 6: add set tops / gloves): "}
+# The phase's decisions, as `decision` lines gen ignores (OFFLINE_FIELD_REWARDS_PHASES.md "Phase R1 - Done").
+DECISIONS = [
+    ("boss-class", "user 2026-11-16 (R1 decision 1): class-blind; every listed character weapon can drop for anyone, no emulator filter"),
+    ("stone-level", "item.kim text (R1 decision 2, no choice left): Lv.7 for L72 / L76 / L80 (71-81), Lv.8 for L82 / L87 (81-90)"),
+    ("field-boss", "user 2026-11-16 (R1 decision 3): EXP + ED only, as DropTable field 40024 x 5124"),
+    ("henir-defence", "default kept (R1 decision 4): Henir 38100 and Defence 38300-38302 get no stand-in rows"),
+    ("set-pools", "user 2026-11-16 (R1 decision 5): both region sets on every boss, as Behemoth Heart's two sets"),
+    ("set-top-gloves", "user 2026-11-16 (R1 decision 6): stage bosses add set tops / gloves at DropTable 33230-33232 x 1215 values"),
+]
+SECRET_REF = [("NORMAL", 33190, [459, 460, 944, 948]), ("HARD", 33191, [459, 460, 980, 984])]   # common / hell = the census diffs
+REGION_ROWS = ("lanox", "elysion")
+
+
+def build_sheet():
+    """-> (lines, problems)."""
+    st = studio()
+    lines, problems, covered = [], [], collections.defaultdict(set)
+
+    def line(kind, region, role, diff, pool, prob="", inner="", source="", exp="", ed="", edp=""):
+        lines.append(dict(kind=kind, region=region, role=role, diff=diff, pool=pool, exp=exp, ed=ed, ed_property=edp,
+                          prob=prob, inner=inner, source=source))
+
+    for role, tab, diffs, npc, cases in RATE_TEMPLATES:
+        tname = "DropTable" if tab == "mon" else "DropTable field"
+        for diff, key in diffs.items():
+            if (key, npc) not in st[tab]:
+                problems.append("%s: no studio row %d x %d" % (role, key, npc))
+                continue
+            exp, ed, edp, have = studio_row(tab, key, npc)
+            covered[(role, tab, key)].add(npc)
+            for region in REGION_ROWS:
+                if role not in ("mob-card",) and not any(l["kind"] == "param" and l["role"] == role and l["diff"] == diff and l["region"] == region
+                                                         for l in lines):
+                    line("param", region, role, diff, "-", exp=exp, ed=ed, edp=edp, source="%s %d x %d Exp / ED / EDProperty" % (tname, key, npc))
+                for c, kind, pool in cases:
+                    if c not in have:
+                        problems.append("%s %s: studio row %d x %d has no case %s" % (role, diff, key, npc, c))
+                        continue
+                    p = have[c]
+                    src = USER_TEMPLATES.get((role, npc), "") + "%s %d x %d %s %s" % (tname, key, npc, c, _fmt(p))
+                    if kind in ("group", "item"):
+                        line(kind, region, role, diff, pool, prob=fmt_prob(p), source=src)
+                    elif kind == "enh":                     # group 4005: Lv.6 weapon 35 / armour 65 -> the tier's stones, same weights
+                        g = dict(st["groups"][int(c[1:])])
+                        for name, wt in (("weapon", g[130082]), ("armour", g[130091])):
+                            line("item", region, role, diff, "%s-%s" % (pool, name), prob=fmt_prob(p * wt / 100.0),
+                                 source="%s x group %s weight %s" % (src, c[1:], _fmt(wt)))
+                    elif kind == "flat":
+                        for i, wt in st["groups"][int(c[1:])]:
+                            sub = "%s.%d" % (pool, i)
+                            if c == "g4090" and i in (130082, 130091):
+                                sub = "%s.enh-%s" % (pool, "weapon" if i == 130082 else "armour")
+                            line("item", region, role, diff, sub, prob=fmt_prob(p * wt / 100.0),
+                                 source="%s x group %s weight %s" % (src, c[1:], _fmt(wt)))
+            for c in have:
+                skip = NOT_COPIED.get((role, npc), set())
+                if c not in [x[0] for x in cases] and skip != "*" and c not in skip:
+                    problems.append("%s %s: studio case %d x %d %s not copied" % (role, diff, key, npc, c))
+    for kind, diffs, cases in STATIC_TEMPLATES:
+        for diff, key in diffs.items():
+            have = dict(("i%d" % i, p) for i, p in st["static"].get((kind, key), []))
+            for region in REGION_ROWS:
+                for c, pool in cases:
+                    if c not in have:
+                        problems.append("static %s %d has no %s" % (kind, key, c))
+                        continue
+                    if any(l["kind"] == "static" and l["pool"] == pool and l["diff"] == diff and l["region"] == region for l in lines):
+                        continue
+                    line("static", region, "*", diff, pool, prob=fmt_prob(have[c]), source="StaticDropTable %s %d %s %s" % (kind, key, c, _fmt(have[c])))
+    # secret dungeons: the studio's Velder secret rows, as `ref` lines gen ignores; R5 maps them onto each dungeon's own entry items
+    for diff, key, npcs in SECRET_REF:
+        for npc in npcs:
+            exp, ed, edp, have = studio_row("mon", key, npc)
+            line("ref", "secret", "npc %d" % npc, diff, "-", exp=exp, ed=ed, edp=edp, source="DropTable %d x %d Exp / ED / EDProperty" % (key, npc))
+            for c, p in have.items():
+                line("ref", "secret", "npc %d" % npc, diff, ("studio-group:" if c[0] == "g" else "studio-item:") + c[1:], prob=fmt_prob(p),
+                     source="DropTable %d x %d %s %s" % (key, npc, c, _fmt(p)))
+    for topic, why in DECISIONS:
+        line("decision", "*", "-", "-", topic, source=why)
+    return lines, problems
+
+
+def write_sheet(rows, cols, path, note):
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("# %s\n" % note)
+        fh.write("\t".join(cols) + "\n")
+        for r in rows:
+            fh.write("\t".join(str(r.get(c, "")).replace("\t", " ") for c in cols) + "\n")
+
+
+def line_key(r):
+    return (r["kind"], r["region"], r["role"], r["diff"], r["pool"])
+
+
+def cmd_pools(a):
+    reg, items = Reg(), Items()
+    rows, left_out = build_pools(reg, items, read_tsv(a.census, COLUMNS, "census"))
+    note = "field-rewards item pools, written by tools/droptable.py pools (OFFLINE_FIELD_REWARDS_PHASES.md R1) - do not hand-edit"
+    if a.check:
+        old = read_tsv(a.out, R1_POOL_COLS, "pools")
+        same = [[str(r[c]) for c in R1_POOL_COLS] for r in rows] == [[r[c] for c in R1_POOL_COLS] for r in old]
+        print("POOLS %d row(s); file == fresh pools: %s" % (len(rows), "YES" if same else "NO"))
+    else:
+        write_sheet(rows, R1_POOL_COLS, a.out, note)
+        print("POOLS %d row(s), %d distinct item(s) -> %s" % (len(rows), len({r["item_id"] for r in rows}), os.path.relpath(a.out, TRUNK)))
+    cnt = collections.Counter((re.split(r"[-.]", r["pool"])[0], r["region"]) for r in rows)
+    print("      " + " ".join("%s/%s=%d" % (p, rg, n) for (p, rg), n in sorted(cnt.items())))
+    for p in left_out:
+        print("      LEFT OUT " + p)
+    return 0 if not a.check or same else 1
+
+
+def cmd_rates(a):
+    lines, problems = build_sheet()
+    fresh_keys = {line_key(l) for l in lines}
+    user = [r for r in read_tsv(a.out, R1_SHEET_COLS, "rate sheet") if r["source"].startswith("user ") and line_key(r) not in fresh_keys]
+    for u in user:                                        # a user decision replaces the generated line it names, or adds one
+        lines = [l for l in lines if line_key(l) != line_key(u)] + [u]
+    note = ("field-rewards rate sheet (percent per kill; columns: see tools/droptable.py above gen_blocks), written by droptable.py rates "
+            "from the studio rows each source names; a line whose source starts 'user <date>' is a user decision and survives a rewrite")
+    if a.check:
+        old = read_tsv(a.out, R1_SHEET_COLS, "rate sheet")
+        fresh = {line_key(l): l for l in lines}
+        bad = [r for r in old if line_key(r) not in fresh or any(str(fresh[line_key(r)][c]) != r[c] for c in R1_SHEET_COLS)]
+        ok = not bad and len(old) == len(lines)
+        print("SHEET %d line(s) (%d user); every other line equals the studio value its source names: %s" % (len(old), len(user), "YES" if ok else "NO"))
+        for r in bad:
+            print("      DIFFERS " + "\t".join(r[c] for c in R1_SHEET_COLS))
+    else:
+        write_sheet(lines, R1_SHEET_COLS, a.out, note)
+        print("SHEET %d line(s) (%d user) -> %s" % (len(lines), len(user), os.path.relpath(a.out, TRUNK)))
+        ok = True
+    for p in problems:
+        print("      PROBLEM " + p)
+    return 0 if ok and not problems else 1
+
+
+# --- simulate -------------------------------------------------------------------------------------------------------------------
+# Two views. Per clear, by category: what a player sees, which mostly measures the dungeon's size, boss count and June's entry lists.
+# The gate, per role: expected items per kill of each role against the same role of the baseline (Behemoth Heart at the same difficulty,
+# or Sander Field 03), which is what the sheet controls. A baseline NPC whose studio row is food / potion only counts as a chest.
+CATEGORIES = ["gear", "stone", "card", "set", "boss", "box"]
+GATE_ROLES = ["mob", "mob-minor", "stage-boss", "final-boss", "box", "field-mob", "field-boss"]
+
+
+def category(pool):
+    head = re.split(r"[-.]", pool)[0]
+    return {"gear": "gear", "stone": "stone", "card": "card", "set": "set", "boss": "boss", "jewel": "boss", "box": "box"}.get(head, "other")
+
+
+def studio_category(case, items):
+    """Category of a studio case for the baseline: the templates' own mapping, else by what the case holds."""
+    for role, tab, diffs, npc, cases in RATE_TEMPLATES:
+        for c, kind, pool in cases:
+            if c == case:
+                return category(pool)
+    n = int(case[1:])
+    if case[0] == "i" and items.has(n) and items.get(n, "name").startswith("Monster Card"):
+        return "card"
+    if case == "g4013":
+        return "stone"                                  # magic stone 90 / 10, Sander's field rows
+    if case[0] == "g" and 1160 <= n <= 1174:
+        return "set"
+    if case[0] == "g" and 2127 <= n <= 2137:
+        return "boss"
+    return "other"
+
+
+def draws():
+    with open(os.path.join(TRUNK, "X2Lib", "X2Define.h"), encoding="utf-8", errors="replace") as fh:
+        m = re.search(r"SERV_IRUHADEV_OFFLINE_DROP_DRAWS\s*=\s*(\d+)", fh.read())
+    return int(m.group(1)) if m else 1
+
+
+def key_info(census, key):
+    rows = [r for r in census if int(r["key"]) == key]
+    if not rows:
+        return None
+    kind = rows[0]["scope"]
+    region = next((rg for rg, (dk, fk) in region_keys().items() if key in dk or key in fk), None)
+    diff = rows[0]["diff"] if kind == "dungeon" else "FIELD"
+    level = max([int(r["level"]) for r in rows if r["level"].isdigit() and r["role"] not in NO_ROW_ROLES + ("box",)] or [0])
+    base = key - DIFF_STEP.get(diff, 0) if kind == "dungeon" else key
+    return rows, kind, region, diff, level, base
+
+
+def simulate_stand_in(key, census, pools, sheet):
+    """-> (per clear {category: items}, per role {role: [spawns, items]}, ED, notes, info), with `gen`'s semantics: a role's `item` lines
+    put every pool item at prob, `group` lines one group at prob; mob-card lines join mob / mob-minor."""
+    rows, kind, region, diff, level, base = key_info(census, key)
+    out, roles, ed, notes = collections.Counter(), collections.defaultdict(lambda: [0.0, 0.0, 0.0]), 0.0, collections.Counter()
+    for r in rows:
+        if r["role"] in NO_ROW_ROLES:
+            continue
+        cnt, role = float(r["count"]), r["role"]
+        par = pick(sheet, "param", region, role, diff)
+        if not par:
+            notes["spawns with no param line (role %s)" % role] += cnt
+            continue
+        if re.match(r"^[A-Z0-9_]+$", r["npc"]) and role != "box":
+            notes["spawns with an internal name (dummy / trigger?) counted as %s" % role] += cnt
+        lines = pick(sheet, "item", region, role, diff) + pick(sheet, "group", region, role, diff)
+        if role in ("mob", "mob-minor"):
+            lines += [l for l in sheet if l["kind"] in ("item", "group") and l["role"] == "mob-card" and l["region"] in (region, "*")
+                      and l["diff"] in (diff, "*")]
+        got = 0.0
+        for l in lines:
+            its = pool_items(pools, l["pool"], region, level, key, base, int(r["npc_id"]) if r["npc_id"].isdigit() else -1)
+            if its:
+                x = cnt * (len(its) if l["kind"] == "item" else 1) * float(l["prob"]) / 100.0
+                out[category(l["pool"])] += x
+                got += x
+        roles[role][0] += cnt
+        roles[role][1] += got
+        roles[role][2] += cnt * float(par[0]["ed"] or 0)
+        ed += cnt * float(par[0]["ed"] or 0) if role != "box" else 0
+    return out, roles, notes, (kind, region, diff, level)
+
+
+def simulate_studio(key, census, items, tab):
+    out, roles = collections.Counter(), collections.defaultdict(lambda: [0.0, 0.0, 0.0])
+    for r in census:
+        if int(r["key"]) != key or r["role"] in NO_ROW_ROLES:
+            continue
+        npc = int(r["npc_id"]) if r["npc_id"].isdigit() else None
+        row = next((k for k in ((key, npc), (0, npc)) if k in studio()[tab]), None)
+        cnt, role = float(r["count"]), r["role"]
+        if row is None:
+            roles[role][0] += cnt
+            continue
+        exp, e, edp, cases = studio_row(tab, row[0], npc)
+        cats = [studio_category(c, items) for c in cases]
+        if cats and all(c == "box" for c in cats):
+            role = "box"
+        got = 0.0
+        for c, p in cases.items():
+            out[studio_category(c, items)] += cnt * p / 100.0
+            got += cnt * p / 100.0
+        roles[role][0] += cnt
+        roles[role][1] += got
+        roles[role][2] += cnt * float(e or 0)
+    return out, roles
+
+
+def cmd_simulate(a):
+    census = read_tsv(a.census, COLUMNS, "census")
+    pools = read_tsv(a.pools, R1_POOL_COLS, "pools")
+    sheet = read_tsv(a.sheet, R1_SHEET_COLS, "rate sheet")
+    items, n = Items(), draws()
+    for key in a.keys:
+        if key_info(census, key) is None:
+            print("%d: no census rows" % key)
+            continue
+        out, roles, notes, (kind, region, diff, level) = simulate_stand_in(key, census, pools, sheet)
+        bkey, btab = (40024, "fld") if kind == "field" else (DIFF3.get(diff, 33250), "mon")
+        bout, broles = simulate_studio(bkey, census, items, btab)
+        name = next(r["key_name"] for r in census if int(r["key"]) == key)
+        print("== %d %s (%s %s, NPC lv %d) against %d" % (key, name, region, diff, level, bkey))
+        print("   per clear  " + "  ".join("%s %.2f (x%d %.2f; base %.2f)" % (c, out[c], n, out[c] * n, bout[c]) for c in CATEGORIES if out[c] or bout[c]))
+        print("   %-11s %7s %10s %10s %6s %8s  gate: items per kill within 15 %%" % ("role", "spawns", "items/kill", "base", "ratio", "ED/kill"))
+        for role in GATE_ROLES:
+            if role not in roles and role not in broles:
+                continue
+            s, it, e = roles.get(role, [0, 0, 0])
+            bs, bit, be = broles.get(role, [0, 0, 0])
+            if not bs and s:                            # no such role in the baseline's census: its template row alone
+                tpl = next(((tb, d, npc) for rl, tb, d, npc, cs in RATE_TEMPLATES if rl == role), None)
+                if tpl and (tpl[1].get(diff, -1), tpl[2]) in studio()[tpl[0]]:
+                    _, e2, _, cases = studio_row(tpl[0], tpl[1][diff], tpl[2])
+                    bs, bit, be = 1.0, sum(cases.values()) / 100.0, float(e2 or 0)
+            mine, base = (it / s if s else 0.0), (bit / bs if bs else 0.0)
+            ratio = mine / base if base else (1.0 if not mine else float("inf"))
+            verdict = "n/a" if not s or not bs else ("PASS" if abs(ratio - 1) <= 0.15 else "FAIL")
+            print("   %-11s %7s %10.4f %10.4f %6.2f %8s  %s" % (role, _fmt(s), mine, base, ratio,
+                                                         "%.1f/%.1f" % (e / s if s else 0, be / bs if bs else 0), verdict))
+        for k, v in notes.items():
+            print("   note: %s: %s" % (k, _fmt(v)))
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
+    p = sub.add_parser("pools")
+    p.add_argument("--out", default=R1_POOLS)
+    p.add_argument("--census", default=OUT_DEFAULT)
+    p.add_argument("--check", action="store_true", help="build in memory and compare with the file")
+    p.set_defaults(fn=cmd_pools)
+    r = sub.add_parser("rates")
+    r.add_argument("--out", default=R1_SHEET)
+    r.add_argument("--check", action="store_true", help="every non-user line equals the studio value its source names")
+    r.set_defaults(fn=cmd_rates)
+    s = sub.add_parser("simulate")
+    s.add_argument("keys", type=int, nargs="+")
+    s.add_argument("--census", default=OUT_DEFAULT)
+    s.add_argument("--pools", default=R1_POOLS)
+    s.add_argument("--sheet", default=R1_SHEET)
+    s.set_defaults(fn=cmd_simulate)
     c = sub.add_parser("census")
     c.add_argument("--out", default=OUT_DEFAULT)
     c.add_argument("--gaps", action="store_true")

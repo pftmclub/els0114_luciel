@@ -255,16 +255,15 @@ Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| R1 | ready (R0 done): item pools + rate sheet, then 4 decisions for the user | Opus 5.5 / high | R0 | `tools/data/drop_item_pools.tsv`, `drop_rate_sheet.tsv`, `tools/droptable.py` | `R1.md` |
 | R2 | done 2026-11-16 (loader flag, `gen` / `check`, probe only, no build); review ready; owes nothing but the review | Sonnet 5.5 / high; review Opus 5.5 / medium | R0 | `X2OfflineDropTable.*`, `Handlers_Room.cpp`, Always.h, `tools/droptable.py` | `R2.md`, review `R2-review.md` |
-| R3 | blocked (R1 approved, R2 review): Lanox rows, first full build + play-test | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` (user packs) | `R3.md` |
+| R3 | ready (R1 done: its files are `gen`'s columns, no adapter; R2 reviewed): Lanox rows, stage + pack + copy, first full build + play-test | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` (you pack) | `R3.md` |
 | R4 | blocked (R3): Elysion rows + play-test | Sonnet 5.5 / medium | R3 | same two server Lua files | `R4.md` |
 | R5 | blocked (R3): secret dungeon rows + play-test | Sonnet 5.5 / high | R1, R3 | same two server Lua files | `R5.md` |
 | R6 | blocked (R3): June-only monsters in old dungeons + smoke; its review covers R3-R6 | Sonnet 5.5 / high; review Opus 5.5 / high | R0, R3 | same two server Lua files | `R6.md` |
 | R7 | blocked (heroic dungeons are not registered in the live `DungeonData.lua` yet: june-dungeons) | Opus 5.5 / high | june-dungeons heroic rows, R5 | sheets + the two server Lua files | `R7.md` |
 | Z | blocked (R6 review): close | Sonnet 5.5 / medium | R6 review | `MODS.md`, backlog, `tools/README.md` | `Z.md` |
 
-Done: R0 (2026-11-16, `droptable.py census`: 12,090 rows, 282 dungeons + 34 fields, 0 unknown roles; 41270's 5 rows are Halloween event monsters, R5 covers 41270; 676 gap rows in 61 keys for R6; no build).
+Done: R0 (2026-11-16, `droptable.py census`: 12,090 rows, 282 dungeons + 34 fields, 0 unknown roles; 41270's 5 rows are Halloween event monsters, R5 covers 41270; 676 gap rows in 61 keys for R6; no build), R1 (2026-11-16, pools 639 rows + rate sheet 577 lines in `gen`'s columns, every rate from its studio row; 6 decisions answered by the user; per-role simulate gate; no build).
 
 ## june-stat-calc - June damage and character stat calculation
 Plan `JUNE_STAT_CALC_PHASES.md` - branch `main` - log tag `[JUNE_STATCALC]` (`offline_server.log`) - flags `SERV_IRUHADEV_JUNE_STATCALC_*` (`_DEFENCE_CURVE`, `_FINAL_DAMAGE`, `_HIT_PIPELINE`, `_DAMAGE_REACT`, `_EXTRA_DAMAGE`, `_UNIT_STAT`, `_HIT_DODGE`, `_EQUIP_STAT`, `_SOCKET`, `_BUFF_FACTOR`, `_RESOURCE`, `_MP_COST`, + `_DEBUG`) - kickoffs `kickoffs/june-stat-calc/` - map `june2017_re/statcalc/statcalc_map.tsv` - backlog Stage 33 - created 2026-11-12.
