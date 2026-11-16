@@ -14374,6 +14374,9 @@ void CX2Main::WarpByCommand( int iPosition )
 #ifdef SERV_IRUHADEV_ELYSION_PORT
 	//{{ Iruha : 2026-10-17 // Atlas A5: June 2017 WarpByCommand (unpacked_x2.exe 0x31d71000, jump table @31d710d4) adds
 	//   positions 15-20; 0-14 equal March. Omitted: 19 = 1500 VMI_SPA_RUBEN (no March enum).
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	case 19: iWorldID = SEnum::VMI_SPA_RUBEN;					break;	// june-spa S2a: June jump table @31d710d4
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 #ifdef SERV_IRUHADEV_RANOX_PORT
 	case 15: iWorldID = SEnum::VMI_RANOX;						break;
 	case 16: iWorldID = SEnum::VMI_BATTLE_FIELD_RANOX_REST_00;	break;

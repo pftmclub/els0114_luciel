@@ -102,6 +102,24 @@ void CX2OfflineServer::PushServerSelectDefaults( KOfflineSession& kSes )
 	kSecNot.m_iOK			= NetError::NET_OK;
 	kSecNot.m_bUseSecondPW	= false;			///< no second password offline
 	Reply( kSes, EGS_SECOND_SECURITY_INFO_NOT, kSecNot );
+
+#ifdef SERV_IRUHADEV_OFFLINE_CODE_EVENTS
+	// june-spa S2a: the server pushes this unasked ( KGSUser::CheckEnableCodeEvent ); offline once per unit list, from code_events
+	KEGS_UPDATE_CODE_EVENT_NOT kCodeNot;
+	CX2OfflineDB::Instance()->LoadEnabledCodeEvents( kCodeNot.m_mapEnableCodeEnum );
+	Reply( kSes, EGS_UPDATE_CODE_EVENT_NOT, kCodeNot );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+	std::wstring wstrIDs;
+	for( std::map< int, bool >::const_iterator it = kCodeNot.m_mapEnableCodeEnum.begin(); it != kCodeNot.m_mapEnableCodeEnum.end(); ++it )
+	{
+		WCHAR wszID[16];
+		_snwprintf( wszID, 16, wstrIDs.empty() ? L"%d" : L",%d", it->first );
+		wszID[15] = L'\0';
+		wstrIDs += wszID;
+	}
+	CX2OfflineLog::Server( L"[JUNE_SPA] code-event send ids=%s", wstrIDs.empty() ? L"(none)" : wstrIDs.c_str() );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+#endif SERV_IRUHADEV_OFFLINE_CODE_EVENTS
 }
 //}}
 

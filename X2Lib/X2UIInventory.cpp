@@ -14129,6 +14129,11 @@ void CX2UIInventory::CreateWarpDest()
 	int row = 0;
 	InitWarpList();
 	const int iMyUnitLevel = g_pData->GetSelectUnitLevel();
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2a: June 32173120 @32173376, the Ruben spa row first, with no gate
+	pControl = m_pDLGWarpDestination->GetControl( L"Village_1500" );
+	if( pControl != NULL ) { pControl->SetShow( false ); AddWarpList( pControlList, row, SEnum::VMI_SPA_RUBEN ); ++row; }
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 #ifdef SERV_IRUHADEV_RANOX_PORT
 	pLocalMapTemplet = g_pData->GetLocationManager()->GetLocalMapTemplet( CX2LocationManager::LMI_RANOX );

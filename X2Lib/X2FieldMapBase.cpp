@@ -491,6 +491,9 @@ void CX2FieldMapBase::ResetCameraMatrix( int iMapID )
 			m_fFov		= D3DXToRadian( 35.978f );
 			m_fAspect	= 2.f;
 		} break;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	case SEnum::VMI_SPA_RUBEN:	// june-spa S2a: June 32f1fec0 gives both spas the FIELD_03 camera
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	case SEnum::VMI_SPA_RANOX:
 		{
 			m_vEyePos	= D3DXVECTOR3( 9030.000f, 3700.000f, -11880.000f );
@@ -641,6 +644,9 @@ void CX2FieldMapBase::ResetMapPosAndSize( int iMapID )
 	case SEnum::VMI_BATTLE_FIELD_RANOX_FIELD_03:
 	case SEnum::VMI_BATTLE_FIELD_RANOX_FIELD_04:
 	case SEnum::VMI_BATTLE_FIELD_RANOX_REST_00:
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	case SEnum::VMI_SPA_RUBEN:	// june-spa S2a: June 32f1fd90
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	case SEnum::VMI_SPA_RANOX:
 #endif SERV_IRUHADEV_RANOX_PORT
 	//}}

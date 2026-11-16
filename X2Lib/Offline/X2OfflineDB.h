@@ -456,6 +456,12 @@ public:
 	{
 		/// Schema revision. Bump it and add a rung to Migrate() when a later
 		/// phase needs a new table, so existing saves are not wiped.
+#ifdef SERV_IRUHADEV_OFFLINE_CODE_EVENTS
+		SCHEMA_VERSION			= 25,	///< v25: code_events, seeded 31 = CEI_SPA_ON_OFF on ( june-spa S2a )
+
+		/// As in the v24 branch below, which this one replaces wholesale.
+		DEFAULT_RESURRECTION_STONE	= 10,
+#else SERV_IRUHADEV_OFFLINE_CODE_EVENTS
 #ifdef SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
 		SCHEMA_VERSION			= 24,	///< v24: worn onepiece slot 20 -> 35, worn bag 21 -> 43 ( char-luciel DU4 )
 
@@ -532,6 +538,7 @@ public:
 #endif SERV_IRUHADEV_JUNE_TRANSCEND_UNIT
 #endif SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_PLAY_STATUS
 #endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+#endif SERV_IRUHADEV_OFFLINE_CODE_EVENTS
 
 		//{{ Iruha : 2026-09-16 // Vanilla hardcodes iDelableDay = 1 (one full
 		// day) for every region (GSGameDBThread.cpp). This build has no
@@ -925,6 +932,11 @@ public:
 	/// rather than inventing a value.
 	bool	GetSetting( const char* szKey, OUT int& iOut );
 	bool	SetSetting( const char* szKey, int iValue );
+
+#ifdef SERV_IRUHADEV_OFFLINE_CODE_EVENTS
+	/// june-spa S2a: the enabled rows of code_events ( v25 ), id -> true, the map EGS_UPDATE_CODE_EVENT_NOT carries.
+	bool	LoadEnabledCodeEvents( OUT std::map< int, bool >& mapOut );
+#endif SERV_IRUHADEV_OFFLINE_CODE_EVENTS
 
 #ifdef SERV_IRUHADEV_OFFLINE_AUTH_LEVEL
 	/// The account auth level the login hands the client, out of

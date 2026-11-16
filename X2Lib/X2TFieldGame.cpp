@@ -5101,6 +5101,12 @@ void CX2TFieldGame::LoadFieldImage(wstring &imgL, wstring &imgR)
 			imgL = L"HQ_LoadingVillage_Elision_01.tga";
 			imgR = L"HQ_LoadingVillage_Elision_02.tga";
 			break;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		case SEnum::VMI_SPA_RUBEN:	// june-spa S2a: June 323ad5f0 @323ad72f
+			imgL = L"HQ_LoadingSpa_Ruben_01.tga";
+			imgR = L"HQ_LoadingSpa_Ruben_02.tga";
+			break;
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 #ifdef SERV_IRUHADEV_RANOX_PORT
 		case SEnum::VMI_SPA_RANOX:
 			imgL = L"HQ_LoadingSpa_Ranox_01.tga";
@@ -5123,12 +5129,28 @@ void CX2TFieldGame::LoadFieldImage(wstring &imgL, wstring &imgR)
 
 void CX2TFieldGame::LoadUI()
 {
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2a: June 323b0f20 @323b0f52, entering a spa from outside also opens the field UI
+	if( g_pData != NULL && NULL != g_pData->GetLocationManager() && g_pInstanceData->IsChangeChannel() == false )
+	{
+		const SEnum::VILLAGE_MAP_ID eOldVillage = g_pData->GetLocationManager()->GetOldVillageID();
+		const SEnum::VILLAGE_MAP_ID eNowVillage = g_pData->GetLocationManager()->GetCurrentVillageID();
+		const bool bEnterSpa = SEnum::VMI_SPA_RUBEN != eOldVillage && SEnum::VMI_SPA_RANOX != eOldVillage &&
+			( SEnum::VMI_SPA_RUBEN == eNowVillage || SEnum::VMI_SPA_RANOX == eNowVillage );
+		if( false == g_pData->GetLocationManager()->IsValidWarpField( g_pData->GetStateArg() ) && false == bEnterSpa )
+		{
+			m_fLoadUiTime = 10.f;
+			return;
+		}
+	}
+#else SERV_IRUHADEV_JUNE_SPA_ENTRY
 	if( g_pData != NULL && g_pData->GetLocationManager()->IsValidWarpField(g_pData->GetStateArg()) == false && g_pInstanceData->IsChangeChannel() == false)
 	{
 		// 정상적인 루트로 마을도착
 		m_fLoadUiTime = 10.f;
 		return;
 	}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 	m_fFieldNameTime = -3.f;
 #ifdef COME_BACK_REWARD
@@ -5297,6 +5319,11 @@ void CX2TFieldGame::OpenFieldName()
 	//   indices read from its jump tables @323b1600 / @323b1624 and equal to the SetIndex() values of June's
 	//   DLG_UI_Field_Title.lua (staged by this phase). June's dialog has no picture 16, so Elysion shows no banner (as in
 	//   June). Omitted: 1500 Ruben spa (29), no March enum. The Ranox cases were a Lanox miss (no banner there before).
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	case SEnum::VMI_SPA_RUBEN:	// june-spa S2a: June 323b1320 @323b14dd
+		iFieldName = 29;
+		break;
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 #ifdef SERV_IRUHADEV_RANOX_PORT
 	case SEnum::VMI_RANOX:
 		iFieldName = 15;

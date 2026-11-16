@@ -1730,6 +1730,11 @@ field game itself; Atlas (Stage 1) and Stage 24 edited `X2TFieldGame.cpp` for en
 - `CX2TFieldGame`: 72 class + 49 file functions unowned (`0x323a4ea0`-`0x323bd4e0`);
 - `CX2SquareUnit` (other units in the village): 47 (`0x323ed330`-`0x323fa4b0`);
 - next to them, Stage 40 gaps `X2GUNPC..X2TFieldGame@0x32394340` (191) and `X2UIQuestNew..X2SquareUnit@0x323e60b0` (103): only what Stage 40 routes here.
+- **Guild agit (village 25000, June state 15 `XS_GUILD_AGIT_GAME`; found by june-spa S2a, 2026-11-17).** March has neither the village id nor the
+  state, and offline has no guilds. June reads it in the local-map loader's last call `VillageParsing( 25000 )` (`32501bb0` @32503076), the Cobo list's
+  row after the spas (`324627f0` @32462b24, no gate), the warp-destination case (`32476050` @32479a1f-@32479c76: `-1` index allowed in state 15,
+  agit-only id tests, `UseWarpPopup( false )` for 25000), and per Atlas A5's omission comments `IsValidWarpField` and both `X2FieldMapBase`
+  functions. Decide here: a stand-in guild agit, or leave it out (it needs a guild).
 - **Depends on:** nothing for planning. Start: `/x2-phase new-plan june-field` (Opus 5.5 high), brief `kickoffs/june-backlog/stage38-plan.md`.
 
 ### Stage 39: June game-event systems (june-census V2, 2026-11-09)

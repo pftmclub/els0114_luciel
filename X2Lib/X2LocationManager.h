@@ -493,6 +493,9 @@ class CX2LocationManager
 			SEnum::VILLAGE_MAP_ID					m_DungeonGateID;
 			SEnum::VILLAGE_MAP_ID					m_DungeonLoungeID;
 			SEnum::VILLAGE_MAP_ID					m_eBattleFieldRestID;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+			SEnum::VILLAGE_MAP_ID					m_eSpaID;	// june-spa S2a: June templet +0x14, SpaData.ID ( ctor 32505910 )
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 			int								m_RequireUnitLevel;
 			vector<SEnum::DUNGEON_ID>	m_DungeonList;
 			wstring							m_ScriptFileName;
@@ -512,11 +515,17 @@ class CX2LocationManager
 			LocalMapTemplet( const LOCAL_MAP_ID eLocalMapID_, 
 				const SEnum::VILLAGE_MAP_ID eVillageID_, const SEnum::VILLAGE_MAP_ID eDungeonGageID_, 
 				const SEnum::VILLAGE_MAP_ID eDungeonLoungeID_, const SEnum::VILLAGE_MAP_ID eBattleFieldRestID_,
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+				const SEnum::VILLAGE_MAP_ID eSpaID_,
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 				const vector<SEnum::DUNGEON_ID>& vecDungeonIdList_, 
 				const vector<SEnum::VILLAGE_MAP_ID>& vecBattleFieldList_, 
 				const wstring& wstrScriptFileName_, const bool bEnable_ )
 				: m_LocalMapID( eLocalMapID_ ), m_VillageID( eVillageID_ ), m_DungeonGateID( eDungeonGageID_ ),
 				m_DungeonLoungeID( eDungeonLoungeID_ ), m_eBattleFieldRestID( eBattleFieldRestID_ ),
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+				m_eSpaID( eSpaID_ ),
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 				m_RequireUnitLevel( 1 ),
 				m_ScriptFileName( wstrScriptFileName_ ), m_bEnable( bEnable_ )
 			{
@@ -630,6 +639,10 @@ class CX2LocationManager
 		{
 			return m_eCurrentVillage;
 		}
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2a: June reads +0x68 inline ( LoadUI 323b0f20 @323b0f7c )
+		SEnum::VILLAGE_MAP_ID GetOldVillageID() const { return m_eOldVillage; }
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 		bool IsVillageField( const SEnum::VILLAGE_MAP_ID eVillageID ) 
 		{

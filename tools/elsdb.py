@@ -14,6 +14,7 @@
   python tools/elsdb.py delitem <unit> <item_uid|item_id> ... [--by-item-id]
   python tools/elsdb.py setting [name [value]]        the `settings` table (cash_start, auth_level, ...)
   python tools/elsdb.py settranscend <unit> <0|1>     unit.transcendence (schema v22), June's CX2Unit +0x3c flag
+  python tools/elsdb.py code-event list | on <id> | off <id>   code_events (schema v25), sent at the next unit list (31 = spa)
   python tools/elsdb.py backup [--tag NAME]           snapshot into <data>/db_backup/ (no restore command on purpose)
   python tools/elsdb.py backups                       list snapshots, newest first
 
@@ -540,6 +541,28 @@ def cmd_settranscend(a):
         say('unit %d (%s): transcendence %d -> %d' % (uid, nick, old, a.value))
 
 
+def cmd_code_event(a):
+    # june-spa S2a: code_events (schema v25), sent by the emulator as EGS_UPDATE_CODE_EVENT_NOT after every unit list
+    if a.action == 'list':
+        c = open_ro(a)
+        if not c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='code_events'").fetchone():
+            die('no code_events table (schema < v25): start the new X2_offline.exe once so it migrates the save')
+        table(['event_id', 'enabled', 'note'], c.execute('SELECT event_id, enabled, note FROM code_events ORDER BY event_id').fetchall())
+        return
+    if a.id is None:
+        die('code-event %s needs an event id' % a.action)
+    value = 1 if a.action == 'on' else 0
+    with Writer(a, 'code-event') as c:
+        if not c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='code_events'").fetchone():
+            die('no code_events table (schema < v25): start the new X2_offline.exe once so it migrates the save')
+        old = c.execute('SELECT enabled FROM code_events WHERE event_id=?', (a.id,)).fetchone()
+        if old:
+            c.execute('UPDATE code_events SET enabled=? WHERE event_id=?', (value, a.id))
+        else:
+            c.execute('INSERT INTO code_events(event_id, enabled, note) VALUES(?,?,?)', (a.id, value, a.note))
+        say('code event %d: %s -> %d (takes effect at the next character list: relog)' % (a.id, old[0] if old else '(no row)', value))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0], formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
     ap.add_argument('--data', default=DATA, help='game data directory (default: %(default)s)')
@@ -578,6 +601,8 @@ def main():
     s.add_argument('--by-item-id', action='store_true', help='ids are item_ids (every copy), not item_uids'); s.add_argument('--kim', default='staged')
     s = add('setting', cmd_setting, True); s.add_argument('name', nargs='?'); s.add_argument('value', nargs='?', type=int)
     s = add('settranscend', cmd_settranscend, True); s.add_argument('unit'); s.add_argument('value', type=int)
+    s = add('code-event', cmd_code_event, True); s.add_argument('action', choices=['list', 'on', 'off'])
+    s.add_argument('id', nargs='?', type=int); s.add_argument('--note', default='', help='note for a new row')
 
     a = ap.parse_args()
     if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':

@@ -2267,6 +2267,14 @@ bool CX2StateMenu::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			if( CX2Main::XS_VILLAGE_MAP == g_pMain->GetNowStateID() &&
 				m_iSelectedWarpDest== g_pData->GetLocationManager()->GetCurrentVillageID() )
 				return true;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+			// june-spa S2a: June 32476050 @32479a98, Ruben spa needs level 10 ( June state 14 = XS_VILLAGE_MAP; its 15, the guild agit, has no March state )
+			if( CX2Main::XS_VILLAGE_MAP == g_pMain->GetNowStateID() && SEnum::VMI_SPA_RUBEN == m_iSelectedWarpDest && g_pData->GetSelectUnitLevel() < 10 )
+			{
+				g_pMain->KTDGUIOKMsgBox( D3DXVECTOR2( 250, 300 ), GET_STRING( 43071 ), g_pMain->GetNowState() );	// string id 43071
+				return true;
+			}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 			UseWarpPopup(m_bIsEdConsumptionWarp);
 			return true;
@@ -6867,6 +6875,21 @@ void CX2StateMenu::CreateWarpDest()
 	int row = 0;
 	InitWarpList();
 	const int iMyUnitLevel = g_pData->GetSelectUnitLevel();
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2a: June 324627f0 @32462a4a, both spa rows need code event 31, the Ranox one also LMI_RANOX's level
+	if( NULL != g_pInstanceData && true == g_pInstanceData->IsEnableCode( CEI_SPA_ON_OFF ) )
+	{
+		pControl = m_pDLGWarpDestination->GetControl( L"Village_1500" );
+		if( pControl != NULL ) { pControl->SetShow( false ); AddWarpList( pControlList, row, SEnum::VMI_SPA_RUBEN ); ++row; }
+
+		pLocalMapTemplet = g_pData->GetLocationManager()->GetLocalMapTemplet( CX2LocationManager::LMI_RANOX );
+		if( pLocalMapTemplet != NULL && iMyUnitLevel >= pLocalMapTemplet->m_RequireUnitLevel )
+		{
+			pControl = m_pDLGWarpDestination->GetControl( L"Village_1501" );
+			if( pControl != NULL ) { pControl->SetShow( false ); AddWarpList( pControlList, row, SEnum::VMI_SPA_RANOX ); ++row; }
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 	pControl = m_pDLGWarpDestination->GetControl( L"Village_20000" );
 	if( pControl != NULL ) { pControl->SetShow( false ); AddWarpList( pControlList, row, SEnum::VMI_RUBEN ); ++row; }

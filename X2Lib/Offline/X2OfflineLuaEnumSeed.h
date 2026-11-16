@@ -554,6 +554,9 @@ namespace X2OfflineLuaEnumSeed
 	//             been packed into the live .kom archives as of this writing.
 		{ "VMI_BATTLE_FIELD_RANOX_REST_00",          1007 },
 		{ "VMI_SPA_RANOX",                           1501 },
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		{ "VMI_SPA_RUBEN",                           1500 },	// june-spa S2a: June Enum.lua
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 		{ "VMI_RANOX",                               20008 },
 		{ "VMI_DUNGEON_LOUNGE_RANOX",                30008 },
 		{ "VMI_BATTLE_FIELD_RANOX_FIELD_01",         40029 },

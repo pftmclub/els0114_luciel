@@ -287,6 +287,41 @@ No door code (S2b), `+0x624` null (S4b), no soak (S3b).
 
 **Done gate.** `finish.py` PASS; probe build 0 errors (full build skipped: batch at S2b); section S2a in `playtest.md` (`playtest.py check` PASS).
 
+## Phase S2a - Done
+
+2026-11-17, Opus 5.5 / high. Flags `SERV_IRUHADEV_OFFLINE_CODE_EVENTS`, `SERV_IRUHADEV_JUNE_SPA_ENTRY`, `SERV_IRUHADEV_JUNE_SPA_DEBUG` (on; Z retires it).
+- **Code events.** Save schema v25 (`X2OfflineDB`): `code_events( event_id PK, enabled, note )`, seeded `( 31, 1, 'CEI_SPA_ON_OFF' )`; save backed up
+  first (`db_backup/els_db_20261117_034207_pre_june-spa-S2a-pre-v25.sql`). `LoadEnabledCodeEvents` -> `EGS_UPDATE_CODE_EVENT_NOT` (June's shape; C9h-2d's map
+  + two empty sets) at the end of `PushServerSelectDefaults`, i.e. after both unit-list ACKs. June's handler `31f00970` re-read: map, two sets,
+  `32344880` (ported, E1c), vslot `+0x100` (empty in `CX2State`; the menu-icon override is Stage 9, C9h-2e). `tools/elsdb.py code-event list | on <id> | off
+  <id>` (takes effect at the next character list). `CEI_SPA_ON_OFF = 31` beside March's `CEI_ALLOW_ELESIS_FIRST_CLASS_OLD_AND_NEW_YEAR_EVENT`
+  (`ScriptID_Code.h`, under `_CODE_EVENTS` because the seed names it; `_SPA_ENTRY` requires it). March's two 31 readers (`X2MemoryHolder.cpp:1049`
+  / `:1213`) sit in the 2013 / 2014 new-year dialog, shown only under code events nothing seeds: no visible effect. The flag-on handler already drops
+  March's `UpdateNewYear2014Event` calls (as June).
+- **SpaData** (`32501bb0` @325024dc / @32502f9e): read after `BattleFieldRestData`, reset per local map, passed to the templet (`m_eSpaID`, June `+0x14`,
+  ctor `32505910`), `VillageParsing( id )` when not -1 / 0. June's ctor also resets all five ids per map; March resets three (its rest id leaks to the next
+  map without a `BattleFieldRestData` table): not changed, out of scope.
+- **Door keys.** `VillageParsing` reads `OtherPlaceID` -> `m_uiBattleFieldId` (@32500887) and `OtherPlaceStartLineIndex` -> `m_usBattleFieldStartLineIndex`
+  (@32500a7f), miss 0 in June; here they read after March's `BattleField*` names and keep those values when absent, because this file's other rows were
+  renamed to March's keys by Atlas A5. (The kickoff's @32500ac4 / @32500be0 are the next keys, `WaitingTime` / `InternalPlaceStartPosID`.)
+- **Shared functions, June's spa cases:** `IsValidWarpField` 1500; `WarpByCommand` 19; `CX2StateMenu::CreateWarpDest` first rows 1500 and 1501 (code
+  event 31 on both, 1501 also `LMI_RANOX` level, @32462a4a-@32462b23); `CX2UIInventory::CreateWarpDest` 1500 first, no gate (@32173376; June's
+  `DLG_Destination.lua` has no `Village_1500`, so it never shows: June's data); warp-destination gate (@32479a98): 1500 and level < 10 -> OK box string 43071
+  at (250, 300), in June's state 14 = `XS_VILLAGE_MAP` (S0's "0xf" is June's guild-agit state; a warp from a battle field is not gated, as June);
+  `LoadFieldImage` Ruben pictures; `LoadUI` (@323b0f52): the early return is skipped when entering a spa from a non-spa village (previous `+0x68`, new
+  getter `GetOldVillageID`); `OpenFieldName` 29; both `X2FieldMapBase` functions; minimap channel combo (@3226440d); offline enum seed `VMI_SPA_RUBEN`.
+  `VMI_SPA_RUBEN` was already registered (`Enum.h`, `JUNE_ENUM_NAMES`).
+- **Emulator, last position ("Decisions" 2):** no change. `Handler_EGS_STATE_CHANGE_FIELD_REQ` saves any map id; login (`X2StateServerSelect.cpp:7330`)
+  falls back to Ruben only when `GetVillageMapTemplet` is null, which `SpaData` now fills for 1500 / 1501.
+- **Not done here:** `X2TFieldGame.cpp:3388` still tests the literal 31 for the signs (Atlas E1d's line): S2b touches that ctor and switches it to
+  `CEI_SPA_ON_OFF`. June's guild agit (village 25000, state 15) seen in the loader tail, the Cobo list and the warp case -> backlog Stage 38 bullet.
+- **Gates.** `finish.py --with` the three flags: flagcheck `JUNE_SPA_ENTRY` PASS (9 PASS, 1 DEFINE, 4 OTHER), `OFFLINE_CODE_EVENTS` PASS (1 PASS, 3 PASS~,
+  1 DEFINE, 9 OTHER), `JUNE_SPA_DEBUG` PASS by hand (3 OTHER: its lines sit inside the other two flags' blocks), junediverge `RESULT: PASS`, enumscan exit 0;
+  `FINISH RESULT: PASS`. CP949 files through `bytepatch.py`: 152 inserted lines, 0 deleted. Range lines: see the commit's run below.
+- **Build.** Full build skipped: no play-test yet (batch at S2b). `/Zs` probe of the 10 changed `.cpp` (stdafx context): 0 errors, all three flags on.
+- **Play-test:** deferred, section S2a in `playtest.md` (`playtest.py check` PASS), batch at S2b.
+- **Open questions:** none.
+
 ## Phase S2b - Spa doors: entering and leaving
 
 **Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_ENTRY` (+ `_DEBUG`); the map rows marked S2b, June's code whole:

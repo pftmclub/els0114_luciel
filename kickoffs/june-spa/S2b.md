@@ -31,6 +31,9 @@ Port June's door code whole, as the map rows marked S2b list:
 - `Handler_EGS_STATE_CHANGE_FIELD_REQ`'s June body (the spa return: Ruben line 5 / Ranox line 31 spots); its June-only states (0xf guild
   agit, 0x16) get labelled stand-ins. Check `junediverge.py` for its row first.
 - Register `USCM_ENTER` (75000, `UI_SPA_CUSTOM_MSG`) where C++ lacks it.
+- Use S2a's `CEI_SPA_ON_OFF` (`ScriptID_Code.h`, flag `_OFFLINE_CODE_EVENTS`) for every code-event 31 test, including the sign test's literal 31 at
+  `X2TFieldGame.cpp:3388` (Atlas E1d's line: `#ifdef` new `#else` old). The doors' destination is in `m_uiBattleFieldId` / `m_usBattleFieldStartLineIndex`
+  (S2a reads June's `OtherPlace*` keys into them).
 Leave the Pporu lines (S4b) and the soak (S3b) out.
 
 Debug lines under `_DEBUG`, throttled: `door near=<0/1> pos=<id>`, `enter village=<id> return=<village>/<line>`, `exit to=<village>/<line>`.

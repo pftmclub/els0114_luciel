@@ -538,6 +538,11 @@ void CX2MiniMapUI::SetShowMiniMap( MINI_MAP_TYPE eMiniMapType, bool bShow )
 					g_pData->GetUIManager()->GetShow(CX2UIManager::UI_MENU_PERSONAL_TRADE) == false &&
 					g_pMain->GetNowStateID() == CX2Main::XS_VILLAGE_MAP &&
 					(true == g_pData->GetLocationManager()->IsVillage( g_pData->GetLocationManager()->GetCurrentVillageID() )
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+					// june-spa S2a: June 32264170 @3226440d, the spa villages too
+					|| SEnum::VMI_SPA_RUBEN == g_pData->GetLocationManager()->GetCurrentVillageID()
+					|| SEnum::VMI_SPA_RANOX == g_pData->GetLocationManager()->GetCurrentVillageID()
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 					 )
 				)
 				{

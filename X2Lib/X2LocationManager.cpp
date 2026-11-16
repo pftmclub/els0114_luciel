@@ -225,6 +225,9 @@ void CX2LocationManager::LocalParsing( KLuaManager& kLuamanager, const vector< L
 	int villageDGID = -1;
 	int villageDungeonLoungeID = -1;
 	int iBattleFieldRestID = -1;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	int iSpaID = -1;
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 	for ( int i = 0; i < (int)vecLocalMapID.size(); i++ )
 	{
@@ -253,6 +256,9 @@ void CX2LocationManager::LocalParsing( KLuaManager& kLuamanager, const vector< L
 		villageID	= -1;
 		villageDGID = -1;
 		villageDungeonLoungeID = -1;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		iSpaID = -1;	// june-spa S2a: June 32501bb0 resets it per local map
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 		if( kLuamanager.BeginTable( "VillageData" ) == true )
 		{
 			LUA_GET_VALUE( kLuamanager, "ID", villageID, -1 );
@@ -277,6 +283,14 @@ void CX2LocationManager::LocalParsing( KLuaManager& kLuamanager, const vector< L
 			LUA_GET_VALUE( kLuamanager, "ID", iBattleFieldRestID, -1 );
 			kLuamanager.EndTable();
 		}
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2a: June 32501bb0 @325024dc, SpaData { ID } after BattleFieldRestData
+		if( kLuamanager.BeginTable( "SpaData" ) == true )
+		{
+			LUA_GET_VALUE( kLuamanager, "ID", iSpaID, -1 );
+			kLuamanager.EndTable();
+		}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 		if( kLuamanager.BeginTable( "DungeonIDList" ) == true )
 		{
@@ -308,6 +322,9 @@ void CX2LocationManager::LocalParsing( KLuaManager& kLuamanager, const vector< L
 			= new CX2LocationManager::LocalMapTemplet( static_cast<const LOCAL_MAP_ID>( localMapID ),
 			static_cast<const SEnum::VILLAGE_MAP_ID>( villageID ), static_cast<const SEnum::VILLAGE_MAP_ID>( villageDGID ), 
 			static_cast<const SEnum::VILLAGE_MAP_ID>( villageDungeonLoungeID ), static_cast<const SEnum::VILLAGE_MAP_ID>( iBattleFieldRestID ),
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+			static_cast<const SEnum::VILLAGE_MAP_ID>( iSpaID ),
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 			vecDungeonID, vecBattleFieldID, localDialogFileName, true );
 		
 		if( kLuamanager.BeginTable( "EnterCondition" ) == true )
@@ -363,6 +380,16 @@ void CX2LocationManager::LocalParsing( KLuaManager& kLuamanager, const vector< L
 
 		if ( -1 != iBattleFieldRestID )
 			VillageParsing( kLuamanager, iBattleFieldRestID );
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2a: June @32502f9e, 0 is skipped as well
+		if( -1 != iSpaID && 0 != iSpaID )
+		{
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_SPA] spadata local=%d village=%d", localMapID, iSpaID );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+			VillageParsing( kLuamanager, iSpaID );
+		}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	}
 
 }
@@ -480,6 +507,11 @@ void CX2LocationManager::VillageParsing( KLuaManager& kLuamanager, const int vil
 
 					LUA_GET_VALUE( kLuamanager, "BattleFieldId",	pStartPosInfo->m_uiBattleFieldId , false );
 					LUA_GET_VALUE( kLuamanager, "BattleFieldStartLineIndex",		pStartPosInfo->m_usBattleFieldStartLineIndex , false );
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+					// june-spa S2a: June @32500887 / @32500a7f reads OtherPlaceID / OtherPlaceStartLineIndex ( miss 0 ); this file's renamed rows keep the names above
+					LUA_GET_VALUE( kLuamanager, "OtherPlaceID",				pStartPosInfo->m_uiBattleFieldId, pStartPosInfo->m_uiBattleFieldId );
+					LUA_GET_VALUE( kLuamanager, "OtherPlaceStartLineIndex",	pStartPosInfo->m_usBattleFieldStartLineIndex, pStartPosInfo->m_usBattleFieldStartLineIndex );
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 #ifdef SERV_IRUHADEV_ELYSION_VILLAGE
 					// June @32500ac4 / @32500be0, after June's OtherPlaceID / OtherPlaceStartLineIndex (= the two keys above under March's
 					// names, Atlas A5's choice for this file)
@@ -1979,6 +2011,9 @@ bool CX2LocationManager::IsValidWarpField( int iVillageId )
 #endif SERV_IRUHADEV_RANOX_PORT
 	//}}
 #endif SERV_IRUHADEV_ELYSION_PORT
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	case SEnum::VMI_SPA_RUBEN:	// june-spa S2a: June 324f1e70 takes 1500-1501
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 		return true;
 	default:

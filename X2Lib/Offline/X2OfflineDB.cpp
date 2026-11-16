@@ -1255,6 +1255,23 @@ bool CX2OfflineDB::Migrate()
 			iSlotRows, iMarchOnepieceSlot, (int)CX2Unit::NESI_ONEPIECE_FASHION, iSizeRows, iMarchWornSlotCount, (int)CX2Unit::NESI_END );
 	}
 #endif SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER
+#ifdef SERV_IRUHADEV_OFFLINE_CODE_EVENTS
+	if( iFrom < 25 )
+	{
+		// june-spa S2a: one row per code event the emulator sends at login; the seed switches June's spa on
+		char szSeed[160];
+		_snprintf( szSeed, 160, "INSERT OR IGNORE INTO code_events( event_id, enabled, note ) VALUES( %d, 1, 'CEI_SPA_ON_OFF' );",
+			(int)CEI_SPA_ON_OFF );
+		szSeed[159] = '\0';
+
+		if( false == Exec( "BEGIN;" ) )			return false;
+		if( false == Exec( "CREATE TABLE IF NOT EXISTS code_events( event_id INTEGER PRIMARY KEY, enabled INTEGER NOT NULL, note TEXT );" ) )	{ Exec( "ROLLBACK;" ); return false; }
+		if( false == Exec( szSeed ) )			{ Exec( "ROLLBACK;" ); return false; }
+		if( false == Exec( "COMMIT;" ) )		return false;
+
+		CX2OfflineLog::Server( L"[JUNE_SPA] DB MIG v25 done: code_events added, %d = CEI_SPA_ON_OFF on", (int)CEI_SPA_ON_OFF );
+	}
+#endif SERV_IRUHADEV_OFFLINE_CODE_EVENTS
 	char szSetVersion[64];
 	_snprintf( szSetVersion, 64, "PRAGMA user_version = %d;", (int)SCHEMA_VERSION );
 	szSetVersion[63] = '\0';
@@ -4395,6 +4412,29 @@ bool CX2OfflineDB::SetSetting( const char* szKey, int iValue )
 	sqlite3_finalize( pStmt );
 	return bOK;
 }
+
+#ifdef SERV_IRUHADEV_OFFLINE_CODE_EVENTS
+// june-spa S2a: enabled rows only, so a row switched off by tools/elsdb.py is simply absent ( IsEnableCode reads absent as off )
+bool CX2OfflineDB::LoadEnabledCodeEvents( OUT std::map< int, bool >& mapOut )
+{
+	KLocker lock( m_cs );
+
+	mapOut.clear();
+
+	if( NULL == m_pDB )
+		return false;
+
+	sqlite3_stmt* pStmt = Prepare( "SELECT event_id FROM code_events WHERE enabled <> 0 ORDER BY event_id;" );
+	if( NULL == pStmt )
+		return false;
+
+	while( SQLITE_ROW == sqlite3_step( pStmt ) )
+		mapOut[ sqlite3_column_int( pStmt, 0 ) ] = true;
+
+	sqlite3_finalize( pStmt );
+	return true;
+}
+#endif SERV_IRUHADEV_OFFLINE_CODE_EVENTS
 
 //////////////////////////////////////////////////////////////////////////
 // pets and riding pets (phase 7)

@@ -14235,3 +14235,35 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN needs _JUNE_HYPER_CUT_IN_TIME ( the templet names ), _CHAR_DUO_BODY ( IsMinorUnitActive ), _CHAR_LUCIEL_DUO ( the class header ), _JUNE_ENUM_NAMES ( its states ) and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-17
+// Description: june-spa S2a - the offline save's general code_events table ( schema v25, seeded 31 = CEI_SPA_ON_OFF, on ) and the
+//              emulator's EGS_UPDATE_CODE_EVENT_NOT after the unit list ( June's client handler 31f00970 ). tools/elsdb.py code-event.
+//              Revert: comment out the #define; the save stays v25, so an exe without it refuses the save.
+#define SERV_IRUHADEV_OFFLINE_CODE_EVENTS
+#if defined( SERV_IRUHADEV_OFFLINE_CODE_EVENTS ) && ( !defined( SERV_IRUHADEV_OFFLINE ) || !defined( SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ) )
+#error SERV_IRUHADEV_OFFLINE_CODE_EVENTS needs SERV_IRUHADEV_OFFLINE ( the emulator ) and SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ( schema v24, the rung below v25 )
+#endif SERV_IRUHADEV_OFFLINE_CODE_EVENTS
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-17
+// Description: june-spa S2a - the spa villages Ruben 1500 / Ranox 1501: SpaData in the local-map loader ( templets exist ), June's
+//              OtherPlaceID / OtherPlaceStartLineIndex door keys, and June's spa cases in IsValidWarpField, WarpByCommand 19, both warp
+//              lists ( code event 31 on the Cobo list ), the level-10 warp gate, LoadFieldImage, LoadUI, OpenFieldName, the field map,
+//              the minimap channel combo. Log [JUNE_SPA]. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_SPA_ENTRY
+#if defined( SERV_IRUHADEV_JUNE_SPA_ENTRY ) && ( !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_ELYSION_VILLAGE ) || !defined( SERV_IRUHADEV_ELYSION_PORT ) || !defined( SERV_IRUHADEV_RANOX_PORT ) || !defined( SERV_IRUHADEV_OFFLINE_CODE_EVENTS ) )
+#error SERV_IRUHADEV_JUNE_SPA_ENTRY needs _JUNE_ENUM_NAMES ( VMI_SPA_RUBEN ), _ELYSION_VILLAGE ( the spa start-pos keys ), _ELYSION_PORT ( June's warp lists ), _RANOX_PORT ( VMI_SPA_RANOX ) and _OFFLINE_CODE_EVENTS ( CEI_SPA_ON_OFF )
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-17
+// Description: june-spa debug lines in offline_server.log, tag [JUNE_SPA] ( S2a: code-event send, spadata ). Retired by june-spa Z.
+#define SERV_IRUHADEV_JUNE_SPA_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_SPA_DEBUG ) && ( !defined( SERV_IRUHADEV_OFFLINE ) || !defined( SERV_IRUHADEV_JUNE_SPA_ENTRY ) )
+#error SERV_IRUHADEV_JUNE_SPA_DEBUG needs SERV_IRUHADEV_OFFLINE ( CX2OfflineLog ) and SERV_IRUHADEV_JUNE_SPA_ENTRY
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+//////////////////////////////////////////////////////////////////////////
