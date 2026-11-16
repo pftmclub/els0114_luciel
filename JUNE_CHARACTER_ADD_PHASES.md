@@ -660,6 +660,33 @@ FINISH RESULT: FAIL (9 gates, 1 failed, 3 skipped)
 
 **Nothing to play-test.** Next: `/x2-phase char-add CH1c` (Sonnet 5.5 high).
 
+### CH1d0 - Done (2026-11-16)
+
+CH0 item 6's 12 non-`same` engine callees now have a March name each ( 15 funcmap rows `(CH1d0)`, status `confirmed` ). Ten are new code, two were already March's, and one needed its reader ported:
+
+| June | March | Flag | First caller |
+|---|---|---|---|
+| `32294530` | `CX2GameUnit::GetNearestPosOnLineMap( vPos, bKeepNearLandLine )` ( static ) | `_CHAR_ADD_CORE` | CH2a |
+| `32293d70` | `CX2GameUnit::CheckPosAlongLastTouchLine( vPos, OUT bAlong )` | `_CHAR_ADD_CORE` | CH1d |
+| `3226e310` | `CX2GameUnit::DecreaseCoolTime( float& )` | `_CHAR_ADD_CORE` | CH1j |
+| `322d58c0` | `CX2Game::GetNearestUnitInSpecificRange( pUnit, vPos, ... )` ( overload, inside `ELYSION_SCRIPT_B` ) | `_CHAR_ADD_CORE` | CH1j |
+| `31fc9430` | `CX2GUUser::SetSyncDataPos( vPos, bFuture )` | `_CHAR_ADD_CORE` | CH3c ( and CH2a's Blink ) |
+| `31c82d50` / `31c834e0` | `CXMeshInstance::SetStateDyingByCrash()` / `IsAnimationEnd()` | `_CHAR_ADD_CORE` | CH2b / CH1j |
+| `31edf5a0` | `CX2Data::IsUpgradedSkill( SKILL_ID )` | `_CHAR_ADD_CORE` | CH2a |
+| `31f63d40` | `CEffect::SetLockOnOnlyFront( bIsRight, iLastTouchLineIndex, vOwnerPos )` | `_CHAR_ADD_CORE` | CH2a |
+| `31f63d30` | `CEffect::SetFadeAlphaStep( float )` | `_DAMAGEEFFECT_ALPHA_FADE` | CH1j / CH3c |
+| `31f63f20` | March's own `CEffect::SetDieDamageEffectScale( float, float, float )` ( `+0xa68` = `m_vDieDamageScale`, read by `CreateDieDamageEffect` ) | none | CH2c |
+| `31fcefa0` | june-engine R5's `CX2GUUser::UpdateCustomRenderState()` ( vslot 0x84c ) | none | CH1k2 |
+
+- **`32294530`, read from the listing.** It is a free function that returns a `D3DXVECTOR3` ( `RET 0x14` ); all three June callers pass `false`. `CanDown` with June's signature finds a line. On `false` it walks 10.0 from `vPos` toward the nearer end ( `GetFixedDistancePositionForWeaponTaker`, June's since char-luciel CH1i2 ) and keeps `vPos.y`. June then tests `&start <= &vResult <= &end`: it compares **addresses**, so with the stack below the heap the input comes back unchanged ( **JUNE_BUGS 780**, kept verbatim ). With no line, both flags scan every enabled line except `LT_WALL` and `LT_MONSTER_ROAD` for the nearest point ( `<=` ), then walk from `vPos` ( not from that point ). On `true` it keeps `vPos` when it lies within 30.0 of the line's projection, or when the line past the nearer end is enabled and not a monster road. Constants ( `charport_consts.py` ): 30.0, 999999.0, 9999999.0, 10.0. `vBest` starts as `vPos` where June leaves it unset; it never reaches the output ( the walk writes it on every `true` return ).
+- **The fade ( new flag `SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE`, two new `CEffect` members ).** The kickoff named only the `+0xb20` setter, but it has no effect without its reader. Only Add calls the setter, so the reader is ported here too ( no partial updates ). The members are `m_fFadeAlpha` ( `+0xb1c`, ctor 1.0 ) and `m_fFadeAlphaStep` ( `+0xb20`, ctor 0 ). `UpdateFadeAlpha` ( `31f75da0` ) does nothing at step 0 ( `IsSamef` ); otherwise it clamps to 0..1 and calls `SetFadeAlpha` ( `31f75be0` ). That sets the main mesh's `m_Color.a` ( `+0x4b8` ) and calls `ChangeAlphaForce` ( `31cf1bd0`, KTDXLIB ) on every particle of the three lists `SetShowObject` walks. The hook is the last line of March's `CEffect::OnFrameMove`. June reaches it from the no-game end, the head die and the normal end, but not from the mid die ( `@31f8aa77` ). March's mid die `return`s, so it skips the hook the same way. Every effect has step 0, so nothing changes until Add's CH1j / CH3c code sets a step.
+- **Kickoffs amended** with the names: CH1d, CH1j, CH1k2, CH2a, CH2b, CH2c, CH3c.
+- **Hygiene.** `finish.py --files <12 files> --with JUNE_CHAR_ADD_CORE JUNE_DAMAGEEFFECT_ALPHA_FADE JUNE_CHAR_ADD_LIVE` ( `_LIVE` only as a partner, so CH1a's `Always.h` guard evaluates ): `_CORE` PASS ( `files: 7 PASS, 1 PASS~, 1 DEFINE, 3 OTHER, 0 FAIL, 0 ERROR` ), `_DAMAGEEFFECT_ALPHA_FADE` PASS ( `4 PASS, 1 DEFINE, 7 OTHER` ), `_LIVE` INERT, 0 deleted / non-ASCII / EOL-mismatched lines; `junediverge` PASS. **enumscan** has one hit that is not this phase's: `X2DamageEffect.cpp:1750`, a 1000 ms log throttle from `20cecda87` ( 2026-09-26 ), misread as `SI_SA_ES_FATAL_FURY`. The OTHER rows are each flag's files counted under the partner flag. `PASS~` = the blank line before the `X2GameUnit.cpp` block.
+- **Compile.** One-file `/Zs` probes ( `census.cl_cmd`, no PCH ) of `X2GameUnit.cpp`, `X2Game.cpp`, `X2DamageEffect.cpp` and `KTDGParticleSystem.cpp` give 0 errors. A throwaway probe that calls all 14 new and kept names compiled with both flags on ( 0 errors ) and was deleted. Full build skipped: no play-test.
+- Not ported: the other callers of `32294530` ( `32296ba0`, a `CX2GameUnit` wrapper on its own position, and `32a69390`, past Add's range ) have no March caller yet.
+
+**Nothing to play-test.** Review: `kickoffs/char-add/CH1d0-review.md` ( Opus 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.

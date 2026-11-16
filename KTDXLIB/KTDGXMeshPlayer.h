@@ -1211,6 +1211,10 @@ public:
 
 				XMeshTemplet* GetTempletData(){ return &m_TempletData; }
 				INSTANCE_STATE GetState(){ return m_State; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+				void SetStateDyingByCrash(){ m_State = IS_DYING_BY_CRASH; }	// char-add CH1d0: June 31c82d50
+				bool IsAnimationEnd(){ return ( NULL != m_pXSkinAnim ) ? m_pXSkinAnim->IsAnimationEnd() : false; }	// char-add CH1d0: June 31c834e0
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 
 

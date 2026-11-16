@@ -7124,6 +7124,71 @@ CX2GameUnit* CX2Game::GetNearestUnitInSpecificRange( CX2GameUnit* pUnit_, int iU
 	}
 	return pNearestUnit;
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+// char-add CH1d0: June 322d58c0 = 322d55b0 above with my position given ( RET 0x28 ); bCenterPos_ still picks the others' centres
+CX2GameUnit* CX2Game::GetNearestUnitInSpecificRange( CX2GameUnit* pUnit_, const D3DXVECTOR3& vPos_, int iUnitType_, bool bFrontOnly_, float fMinRange_, float fMaxRange_, bool bCenterPos_, bool bIncludeSameTeam_ )
+{
+	CX2GameUnit* pMyUnit = pUnit_;
+	if ( NULL == pMyUnit )
+	{
+		if ( NULL == GetMyUnit() )
+			return NULL;
+		pMyUnit = GetMyUnit();
+	}
+
+	const D3DXVECTOR3 vMyPos = vPos_;
+	int iMyTeam = pMyUnit->GetTeam();
+#ifdef SERV_TRAPPING_RANGER_TEST
+	if ( iMyTeam < 0 )
+		iMyTeam = pMyUnit->GetAllyTeam();
+#endif SERV_TRAPPING_RANGER_TEST
+
+	float fBestDistance = fMaxRange_;
+	CX2GameUnit* pNearestUnit = NULL;
+	for ( UINT i = 0; i < m_UnitList.size(); i++ )
+	{
+		CX2GameUnit* pUnit = m_UnitList[i];
+		if ( NULL == pUnit )
+			continue;
+		if ( pUnit->GetTeam() == iMyTeam && false == bIncludeSameTeam_ )
+			continue;
+		if ( NULL != pUnit->GetGageData() && false == ( 0.f < pUnit->GetNowHp() ) )
+			continue;
+		if ( pUnit->GetTeam() < 0 )
+			continue;
+		if ( pUnit->GetUnitUID() == pMyUnit->GetUnitUID() )
+			continue;
+		if ( true == pUnit->GetInvincible() )
+			continue;
+
+		if ( CX2GameUnit::GUT_NPC == pUnit->GetGameUnitType() )
+		{
+			if ( 0 == iUnitType_ )
+				continue;
+			CX2GUNPC* pNpc = static_cast<CX2GUNPC*>( pUnit );
+			if ( CX2UnitManager::NCT_BASIC != pNpc->GetNPCTemplet().m_ClassType &&
+				 CX2UnitManager::NCT_THING_GATE != pNpc->GetNPCTemplet().m_ClassType )
+				continue;
+		}
+		else if ( 1 == iUnitType_ )
+		{
+			continue;
+		}
+
+		const D3DXVECTOR3 vPos = ( true == bCenterPos_ ) ? ElysionGetUnitCenterPos( pUnit ) : pUnit->GetPos( false );
+		if ( true == bFrontOnly_ && ElysionIsPosAlongLastTouchLine( pMyUnit, vPos ) != pMyUnit->GetIsRight() )
+			continue;
+
+		const float fDistance = GetDistance( vMyPos, vPos );
+		if ( fDistance < fBestDistance && fMinRange_ <= fDistance && fDistance <= fMaxRange_ )
+		{
+			fBestDistance = fDistance;
+			pNearestUnit = pUnit;
+		}
+	}
+	return pNearestUnit;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 /** June 322cfef0 / 322cff30: g_pKTDXApp's CKTDGManager ( +0x1fc ), when there is one, -> 31ce6270 / 31ce62c0( time, colour ) */
 void CX2Game::StartFadeInCustomColor( float fTime_, D3DXCOLOR color_ )

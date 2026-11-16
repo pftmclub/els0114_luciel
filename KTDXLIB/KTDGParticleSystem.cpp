@@ -5955,6 +5955,18 @@ void CKTDGParticleSystem::CParticleEventSequence::ChangeColorForce( const D3DXCO
 #endif  X2OPTIMIZE_PARTICLE_AND_ETC_HANDLE
 }
 #endif ELSWORD_SHEATH_KNIGHT
+#ifdef SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+// char-add CH1d0: June 31cf1bd0 ( its ApplyFunctionToParticles 31cfe3f0 ): every particle keeps its colour and takes fAlpha_
+void CKTDGParticleSystem::CParticleEventSequence::ChangeAlphaForce( float fAlpha_ )
+{
+	auto ChangeAlphaForceCB = [&fAlpha_]( CParticle& particle )
+	{
+		const D3DXCOLOR& color = particle.GetColor();
+		particle.SetColor( D3DXCOLOR( color.r, color.g, color.b, fAlpha_ ) );
+	};
+	ApplyFunctionToParticles( ChangeAlphaForceCB );
+}
+#endif SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
 
 #ifdef  X2OPTIMIZE_PARTICLE_AND_ETC_HANDLE
 CKTDGParticleSystem::CParticle* CKTDGParticleSystem::CParticleEventSequence::GetFrontParticle()

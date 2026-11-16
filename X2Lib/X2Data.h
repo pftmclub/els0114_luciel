@@ -249,6 +249,9 @@ class CX2Data : public CKTDXStage
 
 		CX2SkillTree* ResetSkillTree( const WCHAR* pFileName, const WCHAR* pSkillDataFileName ); 
 		CX2SkillTree* GetSkillTree(){ return m_pSkillTree; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+		bool IsUpgradedSkill( CX2SkillTree::SKILL_ID eSkillID_ ) const { return ( NULL != m_pSkillTree ) ? m_pSkillTree->IsUpgradedSkill( eSkillID_ ) : false; }	// char-add CH1d0: June 31edf5a0
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 		void DeleteSkillTree(){ SAFE_DELETE(m_pSkillTree); }
 
 

@@ -56,3 +56,4 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - Class map: **7** functions (4 listing-only; 3 `inside`, 4 `new`), filter `awk -F'\t' '$7=="CH1k2"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
 - 7 rows: 0x810 `329e8960`, 0x818 `329d4250`, 0x828 `329e6100`, 0x834 `329e80f0`, 0x84c `329d49b0`, 0x854 `329ff960` (listing-only) and one helper. The review covers CH1k-CH1k2 (CH1h-CH1h4 and CH1i-CH1j2 have their own).
+- ( CH1d0, 2026-11-16 ) 0x84c's base `31fcefa0` is already March's `virtual void CX2GUUser::UpdateCustomRenderState()` ( june-engine R5, `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE`, `X2GUUser.cpp` ): Add's `329d49b0` is `CX2GUAdd::UpdateCustomRenderState()`, which calls `CX2GUUser::UpdateCustomRenderState()` and then `ClearCustomRenderState()` ( `31fc9570`, the base's ) when the buff state is 4 and its `+0x97d4` byte is 0. CH1d0 wrote nothing for it.

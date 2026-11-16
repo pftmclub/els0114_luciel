@@ -21961,6 +21961,139 @@ bool CX2GameUnit::IsRightTarget(D3DXVECTOR3 vPos)
 }
 #endif //SERV_9TH_NEW_CHARACTER
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+#if !defined( SERV_IRUHADEV_JUNE_LINEMAP_CANDOWN_SIGNATURE ) || !defined( SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER )
+#error char-add CH1d0's GetNearestPosOnLineMap needs June's CanDown ( _LINEMAP_CANDOWN_SIGNATURE ) and June's weapon-taker walk ( _DIVERGE_FIXED_DISTANCE_WEAPON_TAKER )
+#endif // SERV_IRUHADEV_JUNE_LINEMAP_CANDOWN_SIGNATURE || SERV_IRUHADEV_JUNE_DIVERGE_FIXED_DISTANCE_WEAPON_TAKER
+// char-add CH1d0: June 32294530 ( a free function there ); every June caller passes false
+/*static*/ D3DXVECTOR3 CX2GameUnit::GetNearestPosOnLineMap( D3DXVECTOR3 vPos_, bool bKeepNearLandLine_ )
+{
+	if ( NULL == g_pX2Game || NULL == g_pX2Game->GetWorld() || NULL == g_pX2Game->GetWorld()->GetLineMap() )
+		return vPos_;
+
+	CKTDGLineMap* pLineMap = g_pX2Game->GetWorld()->GetLineMap();
+	D3DXVECTOR3 vResult = vPos_;
+	int iLineIndex = 0;
+	const CKTDGLineMap::LineData* pLandLine = NULL;
+	if ( true == pLineMap->CanDown( vPos_, LINE_RADIUS, NULL, NULL, &iLineIndex, false, false, true, false ) )
+		pLandLine = pLineMap->GetLineData( iLineIndex );
+
+	if ( NULL != pLandLine && false == bKeepNearLandLine_ )
+	{
+		const bool bIsRight = ( GetDistance( pLandLine->startPos, vPos_ ) < GetDistance( pLandLine->endPos, vPos_ ) );
+		if ( true == pLineMap->GetFixedDistancePositionForWeaponTaker( &vPos_, 10.f, bIsRight, vResult ) )
+			vResult.y = vPos_.y;
+
+		// June compares the vectors' addresses ( D3DXVECTOR3 -> const FLOAT* ), not their positions: JUNE_BUGS 780
+		const FLOAT* pResult = vResult;
+		if ( static_cast<const FLOAT*>( pLandLine->startPos ) <= pResult && pResult <= static_cast<const FLOAT*>( pLandLine->endPos ) )
+			return vResult;
+		return vPos_;
+	}
+
+	if ( NULL != pLandLine && CKTDGLineMap::LT_MONSTER_ROAD != pLandLine->lineType && CKTDGLineMap::LT_WALL != pLandLine->lineType )
+	{
+		float fNearest = 999999.f;
+		const D3DXVECTOR3 vRel = vPos_ - pLandLine->startPos;
+		const float fT = pLandLine->dirVector.y * vRel.y + vRel.x * pLandLine->dirVector.x + pLandLine->dirVector.z * vRel.z;
+		if ( 0.f <= fT && fT < pLandLine->fLength )
+		{
+			const float fDistance = GetDistance( pLandLine->startPos + pLandLine->dirVector * fT, vPos_ );
+			if ( fDistance < 999999.0 )
+				fNearest = fDistance;
+		}
+		if ( fNearest < 30.0 )
+			return vPos_;
+
+		const int iSideLineIndex = ( GetDistance( vPos_, pLandLine->startPos ) < GetDistance( vPos_, pLandLine->endPos ) ) ? pLandLine->beforeLine : pLandLine->nextLine;
+		const CKTDGLineMap::LineData* pSideLine = pLineMap->GetLineData( iSideLineIndex );
+		if ( NULL != pSideLine && true == pSideLine->bEnable && CKTDGLineMap::LT_MONSTER_ROAD != pSideLine->lineType )
+			return vPos_;
+	}
+
+	float fBestDistance = 9999999.f;
+	int iBestLineIndex = -1;
+	D3DXVECTOR3 vBest = vPos_;
+	for ( int i = 0; i < pLineMap->GetNumLineData(); ++i )
+	{
+		const CKTDGLineMap::LineData* pLineData = pLineMap->GetLineData( i );
+		if ( NULL == pLineData || false == pLineData->bEnable ||
+			CKTDGLineMap::LT_MONSTER_ROAD == pLineData->lineType || CKTDGLineMap::LT_WALL == pLineData->lineType )
+			continue;
+
+		const D3DXVECTOR3 vEdge = pLineData->endPos - pLineData->startPos;
+		D3DXVECTOR3 vDir = vEdge;
+		D3DXVec3Normalize( &vDir, &vDir );
+		const D3DXVECTOR3 vRel = vPos_ - pLineData->startPos;
+		const float fT = D3DXVec3Dot( &vRel, &vDir );
+
+		D3DXVECTOR3 vPoint;
+		if ( fT <= 0.f )
+			vPoint = pLineData->startPos;
+		else if ( D3DXVec3Length( &vEdge ) <= fT )
+			vPoint = pLineData->endPos;
+		else
+			vPoint = pLineData->startPos + vDir * fT;
+
+		const D3DXVECTOR3 vToPoint = vPoint - vPos_;
+		const float fDistance = D3DXVec3Length( &vToPoint );
+		if ( fDistance <= fBestDistance )
+		{
+			fBestDistance = fDistance;
+			iBestLineIndex = i;
+			vBest = vPoint;
+		}
+	}
+
+	vResult = vBest;
+	const CKTDGLineMap::LineData* pBestLine = pLineMap->GetLineData( iBestLineIndex );
+	if ( NULL != pBestLine )
+	{
+		const bool bIsRight = ( GetDistance( pBestLine->startPos, vPos_ ) < GetDistance( pBestLine->endPos, vPos_ ) );
+		if ( true == pLineMap->GetFixedDistancePositionForWeaponTaker( &vPos_, 10.f, bIsRight, vResult ) )
+			return vResult;
+	}
+	return vPos_;
+}
+
+// char-add CH1d0: June 32293d70; true without a line map ( bAlong_ untouched ), false without my last line or on a dot product of 0
+bool CX2GameUnit::CheckPosAlongLastTouchLine( IN const D3DXVECTOR3& vPos_, OUT bool& bAlong_ ) const
+{
+	if ( NULL == g_pX2Game || NULL == g_pX2Game->GetWorld() || NULL == g_pX2Game->GetWorld()->GetLineMap() )
+		return true;
+
+	const CKTDGLineMap::LineData* pLineData = g_pX2Game->GetWorld()->GetLineMap()->GetLineData( GetLastTouchLineIndex( true ) );
+	if ( NULL == pLineData )
+		return false;
+
+	D3DXVECTOR3 vToPos = vPos_ - GetPos( false );
+	D3DXVec3Normalize( &vToPos, &vToPos );
+	D3DXVECTOR3 vLineDir = pLineData->dirVector;
+	D3DXVec3Normalize( &vLineDir, &vLineDir );
+	const float fDot = D3DXVec3Dot( &vToPos, &vLineDir );
+	if ( true == IsSamef( fDot, 0.f ) )
+		return false;
+
+	bAlong_ = ( 0.f < fDot );
+	return true;
+}
+
+// char-add CH1d0: June 3226e310; true on the frame the time runs out
+bool CX2GameUnit::DecreaseCoolTime( IN OUT float& fCoolTime_ ) const
+{
+	if ( 0.f < fCoolTime_ )
+	{
+		fCoolTime_ -= m_fElapsedTime;
+		if ( fCoolTime_ <= 0.f )
+		{
+			fCoolTime_ = 0.f;
+			return true;
+		}
+	}
+	return false;
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+
 #ifdef SERV_ADD_LUNATIC_PSYKER // 김태환
 /** @function	: GetFlickerColor
 	@brief		: 버프를 통해반짝이는 렌더 컬러값 연산 함수

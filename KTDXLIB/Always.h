@@ -13929,6 +13929,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
+// Date: 2026-11-16
+// Description: June character port ( Add ) Phase CH1d0 - June's damage-effect alpha fade: CEffect gains the fade alpha ( June +0xb1c, 1.0 ) and its
+//              per-frame step ( +0xb20, 0 ), the step setter 31f63d30 Add's skills call, the step 31f75da0 at the end of OnFrameMove and the alpha push
+//              31f75be0 ( main mesh and particles ). With step 0, as every effect has until Add's CH1j / CH3c code sets one, nothing changes.
+//              Revert: comment out the #define ( JUNE_DAMAGEEFFECT_ALPHA_FADE ).
+#define SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
 // Date: 2026-11-15
 // Description: June character port ( Add ) Phase CH1a - the DP / formation-mode lines inside the _LIVE bodies ( June's TryHyperModeStateChange key test and the
 //              formation release ) that need CH1q's pieces ( CanHyperMode, the formation hooks ). March's live DP calls stay in the #else. Only with _LIVE.

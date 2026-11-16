@@ -591,6 +591,47 @@ void CX2DamageEffect::CEffect::SetShowObject( bool bShow_ )
 	}
 }
 #endif SERV_IRUHADEV_JUNE_EFFECTSET_RUNTIME
+#ifdef SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+// char-add CH1d0: June 31f75da0, OnFrameMove's last call; a step of 0 ( IsSamef ) changes nothing
+void CX2DamageEffect::CEffect::UpdateFadeAlpha()
+{
+	if( true == IsSamef( 0.f, m_fFadeAlphaStep ) )
+		return;
+
+	m_fFadeAlpha += m_fFadeAlphaStep;
+	if( m_fFadeAlpha <= 0.f )
+		m_fFadeAlpha = 0.f;
+	else if( 1.0 <= m_fFadeAlpha )
+		m_fFadeAlpha = 1.f;
+
+	SetFadeAlpha( m_fFadeAlpha );
+}
+
+// char-add CH1d0: June 31f75be0: the main mesh's colour alpha, then every particle of the three lists SetShowObject walks
+void CX2DamageEffect::CEffect::SetFadeAlpha( float fAlpha_ )
+{
+	CKTDGXMeshPlayer::CXMeshInstance* pMainEffect = GetMainEffect();
+	if( NULL != pMainEffect )
+		pMainEffect->SetMeshAlphaColor( fAlpha_ );
+
+	if( NULL == g_pX2Game || NULL == g_pX2Game->GetMajorParticle() )
+		return;
+
+	vector<ParticleData*>* apParticleDataList[] = { &m_StartParticleDataList, &m_PassiveParticleDataList, &m_TimeParticleDataList };
+	for( int iList = 0; iList < ARRAY_SIZE( apParticleDataList ); ++iList )
+	{
+		for( UINT iParticle = 0; iParticle < apParticleDataList[iList]->size(); ++iParticle )
+		{
+			ParticleData* pParticleData = (*apParticleDataList[iList])[iParticle];
+			if( NULL == pParticleData )
+				continue;
+			CKTDGParticleSystem::CParticleEventSequence* pSeq = g_pX2Game->GetMajorParticle()->GetInstanceSequence( pParticleData->m_hSeq );
+			if( NULL != pSeq )
+				pSeq->ChangeAlphaForce( fAlpha_ );
+		}
+	}
+}
+#endif SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
 
 
 void CX2DamageEffect::DestroyAllInstances()
@@ -1605,6 +1646,10 @@ CX2DamageEffect::CEffect::CEffect( CX2DamageEffect* pManager, KLuaManager* pLuaM
 #ifdef SERV_IRUHADEV_JUNE_SKILL_MEMO_FX
 	m_vScaleBase		= D3DXVECTOR3( 1.f, 1.f, 1.f );		/// June 31f7aab0 @31f7b33c-31f7b368 (fld1)
 #endif SERV_IRUHADEV_JUNE_SKILL_MEMO_FX
+#ifdef SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+	m_fFadeAlpha		= 1.f;	// char-add CH1d0: June 31f7aab0 @31f7adda
+	m_fFadeAlphaStep	= 0.f;
+#endif SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
 
 #ifdef SKILL_CASH_10_TEST
 	m_fReactAnimSpeed	= 0.f;
@@ -3571,6 +3616,9 @@ void CX2DamageEffect::CEffect::OnFrameMove( double fTime, float fElapsedTime )
 		}
 		
 	}	
+#ifdef SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+	UpdateFadeAlpha();	// char-add CH1d0: June @31f8aac2; the mid-frame die return above skips it as June's
+#endif SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
 }
 
 void CX2DamageEffect::CEffect::OnFrameMove_SoundData()

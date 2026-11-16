@@ -2146,6 +2146,9 @@ public:
 		virtual float				GetXPos( bool bFuture = false )	const		{ return GetSyncData(bFuture).position.x; }
 		virtual float				GetYPos( bool bFuture = false )	const		{ return GetSyncData(bFuture).position.y; }
 		virtual float				GetZPos( bool bFuture = false )	const		{ return GetSyncData(bFuture).position.z; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+		void						SetSyncDataPos( const D3DXVECTOR3& vPos_, bool bFuture_ ) { if ( true == bFuture_ ) m_FrameDataFuture.syncData.position = vPos_; else m_FrameDataNow.syncData.position = vPos_; }	// char-add CH1d0: June 31fc9430
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 #ifdef  X2OPTIMIZE_NPC_NONHOST_SIMULATION
         virtual void                BackupPosition()  
         {

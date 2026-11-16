@@ -650,6 +650,9 @@ class CX2Game : public CKTDXStage
 		CX2GameUnit*				GetNearestUnitInSpecificRange_LUA( CX2GameUnit* pUnit_, int iUnitType_, bool bFrontOnly_, float fMinRange_, float fMaxRange_, bool bCenterPos_ );	// June 322d7090
 		CX2GameUnit*				GetNearestUnitInSpecificRange_IncludeSameTeam_LUA( CX2GameUnit* pUnit_, int iUnitType_, bool bFrontOnly_, float fMinRange_, float fMaxRange_, bool bCenterPos_ );	// June 322d7060
 		CX2GameUnit*				GetNearestUnitInSpecificRange( CX2GameUnit* pUnit_, int iUnitType_, bool bFrontOnly_, float fMinRange_, float fMaxRange_, bool bCenterPos_, bool bIncludeSameTeam_ );	// June 322d55b0
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+		CX2GameUnit*				GetNearestUnitInSpecificRange( CX2GameUnit* pUnit_, const D3DXVECTOR3& vPos_, int iUnitType_, bool bFrontOnly_, float fMinRange_, float fMaxRange_, bool bCenterPos_, bool bIncludeSameTeam_ );	// char-add CH1d0: June 322d58c0
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 		void						StartFadeInCustomColor( float fTime_, D3DXCOLOR color_ );	// June 322cfef0
 		void						StartFadeOutCustomColor( float fTime_, D3DXCOLOR color_ );	// June 322cff30
 #endif SERV_IRUHADEV_ELYSION_SCRIPT_B

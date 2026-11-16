@@ -939,6 +939,14 @@ class CX2DamageEffect
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
 				void SetEffectAlphaCondition( int iEffectAlphaCondition ){ m_iApplyEffectAlphaConditionByOption = iEffectAlphaCondition; }	/// June2017 CEffect +0xb32
 #endif SERV_IRUHADEV_JUNE_EFFECT_ALPHA_OPTION
+#ifdef SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+				void SetFadeAlphaStep( float fFadeAlphaStep_ ) { m_fFadeAlphaStep = fFadeAlphaStep_; }	// char-add CH1d0: June 31f63d30
+				void UpdateFadeAlpha();					// char-add CH1d0: June 31f75da0
+				void SetFadeAlpha( float fAlpha_ );		// char-add CH1d0: June 31f75be0
+#endif SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+				void SetLockOnOnlyFront( bool bSaveIsRight_, int iSaveLastTouchLineIndex_, const D3DXVECTOR3& vSaveOwnerPos_ ) { m_LockOnData.m_bSaveIsRight = bSaveIsRight_; m_LockOnData.m_iSaveLastTouchLineIndex = iSaveLastTouchLineIndex_; m_LockOnData.m_vecSaveOwnerPos = vSaveOwnerPos_; m_LockOnData.m_bIsOnlyFront = true; }	// char-add CH1d0: June 31f63d40
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 				CKTDGXMeshPlayer::CXMeshInstance* GetMainEffect();
 #ifdef SERV_IRUHADEV_JUNE_EFFECTSET_RUNTIME
 				// June2017 FUN_31f75570, called by the EffectSet's EffectInstance::SetShowObject (FUN_321de0c0):
@@ -1467,6 +1475,10 @@ class CX2DamageEffect
 #ifdef SERV_IRUHADEV_JUNE_SKILL_MEMO_FX
 				D3DXVECTOR3							m_vScaleBase;	/// June CEffect +0xb24..+0xb2c: 1,1,1 in the ctor (31f7aab0 @31f7b33c), MI_HUGE's s after the ctor's SetScale (@31f7c80a)
 #endif SERV_IRUHADEV_JUNE_SKILL_MEMO_FX
+#ifdef SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+				float								m_fFadeAlpha;		// char-add CH1d0: June +0xb1c ( ctor 1.0 ), pushed to the main mesh and the particles
+				float								m_fFadeAlphaStep;	// char-add CH1d0: June +0xb20 ( ctor 0 ), added to m_fFadeAlpha every frame
+#endif SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
 
 
 #ifdef GIANT_UNIT_GIANT_EFFECT_TEST

@@ -1548,6 +1548,9 @@ class CKTDGParticleSystem
 				void	ChangeSizeForce( const D3DXVECTOR3& vSize_ );
 				void	ChangeColorForce( const D3DXCOLOR& vColor_ );
 #endif ELSWORD_SHEATH_KNIGHT
+#ifdef SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
+				void	ChangeAlphaForce( float fAlpha_ );	// char-add CH1d0: June 31cf1bd0
+#endif SERV_IRUHADEV_JUNE_DAMAGEEFFECT_ALPHA_FADE
 
 
 				CKTDGParticleSystem* GetParticleSystem(){ return m_pParticleSystem; }

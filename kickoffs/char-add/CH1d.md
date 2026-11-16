@@ -58,6 +58,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - Script states: 25 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
 - Checklist rows (`june2017_re/char_add/ch0_checklist_rows.tsv` col 5): L675.
 - Calls `32293d70` (line-side test): CH1d0 writes it first. The untagged nasod-armor combos (`ANSI_COMBO_NASOD_ARMOR_*`, 11 tables) are here; their nasod lines go under `_NASOD` inside the `_LIVE` body. March's class tests in `NasodArmorComboZZEventProcess` / `NasodArmorComboXEventProcess` (`X2GUAdd.cpp:5798` / `:5910`) follow June's bodies.
+- ( CH1d0, 2026-11-16 ) `32293d70` = `CX2GameUnit::CheckPosAlongLastTouchLine( vPos, OUT bool& bAlong )` ( `_CHAR_ADD_CORE` ): returns `true` with no line map ( `bAlong` left as it was ), `false` with no last-touched line or a dot product of 0 ( `IsSamef` ), else `true` with `bAlong = 0 < dot`. June's caller keeps its own `bool` ( initial value ) for the cases that leave it.
 
 ## Added by char-luciel CH1i2 (2026-11-14)
 

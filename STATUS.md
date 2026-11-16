@@ -107,7 +107,7 @@ Plan `JUNE_CHARACTER_ADD_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]` (l
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| CH1d0 | ready (CH1c done): the 12 June engine helpers Sonnet phases call (line-map snap `32294530`, line-side test, CEffect / mesh / user accessors) | Opus 5.5 / high, Opus review | CH1b review | engine files (`X2GameUnit.*`, `X2DamageEffect.*`, `X2GUUser.*`, `X2Game.*`, KTDXLIB mesh) | `CH1d0.md` |
+| CH1d0 | **review ready** (done 2026-11-16: 10 helpers under `_CORE`, June's effect alpha fade under new `_DAMAGEEFFECT_ALPHA_FADE`, 2 already March's, JUNE_BUGS 780; /Zs probes, no build) | Opus 5.5 / high, Opus review | CH1b review | engine files (`X2GameUnit.*`, `X2DamageEffect.*`, `X2GUUser.*`, `X2Game.*`, KTDXLIB mesh / particle) | `CH1d0-review.md` |
 | CH1d | blocked (CH1d0 review): ground combos incl. the untagged nasod-armor combos; no review of its own | Sonnet 5.5 / high | CH1d0 review | `X2GUAdd.*` | `CH1d.md` |
 | CH1d2 | blocked (CH1d): dash and dash / jump combos; review covers CH1c-CH1d2 | Sonnet 5.5 / high, Opus review | CH1d | `X2GUAdd.*` | `CH1d2.md` |
 | CH1e | blocked (CH1d2 review): Psychic Tracer / Lunatic Psyker lines; no review of its own | Sonnet 5.5 / high | CH1d2 review | `X2GUAdd.*` | `CH1e.md` |

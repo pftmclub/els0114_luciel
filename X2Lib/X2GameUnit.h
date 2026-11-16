@@ -3362,6 +3362,11 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		D3DXVECTOR3 GetBoneLinePos( IN const D3DXVECTOR3& vPos_ ) const;			/// June 32293f80
 		bool IsPosAlongLastTouchLine( IN const D3DXVECTOR3& vPos_ ) const;		/// June 32293b80
 #endif SERV_IRUHADEV_JUNE_CHAR_ARME_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+		static D3DXVECTOR3 GetNearestPosOnLineMap( D3DXVECTOR3 vPos_, bool bKeepNearLandLine_ );		// char-add CH1d0: June 32294530
+		bool CheckPosAlongLastTouchLine( IN const D3DXVECTOR3& vPos_, OUT bool& bAlong_ ) const;	// char-add CH1d0: June 32293d70
+		bool DecreaseCoolTime( IN OUT float& fCoolTime_ ) const;								// char-add CH1d0: June 3226e310
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 #ifdef SERV_IRUHADEV_JUNE_BUFF_REACT_APPLY
 		/// June effect completion C4 (renamed from CheckDamageDataKeyName): the DIVISION window gate and its tick / re-arm, see X2GameUnit.cpp.
 		struct DivisionKey
