@@ -25,6 +25,7 @@ Do "Phase P8b" in the plan doc (new 2026-11-16; backlog Stage 15, added by char-
   unknown key). Hand an unknown key to its owner (Rule 6); it does not hold the file, but the play-test must know what to look for.
 - **Also the 7 other `.txt` rows** the census marks `route=txt-review` (june-effect, their old owner, is closed): `GameOptionPreset`, `UnitTitle1300`,
   `UnitTitle1310`, `fontconfig`, `AIN_POWER_OF_GOD_06_1`, `Npc_All_Ariel_Face_Talk_Dark`, `NUI_ERIS_BOSS_Map03_A`; same pre-check, same wave. `DialogLog.txt` stays dropped.
+  **`Npc_All_Ariel_Face_Talk_Dark.txt` is 0 bytes in June** (P2 found it, 2026-11-16): `elstools pack` cannot pack an empty entry (verify fails), so decide before staging: leave it out and record why, or find a tool path that keeps it.
 - **Hand-off:** the village, a dungeon boss and a skill-heavy character: particles and the UI particle layers still draw.
 
 Pack and copy yourself, no ask (user, 2026-11-10; skill `x2-kom-packed`). Run the gates in order (Rule 4):

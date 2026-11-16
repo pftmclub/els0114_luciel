@@ -405,6 +405,35 @@ and is the truth. The "pilot" role is gone: P1's baseline already measures a cli
 - **Measurements:** compare mount milliseconds and private MB with P1's baseline, and record them again after each P4 wave. If private
   memory rose by more than about 300 MB, or the total passes about 1.4 GB, schedule P11 before the next wave.
 
+## Phase P2 - Done (2026-11-16, Sonnet 5.5 high; data only, no client source; play-test owed)
+
+**What landed.** The 15 June kom numbers with no live archive are now live, byte-exact: **4,421 files in 15 new koms** (`june2017_re/P2_stage_plan.tsv`; one wave, the census showed no lopsided split).
+Wave list from `p0_census.tsv` (june-only, june kom in the 15): 4,422 names; 1 left out (below). Counts per kom: data169 999, data170 62, data172 550, data177 820, data187 549, data193 293, data196 23 (fonts,
+92.7 MB), data209 43 (Ain motions), data210 947 (Ain / Rose voices), data213 84 (Ain tutorial), data219 / 220 / 221 1 each (`dummy2NN.X`), datai026 15, datai032 33 (Rose cash meshes).
+- **Left out:** `Npc_All_Ariel_Face_Talk_Dark.txt` (datai026): 0 bytes in June, and `elstools pack` fails its verify on an empty entry ("entry set differs from the dir"). Its census route is
+  `txt-review` = **P8b** (kickoff note added): P8b must decide how an empty `.txt` ships (likely: leave it out, nothing reads an empty file). I removed it from the new `datai026_kom` dir, its manifest and the plan TSV.
+- **Held names:** none in the wave (`verify-staged` and `stage-june` apply `asset_port_held.tsv`).
+
+**Gates, in order.**
+1. `stage-june`: `STAGE-JUNE OK: 15 kom(s), 4422 staged (4422 new, 0 replaced, 0 identical), 0 refused` (dry run first, same numbers). 0 replaced, so no staged-tree backup was needed.
+2. `verify-staged` (after the removal): `VERIFY-STAGED OK: 4421 name(s) equal June's strict decode, 0 problems`.
+3. `pack --wave`: `PACK OK` + `WAVE GATE OK` for all 15; every kom `+N added (N on the list), -0 removed, ~0 changed, no live kom, new archive`; entry counts equal the wave counts.
+4. `dupcheck --with <15>`: `DUPCHECK OK: 0 duplicate names` (186,867 names in the would-be-live set), repeated inside each `copy`.
+5. `copy --wave`: `COPY OK` x15 (game not running; md5 / entry count verified by the tool): data169 43,330,403 B 999 entries md5 6d1d49ec; data170 2,866,976 B 62 fa91d621;
+   data172 22,467,380 B 550 58c5c456; data177 41,383,770 B 820 44b60b73; data187 15,214,767 B 549 f3f85d65; data193 5,832,107 B 293 c140c42c; data196 92,685,127 B 23 da28a646;
+   data209 55,823,478 B 43 32ad5079; data210 50,572,130 B 947 025fb4c8; data213 8,473,660 B 84 97455b85; data219 / 220 / 221 128,248 B 1 each (51cd1f65 / d2e6c58d / f9fe2003);
+   datai026 2,114,295 B 15 b0e06bd3; datai032 715,091 B 33 08990fc1.
+6. Census re-run (`asset_port_census.py`): `June kom numbers with no live archive: 0`; `live-only March entries with no file in kom_contents: 0`; P4a 9,413 / P4b 12,748 / P4c 14,467 june-only rows left; `p0_*.tsv` regenerated.
+
+**Build:** no build: data only (the exe stays P1's f87b25c6). `finish.py` not run: no client source changed. `MODS.md` entry added (Rule 9).
+
+**Baseline to compare after the play-test** (P1, 243 koms): koms=243 entries=182,446 mount_ms=1,158 (861 on the warm re-run) private_MB=167. Expected now: koms=258 entries=186,867.
+**P11 decision:** open until the user's run reports `private_MB`. P11 triggers on private up about 300 MB (> ~467 MB) or past ~1.4 GB. The wave adds 4,421 entries and 0.3 GB of archive on disk, but a mount only
+reads each kom's directory (167 MB for 243 koms), so a large rise is not expected; P4 is not blocked on P11 unless the line says otherwise.
+**Not exercised by anything yet:** nothing in March names these files (Ain / Rose voices and motions wait for their class ports; `Photo_*.Y` for the photo feature; data196's fonts are June's CN / KR fonts); no visible change is expected.
+
+**Open for the user:** the play-test below, then "check logs".
+
 ## Phase P3 - Retired (merged into P2, 2026-11-16)
 
 Not a phase any more: its 61 "remaining new kom numbers" were mostly copied by other plans (see P2), and what is left is in P2's wave.

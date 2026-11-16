@@ -7301,3 +7301,11 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` (no new define); `..._LUCIEL_SKILL_D
 - **What changes in game.** A Demonio ( 129 ) can equip Desperado, Sinister Mind ( a cast in the air starts the fly state with Stable Dark Energy ), Garden of Haures, Abyss Extinction, Rapid Impact, Punisher and Rapid Fury; their preloads and event processes are June's. The shot, spawn and start/frame-move bodies are CH3c2's, so Desperado does not shoot and Garden of Haures does not spawn yet. Transcendence, Abyss Sniping and Demonic Rush are held for CH3c2 ( their states need its event processes ): not registered, not usable.
 - **Differs from March.** March had no Lu/Ciel. `JUNE_BUGS` 776-777 ( Sinister Mind's fly state and Desperado's shot states skip CommonEventProcess ). The skill-state byte ( `m_bSkillState` ) is set on the Rapid Impact / Punisher / Rapid Fury Ciel states.
 - **Revert:** back out the commit `char-luciel Phase CH3c` ( every hunk is insert-only inside `_SKILL`, plus the seven setter cases ); `LuDnA` / `LuDnB` ( units 228 / 229 ) are test characters only.
+
+## june-asset-port P2: 15 new kom numbers (2026-11-16)
+
+Data only, no client source, no flag (the exe is P1's, `SERV_IRUHADEV_KOM_MOUNT_DEBUG` on). Plan `JUNE_ASSET_PORT_PHASES.md` "Phase P2 - Done"; list `june2017_re/P2_stage_plan.tsv`.
+- **What changes in game.** June's files of the 15 kom numbers March had no archive for are mounted, byte-exact, 4,421 files in 15 new koms: data169 (999), data170 (62), data172 (550), data177 (820), data187 (549), data193 (293), data196 (23 fonts), data209 (43), data210 (947), data213 (84), data219 / 220 / 221 (1 each, `dummy2NN.X`), datai026 (15), datai032 (33). Mostly sound (`.ogg`: GFX_ID_*, Rose and Ain voices, Ain tutorial), photo `.Y` scripts, Ain / Rose meshes and motions. No visible change on its own: nothing March has names them yet.
+- **Left out:** `Npc_All_Ariel_Face_Talk_Dark.txt` (0 bytes in June; elstools cannot pack an empty entry) stays with P8b (`txt-review`).
+- **Revert:** delete the 15 `dataNNN.kom` / `dataiNNN.kom` from the game dir (they are new, no earlier file existed) and the 15 `kom_contents/<kom>_kom` dirs plus `<kom>_packed.kom`.
+- **Proof:** `python tools/logs.py --kom-mount` after a boot: 258 koms, `KOM_MOUNT CHECK: PASS`; 0 KEM_ERROR; `existfileinfo.txt` unchanged (md5 64e18d8b).
