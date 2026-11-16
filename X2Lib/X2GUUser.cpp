@@ -5533,6 +5533,7 @@ void CX2GUUser::InitEqip()
 				}
 				m_vecpWeapon.push_back( pWeapon );
 
+#ifndef SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 				// stand-in: June attaches these in CX2Eqip 32961c80 ( case EP_WEAPON_HAND ), March's equip does not until R14d
 				if( NULL != g_pX2Game && NULL != g_pX2Game->GetMajorParticle() )
 				{
@@ -5548,6 +5549,7 @@ void CX2GUUser::InitEqip()
 							AttachWeaponParticle( pWeapon->m_iWeaponIndex, true, pwszBoneName, pSeq->GetHandle() );
 					}
 				}
+#endif SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 			} break;
 
 		case CX2Unit::EP_WEAPON_SECOND:

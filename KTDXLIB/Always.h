@@ -14109,3 +14109,21 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT needs the range members ( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY, SERV_IRUHADEV_JUNE_BUFF_NEW_STAT ) and the emulator's equip groups ( SERV_IRUHADEV_JUNE_CHAR_DUO_STAT )
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: june-engine R14f - June's whole CX2Eqip::LoadAttached (32961c80): sub-equips per weapon slot for Add, Rose's doubled
+//              lists, skin mesh forced by DITT 29 / 83, June's per-item render switch, AddObjectChain only for an equip in the DG chain
+//              (+0x15d5), the attached particles for the weapon, body and accessories, and the sub-equip ctor's tex-change XET (32f09170).
+#define SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: june-engine R14f - June's CX2Eqip::SetFixed (3295a560) only sets m_bFixed; the fixed viewers' equips stay out of the DG
+//              chain through R14f's LoadAttached gate instead of hiding their sub-equips and particles.
+#define SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED
+#if defined( SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED ) && !defined( SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED )
+#error SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED needs SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED ( the DG-chain gate )
+#endif SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED
+//////////////////////////////////////////////////////////////////////////

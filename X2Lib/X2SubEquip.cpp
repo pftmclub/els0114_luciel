@@ -24,7 +24,11 @@ m_pFrameMatrix( pFrameMatrix )
 }
 
 #ifdef ATTACH_SKINMESH
+#ifdef SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
+CX2SubEquip::CX2SubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName, bool bSkin, CKTDXDeviceXET* pModelTexChangeXET ) :
+#else SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 CX2SubEquip::CX2SubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName, bool bSkin ) :
+#endif SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 CKTDGObject( NULL ),
 m_pFrameMatrix( pFrameMatrix )
 {
@@ -51,7 +55,11 @@ m_pFrameMatrix( pFrameMatrix )
 		{
 			m_pSkinAnim = CKTDGXSkinAnim::CreateSkinAnim();
 			m_pSkinAnim->SetAnimXSkinMesh( m_pSkinModel );
+#ifdef SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
+			m_pSkinAnim->AddModelXSkinMesh( m_pSkinModel, NULL, NULL, pModelTexChangeXET );	// june-engine R14f: June 32f09170 @32f092cd passes the equip's tex-change XET
+#else SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 			m_pSkinAnim->AddModelXSkinMesh( m_pSkinModel );
+#endif SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 			m_pSkinAnim->ChangeAnim( L"Normal", false );
 			m_pSkinAnim->Play( CKTDGXSkinAnim::XAP_LOOP );
 			m_pSkinAnim->UseDXMatrix( true );

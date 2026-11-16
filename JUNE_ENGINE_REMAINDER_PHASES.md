@@ -2483,6 +2483,54 @@ alpha blend (soft edges, no opaque or black fringe). **Passed 2026-11-15** (user
   (R5b), `AddObjectChain` on a new sub-equip only when `+0x15d5` is set (@`32962094`), the attached-particle tail (`32960ad0` goes to R6c).
 - Rows: `june_march_divergent.tsv` `LoadAttached` (and its allow row), funcmap `32961c80 / 32960ad0 (R14d)`.
 
+### Phase R14f -- Done
+
+**2026-11-16, Opus 5.5 high.** Flags `SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED` and `SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED` (`#error` without the
+first); `DITT_ATTACHED_SKIN_MESH_FOR_ATTACH_ANIM = 29` / `_NO_DESTBLEND = 83` under `JUNE_ENUM_NAMES` (`X2ItemManager.h`). No `_DEBUG`: the checks
+are visual. 8 funcmap rows `(R14f)`; JUNE_BUGS 771; tsv rows below; MODS.md entry.
+
+**Ported** (`X2Eqip.cpp`, `X2SubEquip.h/.cpp`, `X2ItemManager.h`, `X2GUUser.cpp`):
+- **`CX2Eqip::LoadAttached` = June `32961c80` whole**, March's in `#else`. Passes: 8 for an Add weapon (templet unit type `UT_ADD`, item type
+  `IT_WEAPON`: one per normal anim slot), else 1. Rose's hand weapon reads its mesh list twice (index `i % count`). A skin item takes the unit skin's
+  frame; another takes normal anim [slot], then [ i ] for i > 0 outside the 8-pass case (March: Eve's second only). DITT 29 / 83 force a skin
+  sub-equip (March: `IsAttachedSkinMeshForAttachAnim`). Jiggle, push, `SetManagerObject`, **`AddObjectChain` only when `m_bAttachedInDGManagerChain`**
+  (@`32962094`), layer. June's item switch (5 compare trees + 5 jump tables, decoded from the exe and matching Ghidra's case lists): 14 render
+  groups over ~170 ids; the default: no DITT group -> alpha + `DESTALPHA` (as March), DITT group -> the skin param, NULL -> **return** (@`32962782`,
+  as March), then an inner switch (189025.., 88622.., 82035.., 89351.., 284903.., 295086 `RT_CARTOON_COLOR_EDGE` / `D3DCULL_CCW`, default with
+  `DESTALPHA` unless DITT 83). Then `SetDefaultRenderParam` (R5b). Attached particles for `EP_WEAPON_HAND`, `EP_DEFENCE_BODY`, `EP_AC_TITLE` ..
+  `EP_AC_TEMP3` (June's `MINIME` / `EARRING` share March's `TEMP2` / `TEMP3` values), doubled for Rose's hand weapon.
+- **`CX2SubEquip` ctor = June `32f09170`**: a 4th argument (default NULL) passes the equip's tex-change XET (`m_pNormalTexChangeXET`, eqip `+0x804`)
+  into `AddModelXSkinMesh`; the rest was March's. The two NPC callers keep NULL.
+- **`CX2Eqip::SetFixed` = June `3295a560`**: `m_bFixed` only. An unchained (fixed-viewer) equip's sub-equips now reach the screen only through
+  the equip's fixed draw, which March already has.
+- **R14e's stand-in** (`X2GUUser.cpp` InitEqip, main-weapon particles made on the unit) is compiled out under `#ifndef ..._LOAD_ATTACHED`: the
+  weapon's particles now come from this tail, as in June.
+
+**Stand-ins and routes** (scope rule):
+- `3295c130` / `32f08e60` (custom-render param per mesh from the eqip's `DITT_CUSTOM_RENDER` vectors `+0x92c` / `+0x93c`) -> backlog **Stage 11**
+  (bullet added). Those vectors are never filled before Stage 11, so June's test reads false: no forced skin, no custom copy. Groups 29 / 83 are
+  filled by D1-3d's parser (29 holds 88402, 88622, 82035, ...; June's own 83 list is empty), so no group this function reads is empty in March
+  except type 55.
+- `AttachParticle` `32960ad0` and the group's `SetShowObject( bool, index )` `3295bf90` -> **R6c** (kickoff amended): March's `AttachParticle` is
+  called (allow row); an unchained equip's particles are hidden with March's group `SetShowObject( false )` in place of June's `RemoveObjectChain`
+  (the fixed draw still draws them), and the Lu / Ciel other-body hide uses the same call.
+- June's `CX2UnitViewerUI::SetFixed` `31f933c0` also fixes a skin equip with sub-equips or particles -> **char-luciel DU5d2** (kickoff amended;
+  tsv row verdict `stage2`).
+- Divergence rows: `LoadAttached` and `CX2Eqip::SetFixed` -> ported; new `CX2SubEquip::CX2SubEquip` (ported) and `CX2UnitViewerUI::SetFixed`
+  (stage2, DU5d2); allow rows `OnFrameMove -> LoadAttached` and the two `-> SetFixed` deleted, `LoadAttached -> AttachParticle` added.
+- **JUNE_BUGS 771:** a ninth attached mesh reads past the 8 normal anims; the port bounds `i < 8` (undefined in March's layout).
+
+**Gates** (worktree, `finish.py --files <6 files> --with ..._EQIP_LOAD_ATTACHED ..._DIVERGE_EQIP_SET_FIXED --skip-flag ..._JUNE_ENUM_NAMES`):
+JUNE_EQIP_LOAD_ATTACHED PASS (4 PASS, 1 DEFINE, 1 OTHER = the two enum lines), JUNE_DIVERGE_EQIP_SET_FIXED PASS (1 PASS, 1 DEFINE, 4 OTHER = the
+other flag's files); 548 lines inserted, 0 deleted; junediverge RESULT: PASS (15 allow-listed); enumscan exit 0.
+**Compile:** `/Zs` probes of `X2Eqip.cpp` and `X2SubEquip.cpp`: 0 errors, the flag on.
+**Build:** `DEPLOY OK: X2_offline.exe is 27,134,464 B, dated 2026-11-16 11:10:30, md5 186cb75298e733fa0fbb899e1acb6d31` (built at main
+`92ae38b5` + these edits). No exestr line: R14f adds no string.
+
+**How to see it:** Elsword `jtLordKnight` with Salvatore Ventus Ceylon Wings 88622 and Salvatore Solace Arm Buckler 88402 (DITT 29 skin
+sub-equips), Aisha `jtVoidPrincess` with Evil Tracer Coral Serpent Wings 82035, Ara `arasss` with Heavenly Priestess Spear 285144 (three weapon
+particles, once): village, field, dungeon and the character window.
+
 ## Phase R14e - InitEqip and the character viewer's slot visibility (Raven left arm)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Added by R14c (2026-11-15) from the char-raven CH4c and char-luciel DU3c amendments of

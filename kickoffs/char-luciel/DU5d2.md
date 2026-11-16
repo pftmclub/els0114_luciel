@@ -37,3 +37,11 @@ back body's tint; every other class unchanged.
 
 No hardcoded enum literals, no `June` prefix, one-line comments with the phase tag (`// char-luciel DU5d2`): CLAUDE.md. Run
 `python tools/junediverge.py --list` before transcribing.
+
+## Amended by june-engine R14f (2026-11-16)
+
+June's `CX2UnitViewerUI::SetFixed` `31f933c0` differs from March's: with `true` it fixes a UT_ATTACH_ANIM / UT_ATTACH_NORMAL equip and also a
+UT_SKIN equip that has sub-equips or attached particles (the `31fac390` test, March's `HasSubEquipOrAttachedParticle`), then calls `31f91f90( 0 )`;
+with `false` it calls `31f91f90` with the viewer's shown state. March fixes the two attach types only. Port it here under this phase's flag (tsv row
+`CX2UnitViewerUI::SetFixed`, verdict `stage2`, routed here; funcmap `31f933c0 (R14f)`). R14f made `CX2Eqip::SetFixed` June's (`m_bFixed` only), so
+a fixed skin equip with a wing or tail draws through the equip's fixed draw once this lands.

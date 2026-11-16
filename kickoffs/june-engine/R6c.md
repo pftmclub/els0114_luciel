@@ -52,3 +52,12 @@ whole here with the enchant entries:
 - **Proof item (R14d play-test, 2026-11-15):** Elsword's Miracle Alchemist Light 85811 shows nothing in March: its six particles sit on bone
   `TraceLandPos`, which March's `AttachParticle` cannot find in the item mesh and deletes. June keeps the entry frameless (`32960d65`) and the group
   frame move draws it at the owner's land position (`3296479f` -> `329645a0`, already ported by R14d). The R6c play-test must show this light at the feet.
+
+## Amended by june-engine R14f (2026-11-16)
+
+R14f's `LoadAttached` (`SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED`) calls March's `AttachParticle` and leaves two stand-ins for this phase, both in its
+attached-particle tail: `m_AttachedParticleGroup.SetShowObject( false )` for an equip with the DG-chain byte clear (June's `AttachParticle`
+`RemoveObjectChain`s those particles instead, @`32960c7a` / @`32960d33`), and the Lu / Ciel other-body hide, which June does with the group's
+`SetShowObject( false, -1 )` `3295bf90` (index argument, entry `+0x34` show byte; funcmap `3295bf90 (R14f)`). When `AttachParticle` and the group
+land, delete the first stand-in, call June's `3295bf90` in the second, and drop the `june_diverge_allow.tsv` row `CX2Eqip::LoadAttached` ->
+`AttachParticle`.

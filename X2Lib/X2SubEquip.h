@@ -7,14 +7,22 @@ class CX2SubEquip : public CKTDGObject
 private:
 	CX2SubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName );
 #ifdef ATTACH_SKINMESH
+#ifdef SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
+	CX2SubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName, bool bSkin, CKTDXDeviceXET* pModelTexChangeXET = NULL );	// june-engine R14f: June 32f09170
+#else SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 	CX2SubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName, bool bSkin );
+#endif SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 #endif
 	virtual ~CX2SubEquip(void);
 
 public:
 	static CX2SubEquip* CreateSubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName ) { return new CX2SubEquip( pFrameMatrix, modelName ); }
 #ifdef ATTACH_SKINMESH
+#ifdef SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
+	static CX2SubEquip* CreateSubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName, bool bSkin, CKTDXDeviceXET* pModelTexChangeXET = NULL ) { return new CX2SubEquip( pFrameMatrix, modelName, bSkin, pModelTexChangeXET ); }
+#else SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 	static CX2SubEquip* CreateSubEquip( D3DXMATRIX* pFrameMatrix, const wstring& modelName, bool bSkin ) { return new CX2SubEquip( pFrameMatrix, modelName, bSkin ); }
+#endif SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 #endif
 
 #ifdef ATTACH_SKINMESH

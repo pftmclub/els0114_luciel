@@ -7241,6 +7241,15 @@ No flag, no exe change. `kom.py stage-june june2017_re/char_add/ch0b_stage_list.
 
 **Revert.** Restore the replaced files from the backup folders, `kom.py pack` / `copy` the koms; `data207.kom` and `data217.kom` can be deleted from the game dir if they were not there before. Saves `AddNR40` (uid 200) and `AddLP99` (uid 201) are in `els_db.sql`; the pre-phase snapshot is `db_backup/els_db_20261115_220214_pre_pre_CH0b_add.sql`.
 
+## Engine R14f: June's attached meshes and particles, the DG-chain gate and SetFixed (june-engine R14f, 2026-11-16)
+
+Flags `SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED` and `SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED` (`Always.h`, the second `#error`s without the first); two DITT names under `SERV_IRUHADEV_JUNE_ENUM_NAMES`. Plan `JUNE_ENGINE_REMAINDER_PHASES.md`, "Phase R14f -- Done".
+- **What changes in game.** Attached meshes (wings, tails, weapon parts) load June's way: per weapon slot for Add, Rose's doubled lists, the skin mesh forced by `RenderDivisionItemTemplet.lua` group 29, June's per-item render settings; a fixed viewer's equip (character window, watch) keeps its sub-equips out of the scene chain and draws them itself. The main weapon's attached particles come from the equip again (R14e's unit-side stand-in is compiled out). The sub-equip skin mesh takes the item's tex-change XET.
+- **Differs from March.** March hard-coded the skin-mesh ids, used its own render switch, chained every sub-equip and hid them in `SetFixed`, attached particles only for accessories, and gave the sub-equip no XET.
+- **Files.** `X2Eqip.cpp` (LoadAttached, SetFixed), `X2SubEquip.h/.cpp` (ctor), `X2ItemManager.h` (DITT 29 / 83), `X2GUUser.cpp` (InitEqip stand-in gate).
+- **Not ported yet.** The custom-render vectors (Stage 11), June's `AttachParticle` and particle group (R6c), June's viewer `SetFixed` (char-luciel DU5d2).
+- **Revert:** comment out `SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED` (alone) or both flags, `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`.
+
 ## Engine R14d: June's equip frame move, TraceLandPos and the equip effect-set stop (june-engine R14d, 2026-11-15)
 
 Flags `SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE` (+ the temporary `..._DEBUG`, `[JUNE_ENGINE] EQTRACE` lines; the R14d review retires it) and `SERV_IRUHADEV_JUNE_EQIP_DTOR` (`Always.h`); `RPUI_RAKSHASA = 63` under `SERV_IRUHADEV_JUNE_ENUM_NAMES`. Plan `JUNE_ENGINE_REMAINDER_PHASES.md`, "Phase R14d -- Done".

@@ -3786,6 +3786,510 @@ void CX2Eqip::RestoreSubEquipRenderParam()
 // note!! 일단 무기에만 UT_ATTACH_ANIM인 장비에만 붙일 수 있는 것으로 가정하고 만들었습니다. 그외 다른 장비에는 작동 안함
 void CX2Eqip::LoadAttached()
 {
+#ifdef SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
+#if !defined( SUB_EQUIP_TEST ) || !defined( ATTACH_SKINMESH ) || !defined( EQUIP_ATTACHED_PARTICLE_TEST ) || !defined( X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING ) || !defined( SERV_IRUHADEV_JUNE_ITEM_KIM ) || !defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP ) || !defined( SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET ) || !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW )
+#error SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED needs SUB_EQUIP_TEST, ATTACH_SKINMESH, EQUIP_ATTACHED_PARTICLE_TEST, X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING, SERV_IRUHADEV_JUNE_ITEM_KIM, _CUSTOM_RENDER_STATE_EQUIP, _EQUIP_EFFECT_SET, _ENUM_NAMES, _CHAR_EQUIP_VIEW
+#endif
+	// june-engine R14f: June 32961c80
+	if( true == m_bLoadedAttached )
+		return;
+	m_bLoadedAttached = true;
+
+	// an Add weapon attaches to each of its 8 slot anims, any other item to the first
+	const bool bEveryWeaponSlot = ( CX2Unit::UT_ADD == m_pItemTemplet->GetUnitType() && CX2Item::IT_WEAPON == m_pItemTemplet->GetItemType() );
+	const UINT uNumSlot = ( true == bEveryWeaponSlot ) ? CX2Item::MAX_MODEL_COUNT_A_ITEM : 1;
+	const int iItemID = m_pItemTemplet->GetItemID();
+	for( UINT uSlot = 0; uSlot < uNumSlot; ++uSlot )
+	{
+		UINT uNumMesh = m_pItemTemplet->GetNumAttachedMeshData();
+		const bool bSkinMesh = ( CX2Item::UT_SKIN == m_pItemTemplet->GetUseType() );
+		bool bJiggle = false;
+		// Rose's hand weapon reads its mesh list twice
+		if( CX2Unit::UT_ROSE == m_pItemTemplet->GetUnitType() && CX2Unit::EP_WEAPON_HAND == m_pItemTemplet->GetEqipPosition() )
+			uNumMesh *= 2;
+
+		for( UINT i = 0; i < uNumMesh; ++i )
+		{
+			const wchar_t* pwszMeshName = L"";
+			const wchar_t* pwszBoneName = L"";
+			m_pItemTemplet->GetAttachedMeshData( i % m_pItemTemplet->GetNumAttachedMeshData(), &pwszMeshName, &pwszBoneName, &bJiggle );
+
+			CKTDXDeviceXSkinMesh::MultiAnimFrame* pFrame = NULL;
+			if( true == bSkinMesh )
+			{
+				if( NULL == m_pUnitXSkinAnim )
+					continue;
+				pFrame = m_pUnitXSkinAnim->GetCloneFrame( pwszBoneName );
+			}
+			else
+			{
+				if( NULL == m_pNormalXSkinAnim[uSlot] )
+					continue;
+				pFrame = m_pNormalXSkinAnim[uSlot]->GetCloneFrame( pwszBoneName );
+				// a later mesh takes its own index's model; June reads past the 8 models ( JUNE_BUGS )
+				if( false == bEveryWeaponSlot && 0 < i && i < (UINT) CX2Item::MAX_MODEL_COUNT_A_ITEM && NULL != m_pNormalXSkinAnim[i] )
+					pFrame = m_pNormalXSkinAnim[i]->GetCloneFrame( pwszBoneName );
+			}
+			if( NULL == pFrame )
+				continue;
+
+			// stand-in: June 3295c130 copies a custom-render param from the DITT_CUSTOM_RENDER vectors ( +0x92c / +0x93c, Stage 11 ), empty here
+			const bool bAttachedSkinMesh = ( true == g_pData->GetItemManager()->IsDivisionItem( CX2ItemManager::DITT_ATTACHED_SKIN_MESH_FOR_ATTACH_ANIM, iItemID )
+				|| true == g_pData->GetItemManager()->IsDivisionItem( CX2ItemManager::DITT_ATTACHED_SKIN_MESH_FOR_ATTACH_ANIM_NO_DESTBLEND, iItemID ) );
+			CX2SubEquip* pSubEquip = CX2SubEquip::CreateSubEquip( &pFrame->combineMatrix, pwszMeshName, ( true == bAttachedSkinMesh || true == bSkinMesh ), m_pNormalTexChangeXET );
+			if( NULL == pSubEquip )
+				continue;
+			if( true == bJiggle )
+			{
+				pSubEquip->SetUnitXSkinAnim( m_pUnitXSkinAnim );
+				pSubEquip->SetJiggle( true, 3 );
+			}
+			m_vecpSubEquip.push_back( pSubEquip );
+			pSubEquip->SetManagerObject( this );
+			// June @32962094: a fixed viewer's equip ( chain byte clear ) draws its sub-equips itself
+			if( true == m_bAttachedInDGManagerChain )
+				g_pKTDXApp->GetDGManager()->AddObjectChain( pSubEquip );
+			pSubEquip->SetLayer( GetLayer() );
+
+			CKTDGXRenderer::RenderParam& normalParam = pSubEquip->GetNormalRenderParam();
+			CKTDGXRenderer::RenderParam* pRenderParam = NULL;
+			switch( iItemID )
+			{
+			case 41150:
+			case 81836:
+			case 81869:
+			case 81875:
+			case 81881:
+			case 81887:
+			case 81893:
+			case 81899:
+			case 81905:
+			case 88222:
+			case 88228:
+			case 88234:
+			case 88240:
+			case 88246:
+			case 88252:
+			case 88258:
+			case 88874:
+			case 181495:
+			case 181496:
+			case 185400:
+			case 272696:
+			case 276926:
+			case 276932:
+			case 287123:
+			case 287201:
+			case 287878:
+			case 100000683:
+			case 100000689:
+				{
+					pSubEquip->SetAlphaObject( true );
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+					normalParam.bAlphaBlend		= true;
+					normalParam.srcBlend		= D3DBLEND_SRCALPHA;
+					normalParam.destBlend		= D3DBLEND_DESTALPHA;
+					normalParam.cullMode		= D3DCULL_NONE;
+					normalParam.bZWriteEnable	= false;
+				} break;
+			case 274108:
+			case 274109:
+				{
+					pSubEquip->SetAlphaObject( true );
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+					normalParam.bAlphaBlend		= true;
+					normalParam.srcBlend		= D3DBLEND_SRCALPHA;
+					normalParam.destBlend		= D3DBLEND_INVSRCALPHA;
+					normalParam.cullMode		= D3DCULL_NONE;
+					normalParam.bZWriteEnable	= false;
+				} break;
+			case 82437:
+			case 85720:
+			case 88120:
+			case 131646:
+			case 131647:
+			case 131648:
+			case 131649:
+			case 131650:
+			case 132157:
+			case 132163:
+			case 132169:
+			case 132175:
+			case 132181:
+			case 180052:
+			case 183225:
+				{
+					pSubEquip->SetAlphaObject( true );
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+					normalParam.bAlphaBlend		= true;
+					normalParam.srcBlend		= D3DBLEND_SRCALPHA;
+					normalParam.destBlend		= D3DBLEND_INVSRCALPHA;
+					normalParam.bZWriteEnable	= false;
+				} break;
+			case 41829:
+				{
+					pSubEquip->SetAlphaObject( true );
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+					normalParam.bAlphaBlend		= true;
+					normalParam.srcBlend		= D3DBLEND_SRCALPHA;
+					normalParam.destBlend		= D3DBLEND_DESTALPHA;
+				} break;
+			case 41290:
+			case 42003:
+				{
+					pRenderParam = pSubEquip->GetRenderParam();
+					pSubEquip->SetAlphaObject( true );
+					if( NULL != pRenderParam )
+					{
+						pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+						pRenderParam->srcBlend		= D3DBLEND_SRCALPHA;
+						pRenderParam->destBlend		= D3DBLEND_DESTALPHA;
+						pRenderParam->bAlphaBlend	= true;
+						pRenderParam->bZWriteEnable	= false;
+						pRenderParam->cullMode		= D3DCULL_NONE;
+					}
+				} break;
+			case 82247:
+			case 82453:
+			case 82461:
+			case 82590:
+			case 88335:
+			case 88343:
+			case 88351:
+			case 88359:
+			case 88367:
+			case 88375:
+			case 88383:
+			case 88448:
+			case 88456:
+			case 88464:
+			case 88472:
+			case 88480:
+			case 88488:
+			case 88496:
+			case 88504:
+			case 88512:
+			case 88520:
+			case 88528:
+			case 88536:
+			case 88544:
+			case 88552:
+			case 88560:
+			case 88568:
+			case 88576:
+			case 88584:
+			case 88592:
+			case 88600:
+			case 88608:
+			case 132851:
+				{
+					pSubEquip->SetAlphaObject( true );
+					pRenderParam = pSubEquip->GetRenderParam();
+					if( NULL != pRenderParam )
+					{
+						pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+						pRenderParam->srcBlend		= D3DBLEND_SRCALPHA;
+						pRenderParam->destBlend		= D3DBLEND_DESTALPHA;
+						pRenderParam->bAlphaBlend	= true;
+						pRenderParam->bZWriteEnable	= false;
+					}
+				} break;
+			case 135638:
+				{
+					pRenderParam = pSubEquip->GetRenderParam();
+					pSubEquip->SetAlphaObject( true );
+					if( NULL != pRenderParam )
+					{
+						pRenderParam->bAlphaTestEnable	= true;
+						pRenderParam->renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+						pRenderParam->bAlphaBlend		= true;
+						pRenderParam->srcBlend			= D3DBLEND_SRCALPHA;
+						pRenderParam->destBlend			= D3DBLEND_INVSRCALPHA;
+					}
+				} break;
+			case 88414:
+			case 185696:
+				{
+					pSubEquip->SetAlphaObject( true );
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+					normalParam.bAlphaBlend		= true;
+					normalParam.bZWriteEnable	= false;
+					normalParam.srcBlend		= D3DBLEND_SRCALPHA;
+					normalParam.destBlend		= D3DBLEND_INVSRCALPHA;
+					normalParam.cullMode		= D3DCULL_NONE;
+				} break;
+			case 274113:
+			case 275384:
+				{
+					pRenderParam = pSubEquip->GetRenderParam();
+					pSubEquip->SetAlphaObject( true );
+					if( NULL != pRenderParam )
+					{
+						pRenderParam->bAlphaTestEnable	= true;
+						pRenderParam->renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+						pRenderParam->srcBlend			= D3DBLEND_SRCALPHA;
+						pRenderParam->destBlend			= D3DBLEND_INVSRCALPHA;
+						pRenderParam->bAlphaBlend		= true;
+						pRenderParam->bZWriteEnable		= false;
+						pRenderParam->cullMode			= D3DCULL_NONE;
+					}
+				} break;
+			case 280233:
+				{
+					pRenderParam = pSubEquip->GetRenderParam();
+					pSubEquip->SetAlphaObject( true );
+					if( NULL != pRenderParam )
+					{
+						pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+						pRenderParam->srcBlend		= D3DBLEND_SRCALPHA;
+						pRenderParam->destBlend		= D3DBLEND_DESTALPHA;
+						pRenderParam->cullMode		= D3DCULL_CW;
+						pRenderParam->bAlphaBlend	= true;
+						pRenderParam->bZWriteEnable	= false;
+					}
+				} break;
+			case 88615:
+			case 88623:
+			case 88631:
+			case 88639:
+			case 88647:
+			case 88655:
+			case 88663:
+			case 88671:
+			case 163733:
+			case 288000:
+				{
+					pSubEquip->SetAlphaObject( true );
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+					normalParam.bAlphaBlend		= true;
+					normalParam.cullMode		= D3DCULL_NONE;
+				} break;
+			case 67006491:
+			case 67006492:
+			case 67006494:
+			case 67006496:
+			case 67006497:
+			case 100003092:
+			case 100004874:
+			case 100004875:
+			case 100004877:
+			case 100004878:
+			case 100004880:
+			case 100004882:
+				{
+					pSubEquip->SetAlphaObject( true );
+					if( true == pSubEquip->GetIsSkinMesh() )
+					{
+						pRenderParam = pSubEquip->GetRenderParam();
+						if( NULL != pRenderParam )
+						{
+							pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+							pRenderParam->cullMode		= D3DCULL_NONE;
+							pRenderParam->bAlphaBlend	= true;
+							pRenderParam->bZWriteEnable	= false;
+						}
+					}
+					else
+					{
+						normalParam.bAlphaBlend		= true;
+						normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+						normalParam.cullMode		= D3DCULL_NONE;
+						normalParam.bZWriteEnable	= false;
+					}
+				} break;
+			case 100003637:
+			case 100003638:
+				{
+					pSubEquip->SetAlphaObject( true );
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+					normalParam.bAlphaBlend		= true;
+					normalParam.srcBlend		= D3DBLEND_SRCALPHA;
+					normalParam.destBlend		= D3DBLEND_DESTALPHA;
+					normalParam.bZEnable		= true;
+					normalParam.color			= D3DXCOLOR( 1.f, 1.f, 1.f, 0.3f );	// June 334c9a0c
+				} break;
+			case 130896:
+				{
+					normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+				} break;
+			default:
+				{
+					if( false == bAttachedSkinMesh )
+					{
+						pSubEquip->SetAlphaObject( true );
+						normalParam.renderType		= CKTDGXRenderer::RT_REAL_COLOR;
+						normalParam.bAlphaBlend		= true;
+						normalParam.srcBlend		= D3DBLEND_SRCALPHA;
+						normalParam.destBlend		= D3DBLEND_DESTALPHA;
+						break;
+					}
+
+					pRenderParam = pSubEquip->GetRenderParam();
+					// June @32962782 leaves LoadAttached here: the later sub-equips and the particles are skipped ( as March )
+					if( NULL == pRenderParam )
+						return;
+
+					switch( iItemID )
+					{
+					case 189025:
+					case 189027:
+					case 189037:
+					case 189039:
+					case 189045:
+					case 189047:
+					case 189053:
+					case 189055:
+					case 189061:
+					case 189063:
+					case 189069:
+					case 189071:
+					case 189077:
+					case 189079:
+					case 189085:
+					case 189087:
+					case 189093:
+					case 189095:
+					case 189101:
+					case 189103:
+					case 189109:
+					case 189111:
+					case 189117:
+					case 189119:
+					case 189125:
+					case 189127:
+						{
+							pSubEquip->SetAlphaObject( true );
+							pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+							pRenderParam->cullMode		= D3DCULL_NONE;
+							pRenderParam->destBlend		= D3DBLEND_INVSRCALPHA;
+							pRenderParam->srcBlend		= D3DBLEND_SRCALPHA;
+							pRenderParam->bAlphaBlend	= true;
+							pRenderParam->bZWriteEnable	= false;
+						} break;
+					case 88622:
+					case 88630:
+					case 88638:
+					case 88646:
+					case 88654:
+					case 88662:
+					case 88670:
+					case 88678:
+						{
+							pSubEquip->SetAlphaObject( true );
+							pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+							pRenderParam->cullMode		= D3DCULL_NONE;
+							pRenderParam->bAlphaBlend	= true;
+							pRenderParam->bZWriteEnable	= false;
+						} break;
+					case 82035:
+					case 82051:
+					case 89019:
+					case 89035:
+					case 184185:
+					case 184201:
+						{
+							pSubEquip->SetAlphaObject( true );
+							pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+							pRenderParam->bAlphaBlend	= true;
+						} break;
+					case 89351:
+					case 283073:
+					case 283080:
+						{
+							pSubEquip->SetAlphaObject( true );
+							pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+							pRenderParam->destBlend		= D3DBLEND_DESTALPHA;
+							pRenderParam->cullMode		= D3DCULL_NONE;
+							pRenderParam->srcBlend		= D3DBLEND_SRCALPHA;
+							pRenderParam->bAlphaBlend	= true;
+							pRenderParam->bZWriteEnable	= false;
+						} break;
+					case 284903:
+					case 284910:
+						{
+							pSubEquip->SetAlphaObject( true );
+							pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+							pRenderParam->srcBlend		= D3DBLEND_SRCALPHA;
+							pRenderParam->destBlend		= D3DBLEND_DESTALPHA;
+							pRenderParam->bAlphaBlend	= true;
+							pRenderParam->bZWriteEnable	= true;
+						} break;
+					case 295086:
+						{
+							pSubEquip->SetAlphaObject( true );
+							pRenderParam->renderType	= CKTDGXRenderer::RT_CARTOON_COLOR_EDGE;
+							pRenderParam->cullMode		= D3DCULL_CCW;
+							pRenderParam->destBlend		= D3DBLEND_INVSRCALPHA;
+							pRenderParam->srcBlend		= D3DBLEND_SRCALPHA;
+							pRenderParam->bAlphaBlend	= true;
+							pRenderParam->bZWriteEnable	= false;
+						} break;
+					default:
+						{
+							const bool bNoDestBlend = g_pData->GetItemManager()->IsDivisionItem( CX2ItemManager::DITT_ATTACHED_SKIN_MESH_FOR_ATTACH_ANIM_NO_DESTBLEND, iItemID );
+							pSubEquip->SetAlphaObject( true );
+							pRenderParam->renderType	= CKTDGXRenderer::RT_REAL_COLOR;
+							pRenderParam->cullMode		= D3DCULL_NONE;
+							pRenderParam->bAlphaBlend	= true;
+							pRenderParam->bZWriteEnable	= false;
+							if( false == bNoDestBlend )
+							{
+								pRenderParam->srcBlend	= D3DBLEND_SRCALPHA;
+								pRenderParam->destBlend	= D3DBLEND_DESTALPHA;
+							}
+						} break;
+					}
+				} break;
+			}
+			// june-engine R5b: June @32962937-32962958, what the switch left in the param becomes the sub-equip's default
+			pSubEquip->SetDefaultRenderParam( NULL != pSubEquip->GetRenderParam() ? pSubEquip->GetRenderParam() : &pSubEquip->GetNormalRenderParam() );
+		}
+	}
+
+	switch( m_EqipPos )
+	{
+	case CX2Unit::EP_WEAPON_HAND:
+	case CX2Unit::EP_DEFENCE_BODY:
+	case CX2Unit::EP_AC_TITLE:
+	case CX2Unit::EP_AC_HAIR:
+	case CX2Unit::EP_AC_FACE1:
+	case CX2Unit::EP_AC_FACE2:
+	case CX2Unit::EP_AC_FACE3:
+	case CX2Unit::EP_AC_BODY:
+	case CX2Unit::EP_AC_LEG:
+	case CX2Unit::EP_AC_ARM:
+	case CX2Unit::EP_AC_RING:
+	case CX2Unit::EP_AC_NECKLESS:
+	case CX2Unit::EP_AC_WEAPON:
+	case CX2Unit::EP_AC_TEMP2:	// June EP_AC_MINIME
+	case CX2Unit::EP_AC_TEMP3:	// June EP_AC_EARRING
+		{
+			if( NULL == m_pItemTemplet )
+				break;
+
+			UINT uNumParticle = m_pItemTemplet->GetNumAttachedParticleData();
+			if( CX2Unit::UT_ROSE == m_pItemTemplet->GetUnitType() && CX2Unit::EP_WEAPON_HAND == m_pItemTemplet->GetEqipPosition() )
+				uNumParticle *= 2;
+			for( UINT j = 0; j < uNumParticle; ++j )
+			{
+				const wchar_t* pwszParticleName = L"";
+				const wchar_t* pwszBoneName = L"";
+				m_pItemTemplet->GetAttachedParticleData( j % m_pItemTemplet->GetNumAttachedParticleData(), &pwszParticleName, &pwszBoneName );
+				AttachParticle( true, pwszParticleName, pwszBoneName, D3DXVECTOR3( 0, 0, 0 ) );	// stand-in: June 32960ad0 is R6c's
+			}
+			// stand-in: June 32960ad0 takes an unchained equip's particles out of the DG chain ( R6c ); the fixed draw still draws them
+			if( false == m_bAttachedInDGManagerChain )
+				m_AttachedParticleGroup.SetShowObject( false );
+
+			// a Lu / Ciel item shown on the other body hides its particles
+			if( NULL != m_pOwnerUnit && NULL != m_pOwnerUnit->GetUnitTemplet() && CX2Unit::UT_LUCIEL == m_pOwnerUnit->GetUnitTemplet()->m_UnitType
+				&& 0 < m_ItemUID && m_pItemTemplet->GetIsForMinorUnit() != m_bMinorUnitEquip && CX2Item::UC_ANYONE != m_pItemTemplet->GetUseCondition() )
+				m_AttachedParticleGroup.SetShowObject( false );	// stand-in: June 3295bf90( false, -1 ) is R6c's group
+		} break;
+	default:
+		break;
+	}
+#else SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 	if( true == m_bLoadedAttached )
 		return; 
 
@@ -4182,6 +4686,7 @@ void CX2Eqip::LoadAttached()
 
 
 	
+#endif SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED
 }
 
 
@@ -4448,6 +4953,10 @@ void CX2Eqip::LoadAttached()
 
 void CX2Eqip::SetFixed()
 {
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED
+	// june-engine R14f: June 3295a560
+	m_bFixed = true;
+#else SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED
 	m_bFixed = true;
 
 #ifdef SUB_EQUIP_TEST
@@ -4485,6 +4994,7 @@ void CX2Eqip::SetFixed()
 	}
 
 #endif EQUIP_ATTACHED_PARTICLE_TEST
+#endif SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED
 }
 
 /** @function : ChangeAnim
