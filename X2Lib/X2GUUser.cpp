@@ -26047,7 +26047,7 @@ void CX2GUUser::StateChangeToTransformSkill()
 		return;
 
 	const CX2SkillTree::SKILL_ID eSkillID = m_pTransformSkillSlotUI->GetSlotSkillID( static_cast<UINT>( m_pTransformSkillSlotUI->GetSelectedSlot() ) );
-	StateChange( GetTransformedSkillStateID( eSkillID ), false );
+	CX2GUUser::StateChange( GetTransformedSkillStateID( eSkillID ), false );	// char-luciel CH2d3: June 32039dc0 calls the base, not Lu/Ciel's form mapper
 }
 
 // char-luciel CH1a0: June 31fd0440, the shown row's fourth slot key ( C, or R on the swapped row )

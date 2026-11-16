@@ -71,3 +71,11 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   ( `Motion_Ciel_LDN_Evil.X`, anim `Wait`, `EffectSet_LDN_Ciel_Horn` ), for BTI 763 or 764. Your Transcendence start state ( `32b43b10` ) only applies the buff and the window,
   as CH2d2's Altar of Evil start does; the form's end goes through `EndTransformedForm( 1, ... )` from your end state. The transform window's key labels and A / B type
   follow the skill tree ( CH2d3's `UpdateTransformSkillSlotString` / `SetTransformSkillUIType` hooks ).
+
+## Amended by char-luciel CH2d3 fix (2026-11-16): form states call the base StateChange
+
+- **Every transform-form state function calls `CX2GUUser::StateChange` where June calls `320348c0` / `32034c00` directly**, never the bare `StateChange` ( Lu/Ciel's override
+  `32b4db90` sends any id through `GetStateIDByForm`, which turns every id it does not list into the form's WAIT while transformed: Lu's form was stuck in WAIT, CH2d3 play-test ).
+  June's direct sites in the Transcendence form ( `june2017_re/char_luciel/` has no table; regenerate with the CH2d3 Done note's method ): `32ae95a0`, `32b059a0`-`32b07eb0`,
+  `32b13730`, `32b13860`, `32b15290`, `32b33480`, `32b336a0`, `32b338c0`, `32b33bf0`. Common ids ( `LSI_LU_*` ) stay on the virtual call, as June. Tag each such line
+  `// char-luciel <phase>: June calls the base, not the form mapper`.

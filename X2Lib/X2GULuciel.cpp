@@ -10947,6 +10947,23 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 /*virtual*/ void CX2GULuciel::CommonFrameMove()
 {
 	CX2GUUser::CommonFrameMove();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	if ( true == IsMyUnit() && ( true == IsTransformed( CX2Unit::DT_MAJOR ) || true == IsTransformed( CX2Unit::DT_MINOR ) ) )	// char-luciel CH2d3: once a second while transformed
+	{
+		static DWORD s_dwTransformTraceTime = 0;
+		const DWORD dwNowTime = timeGetTime();
+		if ( dwNowTime - s_dwTransformTraceTime > 1000 )
+		{
+			s_dwTransformTraceTime = dwNowTime;
+			CKTDGXSkinAnim* pFutureAnim = GetXSkinAnimFuture();
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL transform trace now %d future %d fanim %s t %.2f end %d nanim %s input L%d R%d Z%d pos %.0f,%.0f speed %.1f foot %d",
+				GetNowStateID(), GetFutureStateID(), ( NULL != pFutureAnim ? pFutureAnim->GetNowAnimName().c_str() : L"-" ), ( NULL != pFutureAnim ? pFutureAnim->GetNowAnimationTime() : -1.f ),
+				static_cast<int>( NULL != pFutureAnim && true == pFutureAnim->IsAnimationEnd() ), ( NULL != GetXSkinAnimPtr().get() ? GetXSkinAnimPtr()->GetNowAnimName().c_str() : L"-" ),
+				static_cast<int>( m_InputData.pureLeft ), static_cast<int>( m_InputData.pureRight ), static_cast<int>( m_InputData.oneZ ),
+				m_FrameDataNow.syncData.position.x, m_FrameDataNow.syncData.position.y, m_PhysicParam.nowSpeed.x, static_cast<int>( m_FrameDataFuture.unitCondition.bFootOnLine ) );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 
 	FrameMoveChaserOfDarknessEffect();
 
@@ -11900,7 +11917,7 @@ void CX2GULuciel::FrameMoveAltarOfEvilEnd()
 	if ( true == IsMyUnit() && false == m_InputData.pureX )
 	{
 		SetNoDetonationByState( false );
-		StateChange( STATE_ID_ALTAR_OF_EVIL_UNNAMED, false );
+		CX2GUUser::StateChange( STATE_ID_ALTAR_OF_EVIL_UNNAMED, false );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else
 	{
@@ -17258,7 +17275,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_START_EventProcess()
 {
 	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 
 	CommonEventProcess();
@@ -17270,13 +17287,13 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP_EventProcess()
 	if ( 0.f < m_PhysicParam.nowSpeed.y )
 	{
 		if ( true == m_InputData.oneZ )
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z );	// char-luciel CH2d3: June calls the base, not the form mapper
 		else if ( true == m_InputData.oneX )
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 
 	CommonEventProcess();
@@ -17286,11 +17303,11 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP_EventProcess()
 void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN_EventProcess()
 {
 	if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );	// char-luciel CH2d3: June calls the base, not the form mapper
 	else if ( true == m_InputData.oneZ )
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z );	// char-luciel CH2d3: June calls the base, not the form mapper
 	else if ( true == m_InputData.oneX )
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X );	// char-luciel CH2d3: June calls the base, not the form mapper
 
 	CommonEventProcess();
 }
@@ -17300,7 +17317,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X_EventProcess()
 {
 	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
@@ -17308,11 +17325,11 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X_EventProcess()
 		{
 			if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
 				m_fCanNotJumpTime = ALTAR_OF_EVIL_JUMP_X_CAN_NOT_JUMP_TIME;
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );	// char-luciel CH2d3: June calls the base, not the form mapper
 		}
 		else
 		{
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		}
 	}
 
@@ -17324,16 +17341,16 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZ )
 	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
@@ -17350,16 +17367,16 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZ_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZ )
 	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
@@ -17376,16 +17393,16 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZ_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneZ, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZZ )
 	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
@@ -17402,17 +17419,17 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_ZZZZ_EventProcess()
 {
 	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
 		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
 		{
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 		}
 		else
 		{
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
 		}
 	}
@@ -17430,16 +17447,16 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XX )
 	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
@@ -17456,16 +17473,16 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XX_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange, m_InputData.oneX, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY )
 	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
@@ -17482,14 +17499,14 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_EventProces
 {
 	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
 		if ( true == m_InputData.pureX )
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 		else
-			StateChange( ALTAR_OF_EVIL_COMBO_XXX_END_SECOND_STATE_ID );
+			CX2GUUser::StateChange( ALTAR_OF_EVIL_COMBO_XXX_END_SECOND_STATE_ID );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 
 	CommonEventProcess();
@@ -17500,11 +17517,11 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_READY_SECOND_Even
 {
 	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( ALTAR_OF_EVIL_COMBO_XXX_END_SECOND_STATE_ID );
+		CX2GUUser::StateChange( ALTAR_OF_EVIL_COMBO_XXX_END_SECOND_STATE_ID );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 
 	CommonEventProcess();
@@ -17515,16 +17532,16 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_XXX_END_EventProcess(
 {
 	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
 	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
@@ -17840,20 +17857,20 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneZ )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneX )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == CheckTransformSkillSlotKey() )
 	{
@@ -17861,7 +17878,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT_EventProcess()
 	}
 	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.pureDoubleRight || true == m_InputData.pureDoubleLeft )
 	{
@@ -17869,7 +17886,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT_EventProcess()
 	}
 	else if ( true == m_InputData.pureUp )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
 		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
 	}
@@ -17877,7 +17894,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT_EventProcess()
 	else if ( true == m_InputData.oneDown
 		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
 
@@ -17889,24 +17906,24 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( false == m_InputData.pureRight && false == m_InputData.pureLeft )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneZ )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_Z );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneX )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_COMBO_X );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == CheckTransformSkillSlotKey() )
 	{
@@ -17919,14 +17936,14 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK_EventProcess()
 	ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE( LSI_LU_HYPER_MODE )
 	else if ( true == m_InputData.pureUp )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
 		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
 	}
 	else if ( true == m_InputData.oneDown
 		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
 
@@ -17938,22 +17955,22 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneZ )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
 		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
 	}
 	else if ( true == m_InputData.oneX )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_X );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
 		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
 	}
@@ -17963,7 +17980,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY_EventProcess()
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() || true == m_InputData.pureRight || true == m_InputData.pureLeft )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_UP );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
 		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
 	}
@@ -17976,13 +17993,13 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_Z_EventProcess()
 {
 	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
 		if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
 			m_fCanNotJumpTime = ALTAR_OF_EVIL_JUMP_X_CAN_NOT_JUMP_TIME;
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( ( true == m_InputData.pureRight && true == m_FrameDataFuture.syncData.bIsRight )
 		|| ( true == m_InputData.pureLeft && false == m_FrameDataFuture.syncData.bIsRight ) )
@@ -17998,36 +18015,36 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_LANDING_EventProcess()
 {
 	if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
 	else if ( false == HaveThisBuff( BTI_BUFF_ALTAR_OF_EVIL ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.pureRight || true == m_InputData.pureLeft )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WALK );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.pureUp )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_READY );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_PhysicParam.nowSpeed.y = GetJumpSpeed();
 		m_FrameDataFuture.syncData.position.y += LINE_RADIUS;
 	}
 	else if ( true == m_InputData.oneDown
 		&& true == g_pX2Game->GetWorld()->GetLineMap()->CanDown( m_FrameDataFuture.syncData.position, LINE_RADIUS, &m_FrameDataFuture.unitCondition.landPosition, &m_FrameDataFuture.syncData.lastTouchLineIndex ) )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS * 1.5f;
 	}
 	ELSE_IF_KEY_PRESSED_AT_SKIP_POINT_ZXCAS
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 
 	CommonEventProcess();
@@ -18043,7 +18060,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_EventProcess()
 	}
 	else if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneZ )
 	{
@@ -18089,7 +18106,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END_EventProcess()
 	}
 	else if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneZ )
 	{
@@ -18139,7 +18156,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_EventProcess()
 	{
 		if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
 		{
-			StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+			CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 		}
 		else
 		{
@@ -18203,7 +18220,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING_EventProc
 	}
 	else if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) || true == IsFourthSkillSlotKeyPressedOnce() )
 	{
-		StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	else if ( true == m_InputData.oneZ )
 	{
@@ -18408,9 +18425,9 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DEATH_TOUCH_EventProcess()
 	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
 	{
 		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_WAIT );	// char-luciel CH2d3: June calls the base, not the form mapper
 		else
-			StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );
+			CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_JUMP_DOWN );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
 	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
@@ -18426,7 +18443,7 @@ void CX2GULuciel::LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END_EventProcess()
 {
 	if ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() )
 	{
-		StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_END );
+		CX2GUUser::StateChange( LSI_SA_LDB_ALTAR_OF_EVIL_END );	// char-luciel CH2d3: June calls the base, not the form mapper
 	}
 
 	CommonEventProcess();

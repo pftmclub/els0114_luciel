@@ -4146,6 +4146,15 @@ funcmap `grep "(CH2d3)"` ( 6 rows ). Review: `CH2d2-review.md` ( covers CH2d, CH
   `X2UISkillTreeNew.cpp`: 0 errors each.
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,077,120 B, dated 2026-11-16 06:18:49, md5 383991cd4b67a71ea6192b711738a34f, equal to X2/US_SERVICE/x2.exe (2026-11-16 06:18:43); built at main f7d74f91 + 7 uncommitted code file(s)`
   ( peers' `Always.h` / `X2GameUnit.cpp` / `X2UnitViewerUI.h` built in ). `EXESTR OK: 3 of 3` wide ( the start debug line, `EffectSet_LDB_Lu_Horn`, `EVIL_Ru_Wait` ).
+- **Play-test 1 ( 2026-11-16 07:32, user: demon model on, Lu frozen, Z / A / C do nothing ) and fix:** the `transform trace` line ( `_SKILL_DEBUG`, once a second while
+  transformed, `CX2GULuciel::CommonFrameMove` ) showed START -> WAIT ( 424 ) working and the wait anim running, but each key press re-entered WAIT. Cause: Lu/Ciel's
+  `StateChange` override ( `32b4db90` / `32b4dbb0` ) sends every id through `GetStateIDByForm` `32aeb450`, which while transformed maps any id it does not list ( every
+  form state's own id ) to the form's WAIT. June's form states call the base `320348c0` / `32034c00` directly (115 direct sites in the class, all in form functions, the two
+  overrides and `FrameMoveAltarOfEvilEnd` `32b35c60`; the only virtual call with a form id is the cast state's move to the form start, `32b02d80`, made untransformed, kept).
+  72 lines in `X2GULuciel.cpp` ( 25 CH2d / CH2d2 functions + `32b35c60` ) and `CX2GUUser::StateChangeToTransformSkill` ( `32039dc0`, the linked skills A / S / D ) now call
+  `CX2GUUser::StateChange`, each tagged. Kickoffs `CH3c.md` / `CH3c2.md` amended ( Ciel's form functions, same rule ). Gates ( `finish.py --files` both, `--with` `_CORE`
+  `_SKILL` `TRANSFORM_LINK` `_SKILL_DEBUG` ): PASS, 73 deleted lines = the 73 replaced calls. `DEPLOY OK: X2_offline.exe is 27,078,144 B, dated 2026-11-16 07:40:27,
+  md5 6c73c32629bf335a1ab8a6f83ffad842` ( main 306a6b95 + 3 uncommitted ); `EXESTR OK: 1 of 1` ( the trace line ).
 - **How to see it in game:** the hand-off in the closing message ( `LuDbA` / `LuDbB`, keys S and W, the form's end on key C and at the buff's end ). Logs:
   `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
 
