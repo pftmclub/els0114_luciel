@@ -14,8 +14,8 @@ Backlog Stage 33 (`JUNE_PORT_BACKLOG_ORDER.md`, "Stage 33: June damage and chara
 - **Two tracks.**
   - **Damage track (D0-D6): runs now.** It is a playability fault on a reachable path, so the scope rule lets it run ahead of the
     character ports. D1 is the fix for the 0-damage monsters and depends on nothing.
-  - **Stat-sheet and resource track (S0-S4, R1): code after the character ports** (Stages 7 and 8; user, 2026-10-27), so every
-    character's numbers are tested on June's formulas at once. Its map phase S0 is read-only and can run any time.
+  - **Stat-sheet and resource track (S0-S4, R1): no longer waits for the character ports** (user, 2026-11-16; it was "after Stages 7 and 8", 2026-10-27).
+    Character ports in flight are not a dependency; the one-at-a-time file rule still applies. Its map phase S0 is read-only and can run any time.
 - **`GetFinalDamage` is the model of the problem.** March's body (`X2GameUnit.cpp:2705-3999`) carries 16 `SERV_IRUHADEV_` flags from
   several plans (buff, socket parity, enchant parity, effect C2-C10, skill memo, character hooks). Each added one June block. No phase ever
   compared the whole function with June's. NPC `DamageReact` carries 23.
