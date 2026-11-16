@@ -251,11 +251,10 @@ Done: DU5d2 + review (2026-11-16, equip tint by body, June SetFixed, emotion end
 ## field-rewards - offline EXP / ED / drop rows for June-only dungeons and fields (stand-in)
 Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]` (`offline_server.log`) - flags `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` (+ `_DEBUG`) - kickoffs `kickoffs/field-rewards/` - backlog Stage 23 - created 2026-11-12 (user: drop table from item.kim + the dungeon entry lists, fair rates).
 
-**Scope:** generated, labelled rows for Lanox (18 dungeon keys, 4 fields), Elysion (21 keys, 3 fields), 3 secret dungeons, June-only monsters in old dungeons (was june-dungeons C3z-2b) and, once registered, heroic dungeons. Rates copied from the studio's Sander rows; boss items from each dungeon's `BOSS_DROP_ITEM`. The user packs `DropTable.lua` / `StaticDropTable.lua` after each rows phase. R3-R6 edit the same generated block: one at a time.
+**Scope:** generated, labelled rows for Lanox (18 dungeon keys, 4 fields), Elysion (21 keys, 3 fields), 3 secret dungeons, June-only monsters in old dungeons (was june-dungeons C3z-2b) and, once registered, heroic dungeons. Rates copied from the studio's Sander rows; boss items from each dungeon's `BOSS_DROP_ITEM`. Each rows phase stages, packs and copies `DropTable.lua` / `StaticDropTable.lua` itself (server-Lua rule, 2026-11-15). R3-R6 edit the same generated block: one at a time.
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| R2 | done 2026-11-16 (loader flag, `gen` / `check`, probe only, no build); review ready; owes nothing but the review | Sonnet 5.5 / high; review Opus 5.5 / medium | R0 | `X2OfflineDropTable.*`, `Handlers_Room.cpp`, Always.h, `tools/droptable.py` | `R2.md`, review `R2-review.md` |
 | R3 | ready (R1 done: its files are `gen`'s columns, no adapter; R2 reviewed): Lanox rows, stage + pack + copy, first full build + play-test | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` (you pack) | `R3.md` |
 | R4 | blocked (R3): Elysion rows + play-test | Sonnet 5.5 / medium | R3 | same two server Lua files | `R4.md` |
 | R5 | blocked (R3): secret dungeon rows + play-test | Sonnet 5.5 / high | R1, R3 | same two server Lua files | `R5.md` |
@@ -263,7 +262,7 @@ Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]
 | R7 | blocked (heroic dungeons are not registered in the live `DungeonData.lua` yet: june-dungeons) | Opus 5.5 / high | june-dungeons heroic rows, R5 | sheets + the two server Lua files | `R7.md` |
 | Z | blocked (R6 review): close | Sonnet 5.5 / medium | R6 review | `MODS.md`, backlog, `tools/README.md` | `Z.md` |
 
-Done: R0 (2026-11-16, `droptable.py census`: 12,090 rows, 282 dungeons + 34 fields, 0 unknown roles; 41270's 5 rows are Halloween event monsters, R5 covers 41270; 676 gap rows in 61 keys for R6; no build), R1 (2026-11-16, pools 639 rows + rate sheet 577 lines in `gen`'s columns, every rate from its studio row; 6 decisions answered by the user; per-role simulate gate; no build).
+Done: R0 (2026-11-16, `droptable.py census`: 12,090 rows, 282 dungeons + 34 fields, 0 unknown roles; 41270's 5 rows are Halloween event monsters, R5 covers 41270; 676 gap rows in 61 keys for R6; no build), R1 (2026-11-16, pools 639 rows + rate sheet 577 lines in `gen`'s columns, every rate from its studio row; 6 decisions answered by the user; per-role simulate gate; no build), R2 + review (2026-11-16, loader flag + `gen` / `check`; review: pass, no code change; `gen` + `check` PASS on R1's real files; S2 hunk swept into `c3b7e545`, inert).
 
 ## june-stat-calc - June damage and character stat calculation
 Plan `JUNE_STAT_CALC_PHASES.md` - branch `main` - log tag `[JUNE_STATCALC]` (`offline_server.log`) - flags `SERV_IRUHADEV_JUNE_STATCALC_*` (`_DEFENCE_CURVE`, `_FINAL_DAMAGE`, `_HIT_PIPELINE`, `_DAMAGE_REACT`, `_EXTRA_DAMAGE`, `_UNIT_STAT`, `_HIT_DODGE`, `_EQUIP_STAT`, `_SOCKET`, `_BUFF_FACTOR`, `_RESOURCE`, `_MP_COST`, + `_DEBUG`) - kickoffs `kickoffs/june-stat-calc/` - map `june2017_re/statcalc/statcalc_map.tsv` - backlog Stage 33 - created 2026-11-12.

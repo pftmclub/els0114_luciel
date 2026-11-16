@@ -384,6 +384,39 @@ card; Exp / ED / EDProperty are lines of pool `exp` / `ed` / `edproperty`). `gen
 any other shape, so nothing is misread. Whoever commits second reconciles in `gen_inputs` / `gen_blocks` (one adapter, the group / tier / card rules R1 settles are
 not guessed here); R3 cannot run `gen --only lanox` before that, and the sheet needs `static` lines. Review: `kickoffs/field-rewards/R2-review.md` (Opus 5.5 / medium).
 
+### Phase R2 -- Review (2026-11-16)
+
+**Verdict: pass, no code change.** Commit reviewed: `c3b7e545`.
+- **Flag-off = the studio's table.** Every client hunk is insert-only under `#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN` (`X2OfflineDropTable.cpp/.h`: the
+  global, the two `StandIn` reads, `m_bStandIn`, the counters, the summary line, `IsStandInRow`) or `_DEBUG` (`Handlers_Room.cpp`: the namespace, the counter
+  reset / set, the kill line). With the define commented out nothing is published, no field is read, no line is written. The Lua side of rule 7 (nil global
+  skips the block, studio counts exact) is R2's LuaJIT stub proof; nothing in the client changes it.
+- **`DROP_STANDIN`** is `lua_pushnumber( 1 )` + `lua_setglobal`, after the binder `decl` and before `RunScript( SCRIPT_NPC_EXP / DROP_TABLE )` and the later
+  `SCRIPT_STATIC_DROP`: one state, published before both files.
+- **Counters.** `StandIn` is read in `ReadDropBlock` and `ReadStaticBlock`; both stand-in counters sit after the real `++m_iMonsterRows` / `++m_iStaticRows`, so
+  every early return (bad key, no reward of any kind, disabled block) counts nothing. Static rows are last-wins in the loader (`mapTarget[ iKey ] =`); a stand-in key
+  equal to a studio key is what `check` refuses, so "a static row that loses to a studio key" cannot reach the loader. Groups are counted by id in 20000-20999 only.
+  `IsStandInRow` looks up the same specific-then-0 order as `GetNpcReward`. The kill line's throttle is one per second per NPC id; the item count is reset before
+  `PushNpcDrop` and set after `GetNpcItemDrop`.
+- **Generator vs Rules 1-8.** Read in `gen_blocks` / `cmd_check`: studio pairs and static keys are taken from the server text with the block cut out and skipped,
+  group ids numbered from 20000 and checked inside 20000-20999, block ASCII-checked, BOM and CRLF kept, no `.lua` created, a role with no `param` line is a
+  WARNING with no row.
+- **R1's files vs `gen`: closed, no adapter.** R1 (done, not yet committed at review time) wrote `drop_item_pools.tsv` (639 rows) and `drop_rate_sheet.tsv` (577
+  lines) in `gen`'s own columns. Re-run on them: `gen --only lanox --dry-run --out-dir <scratch>` -> `174 dungeon row(s) over 18 key(s), 33 field row(s) over 4
+  field(s), 22 static row(s), 28 group(s)`, studio pairs left alone 0, mixed-role NPCs 6; `check` on that output `CHECK rows 207, static rows 22, groups in block 28
+  ... RESULT: PASS`; negative (one group id 20000 -> 21000): `RESULT: FAIL (2)` (block differs, id outside range). Server files untouched.
+- **Swept-in peer hunk (finding, no action).** `c3b7e545` carries june-stat-calc S2's `#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT` hunk in `Handlers_Room.cpp`
+  (`MakeRoomUserInfo`, the 4-argument `AddEquippedWeaponRange`). At `c3b7e545` that flag is not defined, so the committed tree takes the `#else` (March's 3-argument
+  call) and compiles; S2's commit (`Always.h` define + `X2OfflineInventory.*`) completes it. S2's range gate will not see that hunk: its review reads it here.
+
+**Hygiene.** `finish.py --review --commits c3b7e545 --with ...DROP_STANDIN ...DROP_STANDIN_DEBUG -v`: flagcheck `OFFLINE_DROP_STANDIN` PASS (3 PASS~ blank / marker
+only, 1 DEFINE, 0 OTHER, 0 deleted lines, 0 non-ASCII, 0 EOL mismatch); `junediverge --check` `RESULT: PASS`; enumscan exit 0; INFO line = S2's / the enclosing
+`OFFLINE` / `OFFLINE_MONSTER_GRADE` flags. `junediverge --check-all` `RESULT: FAIL, 1 hit`: `X2Lib/X2Item.cpp:272 IsSocketStatInGame GT_PVP`, a peer's uncommitted
+june-stat-calc S2 edit (not in `HEAD`), not this phase's; S2 owns it. `flagcheck ..._DEBUG --range c3b7e545^..c3b7e545` `RESULT: PASS` (4 OTHER = the
+`DROP_STANDIN` / `OFFLINE` lines of the same commit, 0 deleted). stateends / skillicons / luabind not applicable. Build skipped: no code change, no play-test.
+
+**R3 kickoff amended:** the server-Lua rule of 2026-11-15 (R3 stages, packs and copies `DropTable.lua` / `StaticDropTable.lua` itself) and R1's files committed first.
+
 ## Phase R3 - Lanox: six dungeons and four fields
 
 **Scope.** `gen --only lanox`: keys 33270-33322 (18), fields 40029-40032, their static rows and groups. `check` and `simulate` every
