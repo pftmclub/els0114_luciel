@@ -877,6 +877,11 @@ which this stage widens). Lu/Ciel, Rose and Ain rows stay inert until Stage 8, a
   `EmotionFrameMove`'s jump-table case `3204af38` (table `3204b474`) tests the active anim's end (`@3204af53` / `@3204af74`). `CommonStateStart`
   `@32060bb3` sets the active anim's `+0x2b4` unless `IsAvatarEmotion( m_ePlayedEmotion )` (June's data-driven `3234cb00`). All read `GetXSkinAnimPtr()`.
 
+- **The unit viewer's PlayEmotion by body** (char-luciel DU5d2, 2026-11-16). June's viewer PlayEmotion (`31fa52b0`) runs the per-body EmotionData
+  test `32351900` for Lu (`+0x1e8`) and Ciel (`+0xd7c`), mixes each body's avatar motion (`32351070`, flags `+0xe71`), plays each body on its own
+  (`31fa4c00`, which sets `+0xe5c`), and sets `+0xe60` (`m_bEmotionOnBackUnitOnly`, `@31fa5c30`) when only the back body passed. DU5d2 ported the
+  flag's reader (`31fa64f0`'s body pick) and its clears; the setter waits for this stage (stand-in comment in `CX2UnitViewerUI::PlayEmotion`).
+
 ### Stage 11: division item templets (june-effect C9f, 2026-10-07)
 
 Found by june-effect C9f (`JUNE2017_EFFECT_COMPLETION_PHASES.md`, "C9f - Done"; funcmap rows `Effect C9f`). June's
@@ -897,6 +902,10 @@ that an unowned June system gets its own stage. What it covers:
 - **R14b (june-engine, 2026-10-18) consumers waiting on this stage:** `InitAttatchAnim` `3295dfa0` jiggles normal and hyper attach anims for `DITT_ITEM_ID_JIGGLE_TYPE1` (30) items (ported; June moved March's `ITEM_ID_JIGGLE_TYPE1` ids into `RenderDivisionItemTemplet.lua`, so those items do not jiggle until this stage fills group 30), and for `DITT_LOOP_ANIM_ITEM_ID` (72) items looks up the record (item manager `32807e00`, map +0x2c0) and changes every attach anim to its anim name (`3295a570`), setting eqip +0x15f0 = 1 (not ported, comment at its site, `SERV_IRUHADEV_JUNE_EQIP_ATTACH_ANIM`). **june-engine R14d (2026-11-15):** June's `CX2Eqip::OnFrameMove` `32964ae0` @`32965510` then switches the loop anim by +0x15f0 (1 / 4 -> `3295c960( 1 )`; 2 / 3 -> the record's anim and +0x15f0 = 3) when the normal anim's +0x2ac is set; a stand-in comment sits at that line under `SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE` (`3295c960` is the DITT 72 record anim chooser, 4 cases).
 - **june-march-divergence D1-3d (2026-10-29) ported part of this stage:** the default-chain parser `32814170` (every type but 55 / 85 / 89-93; `m_eItemID` and `m_eItemID_INT`, plus Cobo clones) and the Cobo pair binding `3280b550` with `CoboRenderDivisionItemTemplet.lua` (flag `SERV_IRUHADEV_JUNE_DIVERGE_DIVISION_ITEM_GROUP`). Every group in `RenderDivisionItemTemplet.lua` now fills, so R14's `_UpdateSkin` groups 6 / 0x31 / 0x36 / 7 and R14b's jiggle group 30 are live. Still this stage's: `DivisionItemTemplet.lua`, the 55 / 85 / 89-93 parsers and the other four chain parsers, and the reader of D1-3d's SD one-piece flag (user `+0x8fc0`, `CX2GUUser::m_bSDOnePieceAvatar`): June's head-bone vslot `31fdc070` (and Ain's `32a51670`) take `Bip01_Spine1` instead of `Bip01_Head` for an SD one-piece avatar.
 - **R14f (june-engine, 2026-11-16) consumers waiting on this stage:** `CX2Eqip::LoadAttached` `32961c80` reads the eqip's custom-render vectors (`+0x92c` / `+0x93c`, item manager `32810450` = `DITT_CUSTOM_RENDER` 55) through `3295c130` per attached mesh: an entry forces a skin sub-equip and replaces the item switch with `32f08e60` (stand-in at its site: no entry, so neither happens). Groups 29 / 83 (`DITT_ATTACHED_SKIN_MESH_FOR_ATTACH_ANIM` / `_NO_DESTBLEND`) are already filled by D1-3d's default-chain parser, so June's skin test there is live; no group R14f reads is left empty except type 55.
+
+- **The equip's back-body tint flag** (char-luciel DU5d2, 2026-11-16). `CX2Eqip::m_bBackUnitTint` (June `+0x190`, written by `31f93920`) is read
+  only by `3295b430`, the custom render copy (colour forced to 0.3 x 4, `334c9a0c`), from `SetRenderParam` `32963c80` (the `3295f800` custom-render
+  test) and `3295c460` (type 6). Port that read with the custom-render vectors.
 
 **Already ported:** the CEPE slice (type 81), by june-effect C9f-2: the binding, the dispatcher shell, parser `32814da0`, the two maps and
 the three play sites. This stage adds parsers and consumers to that shell; it does not re-bind.
@@ -960,6 +969,11 @@ rule that an unowned June system gets its own stage. What it covers:
 
 - **The unit viewer's customize pass by body** (found by char-luciel DU5b, 2026-11-16). `31faa150` re-applies the unit's customize map ( CX2Unit `+0xa44`, keys 7 / 8 / 13 / 14 ) for the viewer's shown body ( `+0xd80` ), and `3291d360` (window: `31faa150`, `PlayByMotionType( UVUMT_WAIT )`, `ResetStat( 0 )`; callers `31f1ed70`, `31f23850`, `32400370`) refreshes it; the form NOT ( `323acfb0` ) also reloads the customized lobby motions ( `31fa8230` ) and plays the custom WAIT ( `31fa5c90( 0 )` ), and the cash shop's Lu/Ciel try-on form ( `+0x360` / `+0x364`, read by the viewer's `SetUnit @31faaf04` ) belongs with the try-on preview. DU5b left stand-in lines at each site.
 - **The customize entries' body filter** (found by char-luciel CH4c, 2026-11-16). Four June readers keep a customize entry only when its `+0x40` filter (1 both, 2 Lu, 3 Ciel) fits the shown body: `32363b40` (the sit item for an emotion, against CX2Unit `+0xe40`; callers `323fad80`, `31fa8230`, `323f92f0`), `32237310` (the cash shop's take-off-all tail, against the viewer's `+0x528`), and `32d78bc0` / `32d7e250` (the customize preview dialogs, against `32d767a0` / the viewer's `+0xd80`). NU0 tagged them DU5; they need the applied-customize map, so they port with this stage. funcmap `grep "(CH4c)"`.
+
+- **The back-body gate's 0 writers** (char-luciel DU5d2, 2026-11-16). June hides the viewer's back body (`+0xd82` = `m_bShowDuoBackUnit` = 0)
+  only on its custom sit paths: PlayEmotion `31fa52b0` (8 writes, `@31fa5672`..`@31fa58ad`, each behind a custom sit name `+0xffc` + i x 0x1c) and
+  PlayCustomMotionByMotionType `31fa5c90 @31fa61d0`. DU5d2 ported the 1 writers. Port these with the sit names (and the cash-shop tint at 0 x 4 in
+  `AddEqip`, already ported, then becomes reachable).
 
 **Depends on:** june-effect C9g-2 (the PlayByMotionType shell and `AnimationNameTable.lua`), Stage 10 (the sit emotions 0x19-0x3b and
 the EmotionData path the sit sets ride on), Stage 2 (UI framework) for the dialogs, and Stage 13 (the June `item.kim`, **done 2026-10-08**: its 1,066 customize items and 1,207 type-14 items now resolve). It can run

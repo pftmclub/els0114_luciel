@@ -881,8 +881,12 @@ void CX2ClassChangePopup::SetShow( bool bShow )
 		{
 			/// June @32488b01: 1.4 when my unit is UC_CHUNG_TACTICAL_TROOPER ( 117 ), else 1.5, through the viewer's scale ( 31f969a0, which also
 			/// scales June's duo skin anim ); June then writes 1.5 to viewer +0xd84, a June-only viewer member March's viewer does not have
-			const float fScale = ( 117 == static_cast<int>( g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass ) ) ? 1.4f : 1.5f;
+			const float fScale = ( static_cast<int>( CX2Unit::UC_CHUNG_TACTICAL_TROOPER ) == static_cast<int>( g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass ) ) ? 1.4f : 1.5f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+			m_pUnitViewerUI->SetUnitScale( D3DXVECTOR3( fScale, fScale, fScale ) );	// char-luciel DU5d2: June 31f969a0 @32488b3d, both bodies
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( fScale, fScale, fScale ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		}
 #else SERV_IRUHADEV_JUNE_SKILL_CLASS_POPUP
 		m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( 1.5f, 1.5f, 1.5f ) );

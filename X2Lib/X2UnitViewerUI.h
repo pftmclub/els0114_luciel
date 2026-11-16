@@ -146,6 +146,7 @@
 		bool GetSwitchingView() const { return m_bSwitchingView; }
 		void UpdateSwitchingView();
 		void ApplySwitchingViewFilter( const std::vector<CX2Unit::EQIP_POSITION>& vecKeepEquipPosition_ );
+		void SetEquipColorByBody( const bool bMinorUnit_, const D3DXCOLOR& color_ );	// char-luciel DU5d2: June 31f93920
 		void SetEnableDuoView( const bool bEnableDuoView_ ) { m_bEnableDuoView = bEnableDuoView_; }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 		void SetSwitchingViewValue( const bool bSwitchingView_ ) { m_bSwitchingView = bSwitchingView_; }	// char-luciel DU5c: June's inline +0xd80 write ( 323f3290 @323f3394 ), no UpdateSwitchingView
@@ -360,6 +361,7 @@
 		bool					m_bSwitchingView;			// June +0xd80, Ciel is the shown body
 		bool					m_bEnableDuoView;			// June +0xd81, the other body is drawn behind ( ctor true, the character window false )
 		bool					m_bShowDuoBackUnit;			// June +0xd82, the back body's emotion gate ( its writers are DU5c's )
+		bool					m_bEmotionOnBackUnitOnly;	// char-luciel DU5d2: June +0xe60, the emotion end waits on the back body ( setter: backlog Stage 10 )
 		bool					m_bShowFormEquipOnly;		// char-luciel DU5b2: June +0x118c, a field / room viewer adds only the shown body's equipment ( writers: DU5c )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		D3DXVECTOR3				m_LightPos;

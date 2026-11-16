@@ -3323,7 +3323,11 @@ void CX2CashShop::ResetUnitViewer( CX2Unit* pUnit )
 		m_pUnitViewerUI->SetUnit( pUnit );
 #endif
 		m_pUnitViewerUI->GetMatrix().Move(  D3DXVECTOR3( -250 -105, -60 + 39 + 20 -5000, 200 ) );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		m_pUnitViewerUI->SetUnitScale( D3DXVECTOR3( 1.5f, 1.5f, 1.5f ) );	// char-luciel DU5d2: June 32233f70 @32234150, both bodies
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( 1.5f, 1.5f, 1.5f ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		m_pUnitViewerUI->GetMatrix().Rotate(D3DXToRadian(0),D3DXToRadian(0),D3DXToRadian(0));
 		m_pUnitViewerUI->GetXSkinAnim()->SetApplyMotionOffset( false );
 

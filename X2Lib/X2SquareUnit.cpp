@@ -2772,7 +2772,11 @@ void CX2SquareUnit::StateFrameMove()
 		m_pUnitViewer->GetMatrix().Move( m_SyncData.m_Pos );
 		m_pUnitViewer->GetMatrix().Rotate( D3DXToRadian(m_DirDegree.x), D3DXToRadian(m_DirDegree.y), D3DXToRadian(m_DirDegree.z) );
 	#endif //RIDING_SYSTEM
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		m_pUnitViewer->SetUnitScale( m_Scale * m_pUnitViewer->GetScale() );	// char-luciel DU5d2: June 323f23c0 @323f2b86, both bodies
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		m_pUnitViewer->GetMatrix().Scale( m_Scale * m_pUnitViewer->GetScale() );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		if( m_bPlanRender == false && GetPersonalShopState() != PSS_SHOP )
 		{
 			if ( g_pKTDXApp->GetDGManager()->IsInFrustum( this ) == true )

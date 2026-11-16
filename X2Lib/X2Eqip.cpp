@@ -45,6 +45,9 @@ CX2Eqip::CX2Eqip( CX2Item* pItem, CKTDGXSkinAnimPtr pUnitXSkinAnim, int enchantL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 	m_bMinorUnitEquip			= bMinorUnitEquip;
 	m_bAttachedInDGManagerChain	= bAttachedInDGManagerChain;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	m_bBackUnitTint				= false;	// char-luciel DU5d2: June ctor @329614f6
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	// char-luciel DU3: June @32961362 keeps the unit type only for a UC_ANYONE templet ( June's appearance templet swap is Stage 16 )
 	if ( NULL != pItem->GetItemTemplet() && CX2Item::UC_ANYONE != pItem->GetItemTemplet()->GetUseCondition() )
 		eUnitType = CX2Unit::UT_NONE;
@@ -3782,6 +3785,21 @@ void CX2Eqip::RestoreSubEquipRenderParam()
 	}
 }
 #endif SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE_EQUIP
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+// char-luciel DU5d2: June 3295a9e0, every sub-equip's render param ( the skin's or the mesh's ) takes the colour
+void CX2Eqip::SetSubEquipColor( const D3DXCOLOR& color_ )
+{
+	BOOST_TEST_FOREACH( CX2SubEquip*, pSubEquip, m_vecpSubEquip )
+	{
+		if ( NULL == pSubEquip )
+			continue;
+
+		CKTDGXRenderer::RenderParam* pRenderParam = ( true == pSubEquip->GetIsSkinMesh() ) ? pSubEquip->GetRenderParam() : &pSubEquip->GetNormalRenderParam();
+		if ( NULL != pRenderParam )
+			pRenderParam->color = color_;
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 // note!! 일단 무기에만 UT_ATTACH_ANIM인 장비에만 붙일 수 있는 것으로 가정하고 만들었습니다. 그외 다른 장비에는 작동 안함
 void CX2Eqip::LoadAttached()

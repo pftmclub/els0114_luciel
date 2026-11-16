@@ -2050,6 +2050,58 @@ Opus 5.5 high. Reviewed `0ebcfdff` against June in Ghidra / `disasm_range.py` / 
 - **Build:** full build skipped: no play-test (no code change; DU5d's play-test passed on `65ccb63e`).
 - Next: DU5d2 waits for june-engine R14f.
 
+### DU5d2 - Done (2026-11-16)
+
+Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's: viewer, equip) and `SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY` (DU5c2's: the
+`SetUnitScale` callers). Files: `X2UnitViewerUI.cpp` (+78), `X2UnitViewerUI.h` (+2), `X2Eqip.cpp` (+18), `X2Eqip.h` (+5), `X2StateClassChange.cpp`,
+`X2CashShop.cpp`, `X2SquareUnit.cpp`, `X2StateDungeonResult.cpp`, `X2StateCreateUnit.cpp` (+4 each). funcmap rows: `grep "(DU5d2)" june2017_re/funcmap.tsv`
+(8). Divergent row `CX2UnitViewerUI::SetFixed` now ported (verdict stays `stage2`). No log line added.
+- **Equip tint by body** (`SetEquipColorByBody` = June `31f93920`): every view equip of the given body gets the colour on each sub-equip
+  (`CX2Eqip::SetSubEquipColor` = `3295a9e0`: the skin's render param or the mesh's `m_NormalRenderParam`) and `m_bBackUnitTint` = 1, the other
+  body's equips get 0. `UpdateSwitchingView` calls it twice as June does (`@31f93cf8`: the shown body 1 x 4; `@31f93e4b`: the other body 0.3 x 4, the
+  call that sets the flag last); DU5b's stand-in comment is gone. `AddEqip` ends as June (`@31f9e859-31f9e8fc`): `UVS_CHARINFO` tints the other body
+  0.3 x 4; `UVS_CASHSHOP` with the back body hidden tints it 0 x 4 (no March path hides it, so inert).
+- **`+0x190` named from its readers:** `m_bBackUnitTint`, read only by `3295b430` (the custom render copy forces 0.3 x 4) from `SetRenderParam`'s
+  custom-render branch and `3295c460`: backlog **Stage 11** (bullet added). Ctor 0 (`@329614f6`).
+- **`SetFixed` = June `31f933c0`** (R14f's route): `true` also fixes a `UT_SKIN` equip with sub-equips or attached particles
+  (`HasSubEquipOrAttachedParticle`), then hides the enchant; `false` = March's. `#error` without `JUNE_DIVERGE_EQIP_SET_FIXED` (March's
+  `CX2Eqip::SetFixed` hides sub-equips). Every March caller passes `true` as June does (class change, watch x 2, community, char info x 2).
+- **Back-body gate (`+0xd82` = `m_bShowDuoBackUnit`):** `31fa5c90`'s two writes go into PlayByMotionType's port: type 7 (SIT_READY) sets it with no
+  effect stop (`@31fa5d4d`), the types that stop the effect groups set it after the stops (`@31fa5d36`). Its third write (`@31fa61d0`, = 0) and all 8 of
+  PlayEmotion's (`@31fa5672`..`@31fa58ad`) sit behind the custom sit names (`+0xffc` + i x 0x1c): backlog **Stage 12** (bullet added). With no 0
+  writer reachable, the gate stays on, as March's viewer behaves today.
+- **Emotion end by body (`31fa64f0`, the body pick only):** `EmotionFrameMove` waits on the shown body's anim end (`GetXSkinAnimPtr`), or on the
+  back body's when the new `m_bEmotionOnBackUnitOnly` (`+0xe60`) is set. A missing body counts as ended. The ended case clears the flag
+  (`@31fa68ca`), and PlayByMotionType clears it too (`@31fa5cdb`). March read Lu's skin (`m_pXSkinAnim`) even with Ciel shown. The flag's only setter
+  (PlayEmotion `@31fa5c30`) needs June's per-body EmotionData test (`32351900`), so it is a stand-in comment, backlog **Stage 10** (bullet added,
+  with `32351070`'s per-body mix and `31fa4c00`'s per-body play). March's PlayEmotion already plays both bodies (`PlayAnim` default `UVPB_BOTH`).
+- **`SetUnitScale` callers.** Every Lu/Ciel viewer builds Ciel's skin, room and field included (`SetUnit`), so March's viewer-only `Scale` left her
+  unscaled. Swapped:
+  - class-change popup (`324886b0 @32488b3d`, 1.4 / 1.5)
+  - cash shop `ResetUnitViewer` (`32233f70`, 1.5)
+  - square unit frame move (`323f23c0`, `m_Scale x GetScale`)
+  - dungeon / training result (`3250e6c0`, 1.9)
+  - create-screen job preview `SelectUpperClass` (`325519d0`, 1.2)
+
+  Left as they are, no change:
+  - the 11 per-class `Select*` (one body)
+  - cash shop `SetOpen` / `OnFrameMove` (re-apply the same 1.5; June's pre-equip vec3 list is June-only UI)
+  - the GFx customize handler and wheel zoom (`3224d0f0`, `3224c760`: no March counterpart, Stage 12)
+  - PvP room / result and PVE result (`3253d7d0`, `32516a70`, `324a9650`): offline has no PvP; June's PvP-room 0.65 and per-motion factors are noted
+    here only.
+- **Touched-line enum fix:** `X2StateClassChange.cpp:884` (S7h's `117`) now reads `CX2Unit::UC_CHUNG_TACTICAL_TROOPER`, same value.
+- **Gates:** `finish.py --files <9> --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY SERV_IRUHADEV_JUNE_SKILL_CLASS_POPUP
+  --skip-flag SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED` (the `#error` target): DUO_LOBBY PASS (7 PASS, 2 OTHER, 3 deleted = DU5b's two stand-in
+  comments + the `117` line; the five March scale lines stay whole in `#else`), DUO_VIEWER PASS (4 PASS, 5 OTHER, 2 deleted = DU5b's two stand-in comments), SKILL_CLASS_POPUP PASS
+  (1 PASS, 8 OTHER, 1 deleted = the `117` line), junediverge PASS. enumscan exit 1: 229 older literals in `X2CashShop.cpp` / `X2StateClassChange.cpp`,
+  none on a changed line (checked by line), so not this phase's.
+- **Compile:** `/Zs` probes of all 7 `.cpp`: 0 errors.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,159,552 B, dated 2026-11-16 11:50:04, md5 dc655e7b67f7b84d92c5e37548fb4a8d, equal to X2/US_SERVICE/x2.exe
+  (2026-11-16 11:49:57); built at main 3e9fa56d + 17 uncommitted code file(s).` (this phase's 9 and peers' in-progress files; every edited
+  `.obj` is newer than its source). No exestr line: no string added.
+- **Not done here:** MODS.md's R14f entry still lists the viewer `SetFixed` as "not ported yet"; MODS.md has a peer's uncommitted edits, so char-luciel Z
+  updates that line. Review: `DU5d2-review.md`.
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;

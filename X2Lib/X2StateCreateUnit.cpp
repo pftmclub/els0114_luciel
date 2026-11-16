@@ -3646,7 +3646,11 @@ void CX2StateCreateUnit::SelectUpperClass ( CX2Unit::UNIT_TYPE eUnitType_, CX2Un
 				m_pUnitViewerUI->SetUnit( pUnit, CX2UnitViewerUI::UVS_CLASSCHANGE ); 
 				m_pUnitViewerUI->SetClassChange ( true );
 				m_pUnitViewerUI->GetMatrix().Move( D3DXVECTOR3( 0, -50, 200 ) );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+				m_pUnitViewerUI->SetUnitScale( D3DXVECTOR3( 1.2f, 1.2f, 1.2f ) );	// char-luciel DU5d2: June SelectUpperClass 325519d0 @32551bb7, both bodies
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 				m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3(1.2f, 1.2f, 1.2f) );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 				m_pUnitViewerUI->SetLightPos( -250, 100, -600 );	// 캐릭터뷰어 라이트 위치 변경
 				m_pUnitViewerUI->PlayByMotionType( CX2UnitViewerUI::UVVMT_DOWN_LANDING );
 				EquipPromotionItemByUnitTemplet( pUnitTemplet );

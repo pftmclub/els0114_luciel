@@ -197,6 +197,8 @@ class CX2Eqip : public CKTDGObject
 		bool                    IsMinorUnitEquip() const { return m_bMinorUnitEquip; }	// char-luciel DU3: June +0x15d4, the equip is Ciel's
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		bool                    HasSubEquipOrAttachedParticle() const { return false == m_vecpSubEquip.empty() || false == m_AttachedParticleGroup.m_vecpAttachedParticle.empty(); }	// char-luciel DU5b2: June 31fac390 ( +0x8dc / +0x8f0 )
+		void                    SetSubEquipColor( const D3DXCOLOR& color_ );	// char-luciel DU5d2: June 3295a9e0
+		void                    SetBackUnitTint( const bool bBackUnitTint_ ) { m_bBackUnitTint = bBackUnitTint_; }	// char-luciel DU5d2: June +0x190 ( 31f93920 )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		int                     GetEnchantType() const
@@ -343,6 +345,9 @@ private:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		bool						m_bMinorUnitEquip;			// char-luciel DU3: June +0x15d4
 		bool						m_bAttachedInDGManagerChain;	// char-luciel DU3c: June +0x15d5, sub-equips and particles stay in the DG chain ( readers: june-engine R14c )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		bool						m_bBackUnitTint;			// char-luciel DU5d2: June +0x190, read by the custom render copy 3295b430 ( backlog Stage 11 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #endif SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW
 		CX2Item*					m_pDummyItem;
 		const CX2Item::ItemTemplet*		m_pItemTemplet;

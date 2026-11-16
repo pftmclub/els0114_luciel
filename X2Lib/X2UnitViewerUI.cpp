@@ -80,6 +80,7 @@ CX2UnitViewerUI::CX2UnitViewerUI(void)
 	m_bSwitchingView		= false;
 	m_bEnableDuoView		= true;
 	m_bShowDuoBackUnit		= true;
+	m_bEmotionOnBackUnitOnly	= false;	// char-luciel DU5d2: June ctor @31fab62e
 	m_bShowFormEquipOnly	= false;	// char-luciel DU5b2: June @31fab7d2
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	//m_pXSkinAnim			= NULL;
@@ -3443,6 +3444,11 @@ void CX2UnitViewerUI::AddEquipByTID( int itemTID, bool bBasicItem, bool bMinorUn
 }
 
 // char-luciel DU5b2: June 31f9df40, Lu/Ciel's normal item also builds Ciel's copy; the skin and slot of the item's body
+namespace _CONST_UNITVIEWER_DU5D2_
+{
+	const float BACK_UNIT_EQUIP_COLOR	= 0.3f;		// June 3345993c
+}
+using namespace _CONST_UNITVIEWER_DU5D2_;
 void CX2UnitViewerUI::AddEqip( UidType itemUID )
 {
 	if ( itemUID <= 0 )
@@ -3570,7 +3576,16 @@ void CX2UnitViewerUI::AddEqip( UidType itemUID )
 #ifdef	NOT_RENDERING_OTHER_EQUIP_POS
 	UpdateEquipSlotVisibility();
 #endif	NOT_RENDERING_OTHER_EQUIP_POS
-	// stand-in: in the cash shop ( back body off ) and the character window June tints the other body's equips ( 31f93920, DU5c )
+	// char-luciel DU5d2: June @31f9e859-31f9e8fc, the other body's equipment colour by viewer state
+	if ( UVS_CASHSHOP == m_eUnitViewerState )
+	{
+		if ( false == m_bShowDuoBackUnit )
+			SetEquipColorByBody( false == m_bSwitchingView, D3DXCOLOR( 0.f, 0.f, 0.f, 0.f ) );
+	}
+	else if ( UVS_CHARINFO == m_eUnitViewerState )
+	{
+		SetEquipColorByBody( false == m_bSwitchingView, D3DXCOLOR( BACK_UNIT_EQUIP_COLOR, BACK_UNIT_EQUIP_COLOR, BACK_UNIT_EQUIP_COLOR, BACK_UNIT_EQUIP_COLOR ) );
+	}
 }
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 void CX2UnitViewerUI::UpdateEqip( bool bEconomical /* = false */ )
@@ -5610,6 +5625,11 @@ void CX2UnitViewerUI::PlayByMotionType( CX2UnitViewerUI::UNIT_VIEWER_UI_MOTION_T
 	if( 10 != static_cast<int>( m_eUnitViewerState ) )
 		m_ePlayedEmotion = CX2Unit::ET_NONE;
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	m_bEmotionOnBackUnitOnly = false;	// char-luciel DU5d2: June 31fa5c90 @31fa5cdb
+	if ( UVUMT_SIT_READY == motionType )
+		m_bShowDuoBackUnit = true;	// char-luciel DU5d2: June @31fa5d4d, type 7 shows the back body with no effect stop
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	if( UVUMT_HABIT != motionType && UVUMT_SIT_READY != motionType && UVUMT_SIT_WAIT != motionType )
 	{
 #ifdef SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
@@ -5626,6 +5646,9 @@ void CX2UnitViewerUI::PlayByMotionType( CX2UnitViewerUI::UNIT_VIEWER_UI_MOTION_T
 				ViewerFxStop( iFxGroup );
 		}
 #endif
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		m_bShowDuoBackUnit = true;	// char-luciel DU5d2: June @31fa5d36, after the effect stops
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	}
 
 	// @31fa7ef0 after the pre-pass: needs the unit and the unit manager
@@ -8921,6 +8944,28 @@ void CX2UnitViewerUI::SetPositionOnScr(float x, float y, float z, float scale)	/
 // ( DGManager에서 그리게 하면 안 된다 )
 void CX2UnitViewerUI::SetFixed(bool val)
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+#ifndef SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER needs SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED ( March's CX2Eqip::SetFixed hides a skin equip's sub-equips )
+#endif
+	// char-luciel DU5d2: June 31f933c0, a skin equip with sub-equips or attached particles is fixed too
+	m_bFixed = val;
+	if ( true == m_bFixed )
+	{
+		BOOST_TEST_FOREACH( const ViewEquipMap::value_type&, value, m_ViewEquipMap )
+		{
+			CX2EqipPtr pX2Eqip = value.second;
+			if ( CX2Item::UT_ATTACH_ANIM == pX2Eqip->GetEqipType() || CX2Item::UT_ATTACH_NORMAL == pX2Eqip->GetEqipType()
+				|| ( CX2Item::UT_SKIN == pX2Eqip->GetEqipType() && true == pX2Eqip->HasSubEquipOrAttachedParticle() ) )
+				pX2Eqip->SetFixed();
+		}
+		SetShowAttribEnchant( false );
+	}
+	else if ( true == GetShowObject() )
+	{
+		SetShowAttribEnchant( true );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	m_bFixed = val; 
 
 	if( true == m_bFixed )
@@ -8945,6 +8990,7 @@ void CX2UnitViewerUI::SetFixed(bool val)
 			SetShowAttribEnchant( true );
 		}
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
@@ -8989,7 +9035,25 @@ void CX2UnitViewerUI::UpdateSwitchingView()
 		pBackXSkinAnim->GetMatrix().Scale( GetMatrix().GetScale() * BACK_UNIT_SCALE_RATE );
 		pBackXSkinAnim->GetMatrix().Rotate( GetMatrix().GetRotate() );
 	}
-	// stand-in: the equips' position, scale and colour copies by body ( 31f93710 / 31f93820 / 31f93920: equip +0x908, +0x914, +0x190 ) have no March members
+	// stand-in: the equips' position and scale copies by body ( 31f93710 / 31f93820: equip +0x908, +0x914 ) have no June reader
+	SetEquipColorByBody( m_bSwitchingView, D3DXCOLOR( 1.f, 1.f, 1.f, 1.f ) );	// char-luciel DU5d2: June @31f93cf8
+	SetEquipColorByBody( false == m_bSwitchingView, D3DXCOLOR( BACK_UNIT_EQUIP_COLOR, BACK_UNIT_EQUIP_COLOR, BACK_UNIT_EQUIP_COLOR, BACK_UNIT_EQUIP_COLOR ) );	// char-luciel DU5d2: June @31f93e4b
+}
+
+// char-luciel DU5d2: June 31f93920, the given body's equips take the colour in their sub-equips and the back-body tint flag; the other body's lose the flag
+void CX2UnitViewerUI::SetEquipColorByBody( const bool bMinorUnit_, const D3DXCOLOR& color_ )
+{
+	BOOST_TEST_FOREACH( const ViewEquipMap::value_type&, value, m_ViewEquipMap )
+	{
+		CX2EqipPtr pX2Eqip = value.second;
+		if ( NULL == pX2Eqip )
+			continue;
+
+		const bool bBodyMatch = ( bMinorUnit_ == pX2Eqip->IsMinorUnitEquip() );
+		if ( true == bBodyMatch )
+			pX2Eqip->SetSubEquipColor( color_ );
+		pX2Eqip->SetBackUnitTint( bBodyMatch );
+	}
 }
 
 // char-luciel DU5b: June 31f94190, shows the switching view's body and hides the other body's equips ( a kept position stays )
@@ -9114,7 +9178,13 @@ void CX2UnitViewerUI::EmotionFrameMove()
 		return;
 
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5d2: June 31fa64f0 waits on the shown body, or the back body when only it plays the emotion; a missing body counts as ended
+	CKTDGXSkinAnimPtr pEmotionXSkinAnim = ( true == m_bEmotionOnBackUnitOnly ) ? GetBackXSkinAnimPtr() : GetXSkinAnimPtr();
+	if ( NULL == pEmotionXSkinAnim || true == pEmotionXSkinAnim->IsAnimationEnd() )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	if(m_pXSkinAnim != NULL && m_pXSkinAnim->IsAnimationEnd() == true)
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	{
 		switch(m_ePlayedEmotion)
 		{
@@ -9129,6 +9199,9 @@ void CX2UnitViewerUI::EmotionFrameMove()
 		default:
 			{				
 				m_ePlayedEmotion = CX2Unit::ET_NONE;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+				m_bEmotionOnBackUnitOnly = false;	// char-luciel DU5d2: June @31fa68ca
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 				//if( m_eOldMotionType == CX2UnitViewerUI::UVUMT_READY )
 				//	PlayByMotionType( CX2UnitViewerUI::UVUMT_READY );
 				//else
@@ -9234,6 +9307,9 @@ bool CX2UnitViewerUI::PlayEmotion(CX2Unit::EMOTION_TYPE eEmotionId, wstring &wst
 	}
 #endif SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
 #endif SERV_IRUHADEV_JUNE_EMOTION_EFFECT_SET
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	// char-luciel DU5d2: stand-in: June sets m_bEmotionOnBackUnitOnly when only the back body's EmotionData test ( 32351900 per body ) passes ( backlog Stage 10 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	if(m_pXSkinAnim != NULL)
 	{		
 		if(eEmotionId == CX2Unit::ET_SITWAIT)

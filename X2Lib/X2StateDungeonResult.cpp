@@ -2917,7 +2917,11 @@ void CX2StateDungeonResult::UnitViewerProcess( CX2UnitViewerUI* pViewer )
 	pViewer->SetLightPos( -250, 100, -600 );	// 캐릭터뷰어 라이트 위치 변경
 
 	pViewer->GetMatrix().Move( -272, -126, 0 ); 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	pViewer->SetUnitScale( D3DXVECTOR3( 1.9f, 1.9f, 1.9f ) );	// char-luciel DU5d2: June 3250e6c0 @3250e770, both bodies
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	pViewer->GetMatrix().Scale( 1.9f,1.9f,1.9f );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	pViewer->GetMatrix().Rotate(D3DXToRadian(0),D3DXToRadian(0),D3DXToRadian(0));
 
 	pViewer->OnFrameMove( m_fTime, m_fElapsedTime );
