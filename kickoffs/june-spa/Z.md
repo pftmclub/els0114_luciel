@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Sonnet 5.5, medium** effort, then type `/x2-phase june-spa Z` |
 | Plan doc | `JUNE_SPA_PHASES.md` (branch `main`) |
-| Depends on | every S review |
+| Depends on | the S2b, S3b, S4b and S5 reviews |
 | Flag | none new (retires `SERV_IRUHADEV_JUNE_SPA_DEBUG`) |
 | Log tag | `[JUNE_SPA]` (`python tools/logs.py --tag JUNE_SPA`) |
 | Review | none |

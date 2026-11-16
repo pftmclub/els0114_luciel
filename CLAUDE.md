@@ -250,23 +250,21 @@ then breaks, the fix is code (port June's reader) or a routed follow-up.
 - **Assume March does not have the asset (user, 2026-10-27).** Before debugging code that uses an asset, check it by name: March lacks it ->
   stage June's; March has it -> replace with June's anyway.
 
-## Rule: `DataBase/` and `ScriptData/` are a stale snapshot — the live DB is the source of record
+## Rule: `DataBase/` and `ScriptData/` are a stale snapshot, and there is no live DB anymore (user, 2026-11-16)
 
-The user has the original SQL Server databases (`Account`, `Game01`). `DataBase/` and `ScriptData/` are an old checkout and have been proven
-wrong (`gup_create_unit` here inserts no items, the live one inserts ten; `ItemTemplet.xlsx` lacks every live beginner-gear id). **When
-behaviour depends on a stored procedure or server data table, ask the user to pull it from the live DB first**, naming it and giving the
-query:
+`DataBase/` and `ScriptData/` are an old checkout and have been proven wrong (`gup_create_unit` here inserts no items, the live one inserted
+ten; `ItemTemplet.xlsx` lacks every live beginner-gear id). The user used to pull procedures from the original SQL Server databases
+(`Account`, `Game01`). **Since 2026-11-16 they have no access to the live DB: never ask for a live-DB pull.** When behaviour depends on a
+stored procedure or server data table:
+1. Earlier pulls already transcribed into the repo stay the source of record, verbatim.
+2. Otherwise June's client and data (what it sends, reads and shows) bound the answer, and the emulator gets a designed stand-in under its
+   own flag, approved by the user and logged as `stand-in:` (memory `design-missing-june-pieces`). Never invent a value the design does not
+   name.
+3. `DataBase/` / `ScriptData/` and commented-out live code are read for structure, never values. A procedure missing there is not evidence it
+   does nothing; internally consistent local copies are not corroboration.
 
-```sql
-SELECT OBJECT_NAME(object_id) AS proc_name, definition
-FROM   sys.sql_modules WHERE OBJECT_NAME(object_id) IN ( 'gup_...', … );
-SELECT name FROM sys.procedures WHERE name LIKE 'gup_%' ORDER BY name;
-```
-
-A procedure missing from `DataBase/` is not evidence it does nothing. Internally consistent local copies are not corroboration; only
-genuinely independent sources count. Commented-out live code is read for structure, never values. Transcribe live data verbatim, don't
-tidy it. Ask for dumps as plain text in the conversation, and keep server names, linked servers and logins out of anything committed or
-logged. The two failures behind this rule: `CLAUDE_REFERENCE.md`, "Background: the live-DB rule".
+Plan docs and kickoffs that say "ask the user for a live-DB pull" mean step 2. Keep server names, linked servers and logins out of anything
+committed or logged. History: `CLAUDE_REFERENCE.md`, "Background: the live-DB rule".
 
 ## Build facts that matter every session
 

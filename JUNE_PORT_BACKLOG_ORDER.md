@@ -535,6 +535,8 @@ Everything from Stages 5 and 6, plus:
   (`KUnitInfo +0x15`, Room `+0x21`, Field `+0x24`, Square `+0x4a`: `movzx ... word ptr` in `3235eb20` / `32360090` / `323614c0` / `32361e00`);
   March's `m_cUnitClass` is a `char`, which ends at 127. Check it when a class id above 127 first appears (the new characters). Transcendence
   only adds the int after it (T1).
+- **Rose's Valkyrie gauge in a spa** *(from june-spa S0, 2026-11-16)*. June's gauge UI `32e65970` (`DLG_UI_ROSE_VALKYRIE_GAGE`) is forced
+  shown in villages 1500 / 1501 (@`32e66937`, vslot 0x68 with 1); elsewhere it follows `GetShowMyGageUI`. Port it with Rose's gauge (`char-rose`).
 **Hard gate:** the starter-item rows (below). The live DB has none for these classes (user, 2026-10-27), so each character's planning session derives them from `item.kim` by the name pattern of the existing classes' starter items, as a labelled stand-in under that character's own flag.
 
 **Planned (2026-11-02): Lu/Ciel -> `char-luciel`** (`JUNE_CHARACTER_LUCIEL_PHASES.md`). It owns every bullet above that names Lu/Ciel, and the
@@ -821,6 +823,11 @@ Port whatever June UI is still March-shaped once Stages 1–8 have delivered the
 - **Pet inventory force-open states (char-luciel CH2d20 review, 2026-11-15).** June's `CX2UIManager::PetInventoryForceOpenCondition` `32153450` refuses four main
   states ( 7, 8, 0x10, 0x17 ) where March refuses three ( `XS_PVP_LOBBY`, `XS_PVP_ROOM`, `XS_SQUARE_GAME` ); June's state numbering is shifted, so map the ids by June's
   state enum before porting the body whole. Offline reach: the inventory's pet button. The menu loop itself already equals June ( CH2d20 added menu 44 ).
+- **Spa UI pieces (june-spa S0, 2026-11-16; `june2017_re/spa/spa_map.tsv` rows `route:stage9`).** (1) ESC in a spa village: June's
+  `CX2State::ShortCutKeyProcess` (`31f11c66`, states 0xe / 0xf / 0x15) opens no system menu there and shows STR 4495; it goes with D0c-3's
+  whole-function port. (2) The riding-pet skill slot in a spa: `321f5e30` sets a spa constant on `this+0xb4` and calls `3294b830( 1 )`, and
+  `CX2RidingPetSkillSlot::UpdateStamina` (`3294b030`) shows stamina picture 2 (March: picture 1 only, `X2RidingPetSkillSlot.cpp:81`).
+  (3) The spa event menu icon (`EventButtonIconInfo.lua`, code event 29, `DLG_UI_Menu_Spa_Event.lua`, STR 43105); not the only way in.
 
 **Why UI is last and not first:** UI is not one system. Each stage above brings its own June dialogs: the region maps (1), slots and skill tree (3), quests (4), and the transcendence guides (6). A UI-first pass would port buttons with no system behind them, and then collide with every feature stage that touches the same dialog. The only UI work that must come early is the framework itself, and that is measured in Stage 2.
 
@@ -1397,7 +1404,9 @@ walking up to the door does nothing (user, E1d play-test: "just the door").
 another session in `X2TFieldGame.*`.
 
 **Planned 2026-11-16 (user request):** plan `june-spa`, `JUNE_SPA_PHASES.md` + `kickoffs/june-spa/` + the `june-spa` STATUS block. S0 map and
-design, S1 data, S2 code-event table and doors, S3 soak buff, S4 Pporu, S5 rock-scissors-paper (if S0 keeps it), Z.
+design, S1 data, S2 code-event table and doors, S3 soak buff, S4 Pporu, S5 rock-scissors-paper (if S0 keeps it), Z. **S0 done 2026-11-16:** map
+`june2017_re/spa/spa_map.tsv`; split into S2a / S2b, S3a / S3b, S4a / S4b; rock-scissors-paper is spa-only and stays (S5); emulator buff =
+refresh on every pool entry, login inside a spa allowed; routed: Stage 9 (ESC, riding-pet stamina, event icon), Stage 8 (Rose gauge).
 
 ### Stage 25: June fonts and text rendering (user, 2026-10-17)
 

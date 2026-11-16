@@ -1,0 +1,107 @@
+june_va	what	march	state	phase	readers
+323bad00 @323bae7d-323bae9b	TFG ctor: +0x324 entrance / +0x334 exit vectors zeroed (vector<int>, 0x10 bytes each: first, last, end, alloc)	-	absent	S2b	323b5970, 323b8ba0
+323bad00 @323bb5b5-323bb61f	TFG ctor: inline IsEnableCode( 31 ) (g_pInstanceData+0xa18 find 0x1f, ->second byte +0x10 == 1), then 324f2ca0 -> +0x324 and 324f2d30 -> +0x334	X2TFieldGame.cpp ctor (none)	absent	S2b	323b5970 entrance / exit loops
+324f2ca0	CX2LocationManager: village templet start positions with IsSpaEnter (+0x22) -> vector<int> (start pos ids)	X2LocationManager.cpp:477 parses the key; no list function	absent	S2b	323bad00
+324f2d30	CX2LocationManager: start positions with IsSpaOut (+0x23) -> vector<int>	X2LocationManager.cpp:478 parses the key; no list function	absent	S2b	323bad00
+323bad00 @323baedd / @323bb66a	TFG ctor: +0x3a0 = UI particle handle "MarketInArea" (March m_hMarketInArea); June's spa prompts reuse it	X2TFieldGame.cpp:324	March	-	323ab220, 323ab390, 323ab4f0, market prompts 323aadb0 / 323aafe0 / 323ab1b0
+323bad00 @323bc7c3-323bc804	TFG ctor: spa state init: +0x460 dword 0 (bytes +0x460 enter prompt, +0x461 exit prompt, +0x462 notice on, +0x463 no pool), +0x464 type changed = 0, +0x468 / +0x46c / +0x470 timers 0.0, +0x474 type = -1, +0x478 / +0x47c end time (int64) = -1, +0x484 effect handle = -1	-	absent	S3b (+0x460 / +0x461: S2b)	323b5970, 323aea40, 323bda90, 323ac9d0, 323b2e80
+323bad00 @323baf69-323baf79 / @323bb335-323bb35c	TFG ctor: +0x480 = font (font-manager slot via 32257cf0), +0x484 = -1, +0x624 = 0; +0x480 is the notice's font	- (March font member to confirm in S3b)	mixed	S3b	323aea40 notice
+323bad00 @323bb4fc-323bb54f	TFG ctor: village 1500 / 1501 only: new 0x20-byte Pporu (ctor 32ec76e0, arg TFG+0x108 = UI particle system) -> +0x624; +0x620 (Pporu cheat flag) = 0	X2TFieldGame.cpp:1937 (comment: pointer stays null)	absent	S4b	323b5970, 323aea40, 323b2e80, 323b3690, 323b0980, 323bda90, 323b8ba0
+323b5970 @323b6770-323b67f0	OnFrameMove: per frame, when +0x460 / +0x461 is set: hide the +0x3a0 prompt, clear the flag (same shape as the market block before it)	-	absent	S2b	-
+323b5970 @323b6800-323b6950	OnFrameMove: entrance loop over +0x324: distance from my unit (+0x8 -> +0x3c8..+0x3d0) <= 150.0 (@3346bda8) -> 323ab220( true, pos ), break	-	absent	S2b	-
+323b5970 @323b6953-323b6aa9	OnFrameMove: in village 1500 / 1501 (g_pData+0x268 +0x64): Pporu tick 32ec7240( dt ) when +0x624; exit loop over +0x334 (<= 150.0) -> 323ab390( true, pos ); +0x461 == 1 -> 323a8a60	-	absent	S2b (Pporu tick: S4b)	-
+323b5970 @323b6aa9-323b6cd2	OnFrameMove soak: 323ac9d0; in a pool (+0x474 != -1): hold +0x468 at 0 while end time +0x478 > 0 and +0x464 != 1 and +0x463 != 1; +0x468 += dt, >= 1.0 s (double @334355b0) -> send 0x637 { 1, (char)+0x474 }, +0x463 / +0x464 = 0, +0x468 = 0; +0x470 = 0. Out of a pool: +0x46c, +0x470 += dt; +0x46c >= 1.0 and +0x470 <= 3.0 (double @33439b50) -> send 0x637 { 0, -1 }, +0x462 = 0, +0x46c = 0. Send only when g_pData+0x64 session is up (+0x2c != 1, [0] != 0)	-	absent	S3b	-
+323b5970 @323b7100-323b72e4	OnFrameMove field-NPC loop: Pporu NPC (32ec7230 house 40147): +0x620 cheat and my user +0x2c > 2 -> pporu.ready = 1, +0x620 = 0; ready -> 32ec7280( npc ); shown NPC -> 32ec7620( npc )	X2TFieldGame.cpp:1937 (comment)	absent	S4b	-
+323b5970 @323b7320-323b735d	OnFrameMove field-NPC loop: spa signs 40141 / 40142 get +0x1a1 (talkable) while +0x460 (my unit near a spa door)	X2TFieldGame.cpp:1937 (block ported, flag stays false)	mixed	S2b	-
+323ab220	entrance prompt( bShow, pos ): +0x3a0 sequence at pos + 270 y (double @33491e08), tex Get_In_Up.dds / Get_In_Down.dds by +0x128 (0.5 / 1.0 s); bShow forced false when 31d03920(); +0x460 = bShow	- (March market prompt uses the same textures, X2TFieldGame.cpp:1200-1215)	absent	S2b	323b5970 @323b6944
+323ab390	exit prompt( bShow, pos ): same as 323ab220 with Get_Out_Up.dds / Get_Out_Down.dds, no -y offset; +0x461 = bShow	-	absent	S2b	323b5970 @323b6a94
+323ab4f0	hide both spa prompts, clear +0x460 / +0x461	-	absent	S2b	CX2CashShop::SetOpen 3223d97f, 32508a90 (CX2StateField vtable 334a0f5c / 334a1794 slot)
+323b2e80 @323b2ee9-323b3300	key handler: +0x460 -> store return pos (my unit +0x4a0..+0x4a8 -> location manager g_pData+0x268 +0x88 / +0x8c / +0x90) and line (+0x3d4 -> +0x94); spa name by village (20000 -> STR 43064, 20008 -> STR 43065); OK / Cancel box STR 43070, OK = 75000 USCM_ENTER (31d7efc0)	-	absent	S2b	323b4040 (75000); return fields: 31f12630 param < 1
+323b2e80 @323b3370-323b33a8	key handler NPC talk: Pporu NPC (32ec7230) -> no talk	-	absent	S4b	-
+323b4040 @323b41a3-323b4238	UICustomEventProc USCM_ENTER (75000): close box (0x472 XGM_DELETE_DIALOG); level < 10 (31edefe0) -> OK box STR 43071; else 20000 -> 31f12630( 1500 ), 20008 -> 31f12630( 1501 )	-	absent	S2b	-
+323b3690 case 0x9ccd / 0x9cce	join NPC: spa sign 40141 / 40142 -> store return pos and line, same enter box (STR 43064 / 43065 + 43070, OK 75000)	-	absent	S2b	323b4040
+323b3690 @323b3ce7-323b3d3d	join NPC: Pporu house (32ec7230) -> 32ec8350( npc ), return	-	absent	S4b	-
+323a8a60	spa exit: up key (31c488c0( 0 )) once (state +0x22f latch); close g_pData+0x32c and +0x2e0 UIs (vslot +4); 32151680; state +0xc4 = 0; 31f12630( 0 ) = back to the stored return position	-	absent	S2b	323b5970 @323b6aa4
+323ac9d0	spa type: village templet (324f23a0) SPA_INFO (+0x70, 0x14-byte rows: Type, vector LineIdx) holding my unit's line (+0x3d4) -> +0x474 (last match, -1 none); changed -> +0x464 = 1; none -> +0x463 = 1	- (SPA_INFO parse: X2LocationManager.cpp:416-441)	absent	S3b	323b5970 @323b6aab
+323bda90 @0x638	EventProcess 0x638: 323be4c0 -> { m_iOK, bool, int64 }; IsValidPacket( m_iOK ) (31d91680) and bool -> +0x478 / +0x47c = int64, +0x462 = 1	X2TFieldGame.cpp EventProcess (none)	absent	S3b	323aea40, 323b5970
+323bda90 @0x639	EventProcess 0x639: 323be550 -> int64 -> +0x478 / +0x47c (no flag)	-	absent	S3b	323b5970 (hold), 323ac3e0
+323bda90 @323bdb79-323bdb8f	EventProcess: +0x624 -> 32ec8330( all four args )	-	absent	S4b	-
+323ac910	0x638 handler twin (returns bool); no caller, no xref (dead)	-	absent (dead)	S3b (port only if a caller turns up)	-
+323ac990	0x639 handler twin; no caller, no xref (dead)	-	absent (dead)	S3b (port only if a caller turns up)	-
+323be4c0	0x638 DeSerialize: KSerBuffer -> 320acb70	-	absent	S3a	323bda90, 323ac910
+323be550	0x639 DeSerialize: KSerBuffer -> 320acbe0	-	absent	S3a	323bda90, 323ac990
+320acb70	0x638 Get: int m_iOK (tag 5) +0, bool (tag 0xc) +4, __int64 (tag 8) +5	-	absent	S3a	323be4c0
+320acbe0	0x639 Get: __int64 (tag 8)	-	absent	S3a	323be550
+323bf360 / 320acab0	0x637 Serialize + Put: bool (tag 0xc) +0, char (tag 2) +1	-	absent	S3a	323c15e0
+323c15e0	KSession::SendPacket< 0x637 struct >( 0x202, 0, 0, 0x637, &data, true, false )	KSession::SendPacket template	March	S3a	323b5970 x2, 323b8ba0
+323b1e40	static send 0x637 { a, b } through 323c1fc0; no caller, no xref (dead)	-	absent (dead)	- (not ported)	-
+323aea40 @323aec01-323aef25	render, in 1500 / 1501 with my unit: +0x462 and !+0x463 and !+0x464 -> notice STR 43074 (type SBT_GROW) / 43476 (SBT_STRONG) + 323ac3e0 time, font +0x480 at (512, 150), skipped when 31d03920(); EffectSet_SPA_Buff on my unit -> +0x484 when -1; otherwise stop +0x484 (321dafb0)	EffectSet_SPA_Buff in March UIEffectSet.lua	absent	S3b	-
+323aea40 @323aef25-323aef6e	render: Pporu shown (+0x624; NPC house 40147, +0x5fa) -> 32ec7820	-	absent	S4b	-
+323ac3e0	notice time: difftime( mktime( localtime64( +0x478 ) ), GetServerCurrentTime 31edca50 ) -> (s % 3600) / 60 ":" s % 60, zero-padded seconds	-	absent	S3b	323aea40
+323ad4c0	my unit has the spa factor of the current type (SBT_GROW -> BFI_SPA_GROW_BUFF 948, SBT_STRONG -> BFI_SPA_STRONG_BUFF 949); no caller, no xref	-	absent (dead)	S3b (port only if a caller turns up)	-
+323b8ba0 @323b8bfd-323b8c25	TFG dtor: +0x480 = 0; Pporu dtor 32ec7210 + delete, +0x624 = 0	X2TFieldGame.cpp dtor	absent	S4b	-
+323b8ba0 @323b9380-323b9431	TFG dtor: stop +0x484 effect; in 1500 / 1501 with a session -> send 0x637 { 0, -1 }	-	absent	S3b	-
+323b8ba0 @323b95c4-323b9632	TFG dtor: free +0x334 and +0x324 vectors	-	absent	S2b	-
+323b0980 @323b0ab8-323b0ad9	add field NPC: Pporu NPC (house 40147) starts hidden (325ca920: +0x5fa = 0)	-	absent	S4b	-
+323ba5f0 @323ba88a	village NPC creation: spa signs 40141 / 40142 need code event 31	X2TFieldGame.cpp:3387	March	-	-
+32ec76e0	Pporu ctor( particle system ): word +0 (ready, success) = 0, +4 click timer, +8 success timer, +0x10 elapsed = 0; +0x14 font slot 2 (32257cf0); +0x18 particle system; +0x1c "PPoru_Click" sequence, hidden; +0xc interval = 480.0 (@33537ff4)	-	absent	S4a	323bad00
+32ec7210	Pporu dtor: +0x14 = 0, destroy +0x1c sequence	-	absent	S4a	323b8ba0
+32ec7230	Pporu: house id == HI_SPA_PPORU (40147) (static)	-	absent	S4a	323b5970 x2, 323b2e80, 323b3690, 323b0980
+32ec7240	Pporu OnFrameMove( dt ): +4 += dt; +0x10 += dt, > +0xc -> ready (+0) = 1; success (+1) -> +8 += dt	-	absent	S4a	323b5970 @323b6982
+32ec7280	Pporu appear( npc ): NPC hidden (+0x5fa == 0) -> skin anim "Start", npc +0x17c = 1, 325ca950( 1 ) (show), 325c95e0, 325c95c0; ready = 0, interval = rand() % 240 + 480 s, elapsed = 0; sound Alarm_SpaPporu.ogg	-	absent	S4a	323b5970 @323b7194
+32ec7380	Pporu click mark( bShow, pos ): +0x1c at pos + 270 y; tex SPA_PPORU_Success.DDS while success and +8 <= 0.2 (@334411a8), else _Click.DDS for +4 in (0.5, 1.0], else _Normal.DDS; hidden when 31d03920()	-	absent	S4a	32ec7620
+32ec7500	Pporu: hide the click mark	-	absent	S4a	32ec7620
+32ec7560	Pporu: NPC skin anim (+0x1b8 -> +0x238) is "Wait"	-	absent	S4a	32ec7620, 32ec8350
+32ec7620	Pporu OnFrameMove step( npc ): "Wait" -> mark at the NPC (32ec7380( true, pos )), else 32ec7500	-	absent	S4a	323b5970 @323b72df
+32ec7820	Pporu render: notice STR 43533 + STR 23588 (colour 0x326 / 0x327) at (512, 120), font +0x14; skipped when 31d03920()	-	absent	S4a	323aea40
+32ec7b40	Pporu catch request: inventory full -> STR 3860 chat; ED < price of item 164548 (Hard-boiled Egg, 20000 ED) -> STR 851 chat; else send 0xe6 { 164548: 1 } (31e92980; shape of EGS_BUY_ED_ITEM_REQ) and AddServerPacket( 0xe7 )	Offline/Handlers_Inventory.cpp:1329 Handler_EGS_BUY_ED_ITEM_REQ (charges the ED price)	absent	S4a	32ec8350
+32ec7fa0	Pporu catch ACK 0xe7: DeleteServerPacket, IsValidPacket, UpdateInventorySlotList (3286d590), protected ED / point fields, UI refresh (3214ef90 / 32196a00), STR 852 chat	- (March CX2UIShop handles EGS_BUY_ED_ITEM_ACK)	absent	S4a	32ec8330
+32ec8330	Pporu UIServerEventProc: event 0xe7 -> 32ec7fa0	-	absent	S4a	323bda90
+32ec8350	Pporu click( npc ): "Wait" anim -> success (+1) = 1, 32ec7b40	-	absent	S4a	323b3690 x2
+31e4e4c0	TFG +0x620 setter, Lua name SetAppearPPoruCheat (binder 31d95080 @31e2a945)	- (March X2Main.cpp lua_tinker class_def)	absent	S4b	Lua (dev console)
+32501bb0 @325024dc-32502554	local-map loader: SpaData { ID } -> LocalMapTemplet ctor arg (32505910) and VillageParsing( id ) @32502f9e when id is not -1 / 0	X2LocationManager.cpp:265-365 (no SpaData)	absent	S2a	GetVillageMapTemplet( 1500 / 1501 ): every spa reader
+324ff4b0	VillageParsing: SPA_INFO, IsSpaEnter, IsSpaOut	X2LocationManager.cpp:416-441, 475-479	March	-	323ac9d0, 324f2ca0, 324f2d30
+31f00970	CX2State::Handler_EGS_UPDATE_CODE_EVENT_NOT	X2State.cpp:13423 (ported C9h-2d)	March	S2a (emulator sends it)	IsEnableCode( 31 )
+32462a6f in 324627f0	CX2StateMenu::CreateWarpDest: reads code event 31 (inline find 0x1f)	see the spa-id rows	-	S2a	-
+32681590	CX2CustomEventManager: AddRockScissorsPaperData (Lua, CustomEventScript.lua: ED_COST 10000, REWARD_ITEM 164571 x1, MIN / MAX_VALID_TIME 0.4 / 0.6, TOTAL_TIME 3, COOL_TIME 11, NPC NUI_SHY_WISP_EVENT / NUI_SAYRENA_EVENT)	-	absent	S5	RPS UI
+328d07d0	RPS UI: loads DLG_UI_RockScissorsPaper.lua (S5 maps the class 328d0000-328d2d00)	-	absent	S5	-
+328d0a20	RPS: send 0x651 (328d2bc0), AddServerPacket( 0x652 )	-	absent	S5	-
+328d10b0	RPS: send 0x653 (328d2c90), AddServerPacket( 0x654 )	-	absent	S5	-
+328d04ed (in 328d0xxx)	RPS: DeleteServerPacket( 0x654 ) (0x654 handler)	-	absent	S5	-
+32ec84e0 / 32ecd610 / 32ed08c0	use the "RockScissorsPaper" key (S5 reads)	-	absent	S5	-
+32746da0	Lua ResetSpaRestExp: send 0x64f (no payload): admin reset of a server-only spa rest EXP	-	route:none	-	Lua (dev console)
+323ad5f0	CX2TFieldGame::LoadFieldImage: 1500 -> HQ_LoadingSpa_Ruben_01 / 02.tga (loaded through 31f54a10( str, 0x1a )), 1501 -> HQ_LoadingSpa_Ranox_01 / 02.tga	X2TFieldGame.cpp:5105 (1501 only)	mixed	S2a	-
+323b0c00 @323b0f7f-323b0f90 (LoadUI 323b0f20)	CX2TFieldGame::LoadUI: no loading screen (m_fLoadUiTime = 10) only when IsValidWarpField( arg ) is false and neither the previous (+0x68) nor the current (+0x64) village is 1500 / 1501	X2TFieldGame.cpp:5124 (no spa clause)	mixed	S2a	-
+323b1320	CX2TFieldGame::OpenFieldName: title picture 29 for 1500, 30 for 1501	X2TFieldGame.cpp:5307 (1501 only)	mixed	S2a	-
+31f12630 param < 1	CX2State::Handler_EGS_STATE_CHANGE_FIELD_REQ( 0 ) in XS_VILLAGE_MAP: 1500 -> 20000 at ( 2569.0, 60.0, 150.0 ) line 5; 1501 -> 20008 at ( -4100.0, 790.0, 266.0 ) line 31 (the door's stored fields are not read here); June-only states 0xf / 0x16 read location +0xb4 / +0x88..+0x94	X2State.cpp:7105 (no spa return)	mixed	S2b	323a8a60
+31d71000	CX2Main::WarpByCommand: position 19 -> 1500, 20 -> 1501 (g_pData+0x2e8 = id, then the state's field request)	X2Main.cpp:14376 (19 omitted)	mixed	S2a	dev console warp
+32173120	CX2UIInventory::CreateWarpDest: Village_1500 row (no gate), then Village_1501 when my level >= local map 0x2718's level	X2UIInventory.cpp:14098, 1501 row :14138	mixed	S2a	-
+324627f0	CX2StateMenu::CreateWarpDest: code event 31 (@32462a6f) gates both rows: Village_1500, then Village_1501 (level >= local map 0x2718's)	X2StateMenu.cpp:6833-6848 (1500 omitted; 1501 not gated)	mixed	S2a	-
+32476050 @32479a98	CX2StateMenu::UICustomEventProc warp destination: 1500 picked and level < 10 -> STR 43071, abort (XS_VILLAGE_MAP / 0xf)	X2StateMenu.cpp:2243-2282 (no gate)	absent	S2a	-
+324f1e70	CX2LocationManager::IsValidWarpField: 1000-1008 except 1003, 1500-1501, 20000-20009, 25000	X2LocationManager.cpp:1974 (1500 omitted)	mixed	S2a	-
+32264170	CX2MiniMapUI::SetShowMiniMap: channel combo enabled in XS_VILLAGE_MAP when IsVillage or 1500 / 1501	X2MiniMapUI.cpp:458 (IsVillage only)	absent	S2a	-
+32f1fd90	CX2FieldMapBase::ResetMapPosAndSize: 1500 / 1501 in the 1000-1007 / 20000 block (1536 x 768, tex 512 x 512)	X2FieldMapBase.cpp:636-650 (1501 only)	mixed	S2a	-
+32f1fec0	CX2FieldMapBase::ResetCameraMatrix: 1500 / 1501 share the Ranox FIELD_03 block (eye 9030, 3700, -11880)	X2FieldMapBase.cpp:473-499 (1501 only)	mixed	S2a	-
+X2OfflineLuaEnumSeed.h:556	offline Lua enum seed: VMI_SPA_RANOX only (VMI_SPA_RUBEN missing)	X2Lib/Offline/X2OfflineLuaEnumSeed.h:556	mixed	S2a	offline Lua
+31f118c0 @31f11c66	CX2State::ShortCutKeyProcess: ESC in 1500 / 1501 (states 0xe / 0xf / 0x15) -> no system menu, STR 4495 notice	X2State.cpp ShortCutKeyProcess (funcmap D0c-3: whole function differs)	route:stage9	-	-
+321f5e30 / 3294b030	riding-pet skill slot: spa constant on this+0xb4 and 3294b830( 1 ); UpdateStamina shows stamina picture 2 in a spa	X2RidingPetSkillSlot.cpp:81 (picture 1 only)	route:stage9	-	-
+32e65970 @32e66937	Rose Valkyrie gauge (DLG_UI_ROSE_VALKYRIE_GAGE) forced shown in a spa	- (Rose not ported)	route:char-rose	-	-
+3232fd70	CX2QuestManager::GetBoardStartQuestList: 1500 -> board 20000 + billboard NPC quests, 1501 -> 20008	X2QuestManager.cpp:1806-1830	March	-	-
+323f1490 / 323f8080	CX2SquareUnit: spa SD mesh column (_Content10)	X2SquareUnit.cpp:30-42, :217	March	-	-
+325c8250 / 325ccb40 / 325c8030 / 325ca950 @325cc623 / 325cdfa0	CX2TFieldNpc: spa signs SetCanTalkNpc, Ranox sign label -150, Pporu house type 0, no shadow for 40147, Pporu in-area block and name tag	X2TFieldNpc.cpp:3816, 3773, 2391-2415, 3700, 4241, 3279	March	-	-
+323aa1f0 / 3259beb0 / 325d2c60	is-spa-village / is-spa-id stubs; no caller, no xref (dead)	-	absent (dead)	- (not ported)	-
+X2GageUI.cpp:1083 / X2PremiumBuffManager.cpp:758	buff icon shown in a spa; BFI_SPA_STRONG_BUFF hidden in the PvP lobby	X2GageUI.cpp:1083, X2PremiumBuffManager.cpp:758	March	-	-
+EventButtonIconInfo.lua (code event 29)	spa event menu icon DLG_UI_Menu_Spa_Event.lua; not the only way in (doors and signs)	-	route:stage9	-	-
+WorldData.lua dataFileName_CodeEvent	Spa_Ruben_Snow / Spa_Ranox_Snow: picked only when code event 46 is on (March X2WorldManager.cpp:111, June 32803d10); code_events seeds 31 only	X2WorldManager.cpp:111	March	- (stays off)	-
+sweep: 32392d00 / 32393dc0 / 32394340 / 323948e0 / 32398100 / 323a3890 / 323a5680 / 323a6650	dispsweep hits in the TFG range on +0x324..+0x340: other classes compiled before TFG (CX2GUNPC::StateData ctor and neighbours)	-	not-spa	-	-
+sweep: 323aadb0 / 323aafe0 / 323ab1b0	market prompt (+0x3a0 m_hMarketInArea, +0x354 flag), not spa	X2TFieldGame.cpp:1200-1215	not-spa	-	-
+sweep: 323a8a60 @323a8a9d / 323ae130 / 323aea40 @323aeb55 / 323b1650 / 323b2e80 @323b362a / 323b4040 @323b413f / 323ba5f0 / 323bad00 @323bb7ee	+0x32c / +0x330 / +0x334 / +0x328 on another object (g_pData, NPC, templet), not TFG	-	not-spa	-	-
+sweep: 323aa1b0 / 323aa310 / 323adad0 / 323adba0 / 323af8f0 / 323b52d0 / 323b97f0 / 323cc280	+0x340 / +0x488 hits: TFG members outside the spa block or other objects	-	not-spa	-	-
+sweep: 323b7ff0 / 323c2aa0 / 323c3340 / 323c3cf0	HouseTemplet copy / dtor / ctor (+0x324 / +0x334 wstring and vector fields, +0x46c / +0x470 string size and capacity)	-	not-spa	-	-
+sweep: 323c9fa0 / 323cee10 / 323cf570 / 323d0ca0 / 323d0770 / 323d2b40 / 323d5650 / 323d80d0 / 323d9400	classes after the TFG unit (own vtable 33493b2c and others)	-	not-spa	-	-
+sweep: gTFG functions (31d88bf0, 31d8e280, 31f0d390, 31f23e70, 3223d680, 323e05f0, 323e4cb0, 323eef70, 323f8080, 323fad80, 32507840, 32507d40, 32508a90, 32508e70, 32509170, 325094b0, 3250a800, 325ca2b0, 325cd7c0, 325cdfa0, 325ee7d0, 326ea980, 326ee190, 328a1d90, 328a2080, 328a7460, 328b6370, 32d2db50, 32e53d30)	load g_pTFieldGame but no spa-offset hit has it as the base register (scan: none); the offsets belong to their own objects	-	not-spa	-	-
+emu: code_events	emulator: code_events table (31 = on), EGS_UPDATE_CODE_EVENT_NOT at login after the unit list, elsdb.py code-event ("Design")	X2Lib/Offline (nothing sends it today)	absent	S2a	IsEnableCode( 31 ): 323bad00, 323ba5f0, 324627f0
+emu: last position	emulator: EGS_STATE_CHANGE_FIELD_REQ saves any map id as last_pos; login inside a spa per "Decisions" 2	Offline/Handlers_Field.cpp:62	design	S2a	X2StateServerSelect.cpp:7314-7410
+emu: 0x637	emulator answer to 0x637 per "Decisions" 1 (no June server code)	-	design	S3a	-
+emu: 0xe6 / 0xe7	Pporu catch = shop buy of 164548 for its ED price; the emulator's buy handler already charges it	Offline/Handlers_Inventory.cpp:1329	March	S4b (check only)	-
+emu: 0x651-0x654	rock-scissors-paper packets: emulator stand-in designed in S5 once the structs are read	-	design	S5	-

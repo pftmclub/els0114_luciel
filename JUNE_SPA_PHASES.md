@@ -24,10 +24,10 @@ and June's link filter keeps spa rows out of the portal list. On today's data, w
    function adds the row first. A row is `June` only after a read of the exe in this plan.
 3. **No server, so a designed stand-in for the server's answer.** June's server logic for the spa packets is gone (no spa code in
    `KncWX2Server`, no spa row in `ServerResource/US`). The emulator answers the way S0's design says, under its own flag, with a logged
-   `stand-in:` line (memory `design-missing-june-pieces`). The user approves the design before S3 writes it. Live-DB procedures come first:
-   S0 asks the user for any `%spa%` procedure (CLAUDE.md live-DB rule) and transcribes what comes back verbatim.
+   `stand-in:` line (memory `design-missing-june-pieces`). The user approves the design before S3a writes it. There is no live DB to pull
+   procedures from (user, 2026-11-16; CLAUDE.md rule rewritten the same day).
 4. **The spa's code event is switched on from the save.** June builds the door lists only when `CEI_SPA_ON_OFF` (31,
-   `CodeScriptEnum_KR.lua`) is on. Offline nothing sends code events, so S2 adds a save-DB code-event table that the emulator sends at login
+   `CodeScriptEnum_KR.lua`) is on. Offline nothing sends code events, so S2a adds a save-DB code-event table that the emulator sends at login
    (standing rule "Game events are switched on from the save DB"). The table is general, the first row is 31 = on, and `tools/elsdb.py` switches
    rows. The rest of June's code-event logic stays June's.
 5. **Data through the tools.** Core-list Lua (`DLG_Map_Village`, `DLG_Map_House`, `NPCTemplet`, `WorldData`, `MapData`, `Enum`) gets June's
@@ -36,10 +36,10 @@ and June's link filter keeps spa rows out of the portal list. On today's data, w
 6. **Scope.** Spa avatars (`DITT_SPA_AVATAR_*`) are Stage 11's. The spa event menu icon (`EventButtonIconInfo` -> `DLG_UI_Menu_Spa_Event.lua`)
    is Stage 9's, unless S0 shows it is the only way in. Spa achievements (`ACT_SPA_GAME_WIN`, `BTI_ALWAYS_SPA_BUFF_*`) are Stage 31's. The snow
    worlds (`dataFileName_CodeEvent`) stay off unless S0 finds a reason. Whatever else S0 finds goes through the scope rule (CLAUDE.md).
-7. **One debug flag:** `SERV_IRUHADEV_JUNE_SPA_DEBUG`. S2 turns it on, Z retires it. Lines go to `offline_server.log` through
+7. **One debug flag:** `SERV_IRUHADEV_JUNE_SPA_DEBUG`. S2a turns it on, Z retires it. Lines go to `offline_server.log` through
    `CX2OfflineLog::Server( L"[JUNE_SPA] ..." )`, throttled to about one a second.
 8. Standing rules apply unchanged: branch `main`, explicit pathspecs, CP949 sources through `bytepatch.py`, no hardcoded enum literals (spa
-   ids are in June's `Enum.lua`: use the names), one-line comments with the phase tag (`// june-spa S2: June 323b2e80`), `junediverge.py`,
+   ids are in June's `Enum.lua`: use the names), one-line comments with the phase tag (`// june-spa S2b: June 323b2e80`), `junediverge.py`,
    June bugs verbatim with a `JUNE_BUGS.md` row, `tools/finish.py` at every finish.
 
 ## Starting context
@@ -112,13 +112,12 @@ and June's link filter keeps spa rows out of the portal list. On today's data, w
 
 - **Map** `june2017_re/spa/spa_map.tsv`: `june_va`, `what`, `march` (file:line or `-`), `state` (`June` / `March` / `mixed` / `absent` /
   `route:<stage>`), `phase`, `readers`. funcmap rows tagged `Spa S24`.
-- **Code-event switch (S2).** `X2OfflineDB` migration adds `code_events( event_id INTEGER PRIMARY KEY, enabled INTEGER NOT NULL, note TEXT )`
+- **Code-event switch (S2a).** `X2OfflineDB` migration adds `code_events( event_id INTEGER PRIMARY KEY, enabled INTEGER NOT NULL, note TEXT )`
   seeded with `( 31, 1, 'CEI_SPA_ON_OFF' )`. At login, after the unit list, the emulator sends `EGS_UPDATE_CODE_EVENT_NOT` with the enabled
   ids in June's shape (the client handler `31f00970` is already partly ported, C9h-2d). `tools/elsdb.py code-event list | on <id> | off <id>`.
   Flag `SERV_IRUHADEV_OFFLINE_CODE_EVENTS` (emulator + DB). Save backed up before the migration; migrations are forward-only.
-- **Emulator spa answer (S3).** S0 writes the options. The default S0 should test against June: on 0x637 with type `SBT_STRONG`, reply 0x638
-  ok and grant `BTI_SPA_STRONG_BUFF` (1200 s from `BuffTemplet`) through the item-buff path. Then 0x639 or nothing while the buff runs.
-  The user picks before S3.
+- **Emulator spa answer (S3a).** Decided 2026-11-16 ("Decisions" 1): refresh on every pool entry; grant the type's buff for its `BuffTemplet`
+  period, reply 0x638 with the end time; no 0x639.
 - **Debug lines.** `[JUNE_SPA] door near=<0/1> pos=<id>`, `[JUNE_SPA] enter village=<id> return=<village>/<line>`,
   `[JUNE_SPA] type <old> -> <new> line=<n>`, `[JUNE_SPA] send 0x637 flag=<b> type=<n>`, `[JUNE_SPA] recv 0x638 ok=<b>`,
   `[JUNE_SPA] effect play/stop handle=<h>`, `[JUNE_SPA] emu grant buff=<BTI> sec=<n> stand-in`, `[JUNE_SPA] pporu <event>`.
@@ -158,6 +157,54 @@ phase that holds more than about a dozen `absent` / `mixed` rows, amend kickoffs
 **Done gate.** Every "June code" row and every sweep hit has a map row with a state, a phase and readers. Event structs written field by
 field. "Decisions" holds the emulator options and the live-DB ask. Kickoffs S2-S5 amended. No client code, so: full build skipped, no play-test.
 
+## Phase S0 - Done
+
+2026-11-16, Opus 5.5 / xhigh. Read-only: no client code, so full build skipped (no play-test) and no gate applies (`finish.py` takes code files).
+- **Map** `june2017_re/spa/spa_map.tsv`, 106 rows: every "June code" row read in the exe; the sweep hits by function (`not-spa` rows grouped);
+  the spa-id readers outside TFG (immediate scan for 1500 / 1501 / `-1500` and houses 40141 / 40142 / 40147); RPS leads; emulator design rows.
+  funcmap: 46 rows tagged `Spa S24`.
+- **Sweeps.** `dispsweep.py` on +0x324..+0x340, +0x3a0, +0x460..+0x488, +0x624: 10,061 hits; 47 functions in the TFG range, 29 others that
+  load `g_pTFieldGame`. A base-register scan finds no spa-offset hit outside TFG with `g_pTFieldGame` as its base: the spa state is private to
+  the field game. The ctor's ebp-based hits (ebp = this there) were re-read from the locals file.
+- **Events, field by field** (KSerializer type tags: 2 char, 5 int, 8 `__int64`, 0xc bool). June's packet names are not in the exe (no `EGS_`
+  string table): the names are S0's, from the shapes; S3a appends them to March's id list under the flag (wire ids are March ordinals).
+  - **0x637** `EGS_SPA_SOAK_REQ` C->S `{ bool m_bInPool; char m_cSpaBuffType }` (`323bf360` / `320acab0`), `KSession::SendPacket` (`323c15e0`:
+    dest 0x202, logging on, no ack awaited). In a pool `{ 1, type }` after 1.0 s, once per entry (held while the end time is > 0 and the type is
+    unchanged). Out of a pool `{ 0, -1 }` once a second for the first 3 s. TFG dtor in a spa: `{ 0, -1 }`.
+  - **0x638** `EGS_SPA_SOAK_ACK` S->C `{ int m_iOK; bool m_bSoaking; __int64 m_tBuffEndTime }` (`320acb70`): `IsValidPacket( m_iOK )` and the
+    bool -> end time to +0x478, notice on (+0x462).
+  - **0x639** `EGS_SPA_BUFF_END_TIME_NOT` S->C `{ __int64 m_tBuffEndTime }` (`320acbe0`): replaces the end time only (0 lets the client ask again).
+  - The end time is absolute: `323ac3e0` shows `mktime( localtime64( end ) ) - GetServerCurrentTime()` as M:SS. No other handler: no compare
+    or push of 0x637-0x639 outside TFG; `CX2StateField` (`3250d2f0`) forwards to TFG `EventProcess`.
+- **Entry.** Prompt (`323ab220`) within 150 of an `IsSpaEnter` start pos; the key handler stores the return position and opens an OK / Cancel box
+  (STR 43070, OK = `USCM_ENTER` 75000); talking to sign 40141 / 40142 opens the same box. `USCM_ENTER` (`323b4040`) refuses level < 10
+  (STR 43071), else asks for 1500 (from Ruben) or 1501 (from Ranox). **Exit:** up key near an `IsSpaOut` start pos ->
+  `Handler_EGS_STATE_CHANGE_FIELD_REQ( 0 )`, which in a village sends 1500 to Ruben (2569, 60, 150) line 5 and 1501 to Ranox (-4100, 790, 266)
+  line 31. The stored door position is not read there.
+- **SpaData.** The local-map loader passes `SpaData.ID` to the templet and calls `VillageParsing( id )` (`32501bb0` @32502f9e). March reads no
+  `SpaData`, so the spa villages' templets are never parsed today (S2a's first row).
+- **Pporu** (`+0x624`, 0x20 bytes, no vtable or RTTI): NPC 40147 starts hidden, appears every 480-720 s (`rand() % 240 + 480`) with the "Start"
+  anim and `Alarm_SpaPporu.ogg`; clicking it while it plays "Wait" sends June's shop-buy 0xe6 `{ 164548: 1 }` (Hard-boiled Egg, 20000 ED; the
+  client checks bag space and ED first) and takes the 0xe7 ACK as a purchase. June's Pporu sells the egg, and the emulator's
+  `Handler_EGS_BUY_ED_ITEM_REQ` already charges the price: no stand-in. Dev cheat: Lua `SetAppearPPoruCheat` (TFG +0x620, auth level > 2).
+- **Rock-scissors-paper** is spa-only (`ROCKSCISSORSPAPER_NPC` only on houses 40143 / 40144; `AddRockScissorsPaperData` only for
+  `NUI_SHY_WISP_EVENT` / `NUI_SAYRENA_EVENT`): S5 stays. Data (`CustomEventScript.lua`): 10000 ED a try, reward 164571 x1, valid 0.4-0.6 s, 3 s
+  rounds, 11 s cool time. Packets 0x651 / 0x652 and 0x653 / 0x654; UI class around 328d0000-328d2d00.
+- **Code event 31** readers: TFG ctor (door lists), village NPC creation (signs; March has it), `CX2StateMenu::CreateWarpDest` (both spa warp
+  rows). The snow worlds use code event 46 (`X2WorldManager.cpp:111`): they stay off. The spa event icon is code event 29 and not the only way
+  in: Stage 9.
+- **Dead in June, not ported:** `323ac910`, `323ac990`, `323ad4c0`, `323b1e40`, `323aa1f0`, `3259beb0`, `325d2c60` (no caller, no xref).
+- **Also found.** `UI_SPA_PPORU.lua` is named by June's `NPCTemplet` but is in no June kom (Pporu has `bCanTalkNpc = FALSE`): nothing to stage.
+  Lua `ResetSpaRestExp` sends 0x64f with no payload, an admin reset of a server-only spa rest EXP with no June values: `route:none`.
+- **Sizing.** S2 held 32 absent / mixed rows, S3 18, S4 23. Split: S2a plumbing (15 rows, mostly one-line Ruben cases), S2b doors (17, five of
+  them a few lines), S3a wire + emulator (6), S3b client soak (12), S4a Pporu class (14 small methods), S4b hooks (9). One review per pair (at
+  S2b, S3b, S4b). Seam S2b: S1 and S2a batch into it. S3a and S4a are inert (probe build; S3b / S4b test them).
+- **Routed** (bullets added): ESC in a spa (`31f11c66`), the riding-pet stamina picture in a spa (`321f5e30` / `3294b030`) and the spa event
+  icon -> Stage 9; Rose's Valkyrie gauge forced shown in a spa (`32e65970`) -> Stage 8 (char-rose).
+- **Decisions** answered below. The live-DB ask is void: the user has no live-DB access anymore, and CLAUDE.md's rule was rewritten the same day.
+- Rule note for S2a: March's `CEI_*` value 31 is `CEI_ALLOW_ELESIS_FIRST_CLASS_OLD_AND_NEW_YEAR_EVENT` (`ScriptID_Code.h:88`), a 2014 event;
+  June's 31 is `CEI_SPA_ON_OFF`. The meaning differs, so S2a registers June's name beside it under the flag and uses it.
+
 ## Phase S1 - Spa data and assets
 
 **Scope.** Everything the spa needs on disk, no C++:
@@ -170,82 +217,132 @@ field. "Decisions" holds the emulator options and the live-DB ask. Kickoffs S2-S
 - `WorldData.lua` (data040, core): rows 725 / 726. World luas and line maps (adopt-june), the snow variants staged too (byte-exact rule) but not
   switched on.
 - `DLG_Map_Local_Ruben.src.lua`: restore `SpaData.ID = VMI_SPA_RUBEN` (comment it as a June-parity restore).
-- NPC / UI luas: `UI_SPA_PPORU`, `UI_MUL_MAI`, `UI_MULSAYRENA`, `UI_NPC_SHY_WISP`, `UI_WISP`, `UI_NPC_BILLBOARD_SPA` (adopt-june; find
-  `UI_SPA_PPORU`'s kom first). `DLG_Destination_byButton` / `DLG_UI_Field_Title`: June's spa entries are present or merged.
+- NPC / UI luas: `UI_MUL_MAI`, `UI_MULSAYRENA`, `UI_NPC_SHY_WISP`, `UI_WISP`, `UI_NPC_BILLBOARD_SPA` (adopt-june, data039). `UI_SPA_PPORU` is in
+  no June kom (S0): nothing to stage. `DLG_Destination_byButton` / `DLG_UI_Field_Title`: June's spa entries are present or merged.
 - Assets: `Motion_Spa_Bboru.x`, `Motion_Wisp_EVENT*.xet`, the three sounds, loading images `HQ_LoadingSpa_Ruben_01/02.tga` (and Ranox's if
   missing), every `.TET` beside a staged UI texture (memory `stage-tet-with-every-ui-texture`), `SPA_PPORU_*.DDS`, `Alarm_SpaPporu.ogg`.
   Gates: an asset closure over the four spa world luas and the spa NPC / UI luas prints 0 missing; `luabind.py check` passes for every staged
   NPC / UI lua (ENUM and STATE gates too); `luasrc.py core --check` and `ledger --check` pass.
 - Pack and copy every touched kom.
 
-**Run with.** Sonnet 5.5 / high (data work). Review: inside S2's review (Opus). **Hand-off:** batch at S2 (regression section: Ruben, Ranox and
+**Run with.** Sonnet 5.5 / high (data work). Review: inside S2b's review (Opus). **Hand-off:** batch at S2b (regression section: Ruben, Ranox and
 one other village still load, the Ruben sign and the spa houses appear, nothing new in `ErrorLog.txt`).
 
 **Read list.** "Rules", "Starting context", "Phase S1 - Spa data and assets", S0's Done note.
 
 **Done gate.** The gates above PASS (paste them), `PACK OK` / `COPY OK` per kom, `MODS.md` entry, the replaced files listed in the Done note.
-Full build skipped: no play-test yet (batch at S2).
+Full build skipped: no play-test yet (batch at S2b).
 
-## Phase S2 - Code-event switch, entering and leaving the spa
+## Phase S2a - Code events, spa village plumbing, Ruben omissions
 
-**Scope.** Flags `SERV_IRUHADEV_OFFLINE_CODE_EVENTS`, `SERV_IRUHADEV_JUNE_SPA_ENTRY`, `SERV_IRUHADEV_JUNE_SPA_DEBUG`:
+**Scope.** Flags `SERV_IRUHADEV_OFFLINE_CODE_EVENTS`, `SERV_IRUHADEV_JUNE_SPA_ENTRY`, `SERV_IRUHADEV_JUNE_SPA_DEBUG`; the map rows marked S2a:
 - the code-event table, its migration, the login send and the `elsdb.py` command ("Design"); `IsEnableCode( 31 )` reads true offline;
-- TFG ctor: the two lists (`324f2ca0`, `324f2d30`) under June's code-event test, as June has them;
-- OnFrameMove: entrance prompt (`323ab220`), exit prompt (`323ab390`), reset (`323ab4f0`); the key handler `323b2e80` (return position and
-  line) and the exit `323a8a60`, with every reader of the stored return fields;
-- March's Ruben omissions: `X2LocationManager.cpp:1974`, `X2Main.cpp` world index, `X2FieldMapBase.cpp`, `LoadFieldImage`, the offline enum seed;
-  `VMI_SPA_RUBEN` registered where C++ lacks it (`JUNE_ENUM_NAMES` pattern);
-- emulator: state change into 1500 / 1501 and back, and the login-inside-spa answer from "Decisions";
-- the other rows S0 assigns here.
-`+0x624` stays null (S4) and the soak timer stays out (S3).
+  `CEI_SPA_ON_OFF` registered beside March's 31 (S0's rule note);
+- `SpaData` in the local-map loader (`32501bb0`: templet arg + `VillageParsing`), so 1500 / 1501 get templets;
+- March's Ruben omissions and the spa cases of the shared functions: `IsValidWarpField`, `WarpByCommand` 19, both `CreateWarpDest`s (with the
+  code-event 31 gate), the warp-destination level-10 gate, `LoadFieldImage`, `LoadUI`'s loading-screen clause, `OpenFieldName`,
+  `X2FieldMapBase` (two), the minimap channel combo, the offline enum seed; `VMI_SPA_RUBEN` registered where C++ lacks it (`JUNE_ENUM_NAMES`);
+- emulator: last position as "Decisions" 2 says (saved like any village).
+No door code (S2b), `+0x624` null (S4b), no soak (S3b).
 
-**Run with.** Opus 5.5 / high. Own review (`S2-review.md`, covers S1's data). **Hand-off:** now. This is the seam: `build.py --deploy`, then
-`playtest.py assemble june-spa S1 S2` in full.
+**Run with.** Opus 5.5 / high. Review: in S2b's. **Hand-off:** batch at S2b (warp into both spas by console command; code event on / off).
 
-**Read list.** "Rules", "Starting context", "Design", "Decisions", "Phase S2 - ...", S0's and S1's Done notes, the map rows marked S2.
+**Read list.** "Rules", "Starting context", "Design", "Decisions", "Phase S2a - ...", S0's and S1's Done notes, the map rows marked S2a.
 
-**Done gate.** Play-test: in Ruben and in Ranox, walk to the door, the prompt shows, the key enters the spa (loading image, BGM, world, NPCs),
-both exits lead back to the door's position. A relog inside a spa follows the decision. `elsdb.py code-event off 31`, relog: the doors do
-nothing (June's behaviour with the event off). Log lines `door`, `enter`, the emulator's `FIELD` lines. `exestr.py` for the debug tag.
+**Done gate.** `finish.py` PASS; probe build 0 errors (full build skipped: batch at S2b); section S2a in `playtest.md` (`playtest.py check` PASS).
 
-## Phase S3 - Soaking, the spa notice, effect and buff
+## Phase S2b - Spa doors: entering and leaving
 
-**Scope.** Flag `SERV_IRUHADEV_JUNE_SPA_BUFF` (+ `_DEBUG`):
-- `323ac9d0` type pick; the soak timers and the 0x637 send in OnFrameMove; 0x638 / 0x639 in `EventProcess` (and `323ac910` / `323ac990` if
-  they are separate vslots); the spa block of `323aea40` (notice, `EffectSet_SPA_Buff` play and stop, handle `+0x484`);
-- the three events' structs in `KncWX2Server/Common` and their `Put` / `Get`, client side behind the flag (`CommonPacket.h`: second home in
+**Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_ENTRY` (+ `_DEBUG`); the map rows marked S2b, June's code whole:
+- TFG ctor: the two lists (`324f2ca0`, `324f2d30`) under June's code-event test; dtor frees them;
+- OnFrameMove: the per-frame prompt reset, the entrance loop, the spa-village exit loop and exit key; the spa-sign talk flag in the NPC loop;
+- the prompts `323ab220` / `323ab390` / `323ab4f0` (and its two callers), the door branch of the key handler `323b2e80`, `USCM_ENTER` in
+  `323b4040`, the sign cases of `323b3690`, the exit `323a8a60`, and the spa return of `Handler_EGS_STATE_CHANGE_FIELD_REQ( 0 )` (June's body
+  whole; its June-only states get labelled stand-ins).
+Leave the Pporu lines (S4b) and the soak (S3b) out.
+
+**Run with.** Opus 5.5 / high. Own review (`S2b-review.md`, covers S1 and S2a). **Hand-off:** now. **Seam:** `build.py --deploy`, then
+`playtest.py assemble june-spa S1 S2a S2b` in full.
+
+**Read list.** "Rules", "Starting context", "Design", "Decisions", "Phase S2b - ...", S0's, S1's and S2a's Done notes, the map rows marked S2b.
+
+**Done gate.** Play-test: in Ruben and in Ranox, walk to the door, the prompt shows, the key opens June's box, OK enters the spa (loading image,
+BGM, world, NPCs); a level-9 unit gets June's refusal; talking to the sign opens the same box; both exits lead to June's fixed spot by the door
+(Ruben line 5, Ranox line 31). A relog inside a spa loads the spa. `elsdb.py code-event off 31`, relog: no doors, no signs, no spa warp rows.
+Log lines `door`, `enter`, the emulator's `FIELD` lines. `exestr.py` for the debug tag.
+
+## Phase S3a - Spa packets and the emulator's buff answer
+
+**Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_BUFF`, `SERV_IRUHADEV_OFFLINE_SPA_BUFF` (stand-in); the map rows marked S3a:
+- events 0x637 / 0x638 / 0x639 as S0's Done note writes them, appended to March's id list (`EGS_SPA_SOAK_REQ`, `EGS_SPA_SOAK_ACK`,
+  `EGS_SPA_BUFF_END_TIME_NOT`), structs and `Put` / `Get` in `KncWX2Server/Common` behind the flag (`CommonPacket.h`: second home in
   `ServerDefine.h` + `SECOND_HOMES`);
-- the emulator handler as the user decided (stand-in flag `SERV_IRUHADEV_OFFLINE_SPA_BUFF`, logged `stand-in:` line), the buff through the
-  item-buff path; the buff's templet and factor rows checked live in March's data (S1 adds them if missing);
-- `BFI_SPA_GROW_BUFF` / `BTI_*` names registered where C++ lacks them.
+- `BTI_SPA_GROW_BUFF` 918 / `BTI_SPA_STRONG_BUFF` 919 / `BFI_SPA_GROW_BUFF` 948 registered where C++ lacks them; the buff templet and factor rows
+  checked live in data036;
+- the emulator's 0x637 handler as "Decisions" 1 says, through the buff path (`CX2OfflineBuff`), one logged `stand-in:` line per grant.
+Inert on the client (nothing sends 0x637 until S3b).
 
-**Run with.** Opus 5.5 / high. Own review (`S3-review.md`). **Hand-off:** now.
+**Run with.** Opus 5.5 / high. Review: in S3b's. **Hand-off:** none of its own (S3b's play-test runs it).
 
-**Done gate.** Play-test in each spa: stand in a pool line -> after June's soak time the notice (string 43476 for `SBT_STRONG`) and the
-effect show, the buff icon appears with 20:00, leaving the line stops the effect, a dungeon run shows the buff applied (and the PvE rule
-June's `NOT_USE_IN_PVE` gives). Log lines `type`, `send 0x637`, `recv 0x638`, `effect`, `emu grant`.
+**Read list.** "Rules", "Design", "Decisions", "Phase S3a - ...", S0's Done note, the map rows marked S3a.
 
-## Phase S4 - The Pporu game
+**Done gate.** `finish.py` PASS; probe build 0 errors (full build skipped: no play-test).
 
-**Scope.** Flag `SERV_IRUHADEV_JUNE_SPA_PPORU` (+ `_DEBUG`): the `+0x624` object as June builds it in the ctor (1500 / 1501 only), its tick
-`32ec7240`, its OnFrameMove step `32ec7620` / `32ec7380`, `32ec7280`, the render hook `32ec7820` from `323aea40`, its UI events `32ec8330` /
-`32ec7fa0`, its sound and textures, the house-40147 NPC click, and any packet and emulator reply S0 found. A new class in the field game's
-own naming pattern (S0 names it from June's RTTI if present). The dtor `323b8ba0` frees it.
+## Phase S3b - Soaking, the spa notice and effect
 
-**Run with.** Opus 5.5 / high. Own review (`S4-review.md`). **Hand-off:** now.
+**Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_BUFF` (+ `_DEBUG`); the map rows marked S3b, June's code whole: the ctor's spa state init and the
+notice font (`+0x480`), `323ac9d0`, the soak timers and sends in OnFrameMove, 0x638 / 0x639 in `EventProcess`, the spa block of `323aea40`
+(notice, `323ac3e0`, `EffectSet_SPA_Buff` play and stop), the dtor's leave send. The dead twins (`323ac910`, `323ac990`, `323ad4c0`) stay out
+unless a caller turns up.
 
-**Done gate.** Play-test: in each spa, the Pporu NPC is there, the click game runs to success (textures and the alarm sound), leaving and
-re-entering the spa does not crash or leak (log lines `pporu`).
+**Run with.** Opus 5.5 / high. Own review (`S3b-review.md`, covers S3a). **Hand-off:** now.
 
-## Phase S5 - The wisp NPC's rock-scissors-paper (only if S0 keeps it here)
+**Read list.** "Rules", "Starting context", "Design", "Decisions", "Phase S3b - ...", S0's, S2b's and S3a's Done notes, the map rows marked S3b.
 
-**Scope.** Flag `SERV_IRUHADEV_JUNE_SPA_RPS`: the inner wisp NPC's `ROCKSCISSORSPAPER_NPC` path (`DLG_UI_RockScissorsPaper.lua`), its
-packets and the emulator's answer (a stand-in designed in S0, user-approved), June's rewards as data says. If S0 routes rock-scissors-paper to
-its own plan, this phase is deleted from STATUS and the NPC keeps June's talk menu only.
+**Done gate.** Play-test in each spa: stand in a pool line -> after 1 s the notice (STR 43476 for `SBT_STRONG`) with M:SS left and the effect
+show, the buff icon appears with 20:00; step out and back in -> the buff restarts at 20:00 ("Decisions" 1); leaving the line stops the effect;
+a dungeon run shows the buff applied (and June's `NOT_USE_IN_PVE` rule). Log lines `type`, `send 0x637`, `recv 0x638`, `effect`, `emu grant`.
+
+## Phase S4a - The Pporu class
+
+**Scope.** Flag `SERV_IRUHADEV_JUNE_SPA_PPORU`; the map rows marked S4a: the `+0x624` object (`32ec76e0` .. `32ec8350`, 14 methods) as a new
+class in the field game's naming pattern (no RTTI in June: name it from what it does), its own files in `X2Lib_2010.vcxproj` and filters. The
+catch request sends March's `EGS_BUY_ED_ITEM_REQ` (June's 0xe6 has its shape) and the ACK path follows June's `32ec7fa0`. Inert: nothing
+creates it until S4b.
+
+**Run with.** Opus 5.5 / high. Review: in S4b's. **Hand-off:** none of its own.
+
+**Read list.** "Rules", "Phase S4a - ...", S0's Done note, the map rows marked S4a.
+
+**Done gate.** `finish.py` PASS; probe build 0 errors (full build skipped: no play-test).
+
+## Phase S4b - Pporu in the field game
+
+**Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_PPORU` (+ `_DEBUG`); the map rows marked S4b: ctor creation (1500 / 1501), the tick and the NPC-loop
+steps in OnFrameMove, the key-handler and join-NPC skips, `EventProcess` forwarding, the render hook, the hidden start in add-field-NPC, the
+dtor delete, and the Lua `SetAppearPPoruCheat` bind; textures, the alarm sound and the click particle checked staged (S1).
+
+**Run with.** Opus 5.5 / high. Own review (`S4b-review.md`, covers S4a). **Hand-off:** now.
+
+**Read list.** "Rules", "Starting context", "Decisions", "Phase S4b - ...", S0's and S4a's Done notes, the map rows marked S4b.
+
+**Done gate.** Play-test in each spa: the cheat makes Pporu appear (alarm, "Start" anim, on-screen notice); clicking it during "Wait" buys the
+Hard-boiled Egg (164548) for 20000 ED; with too little ED June's refusal shows; leaving and re-entering the spa does not crash or leak (log
+lines `pporu`).
+
+## Phase S5 - The spa NPCs' rock-scissors-paper
+
+**Scope.** Flag `SERV_IRUHADEV_JUNE_SPA_RPS`. Spa-only (S0): houses 40143 / 40144, NPCs `NUI_SHY_WISP_EVENT` (Ruben) / `NUI_SAYRENA_EVENT`
+(Ranox). First map the RPS class (UI around 328d0000-328d2d00, `CX2CustomEventManager::AddRockScissorsPaperData` `32681590`, the
+`NMUM_ROCK_SCISSORS_PAPER` button, packets 0x651 / 0x652 and 0x653 / 0x654 with their structs) into `spa_map.tsv`; if it holds more than about a
+dozen absent / mixed rows, split this phase before porting. Data: `CustomEventScript.lua`'s two `AddRockScissorsPaperData` rows and
+`DLG_UI_RockScissorsPaper.lua` (data034), through the tools. The emulator answer is a stand-in built only from those rows (ED cost, reward
+item and quantity), written to "Decisions" and approved by the user before it is coded.
 
 **Run with.** Opus 5.5 / high. Own review (`S5-review.md`). **Hand-off:** now.
 
-**Done gate.** Play-test: talk to the wisp in each spa, play a round, see June's win / lose / draw UI and the reward the stand-in gives.
+**Done gate.** Play-test: talk to the NPC in each spa, play a round, see June's win / lose / draw UI, the 10000 ED cost and the reward the
+stand-in gives.
 
 ## Phase Z - Close
 
@@ -255,10 +352,31 @@ memory note updated; the STATUS block moved to `STATUS_ARCHIVE.md` with one *Clo
 
 ## Decisions
 
-(S0 writes the options here; the user answers before S2 / S3 start.)
+Written by S0 and answered by the user on 2026-11-16 (`AskUserQuestion`).
+
+1. **The emulator's answer to 0x637** (no June server code). June evidence: the client sends `{ 1, type }` 1.0 s after a pool line is entered
+   (and again only after the type changes or the player left a pool); `{ 0, -1 }` once a second for 3 s after leaving and from the TFG dtor;
+   0x638 `{ m_iOK, bool, end time }` turns the notice and effect on, the notice counting down `end - server now` as M:SS; 0x639 only replaces the
+   end time (0 or less makes the client ask again). Both spas' `SPA_INFO` rows are `SBT_STRONG` -> `BTI_SPA_STRONG_BUFF` 919 (1200 s,
+   `URT_DUNGEON` / `URT_BATTLE_FIELD`, `NOT_USE_IN_PVE`); `SBT_GROW` -> `BTI_SPA_GROW_BUFF` 918 has no factor behaviour (`BBT_EMPTY`).
+   Options: (a) grant when inactive, answer the current end time when active, push 0x639 `{ 0 }` at expiry while in a spa (recommended);
+   (b) grant once per pool entry, no 0x639; (c) refresh on every entry.
+   **Answer: (c) refresh on every entry.** On `{ 1, type }` with type `SBT_GROW` / `SBT_STRONG`: grant (or re-grant) that type's buff for its
+   `BuffTemplet` period from now, reply 0x638 `{ NET_OK, true, now + period }`, sync the buff list; log `stand-in:` with the buff id and seconds.
+   `{ 0, -1 }`: logged, no reply. Other types: logged, ignored. 0x639 is never sent, so a player who stands in the pool past the 20 minutes
+   sees June's notice count below zero (June's client has no clamp) until they step out and back in.
+2. **Login with a saved position inside a spa.** June's client has no spa rule at login (it loads the saved village once the templet exists,
+   which S2a's `SpaData` read gives), and June's exit needs no stored data (fixed spots by each door). Options: allow it (recommended) / never
+   save a spa as last position. **Answer: allow it.** The emulator keeps saving 1500 / 1501 like any village. With code event 31 off, June
+   builds no exit points, so a unit saved inside a spa can only leave by warp (June's behaviour with the event off).
+3. **Live-DB ask** (`%spa%` procedures). **Answer: the user has no live-DB access anymore.** The ask is void; CLAUDE.md's live-DB rule was
+   rewritten the same day (no pulls; repo transcriptions, else a user-approved stand-in). Rule 3 above follows it.
+4. **Other S0 calls (no question needed).** Pporu: June's client buys the egg through the shop packet, so the existing buy handler answers it
+   (no stand-in). Rock-scissors-paper: spa-only, so S5 stays; its stand-in is designed in S5 from June's `CustomEventScript` rows and asked
+   then. Snow worlds: code event 46, not seeded: off. Spa event menu icon: code event 29, not the only way in: Stage 9.
 
 ## Play-test hand-off
 
-Dev console first (END key, auth level 3). Copy-ready lines. Village warps go through the console's warp command or the map; a unit for
-Ranox must meet `MapData`'s level 65 (`/x2-create-char` or `elsdb.py`). Per check: where, what to press, what to look for, what a failure looks
+Dev console first (END key, auth level 3). Copy-ready lines. Village warps go through the console's warp command or the map. June's client
+gates spa entry on level 10 only (`MapData`'s 65 for Ranox is a server check the emulator does not run); test the refusal with a level-9 unit. Per check: where, what to press, what to look for, what a failure looks
 like, and the `[JUNE_SPA]` lines to expect. Read with `python tools/logs.py --tag JUNE_SPA` plus the emulator's `FIELD` lines.

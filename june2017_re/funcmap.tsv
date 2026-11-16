@@ -12650,3 +12650,49 @@ user +0x94a0 (StatCalc S33 S3)	CX2GUUser second socket-option list (no March mem
 32b07f30 (CH3d)	CX2GULuciel::LSI_HA_LDN_DIABOLIC_DISASTER_FrameMove	PORTED	Char Luciel CH3d: on Lu's own anim +0x87d4 ( not the active body's ): EventTimerOneshot( 0.09 ) -> SetInvisibility( true ), EventTimerOneshot( 6.9 ) -> SetInvisibility( false ); CommonFrameMove
 32014fc0 @320150c1 (CH3d)	CX2GUUser::ShowHyperSkillCutInByScript: the Lu/Ciel branches	PORTED	Char Luciel CH3d ( SERV_IRUHADEV_JUNE_CHAR_DUO_HYPER_CUT_IN ): vslot 0x260 ( 3208e160 = byte +0x8e90 = IsMinorUnitActive ) and templet +0x314 not empty -> m_MinorUnitHyperCutIn; templet unit type 10 / class 0x81: 320761a0 ( = GetFutureStateID, ( +0x7cb0 - +0x7cec ) / 100 ) 0x1c2 without the second body -> +0x330 m_HyperCutIn_Trans, 0x1f6 with it -> +0x34c m_MinorUnitHyperCutIn_Trans
 3336f3e0 / 33379860 / 3337eab0 / 333988f0 / 3339ead0 (CH3d)	June image table initializers: Lu/Ciel transcended rows	PORTED	Char Luciel CH3d ( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_TRANSCEND, CX2Data::GetCharacterImageName ): 127 / 128 / 129 = gauge TR_D_LORD_1 / TR_N_OBLESSE_1 / TR_D_EMONIO_1 ( Texture102_NEW @3337366f ), large TR_D_LORD_1E / TR_N_OBLESSE_2 / TR_D_EMONIO_1 ( Texture103_NEW @333788ba ), gray _2_GRAY ( Texture103_GRAY @3337db05 ), medium _1_MEDIUM / _1_MEDIUM / TR_D_EMONIO_1MEDIUM, icon _1_ICON, party _1_PARTY ( Texture100_NEW ), slot list_TR_D_LORD_2 / _N_OBLESSE_1 / _D_EMONIO_2, slot gray list_TR_*_1_GRAY; every name is in the March-staged .TET as spelt
+323bad00 @323bc7c3-323bc804	CX2TFieldGame ctor: spa state init (none in March)	confirmed	Spa S24 (june-spa S0): +0x460 dword 0, +0x464 = 0, +0x468 / +0x46c / +0x470 = 0.0, +0x474 = -1, +0x478 / +0x47c = -1, +0x484 = -1; spa_map.tsv
+323b5970 @323b6800-323b6aa9	CX2TFieldGame::OnFrameMove: spa entrance / exit loops (none in March)	confirmed	Spa S24 (june-spa S0): +0x324 / +0x334 lists, distance <= 150.0 (@3346bda8) -> 323ab220 / 323ab390; +0x461 -> 323a8a60; Pporu tick 32ec7240 in 1500 / 1501
+323b5970 @323b6aa9-323b6cd2	CX2TFieldGame::OnFrameMove: spa soak timers and 0x637 sends (none in March)	confirmed	Spa S24 (june-spa S0): in a pool +0x468 >= 1.0 s (double @334355b0) -> { 1, type }, held while end time > 0; out of a pool +0x46c >= 1.0 and +0x470 <= 3.0 (double @33439b50) -> { 0, -1 }
+323ab220	none in March: spa entrance prompt( bShow, pos )	confirmed	Spa S24 (june-spa S0): +0x3a0 (m_hMarketInArea) at pos + 270 y, Get_In_Up / _Down.dds by +0x128; +0x460 = bShow
+323ab390	none in March: spa exit prompt( bShow, pos )	confirmed	Spa S24 (june-spa S0): as 323ab220 with Get_Out_Up / _Down.dds; +0x461 = bShow
+323ab4f0	none in March: hide both spa prompts	confirmed	Spa S24 (june-spa S0): clears +0x460 / +0x461; callers CX2CashShop::SetOpen 3223d97f, 32508a90 (CX2StateField vtable slot)
+323a8a60	none in March: spa exit by the up key	confirmed	Spa S24 (june-spa S0): 31c488c0( 0 ) once (state +0x22f), closes g_pData+0x32c / +0x2e0 UIs, 32151680, state +0xc4 = 0, 31f12630( 0 )
+323ac9d0	none in March: spa type from SPA_INFO by my unit's line	confirmed	Spa S24 (june-spa S0): templet +0x70 rows (0x14: Type, vector LineIdx) vs unit +0x3d4 -> +0x474; changed -> +0x464, none -> +0x463
+323ac3e0	none in March: spa notice remaining time M:SS	confirmed	Spa S24 (june-spa S0): localtime64( +0x478 ) -> mktime, difftime with GetServerCurrentTime 31edca50
+323ac910	none in March: 0x638 handler twin (dead)	confirmed	Spa S24 (june-spa S0): same body as EventProcess 0x638, returns bool; no caller, no xref
+323ac990	none in March: 0x639 handler twin (dead)	confirmed	Spa S24 (june-spa S0): same body as EventProcess 0x639; no caller, no xref
+323ad4c0	none in March: my unit has the current spa type's factor (dead)	confirmed	Spa S24 (june-spa S0): SBT_GROW -> BFI 948, SBT_STRONG -> BFI 949 in unit +0x1a0 +0xdbc list; no caller, no xref
+323be4c0	DeSerialize( KSerBuffer, 0x638 struct ) (none in March)	confirmed	Spa S24 (june-spa S0): -> 320acb70
+323be550	DeSerialize( KSerBuffer, 0x639 struct ) (none in March)	confirmed	Spa S24 (june-spa S0): -> 320acbe0
+320acb70	Get( 0x638 struct ): int m_iOK, bool, __int64 (none in March)	confirmed	Spa S24 (june-spa S0): tags 5 / 0xc / 8 at +0 / +4 / +5 (pack 1)
+320acbe0	Get( 0x639 struct ): __int64 (none in March)	confirmed	Spa S24 (june-spa S0): tag 8
+323bf360	KEvent serialize of the 0x637 struct (none in March)	confirmed	Spa S24 (june-spa S0): -> 320acab0
+320acab0	Put( 0x637 struct ): bool, char (none in March)	confirmed	Spa S24 (june-spa S0): tags 0xc / 2
+323c15e0	KSession::SendPacket< 0x637 struct >	confirmed	Spa S24 (june-spa S0): ( 0x202, 0, 0, 0x637, &data, true, false ); callers 323b5970 x2, 323b8ba0
+323b1e40	none in March: static send 0x637 { a, b } (dead)	confirmed	Spa S24 (june-spa S0): via 323c1fc0; no caller, no xref
+323aea40 @323aec01-323aef6e	CX2TFieldGame render: spa notice, EffectSet_SPA_Buff, Pporu notice (none in March)	confirmed	Spa S24 (june-spa S0): STR 43074 / 43476 + 323ac3e0 at (512, 150) with font +0x480; effect -> +0x484, stop 321dafb0; Pporu 32ec7820
+323b2e80 @323b2ee9-323b3300	CX2TFieldGame key handler: spa door (none in March)	confirmed	Spa S24 (june-spa S0): +0x460 -> return pos to location +0x88..+0x94, OK / Cancel STR 43064 or 43065 + 43070, OK 75000
+323b4040 @323b41a3-323b4238	CX2TFieldGame::UICustomEventProc: USCM_ENTER 75000 (none in March)	confirmed	Spa S24 (june-spa S0): level < 10 (31edefe0) -> STR 43071; 20000 -> 31f12630( 1500 ), 20008 -> 31f12630( 1501 )
+323b3690	CX2TFieldGame join NPC by index: spa sign and Pporu cases (none in March)	confirmed	Spa S24 (june-spa S0): case 40141 / 40142 -> enter box (75000); house 40147 -> 32ec8350 and return
+323b8ba0	CX2TFieldGame::~CX2TFieldGame	confirmed	Spa S24 (june-spa S0): called from 323c41f0 (deleting dtor) and 324ed9f0; +0x480 = 0, Pporu delete, stop +0x484, send 0x637 { 0, -1 } in 1500 / 1501, free +0x334 / +0x324
+323b0980 @323b0ab8-323b0ad9	CX2TFieldGame add field NPC: Pporu starts hidden	confirmed	Spa S24 (june-spa S0): house 40147 -> 325ca920 (+0x5fa = 0)
+31f12630 param < 1	CX2State::Handler_EGS_STATE_CHANGE_FIELD_REQ: spa exit return	confirmed	Spa S24 (june-spa S0): XS_VILLAGE_MAP 1500 -> 20000 ( 2569, 60, 150 ) line 5; 1501 -> 20008 ( -4100, 790, 266 ) line 31 (@3346bda8..bdb8, 33458fa0)
+32501bb0 @325024dc-32502f9e	CX2LocationManager::OpenScriptFile: SpaData	confirmed	Spa S24 (june-spa S0): SpaData.ID -> templet ctor 32505910 arg and VillageParsing 324ff4b0( id ) when not -1 / 0; March reads no SpaData
+32ec76e0	none in March: Pporu ctor( particle system )	confirmed	Spa S24 (june-spa S0): 0x20 bytes, no vtable; font slot 2 -> +0x14, +0x18 particle system, +0x1c "PPoru_Click" hidden, +0xc = 480.0
+32ec7210	none in March: Pporu dtor	confirmed	Spa S24 (june-spa S0): +0x14 = 0, destroy +0x1c
+32ec7230	none in March: is house HI_SPA_PPORU (40147)	confirmed	Spa S24 (june-spa S0): static compare
+32ec7240	none in March: Pporu OnFrameMove( dt )	confirmed	Spa S24 (june-spa S0): +4 / +0x10 += dt, +0x10 > +0xc -> ready; success -> +8 += dt
+32ec7280	none in March: Pporu appear( npc )	confirmed	Spa S24 (june-spa S0): anim "Start", npc +0x17c = 1, 325ca950( 1 ), interval rand() % 240 + 480, Alarm_SpaPporu.ogg
+32ec7380	none in March: Pporu click mark( bShow, pos )	confirmed	Spa S24 (june-spa S0): SPA_PPORU_Success / _Click / _Normal.DDS (0.2 s @334411a8, 0.5 / 1.0 s)
+32ec7500	none in March: Pporu hide click mark	confirmed	Spa S24 (june-spa S0)
+32ec7560	none in March: NPC skin anim is "Wait"	confirmed	Spa S24 (june-spa S0): npc +0x1b8 -> +0x238 compared with L"Wait" (@33474724)
+32ec7620	none in March: Pporu OnFrameMove step( npc )	confirmed	Spa S24 (june-spa S0): Wait -> 32ec7380( true, pos ), else 32ec7500
+32ec7820	none in March: Pporu render notice	confirmed	Spa S24 (june-spa S0): STR 43533 + 23588 at (512, 120)
+32ec7b40	none in March: Pporu catch request	confirmed	Spa S24 (june-spa S0): bag full -> STR 3860; ED < price( 164548 ) -> STR 851; else send 0xe6 { 164548: 1 } (31e92980), AddServerPacket( 0xe7 )
+32ec7fa0	none in March: Pporu catch ACK (0xe7)	confirmed	Spa S24 (june-spa S0): IsValidPacket, UpdateInventorySlotList 3286d590, ED fields, STR 852
+32ec8330	none in March: Pporu UIServerEventProc	confirmed	Spa S24 (june-spa S0): event 0xe7 -> 32ec7fa0
+32ec8350	none in March: Pporu click( npc )	confirmed	Spa S24 (june-spa S0): Wait -> success flag, 32ec7b40
+31e4e4c0	none in March: CX2TFieldGame Lua SetAppearPPoruCheat( bool ) -> +0x620	confirmed	Spa S24 (june-spa S0): bound in 31d95080 @31e2a945 (xorstrings row 2128)
+32681590	none in March: CX2CustomEventManager Lua AddRockScissorsPaperData	confirmed	Spa S24 (june-spa S0): bound @31e3ec26; CustomEventScript.lua rows for NUI_SHY_WISP_EVENT / NUI_SAYRENA_EVENT
+328d0a20 / 328d10b0	none in March: rock-scissors-paper sends 0x651 / 0x653	likely	Spa S24 (june-spa S0): serializers 328d2bc0 / 328d2c90, AddServerPacket 0x652 / 0x654; S5 reads the class
+32746da0	none in March: Lua ResetSpaRestExp	confirmed	Spa S24 (june-spa S0): SendPacket( 0x64f ) with no payload (31e57100); server-only admin
