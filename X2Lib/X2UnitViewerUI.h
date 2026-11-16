@@ -150,6 +150,11 @@
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 		void SetSwitchingViewValue( const bool bSwitchingView_ ) { m_bSwitchingView = bSwitchingView_; }	// char-luciel DU5c: June's inline +0xd80 write ( 323f3290 @323f3394 ), no UpdateSwitchingView
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		void BackUnitFrameMove( double fTime, float fElapsedTime );	// char-luciel DU5c2: June 31fa8ce0( t, dt, 0 )
+		void SetUnitScale( const D3DXVECTOR3& vScale_ );	// char-luciel DU5c2: June 31f969a0
+		void SetMinorUnitRotation( const D3DXVECTOR3& vRotation_ ) { if ( NULL != m_pMinorUnitXSkinAnim ) m_pMinorUnitXSkinAnim->GetMatrix().Rotate( vRotation_ ); }	// char-luciel DU5c2: June 31f90fb0
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		CKTDGXSkinAnim* GetXSkinAnim(){ return m_pXSkinAnim.get(); }
 		CKTDGXSkinAnimPtr GetXSkinAnimPtr() { return m_pXSkinAnim; }

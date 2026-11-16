@@ -3,6 +3,9 @@
 #include "Offline/X2OfflineLog.h"	// char-add CH0c: the ADD CREATE lines
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CREATE_DEBUG
 #ifndef ELSWORD_NEW_BEGINNING
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+#include "Offline/X2OfflineLog.h"	// char-luciel DU5c2: the LUCIEL DUO LOBBY line
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #include ".\x2statecreateunit.h"
 
 
@@ -2569,9 +2572,15 @@ void CX2StateCreateUnit::SelectLuciel()
 
 	m_pUnitViewerUI = CX2UnitViewerUI::CreateUnitViewerUI();
 	g_pKTDXApp->GetDGManager()->AddObjectChain( m_pUnitViewerUI );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	m_pUnitViewerUI->SetUnit( m_pDummyLuciel, CX2UnitViewerUI::UVS_CREATEUNIT );	// char-luciel DU5c2: June @32555d38 passes state 5; the scale takes both bodies ( 31f969a0 )
+	m_pUnitViewerUI->GetMatrix().Move( D3DXVECTOR3( 0, -50, 200 ) );
+	m_pUnitViewerUI->SetUnitScale( D3DXVECTOR3( 1.2f, 1.2f, 1.2f ) );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	m_pUnitViewerUI->SetUnit( m_pDummyLuciel );
 	m_pUnitViewerUI->GetMatrix().Move( D3DXVECTOR3( 0, -50, 200 ) );
 	m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( 1.2f, 1.2f, 1.2f ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	m_pUnitViewerUI->SetLightPos( -250, 100, -600 );
 	m_pUnitViewerUI->PlayAnim( L"LobbyDownLanding", CKTDGXSkinAnim::XAP_ONE_WAIT );
 
@@ -2582,6 +2591,11 @@ void CX2StateCreateUnit::SelectLuciel()
 
 	// stand-in: June 3254e410 preloads the templet's promotion items; March's EquipPromotionItem has no Lu array
 	EquipPromotionItemByUnitTemplet( m_pDummyLuciel->GetUnitTemplet() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	// char-luciel DU5c2: June @32555fe8-3255602a, Ciel turned by her templet lobby rotation ( 31edf260( class, 1 ), 31f90fb0 )
+	m_pUnitViewerUI->SetMinorUnitRotation( D3DXVECTOR3( 0.f, D3DXToRadian( g_pData->RotateYSelectCharacterType( m_SelectUnitClass, true ) ), 0.f ) );
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO LOBBY create screen: both bodies, Ciel turned %.1f deg", g_pData->RotateYSelectCharacterType( m_SelectUnitClass, true ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 
 	m_pUnitViewerUI->OnFrameMove( g_pKTDXApp->GetTime(),g_pKTDXApp->GetElapsedTime() );
 

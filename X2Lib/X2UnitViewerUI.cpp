@@ -3,6 +3,13 @@
 
 bool CX2UnitViewerUI::m_sbShow = true;
 bool CX2UnitViewerUI::m_sbUnitClicked = false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+namespace _CONST_UNITVIEWER_DU5C2_
+{
+	const D3DXVECTOR3 BACK_UNIT_POSITION_OFFSET( 50.f, 0.f, 70.f );	// June 33732708-33732710, times ( +0xd84 + 1.0 ), +0xd84 is the ctor's 0 only
+}
+using namespace _CONST_UNITVIEWER_DU5C2_;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 
 //{{ robobeg : 2008-10-18
 
@@ -346,7 +353,11 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 	CKTDGXSkinAnimPtr& m_pXSkinAnim = AccessShownXSkinAnim();	// char-luciel DU5b: June 31fa8ce0 moves the shown body ( 31f90ff0 ); the local hides the member
 	if ( NULL == m_pXSkinAnim )
 		return false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	// char-luciel DU5c2: the back body's pass ( 31faa550's second 31fa8ce0 call ) is BackUnitFrameMove, after the render params below
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	// stand-in: the back body's frame move ( 31faa550's second 31fa8ce0 call ) is the create / select screens' ( DU5c )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 #ifdef UNIT_EMOTION
@@ -411,6 +422,10 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 		// char-luciel DU5b2: June 31fa8ce0 @31fa8f9b-31fa90a0, the slot of the equip's body at its second-ring position
 		const int iViewSlotPosition = GetViewSlotPosition( pX2Eqip.get(), pItemTemplet );
 		const int iViewSlotBody = ( true == pX2Eqip->IsMinorUnitEquip() ) ? 1 : 0;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		if ( pX2Eqip->IsMinorUnitEquip() != m_bSwitchingView )
+			continue;	// char-luciel DU5c2: June 31fa8ce0 @31fa8f5b moves only this pass's body's equipment ( 31fac160 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		if ( m_ViewEquipFashion[ iViewSlotPosition ][ iViewSlotBody ] == value.first )
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
         if ( m_ViewEquipFashion[ ePos ] == value.first )
@@ -418,7 +433,11 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
         {
             ASSERT( pItemTemplet->GetFashion() );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+			CX2Item* pTempItem = m_pUnit->GetInventory().GetEquippingItemByEquipPos( static_cast<CX2Unit::EQIP_POSITION>( iViewSlotPosition ), false, 1 == iViewSlotBody );	// char-luciel DU5c2: June @31fa9040, 32869e10( second-ring pos, 0, body )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			CX2Item* pTempItem = m_pUnit->GetInventory().GetEquippingItemByEquipPos( ePos, false );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			
 			//{{ kimhc // 실시간 엘소드 중 실시간 내구도 감소
 #ifdef	REAL_TIME_ELSWORD
@@ -472,7 +491,12 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 //{{ robobeg : 2008-10-17
     	//pX2Eqip->OnFrameMove( fTime, fElapsedTime, m_pXSkinAnim->GetRenderParam() );
 		pX2Eqip->SetRenderParam( fTime, fElapsedTime, m_pXSkinAnim->GetRenderParam() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		if ( CX2Unit::EP_AC_TEMP4 != iViewSlotPosition )	// char-luciel DU5c2: June @31fa90e7 skips the second ring's ( June EP_AC_RING2 ) frame move
+			pX2Eqip->OnFrameMove( fTime, fElapsedTime );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		pX2Eqip->OnFrameMove( fTime, fElapsedTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 //}} robobeg : 2008-10-17
 	}
 
@@ -528,6 +552,9 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 		pRenderParam->bAlphaBlend		= false;
 	}	
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	BackUnitFrameMove( fTime, fElapsedTime );	// char-luciel DU5c2: June 31faa550 @31faa5a3, only with the two-body view and its back body on
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #ifdef SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
 	// June 31fa8ce0 runs these after the skin update, the equip loop (+0x1fc) and the render-param block: the re-arm @31fa9271,
 	// the drain @31fa93f6, then (after a June-only +0xf28 mesh show loop) the base viewer's second update @31fa9639.
@@ -1349,6 +1376,23 @@ RENDER_HINT   CX2UnitViewerUI::OnFrameRender_Prepare()
     
     if ( renderHintResult.m_eHint != RENDER_HINT::NORENDER )
         m_pXSkinAnim->SetInstantShow( true );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	// char-luciel DU5c2: June 31f974b0( false ), the back body's prepare
+	CKTDGXSkinAnimPtr pBackXSkinAnim = GetBackXSkinAnimPtr();
+	if ( NULL != pBackXSkinAnim )
+	{
+		pBackXSkinAnim->SetInstantShow( false );
+		if ( true == pBackXSkinAnim->GetShowObject() )
+		{
+			const RENDER_HINT backUnitRenderHint = pBackXSkinAnim->OnFrameRender_Prepare();
+			if ( backUnitRenderHint.m_eHint != RENDER_HINT::NORENDER )
+			{
+				pBackXSkinAnim->SetInstantShow( true );
+				renderHintResult.MergeRenderHint( backUnitRenderHint );
+			}
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 
     if ( !IsRecursivelyManagedByDGManager() && !m_ViewEquipMap.empty() )
     {
@@ -1530,6 +1574,11 @@ void    CX2UnitViewerUI::OnFrameRender_Draw()
 
     if ( m_pXSkinAnim != NULL && m_pXSkinAnim->GetShowObject() && m_pXSkinAnim->IsInstantShow() )
 	    m_pXSkinAnim->OnFrameRender_Draw();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	CKTDGXSkinAnimPtr pBackXSkinAnim = GetBackXSkinAnimPtr();	// char-luciel DU5c2: June 31fa00b0 @31fa022d-31fa0346 draws the back body after the shown one
+	if ( NULL != pBackXSkinAnim && pBackXSkinAnim->GetShowObject() && pBackXSkinAnim->IsInstantShow() )
+		pBackXSkinAnim->OnFrameRender_Draw();
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 
 
 // Equip들은 CKTDGObject 로 정의되어 본체가 CKTDGManager 에서 매니지되는 경우 CKTDGManager 에서 렌더링되도록 수정됨.
@@ -8702,13 +8751,22 @@ void CX2UnitViewerUI::SetPositionOnScr(float x, float y, float z, float scale)	/
 
 	m_bFixed = true;
 	GetMatrix().Move( vScrPos.x, vScrPos.y, vScrPos.z );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	SetUnitScale( vScale );	// char-luciel DU5c2: June 31f9a860 scales both bodies ( 31f969a0 )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	GetMatrix().Scale( vScale );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #ifdef FIX_REFORM_ENTRY_POINT_3RD		// 김종훈, 진입 구조 개편 3차 ( 크래시 ) 수정
 	if ( NULL != m_pXSkinAnim )
 #endif // FIX_REFORM_ENTRY_POINT_3RD	// 김종훈, 진입 구조 개편 3차 ( 크래시 ) 수정
 		m_pXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() );
 #ifdef SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
 	// June 31f99f70 @31f9a153: the viewer's move sets the base viewer's land-dirty byte (+0x1d4)
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	CKTDGXSkinAnimPtr pBackXSkinAnim = GetBackXSkinAnimPtr();	// char-luciel DU5c2: June 31f99f70 @31f9a07e-31f9a14b, the back body at its offset
+	if ( NULL != pBackXSkinAnim )
+		pBackXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() + BACK_UNIT_POSITION_OFFSET );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	m_bFxLandDirty = true;
 #endif SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
 	
@@ -8823,6 +8881,92 @@ void CX2UnitViewerUI::ApplySwitchingViewFilter( const std::vector<CX2Unit::EQIP_
 			pX2Eqip->SetShowObject( false );
 	}
 }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+// char-luciel DU5c2: June 31fa8ce0( t, dt, 0 ), the back body's own part; June's shared tail there works on the shown body again and is not repeated
+void CX2UnitViewerUI::BackUnitFrameMove( double fTime, float fElapsedTime )
+{
+	CKTDGXSkinAnimPtr pBackXSkinAnim = GetBackXSkinAnimPtr();
+	if ( NULL == pBackXSkinAnim || NULL == m_pUnit )
+		return;
+
+	pBackXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() + BACK_UNIT_POSITION_OFFSET );
+	pBackXSkinAnim->OnFrameMove( fTime, fElapsedTime );
+
+	const bool bBackUnitIsMinorUnit = ( false == m_bSwitchingView );
+	const int iViewSlotBody = ( true == bBackUnitIsMinorUnit ) ? 1 : 0;
+	BOOST_TEST_FOREACH( const ViewEquipMap::value_type&, value, m_ViewEquipMap )
+	{
+		CX2EqipPtr pX2Eqip = value.second;
+		const CX2Item::ItemTemplet* pItemTemplet = _GetSafeEquipItemTemplet( pX2Eqip );
+		if ( NULL == pItemTemplet || pX2Eqip->IsMinorUnitEquip() != bBackUnitIsMinorUnit )
+			continue;
+
+		const int iViewSlotPosition = GetViewSlotPosition( pX2Eqip.get(), pItemTemplet );
+		if ( m_ViewEquipFashion[ iViewSlotPosition ][ iViewSlotBody ] == value.first )
+		{
+			// June @31fa9031-31fa9092: the enchant of the worn item in the back body's slot
+			CX2Item* pWornItem = m_pUnit->GetInventory().GetEquippingItemByEquipPos( static_cast<CX2Unit::EQIP_POSITION>( iViewSlotPosition ), false, bBackUnitIsMinorUnit );
+			const bool bWornItemUsable = ( NULL != pWornItem && true == pWornItem->IsUsableEquip() );
+			if ( true == bWornItemUsable && pX2Eqip->GetEnchantLevel() != pWornItem->GetItemData().m_EnchantLevel )
+				pX2Eqip->ChangeEnchantLevel( pWornItem->GetItemData().m_EnchantLevel );
+			if ( 0 != pX2Eqip->GetEnchantLevel() && false == bWornItemUsable )
+				pX2Eqip->ChangeEnchantLevel( 0 );
+		}
+		else if ( m_ViewEquipNormal[ iViewSlotPosition ][ iViewSlotBody ] != value.first )
+		{
+			continue;
+		}
+
+		pX2Eqip->SetRenderParam( fTime, fElapsedTime, pBackXSkinAnim->GetRenderParam() );
+		if ( CX2Unit::EP_AC_TEMP4 != iViewSlotPosition )	// June EP_AC_RING2
+			pX2Eqip->OnFrameMove( fTime, fElapsedTime );
+	}
+
+	// the shown body's render params, applied to the back body ( June @31fa9149 on the pass's skin )
+	CKTDGXRenderer::RenderParam* pRenderParam = pBackXSkinAnim->GetRenderParam();
+	pRenderParam->renderType = CKTDGXRenderer::RT_CARTOON_BLACK_EDGE;
+	if( g_pMain->GetGameOption().GetOptionList().m_UnitDetail == CX2GameOption::OL_MEDIUM )
+		pRenderParam->renderType = CKTDGXRenderer::RT_CARTOON;
+	else if( g_pMain->GetGameOption().GetOptionList().m_UnitDetail == CX2GameOption::OL_LOW )
+		pRenderParam->renderType = CKTDGXRenderer::RT_REAL_COLOR;
+
+	if( g_pMain->GetGameOption().GetOptionList().m_UnitDetail == CX2GameOption::OL_HIGH )
+	{
+		if( true == m_bPickUnit )
+		{
+			pRenderParam->renderType	= CKTDGXRenderer::RT_CARTOON_COLOR_EDGE;
+			pRenderParam->outLineColor	= 0xffff5511;
+		}
+		else
+		{
+			pRenderParam->renderType	= CKTDGXRenderer::RT_CARTOON_BLACK_EDGE;
+			pRenderParam->outLineColor	= 0xffffffff;
+		}
+	}
+	else
+	{
+		pRenderParam->cartoonTexType	= CKTDGXRenderer::CTT_NORMAL;
+		pRenderParam->color				= 0xffffffff;
+	}
+	pRenderParam->lightPos			= m_LightPos;
+#ifdef UNIT_SCALE_COMBINE_ONE
+	pRenderParam->fOutLineWide		= CARTOON_OUTLINE_WIDTH;
+#else //UNIT_SCALE_COMBINE_ONE
+	pRenderParam->fOutLineWide		= 1.5f;
+#endif //UNIT_SCALE_COMBINE_ONE
+	pRenderParam->bAlphaBlend		= false;
+}
+
+// char-luciel DU5c2: June 31f969a0; June then copies the scale into the equips ( 31f93640, equip +0x914: no June reader )
+void CX2UnitViewerUI::SetUnitScale( const D3DXVECTOR3& vScale_ )
+{
+	GetMatrix().Scale( vScale_ );
+	if ( NULL != m_pXSkinAnim )
+		m_pXSkinAnim->GetMatrix().Scale( vScale_ );
+	if ( NULL != m_pMinorUnitXSkinAnim )
+		m_pMinorUnitXSkinAnim->GetMatrix().Scale( vScale_ );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 

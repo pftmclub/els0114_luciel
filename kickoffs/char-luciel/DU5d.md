@@ -47,3 +47,15 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - `InitWeaponTrace` (`31f9a2a0`) loops bodies 0-2 (`+0x5e0 + body x 8` = the fashion weapon slot of each body, then `+0x238 + body x 8` the normal
   one) and keeps trace frames per body; DU5b2 reads Lu's weapon only (`[ EP_WEAPON_HAND ][0]`, stand-in comment). Port the per-body frames with
   the viewer weapon effects (case 10).
+
+## Amended by char-luciel DU5c2 (2026-11-16): the back body's emotions, the window's equip tint, the remaining Scale callers
+
+- **`+0xd82` writers** (the back body's emotion gate): `PlayEmotion` `31fa52b0` (8 sites) and `31fa5c90` (3 sites, a jump table: case 7 sets it, cases
+  other than 6 / 7 / 8 set it after the customize reset); the emotion frame move `31fa64f0` reads the back skin's anim end (`+0x2ac`) when `+0xe60`
+  is set. DU5c2 drew the back body ( create / select screens ) but kept its emotions out.
+- **`31f93920`** (equip colour by body: sub-equip colour `3295a9e0`, equip `+0x190` = the body matches): called only by `UpdateSwitchingView`
+  (the character window, one body shown). DU5b's stand-in comment in `UpdateSwitchingView` stays until this lands. The position / scale copies
+  (`31f93710` / `31f93820` / `3295b260` / `31f93640` / `31f968e0`) are write-only in June: closed, nothing to port.
+- **`31f969a0` = `CX2UnitViewerUI::SetUnitScale`** (DU5c2): June's 28 callers scale both bodies where March calls `GetMatrix().Scale`. DU5c2 changed
+  `SetPositionOnScr`, `SelectLuciel` and the select screen; the rest ( cash shop `3250e6c0`, the other create-screen `Select*` `32551bb7`..`32556c39`,
+  dungeon result `32516a70`, `324886b0`, `3223xxxx` / `3224xxxx` UI viewers, `323f23c0` square unit ) are yours where a two-body viewer reaches them.

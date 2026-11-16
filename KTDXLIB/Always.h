@@ -13826,30 +13826,24 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
-// Description: June character port ( Add ) Phase CH1a - June-only class-core pieces March's CX2GUAdd lacks ( the state name ANSI_CAN_NOT_ATTACK_JUMP_DOWN and its
-//              EventProcess ), compiled in every build and referenced by nothing until CH1m. Revert: comment out the #define ( JUNE_CHAR_ADD_CORE ).
-#define SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+// Description: june-engine R14d: June's whole CX2Eqip::OnFrameMove ( 32964ae0 ). A hidden attach-anim equip still moves while my
+//              unit rides Rakshasa ( RPUI_RAKSHASA 63 ); the skin switch takes June's alpha ids and drops March's Ara render-param ids;
+//              a TraceLandPos item re-reads its frame offset every frame and moves by the owner's land position ( the particle group's
+//              329645a0, ported with the members it reads ) minus the unit's root frame; attach anims and attach-normal matrices take
+//              the equip's body. Not ported: the attached-particle time sync 3295ce00 and June's group frame move 329646c0 ( R6c ),
+//              the DITT 72 loop anim ( Stage 11 ), June's LoadAttached 32961c80 ( R14f ).
+#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
+// Description: june-engine R14d debug: one "[JUNE_ENGINE] EQTRACE" line per TraceLandPos move ( first 10, then every 600th ); the
+//              review retires it.
+//#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE_DEBUG	// retired by the R14d review 2026-11-15
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
-// Description: June character port ( Add ) Phase CH1a - June's bodies of CX2GUAdd's movement and slot-head states ( CH1a-CH1k2 add the rest ), inside March's own
-//              functions with March's in the #else. Inert until CH1 defines it. Revert: comment out the #define ( JUNE_CHAR_ADD_LIVE ).
-//#define SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
-#if defined( SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ADD_CORE )
-#error SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ADD_CORE ( the June state name and EventProcess its bodies use )
-#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
-//////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////
-// Author: Iruha
-// Date: 2026-11-15
-// Description: June character port ( Add ) Phase CH1a - the DP / formation-mode lines inside the _LIVE bodies ( June's TryHyperModeStateChange key test and the
-//              formation release ) that need CH1q's pieces ( CanHyperMode, the formation hooks ). March's live DP calls stay in the #else. Only with _LIVE.
-//              Revert: comment out the #define ( JUNE_CHAR_ADD_DP ).
-//              Needs _LIVE and SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK ( ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE ); CH1q adds the #error guards when it defines it.
-//#define SERV_IRUHADEV_JUNE_CHAR_ADD_DP
+// Description: june-engine R14d: the rest of June's ~CX2Eqip ( 329602f0 ): after the sub-equips it stops the equip's effect set
+//              ( +0x15f8, ReleaseEquipEffectSet( true ) ), which March's destructor left playing. Needs SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET.
+#define SERV_IRUHADEV_JUNE_EQIP_DTOR
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
@@ -13915,37 +13909,30 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
-// Description: june-engine R14d: June's whole CX2Eqip::OnFrameMove ( 32964ae0 ). A hidden attach-anim equip still moves while my
-//              unit rides Rakshasa ( RPUI_RAKSHASA 63 ); the skin switch takes June's alpha ids and drops March's Ara render-param ids;
-//              a TraceLandPos item re-reads its frame offset every frame and moves by the owner's land position ( the particle group's
-//              329645a0, ported with the members it reads ) minus the unit's root frame; attach anims and attach-normal matrices take
-//              the equip's body. Not ported: the attached-particle time sync 3295ce00 and June's group frame move 329646c0 ( R6c ),
-//              the DITT 72 loop anim ( Stage 11 ), June's LoadAttached 32961c80 ( R14f ).
-#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE
-// Description: june-engine R14d debug: one "[JUNE_ENGINE] EQTRACE" line per TraceLandPos move ( first 10, then every 600th ); the
-//              review retires it.
-//#define SERV_IRUHADEV_JUNE_EQIP_FRAME_MOVE_DEBUG	// retired by the R14d review 2026-11-15
+// Description: June character port ( Add ) Phase CH1a - June-only class-core pieces March's CX2GUAdd lacks ( the state name ANSI_CAN_NOT_ATTACK_JUMP_DOWN and its
+//              EventProcess ), compiled in every build and referenced by nothing until CH1m. Revert: comment out the #define ( JUNE_CHAR_ADD_CORE ).
+#define SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
-// Description: june-engine R14d: the rest of June's ~CX2Eqip ( 329602f0 ): after the sub-equips it stops the equip's effect set
-//              ( +0x15f8, ReleaseEquipEffectSet( true ) ), which March's destructor left playing. Needs SERV_IRUHADEV_JUNE_EQUIP_EFFECT_SET.
-#define SERV_IRUHADEV_JUNE_EQIP_DTOR
+// Description: June character port ( Add ) Phase CH1a - June's bodies of CX2GUAdd's movement and slot-head states ( CH1a-CH1k2 add the rest ), inside March's own
+//              functions with March's in the #else. Inert until CH1 defines it. Revert: comment out the #define ( JUNE_CHAR_ADD_LIVE ).
+//#define SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ADD_CORE )
+#error SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ADD_CORE ( the June state name and EventProcess its bodies use )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-15
-// Description: char-luciel DU5b: the unit viewer's second body. The viewer builds Ciel's skin from the templet's minor-unit motions
-//              ( 31faa6f0 ) and keeps June's switching view ( +0xd80, set by 32912c50 / 31f93a10 ): its skin getters, frame move and
-//              render take the shown body, PlayByMotionType plays both bodies ( 31fa3010 with 2 ), and the character window shows
-//              only the switching view's body ( 31f94190, the two-body view off as June 329148d0 ). Each body's equipment is DU5b2's.
-#define SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
-#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET ) && defined( SEPARATION_MOTION ) && defined( SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER ) )
-#error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER needs SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ( the form, the window switch ), _MINOR_UNIT_TEMPLET ( Ciel's motions ), SEPARATION_MOTION ( SetUnit's templet ) and SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER ( ViewerFxStop ), char-luciel DU5b
-#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+// Description: June character port ( Add ) Phase CH1a - the DP / formation-mode lines inside the _LIVE bodies ( June's TryHyperModeStateChange key test and the
+//              formation release ) that need CH1q's pieces ( CanHyperMode, the formation hooks ). March's live DP calls stay in the #else. Only with _LIVE.
+//              Revert: comment out the #define ( JUNE_CHAR_ADD_DP ).
+//              Needs _LIVE and SERV_IRUHADEV_JUNE_BUFF_AWAKE_LOCK ( ELSE_IF_CAN_HYPER_MODE_THEN_STATE_CHANGE ); CH1q adds the #error guards when it defines it.
+//#define SERV_IRUHADEV_JUNE_CHAR_ADD_DP
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -13961,6 +13948,19 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_STAT ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ) && defined( SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK ) && defined( SERV_IRUHADEV_JUNE_CHAR_EQUIP_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHAR_NESI_RENUMBER ) )
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_STAT needs SERV_IRUHADEV_JUNE_CHAR_DUO_BODY ( m_MinorUnitGameStat ), _TRANSFORM_LINK ( IsTransformed ), _EQUIP_VIEW and _NESI_RENUMBER ( the slot bodies )
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-15
+// Description: char-luciel DU5b: the unit viewer's second body. The viewer builds Ciel's skin from the templet's minor-unit motions
+//              ( 31faa6f0 ) and keeps June's switching view ( +0xd80, set by 32912c50 / 31f93a10 ): its skin getters, frame move and
+//              render take the shown body, PlayByMotionType plays both bodies ( 31fa3010 with 2 ), and the character window shows
+//              only the switching view's body ( 31f94190, the two-body view off as June 329148d0 ). Each body's equipment is DU5b2's.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ) && defined( SERV_IRUHADEV_JUNE_CHAR_MINOR_UNIT_TEMPLET ) && defined( SEPARATION_MOTION ) && defined( SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER needs SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW ( the form, the window switch ), _MINOR_UNIT_TEMPLET ( Ciel's motions ), SEPARATION_MOTION ( SetUnit's templet ) and SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER ( ViewerFxStop ), char-luciel DU5b
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -14001,4 +14001,27 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) && defined( SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE ) && defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
 #error SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR needs SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ( the viewer's bodies and setters ), _UNIT_TYPE_RANGE ( UT_END 13, the table rows ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( VMI_SPA_RUBEN ), char-luciel DU5c
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel DU5c2 - the create and select screens show Lu and Ciel side by side. The viewer's back body ( Ciel while Lu
+//              is shown ) stands at the viewer position + ( 50, 0, 70 ) with its own frame move, equipment and render params
+//              ( 31fa8ce0( t, dt, 0 ) ), is prepared and drawn after the shown body ( 31f974b0, 31fa00b0 ) and follows SetPositionOnScr
+//              ( 31f99f70 ); the shown pass moves only its own body's equipment. SelectLuciel and the select-screen viewer turn Ciel by her
+//              templet lobby rotation ( 31f90fb0 ) and scale both bodies ( 31f969a0 ). Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) && defined( SERV_IRUHADEV_JUNE_CHAR_CREATE ) && defined( SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY needs SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ( the bodies ), _CHAR_CREATE ( SelectLuciel, RotateYSelectCharacterType by body ) and SERV_IRUHADEV_JUNE_STATCALC_FINAL_DAMAGE ( GetEquippingItemByEquipPos by body ), char-luciel DU5c2
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel DU5c2 ( june-engine R14e's select-screen onepiece ) - June's CX2Inventory ctor ( 3286d280 ) sizes every bag 50
+//              until ResetSize. March's 24 cut the select-screen unit's equip bag ( built from the character list with no reset ) below
+//              the onepiece slot 35 and the second rings. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE
 //////////////////////////////////////////////////////////////////////////

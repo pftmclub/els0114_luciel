@@ -12,6 +12,9 @@
 #ifdef SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
 #include "Offline/X2OfflineLog.h"	// june-dungeons C3y-2: the JUNE_FX C3y-2 room line
 #endif SERV_IRUHADEV_JUNE_CLASS_TUTORIAL_DUNGEON_DEBUG
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+#include "Offline/X2OfflineLog.h"	// char-luciel DU5c2: the LUCIEL DUO LOBBY line
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 //}}
 
 bool CX2StateServerSelect::m_sbSelectedServerSet = false;
@@ -10472,7 +10475,15 @@ void CX2StateServerSelect::CreateServerSelectUnitViewerUI ( CX2Unit * pUnit_ )
 			g_pMain->SetProjectionFov( vFov.x );
 		
 			m_pUnitViewerUI->GetMatrix().Move( D3DXVECTOR3 ( vUnitPos.x, vUnitPos.y, vUnitPos.z ) );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+			m_pUnitViewerUI->SetUnitScale( D3DXVECTOR3( 1.2f, 1.2f, 1.2f ) * m_pUnitViewerUI->GetScale() );	// char-luciel DU5c2: June 32564400 @32564846, both bodies ( 31f969a0 )
+			// June @32564883-325648ac: the minor body turned by its templet lobby rotation ( 31edf260( class, 1 ), 31f90fb0 )
+			m_pUnitViewerUI->SetMinorUnitRotation( D3DXVECTOR3( 0.f, D3DXToRadian( g_pData->RotateYSelectCharacterType( pUnit_->GetClass(), true ) ), 0.f ) );
+			if ( CX2Unit::UT_LUCIEL == pUnit_->GetType() )
+				CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO LOBBY select screen: unit %I64d class %d, both bodies, minor body turned %.1f deg", pUnit_->GetUID(), static_cast<int>( pUnit_->GetClass() ), g_pData->RotateYSelectCharacterType( pUnit_->GetClass(), true ) );
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( 1.2f, 1.2f, 1.2f ) * m_pUnitViewerUI->GetScale() );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			m_pUnitViewerUI->OnFrameMove( g_pKTDXApp->GetTime(),g_pKTDXApp->GetElapsedTime() );
 			m_pUnitViewerUI->PlayByMotionType( CX2UnitViewerUI::UVVMT_DOWN_LANDING );
 			m_bPlayDownAnim = true;

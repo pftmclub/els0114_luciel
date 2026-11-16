@@ -709,6 +709,7 @@ Opus 5.5 high. **Verdict: pass after one hygiene fix** (a missing flag-dependenc
 | DU5b | (split from DU5, 2026-11-15) The unit viewer's second body: `+0xd7c` minor skin, `+0xd80` / `+0xd81` / `+0xd82`, `31f93a10`, `31f94190`, `31faa150`, `3291d360`, `PlayAnim` which = 2; retires DU5's "viewer `+0xd80` read as the window's switch" stand-ins and the NOT's viewer calls. | `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` |
 | DU5b2 | (split from DU5b, 2026-11-16) Each body's equipment in the unit viewer: June's whole `UpdateEqip` `31fa9e60`, `AddEqip` `31f9df40`, `AddEquipByTID` `31f9c640`, `ReplaceEmptyToBasic` `31f9e930` / `31f9cfd0`, `RemoveEqip` / `RemoveAllEquips`; slot tables `[ pos ][ 3 ]` (drops R14e's two stand-ins). | DU5b's |
 | DU5c | (split from DU5) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the village avatar (`323f3290` rest: `323f1490`, the viewer rebuild; `323fa700` / `323fad80`; SD mesh table `31ee3470`). | DU5b's, or `_DUO_AVATAR` |
+| DU5c2 | (split from DU5c, 2026-11-16) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the viewer's back body (frame move, draw, `+0xd82` writers, equip copies), `CX2Eqip::SetFixed` `3295a560`, R14e's select-screen onepiece. | DU5b's |
 | DU5d | (split from DU5) Viewer weapon effects case 10 (`X2UnitViewerUI.cpp:960`, `:6255`, `:8559`, `:8681`) and CH0's checklist viewer rows (CharCustomData, UnitViewerEffectSetTable, `IS_FOR_MINOR_UNIT` slot key, glow). | DU5b's |
 | DU5e | (split from DU5) Each body's game stat: `SetGameStats` second `KStat` `323571c0`, the packet fields and the seven sites, the emulator's per-body numbers. | `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` |
 | DU5f | (split from DU5e, 2026-11-15) Each body's sockets: the type-10 socket aggregate and the HUD's second gage, the set-socket count `3286a6b0` and the per-body socket record `3271a060`, the window's other-form set sum `@3291bf2d`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET` |
@@ -1874,6 +1875,48 @@ Opus 5.5 high. Reviewed `b7dfce78` against June's listing (`disasm_range.py`, re
 - **Play-test: passed** (user, 2026-11-16, logs read): `LuDbA` ( unit 202 ) entered as Ciel ( `SD mesh Mesh_Ciel_Base_SD.X ( form 1 ) loaded` ),
   four window switches each logged `LUCIEL DUO FORM ... saved, NOT sent` then the matching Lu / Ciel `SD mesh ... loaded`, the relog loaded Ciel again
   ( 08:32:55 ); no `LUCIEL DUO AVATAR` line for another unit; ErrorLog 0 matching lines, packets 0 EXCEPTION.
+
+### DU5c2 - Done (2026-11-16)
+
+Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY` (`#error` guard: `DUO_VIEWER`, `JUNE_CHAR_CREATE`, `JUNE_STATCALC_FINAL_DAMAGE`, all on at that
+line by a `/Zs` flag probe) and `SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE`. Files: `X2UnitViewerUI.cpp` (+144), `X2UnitViewerUI.h` (+5),
+`X2StateCreateUnit.cpp` (+14), `X2StateServerSelect.cpp` (+11), `X2Inventory.cpp` (+12), insert-only. funcmap rows: `grep "(DU5c2)" june2017_re/funcmap.tsv`
+(16). Log lines (permanent, one per screen build): `[JUNE_CHAR] LUCIEL DUO LOBBY create screen: ...` / `... select screen: unit <uid> class <c> ...`.
+- **Back body** (Ciel while Lu is shown; `GetBackXSkinAnimPtr`, two-body view on): new `BackUnitFrameMove` = June `31fa8ce0( t, dt, 0 )`'s own part:
+  position = viewer + ( `+0xd84` + 1.0 ) x ( 50, 0, 70 ) (`+0xd84` is the ctor's 0, no other writer), skin frame move, that body's equipment
+  (`31fac160`; fashion slot: worn item `32869e10( second-ring pos, 0, body )` enchant sync; no frame move for June `EP_AC_RING2` = `EP_AC_TEMP4`),
+  the render-param block. Called from `OnFrameMove` after the shown body's render params (`31faa550 @31faa5a3`). Prepare (`31f974b0( false )`) and
+  Draw (`31fa00b0 @31fa022d-31fa0346`) add the back skin after the shown one; `SetPositionOnScr` moves it to its offset (`31f99f70`).
+- **Shown pass = June's** (same function, param 1): equips of the other body are skipped (`@31fa8f5b`), the enchant lookup asks the equip's body at
+  its second-ring position (`@31fa9040`; DU5b2's two-argument stand-in closed), the second ring gets no frame move (`@31fa90e7`).
+- **Not repeated (decision):** June's second `31fa8ce0` pass also re-runs its shared tail on the shown body (`31f90ff0`: effect re-arm / drain, weapon
+  effects, hand fire, `Bip01_Head` / `+0xe28` particle) - the shown body's work twice per frame. The port runs it once; the review judges it.
+  Skin `+0x320` = viewer `+0xd88` (ctor 0, never written again) and the Rose weapon call `3295dbc0` (unit type 11) are not ported.
+- **`SetUnitScale`** (`31f969a0`: the viewer and both skins) and **`SetMinorUnitRotation`** (`31f90fb0`). `SelectLuciel` passes state 5
+  (`@32555d38`, Ciel's lobby motions) and scales both bodies; then `D3DXToRadian( RotateYSelectCharacterType( class, true ) )` turns Ciel
+  (`@32555fe8-3255602a`). The select screen (`32564400 @32564846-325648ac`) scales both bodies and turns the minor body the same way; June's
+  `31f99f70` move there is covered by March's `Move` + the frame move that follows; `31faa150` (customize) stays Stage 12.
+- **R14e's select-screen onepiece:** June's list handler `3257cd60` builds the unit with `32366e20( info )` and calls no size function; June's
+  `CX2Inventory` ctor (`3286d280`) sizes every bag 50, March's 24 cut the equip bag below slot 35 (onepiece) and 41 / 42 (second rings) and Ciel's
+  slots 24-25. Replaced under its own divergence flag; new divergent row `CX2Inventory::CX2Inventory`. The other `GetItemMaxNum( ST_E_EQUIP )`
+  loops on unreset units (`X2Unit.cpp`) are covered by the same default.
+- **Equip copies closed:** `31f93710` / `31f93820` / `3295b260` / `31f93640` / `31f968e0` write equip `+0x908`-`+0x920`, which nothing in June's
+  CX2Eqip or viewer reads (dispsweep): nothing to port (DU5b / DU5b2 stand-ins answered; their comments stay as written).
+- **Routed (scope rule):** `CX2Eqip::SetFixed` -> **june-engine R14f** (kickoff amended): June's fixed viewers build equips with `+0x15d5` clear,
+  so `LoadAttached @32962094` never chains their sub-equips and `OnFrameRender_Draw 3295d280 @3295d5aa` draws the shown ones; March chains every
+  sub-equip until R14f, so June's `SetFixed` alone would draw them twice. Divergent row and the two allow rows now name R14f. The `+0xd82` writers
+  (`PlayEmotion 31fa52b0`, `31fa5c90`), the emotion frame move's back body (`31fa64f0`), the window's equip tint `31f93920` and June's other 25
+  `SetUnitScale` callers -> **DU5d** (kickoff amended). Other players' form byte (`32367330` / `32367da0` / `32368300`; room, field, watch
+  callers): offline has no other players, closed with DU5e's packet fields, no change.
+- **Gates:** `finish.py --files <6> --with SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE`: `FINISH RESULT: PASS
+  (9 gates, 0 failed, 5 skipped)`; flagcheck DUO_LOBBY 4 PASS / 2 OTHER (`Always.h` peers' uncommitted block moves, `X2Inventory.cpp` = the
+  inventory flag), INVENTORY 1 PASS / 5 OTHER, 0 FAIL, 0 deleted lines, 8 EOL-mismatched inserts (`X2Inventory.cpp`: the namespace takes its CRLF
+  anchor in a mixed file); junediverge PASS; enumscan exit 0; stateends / skillicons / luabind n/a. Post-commit `--range`: see below.
+- **Compile:** `/Zs` probes of `X2UnitViewerUI.cpp`, `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2Inventory.cpp`: 0 errors each.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,083,264 B, dated 2026-11-16 08:41:00, md5 22bcc29d90d1a473658994398ca12953` (built at main 0856b6bd + 6
+  uncommitted code files, DU5c2's); `EXESTR OK: 2 of 2` (the two `LUCIEL DUO LOBBY` lines, wide).
+- **Play-test:** create screen (Lu + Ciel side by side, Ciel turned), select screen (`testlu1`: both bodies, Ciel's shoes and weapon from slots 24-25;
+  `jtLordKnight`: Spa Wear 163569 alone), other classes unchanged. Review: `DU5c2-review.md`.
 
 ### DU5e - Done (2026-11-15)
 
@@ -4020,7 +4063,6 @@ No review of its own ( the CH2c2 review covers it ). Commit: see git log `char-l
   **Not exercised:** page 2 / key Q ( bank B, slot 5 ): no `equip ... slot 5 bank B` line, so the B-slot cast is still owed ( CH2c2's play-test can take it with the other ids ).
 - **Next:** `/x2-phase char-luciel CH2c2` on Sonnet 5.5 high.
 
-### CH2d20 - Done (2026-11-15)
 ### CH2c2 - Done (2026-11-15)
 
 Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( CH2a's, no new define ); `SERV_IRUHADEV_JUNE_ENUM_NAMES` for 6 new buff names; the temporary `_SKILL_DEBUG` stays **on** ( the CH2c2 review retires it ).
@@ -4076,6 +4118,7 @@ Files: `X2GULuciel.cpp` / `.h`, `Always.h` ( the debug line ), `ch1_offsets.tsv`
 - **Build:** full build skipped: no play-test ( the fix changes one number on Soul Shock's damage effect; CH2d's build carries it, and its hand-off re-casts Soul Shock once ).
 - **Next:** `/x2-phase char-luciel CH2d` on Sonnet 5.5 high.
 
+### CH2d20 - Done (2026-11-15)
 
 Opus 5.5 high. Files: `X2GUUser.h` / `.cpp`, `X2UIManager.h` / `.cpp`, `X2StateMenu.cpp`, `X2Game.cpp`, `X2GULuciel.cpp`, `Always.h`. Flags: `SERV_IRUHADEV_JUNE_CHAR_TRANSFORM_LINK`
 ( the window, the user wrappers, the `UI_MENU` member ) and `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE` ( the hooks inside March functions; new `Always.h` guard: `_LIVE` needs
@@ -4159,7 +4202,6 @@ Files: `X2GULuciel.h` / `.cpp`, `X2GUUser.h` / `.cpp` ( one fix, below ), `Alway
   **Not in the logs:** page 2 ( slots 5 / 6, Q / W ) — no `equip ... slot 5` line, so the B-slot casts are still owed ( CH2d2's play-test can take them ); the Soul Shock re-cast on `LuRgA` ( no `soul shock` line, that unit was not played ). The user reports all passed by sight.
 
 ### CH2d2 - Done (2026-11-16)
-| DU5c2 | (split from DU5c, 2026-11-16) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the viewer's back body (frame move, draw, `+0xd82` writers, equip copies), `CX2Eqip::SetFixed` `3295a560`, R14e's select-screen onepiece. | DU5b's |
 
 Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( no new define ); `SERV_IRUHADEV_JUNE_ENUM_NAMES` for 2 new buff names ( `BFI_BUFF_DEATH_TOUCH` 786, `BFI_BUFF_ALTAR_OF_EVIL` 789 ); `_SKILL_DEBUG` stays **on** for the play-test ( the CH2d2 review retires it ).
 Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h` ( bytepatch ), `MODS.md`, `funcmap.tsv` ( `grep "(CH2d2)"`, 12 rows ), `JUNE_BUGS.md` ( 758-761 ), `kickoffs/char-luciel/CH2d2-review.md` ( new, covers CH2d, CH2d2 ) and `CH2d2_save.sql` ( new ).
@@ -4355,6 +4397,25 @@ Opus 5.5 high. Reviewed commit `b4f80375` against June's listing (`disasm_range.
   replaced line inside the flag's own block ). Commit `191732e7`, range gate `191732e7^..191732e7`: the same, `FINISH RESULT: PASS`.
 - **Second fix ( found by the full build ):** `Always.h`'s `_NPC_LUA_BINDS` guard named three `ServerDefine.h` flags ( `SERV_INSERT_GLOBAL_SERVER`,
   `SERV_TRAPPING_RANGER_TEST`, `SERV_NEW_DEFENCE_DUNGEON` ) that KTDXLIB never sees ( `C1189` ); the CH3c20 probes compiled X2Lib files only. Those three now
+## Phase CH4 - Passives and class mechanics
+
+**Run with:** Opus 5.5 high, Opus review, user play-test.
+
+| Sub-phase | Scope |
+|---|---|
+| CH4a | Lu/Ciel's passive state (June's `InitPassiveSkillState` counterpart, CH0 names it), the passive ids, their objects and readers, and the 7am delegate lists. Flag `_PASSIVE` |
+| CH4b | The damage-exception override and the other overrides CH0 finds (`GetActualMPConsume` / `GetActualCoolTime` style), death prevention, the per-skill stores |
+| CH4c | Memo and item readers: `MemoConditionLuciel`, the memo ids, and Lu/Ciel's branches in `CX2Game::UseItemSpecialAbility` / `X2BuffTemplet.cpp` |
+
+**Done gate:** each passive's effect shows (CH0 names the stat or log line); 0 `no_state` rows left except passives with no state in June.
+
+## Phase CH5 - UI and data
+
+**Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI`, sub-tag `UI`. The skill and hyper cut-in
+table for both bodies (June's names from data152 / data195), the HUD portrait for both bodies, the combination-point gauge / UI if June has one
+(CH0), the bounding-key dialog, the Lu/Ciel event-scene and cut-in names the june-gfx bullet lists, and the dialog pieces the earlier phases
+did not take. **Done gate:** a select-screen pass of all ten characters with no new error; both bodies' cut-ins and portraits show June's art.
+
 ## CH5 - Done (2026-11-16)
 
 Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI` ( `Always.h`, needs `_LIVE`, `_CHAR_CREATE`, `_CHAR_DUO_BODY`, `_CHAR_DUO_WIN_SPEECH`, `JUNE_SKILL_TREE_PANELS`, `JUNE_TRANSCEND_CHANGE` ). No debug flag, no log line: the play-test is visual.
@@ -4381,25 +4442,6 @@ Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI` ( `Always.h`, needs `_LIVE`, `_CHAR_CRE
   sit in an `#error` inside the flag block in `X2GUNPC.cpp` ( beside the `CreateNPCReq` call ); the `Always.h` guard keeps the six it can see. Gates PASS ( 2 deleted
   lines = the replaced guard pair ). `DEPLOY OK: X2_offline.exe is 26,948,608 B, dated 2026-11-15 18:31:09, md5 df9afaf486b60758f01f2f05bc28f749`.
 - **Build:** `/Zs` probe of `X2Game.cpp`: 0 errors. Full build skipped: no play-test ( CH3c2 plays it ). CH3c2's kickoff checked: its CH3c20 amendment stands; it waits only on CH3c.
-
-## Phase CH4 - Passives and class mechanics
-
-**Run with:** Opus 5.5 high, Opus review, user play-test.
-
-| Sub-phase | Scope |
-|---|---|
-| CH4a | Lu/Ciel's passive state (June's `InitPassiveSkillState` counterpart, CH0 names it), the passive ids, their objects and readers, and the 7am delegate lists. Flag `_PASSIVE` |
-| CH4b | The damage-exception override and the other overrides CH0 finds (`GetActualMPConsume` / `GetActualCoolTime` style), death prevention, the per-skill stores |
-| CH4c | Memo and item readers: `MemoConditionLuciel`, the memo ids, and Lu/Ciel's branches in `CX2Game::UseItemSpecialAbility` / `X2BuffTemplet.cpp` |
-
-**Done gate:** each passive's effect shows (CH0 names the stat or log line); 0 `no_state` rows left except passives with no state in June.
-
-## Phase CH5 - UI and data
-
-**Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI`, sub-tag `UI`. The skill and hyper cut-in
-table for both bodies (June's names from data152 / data195), the HUD portrait for both bodies, the combination-point gauge / UI if June has one
-(CH0), the bounding-key dialog, the Lu/Ciel event-scene and cut-in names the june-gfx bullet lists, and the dialog pieces the earlier phases
-did not take. **Done gate:** a select-screen pass of all ten characters with no new error; both bodies' cut-ins and portraits show June's art.
 
 ## CH5 - Review (2026-11-16)
 

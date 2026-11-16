@@ -8,6 +8,14 @@ CX2Inventory::InvenSlotData::~InvenSlotData()
 }
 
 
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE
+namespace _CONST_INVENTORY_DU5C2_
+{
+	const int DEFAULT_INVENTORY_SIZE = 50;	// June 3286d280, every sort type until ResetSize
+}
+using namespace _CONST_INVENTORY_DU5C2_;
+
+#endif SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE
 CX2Inventory::CX2Inventory()
 //{{ kimhc // 2009-08-07 // 캐릭터별 은행
 : m_pOwnerUnit( NULL )
@@ -22,7 +30,11 @@ CX2Inventory::CX2Inventory()
 //Reset할 때 서버에서 날아오는 정보가 정확해지면 이 밑에 코드는 빠져야함.
 	for( int i = ST_NONE; i < ST_END; i++ )
 	{
+#ifdef SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE
+		m_MaxSize[i] = DEFAULT_INVENTORY_SIZE;	// char-luciel DU5c2: June 3286d280
+#else SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE
 		m_MaxSize[i] = MAX_INVENTORY_SIZE;
+#endif SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE
 	}
 /*
 	m_MaxSize[ST_EQUIP]			= m_pOwnerUnit->GetUnitData().m_EquipInventorySize;
