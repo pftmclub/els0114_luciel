@@ -43,3 +43,13 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   unit is transcended (`JUNE_BUGS` 736; `/tc` does not handle Lu/Ciel yet, so DU3c could not check it). In the transcendence walk: before transcending,
   open the skill window (K) and press V: Ciel's header is empty (June's behaviour, not a failure). After transcending, reopen the window and press V:
   Ciel's description and combo rows must show, and V back shows Lu's. An empty Ciel header on the transcended unit is a port gap: name the job.
+
+## Amended by the CH4c review (2026-11-16)
+
+- **Passives (CH4a / CH4b) in the walk:** `_PASSIVE_DEBUG` is retired, so check them by the damage numbers, not log lines (uncomment the define only if a
+  number looks wrong). Per second job: a hit from behind lands bigger than the same hit from the front; Backstab (Dread Lord, Ambush Attack 30205) only from
+  behind; Noblesse's Shadow takes part of each hit while either body's Shadow buff is on, and **break the pool** (take hits until it is gone: both Shadow buffs
+  end at once; the CH4b review saw only the buff end by time); on a transcended Noblesse, Noble Devotion's MP gain when Tribute erases a debuff. The CH4a /
+  CH4b Done notes list the expected lines and values.
+- **Nothing to walk for memos or customize filters:** June's Lu/Ciel memo reads are stubs (no memo variant ever plays) and the customize body filter is
+  backlog Stage 12.

@@ -4802,6 +4802,29 @@ funcmap `grep "(CH4c)"` ( 4 rows ).
 - **Gates:** no client source changed, so `finish.py` has nothing to check ( no flag, no file ). Full build skipped: no play-test.
 - **How to see it in game:** nothing new. The memo and item paths behave as before; the Lu/Ciel passives are CH4a / CH4b's. Review: `CH4c-review.md`.
 
+### CH4c - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed `708255e6` ( no code ) against the exe bytes ( `disasm_range.py`, capstone scans, PE reads ) and Ghidra decompiles, read-only.
+**Verdict: pass, no code change.** Every verdict of the Done note holds.
+- **MemoConditionLuciel:** vtable `334f036c` slot 1 = `32ae5150` ( `push [esp+4]; call 31fd4450; test al, al; setne al; ret 4` ), slot 2 = `32ae5170` ( `jmp 31fc8cf0` );
+  `31fd4450` = `xor al, al; ret 4`. The ctor `32aeb3f0` = base ctor `31fc8cd0` + the vtable store. Always false: not porting it is right.
+- **Memo calls in `32ae4080-32b4e76f` ( rel32 scan ):** 15 calls to `31fca9e0` ( = `xor al, al; ret 4` ) in the 10 functions named, 3 to `31fdbcc0` ( `32b3c4b4`, `32b3c4e4`,
+  `32b46680` ), none to `31fdbbb0` / `31fdbe20` / `31fdbe70`. Spot-checks: `32b2ba70 @32b2bd66` ( `cmp al, 1; jne` past the memo set, CH2c2's comment says so ) and `32b2d2a0`
+  ( 5 calls, `@32b2d345` gates the memo variant on synced short 5; the CH3b body plays the plain boxes only ). Both ports drop the read as June's stub does.
+- **Unit-test scan, re-run ( `call 31e4c370 / 31e4d0e0 / 31e4d0c0`, then `cmp` within 8 instructions, outside the class ):** the same 14 sites, all `cmp eax, 0xa`; no
+  class-id test ( 37 / 38 / 39 / 127 / 128 / 129 / 200 / 177-179, `cmp` / `sub` / `add` within 12 ). The one unit-type switch after those getters ( `@32622f00`, cases 0-6 )
+  has no case 10. Each site has a home: `320483e6` / `327b33a5` ( Backstab ) and `32048d0c` / `327b3a15` ( hit from behind ) are inside CH4b's funcmap ranges, `3204963f` is
+  CH4b's Shadow pool step ( `@3204963d-32049674`, `X2GUUser.cpp` comment ), `3204dedf` is in `3204dcd0` ( CH4b slot 251 ), `3230cb5a` is in `3230c1a0` ( CH3a0 ), `321960ee`
+  is the `321960dc` row ( DU3b ); `32020ac9` ( `320200b0`, backlog Stage 16 ) and `321fabaa` ( `321faa90`, Stage 19 ) are routed; `32237384`, `32363bda`, `32d78cd5`,
+  `32d7e6e5` are the 4 customize readers in the new Stage 12 bullet.
+- **`3229e1a0`:** Ghidra's decompile switches on 29 / 56 / 62 / 223 / 439 / 720 / 767 ( `0x2ff` ) / 819 / 891 / 894 / 920 / 927 / 952 / 1010 / 1022 / 1038, none Lu/Ciel's.
+- **`322fbc60`:** the SAT switch ( `dec eax; cmp eax, 0x29`, byte index `322ff6d0`, table `322ff65c` ) sends SAT 12 to `322fd2fe` ( DU1c's port ). Its only unit tests are
+  class 0x14 / 0x6e x2 ( Chung ) and type 9 x2 / 7 ( Add / Ara ); nothing tests Lu/Ciel.
+- **For the CH3b review ( peer, uncommitted at this review ):** the `32b2d2a0` port's head comment is two lines; the one-line comment rule wants one.
+- **CH6's kickoff** gains an "Amended by the CH4c review" section: walk the CH4 passives by their numbers ( the debug define is retired ), Shadow's pool break that the
+  CH4b review did not reach, and nothing for memos or customize filters.
+- **Gates:** no client source changed ( `finish.py`: nothing to check ). Full build skipped: no play-test. `_PASSIVE_DEBUG` stays retired.
+
 ## Phase CH5 - UI and data
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI`, sub-tag `UI`. The skill and hyper cut-in
