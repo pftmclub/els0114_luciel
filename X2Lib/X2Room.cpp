@@ -1502,6 +1502,9 @@ bool CX2Room::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( KEGS_CHANGE_EQUIPPED
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	pSlotData->m_pUnit->AccessUnitData().m_GameStat.SetKStat( kEGS_CHANGE_EQUIPPED_ITEM_NOT.m_kGameStat );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	pSlotData->m_pUnitViewer->SetShowFormEquipOnly( true );	// char-luciel DU5c: June 31ed46e0 @31ed480c-31ed4815
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 
 
 
@@ -1528,6 +1531,10 @@ bool CX2Room::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( KEGS_CHANGE_EQUIPPED
 		g_pData->GetUIManager()->GetUIWatch()->GetTargetUnitUID() == kEGS_CHANGE_EQUIPPED_ITEM_NOT.m_UnitUID )
 	{
 		pUnitViewerUIWatch = g_pData->GetUIManager()->GetUIWatch()->GetUnitViewerUI();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+		if ( NULL != pUnitViewerUIWatch )
+			pUnitViewerUIWatch->SetShowFormEquipOnly( true );	// char-luciel DU5c: June 31ed46e0 @31ed4890-31ed489b
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 	}
 
 	StateLog( pSlotData->m_pUnit->GetNickName() );

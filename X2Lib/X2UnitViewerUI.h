@@ -147,6 +147,9 @@
 		void UpdateSwitchingView();
 		void ApplySwitchingViewFilter( const std::vector<CX2Unit::EQIP_POSITION>& vecKeepEquipPosition_ );
 		void SetEnableDuoView( const bool bEnableDuoView_ ) { m_bEnableDuoView = bEnableDuoView_; }
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+		void SetSwitchingViewValue( const bool bSwitchingView_ ) { m_bSwitchingView = bSwitchingView_; }	// char-luciel DU5c: June's inline +0xd80 write ( 323f3290 @323f3394 ), no UpdateSwitchingView
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		CKTDGXSkinAnim* GetXSkinAnim(){ return m_pXSkinAnim.get(); }
 		CKTDGXSkinAnimPtr GetXSkinAnimPtr() { return m_pXSkinAnim; }

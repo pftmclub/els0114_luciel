@@ -460,6 +460,9 @@ class CX2SquareUnit : public CKTDGObject
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 		bool GetFootOnLine() const { return m_bFootOnLine; }	// char-luciel DU5: June +0x49c, read by the character window's switch
 		bool SetMinorUnitForm( const bool bMinorUnitForm_ );	// char-luciel DU5: June 323f3290
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+		void UpdateSDMeshByMinorUnitForm( const bool bMinorUnitForm_, const CX2Unit::UNIT_TYPE eUnitType_ );	// char-luciel DU5c: June 323f1490
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #ifdef SERV_IRUHADEV_JUNE_EMOTION_EFFECT_SET
 		void StopEmotionEffectSet();	// June 323f4640 (stop +0x7ac, then -1); called from CX2TFieldGame::RemoveUnit
@@ -512,7 +515,13 @@ class CX2SquareUnit : public CKTDGObject
 		void		PhysicProcess();
 
 		
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	public:	// char-luciel DU5c: the form NOT replays the state ( June 323acfb0 calls 323fad80 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 		void		StateStart();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	protected:
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 		void		StateFrameMove();
 		void		StateEventProcess();
 		void		StateEnd();

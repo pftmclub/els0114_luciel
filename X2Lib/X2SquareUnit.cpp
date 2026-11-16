@@ -1,5 +1,49 @@
 #include "StdAfx.h"
 #include ".\x2squareunit.h"
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+#include "Offline/X2OfflineLog.h"
+
+namespace _CONST_SQUAREUNIT_DU5C_
+{
+	// char-luciel DU5c: June's SD mesh table 3372c1e8 ( filled by 333a3d20 ), row = unit type, column = spa village; June's names verbatim
+	const WCHAR* const SD_MESH_FILE_NAME[CX2Unit::UT_END][2] =
+	{
+		{ L"Dummy_Ani_Wait.X",			L"Dummy_Ani_Wait.X" },
+		{ L"Mesh_Elsword_Base_SD.x",	L"Mesh_Elsword_Base_SD_Content.X" },
+		{ L"Mesh_Arme_Base_SD.x",		L"Mesh_Arme_Base_SD_Content10.x" },
+		{ L"Mesh_Lire_Base_SD.x",		L"Mesh_Lire_Base_SD_Content10.X" },
+		{ L"Mesh_Raven_Base_SD.x",		L"Mesh_Raven_Base_SD_Content10.X" },
+		{ L"Mesh_Eve_Base_SD.x",		L"Mesh_Eve_Base_SD_Content10.x" },
+		{ L"Mesh_CHUNG_Base_SD.X",		L"Mesh_CHUNG_Base_SD_Content10.X" },
+		{ L"Mesh_Ara_Base_SD.X",		L"Mesh_ARA_Base_SD_Content10.X" },
+		{ L"Mesh_EL_Base_SD.X",			L"Mesh_EL_Base_SD_Content10.X" },
+		{ L"Mesh_Add_Base_SD.X",		L"Mesh_Add_Base_SD_Content10.x" },
+		{ L"Mesh_Lu_Base_SD.X",			L"Mesh_Lu_Base_SD_Content10.X" },
+		{ L"Mesh_Rose_Base_SD.X",		L"Mesh_Rose_Base_SD_Contnet10.X" },
+		{ L"Mesh_Ain_Base_SD.X",		L"Mesh_Ain_Base_SD_Contnet10.X" },
+	};
+
+	// June 31ee3470 ( June checks no upper bound; no unit type passes UT_AIN )
+	bool GetSDMeshFileName( OUT wstring& wstrSDMeshFileName_, const int iUnitType_, const bool bSpaVillage_ )
+	{
+		if ( 0 < iUnitType_ && iUnitType_ < CX2Unit::UT_END )
+		{
+			wstrSDMeshFileName_ = SD_MESH_FILE_NAME[iUnitType_][true == bSpaVillage_ ? 1 : 0];
+			return true;
+		}
+		return false;
+	}
+
+	// June 323f8080 @323f8bb2 / 323f1490 @323f152a: the current village is a spa ( the SD Content10 meshes )
+	bool IsSpaVillage()
+	{
+		const CX2LocationManager* pLocationManager = g_pData->GetLocationManager();
+		return NULL != pLocationManager
+			&& ( SEnum::VMI_SPA_RUBEN == pLocationManager->GetCurrentVillageID() || SEnum::VMI_SPA_RANOX == pLocationManager->GetCurrentVillageID() );
+	}
+}
+using namespace _CONST_SQUAREUNIT_DU5C_;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 
 #pragma region CX2SquareUnit
 CX2SquareUnit::CX2SquareUnit( bool bMyUnit, CX2Unit* pUnit, const WCHAR* pScriptName, bool bTFieldUnit 
@@ -165,6 +209,15 @@ CX2SquareUnit::CX2SquareUnit( bool bMyUnit, CX2Unit* pUnit, const WCHAR* pScript
     m_pMesh = NULL;	
 
 	// note!! 전직 추가되면 수정, 혹은 unit_type으로
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	// char-luciel DU5c: June 323f8080 @323f8bb2-323f8c8a, the SD mesh by June's table; a Lu/Ciel opens Lu's, Init takes the form
+	if ( NULL != g_pData->GetLocationManager() )
+	{
+		wstring wstrSDMeshFileName;
+		GetSDMeshFileName( wstrSDMeshFileName, m_pUnit->GetType(), IsSpaVillage() );
+		m_pMesh = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( wstrSDMeshFileName );
+	}
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 	switch( m_pUnit->GetType() )
 	{
 		case CX2Unit::UT_ELSWORD:
@@ -223,6 +276,7 @@ CX2SquareUnit::CX2SquareUnit( bool bMyUnit, CX2Unit* pUnit, const WCHAR* pScript
 			} break;
 #endif // SERV_9TH_NEW_CHARACTER
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
  
 	if( m_pMesh != NULL )
 	{
@@ -643,6 +697,15 @@ void CX2SquareUnit::Init()
 {
 	m_bInit = true;		/// 초기화 됨
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	// char-luciel DU5c: June 323fea90 @323feaa0-323fead8, the SD mesh and skill command group of the unit's form
+	if ( NULL != m_pUnit )
+	{
+		const bool bMinorUnitForm = m_pUnit->IsMinorUnitForm();
+		UpdateSDMeshByMinorUnitForm( bMinorUnitForm, m_pUnit->GetType() );
+		m_pUnit->UpdateSkillTreeCommandGroup( true == bMinorUnitForm ? 1 : 0 );	// command group 1 = Ciel's ( no Enum entry )
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 	InitSystem();
 	InitViewer();
 	InitState();
@@ -695,6 +758,10 @@ void CX2SquareUnit::InitViewer()
 // UnitViewer 가 가진 part들을 KTDGManager 에서 manage하기 위해 반드시 필요!
     ASSERT( m_pUnitViewer );
     m_pUnitViewer->SetManagerObject( this );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	m_pUnitViewer->SetEnableDuoView( false );	// char-luciel DU5c: June 323f7380 @323f740d-323f741e, one body, the shown body's equipment only
+	m_pUnitViewer->SetShowFormEquipOnly( true );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 //}} robobeg : 2008-10-21
 
 #ifdef SEPARATION_MOTION
@@ -3177,12 +3244,71 @@ bool CX2SquareUnit::SetMinorUnitForm( const bool bMinorUnitForm_ )
 
 	m_pUnit->SetMinorUnitForm( bMinorUnitForm_ );
 	const bool bUnitMinorUnitForm = m_pUnit->IsMinorUnitForm();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	UpdateSDMeshByMinorUnitForm( bUnitMinorUnitForm, m_pUnit->GetType() );	// char-luciel DU5c: June 323f3290 @323f32dc-323f3305
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 	// stand-in: the SD mesh by form ( 323f1490 ) and the viewer's rebuild ( @323f331e-323f3479 ) are the village avatar's ( DU5c )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 	m_pUnit->UpdateSkillTreeCommandGroup( true == bMinorUnitForm_ ? 1 : 0 );	// command group 1 = Ciel's ( no Enum entry )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+	if ( NULL != m_pUnitViewer )
+	{
+		// char-luciel DU5c: June 323f3290 @323f331e-323f3479, the viewer shows the new body and carries on the shown body's motion
+		wstring wstrAnimName = L"LobbyWait";
+		CKTDGXSkinAnim::XSKIN_ANIM_PLAYTYPE ePlayType = CKTDGXSkinAnim::XAP_LOOP;
+		CKTDGXSkinAnimPtr pShownXSkinAnim = m_pUnitViewer->GetXSkinAnimPtr();
+		if ( NULL != pShownXSkinAnim )
+		{
+			wstrAnimName = pShownXSkinAnim->GetNowAnimName();
+			ePlayType = pShownXSkinAnim->GetPlayType();
+		}
+
+		m_pUnitViewer->SetSwitchingViewValue( bMinorUnitForm_ );
+		m_pUnitViewer->UpdateEqip();
+		if ( false == m_pUnitViewer->GetShowObject() )
+			m_pUnitViewer->NotifyShowObjectChanged();
+
+		pShownXSkinAnim = m_pUnitViewer->GetXSkinAnimPtr();
+		if ( NULL != pShownXSkinAnim )
+		{
+			pShownXSkinAnim->ChangeAnim( wstrAnimName.c_str(), false, 0.f );
+			pShownXSkinAnim->Play( ePlayType );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 	return bUnitMinorUnitForm;
 }
 
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+// char-luciel DU5c: June 323f1490, a Lu/Ciel square unit's SD mesh by form ( other unit types keep the constructor's )
+void CX2SquareUnit::UpdateSDMeshByMinorUnitForm( const bool bMinorUnitForm_, const CX2Unit::UNIT_TYPE eUnitType_ )
+{
+	if ( CX2Unit::UT_LUCIEL != eUnitType_ )
+		return;
+
+	wstring wstrSDMeshFileName = ( true == bMinorUnitForm_ ? L"Mesh_Ciel_Base_SD.X" : L"Mesh_Lu_Base_SD.X" );
+	if ( true == IsSpaVillage() )
+		wstrSDMeshFileName = ( true == bMinorUnitForm_ ? L"Mesh_Ciel_Base_SD_Content10.X" : L"Mesh_Lu_Base_SD_Content10.X" );
+
+	if ( NULL != g_pKTDXApp->GetDeviceManager() )
+		SAFE_CLOSE( m_pMesh );
+	SAFE_DELETE_KTDGOBJECT( m_pXSkinAnim );
+
+	m_pMesh = g_pKTDXApp->GetDeviceManager()->OpenXSkinMesh( wstrSDMeshFileName );
+	if ( NULL != m_pMesh )
+	{
+		m_pXSkinAnim = CKTDGXSkinAnim::CreateSkinAnim();
+		m_pXSkinAnim->SetApplyMotionOffset( true );
+		m_pXSkinAnim->SetAnimXSkinMesh( m_pMesh );
+		m_pXSkinAnim->AddModelXSkinMesh( m_pMesh );
+		m_pXSkinAnim->SetShowObject( false );
+	}
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO AVATAR unit %I64d: SD mesh %s ( form %d ) %s", m_pUnit->GetUID(), wstrSDMeshFileName.c_str(),
+		static_cast<int>( bMinorUnitForm_ ), ( NULL != m_pMesh ? L"loaded" : L"missing" ) );
+}
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 bool CX2SquareUnit::CanDown_LUA()
 {
 	if(m_bTFieldUnit == false)

@@ -13988,3 +13988,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              the unit's cached first-body frames. Other classes and NPCs: the same bones of their one body. Revert: comment out the #define.
 #define SERV_IRUHADEV_JUNE_CHAR_DUO_AWAKEN_EFFECT
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel DU5c - the village avatar of a Lu/Ciel follows the form. The square unit's SD mesh comes from June's table
+//              ( 31ee3470, 24 names by unit type and spa village ); Init and SetMinorUnitForm take Ciel's or Lu's SD mesh by form
+//              ( 323f1490 ), and SetMinorUnitForm shows the viewer's other body and carries the motion on ( 323f3290 ). The form NOT
+//              replays the wait motions and the state ( 323fa700, 323fad80 ). Field and room viewers draw one body and add only the
+//              shown body's equipment ( 323f7380, 31ed46e0 ). Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+#if defined( SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ) && defined( SERV_IRUHADEV_JUNE_CHAR_UNIT_TYPE_RANGE ) && defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR needs SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER ( the viewer's bodies and setters ), _UNIT_TYPE_RANGE ( UT_END 13, the table rows ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( VMI_SPA_RUBEN ), char-luciel DU5c
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+//////////////////////////////////////////////////////////////////////////

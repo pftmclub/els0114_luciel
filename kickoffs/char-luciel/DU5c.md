@@ -85,3 +85,9 @@ show both, so these come with this phase:
   same copies by body.
 - **The frame move's enchant lookup** (`31fa8ce0 @31fa9040`): June asks the worn item on the equip's body (`32869e10( pos, 0, body )`); March's
   two-argument call stays until the back body's frame move lands here.
+
+## Split by DU5c (2026-11-16)
+
+DU5c did the village avatar ( the square unit's SD table and SD mesh by form, Init's form head, SetMinorUnitForm's viewer rebuild, the NOT's replays,
+`m_bShowFormEquipOnly` in `InitViewer` and `CX2Room` ). The create / select screens, the viewer's back body, `CX2Eqip::SetFixed`, R14e's onepiece and
+the other players' form byte moved to **DU5c2** ( `kickoffs/char-luciel/DU5c2.md` ).

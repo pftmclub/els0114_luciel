@@ -6707,7 +6707,14 @@ bool CX2TFieldGame::Handler_EGS_CHANGE_UNIT_FORM_NOT( const KEGS_CHANGE_UNIT_FOR
 	if ( -1 != kEvent_.m_cMinorUnitForm )
 	{
 		bMinorUnitForm = pSquareUnit->SetMinorUnitForm( 1 == kEvent_.m_cMinorUnitForm );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
+#ifdef RIDING_SYSTEM
+		pSquareUnit->InitWaitMotion();	// char-luciel DU5c: June 323acfb0 @323ad02c-323ad038, 323fa700 then 323fad80
+#endif RIDING_SYSTEM
+		pSquareUnit->StateStart();
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 		// stand-in: June then replays the square unit's sit / stand set and state ( 323fa700, 323fad80 ) for the new mesh ( DU5c )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR
 	}
 
 	CX2Unit* pMyUnit = g_pData->GetMyUser()->GetSelectUnit();

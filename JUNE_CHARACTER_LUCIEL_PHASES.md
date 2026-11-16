@@ -1806,6 +1806,39 @@ against June in Ghidra and the exe bytes. **Verdict: pass, no code change.**
 - **Build:** no code change; full build skipped: no play-test (DU5b2's `DEPLOY OK` md5 `2c919c74` and the passed run-3 play-test stand).
 - **Next:** DU5c and DU5d are ready (`DU5c.md`, `DU5d.md`). Both edit `X2UnitViewerUI.cpp`, so run them one at a time.
 
+### DU5c - Done (2026-11-16)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR` (Always.h; `#error` guard: `DUO_VIEWER`, `UNIT_TYPE_RANGE`, `JUNE_ENUM_NAMES`, all on at that
+line by a `/Zs` flag probe, `RIDING_SYSTEM` on too). Files: `X2SquareUnit.cpp` (+126), `X2SquareUnit.h` (+9), `X2UnitViewerUI.h` (+3), `X2TFieldGame.cpp`
+(+7), `X2Room.cpp` (+7), insert-only. funcmap rows: `grep "(DU5c)" june2017_re/funcmap.tsv` (7). Log line (permanent, one per SD mesh load):
+`[JUNE_CHAR] LUCIEL DUO AVATAR unit <uid>: SD mesh <name> ( form <0|1> ) loaded|missing`.
+- **Split (scope rule, one logical change):** DU5c = the village avatar (the done gate's village half). The create / select screens, the viewer's back
+  body (frame move, draw, `+0xd82` writers, `31f90fb0`, `31f99f70`, equip copies, enchant lookup), `CX2Eqip::SetFixed` (June's three `+0x8ec` readers sit
+  outside carved functions), R14e's select-screen onepiece and the other players' form byte -> **DU5c2** (kickoff written; `DU5c.md` "Split by DU5c").
+- **SD table** (`31ee3470`, table `3372c1e8` filled by `333a3d20`): `_CONST_SQUAREUNIT_DU5C_::SD_MESH_FILE_NAME[ UT_END ][ 2 ]`, 13 rows by unit type x
+  spa village, June's names verbatim (row 0 `Dummy_Ani_Wait.X`, Elsword's `_SD_Content.X`, Rose / Ain `Contnet10`). The ctor (`323f8080 @323f8bb2-323f8c8a`)
+  opens the SD mesh from it when the location manager exists, replacing March's switch (Lu had no case: no SD mesh before). Spa = `GetCurrentVillageID()`
+  `VMI_SPA_RUBEN` / `VMI_SPA_RANOX` (June's `+0x64 - 1500 < 2`, as june-hud H2). June checks no upper bound on the type; the port bounds it by `UT_END`.
+- **SD mesh by form** = new `CX2SquareUnit::UpdateSDMeshByMinorUnitForm` (`323f1490`): type 10 only, `Mesh_Ciel_Base_SD.X` / `Mesh_Lu_Base_SD.X` (or
+  `_Content10`), close + delete, open, new skin anim, hidden. Called by `Init`'s head (`323fea90 @323feaa0-323fead8`, with the skill command group) and
+  by `SetMinorUnitForm` (DU5's stand-in retired). Assets in March: `data021` holds both bodies' SD meshes (CH0b).
+- **Viewer rebuild** (`323f3290 @323f331e-323f3479`): keep the shown skin's anim name and play type (`LobbyWait` / loop when none), write `+0xd80` raw
+  (new `SetSwitchingViewValue`, no `UpdateSwitchingView`, as June), `UpdateEqip`, `NotifyShowObjectChanged` (vslot 0x28 = `31f96ad0`) when hidden, then
+  `ChangeAnim( name, false, 0 )` + `Play( type )` on the new shown body.
+- **The form NOT** (`323acfb0 @323ad02c-323ad038`): `InitWaitMotion` then `StateStart` (protected in March: made public under the flag, the name kept).
+- **One body, shown body's equipment:** `InitViewer` (`323f7380 @323f740d-323f741e`) sets `SetEnableDuoView( false )` and `SetShowFormEquipOnly( true )`
+  before `SetUnit`; `CX2Room::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT` sets it on the slot viewer (`@31ed4815`) and on the watch window's viewer
+  (`@31ed489b`; DU5b2's "my unit's" reading corrected: UI 0x19 with a target UID).
+- **Divergent function found:** June's `CX2SquareUnit::Init` (`323fea90`) has a longer tail (`ApplyCustomize( 2 )`, `323eec00`, `323ee400`, the gage
+  singleton's HP set): row `stage12`, only the form head ported here; the tail goes with the customize system (backlog Stage 12). `323f3250` (form head
+  without the viewer) has no caller.
+- **Gates:** `finish.py --files <6> --with SERV_IRUHADEV_JUNE_CHAR_DUO_AVATAR`: flagcheck PASS (5 PASS, 1 OTHER = `Always.h`, peers' uncommitted block
+  moves; 0 FAIL), junediverge PASS, enumscan exit 0; stateends / skillicons / luabind n/a. Post-commit `--range` line: see the commit's hand-off.
+- **Compile:** `/Zs` probes of `X2SquareUnit.cpp`, `X2TFieldGame.cpp`, `X2Room.cpp`, `X2UnitViewerUI.cpp`: 0 errors each.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,080,192 B, dated 2026-11-16 07:57:54, md5 2f5527f0b4e32a87036715b23f48db9e` (built at main a1262f00 + 6 uncommitted code files, DU5c's); `EXESTR OK: 2 of 2` (the `LUCIEL DUO AVATAR` line and `Mesh_Ciel_Base_SD_Content10.X`, wide).
+- **Play-test:** village switch (window button, Ciel <-> Lu) changes the avatar and its SD mesh, a relog keeps it; field / room viewers unchanged for
+  other classes. Review: `DU5c-review.md`.
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;
@@ -4090,6 +4123,7 @@ Files: `X2GULuciel.h` / `.cpp`, `X2GUUser.h` / `.cpp` ( one fix, below ), `Alway
   **Not in the logs:** page 2 ( slots 5 / 6, Q / W ) — no `equip ... slot 5` line, so the B-slot casts are still owed ( CH2d2's play-test can take them ); the Soul Shock re-cast on `LuRgA` ( no `soul shock` line, that unit was not played ). The user reports all passed by sight.
 
 ### CH2d2 - Done (2026-11-16)
+| DU5c2 | (split from DU5c, 2026-11-16) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the viewer's back body (frame move, draw, `+0xd82` writers, equip copies), `CX2Eqip::SetFixed` `3295a560`, R14e's select-screen onepiece. | DU5b's |
 
 Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( no new define ); `SERV_IRUHADEV_JUNE_ENUM_NAMES` for 2 new buff names ( `BFI_BUFF_DEATH_TOUCH` 786, `BFI_BUFF_ALTAR_OF_EVIL` 789 ); `_SKILL_DEBUG` stays **on** for the play-test ( the CH2d2 review retires it ).
 Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h` ( bytepatch ), `MODS.md`, `funcmap.tsv` ( `grep "(CH2d2)"`, 12 rows ), `JUNE_BUGS.md` ( 758-761 ), `kickoffs/char-luciel/CH2d2-review.md` ( new, covers CH2d, CH2d2 ) and `CH2d2_save.sql` ( new ).
