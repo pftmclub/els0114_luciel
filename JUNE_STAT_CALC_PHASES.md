@@ -1334,6 +1334,11 @@ call it directly (no longer from `AddEquippedStat`). /Zs probes 0 errors. `DEPLO
 10:58:37, md5 a50a8e6072cc3582b8de569eabd44325, equal to X2/US_SERVICE/x2.exe (2026-11-16 10:58:29); built at main 132e6b1e + 11 uncommitted
 code file(s)`.
 
+**Play-test passed (user, 2026-11-16, after the fix).** `logs.py`: jtLordKnight `SHEET emu` / `game` / `window` all `range=9294/7394`
+(weapon 163450, damage_range 55); the window's `unit` part carries it, `equip` 0 (June); HIT lines `atk=` 10104-24625 around 19398 (June's
+roll on the new range). testlu1 window `range 10765/10264` in both forms. jtVoidPrincess has no weapon: range 0, min = max. ErrorLog 0 lines.
+Found: testlu1's window `equip=0/7/6/...` with a +13 Henir weapon (the client's item stat for Lu/Ciel gear near 0) -> S2 (kickoff amended).
+
 **Not ported, routed.** Socket option data's range ([9] / [10] of the option stat, `+0x314` / `+0x318` in `328842f0`'s sum) -> S3 with the
 option vectors. Item-side `KItemFormatStatData` has no range slot (June's templet slots are 0) -> nothing. A weapon swap in the village
 refreshes the game stat at once; the base stat (window range) follows on the next unit info / level-up, as no NOT carries the base.
