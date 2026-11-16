@@ -238,7 +238,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5d2 | built (2026-11-16), re-test owed (check 2, cash shop: no back body as June; checks 1, 3-5 passed): emotion end by body, equip tint, June SetFixed, 5 `SetUnitScale` callers | Opus 5.5 / high, Opus review, user play-test | R14f | `X2UnitViewerUI.*`, `X2Eqip.*`, create / select states | `DU5d2.md`, review `DU5d2-review.md` |
+| DU5d2 | done (2026-11-16, play-test passed, logs read; review ready): emotion end by body, equip tint, June SetFixed, 5 `SetUnitScale` callers | Opus 5.5 / high, Opus review, user play-test | R14f | `X2UnitViewerUI.*`, `X2Eqip.*`, create / select states | `DU5d2.md`, review `DU5d2-review.md` |
 | CH3a | done (2026-11-16, play-test passed, logs read): Dread Lord (127) skills; `_SKILL_DEBUG` stays on until the CH3b review ( it covers CH3a ) | Sonnet 5.5 / high, no review of its own (CH3b review covers it), user play-test | CH2d2 review, CH3a0 review | `X2GULuciel.*` | `CH3a.md` |
 | CH3b | done (2026-11-16, play-test passed, logs read; gaps and a sound error go to the review): Noblesse (128) skills; `_SKILL_DEBUG` stays on until the CH3b review ( it covers CH3a ) | Sonnet 5.5 / high, Opus review (also covers CH3a), user play-test | CH3a | `X2GULuciel.*` | `CH3b.md` |
 | CH3c | blocked (CH3b review; CH1i2 + review, DU1 review done): Demonio (129) skills part 1, `CUSTOM_RENDER_STATE` | Sonnet 5.5 / high, no review of its own (CH3c2 review covers it), user play-test | CH3b review, CH1i2, DU1 review | `X2GULuciel.*` | `CH3c.md` |

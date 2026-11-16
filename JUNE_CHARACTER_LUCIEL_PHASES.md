@@ -2110,6 +2110,7 @@ Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's: viewer, equip
   DUO_VIEWER PASS, SKILL_CLASS_POPUP PASS, junediverge PASS, enumscan the same older rows (none on a changed line). `/Zs` probes 0 errors.
   `DEPLOY OK: X2_offline.exe is 27,159,552 B, dated 2026-11-16 12:19:43, md5 451483489dd8639d115fa6b7fd5d5d10, equal to X2/US_SERVICE/x2.exe
   (2026-11-16 12:19:36); built at main 65abbe87 + 4 uncommitted code file(s).` (this fix's 4).
+- **Re-test passed** (user, 2026-11-16, md5 `45148348`): cash shop shows Lu only, the character window and another class are unchanged. Logs (run 12:57, after the deploy): 0 EXCEPTION, 0 ErrorLog lines, 0 unbound Lua names; `LUCIEL DUO LOBBY` / `AVATAR` / `FORM` lines as before.
 - **Not done here:** MODS.md's R14f entry still lists the viewer `SetFixed` as "not ported yet"; MODS.md has a peer's uncommitted edits, so char-luciel Z
   updates that line. Review: `DU5d2-review.md`.
 
