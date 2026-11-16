@@ -1534,7 +1534,9 @@ enchant sets, 0 mismatch(es) -> PASS` (Unicorn: June's switch @32358efa-32359588
 **Gates** (`finish.py --files <12 files> --with EQUIP_STAT DEBUG -v`): flagcheck EQUIP_STAT `RESULT: PASS` (9 PASS, 1 PASS~ one blank line outside
 the flag, 1 DEFINE, 0 OTHER, 0 deleted); junediverge `RESULT: PASS` (one allow row: June's PvP-only test is type 1 only, @32884753-32884761);
 enumscan exit 1 on 190 pre-existing rows, 0 on lines this phase changed (diff-line check). The 38 EOL-mismatched lines are LF lines beside CRLF
-anchors in the mixed-EOL sources. stateends / skillicons / luabind: not applicable. A first build failed on this phase's own guard
+anchors in the mixed-EOL sources. stateends / skillicons / luabind: not applicable. Range gate (`finish.py --range 39ba4025^..39ba4025 --with
+...`): flagcheck EQUIP_STAT `RESULT: PASS` (9 PASS, 1 PASS~, 1 DEFINE, 0 OTHER, 0 deleted), junediverge `RESULT: PASS`, enumscan the same
+pre-existing rows. A first build failed on this phase's own guard
 (`SERV_NEW_ITEM_SYSTEM_2013_05` is not in `Always.h`); fixed at once.
 Build: `DEPLOY OK: X2_offline.exe is 27,192,832 B, dated 2026-11-16 14:51:34, md5 9e0bda3c359d7701fc1033ce3149fdac, equal to X2/US_SERVICE/x2.exe
 (2026-11-16 14:51:26); built at main 7eb699dc + 23 uncommitted code file(s)` (peers' files built in too). `EXESTR OK: 2 of 2 found in X2_offline.exe,
