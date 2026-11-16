@@ -4691,6 +4691,42 @@ review retires it ), `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( 7 BFI + 3 BTI names in `X
   Communion Expand / Absorb `no-down N%` and `force down` in `init 2`; Chemistry the V key over a bounded enemy; Invasion `invasion of dark energy mark`;
   Madness Crave `madness crave ( nearest ... )`; Madness Destroy `crit rate x` in `init 2`; the point on hit ( CH2a2's owed check ) `LUCIEL DUO point: +1 on hit`.
 
+### CH4b - Done (2026-11-16)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE` ( CH4a's; no new flag, no new `Always.h` entry ), `_PASSIVE_DEBUG` stays on ( the CH4b review retires it ).
+Files: `X2DamageManager.h`, `X2GameUnit.h` / `.cpp`, `X2GUUser.h` / `.cpp`, `X2GUNPC.cpp` ( bytepatch ), `X2GULuciel.h` / `.cpp`. funcmap `grep "(CH4b)"` ( 5 rows ).
+Review: `CH4b-review.md` covers CH4a and CH4b.
+- **Hit from behind ( checklist 7aw, kickoff amendment CH4a ):** `DamageData::m_bHitFromBehind` ( June `+0x5c0`; `SimpleInit` zeroes it with `+0x5c1` = `m_bMakeTarget` ).
+  Both DamageReacts set it when the Now `bAttackerFront` is clear ( user `+0x80cd` = `m_FrameDataNow.unitCondition.bAttackerFront`, proven by June's Now -> Future
+  copy `@3204682c`; NPC `+0x844d` = `m_NPCFrameData` ), then for a `GUT_USER` `UT_LUCIEL` attacker: AT_SPECIAL x `GetSeizedByFearRate` ( `+0x95f8` ) unless the used
+  skill is `ST_HYPER_ACTIVE_SKILL`, any other hit x `GetPowerOfOriaxDamageRate` ( June `32ae5120`: BTI 464 / 520 -> `+0x9604` ), and Backstab x `GetBackstabAttackRate`
+  ( `+0x9600` ). User `@32048cdb-32048d82`, NPC `@327b39cf-327b3a8d`, at the D4a / D4b stand-ins ( kept in `#else` ). CH4a's `bHitFromBehind` stand-in now reads the member.
+- **Backstab ( checklist 7d ):** user `@320483c2-3204842e`, NPC `@327b3382-327b33ed`, right before `GetFinalDamage`: with `bAttackerFront` clear, a Lu/Ciel user
+  attacker and `USED_SKILL_ID` 30205 set `m_bIgnoreDefence`, `_OnPvp` and `_Decline` ( the funcmap's "NPC only" for `+0x534` was wrong: the user side sets it too ), and
+  `IsEquippedSkillUpgraded( 30205 )` ( `32071e70` ) sets `m_fCriticalRate` ( `+0x510` ) to 1.0, which the checklist row did not list.
+- **Shadow ( checklist 7j ):** `CX2GULuciel::AbsorbDamageByShadowShield` ( June `32aebaf0` ) and the user DamageReact step `@3204963d-32049674` ( after the 0x4f8 / 0x4fc
+  hooks, outside their attacker block, before `322cfca0` ): the pool takes damage x 0.2, the hit is x 0.8; at <= 0 both Shadow buffs end.
+- **Slot-251 buff hook ( checklist 7 L257, kickoff amendment CH4a ):** `CX2GameUnit::ProcessAfterSetBuffFactor( BTI )` ( empty virtual ), called in
+  `SetBuffFactorToGameUnit` before slot 7 as June `@322a886e-322a8880`; `CX2GUUser`'s body = June `3204dcd0`. **Tribute is a chance, not an HP threshold** ( the
+  checklist / funcmap 339 wording ): vslot 0x1cc is `GetRandomFloat`, so `GetRandomFloat( 0 ) < SA_EFFECTIVE_RATE`; with BTI 462 held the first debuff is erased and
+  Soul Collector loses one stack ( `AddBuffAccumulationCount( 523, -1, 1, 0 )` ); Noble Devotion 30419 then gives `SA_RECOVERY_VALUE_REL` points ( `UpCombinationPoint`,
+  a `friend` of `CX2GUUser` for this ) and `SA_RECOVER_MP_ABS` ( `_2` in PvP, June `322cc180` = `GT_PVP` only: allow-list row ) MP with the MP text. Ain's `32a3d220` waits.
+- **Already done, checked only:** `SetDamageExceptionProcess` `32aea530` ( CH1k ), the gauge snapshot pair `32aeb410` / `32aeb430` ( CH1k; no March engine caller,
+  Crest of Time is every user's, char-add ), Nobility's `m_fDamagedRateBySpecialActive` ( CH4a ). Not CH4b's: the user `ProcessAttackResultPassive` base `32011b80`
+  ( Celestial Blitz, Stage 2 ), routed by the funcmap.
+- **June quirk kept ( JUNE_BUGS 769 ):** the behind-hit byte and Backstab's defence flags stay on the attacker's DamageData until `SimpleInit`, never per hit.
+- **Gates ( worktree, `finish.py --files` 8 files `--with JUNE_CHAR_LUCIEL_PASSIVE _PASSIVE_DEBUG` ):** flagcheck PASS ( 6 PASS, 1 PASS~ = the blank line before the hook
+  body, 1 OTHER = `X2GameUnit.cpp`, whose other 31 lines are a peer's uncommitted `JUNE_STATCALC_UNIT_STAT` ); the one deleted line is CH4a's stand-in inside `_PASSIVE`;
+  junediverge PASS after the `GT_PVP` allow row ( Ghidra: `322cc180` = `GetGameType() - 1 == 0` ); enumscan exit 0. `/Zs` probes of the 4 `.cpp`: 0 errors.
+- **Build:** my first run hit `LOCK TIMEOUT` ( a peer's build ); re-run: `BUILD OK: X2/US_SERVICE/x2.exe 27,133,440 B, 2026-11-16 10:38:01` then `DEPLOY OK: X2_offline.exe is
+  27,133,440 B, dated 2026-11-16 10:38:08, md5 85d46dcf40f1843140ce152466d7cc5c, equal to X2/US_SERVICE/x2.exe (2026-11-16 10:38:01); built at main 9fb16748 + 10 uncommitted code file(s)`
+  ( peers' too ). `EXESTR OK: 5 of 5 found in X2_offline.exe` wide ( hit from behind, backstab, shadow shield, tribute, noble devotion ).
+- **Play-test saves ( `elsdb x --file` / `setchar` / `settranscend` ):** `LuPasLD` 220 Ambush Attack 30205 in slot 2 ( Dead Hands 30007 out ); `LuPasCN` 221 Shadow 30209
+  in slot 6, Noblesse Oblige 30419 at 1, level 99, transcended ( 30419 is `SPRT_HYPER_CLASS` ). Tribute's chance at level 4 is 0.275.
+- **How to see it in game:** the hand-off in the closing message. Logs: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL PASSIVE"`. Per item: `hit from behind on
+  npc ...: damage A -> B` ( 7aw ), `backstab from behind on npc ...` ( 7d ), `lord of fear effect ( N stack(s) ... )` ( CH4a's fear effect, now reachable ), `shadow shield
+  took ...` ( 7j ), `tribute: BTI ... erased` and `noble devotion: N point(s), mp +M` ( slot 251 ).
+
 ## Phase CH5 - UI and data
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI`, sub-tag `UI`. The skill and hyper cut-in

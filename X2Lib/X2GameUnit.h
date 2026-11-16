@@ -4101,6 +4101,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 #ifdef SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
 		virtual void ProcessAttackResultPassive( CX2DamageManager::DamageData* pDamageData_ ) {}	/// char-rena CH1o: June unit vslot 0x1e8 ( base 3208ddc0, empty; the user's 32011b80 is Stage 2's )
 #endif SERV_IRUHADEV_JUNE_CHAR_RENA_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+		virtual void ProcessAfterSetBuffFactor( const BUFF_TEMPLET_ID eBuffTempletID_ ) {}	// char-luciel CH4b: June unit vslot 251, empty but for CX2GUUser 3204dcd0 ( and Ain's 32a3d220 )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 		virtual void DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ ) {}	// char-ara CH1o: June unit vslot 0x2fc ( base 3208ddc0, empty ), called on the attacker by ~DamageData
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE

@@ -34,3 +34,4 @@ X2GUUser.cpp	CX2GUUser::CommonFrameMove	CommonFrameMove_TimedEvent	routed to bac
 X2Eqip.cpp	CX2Eqip::OnFrameMove	LoadAttached	routed: june-engine R14f ports June's LoadAttached 32961c80 whole ( DITT render switches, the DG-chain byte +0x15d5 ); R14d found it
 X2UnitViewerUI.cpp	CX2UnitViewerUI::AddEquipByTID	SetFixed	char-luciel DU5b2: June 31f9c640 @31f9c990 calls SetFixed 3295a560; March's also hides the sub-equips, its replacement is routed to june-engine R14f with the DG-chain gate it needs ( char-luciel DU5c2; row CX2Eqip::SetFixed )
 X2UnitViewerUI.cpp	CX2UnitViewerUI::AddEqip	SetFixed	char-luciel DU5b2: June 31f9df40 @31f9e305 calls SetFixed 3295a560; March's also hides the sub-equips, its replacement is routed to june-engine R14f with the DG-chain gate it needs ( char-luciel DU5c2; row CX2Eqip::SetFixed )
+X2GUUser.cpp	CX2GUUser::ProcessAfterSetBuffFactor	GT_PVP	June 3204dcd0 @3204deb0 -> 322cc180: GetGameType() - 1 == 0 (type 1 only), char-luciel CH4b

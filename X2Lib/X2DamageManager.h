@@ -1431,6 +1431,9 @@ class CX2DamageManager
 			/// the defender's UnitUID/GameUnitType onto the owner (CX2GameUnit::m_uidMakeTarget /
 			/// m_eMakeTargetGameUnitType, @31f86abf-31f86acb). No March reader yet.
 			bool				m_bMakeTarget;						/// MAKE_TARGET
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+			bool				m_bHitFromBehind;					// char-luciel CH4b: June +0x5c0, set by both DamageReacts on a hit from behind; read by Lu/Ciel's fear 32b3d380
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 
 			/// string getter (sdd_walk.py row 130, decrypt @3263ec64-getter @3263edbd). Registered
 			/// with the damage manager by June (FUN_32622220 @3263edee) when non-empty; that
@@ -1723,6 +1726,9 @@ class CX2DamageManager
 				m_vecDamageTriggerData.clear();
 				m_iDamageTriggerCondition				= -1;
 				m_bMakeTarget								= false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+				m_bHitFromBehind							= false;	// char-luciel CH4b: June SimpleInit 31f8ee50 zeroes the word +0x5c0 / +0x5c1
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 				m_wstrDamageDataKeyName					= L"";
 				m_iAppliedSkillID						= 0;
 #ifndef ADD_RENA_SYSTEM

@@ -758,6 +758,13 @@ public:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
 	void				SetShadowBoltNpcUID( const int iShadowBoltNpcUID_ ) { m_iShadowBoltNpcUID = iShadowBoltNpcUID_; }	// char-luciel CH3a0: June 3230c1a0 0x774 writes +0x9690
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+	friend class CX2GUUser;	// char-luciel CH4b: June's buff hook 3204dcd0 calls UpCombinationPoint 32b14860 on a Lu/Ciel unit
+	float				GetSeizedByFearRate() const { return m_fSeizedByFearRate; }	// char-luciel CH4b: June +0x95f8, both DamageReacts scale AT_SPECIAL by it
+	float				GetBackstabAttackRate() const { return m_fBackstabAttackRate; }	// char-luciel CH4b: June +0x9600, both DamageReacts scale Backstab by it
+	float				GetPowerOfOriaxDamageRate();	// char-luciel CH4b: June 32ae5120
+	bool				AbsorbDamageByShadowShield( const float fDamage_ );	// char-luciel CH4b: June 32aebaf0
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,

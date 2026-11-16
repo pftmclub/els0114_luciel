@@ -11613,6 +11613,32 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 // 		if ( null != pDamageData->optrAttackerGameUnit )
 // 			pDamageData->optrAttackerGameUnit->ModifyFinalDamageByGameUnitType( pDamageData );
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+		// char-luciel CH4b: June @320483c2-3204842e: Lu/Ciel's Backstab from behind ignores defence; the upgraded one is a sure critical
+		if ( false == m_FrameDataNow.unitCondition.bAttackerFront && null != pDamageData->optrAttackerGameUnit
+			&& CX2GameUnit::GUT_USER == pDamageData->optrAttackerGameUnit->GetGameUnitType() )
+		{
+			CX2GUUser* pBackstabUser = static_cast<CX2GUUser*>( pDamageData->optrAttackerGameUnit.GetObservable() );
+			if ( NULL != pBackstabUser->GetUnit() && NULL != pBackstabUser->GetUnit()->GetUnitTemplet()
+				&& CX2Unit::UT_LUCIEL == pBackstabUser->GetUnit()->GetUnitTemplet()->m_UnitType
+				&& CX2SkillTree::RNSI_A_LLC_BACKSTAB == pDamageData->m_eUsedSkillID )
+			{
+				pDamageData->m_bIgnoreDefence = true;
+				pDamageData->m_bIgnoreDefenceOnPvp = true;
+				pDamageData->m_bIgnoreDefenceDecline = true;
+				if ( true == pBackstabUser->IsEquippedSkillUpgraded( CX2SkillTree::RNSI_A_LLC_BACKSTAB ) )
+					pDamageData->m_fCriticalRate = 1.f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+				static DWORD s_dwBackstabLogTime = 0;
+				if ( timeGetTime() - s_dwBackstabLogTime >= 1000 )
+				{
+					s_dwBackstabLogTime = timeGetTime();
+					CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE backstab from behind on user %I64d: ignore defence, critical rate %.2f", GetUnitUID(), pDamageData->m_fCriticalRate );	// char-luciel CH4b
+				}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 		float fFinalDamage = GetFinalDamage( pDamageData );
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
@@ -11949,7 +11975,46 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		kDamageReactTrace.fAfterCritical = fFinalDamage;	// june-stat-calc D4b
 		kDamageReactTrace.bCritical = bShowRedPicture;
 #endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+		// char-luciel CH4b: June @32048cdb-32048d82: a hit from behind marks the damage data, then a Lu/Ciel attacker scales the damage
+		if ( false == m_FrameDataNow.unitCondition.bAttackerFront )
+		{
+			pDamageData->m_bHitFromBehind = true;
+			if ( null != pDamageData->optrAttackerGameUnit && CX2GameUnit::GUT_USER == pDamageData->optrAttackerGameUnit->GetGameUnitType() )
+			{
+				CX2GUUser* pLucielUser = static_cast<CX2GUUser*>( pDamageData->optrAttackerGameUnit.GetObservable() );
+				if ( NULL != pLucielUser->GetUnit() && NULL != pLucielUser->GetUnit()->GetUnitTemplet()
+					&& CX2Unit::UT_LUCIEL == pLucielUser->GetUnit()->GetUnitTemplet()->m_UnitType )
+				{
+					CX2GULuciel* pLuciel = static_cast<CX2GULuciel*>( pLucielUser );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+					const float fDamageBeforeLucielScale = fFinalDamage;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+					if ( CX2DamageManager::AT_SPECIAL == pDamageData->attackType )
+					{
+						const CX2SkillTree::SkillTemplet* pUsedSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( pDamageData->m_eUsedSkillID );
+						if ( NULL == pUsedSkillTemplet || CX2SkillTree::ST_HYPER_ACTIVE_SKILL != pUsedSkillTemplet->m_eType )
+							fFinalDamage *= pLuciel->GetSeizedByFearRate();
+					}
+					else
+						fFinalDamage *= pLuciel->GetPowerOfOriaxDamageRate();
+
+					if ( CX2SkillTree::RNSI_A_LLC_BACKSTAB == pDamageData->m_eUsedSkillID )
+						fFinalDamage *= pLuciel->GetBackstabAttackRate();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+					static DWORD s_dwBehindHitLogTime = 0;
+					if ( timeGetTime() - s_dwBehindHitLogTime >= 1000 )
+					{
+						s_dwBehindHitLogTime = timeGetTime();
+						CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE hit from behind on user %I64d: skill %d, attack type %d, damage %.1f -> %.1f", GetUnitUID(), static_cast<int>( pDamageData->m_eUsedSkillID ), static_cast<int>( pDamageData->attackType ), fDamageBeforeLucielScale, fFinalDamage );	// char-luciel CH4b
+					}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+				}
+			}
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 		// stand-in: Lu/Ciel not ported; June @32048cdb-32048d82: +0x80cd clear sets DD +0x5c0, then a UT_LUCIEL attacker scales the damage ( char-luciel, checklist 7aw )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 #endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef ADD_BACKATTACK
 		if( bBackAttack == true && bCriticalHit == false )
@@ -12270,7 +12335,14 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 			}
 		}
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+		// char-luciel CH4b: June @3204963d-32049674: Shadow's pool takes 0.2 of the hit ( 334411a8 ), then the hit is x 0.8 ( 33449128 )
+		if ( NULL != GetUnit() && NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType
+			&& true == static_cast<CX2GULuciel*>( this )->AbsorbDamageByShadowShield( static_cast<float>( fFinalDamage * 0.2 ) ) )
+			fFinalDamage = static_cast<float>( fFinalDamage * 0.8 );
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 		// stand-in: Lu/Ciel not ported; June @3204963d-32049674: a UT_LUCIEL defender whose shadow shield 32aebaf0 takes 0.2 of the hit keeps x 0.8 ( checklist 7j )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 #endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 		/// June @32049678-3204968a: 322cfca0 on the game, after the attacker hooks ( and the Lu/Ciel shield and the 2017 event
 		/// block, neither ported ), before the HP-rate call
@@ -55475,4 +55547,64 @@ void CX2GUUser::SLockOnSystem::ProcessLockOn( CX2GUUser* myUnit )
 	}
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+// char-luciel CH4b: June 3204dcd0 ( unit vslot 251 ), after a buff lands: Tribute may trade a Soul Collector stack for one debuff, Noble Devotion pays points and MP
+/*virtual*/ void CX2GUUser::ProcessAfterSetBuffFactor( const BUFF_TEMPLET_ID eBuffTempletID_ )
+{
+	CX2BuffTempletPtr ptrBuffTemplet = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( eBuffTempletID_ );
+	if ( NULL == ptrBuffTemplet || NULL == GetUnit() )
+		return;
+
+	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
+	float fTributeRate = 0.f;
+	const int iTributeSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LCN_TRIBUTE, false, 0, true );
+	if ( 0 < iTributeSkillLevel )
+	{
+		const CX2SkillTree::SkillTemplet* pTributeTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_LCN_TRIBUTE );
+		if ( NULL != pTributeTemplet )
+			fTributeRate = pTributeTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iTributeSkillLevel, false );
+	}
+
+	if ( false == ptrBuffTemplet->IsDeBuff() )
+		return;
+
+	if ( false == ( GetRandomFloat( 0 ) < fTributeRate ) || false == HaveThisBuff( BTI_BUFF_SOUL_COLLECTOR ) )
+		return;
+
+	vector<KBuffFactor> vecDebuffFactor;
+	GetBuffFactorOnlyDebuff( vecDebuffFactor );
+	if ( true == vecDebuffFactor.empty() )
+		return;
+
+	const BUFF_TEMPLET_ID eErasedDebuffID = static_cast<BUFF_TEMPLET_ID>( vecDebuffFactor.front().m_BuffIdentity.m_eBuffTempletID );
+	EraseBuffTempletFromGameUnit( eErasedDebuffID );
+	AddBuffAccumulationCount( BFI_BUFF_SOUL_COLLECTOR, -1, 1, 0 );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE tribute: BTI %d landed, debuff %d erased, one soul collector stack spent ( chance %.2f )", static_cast<int>( eBuffTempletID_ ), static_cast<int>( eErasedDebuffID ), fTributeRate );	// char-luciel CH4b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+
+	const int iNobleDevotionSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LCN_NOBLE_DEVOTION, false, 0, true );
+	if ( iNobleDevotionSkillLevel <= 0 )
+		return;
+
+	const CX2SkillTree::SkillTemplet* pNobleDevotionTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_LCN_NOBLE_DEVOTION );
+	if ( NULL == pNobleDevotionTemplet )
+		return;
+
+	const float fCombinationPoint = pNobleDevotionTemplet->GetSkillAbilityValue( CX2SkillTree::SA_RECOVERY_VALUE_REL, iNobleDevotionSkillLevel, false );
+	// 322cc180: the PvP-only test
+	const CX2SkillTree::SKILL_ABILITY_TYPE eRecoverMpAbility = ( NULL != g_pX2Game && CX2Game::GT_PVP == g_pX2Game->GetGameType() ) ? CX2SkillTree::SA_RECOVER_MP_ABS_2 : CX2SkillTree::SA_RECOVER_MP_ABS;
+	const float fRecoverMp = pNobleDevotionTemplet->GetSkillAbilityValue( eRecoverMpAbility, iNobleDevotionSkillLevel, false );
+	if ( NULL != GetUnit()->GetUnitTemplet() && CX2Unit::UT_LUCIEL == GetUnit()->GetUnitTemplet()->m_UnitType )
+	{
+		static_cast<CX2GULuciel*>( this )->UpCombinationPoint( static_cast<int>( fCombinationPoint ) );
+		SetNowMp( GetNowMp() + fRecoverMp );
+		m_vecMpChangeText.push_back( fRecoverMp );	// June 31fac820 on +0x68ac, with no + 0.005 here
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE noble devotion: %d point(s), mp +%.1f", static_cast<int>( fCombinationPoint ), fRecoverMp );	// char-luciel CH4b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 

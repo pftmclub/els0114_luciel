@@ -15005,6 +15005,9 @@ bool CX2GameUnit::SetBuffFactorToGameUnitAtLevel( const CX2SkillTree::SkillTempl
 
 	/// June then runs unit slot 251 (post-apply hook; empty but for CX2GUUser 3204dcd0) and the
 	/// custom-function-by-buff list's slot 7 (32275860, Phase 9). Neither is ported.
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+	ProcessAfterSetBuffFactor( eBuffTempletID );	// char-luciel CH4b: June @322a886e-322a8880, slot 251 with the templet's id, before slot 7
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_BUFF_CUSTOM_FUNCTION
 	/// June buff port Phase 9a: slot 7 is ported (32275860 @322a8885, the factor just applied); slot 251 still is not.
 	DoCustomFunctionByBuffInSetBuffFactor( buffFactor_ );

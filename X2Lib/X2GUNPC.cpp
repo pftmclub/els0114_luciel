@@ -10844,6 +10844,32 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 	{		
 		if ( GetHasBossGage() )
 			CX2GageManager::GetInstance()->ShowBossGageUIByUIDAndNotShowOtherBossGageUI( GetUnitUID() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+		// char-luciel CH4b: June @327b3382-327b33ed: Lu/Ciel's Backstab from behind ignores defence; the upgraded one is a sure critical
+		if ( false == m_NPCFrameData.unitCondition.bAttackerFront && null != pDamageData->optrAttackerGameUnit
+			&& CX2GameUnit::GUT_USER == pDamageData->optrAttackerGameUnit->GetGameUnitType() )
+		{
+			CX2GUUser* pBackstabUser = static_cast<CX2GUUser*>( pDamageData->optrAttackerGameUnit.GetObservable() );
+			if ( NULL != pBackstabUser->GetUnit() && NULL != pBackstabUser->GetUnit()->GetUnitTemplet()
+				&& CX2Unit::UT_LUCIEL == pBackstabUser->GetUnit()->GetUnitTemplet()->m_UnitType
+				&& CX2SkillTree::RNSI_A_LLC_BACKSTAB == pDamageData->m_eUsedSkillID )
+			{
+				pDamageData->m_bIgnoreDefence = true;
+				pDamageData->m_bIgnoreDefenceOnPvp = true;
+				pDamageData->m_bIgnoreDefenceDecline = true;
+				if ( true == pBackstabUser->IsEquippedSkillUpgraded( CX2SkillTree::RNSI_A_LLC_BACKSTAB ) )
+					pDamageData->m_fCriticalRate = 1.f;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+				static DWORD s_dwBackstabLogTime = 0;
+				if ( timeGetTime() - s_dwBackstabLogTime >= 1000 )
+				{
+					s_dwBackstabLogTime = timeGetTime();
+					CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE backstab from behind on npc %I64d: ignore defence, critical rate %.2f", GetUnitUID(), pDamageData->m_fCriticalRate );	// char-luciel CH4b
+				}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 
 		float fFinalDamage = GetFinalDamage( pDamageData );		
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
@@ -11134,7 +11160,46 @@ void CX2GUNPC::DamageReact( CX2DamageManager::DamageData* pDamageData )
 		kDamageReactTrace.fAfterCritical = fFinalDamage;	// june-stat-calc D4a
 		kDamageReactTrace.bCritical = bShowRedPicture;
 #endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+		// char-luciel CH4b: June @327b39cf-327b3a8d: a hit from behind marks the damage data, then a Lu/Ciel attacker scales the damage
+		if ( false == m_NPCFrameData.unitCondition.bAttackerFront )
+		{
+			pDamageData->m_bHitFromBehind = true;
+			if ( null != pDamageData->optrAttackerGameUnit && CX2GameUnit::GUT_USER == pDamageData->optrAttackerGameUnit->GetGameUnitType() )
+			{
+				CX2GUUser* pLucielUser = static_cast<CX2GUUser*>( pDamageData->optrAttackerGameUnit.GetObservable() );
+				if ( NULL != pLucielUser->GetUnit() && NULL != pLucielUser->GetUnit()->GetUnitTemplet()
+					&& CX2Unit::UT_LUCIEL == pLucielUser->GetUnit()->GetUnitTemplet()->m_UnitType )
+				{
+					CX2GULuciel* pLuciel = static_cast<CX2GULuciel*>( pLucielUser );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+					const float fDamageBeforeLucielScale = fFinalDamage;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+					if ( CX2DamageManager::AT_SPECIAL == pDamageData->attackType )
+					{
+						const CX2SkillTree::SkillTemplet* pUsedSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( pDamageData->m_eUsedSkillID );
+						if ( NULL == pUsedSkillTemplet || CX2SkillTree::ST_HYPER_ACTIVE_SKILL != pUsedSkillTemplet->m_eType )
+							fFinalDamage *= pLuciel->GetSeizedByFearRate();
+					}
+					else
+						fFinalDamage *= pLuciel->GetPowerOfOriaxDamageRate();
+
+					if ( CX2SkillTree::RNSI_A_LLC_BACKSTAB == pDamageData->m_eUsedSkillID )
+						fFinalDamage *= pLuciel->GetBackstabAttackRate();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+					static DWORD s_dwBehindHitLogTime = 0;
+					if ( timeGetTime() - s_dwBehindHitLogTime >= 1000 )
+					{
+						s_dwBehindHitLogTime = timeGetTime();
+						CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE hit from behind on npc %I64d: skill %d, attack type %d, damage %.1f -> %.1f", GetUnitUID(), static_cast<int>( pDamageData->m_eUsedSkillID ), static_cast<int>( pDamageData->attackType ), fDamageBeforeLucielScale, fFinalDamage );	// char-luciel CH4b
+					}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+				}
+			}
+		}
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 		// stand-in: Lu/Ciel not ported; June @327b39cf-327b3a8d: a hit from behind ( +0x844d clear ) sets DD +0x5c0, then a UT_LUCIEL attacker scales the damage ( char-luciel )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 #endif SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT
 #ifdef ADD_BACKATTACK
 		if( bBackAttack == true && bCriticalHit == false )

@@ -20640,7 +20640,7 @@ void CX2GULuciel::ApplyFearOnHit( const CX2DamageManager::DamageData& damageData
 	if ( NULL == pDefender )
 		return;
 
-	const bool bHitFromBehind = false;	// stand-in: DamageData +0x5c0 ( hit from behind, both DamageReacts set it ) is not ported, char-luciel CH4b
+	const bool bHitFromBehind = damageData_.m_bHitFromBehind;	// char-luciel CH4b: June DamageData +0x5c0, set by both DamageReacts
 	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
 	const CX2SkillTree::SkillTemplet* pSkillTemplet = NULL;
 	int iSkillLevel = 0;
@@ -21121,6 +21121,37 @@ void CX2GULuciel::FrameMoveMadnessCrave()
 	if ( true == IsPassiveLogDue( s_dwMadnessLogTime ) )
 		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE madness crave ( nearest %.0f, near %d value %.3f, far %d )", fNearestDistance, static_cast<int>( bEnemyNear ), fAttackValue, static_cast<int>( bNoEnemyNear ) );
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4b: June 32ae5120, Power of Oriax's rate while its buff ( or the memo's ) is on; both DamageReacts scale a non-special hit by it
+float CX2GULuciel::GetPowerOfOriaxDamageRate()
+{
+	if ( true == HaveThisBuff( BTI_BUFF_POWER_OF_ORIAX ) || true == HaveThisBuff( BTI_BUFF_POWER_OF_ORIAX_MEMO ) )
+		return m_fPowerOfOriaxAttackRate;
+
+	return 1.f;
+}
+
+// char-luciel CH4b: June 32aebaf0, Shadow's pool takes the part while either body's Shadow buff is on; at 0 both buffs end
+bool CX2GULuciel::AbsorbDamageByShadowShield( const float fDamage_ )
+{
+	if ( false == HaveThisBuff( BTI_BUFF_SHADOW_LU ) && false == HaveThisBuff( BTI_BUFF_SHADOW_CIEL ) )
+		return false;
+
+	m_fShadowShieldAmount -= fDamage_;
+	const bool bShieldBroken = ( m_fShadowShieldAmount <= 0.f );
+	if ( true == bShieldBroken )
+	{
+		EraseBuffTempletFromGameUnit( BTI_BUFF_SHADOW_LU );
+		EraseBuffTempletFromGameUnit( BTI_BUFF_SHADOW_CIEL );
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	static DWORD s_dwShadowShieldLogTime = 0;
+	if ( true == bShieldBroken || true == IsPassiveLogDue( s_dwShadowShieldLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE shadow shield took %.1f, left %.1f%s", fDamage_, m_fShadowShieldAmount, ( true == bShieldBroken ? L", broken: both shadow buffs erased" : L"" ) );	// char-luciel CH4b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	return true;
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 //}}

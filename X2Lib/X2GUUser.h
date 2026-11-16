@@ -4019,6 +4019,9 @@ public:
 		virtual void OnAttackerDamageReact_Slot4F8( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ ) {}
 		virtual void OnAttackerDamageReact_Slot4FC( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ ) {}
 #endif SERV_IRUHADEV_JUNE_DAMAGE_REACT_HOOKS
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+		virtual void ProcessAfterSetBuffFactor( const BUFF_TEMPLET_ID eBuffTempletID_ );	// char-luciel CH4b: June 3204dcd0 ( unit vslot 251 )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ELESIS_BLOOD
 		virtual void SetShadowEdgeTransitionDamage( const float fDamage_ ) {}	// char-elesis CH4c: June user vslot 0x730 ( base 3208ddc0, empty; only Elesis overrides it )
 		virtual void OnDefenderDamageReact( const CX2DamageManager::DamageData* pDamageData_, float fDamage_ ) {}	// char-elesis CH4c: June user vslot 0x734 ( base 33093ad0, empty; only Elesis overrides it )
