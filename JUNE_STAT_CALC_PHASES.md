@@ -1345,6 +1345,47 @@ refreshes the game stat at once; the base stat (window range) follows on the nex
 
 Play-test: below; review `kickoffs/june-stat-calc/S1-review.md`.
 
+### Phase S1 - Review (2026-11-16)
+
+**Verdict: pass, no code change.** Reviewed commits `3f2911a9` (S1) and `94dbb485` (play-test fix). Full build skipped: no code change,
+no play-test. `_STATCALC_DEBUG` stays on for S1b.
+
+- **KStat** = June's `{ float hp; int atkP, atkM, rangeP, rangeM, defP, defM }`; Put / Get / Init / AddStat in that order. Every live
+  `m_iBaseHP` reader moved: the deployed builds compile with the member renamed, so no live reader is left. Dead readers are the ones the
+  note lists, plus `X2StateMenu.cpp:4944` (`#else`). The KStat `MultiplyStat` / `MultiplyBaseHP` helpers have no client or emulator caller.
+- **Stat block ops, read in June** (the doubt S1 left open):
+  - ConvertAndAddStat `32070490` adds [6..12] uniformly (range included); [0] gets the HP increment times the value, [1..5] are added
+    plain. That is March's ExtraStat handling.
+  - MultiplyStat: the CX2GameUnit copy @3227cb71 multiplies [6..12] uniformly by the factor and leaves [0..5].
+  - GetFinalDamage has no MultiplyStat after its copies (@32284cd8 / @32285538). March's scale-transform multiply is under `#ifndef
+    DUNGEON_ITEM`, and DUNGEON_ITEM is ON by cl /P, so March's is dead as well.
+  - DecStat has no live caller: its one site, `X2Item.cpp:764`, is the `#else` of `X2OPTIMIZE_ITEM_TEMPLET_PREPROCESSING` (ON by cl /P).
+- **SetGameStat `322814a0`** (`disasm_range.py`): hp `fld [eax]` goes to [6] and `fild +4..+0x18` to [7..12]; `fldz` zeroes [0..5]; then
+  the basics start at [6] on `+0x42d0`. This matches the KStat overload (a fresh Stat, `SetKStat`, whole assign). The Stat overload keeps
+  the rates. `emu_unit_stat.py`: `EMU_UNIT_STAT: 370 KStat sets, 303 SetStat sets, 0 mismatch(es) -> PASS`.
+- **Emulator range, applied once per stat:**
+  - `MakeGameStat`: `AddEquippedStat` (no range), then `AddBaseWeaponRange` once.
+  - `MakeMinorUnitGameStat`: `AddEquippedWeaponRange( 1 )` once. Its `MakeGameStat( kMajor )` only feeds the log.
+  - The base stat gets the range once each in `MakeUnitInfoFromRow` and `PushLevelUp`. `GetUnitStat` runs `Init()` first, so no range
+    is carried over. Equip range is 0 (June).
+  - The window shows `min ~ max` from the base: the guides read `kStat.m_fAtk*Range`.
+- **SHEET lines** (`logs.py`):
+  - jtLordKnight: emu / game / window agree on atk 19398 / 15685, range 9294 / 7394 and def 4165 / 3391. Skill, guild, title and socket
+    are 0.
+  - HP: window 235624 against game 226204. The gap is the window's `unit` part (166419 against StatTable 157000 = x 1.06): Strong Bone
+    (21403) in June's `GetUnitStat` 32358b00 (`SERV_IRUHADEV_JUNE_SKILL_STAT_GETTERS`), which applies to the window only. It is a skill
+    term, so it is allowed. The emulator's game stat has no passive HP, so in-game max HP lacks Strong Bone -> S1b (ResetMaxHP is its
+    subject; kickoff amended).
+  - jtVoidPrincess (no weapon): range 0 everywhere. testlu1: the same base range in both forms (one base stat, as June sends one).
+- **Gates:** `finish.py --review --commits 3f2911a9 94dbb485 --with SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT SERV_IRUHADEV_JUNE_STATCALC_DEBUG -v`:
+  - flagcheck UNIT_STAT `RESULT: PASS`: 17 PASS, 3 PASS~ (one blank / marker line each), 2 DEFINE, 0 OTHER, 0 FAIL.
+  - 9 deleted lines: 1 in `Always.h` (`//#define ..._DEBUG` uncommented) and 8 in the fix commit, which rewrote S1's own lines inside the
+    flag (`Handlers_Room.cpp` 1, `X2OfflineInventory.cpp` 5, `.h` 1, `X2OfflineServer.cpp` 1).
+  - junediverge `RESULT: PASS`; `--check-all` `RESULT: PASS`.
+  - enumscan exit 1: the same 192 pre-existing rows, none on S1's lines.
+  - stateends SKIPPED: no skill state registered.
+  - INFO: the other flags on the changed lines are partners (BUFF_*, CHAR_DUO_STAT, SKILL_STAT_GETTERS, OFFLINE, ...).
+
 ## Phase Z - Close
 
 **Scope.** `MODS.md` complete, the map has no `March` / `mixed` / `unknown` row, `tools/data/june_diverge_allow.tsv` holds no `stage33`

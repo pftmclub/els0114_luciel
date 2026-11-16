@@ -23,6 +23,9 @@ Port the map's `phase = S1b` rows whole (June's body inside March's function, Ma
 - **`ResetMaxHP` `31feba70`** (called from `InitComponent` before vslot 0x664): gage max HP = Stat [6], then the two room-mode multipliers
   (room `+0xd8` == 4 with event 0x891 and my slot `+0x58` / `+0x10` -> x 0.7; room `+0xd8` == 5 with room `+0xf8` == 0x8a9 and slot
   `+0x58` -> x 1.5). Name the room members and events, port them as June has them, and say whether offline can reach either.
+  S1 review: in game, max HP = the game stat's [6], and the emulator adds no passive HP. So Lord Knight's Strong Bone (21403, x 1.06) is in
+  the window's base (June `GetUnitStat` 32358b00) but not in game (jtLordKnight: window 235624, game 226204). Find where June gets passive
+  max HP into play (the server's game stat, or a client term), and port it or design the emulator's stand-in.
 - **`CalcHitDodgePercent` `32610a00`** whole: June has no Chung Deadly Chaser accuracy block and reads Raven Blade Master's Exquisite
   Swordmanship by 24406 (`RNSI_P_RST_EXQUISITE_SWORDMANSHIP`); name both in the hand-off for char-chung / char-raven (rule 5). With it, the
   dodge roll's index offset in the four collision paths (@326253e2 / @326285b9 / @3262b2fe / @3262f11a): an NPC defender whose stat byte
