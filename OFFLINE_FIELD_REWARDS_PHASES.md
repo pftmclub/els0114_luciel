@@ -330,6 +330,21 @@ NPC 29 `CHEST_MONSTER` in the secret dungeons is census `mob`, but the studio tr
 **Done gate.** `flagcheck` PASS for both flags, `junediverge --check` PASS, one-file probe build with 0 errors; `gen --dry-run` prints
 row counts and `check` passes on the dry output; no row is written to the server Lua yet. Full build skipped: no play-test.
 
+### Phase R3 - Done (2026-11-16)
+
+**What landed.** `droptable.py gen --only lanox`: 174 dungeon rows (18 keys), 33 field rows (4 fields), 22 static rows, 28 groups, written into the marked block of
+`KncWX2Server/ServerResource/US/DropTable.lua` and `StaticDropTable.lua` (BOM + CRLF intact, +2,798 insertions, 0 deletions). `check`: rows 207, static 22, groups 28, PASS. No client code changed, no new flag.
+
+**Fairness gate (`simulate`, 18 keys + 4 fields).** `mob` 0.99, `final-boss` 1.00-1.13, `box` 1.00, fields `field-mob` 1.00 (all four = Sander Field 03). 12 role rows exceed 15 %, all as R1's note explains:
+`mob-minor` 1.16 (6 keys: Burned Forest / Ashes Village; `gen` adds the 0.3 card line) and Expert / Hard `stage-boss` 1.15-1.17 (decision 6 tops / gloves).
+
+**Pack.** `stage-server` DropTable.lua md5 134ccb9d (928,406 B), StaticDropTable.lua md5 00fb42b5 (43,683 B); `PACK OK data036` (273 entries, 2 changed); `COPY OK data036` md5 76f3fee5e8a15fd286845e1a731a8e8e.
+**Build.** `DEPLOY OK: X2_offline.exe ... md5 b525d2f18f70b977cf430339d5627662` (coalesced into a peer's full build). `EXESTR OK: 1 of 1 found` for `[DROP_STANDIN]`.
+**Gates.** `finish.py --no-flag "data-only"`: PASS (no client file changed).
+
+**How to see it.** Log tag `DROP_STANDIN`: expect `loaded:` 174 / 33 / 22 / 28 (per the loader's wording), per-kill lines, and no `no reward row` for keys 33270-33322 / 40029-40032.
+**Play-test:** pending the user (hand-off below in the reply). The debug define stays on until the R6 review.
+
 ### Phase R2 - Done (2026-11-16)
 
 **What landed.** Flags `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` and `_DEBUG` (end of `Always.h`; `_DEBUG` is on for R3's play-test and retires in

@@ -255,7 +255,7 @@ Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| R3 | ready (R1 done: its files are `gen`'s columns, no adapter; R2 reviewed): Lanox rows, stage + pack + copy, first full build + play-test | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` (you pack) | `R3.md` |
+| R3 | built + packed 2026-11-16 (`COPY OK data036`, `DEPLOY OK`); owes the user's play-test of Lanox dungeons + fields, then `check logs` | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` | `R3.md` |
 | R4 | blocked (R3): Elysion rows + play-test | Sonnet 5.5 / medium | R3 | same two server Lua files | `R4.md` |
 | R5 | blocked (R3): secret dungeon rows + play-test | Sonnet 5.5 / high | R1, R3 | same two server Lua files | `R5.md` |
 | R6 | blocked (R3): June-only monsters in old dungeons + smoke; its review covers R3-R6 | Sonnet 5.5 / high; review Opus 5.5 / high | R0, R3 | same two server Lua files | `R6.md` |
