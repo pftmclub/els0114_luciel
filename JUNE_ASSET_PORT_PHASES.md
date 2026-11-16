@@ -325,16 +325,18 @@ Next: `/x2-phase june-asset-port P1` on Sonnet 5.5 high (builds the exe, hands o
 
 **Done gate:** a `[KOM_MOUNT]` line for every live kom; the comparator is clean; the baseline numbers are recorded.
 
-## Phase P1 - Done (2026-11-16, Sonnet 5.5 high; flag `SERV_IRUHADEV_KOM_MOUNT_DEBUG`, on; built and deployed, awaiting the user's play-test)
+## Phase P1 - Done (2026-11-16, Sonnet 5.5 high; flag `SERV_IRUHADEV_KOM_MOUNT_DEBUG`, on; built, deployed and play-tested; review next)
 
-**What landed.** `KTDXLIB/KGCMassFileManager.cpp` (CP949, `bytepatch.py`, 102 inserted lines, no deletion) and `KTDXLIB/Always.h` (8 lines):
+**What landed.** `KTDXLIB/KGCMassFileManager.cpp` (CP949, `bytepatch.py`, 112 inserted lines, no deletion), `KTDXLIB/KTDXApp.cpp` (11 lines) and `KTDXLIB/Always.h` (8 lines):
 - `AddMassFile` starts a QueryPerformanceCounter timer, counts the `m_mapMassFile.insert` calls that succeed (both the long-name and the original branch),
   and, only at the successful end, pushes `{kom base name, GetFileCount(), registered, mount ms}` into a file-local vector. A kom that returns NULL earlier (load
   failure, or the duplicate path that deletes the kom) never gets there, so it is **absent** from the log, not logged as mounted.
 - `LockMassFileMap` (called once after the last mount, `X2Main.cpp:1477`) samples `PrivateUsage` (`GetProcessMemoryInfo`; `Psapi.lib` is already linked by `KTDXCommonFunc.h`).
-- `LoadDataFile` calls `LogKomMountOnce()` once the map is locked: one `[KOM_MOUNT] <kom>.kom files=N registered=N ms=N` line per kom, then
-  `[KOM_MOUNT] total koms=N entries=N ms=N private=<MB>`, through `KLOG("ErrorLog.txt")` at use-time (mount-time lines are lost, memory `errorlog-loses-mount-time-lines`).
-  After the first call the cost is one volatile read. Nothing per frame.
+- **Trigger (corrected after the first play-test).** The first build logged from the first `LoadDataFile` after `LockMassFileMap`; the user's run showed 0 lines in a
+  1,143-line ErrorLog (ErrorLog.txt only keeps lines from later in startup, as X4 found). The fix moves the trigger to the first frame: `CKTDXApp::OnFrameMove` calls
+  `KomMountOnFirstFrame()` once (beside `KTDGFXRuntime_FirstFrameLog`, whose line does survive); `LogKomMountOnce()` returns until then. It writes one
+  `[KOM_MOUNT] <kom>.kom files=N registered=N ms=N` line per kom, then `[KOM_MOUNT] total koms=N entries=N ms=N private=<MB>`, through `KLOG("ErrorLog.txt")`.
+  The `LoadDataFile` call stays (one volatile read, gated until the first frame). Nothing else per frame: one `static bool` test in `OnFrameMove`.
 - Names: helpers and structs sit in a named `_CONST_KOMMOUNT_P1_` namespace plus `using namespace`; no anonymous namespace, no `June`, no phase tag in an identifier.
 - **Comparator:** `python tools/logs.py --kom-mount` (new): every live kom (kom.py's index of `elstools inspect`) has a line, `files == inspect`, `registered == files`,
   the total line agrees; prints `KOM_MOUNT CHECK: PASS|FAIL` and the baseline numbers. Tested on a synthetic log: all-good PASS; a missing kom, a short `registered`
@@ -342,16 +344,19 @@ Next: `/x2-phase june-asset-port P1` on Sonnet 5.5 high (builds the exe, hands o
 
 **Gates.** `finish.py --files KTDXLIB/KGCMassFileManager.cpp KTDXLIB/Always.h --with KOM_MOUNT_DEBUG`: flagcheck PASS (`files: 1 PASS, 0 DEFINE.. 1 OTHER` = the other
 flags' lines in Always.h, none mine), junediverge PASS, enumscan PASS, 0 deleted / 0 non-ASCII / 0 EOL-mismatched inserted lines.
-`DEPLOY OK: X2_offline.exe is 27,199,488 B, dated 2026-11-16 15:03:03, md5 b525d2f18f70b977cf430339d5627662` (build: KTDXLIB 64 s, X2Lib 592 s, both PCHs touched
-because `Always.h` changed).
-`EXESTR OK: 5 of 5 found in X2_offline.exe` (`[KOM_MOUNT] `, ` files=`, ` registered=`, `total koms=`, ` private=`).
+First build: `DEPLOY OK: X2_offline.exe is 27,199,488 B, dated 2026-11-16 15:03:03, md5 b525d2f18f70b977cf430339d5627662` (the one with the too-early trigger).
+Fix build: my `build.py --deploy` **COALESCED** with another session's full build (started 15:19:21, after my edits, succeeded); that run deployed the exe: X2_offline.exe 27,204,608 B,
+dated 2026-11-16 15:20:03, md5 f87b25c6abac0bdbb76342573579294e = X2/US_SERVICE/x2.exe. My own deploy step was refused only because the game was running again.
+Proof the fix is in it: `X2.map` lists `KomMountOnFirstFrame`, and the play-test below logged from the first frame.
+`EXESTR OK: 3 of 3 found in X2_offline.exe` md5 f87b25c6 (`[KOM_MOUNT] `, `total koms=`, ` registered=`); the first exe had 5 of 5.
 After the commit (`5866cb7d`): `finish.py --range 5866cb7d^..5866cb7d --with KOM_MOUNT_DEBUG` = flagcheck PASS (`1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL`), junediverge PASS, enumscan PASS.
 
-**How to see it in game.** Boot and walk one village, close the game normally, then "check logs": `python tools/logs.py --kom-mount`. Expected: 243 lines with
-`registered == files`, a total line, **no** duplicate-name MessageBox at boot, `existfileinfo.txt` not grown.
+**Play-test and baseline (2026-11-16 15:20 run, exe f87b25c6).** `python tools/logs.py --kom-mount`: **243 live koms, 243 `[KOM_MOUNT]` lines, `KOM_MOUNT CHECK: PASS`** (every kom `files == inspect`,
+`registered == files`; no kom absent). Total line: **koms=243 entries=182,446 mount_ms=1,158 private_MB=167** (private memory sampled right after the last mount). 0 UNHANDLED, 0 EXCEPTION,
+0 unbound Lua in that run. The first run (exe b525d2f1, 15:04) booted to the village and walked about a minute with no crash or MessageBox (server log clean exit); it only lacked the lines.
+These are P2's numbers to compare against; P11 triggers on private memory up about 300 MB or past about 1.4 GB, read from this line after each wave.
 
-**Still owed (after the play-test):** the baseline numbers (koms, entries, mount ms, private MB) go here, and P2's kickoff compares against them. The debug define stays on
-through P2-P10 (every wave's log check reads it); P12 retires it. Review: `kickoffs/june-asset-port/P1-review.md` (written).
+**Still open:** the P1 review (`kickoffs/june-asset-port/P1-review.md`, written). The debug define stays on through P2-P10; P12 retires it.
 
 ## Phase P2 - New kom numbers (rewritten 2026-11-16; was "Pilot: 5 new kom numbers" plus P3's 61)
 

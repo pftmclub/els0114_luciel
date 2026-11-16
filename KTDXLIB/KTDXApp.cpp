@@ -728,6 +728,17 @@ HRESULT CKTDXApp::OnFrameMove( double dTime, float fElapsedTime )
 #ifdef SERV_IRUHADEV_JUNE_GFX_RUNTIME
 	KTDGFXRuntime_FirstFrameLog();	// one use-time line; a mount-time line never reaches ErrorLog.txt
 #endif SERV_IRUHADEV_JUNE_GFX_RUNTIME
+#ifdef SERV_IRUHADEV_KOM_MOUNT_DEBUG
+	{
+		void KomMountOnFirstFrame();	// KGCMassFileManager.cpp: june-asset-port P1, the [KOM_MOUNT] lines
+		static bool s_bKomMountLogged = false;
+		if( s_bKomMountLogged == false )
+		{
+			s_bKomMountLogged = true;
+			KomMountOnFirstFrame();
+		}
+	}
+#endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 
 	m_pd3dDevice->SetTransform( D3DTS_WORLD,		&m_WorldMatrix		);
 	m_pd3dDevice->SetTransform( D3DTS_VIEW,			&m_ViewMatrix		);

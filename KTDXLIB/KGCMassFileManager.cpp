@@ -461,6 +461,7 @@ namespace _CONST_KOMMOUNT_P1_
 	static std::vector<SKomMountRecord>	g_vecKomMountRecord;
 	static int							g_iKomMountPrivateMB = -1;
 	static volatile LONG				g_lKomMountLogged = 0;
+	static volatile LONG				g_lKomMountFrameReached = 0;	// ErrorLog.txt keeps lines only from the first frame on (like KTDGFXRuntime_FirstFrameLog)
 
 	static double GetKomMountNowMs()
 	{
@@ -481,6 +482,8 @@ namespace _CONST_KOMMOUNT_P1_
 
 	static void LogKomMountOnce()
 	{
+		if( g_lKomMountFrameReached == 0 )
+			return;
 		if( g_lKomMountLogged != 0 )
 			return;
 		if( InterlockedExchange( &g_lKomMountLogged, 1 ) != 0 )
@@ -499,6 +502,13 @@ namespace _CONST_KOMMOUNT_P1_
 	}
 }
 using namespace _CONST_KOMMOUNT_P1_;
+
+// called once from CKTDXApp::OnFrameMove: the first frame is the earliest point a KLOG line is known to survive in ErrorLog.txt
+void KomMountOnFirstFrame()
+{
+	g_lKomMountFrameReached = 1;
+	LogKomMountOnce();
+}
 #endif SERV_IRUHADEV_KOM_MOUNT_DEBUG
 
 //#ifdef	X2OPTIMIZE_REMOVE_MASS_FILE_MANAGER_LOCK
