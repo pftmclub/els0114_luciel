@@ -540,9 +540,78 @@ namespace _CONST_OFFLINE_SERVER_S1_
 using namespace _CONST_OFFLINE_SERVER_S1_;
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+namespace _CONST_OFFLINE_SERVER_S1B_
+{
+	// june-stat-calc S1b stand-in: the held level with June's upgrade swap ( 328905b0 ); "acquired" read as level > 0
+	int GetPassiveSkillLevel( const CX2SkillTree* pSkillTree_, const CX2OfflineSkill* pSkill_, CX2SkillTree::SKILL_ID eSkillID_, OUT CX2SkillTree::SKILL_ID& eUsedID_ )
+	{
+		eUsedID_ = eSkillID_;
+		const int iUpgradedID = pSkillTree_->GetUpgradedSkillID( eSkillID_ );
+		if( 0 < iUpgradedID && 0 < pSkill_->GetSkillLevel( iUpgradedID ) )
+			eUsedID_ = static_cast<CX2SkillTree::SKILL_ID>( iUpgradedID );
+		return pSkill_->GetSkillLevel( eUsedID_ );
+	}
+
+	// june-stat-calc S1b stand-in ( no June server ): June's client reads these passives only in the window ( GetUnitStat 32358b00 ), so its
+	// server put them into the game stat, as March's server adds its passive HP ( GSUserFunction.cpp kModifiedBaseStatBySkill ); same terms
+	void AddPassiveSkillStat( const KOfflineUnitRow& kRow_, IN OUT KStat& kStat_ )
+	{
+		CX2SkillTree* pSkillTree = ( NULL != g_pData ) ? g_pData->GetSkillTree() : NULL;
+		CX2OfflineSkill* pSkill = CX2OfflineSkill::Instance();
+		if( NULL == pSkillTree || false == pSkill->Load( kRow_.m_nUnitUID ) )
+			return;
+
+		const KStat kBase = kStat_;
+		CX2SkillTree::SKILL_ID eUsedID = CX2SkillTree::RNSI_P_ELK_STRONG_BONE;
+
+		int iSkillLevel = GetPassiveSkillLevel( pSkillTree, pSkill, CX2SkillTree::RNSI_P_ELK_STRONG_BONE, eUsedID );
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = ( 0 < iSkillLevel ) ? pSkillTree->GetSkillTemplet( eUsedID ) : NULL;
+		if( NULL != pSkillTemplet )
+			kStat_.m_fBaseHP = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MAX_HP_REL, iSkillLevel, false ) * kStat_.m_fBaseHP;
+
+		iSkillLevel = GetPassiveSkillLevel( pSkillTree, pSkill, CX2SkillTree::RNSI_P_CFG_GUARD_MASTERY, eUsedID );
+		pSkillTemplet = ( 0 < iSkillLevel ) ? pSkillTree->GetSkillTemplet( eUsedID ) : NULL;
+		if( NULL != pSkillTemplet )
+		{
+			const float fRate = static_cast<float>( static_cast<double>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MAX_HP_REL, iSkillLevel, false ) ) - 1.0 + 5e-08 );
+			kStat_.m_fBaseHP = fRate * kBase.m_fBaseHP + kStat_.m_fBaseHP;
+		}
+
+		iSkillLevel = GetPassiveSkillLevel( pSkillTree, pSkill, CX2SkillTree::SI_P_ASD_SELF_PROTECTION_FORTITUDE, eUsedID );
+		pSkillTemplet = ( 0 < iSkillLevel ) ? pSkillTree->GetSkillTemplet( eUsedID ) : NULL;
+		if( NULL != pSkillTemplet )
+		{
+			float fRate = static_cast<float>( static_cast<double>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DEF_PHYSIC_REL, iSkillLevel, false ) ) - 1.0 + 5e-08 );
+			kStat_.m_iDefPhysic = static_cast<int>( fRate * kBase.m_iDefPhysic + kStat_.m_iDefPhysic );
+			fRate = static_cast<float>( static_cast<double>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DEF_MAGIC_REL, iSkillLevel, false ) ) - 1.0 + 5e-08 );
+			kStat_.m_iDefMagic = static_cast<int>( fRate * kBase.m_iDefMagic + kStat_.m_iDefMagic );
+			fRate = static_cast<float>( static_cast<double>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MAX_HP_REL, iSkillLevel, false ) ) - 1.0 + 5e-08 );
+			kStat_.m_fBaseHP = fRate * kBase.m_fBaseHP + kStat_.m_fBaseHP;
+		}
+
+		iSkillLevel = GetPassiveSkillLevel( pSkillTree, pSkill, CX2SkillTree::RNSI_P_COMMON_HYPER_AURA, eUsedID );
+		pSkillTemplet = ( 0 < iSkillLevel ) ? pSkillTree->GetSkillTemplet( eUsedID ) : NULL;
+		if( NULL != pSkillTemplet )
+		{
+			const float fRate = static_cast<float>( static_cast<double>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MAX_HP_REL, iSkillLevel, false ) ) - 1.0 + 5e-08 );
+			kStat_.m_fBaseHP = fRate * kBase.m_fBaseHP + kStat_.m_fBaseHP;
+		}
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_STATCALC] PASSIVE unit=%I64d class=%d hp=%.0f>%.0f def=%d/%d>%d/%d", (__int64)kRow_.m_nUnitUID, kRow_.m_iUnitClass,
+			kBase.m_fBaseHP, kStat_.m_fBaseHP, kBase.m_iDefPhysic, kBase.m_iDefMagic, kStat_.m_iDefPhysic, kStat_.m_iDefMagic );
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+	}
+}
+using namespace _CONST_OFFLINE_SERVER_S1B_;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+
 /*static*/ void CX2OfflineServer::MakeGameStat( const KOfflineUnitRow& kRow, OUT KStat& kOut )
 {
 	CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel, kOut );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	AddPassiveSkillStat( kRow, kOut );	// june-stat-calc S1b stand-in: before the gear, as March's server does
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	// Equipped gear on top, from *this* character's inventory. The Load is what
 	// makes that true: every caller here hands in a row, and the row says which
@@ -573,6 +642,9 @@ using namespace _CONST_OFFLINE_SERVER_S1_;
 		return;
 
 	CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel, kOut );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	AddPassiveSkillStat( kRow, kOut );	// june-stat-calc S1b stand-in: Ciel's stat takes the same passives
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	CX2OfflineInventory* pInven = CX2OfflineInventory::Instance();
 	if( true == pInven->Load( kRow.m_nUnitUID ) )

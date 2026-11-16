@@ -15,6 +15,46 @@
 // Phase 8c: the rule-5 lines below are not diagnostics, so this is not behind SERV_IRUHADEV_JUNE_FX_DEBUG.
 #include "Offline/X2OfflineLog.h"
 #endif SERV_IRUHADEV_OFFLINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+namespace _CONST_DAMAGEMANAGER_S1B_
+{
+	// june-stat-calc S1b: June @326253e2: an NPC defender whose stat came from an ExtraNPCStat row ( NPC stat +0xe8 ) rolls dodge further on
+	int GetHitDodgeRandomOffset( CX2GameUnit* pAttacker, CX2GameUnit* pDefender )
+	{
+		if ( CX2GameUnit::GUT_NPC != pDefender->GetGameUnitType() )
+			return 0;
+
+		const CX2UnitManager* pUnitManager = ( NULL != g_pData ) ? g_pData->GetUnitManager() : NULL;
+		const CX2UnitManager::NPC_UNIT_ID eDefenderNPCID = static_cast<CX2GUNPC*>( pDefender )->GetNPCTemplet().m_nNPCUnitID;
+		if ( NULL == pUnitManager || false == pUnitManager->HasExtraNPCStat( eDefenderNPCID ) )
+			return 0;
+
+		if ( NULL == pAttacker )
+			return 0;	// June @3262f141 reads the damage data's attacker unit with no NULL test ( JUNE_BUGS )
+
+		int iOffset = 0;
+		if ( CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() )
+			iOffset = pAttacker->GetRandomInt( 0 );
+		else
+		{
+			CX2GameUnit* pOwner = static_cast<CX2GUNPC*>( pAttacker )->GetOwnerGameUnit();
+			if ( NULL != pOwner )
+				iOffset = pOwner->GetRandomInt( 0 );
+		}
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+		static DWORD s_dwDodgeOffsetLogged = 0;
+		if ( ::GetTickCount() - s_dwDodgeOffsetLogged >= 1000 )
+		{
+			s_dwDodgeOffsetLogged = ::GetTickCount();
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] DODGEROLL att=%I64d def=npc %d extra=1 offset=%d index=%d", pAttacker->GetUnitUID(), static_cast<int>( eDefenderNPCID ),
+				iOffset, static_cast<int>( CKTDXRandomNumbers::SRO_HIT_DODGE ) + iOffset );
+		}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+		return iOffset;
+	}
+}
+using namespace _CONST_DAMAGEMANAGER_S1B_;
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 
 // Plan rule 5 (Phase 8c): a DAMAGE_DATA key whose system this build lacks is logged once per key per
 // templet for the session, as "JUNE_FX unsupported <KEY> in <templet>: <system> absent". Only a value
@@ -2234,10 +2274,17 @@ bool CX2DamageManager::UnitToUnit( DamageData* pDamageData, bool bAttackOnlyThis
 			}
 			else
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+				const int iHitDodgeRandomOffset = GetHitDodgeRandomOffset( pAttacker, pDefender );	// june-stat-calc S1b: June @326253e2
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 				SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @32625439, before the dodge roll
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE + iHitDodgeRandomOffset ) > fHitPercent )
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 				{
 					bCheckMiss = true;
 					bMiss = true;
@@ -3141,10 +3188,17 @@ bool CX2DamageManager::EffectToUnit( DamageData* pDamageData )
 			}
 			else
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+				const int iHitDodgeRandomOffset = GetHitDodgeRandomOffset( pDamageData->optrAttackerGameUnit.GetObservable(), pDefender );	// june-stat-calc S1b: June @3262f11a, the damage data's attacker unit
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 				SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @3262f184, before the dodge roll
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE + iHitDodgeRandomOffset ) > fHitPercent )
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 				{
 					bCheckMiss = true;
 					bMiss = true;
@@ -3625,10 +3679,17 @@ bool CX2DamageManager::MeshToUnit( DamageData* pDamageData )
 			}
 			else
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+				const int iHitDodgeRandomOffset = GetHitDodgeRandomOffset( pAttacker, pDefender );	// june-stat-calc S1b: June @326285b9
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 				SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @3262861c, before the dodge roll
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE + iHitDodgeRandomOffset ) > fHitPercent )
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 				if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 				{
 					bCheckMiss = true;
 					bMiss = true;
@@ -3911,10 +3972,17 @@ bool CX2DamageManager::CollisionDataToUnit( DamageData* pDamageData )
 				}
 				else
 				{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+					const int iHitDodgeRandomOffset = GetHitDodgeRandomOffset( pAttacker, pDefender );	// june-stat-calc S1b: June @3262b2fe
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
 					SetDefenderDamageRateOfPart( pDefender );	// june-stat-calc D3: June 32621f40 @3262b358, before the dodge roll
 #endif SERV_IRUHADEV_JUNE_STATCALC_HIT_PIPELINE
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+					if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE + iHitDodgeRandomOffset ) > fHitPercent )
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 					if ( pDefender->GetRandomFloat( CKTDXRandomNumbers::SRO_HIT_DODGE ) > fHitPercent )
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 					{
 						bMiss = true;
 					}
@@ -4368,6 +4436,86 @@ const WCHAR* CX2DamageManager::GetDamageSound( HIT_TYPE hitType, HITTED_TYPE hit
 // 명중 확률을 계산해서 0~1사이의 값을 return
 float CX2DamageManager::CalcHitDodgePercent( CX2GameUnit* pAttacker, CX2GameUnit* pDefender )
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+	// june-stat-calc S1b: June 32610a00 ( no Chung Deadly Chaser block; Raven by June's skill id )
+	if( NULL == pAttacker || NULL == pDefender )
+		return 1.f;
+
+	if( CX2GameUnit::GUT_USER == pDefender->GetGameUnitType() )
+	{
+		CX2GUUser* pDefenderUser = static_cast<CX2GUUser*>( pDefender );
+		const CX2GUUser::FrameData& kFrameData = pDefenderUser->GetNowFrameData();
+		const CKTDGXSkinAnim* pSkinAnim = pDefenderUser->GetXSkinAnim();
+		if( NULL == pSkinAnim )
+			return 1.f;
+
+		const float fNowAnimTime = pSkinAnim->GetNowAnimationTime();
+		if( kFrameData.stateParam.fRevengeStartTime < fNowAnimTime && kFrameData.stateParam.fRevengeEndTime > fNowAnimTime
+			&& true == kFrameData.unitCondition.bAttackerFront )
+			return 1.f;
+
+		if( kFrameData.stateParam.fReflexMagicStartTime < fNowAnimTime && kFrameData.stateParam.fReflexMagicEndTime > fNowAnimTime
+			&& true == kFrameData.unitCondition.bAttackerFront )
+			return 1.f;
+	}
+
+	if( false == pDefender->GetVecReflectMagicByBuffPtr().empty() )
+		return 1.f;
+
+	float fExtraEvadeRate = 0.f;
+	if( CX2GameUnit::GUT_NPC == pAttacker->GetGameUnitType() )
+		fExtraEvadeRate = pDefender->GetEvadeUpPerBySMA( static_cast<CX2GUNPC*>( pAttacker )->GetNPCTemplet().m_nNPCUnitID );
+
+	const float fAttackerHitRate = pAttacker->GetAttackRateByAbnormalityBlind() * pAttacker->GetAccuracyPercent();
+	const float fDefenderEvadeRate = static_cast<float>( static_cast<double>( pDefender->GetAvoidancePercent() ) + fExtraEvadeRate - 1.0 );
+	float fHitRate = fAttackerHitRate - fDefenderEvadeRate;
+
+	CX2SkillTree* pSkillTree = g_pData->GetSkillTree();
+	if( CX2GameUnit::GUT_USER == pAttacker->GetGameUnitType() )
+	{
+		const CX2Unit* pAttackerUnit = static_cast<CX2GUUser*>( pAttacker )->GetUnit();
+		if( NULL != pAttackerUnit && CX2Unit::UC_RAVEN_BLADE_MASTER == pAttackerUnit->GetClass() )
+		{
+			const int iSkillLevel = pAttackerUnit->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_RST_EXQUISITE_SWORDMANSHIP, true, 0, true );
+			if( 0 < iSkillLevel )
+			{
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = pSkillTree->GetSkillTemplet( CX2SkillTree::RNSI_P_RST_EXQUISITE_SWORDMANSHIP );
+				if( NULL != pSkillTemplet )
+					fHitRate += pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ACCURACY_PERCENT_ABS, iSkillLevel, false );
+			}
+		}
+
+		if( NULL != pAttackerUnit )
+		{
+			const int iSkillLevel = pAttackerUnit->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::SI_P_COMMON_GET_CHANCE, true, 0, true );
+			if( 0 < iSkillLevel )
+			{
+				const CX2SkillTree::SkillTemplet* pSkillTemplet = pSkillTree->GetSkillTemplet( CX2SkillTree::SI_P_COMMON_GET_CHANCE );
+				if( NULL != pSkillTemplet )
+					fHitRate += pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ACCURACY_PERCENT_ABS, iSkillLevel, false );
+			}
+		}
+
+		const float fAddAccuaracyPercent = static_cast<CX2GUUser*>( pAttacker )->GetAddAccuaracyPercent();
+		if( 0 < fAddAccuaracyPercent )
+			fHitRate += fAddAccuaracyPercent;
+	}
+
+	if( true == pDefender->GetInvincible() )
+		fHitRate = 1.f;
+
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	static DWORD s_dwHitRateLogged = 0;
+	if( ::GetTickCount() - s_dwHitRateLogged >= 1000 )
+	{
+		s_dwHitRateLogged = ::GetTickCount();
+		CX2OfflineLog::Server( L"[JUNE_STATCALC] HITRATE att=%I64d def=%I64d acc=%.3f blind=%.3f avoid=%.3f extra=%.3f hit=%.3f",
+			pAttacker->GetUnitUID(), pDefender->GetUnitUID(), pAttacker->GetAccuracyPercent(), pAttacker->GetAttackRateByAbnormalityBlind(),
+			pDefender->GetAvoidancePercent(), fExtraEvadeRate, fHitRate );
+	}
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+	return fHitRate;
+#else SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 	// 최종 명중 확률 = (100 + attacker 추가 명중) - defender의 회피		
 
 	if( NULL == pAttacker )
@@ -4542,6 +4690,7 @@ float CX2DamageManager::CalcHitDodgePercent( CX2GameUnit* pAttacker, CX2GameUnit
 		fHitRate = 1.f;
 
 	return fHitRate;
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
 }
 
 #ifdef NEW_EXTRA_DAMAGE

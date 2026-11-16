@@ -33,6 +33,13 @@ Identify June's resonance system (found by june-result R0 and june-transcend pla
   - UI `328b3810`, `3291df90`, `31d8e280`, `32468c70`, `32356640`.
 - **The rest.** What resonance gives (stats? a buff? points to spend?), its data file(s), its UI, and the emulator / save it needs (a
   `unit` column rung, `KUnitInfo` fields offline-only). There is no March counterpart.
+- **The stat points (added by june-stat-calc S1b, 2026-11-16).** The per-unit ability map `32358970` (CX2Unit `+0xaac`, value = table
+  `g_pData +0x5a4` entry `+0x1c` x the map's level, x `g_pData +0x5cc` in PvP, 0 under GT_PVE) is resonance's stat allocation. It is filled
+  only by June event `0x607` (dispatcher `3260e0c0`, handler `3260c140`: `3234b3e0` + map assign `32356640`) and the in-game NOT `31f1ed70`;
+  the table is `ElResonanceTable.lua` (client data). Every reader reads 0 today (June's absent value) and moves with this stage: `ResetMaxMP`
+  key 5 (`X2GUUser.cpp`, `X2GULuciel.cpp`), `GetActualMPConsume` key 11, skill damage-up `3201ad10` keys 6 / 13-16, the character window
+  `32913460` keys 1 / 2 (`X2UICharInfo.cpp`), `GetEnchantStat` key 4, `ResetHudMaxHpMp` key 5 (`X2Unit.cpp`), `GetUnitStat` `32358b00` key 5,
+  `X2GuEve.cpp`, the UI `3260a360` / `3260ceb0`. Full list: `june2017_re/statcalc/statcalc_map.tsv`, row "per-unit ability map".
 
 Output:
 - `JUNE_RESONANCE_PHASES.md` (map phase first, Opus review each);

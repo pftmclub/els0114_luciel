@@ -14127,3 +14127,17 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED needs SERV_IRUHADEV_JUNE_EQIP_LOAD_ATTACHED ( the DG-chain gate )
 #endif SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: june-stat-calc S1b - June's whole CalcHitDodgePercent (32610a00: no Chung Deadly Chaser accuracy block, Raven Blade
+//              Master's Exquisite Swordmanship by June's id 24406) and the dodge roll's index offset in the four collision paths: an NPC
+//              defender whose stat came from an ExtraNPCStat row rolls SRO_HIT_DODGE + the attacker's (or its owner's) GetRandomInt( 0 ).
+#define SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE ) && !( defined( SERV_IRUHADEV_EXTRA_NPC_STAT ) && defined( DUNGEON_RANK_NEW ) && defined( SERV_IRUHADEV_JUNE_SKILL_TEMPLET ) && defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) && defined( NEW_CHARACTER_EL ) && defined( NEW_SKILL_2010_11 ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE needs HasExtraNPCStat, GetOwnerGameUnit, June's skill templet calls and enum names, GetAddAccuaracyPercent and the blind rate
+#endif SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT ) && !( defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) && defined( SERV_IRUHADEV_JUNE_SKILL_TEMPLET ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT needs June's PvP game type names and the upgrade swap / skill templet calls ( june-stat-calc S1b )
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+//////////////////////////////////////////////////////////////////////////

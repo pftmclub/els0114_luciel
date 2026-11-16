@@ -1386,6 +1386,61 @@ no play-test. `_STATCALC_DEBUG` stays on for S1b.
   - stateends SKIPPED: no skill state registered.
   - INFO: the other flags on the changed lines are partners (BUFF_*, CHAR_DUO_STAT, SKILL_STAT_GETTERS, OFFLINE, ...).
 
+### Phase S1b - Done (2026-11-16)
+
+Flags `SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT` (S1's, `ResetMaxHP` + the emulator stand-in) and the new `SERV_IRUHADEV_JUNE_STATCALC_HIT_DODGE`
+(`Always.h`, guard on Always.h-only flags); `_STATCALC_DEBUG` stays on. Commit: `git log --grep "june-stat-calc Phase S1b:"`. Each item = June, read
+in the exe this session; map rows updated (3 -> `June`, the ability map -> `June default`), funcmap rows tagged `StatCalc S33 S1b`.
+
+**`ResetMaxHP` `31feba70`** (`X2GUUser.cpp`): `SetMaxHp( [6] )` (= March's line), then the two boss multipliers. Named: room `+0xd8` =
+`CX2PVPRoom::m_PVPGameType` (offset probed = March), 4 / 5 = `PGT_GUILD` / `PGT_EVENT_MODE` (June `Enum.lua`, registered in `X2PVPRoom.h` under
+`JUNE_ENUM_NAMES`); slot `+0x10` = `m_TeamNum` (`TN_BLUE`); events `0x891` 2193 / `0x8a9` 2217 are code events with no CEI name (2217 is also
+an `IsEnableCode` key at `322bf874` / `3245f87c`). Not in March: slot `+0x58` (a boss flag at the spot of March's commented-out `m_bIsBoss`,
+`PVP_BOSS_COMBAT_TEST`) and PvP room `+0xf8` (the event mode's code event; March's `CX2PVPRoom` ends at `0xf8`): stand-ins `false` / 0, so
+neither branch fires. June reads `+0xd8` of any room; the port reads it on a PvP room only, since a dungeon room holds its difficulty (0-2) and a
+field room its field id there, never 4 / 5. **Offline reach: none** (no PvP). Multiplies = June (`emu_hit_dodge.py`, 50 sets).
+
+**Strong Bone in game.** June's client reads 21403 only in `GetUnitStat` `32358b00` (window) and `32d1c797` (Elsword, damaged-rel; a `.text`
+scan for `9b 53 00 00` finds nothing else), so June's in-game passive HP came in the server's game stat; March's server does the same
+(`GSUserFunction.cpp`: `kModifiedBaseStatBySkill` += passive HP before the gear). **Stand-in** (`X2OfflineServer.cpp`, `AddPassiveSkillStat`,
+labelled): the emulator's game stat (Lu's and Ciel's) takes `GetUnitStat`'s four passive terms on the StatTable base, before the gear: Strong
+Bone 21403 (HP x rate), Guard Mastery 26403 and Hyper Aura 106 (HP + ( rate - 1 + 5e-8 ) x base), Fortitude 7407 (both defences and HP the same
+way). Skill levels from `unit_skill` with June's upgrade swap ("acquired" read as level > 0). The base stat stays without them (the window adds
+them itself). Expected: jtLordKnight (Strong Bone 4, 1.06) in-game max HP = the window's 235624 (was 226204).
+
+**`CalcHitDodgePercent` `32610a00`** (`X2DamageManager.cpp`), whole: = March except no Chung Deadly Chaser block and Raven Blade Master's
+Exquisite Swordmanship by 24406 with `GetSkillLevel( id, true, 0, true )`. `emu_hit_dodge.py` (Unicorn, @32610b31-32610b98): 1800 sets PASS.
+June's data gives 24406 an accuracy of 0 at every level, so Raven's term adds nothing (as in June).
+
+**Dodge roll offset** (the four live rolls, `GetHitDodgeRandomOffset`): an NPC defender whose stat came from an ExtraNPCStat row (June NPC stat
+`+0xe8`, written only by `323752f0` under the fetch; port: `HasExtraNPCStat( id )`) rolls `SRO_HIT_DODGE` + the attacker's `GetRandomInt( 0 )`, or
+an NPC attacker's owner's (`32759f00`), or 0; computed before `SetDefenderDamageRateOfPart` as June. The effect path (@3262f11a) takes the damage
+data's attacker unit (`+0xc`), not the effect owner, with no NULL test in June: `JUNE_BUGS` 775 (NULL -> 0). The Lua setter `324050d0` (S0's
+lead) is `CX2GuildManager::SetLimitGuildLevel_LUA` (binding name decoded at @31e32825), not this byte.
+
+**The ability map `32358970` = June's resonance stat allocation** (backlog Stage 30). Filled only by June event `0x607` (dispatcher `3260e0c0`
+case 0 -> `3260c140`: resonance fields `3234b3e0`, map assign `32356640`, HUD `3235a160`) and the in-game NOT `31f1ed70`. Its table is client
+data (`ElResonanceTable.lua`), but with no resonance system the map is empty: June's absent value 0 stands. Readers handed to
+`kickoffs/june-backlog/stage30-plan.md` ("The stat points").
+
+**Hand to char ports (rule 5):** char-chung: June has no Deadly Chaser accuracy block (`SI_P_CDC_ACCURATE_MARKMANSHIP` in March) in
+`CalcHitDodgePercent`; char-raven: Blade Master's accuracy reads 24406 (value 0 in June's data). Both ride with this body; nothing owed.
+
+**Proof and gates.** `emu_hit_dodge.py`: `EMU_HIT_DODGE: 1800 hit-rate sets, 50 max-HP sets, 0 mismatch(es) -> PASS`. /Zs probes
+(`X2DamageManager.cpp`, `X2GUUser.cpp`, `Offline/X2OfflineServer.cpp`, `X2PVPRoom.cpp`): 0 errors. `finish.py --files ... --with UNIT_STAT HIT_DODGE
+DEBUG`: `FINISH RESULT: PASS` (flagcheck HIT_DODGE PASS: 1 PASS, 1 DEFINE, 0 deleted; UNIT_STAT PASS: 1 PASS, 1 PASS~, 1 DEFINE, 0 deleted;
+junediverge `RESULT: PASS`; enumscan exit 0). The 12 "EOL-mismatched" lines are LF lines beside the CRLF `{` anchors in the mixed-EOL
+`X2DamageManager.cpp` (the file is LF bar 289 lines; D3's lines there are LF too). `flagcheck JUNE_ENUM_NAMES --files X2Lib/X2PVPRoom.h`: PASS.
+Build (coalesced into a run started after this phase's last edit): `DEPLOY OK: X2_offline.exe is 27,159,552 B, dated 2026-11-16 11:50:04, md5
+dc655e7b67f7b84d92c5e37548fb4a8d, equal to X2/US_SERVICE/x2.exe (2026-11-16 11:49:57); built at main 3e9fa56d + 17 uncommitted code file(s).`
+`EXESTR OK: 4 of 4 found in X2_offline.exe, 27159552 B, dated 2026-11-16 11:50:04, md5 dc655e7b67f7b84d92c5e37548fb4a8d` (HITRATE, DODGEROLL,
+MAXHP, PASSIVE).
+
+**Debug lines** (`[JUNE_STATCALC]`): `MAXHP` (my unit, each ResetMaxHP), `PASSIVE` (emulator, each game stat), `HITRATE` (1 / s), `DODGEROLL`
+(1 / s, ExtraNPCStat defenders only).
+
+Play-test: below; review `kickoffs/june-stat-calc/S1b-review.md`.
+
 ## Phase Z - Close
 
 **Scope.** `MODS.md` complete, the map has no `March` / `mixed` / `unknown` row, `tools/data/june_diverge_allow.tsv` holds no `stage33`

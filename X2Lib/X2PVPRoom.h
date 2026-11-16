@@ -10,6 +10,8 @@ class CX2PVPRoom : public CX2Room
 			PGT_SURVIVAL,
 			PGT_TAG,
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+			PGT_GUILD = 4,			/// June Enum.lua PVP_GAME_TYPE; june-stat-calc S1b
+			PGT_EVENT_MODE = 5,		/// June Enum.lua PVP_GAME_TYPE; june-stat-calc S1b
 			PGT_WINNER = 6,			/// June Enum.lua PVP_GAME_TYPE
 			PGT_AMUSEMENT_ITEM = 8,	/// June Enum.lua PVP_GAME_TYPE; char-luciel CH1k2
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES

@@ -39731,6 +39731,31 @@ void CX2GUUser::SetBasicEquipAtStrippedPosition( CX2Unit::EQIP_POSITION eEquipPo
 
 void CX2GUUser::ResetMaxHP()
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	// june-stat-calc S1b: June 31feba70
+	const float fBaseHP = GetStat().GetStat().m_fBaseHP;
+	SetMaxHp( fBaseHP );
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	if( true == IsMyUnit() )
+		CX2OfflineLog::Server( L"[JUNE_STATCALC] MAXHP unit=%I64d minor=%d hp=%.0f", (__int64)GetUnitUID(), IsMinorUnitActive() ? 1 : 0, fBaseHP );
+#endif // SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_OFFLINE
+
+	// June reads +0xd8 of any room: a dungeon room's difficulty ( 0-2 ) or a field room's field id is never PGT_GUILD / PGT_EVENT_MODE
+	CX2PVPRoom* pPVPRoom = ( NULL != g_pX2Room && g_pData->GetPVPRoom() == g_pX2Room ) ? g_pData->GetPVPRoom() : NULL;
+	if( NULL == pPVPRoom )
+		return;
+
+	const CX2Room::SlotData* pSlotData = pPVPRoom->GetSlotDataByUnitUID( GetUnitUID() );
+	const bool bBossSlot = false;		// stand-in: June's slot +0x58 boss flag; March's m_bIsBoss is commented out ( PVP_BOSS_COMBAT_TEST )
+	const int iRoomCodeEventID = 0;		// stand-in: June's PvP room +0xf8 ( the event mode's code event ) has no March member
+
+	if( NULL != g_pInstanceData && true == g_pInstanceData->IsEnableCode( 2193 )	// code event 0x891: no CEI name
+		&& CX2PVPRoom::PGT_GUILD == pPVPRoom->GetPVPGameType() && NULL != pSlotData && true == bBossSlot && CX2Room::TN_BLUE == pSlotData->m_TeamNum )
+		SetMaxHp( static_cast<float>( static_cast<double>( fBaseHP ) * static_cast<double>( 0.7f ) ) );	// 3344af88 = 0.7f widened
+
+	if( CX2PVPRoom::PGT_EVENT_MODE == pPVPRoom->GetPVPGameType() && 2217 == iRoomCodeEventID && NULL != pSlotData && true == bBossSlot )	// code event 0x8a9: no CEI name
+		SetMaxHp( fBaseHP * 1.5f );
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	SetMaxHp( GetStat().GetStat().m_fBaseHP );
 
 
@@ -39750,6 +39775,7 @@ void CX2GUUser::ResetMaxHP()
 //
 //#endif PVP_BOSS_COMBAT_TEST
 //
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
 
 
