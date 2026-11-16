@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase new-plan char-rose` (set ready by char-luciel Z; later: `char-ain`) |
+| Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase new-plan char-rose` (ready since char-luciel Z, 2026-11-16; later: `char-ain`) |
 | Output | plan key `char-<name>` (`JUNE_CHARACTER_<NAME>_PHASES.md`, `kickoffs/char-<name>/`, a `char-<name>` STATUS block); one character per planning session |
 | Plan doc | `JUNE_PORT_BACKLOG_ORDER.md` (Stage 8); template: `JUNE_CHARACTER_LUCIEL_PHASES.md` (and its "Template for Stage 8", written by char-luciel Z) |
 | Depends on | char-luciel Z: the NU (new-character foundation) and DU (two-body engine) flags are class-agnostic and Rose / Ain widen them |
@@ -10,7 +10,7 @@
 | Log tag | `[JUNE_CHAR] <PREFIX>` |
 | Review | none (a planning session) |
 
-Lu/Ciel was planned first (2026-11-02, `char-luciel`).
+Lu/Ciel was planned first (2026-11-02, `char-luciel`) and closed 2026-11-16 (Z): its "Template for Stage 8" in `JUNE_CHARACTER_LUCIEL_PHASES.md` lists what NU / DU took and what Rose and Ain widen.
 
 ## Read first (and nothing else unless you need it)
 

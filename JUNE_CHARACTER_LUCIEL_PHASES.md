@@ -5194,3 +5194,32 @@ Open:
    logged. CH0 (2026-11-02) reported: no June per-level table exists; the existing rows all follow June's relative table (CH0 Done note).
    **Settled (user, 2026-11-02): derive from June.** NU4 writes Lu/Ciel's `StatTable.lua` rows from June's `CharacterStatTable` relative rows with
    the fitted formula (levels 1-80; 81-99 by `cap99_gen.py` as for the other classes), a labelled stand-in under its own flag; the user packs it.
+
+## Phase Z - Done (2026-11-16)
+
+Sonnet 5.5 medium. Docs only: no code, no flag, no build ( full build skipped: no play-test ). `finish.py` has no client file to check.
+- **`MODS.md`:** new section "June character: Lu/Ciel (Stage 8 ...)" ( flags, files, data, stand-ins, revert order ).
+- **Debug defines:** `Always.h` has no uncommented `_DEBUG` define for Lu/Ciel, `DUO_*` or `CHAR_*` ( grep ); each is `//#define` with its retiring review.
+- **Checklist rows:** `JUNE2017_CHARACTER_PORT_CHECKLIST.md` rows 151 / 251 / 289 / 375 / 461 / 464 / 486 now carry `(Lu/Ciel: <phase>)`, each checked against its funcmap row or the class source. Rows that mention Lu/Ciel only as a later reader ( customize filters, emotion voice ) stay routed to Stages 9 / 12 by the CH4c / CH5 notes.
+- **Closed:** the `char-luciel` STATUS block is archived with a closed-plans row; `stage8-plan.md` now starts `char-rose`.
+
+## Template for Stage 8 ( written at char-luciel Z, 2026-11-16 )
+
+Lu/Ciel took 313 commits ( NU 4 phases, DU 6 stages, CH0-CH6 with about 100 CH1-CH4 sub-phases, CHN, TU ). Rose and Ain do not repeat the foundation; they widen it.
+- **What NU took ( class-agnostic, live ):** `UT_ROSE` 11 / `UT_AIN` 12 / `UT_END` 13 ( NU1, `UNIT_TYPE_RANGE` ); the 2-byte class on the wire and in `KUnitInfo` ( NU2, `UNIT_CLASS_WORD`, `ServerDefine.h` second home );
+  the minor-unit `UnitTemplet` keys and loader ( NU3 ); creation / select screens, rotation, voice table, stat fallback ( NU4, `CREATE`, `SELECT_VOICE_TABLE` ).
+  **Rose's and Ain's NU work is their own rows only:** a `UnitTemplet` row each ( core-list source, append June's rows ), `Select<Char>` + stand board, a starter-item stand-in
+  ( `plan_starter_items.tsv` documents the pattern ), stat = the flat table.
+- **What DU took:** the second body in `CX2GUUser`, damage-state getters ( every class, `USER_DAMAGE_STATE_GETTERS` ), the equip view ( `EQUIP_VIEW` ), June's `NESI_*` numbering and the v24 save
+  ( `NESI_RENUMBER`; **Rose and Ain add no migration** ), viewer second body, avatar, lobby, awaken effect, hyper cut-in ( `DUO_*` ). Rose's weapon index rides the form packets `0x4fd` / `0x4fe`,
+  which DU5 left; widen the existing `EGS_CHANGE_UNIT_FORM_REQ` path, do not re-derive it.
+- **Phase shape that worked:** CH0 map + CH0b assets first; inert `_CORE` transcription in `X2G<Char>.cpp` ( ~25 CH1 sub-phases of 15-35 rows ) with one-file `/Zs` probes and a review every 2-4 phases;
+  `_LIVE` flips at CH1 final; then skills ( CH2 base + first jobs, CH3 second jobs + hyper actives + transcendence rows ), passives ( CH4 ), CH5 UI / data, CHN job change, TU tutorial, CH6 walk.
+  Split CH1 by vtable slot ranges, not by skill.
+- **Traps found here:** the `ReservedSkillStart` hook and the stuck-state gate per class; 85 override targets uncarved in Ghidra ( capstone dumps in `june2017_re/char_luciel/ghidra/` );
+  `DT_BOTH` / `DT_KEEP` missing from the live `Enum.lua` ( CH1p ); a June asset staged without its `.TET` draws nothing; the state-id numbers ( june-state-ids ) land before the class script;
+  a character's creation screen, class pictures and cut-in tables belong to its own port, never to Stage 9.
+- **Routed out:** customize-item body filters -> Stage 12; emotion voice ( `PlayEmotionSound` ) and the `324d08a0` frame move -> Stage 9; `RETAIN_CAMERA_STATE` / `FORCE_DYNAMIC_CAMERA_INDEX` -> Stage 9;
+  guild-agit form packets: not reachable offline.
+- **Per character:** Rose ( `UT_ROSE` 11, base 201 ): `ROSE_WEAPON_TYPE`, weapon UI `32913f40` / lock `0x5e3`, Neil the Sniper aim, her event scenes.
+  Ain ( `UT_AIN` 12, base 202, no name in `Enum.src.lua` ): `USEFUL_STRING` readers, SetStopTime overrides, Lied Schwach. Order: Rose, then Ain ( `kickoffs/june-backlog/stage8-plan.md` ).
