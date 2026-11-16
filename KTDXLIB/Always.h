@@ -12608,8 +12608,8 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Author: Iruha
 // Date: 2026-11-12
 // Description: june-stat-calc (from D1) - per-hit "[JUNE_STATCALC] HIT" line in offline_server.log, about once a second per
-//              attacker-defender pair, with March's rate beside June's. The D6 review retires it. Revert: comment out the #define.
-#define SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+//              attacker-defender pair, with March's rate beside June's. Retired by the D6 review (2026-11-16); uncomment for a play-test.
+//#define SERV_IRUHADEV_JUNE_STATCALC_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && !defined( SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE )
 #error SERV_IRUHADEV_JUNE_STATCALC_DEBUG needs SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE
 #endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG

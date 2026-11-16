@@ -1128,6 +1128,35 @@ socket attack / defence did not reach the unit's attack here (`socket=0.0000` ra
 **The other seven sheets are not run (user, 2026-11-16: too long).** The shared formula (rate, chain, react) is proven on 308 hits; D2b / D4b already played Raven, Aisha and Eve, and
 the class blocks are the char ports' own (each play-tested there). The D6 review decides whether that closes the gate.
 
+### Phase D6 review - Done (2026-11-16)
+
+**Opus 5.5 / high. Verdict: pass; the damage track D0-D6 is closed.** Code change: `SERV_IRUHADEV_JUNE_STATCALC_DEBUG` retired (`//#define`, `KTDXLIB/Always.h`;
+it guards only debug lines, no `#else`, nothing negates it). Build skipped: debug retire only. S1 uncomments it for its play-test (S1 kickoff), Z retires it again.
+
+**The sheets.** `python tools/statcalc_check.py --units 204 205 --socket 204 205` re-run on the live `offline_server.log` (the Elsword run, 09:15-09:22; 308 HIT / GFD /
+GFD2 / REACT lines, 71 EFFHIT, 1 EDT): rate 308, chain 308, react 308, 6 zero-damage hits on a no-damage defender state; only SOCKET fails (medians 19360 / 19350).
+Hand re-check: dlv 89 defence 1516 -> 1516 / 5276.80 = 0.2873; dlv 104 defence 5374 -> 0.5526; REACT 4900704 - 4881493 = 19211 vs dmg 19212 (+-1).
+**Gate decision (the D6 Done note left it here): the seven unrun sheets are waived, not owed.** The shared path (GetFinalDamage, both DamageReact damage sections, extra
+damage) has no class branch outside the map's `class` row: every class's `DamageReact` / `SetDamageExceptionProcess` override (`X2GU*.h`, 9 classes) is a layer around it,
+owned and play-tested by its char port (map row 13; Add and Elesis open there). Elsword's run exercised the shared path at three monster levels and on incoming hits;
+D2b / D4b already logged Raven, Aisha and Eve. The sheets stay in `playtest.md` for whoever needs a class smoke later.
+**SOCKET lead -> S3** (bullet added to `kickoffs/june-stat-calc/S3.md`: unit 204's flat socket attack does not reach `patk`; `statcalc_check.py --socket 204 205` must pass).
+
+**Map gate:** damage rows 36 `June`, 1 `class` (row 13, char ports), 1 `absent` (row 21, DI_EVENT_ALCHEMY_LAB -> backlog Stage 19), 1 `n/a` (row 39), 1 `March`
+(row 78, dodge roll index offset +0xe8, phase `S1b`); no `mixed`. Pass.
+
+**Gates:** `python tools/finish.py --review -v --commits 42183ed2 3973df2a 2ec41be0 617950eb 3812c4cd c0a28ccc a93c5420 --with <the 5 D flags + _DEBUG>`:
+- `junediverge` `RESULT: PASS`; `junediverge --check-all` `RESULT: PASS`.
+- flagcheck per flag: 0 FAIL, 0 deleted, 0 non-ASCII, 0 encoding change in every flag; DAMAGE_REACT 14 PASS, FINAL_DAMAGE 26 PASS + 1 PASS~, HIT_PIPELINE 19 PASS,
+  EXTRA_DAMAGE 4 PASS, DEFENCE_CURVE 4 PASS. Each prints `RESULT: FAIL` on one shared row: `ERROR a93c542 KTDXLIB/Always.h line 13344`, char-elesis CH4b2's guard
+  `#error ELESIS_PASSIVE needs STATCALC_DAMAGE_REACT`, which fires because `--with` switches DAMAGE_REACT off with the group: the guard working, not a hygiene fault.
+  Proof: `flagcheck.py SERV_IRUHADEV_JUNE_STATCALC_EXTRA_DAMAGE --range a93c542^..a93c542` alone: 4 PASS, 1 DEFINE, 1 OTHER, 0 ERROR, `RESULT: PASS`.
+- OTHER rows: every one is another of the five D flags' file in the same commit, or `SERV_IRUHADEV_JUNE_ENUM_NAMES` (June enum names registered in `X2UnitManager.h`,
+  `DungeonEnum.h`, `X2DamageManager.h`, `X2SkillTree.h` by D2b / D4a / D5). DEFINE rows: the `Always.h` blocks.
+- HIT_PIPELINE's 12 EOL-mismatched lines: the dodge sites in `X2DamageManager.cpp`'s mixed-EOL region, already explained in the D3 review.
+- enumscan exit 1 on one row: `X2DamageEffect.cpp:1705` `1000` = a 1000 ms log throttle in a JUNE_FX line (commit 20cecda8, 2026-09-26), not a skill id and not D code.
+- This review's own change is a `//#define` (retired: checks nothing).
+
 ## Phase S0 - Stat-sheet and resource map (read-only)
 
 **Scope.** The stat and resource rows of the map: base stats by level, `SetKStat` `323571c0` (two 7-value sets), `SetGameStat`
