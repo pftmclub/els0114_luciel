@@ -1926,6 +1926,8 @@ line by a `/Zs` flag probe) and `SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SI
   X2StateCreateUnit.cpp --with SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY`: PASS (6 gates); `/Zs` probe 0 errors.
   `DEPLOY OK: X2_offline.exe is 27,075,584 B, dated 2026-11-16 09:04:05, md5 2a1a963a14c71dc33eeb4df476a7a3d7` (built at main 6e440d0a + 12 uncommitted
   code files: this fix and 11 of peers' in-progress files).
+- **Fix play-test passed** (user, 2026-11-16, md5 `2a1a963a`): Ciel in her promotion items on the create screen. Log: `[09:06:36.822] [JUNE_CHAR]
+  LUCIEL DUO LOBBY create screen: both bodies, Ciel turned 30.0 deg`; 0 EXCEPTION, 0 ErrorLog lines.
 
 ### DU5e - Done (2026-11-15)
 
