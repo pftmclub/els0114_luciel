@@ -244,7 +244,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH3c | blocked (CH3b review; CH1i2 + review, DU1 review done): Demonio (129) skills part 1, `CUSTOM_RENDER_STATE` | Sonnet 5.5 / high, no review of its own (CH3c2 review covers it), user play-test | CH3b review, CH1i2, DU1 review | `X2GULuciel.*` | `CH3c.md` |
 | CH3c2 | blocked (CH3c): Demonio (129) skills part 2 | Sonnet 5.5 / high, Opus review (also covers CH3c), user play-test | CH3c, CH3c20 review (done) | `X2GULuciel.*` | `CH3c2.md` |
 | CH3d | blocked (CH3c2 review): hyper actives + transcendence rows, both bodies' cut-ins | Opus 5.5 / high, Opus review, user play-test | CH3c2 review | `X2GULuciel.*`, `X2GUUser.cpp`, data koms | `CH3d.md` |
-| CH4c | ready (CH4b review passed 2026-11-16): memo and item readers (`MemoConditionLuciel`) | Opus 5.5 / high, Opus review, user play-test | CH4b review | `X2GULuciel.*`, `X2BuffTemplet.cpp`, `X2Game.cpp` | `CH4c.md` |
+| CH4c | done (2026-11-16, no code change): memo, item and buff readers are ported or never fire in June; 4 customize readers -> Stage 12; review ready | Opus 5.5 / high, Opus review, no play-test | CH4b review | docs, funcmap | `CH4c-review.md` |
 | CH6 | blocked: scans rerun + user walk incl. creation, tutorial, job change and the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH3d, CH4c, CH5, TU reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, "Template for Stage 8", `stage8-plan` -> `char-rose` | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
 

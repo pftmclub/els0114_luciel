@@ -4770,6 +4770,38 @@ Opus 5.5 high. Covers CH4a ( `a31855e9` ) and CH4b ( `5d07d7dc`, `9bdc3e6a` ). *
 - **Commit `df5fa9be`** ( `finish.py --range df5fa9be^..df5fa9be --with JUNE_CHAR_LUCIEL_PASSIVE_DEBUG --skip-flag JUNE_CHAR_LUCIEL_PASSIVE` ): FINISH RESULT PASS;
   `_PASSIVE_DEBUG` retired ( nothing to check ), `_PASSIVE` skipped: the only line is the commented define, and its compound `#error` guard is not unifdef-able.
 
+### CH4c - Done (2026-11-16)
+
+Opus 5.5 high. **No code change:** each item of the CH4c row is ported already or never fires in June. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE`
+untouched, `_PASSIVE_DEBUG` stays retired ( no new log line ). Scans: capstone on `unpacked_x2.exe` ( call + `cmp` windows ) and Ghidra decompiles, read-only.
+funcmap `grep "(CH4c)"` ( 4 rows ).
+- **`MemoConditionLuciel` ( ctor `32aeb3f0`, `IsCondition` `32ae5150`, slot 2 `32ae5170` ): not ported, = the other 12 classes.** Bytes: `IsCondition` =
+  `push [esp+4]; call 31fd4450; test al, al; setne al; ret 4`, and `31fd4450` = `xor al, al; ret 4`, so it always answers false. Slot 2 is a `jmp` to the
+  base parse `31fc8cf0`. Divergence row `MemoCondition::decide / parse` ( D1-1: no MemoCondition class in the tree, `m_bApplyMemo` is false for every
+  class ) covers it. CH1a's stand-in comment in the ctor ( `X2GULuciel.cpp:163` ) stays.
+- **Memo reads in the class ( 21 calls to June's memo functions in `32ae4080-32b4e76f` ):**
+  - 15 calls to `31fca9e0` ( `GetEqippedSkillMemo`, June's stub that returns 0 ) in 10 functions. Each port drops the read with a one-line comment:
+    `32b15050` CH1l2, `32b1f800` CH1l3, `32b29af0` CH2a, `32b2ba70` / `32b2bf20` / `32b2c270` / `32b2e080` CH2c2, `32b3d010` CH2b, `32b3d380` CH4a, `32b2d2a0`
+    CH3b ( 5 calls; uncommitted at this phase, the CH3b review owns it ). `X2GULuciel.cpp` has no call to March's `GetEqippedSkillMemo`.
+  - 3 calls to `31fdbcc0` ( `GetTranscendenceMemoSkillID` ): `32b3c3b0` x2 ( Dancing Blade, CH3a ) and the skill head `32b46580 @32b46680` ( CH1n / CH3a ).
+  - None to `31fdbbb0` ( `GetSkillMemoEntry` ), `31fdbe20` ( memo MP rate ) or `31fdbe70` ( memo MP refund, reached through `ReservedSkillStart`, CH1o3 ).
+  - Plus the 2 MemoCondition ctor calls above ( `32aeb3f0`, and the class ctor `32b1bd90 @32b1c50b` ).
+- **`CX2Game::UseItemSpecialAbility` ( `322fbc60`, scanned to the jump tables at `322ff65c` ):** its only Lu/Ciel piece is the SAT 12 case ( `322fd2fe-322fd3f0`,
+  ported by DU1c ). Its other unit tests are Chung class 0x14 / 0x6e ( char-chung CH4c ), unit type 9 ( Add, `@322fe80a`, `@322ff4ed` ) and 7 ( Ara, `@322ff3dd` ).
+- **`X2BuffTemplet.cpp`: no Lu/Ciel branch in June.** `CreateAndInsertCustomFunctionByBuff` `3229e1a0` switches on BTI 29 / 56 / 62 / 223 / 439 / 720 / 767 / 819 /
+  891 / 894 / 920 / 927 / 952 / 1010 / 1022 / 1038 ( Ghidra decompile ), none of them Lu/Ciel's. June's buff code ( the funcmap's `CX2Buff*` ranges ) has no
+  `GetUnitType` == 10 test and no immediate compare to a Lu/Ciel BTI ( 460-483, 520, 760, 763, 764, 775, 776, 877, 895 ). The one hit, `push 0x208` x3 in
+  `CX2PremiumBuffManager` `326c7a10`, is a call argument, not BTI 520.
+- **Every June Lu/Ciel unit test outside the class** ( `call 31e4c370 / 31e4d0e0 / 31e4d0c0` then `cmp` with 10 or a Lu/Ciel class id ): 14 sites, no class-id
+  test. 8 are ported: `320483e6`, `32048d0c`, `3204963f`, `3204dedf`, `327b33a5`, `327b3a15` ( CH4b ), `3230cb5a` ( CH3a0 ), `321960ee` ( DU3b ). 2 were routed
+  earlier: `32020ac9` in `320200b0` ( socket-option particles, Stage 16, DU1d3b ) and `321fabaa` in `321faa90` ( Stage 19, CH1a0 ).
+- **Routed by CH4c ( scope rule: not this plan's subject, nothing reachable offline ):** 4 customize-item readers test an entry's `+0x40` body filter
+  ( 1 both, 2 Lu, 3 Ciel ) against the form. They are `32363b40` ( the sit item for an emotion, against `CX2Unit +0xe40` ), `32237310` ( the cash shop's take-off-all
+  tail, against viewer `+0x528` ), and `32d78bc0` / `32d7e250` ( the customize preview dialogs, against `32d767a0` / viewer `+0xd80` ). NU0 tagged them DU5. They go
+  to backlog Stage 12 ( the customize system, one new bullet ), since March has no customize map ( `+0xa44` ) to filter.
+- **Gates:** no client source changed, so `finish.py` has nothing to check ( no flag, no file ). Full build skipped: no play-test.
+- **How to see it in game:** nothing new. The memo and item paths behave as before; the Lu/Ciel passives are CH4a / CH4b's. Review: `CH4c-review.md`.
+
 ## Phase CH5 - UI and data
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI`, sub-tag `UI`. The skill and hyper cut-in
