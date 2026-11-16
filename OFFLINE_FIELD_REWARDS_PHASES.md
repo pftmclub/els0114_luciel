@@ -422,7 +422,7 @@ Also seen, left as R0 classified: 33170 `CHILLING_SPINE_TRAP` 710, 33140 `PIRANH
 **Build.** Full build skipped: no code change, deployed exe is R3's loader build (`EXESTR OK` `[DROP_STANDIN]`, wide x3, X2_offline.exe md5 f87b25c6). Gates: `finish.py --no-flag "data-only"`: PASS.
 
 **How to see it.** Log: `[DROP_STANDIN] loaded: 664 dungeon row(s) over 93 key(s), 58 field row(s) over 7 field(s), 50 static row(s), 67 group(s)`; per-kill lines; `no reward row` empty for the
-50 keys that got rows. **Play-test:** handed to the user (one smoke: Sander Garpai Rock Normal, 33210, Fogta Trock 1154 / Flame Tooth Caskey 1159 = June-only NPCs copied from 1155 / 1171). R4 and R5 smokes stay deferred to the plan's end.
+50 keys that got rows. **Play-test:** deferred to the plan's end (user 2026-11-16, as R4 / R5). Smoke when it runs: jtLordKnight, Sander Garpai Rock Normal 33210, `/stage 1`, kill Fogta Trock 1154 (copied from 1155) and the Tooth Caskeys 1159-1161 (from 1171); expect EXP / ED per kill, `loaded: 664 ... 93 key(s)`, no `no reward row` for 33210.
 
 ### Phase R2 - Done (2026-11-16)
 

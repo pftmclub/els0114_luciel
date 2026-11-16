@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase field-rewards R6 review` |
 | Plan doc | `OFFLINE_FIELD_REWARDS_PHASES.md` (branch `main`) |
-| Depends on | R6 done (its Done note, commit, and the user's smoke result) |
+| Depends on | R6 done (its Done note and commit; the smoke is deferred to the plan's end, user 2026-11-16) |
 | Flag | `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` (+ `_DEBUG`) |
 | Log tag | `[DROP_STANDIN]` |
 
@@ -22,7 +22,7 @@ Review R3-R6 together (the generated block in `DropTable.lua` / `StaticDropTable
 - **R6's copies:** every `-- source:` row equals its source studio row (Exp / ED / EDProperty / items / groups), the source is the same role and the same dungeon,
   or its other difficulty (user decision 2026-11-16); a copied row never carries a monster card of another NPC. Re-run `droptable.py check` and `simulate` for the
   R3-R6 keys; re-confirm the 30 unresolved pairs have no same-role studio row (`gen --dry-run` lists them) and decide with the user whether any gets a rule.
-- **Smoke results:** R3 passed, R6's smoke (Garpai Rock Normal) is the user's; R4 (Elysion) and R5 (secret) smokes were deferred to the plan's end (user
+- **Smoke results:** R3 passed; R4 (Elysion), R5 (secret) and R6 (Garpai Rock Normal 33210, spec in the R6 Done note) smokes were deferred to the plan's end (user
   2026-11-16): list what is still unplayed in the review and ask the user once whether to hand them off now.
 - **`_DEBUG`:** read every `#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG` hunk, then comment out the define in `KTDXLIB/Always.h` (retire only; build skipped:
   debug retire only).
