@@ -6,7 +6,17 @@ bool CX2UnitViewerUI::m_sbUnitClicked = false;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 namespace _CONST_UNITVIEWER_DU5C2_
 {
-	const D3DXVECTOR3 BACK_UNIT_POSITION_OFFSET( 50.f, 0.f, 70.f );	// June 33732708-33732710, times ( +0xd84 + 1.0 ), +0xd84 is the ctor's 0 only
+	const D3DXVECTOR3 BACK_UNIT_POSITION_OFFSET( 50.f, 0.f, 70.f );	// June 33732708-33732710, times ( +0xd84 + 1.0 ); +0xd84 is 0 outside June's customize preview ( 3224d0f0, Stage 12 )
+
+	// char-luciel DU5c2 review: June 31fa8ce0 @31fa9031-31fa9092, the worn item's enchant while it is usable ( 328825c0 ), else 0
+	void ApplyWornItemEnchantLevel( CX2Eqip* pX2Eqip_, const CX2Item* pWornItem_ )
+	{
+		const bool bWornItemUsable = ( NULL != pWornItem_ && true == pWornItem_->IsUsableEquip() );
+		if ( true == bWornItemUsable && pX2Eqip_->GetEnchantLevel() != pWornItem_->GetItemData().m_EnchantLevel )
+			pX2Eqip_->ChangeEnchantLevel( pWornItem_->GetItemData().m_EnchantLevel );
+		if ( 0 != pX2Eqip_->GetEnchantLevel() && false == bWornItemUsable )
+			pX2Eqip_->ChangeEnchantLevel( 0 );
+	}
 }
 using namespace _CONST_UNITVIEWER_DU5C2_;
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
@@ -438,6 +448,9 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			CX2Item* pTempItem = m_pUnit->GetInventory().GetEquippingItemByEquipPos( ePos, false );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+			ApplyWornItemEnchantLevel( pX2Eqip.get(), pTempItem );	// char-luciel DU5c2 review: the shown pass runs the same June test as the back pass
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			
 			//{{ kimhc // 실시간 엘소드 중 실시간 내구도 감소
 #ifdef	REAL_TIME_ELSWORD
@@ -470,6 +483,7 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 #endif	REAL_TIME_ELSWORD
 			//}} kimhc // 실시간 엘소드 중 실시간 내구도 감소
 			
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
         }
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		else if ( m_ViewEquipNormal[ iViewSlotPosition ][ iViewSlotBody ] == value.first )	// char-luciel DU5b2
@@ -8760,13 +8774,13 @@ void CX2UnitViewerUI::SetPositionOnScr(float x, float y, float z, float scale)	/
 	if ( NULL != m_pXSkinAnim )
 #endif // FIX_REFORM_ENTRY_POINT_3RD	// 김종훈, 진입 구조 개편 3차 ( 크래시 ) 수정
 		m_pXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() );
-#ifdef SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
-	// June 31f99f70 @31f9a153: the viewer's move sets the base viewer's land-dirty byte (+0x1d4)
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
-	CKTDGXSkinAnimPtr pBackXSkinAnim = GetBackXSkinAnimPtr();	// char-luciel DU5c2: June 31f99f70 @31f9a07e-31f9a14b, the back body at its offset
+	CKTDGXSkinAnimPtr pBackXSkinAnim = GetBackXSkinAnimPtr();	// char-luciel DU5c2: June 31f99f70 @31f9a07e-31f9a14b, the back body at its offset ( review: out of EFFECT_PLAYER )
 	if ( NULL != pBackXSkinAnim )
 		pBackXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() + BACK_UNIT_POSITION_OFFSET );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+#ifdef SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
+	// June 31f99f70 @31f9a153: the viewer's move sets the base viewer's land-dirty byte (+0x1d4)
 	m_bFxLandDirty = true;
 #endif SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER
 	
@@ -8906,11 +8920,7 @@ void CX2UnitViewerUI::BackUnitFrameMove( double fTime, float fElapsedTime )
 		{
 			// June @31fa9031-31fa9092: the enchant of the worn item in the back body's slot
 			CX2Item* pWornItem = m_pUnit->GetInventory().GetEquippingItemByEquipPos( static_cast<CX2Unit::EQIP_POSITION>( iViewSlotPosition ), false, bBackUnitIsMinorUnit );
-			const bool bWornItemUsable = ( NULL != pWornItem && true == pWornItem->IsUsableEquip() );
-			if ( true == bWornItemUsable && pX2Eqip->GetEnchantLevel() != pWornItem->GetItemData().m_EnchantLevel )
-				pX2Eqip->ChangeEnchantLevel( pWornItem->GetItemData().m_EnchantLevel );
-			if ( 0 != pX2Eqip->GetEnchantLevel() && false == bWornItemUsable )
-				pX2Eqip->ChangeEnchantLevel( 0 );
+			ApplyWornItemEnchantLevel( pX2Eqip.get(), pWornItem );
 		}
 		else if ( m_ViewEquipNormal[ iViewSlotPosition ][ iViewSlotBody ] != value.first )
 		{

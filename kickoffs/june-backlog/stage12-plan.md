@@ -27,7 +27,9 @@ First RE (read-only Ghidra) what C9g left open:
 - `CharCustomPreviewData.lua` (`3264d790`) and `CustomItemHide.lua`;
 - the viewer members `+0xf48..+0x11d0`, `ApplyCustomize` `31fa89b0`, `ResetCustomize` `31fa4980`, motion-list load `31fa8230`;
 - the custom branches of `31fa5c90`, which C9g-2 left as Stage 12: cases 0/3/6 custom, the 1-2 custom-WAIT shortcut, the sit arrays 7/8/9;
-- the HABIT timer `31fa8ce0 @31fa99f1` (`+0xf9c`/`+0xfa0`/`+0xf90`) and `31fa7ef0`'s `+0x11c0` HABIT branch (`326509e0`);
+- the HABIT timer `31fa8ce0 @31fa99f1` (`+0xf9c`/`+0xfa0`/`+0xf90`) and `31fa7ef0`'s `+0x11c0` HABIT branch (`326509e0`); with Lu/Ciel's back
+  body shown June runs `31fa8ce0` twice per frame, so the timer advances twice (char-luciel DU5c2 review: `BackUnitFrameMove` does not repeat the
+  tail; the HABIT port must); the preview's back-body offset `+0xd84` (0.33, `32233f70 @32234125`, `3224d0f0 @3224de5b`) is a constant in March;
 - the square side (`323fad80` custom sets, `323f92f0`/`323f9470`/`323f9680` in `323fa700`);
 - the preview dialogs (`3224b340`, `3224d0f0`, `32d77220`, `32d7c7d0`; `32d7c962` is the only PlayByMotionType caller passing bTransition 0).
 

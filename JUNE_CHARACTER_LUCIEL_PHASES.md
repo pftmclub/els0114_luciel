@@ -1929,6 +1929,45 @@ line by a `/Zs` flag probe) and `SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SI
 - **Fix play-test passed** (user, 2026-11-16, md5 `2a1a963a`): Ciel in her promotion items on the create screen. Log: `[09:06:36.822] [JUNE_CHAR]
   LUCIEL DUO LOBBY create screen: both bodies, Ciel turned 30.0 deg`; 0 EXCEPTION, 0 ErrorLog lines.
 
+### DU5c2 - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed `8fe221f2` + `bd1bb0a0` against June in Ghidra / `disasm_range.py`. Verdict: **pass after one fix**, plus a comment fix and a
+flag-nesting move, all under `SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY` (`X2UnitViewerUI.cpp` only).
+- **Fix: the shown pass's enchant sync.** June runs the same code `@31fa9031-31fa9092` for both passes (worn item `32869e10( pos, 0, body )`, change
+  while usable `328825c0`, else 0). DU5c2 gave the back pass June's test but left March's `REAL_TIME_ELSWORD` endurance / infinity test on the shown
+  pass. Both now call `ApplyWornItemEnchantLevel` (in `_CONST_UNITVIEWER_DU5C2_`); it differs from March only for a broken, PC-bang-only or
+  non-endurance, non-infinity worn item.
+- **Comment fix:** `+0xd84` is not ctor-only: June's customize preview writes 0.33 (`32233f70 @32234125`, `3224d0f0 @3224de5b` / `@3224de6d`). The
+  port's constant offset is right for every March path (customize is Stage 12); routed to the Stage 12 brief. `+0xd88`: the ctor `@31fab47a` is the
+  only viewer writer (the other `+0xd88` hits are `CX2Unit` and unrelated classes).
+- **Move:** `SetPositionOnScr`'s back-body move sat inside `#ifdef SERV_IRUHADEV_JUNE_UNIT_VIEWER_EFFECT_PLAYER`; it now stands before that block
+  (June order: `31f99f70` moves the back skin `@31f9a0ae-31f9a12d` before `31f968e0` and `+0x1d4`). No behaviour change with the live flags.
+- **Doubled tail: keep the decision, no JUNE_BUGS row.** June's second `31fa8ce0` pass re-runs the shown body's tail (base viewer `329585f0` at
+  head and tail, re-arm, drain, `+0xf28` show loop, title / CEPE / HABIT). Nothing reachable changes when it runs twice: the re-arm needs a loop row
+  and Lu/Ciel's only row (`LDN_LobbyWait`, `DT_MINOR`) is loop false; drain, bone positions, show flags and sounds are idempotent;
+  `EffectSet_LDN_Start_Ciel` (UIEffectSet) has no `TRACE_MATRIX` entry, so no cumulative offset doubles. The one dt accumulator, the HABIT timer
+  `+0xf90` / `+0xfa0` (`3322a380` @31fa99f1), is not in March: the Stage 12 brief now says its port must run it twice with the back body shown.
+- **Confirmed = June:** filter `31fac160` (shown: `+0x15d4 == +0xd80`; back: `!= `) and body index; enchant arguments `( pos, 0, body )`; second-ring
+  skip `pos != 0x1c` = `EP_AC_TEMP4` (28); render-param block `@31fa9149` on the pass's skin; back position = viewer + ( `+0xd84` + 1.0 ) x
+  ( 50, 0, 70 ) (`334355b0` = 1.0 double, `33732708` = 50 / 0 / 70); Prepare `31f974b0` (instant-show off, show test, prepare, on) and Draw `31fa00b0
+  @31fa022d-31fa0346` (back skin with show + instant show, after the shown one); `31f91020` = back skin only with `+0xd81` and `+0xd82`;
+  `SetUnitScale` = `31f969a0` (viewer, `+0x1e8`, `+0xd7c`); `SetMinorUnitRotation` = `31f90fb0` (`Rotate`); SelectLuciel `@32555d38` `SetUnit( .., 5 )` =
+  `UVS_CREATEUNIT`, rotation `@32555fe8-3255602a` after `3254e410`, `31edf260( +0x2c0 class, 1 )` x `33441c58` (pi / 180 double); select screen
+  `@32564846-325648ac` (June reads the templet's class, the port the unit's: equal); `3286d280` sets every bag 0x32; `3257cd60`'s calls hold no size
+  function; `32961c80 @32962094` chains a sub-equip only with `+0x15d5`, so R14f owns `SetFixed`.
+- **Flag-off = March:** `cl /P` of `X2UnitViewerUI.cpp`, `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2Inventory.cpp` with both flags
+  `#undef`'d after the stdafx include vs the same at `0856b6bd`: same line counts, only `__LINE__` / FOREACH-counter digits differ. `/Zs` probe of
+  `X2UnitViewerUI.cpp` (flags on): 0 errors.
+- **Gates:** `finish.py --review --commits 8fe221f2 bd1bb0a0 --with SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE -v`:
+  `FINISH RESULT: PASS (10 gates, 0 failed, 5 skipped)`; OTHER rows = `Always.h` peers' blocks and each file's other flag; 8 EOL-mismatched lines =
+  `X2Inventory.cpp`'s namespace (as the phase note says); `JUNE_CHAR_ADD_DP` / `JUNE_EQIP_FRAME_MOVE_DEBUG` retired. The fix: `finish.py --files
+  X2UnitViewerUI.cpp --with SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY`: PASS (6 gates); 9 deleted lines, all DU5c2's own lines under the flag (the
+  comment, the moved block, the enchant lines now in the helper). Post-commit `--range`: see below.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,090,432 B, dated 2026-11-16 09:23:17, md5 65db270adcaffe9c32baccee653ab7f4` (built at main db9bd3ef + 5
+  uncommitted code files: this fix and peers' in-progress files; nothing relinked: a peer's 09:22 link already holds `X2UnitViewerUI.obj` 09:21:32,
+  newer than the edit at 09:16:25). No new strings, so no `exestr` line.
+- **Play-test owed:** a regression of the create / select screens (both bodies, Ciel's gear, an enchanted weapon's glow on the shown body).
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;
