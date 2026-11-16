@@ -1022,8 +1022,12 @@ X0 answers the deferred June loader plan's RE items 1-3. The loader port itself 
 
 After Stage 14's extractor and its trial, the user asked for every June non-lua asset still missing or different in March,
 byte-exact. The plan is `JUNE_ASSET_PORT_PHASES.md` (STATUS block `june-asset-port`, kickoffs `kickoffs/june-asset-port/`).
-- **Scope:** 117,562 June-only files added, and 4,363 colliding files replaced by June's. There are no holds: March consumers that
-  break are routed to their owners.
+- **Scope (2026-10-08 baseline; P0's census replaces these counts, plan "Amended 2026-11-16"):** 117,562 June-only files added, and 4,363
+  colliding files replaced by June's. Other plans have staged part of both since (world files, class assets, K2's 501 item assets, atlas
+  pairs), and 243 of June's 258 kom numbers are already live. Holds are only the Rule 8 list (the 7 W3f village files, the 83
+  `Motion_<Class>*` files, `tools/data/asset_port_held.tsv`); March consumers that break are routed to their owners.
+- **Phases changed 2026-11-16:** P2 is now "the June kom numbers with no live archive" (15), P3 is merged into it, P8b (the 4 `_INT.txt`) is new,
+  and pack / copy no longer ask.
 - **Also covered:** loose music, movie and eventscene files, and `XRenderer.fx` alone.
 - **Out of scope:** `.txt` stays with june-effect, and `.lua` with the ports.
 - **Added by char-eve CH0 (2026-10-26): the 4 `_INT.txt` definitions.** `UIMajorParticle_INT`, `GameMajorParticle_INT`, `UIMajorXMeshPlayer_INT`

@@ -1,0 +1,24 @@
+was_at_baseline	named_by	files
+june-only	(no stage-plan tsv names it)	72730
+june-only	stage_plan.tsv	3394
+differs	(no stage-plan tsv names it)	2964
+june-only	c3y1b_world_asset_need.tsv	408
+differs	c3z1_stage_plan.tsv	365
+june-only	world_asset_need.tsv	363
+june-only	c3z1_npc_mesh_need.tsv	199
+june-only	particle_files_need.tsv	179
+june-only	npc_mesh_need_replaced.tsv	143
+june-only	c3z1_data101_pending.tsv	101
+june-only	npc_effect_closure_need.tsv	93
+differs	npc_anim_collision_need.tsv	89
+differs	w3b_stage_assets.tsv	47
+june-only	c3x1_world_asset_need.tsv	43
+june-only	c3z1_stage_plan.tsv	39
+june-only	npc_effect_closure_need_ps.tsv	36
+june-only	c3z1r_stage_list.tsv	14
+june-only	w3b_stage_assets.tsv	13
+june-only	npc_anim_collision_need.tsv	8
+differs	w3c_need_stage.tsv	5
+differs	c3z1r_stage_list.tsv	4
+june-only	dungeon_map_replace.tsv	3
+differs	c3z1_data101_pending.tsv	1

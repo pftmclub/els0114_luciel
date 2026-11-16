@@ -53,27 +53,29 @@ Plan `COSTUME_SHOP_PHASES.md` · branch `main` · log tag `[COSTUME_SHOP]` · fl
 | S0 | **built + deployed, awaiting play-test** (38,844 rows written into els_db.sql by costume_shop/insert_products.py, no seeder; client file check built; user owes the play-test, then "check logs") | Sonnet 5.5 / high, then user play-test | june-item-kim K4 (done) | `X2Lib/Offline/X2OfflineCashShop.cpp/.h`, `X2OfflineDB` (read/insert only), `KTDXLIB/Always.h`, ... | `S0.md` |
 
 ## june-asset-port - every remaining June non-lua asset in the March client
-Plan `JUNE_ASSET_PORT_PHASES.md` · branch `main` · log tag `[KOM_MOUNT]` · flag `SERV_IRUHADEV_KOM_MOUNT_DEBUG` (P1, short-lived) · kickoffs `kickoffs/june-asset-port/` · backlog Stage 15 · created 2026-10-08.
+Plan `JUNE_ASSET_PORT_PHASES.md` (brought up to date 2026-11-16: "Amended 2026-11-16") · branch `main` · log tag `[KOM_MOUNT]` · flag `SERV_IRUHADEV_KOM_MOUNT_DEBUG` (P1, short-lived, retired by P12) · kickoffs `kickoffs/june-asset-port/` · backlog Stage 15 · created 2026-10-08. Pack and copy need no ask (2026-11-10). Hand-off `now` for every wave.
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| P0 | ready (`data118_kom` `blur_16.dds` already restored from the live kom, 2026-10-10, C3s mesh copy) | Sonnet 5.5 / high | - | `tools/kom.py`, `tools/README.md`, new `june2017_re/asset_port_census.py` + `p0_*.tsv`, ... | `P0.md` |
-| P1 | waiting (P0) | Sonnet 5.5 / high, then user play-test | P0 | `KTDXLIB/KGCMassFileManager.cpp`, `KTDXLIB/Always.h`, `tools/logs.py` | `P1.md` |
+| P1 | ready (P0 done 2026-11-16): `[KOM_MOUNT]` diagnostic, builds the exe, boot-to-village play-test | Sonnet 5.5 / high, then user play-test | P0 | `KTDXLIB/KGCMassFileManager.cpp`, `KTDXLIB/Always.h`, `tools/logs.py` | `P1.md` |
 | P1 review | waiting (P1) | Sonnet 5.5 / high | P1 | review (P1 files only if a fix) | `P1-review.md` |
-| P2 | waiting (P1 review) | Sonnet 5.5 / high, then user play-test | P1 review | new `kom_contents/data152,179,214,224,i027_kom`, game dir koms | `P2.md` |
-| P3 | waiting (P2) | Sonnet 5.5 / medium, then user play-test | P2 | 61 new `kom_contents/dataNNN_kom`, game dir koms | `P3.md` |
-| P4a | waiting (P3) | Sonnet 5.5 / medium, then user play-test | P3 | `kom_contents/data001-075_kom`, game dir koms | `P4a.md` |
-| P4b | waiting (P4a) | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data076-150_kom`, game dir koms | `P4b.md` |
-| P4c | waiting (P4b) | Sonnet 5.5 / medium, then user play-test | P4b | `kom_contents/data151-226_kom`, `datai*_kom`, game dir koms | `P4c.md` |
-| P5 | waiting (P0; can run alongside P2-P4) | Opus 5.5 / high | P0 | new `june2017_re/asset_keys.py`, `p5_*.tsv`, `p6/p7/p8_wave.tsv`, owners' docs ... | `P5.md` |
+| P2 | waiting (P1 review): the 15 June kom numbers with no live archive (rewritten 2026-11-16; 243 of 258 are live) | Sonnet 5.5 / high, then user play-test | P1 review | new `kom_contents/data169,170,...,datai026,032_kom`, game dir koms | `P2.md` |
+| P3 | retired 2026-11-16 (merged into P2; GodBeast Fire moved to P4) | - | - | - | `P3.md` (stub) |
+| P4a | waiting (P2) | Sonnet 5.5 / medium, then user play-test | P2 | `kom_contents/data001-150_kom`, game dir koms | `P4a.md` |
+| P4b | waiting (P4a) | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data151-185_kom`, game dir koms | `P4b.md` |
+| P4c | waiting (P4b) | Sonnet 5.5 / medium, then user play-test | P4b | `kom_contents/data186-226_kom`, `datai*_kom`, game dir koms | `P4c.md` |
+| P5 | ready (P0 done; can run alongside P1-P4) | Opus 5.5 / high | P0 | new `june2017_re/asset_keys.py`, `p5_*.tsv`, `p6/p7/p8_wave.tsv`, owners' docs ... | `P5.md` |
 | P5 review | waiting (P5) | Opus 5.5 / high | P5 | review | `P5-review.md` |
 | P6 | waiting (P4c, P5 review) | Sonnet 5.5 / high, then user play-test | P4c, P5 review | koms on `p6_wave.tsv` | `P6.md` |
 | P7 | waiting (P6) | Sonnet 5.5 / high, then user play-test | P6 | koms on `p7_wave.tsv` | `P7.md` |
 | P8 | waiting (P7) | Sonnet 5.5 / high, then user play-test | P7 | koms on `p8_wave.tsv` | `P8.md` |
-| P9 | waiting (P0; independent of the kom waves) | Sonnet 5.5 / high, then user play-test | P0 | game dir `music/`, `movie/`, `eventscene/` | `P9.md` |
-| P10 | waiting (P4a). june-engine R2 (reviewed 2026-10-17) already copied June's `XRenderer.fx` into data041 (`COPY OK` md5 027c8a01): P10 = gates + play-test only | Sonnet 5.5 / high, then user play-test | P4a, june-engine R2 review (done) | `kom_contents/data041_kom` (`XRenderer.fx`), game dir data041 | `P10.md` |
-| P11 | conditional (P2/P4 measurements) | Opus 5.5 / high | P2 | `X2/X2_2010.vcxproj` (user approval first) | `P11.md` |
-| P12 | waiting (P3, P4a-c, P6-P10) | Sonnet 5.5 / medium | all | census, STATUS, backlog | `P12.md` |
+| P8b | waiting (P0, P4c; new 2026-11-16): the 4 `_INT.txt` particle / mesh-player definitions (datai015) + 7 other `.txt` the census routes here | Sonnet 5.5 / high, then user play-test | P0, P4c | `kom_contents/datai015_kom`, game dir datai015 | `P8b.md` |
+| P9 | ready (P0 done; independent of the kom waves) | Sonnet 5.5 / high, then user play-test | P0 | game dir `music/`, `movie/`, `eventscene/` | `P9.md` |
+| P10 | waiting (P4a). june-engine R2 already copied June's `XRenderer.fx` into data041 (`COPY OK` md5 027c8a01): gates + play-test only | Sonnet 5.5 / high, then user play-test | P4a, june-engine R2 review (done) | `kom_contents/data041_kom` (`XRenderer.fx`), game dir data041 | `P10.md` |
+| P11 | conditional (P2 / P4 measurements); asks the user first (linker setting) | Opus 5.5 / high | P2 | `X2/X2_2010.vcxproj` (user approval first) | `P11.md` |
+| P12 | waiting (P2, P4a-c, P6-P10, P8b): census, close the block, retire the debug define (no build) | Sonnet 5.5 / medium | all | census, STATUS, backlog | `P12.md` |
+
+Done: P0 (2026-11-16: plan and 18 kickoffs refreshed, census 41,057 june-only / 719 differs / 0 unstaged, four `kom.py` gates tested, P4 waves re-cut, P3 retired, P8b added; `june2017_re/p0_*.tsv`).
 
 ## lua-source - core client Lua as proven plaintext source, the rest as June's bytecode
 Plan `LUA_SOURCE_PHASES.md` · branch `main` · log tag `[LUA_SRC]` · flag `SERV_IRUHADEV_LUA_SOURCE` (+ `_DEBUG`, L6 only) · kickoffs `kickoffs/lua-source/` · skills `x2-lua`, `x2-adopt-june` (built here) · created 2026-10-09 (user request).

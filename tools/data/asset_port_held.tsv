@@ -1,0 +1,91 @@
+name	reason	owner	date
+altera_village_g02.y	W3f: March route board / line map kept over June's (user 2026-11-12)	june-dungeons W3f	2026-11-12
+altera_village_typo.y	W3f: March route board / line map kept over June's (user 2026-11-12)	june-dungeons W3f	2026-11-12
+besma_village_alpha_text.y	W3f: March route board / line map kept over June's (user 2026-11-12)	june-dungeons W3f	2026-11-12
+field_besma_rest_g01_navi.y	W3f: March route board / line map kept over June's (user 2026-11-12)	june-dungeons W3f	2026-11-12
+field_elder_stagerest_alpaguide.y	W3f: March route board / line map kept over June's (user 2026-11-12)	june-dungeons W3f	2026-11-12
+field_peita_villeage_sign.y	W3f: March route board / line map kept over June's (user 2026-11-12)	june-dungeons W3f	2026-11-12
+linemap_altera_village.lua	W3f: March route board / line map kept over June's (user 2026-11-12)	june-dungeons W3f	2026-11-12
+Motion_Raven_Boss.xet	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+MOTION_EL_GM.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ADD.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ADD_Common.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ADD_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ADD_LP.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ADD_Lobby.X	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ADD_PT.X	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ARA.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ARA_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_ARA_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Add_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Ara_LD.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Ara_LH.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Ara_SD.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Ara_YR.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_BM.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_Common.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_DM.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_DW.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_EM.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_HM.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Arme_VP.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_CDC.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_CFG.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_CHG.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_CIP.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_CSG.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_CTT.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_Common.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_CHUNG_Lobby.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EL_BH.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EL_Common.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EL_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EL_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EL_PK.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_AT.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_BS.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_EG.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_EP.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_Lobby.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_NS.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_EVE_PR.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_Common.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_IS.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_LK.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_Lobby.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_MK.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_RS.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_SK.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Elsword_TK.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_CR.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_Common.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_GA.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_Lobby.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_NW.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_RTR.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_SR.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Lire_WS.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_BM.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_Common.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_Emotion.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_Field.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_Lobby.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_OT.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_RF.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_ST.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_VC.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
+Motion_Raven_WT.x	class motion: June renamed the animations its class script plays; the class port stages it (R12b)	class port (JUNE2017_CHARACTER_PORT_CHECKLIST 7ad)	2026-10-18
