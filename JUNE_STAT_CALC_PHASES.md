@@ -1114,6 +1114,7 @@ of the top +10 gear (Apocalypse Type weapon, 4th Dimension armour) and the loado
 (three weapon sockets of option 20 or, for the magic classes Aisha and Eve, 120 (+400 attack), three armour sockets per piece of 220 or 620 (+100 defence)); `D6<Name>N`
 the next uid, no sockets. Skill ids were read from June's `NewSkillTempletVer2.src.lua` (types 6 active, 13 hyper active, 14 / 15 / 16 special active grades).
 
+**Normal-monster dungeon (user, 2026-11-16):** Elysion: Soless (Expert) 33892, monsters level 89 (Altera Plain's are level 34); the secret and boss steps stay in Elder Secret Dungeon (Hell) 33031, which scales monsters to the party level.
 **Level-damage hits are not on the sheets:** D2b proved no player-reachable skill takes the level-damage path in June's data (`emu_final_damage_b.py` is the proof).
 **Map gate:** the one damage row still `March`, `dodge roll index offset (NPC stat byte +0xe8)`, is routed to S1b by the S0 review.
 **Throttle:** the debug lines print once a second per attacker / monster pair, so the sheets say to pause 2 s between hit kinds; the log does not name normal vs command.

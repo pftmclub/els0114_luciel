@@ -32,17 +32,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Impact Smash has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6ElswordS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the physical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6ElswordN` (no sockets). Look at the character window: the physical attack is lower than D6ElswordS's.
 6. Repeat step 2 with `D6ElswordN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6ElswordN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6ElswordN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=204 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6ElswordS`'s unit uid, and the plain unit's is `205`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
@@ -87,17 +87,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Heavy Press has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6AishaS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the magical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6AishaN` (no sockets). Look at the character window: the magical attack is lower than D6AishaS's.
 6. Repeat step 2 with `D6AishaN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6AishaN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6AishaN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=206 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6AishaS`'s unit uid, and the plain unit's is `207`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
@@ -141,17 +141,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Arc Shot has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6RenaS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the physical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6RenaN` (no sockets). Look at the character window: the physical attack is lower than D6RenaS's.
 6. Repeat step 2 with `D6RenaN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6RenaN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6RenaN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=208 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6RenaS`'s unit uid, and the plain unit's is `209`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
@@ -195,17 +195,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Finishing Slash has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6RavenS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the physical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6RavenN` (no sockets). Look at the character window: the physical attack is lower than D6RavenS's.
 6. Repeat step 2 with `D6RavenN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6RavenN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6RavenN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=210 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6RavenS`'s unit uid, and the plain unit's is `211`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
@@ -249,17 +249,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Spitfire has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6EveS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the magical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6EveN` (no sockets). Look at the character window: the magical attack is lower than D6EveS's.
 6. Repeat step 2 with `D6EveN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6EveN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6EveN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=212 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6EveS`'s unit uid, and the plain unit's is `213`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
@@ -303,17 +303,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Fatal Cannon has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6ChungS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the physical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6ChungN` (no sockets). Look at the character window: the physical attack is lower than D6ChungS's.
 6. Repeat step 2 with `D6ChungN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6ChungN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6ChungN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=214 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6ChungS`'s unit uid, and the plain unit's is `215`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
@@ -358,17 +358,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Rakshasa Inferno has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6AraS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the physical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6AraN` (no sockets). Look at the character window: the physical attack is lower than D6AraS's.
 6. Repeat step 2 with `D6AraN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6AraN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6AraN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=216 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6AraS`'s unit uid, and the plain unit's is `217`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
@@ -412,17 +412,17 @@ that second logs nothing. Hit each kind on the **same** monster, in this order, 
 your Upper Slash has); (3) special active: the skill on D; (4) special active: the skill on C; (5) special active: the skill on S;
 (6) hyper active: F (fill the hyper gauge first by hitting monsters until the F skill is lit); (7) one more special active: Q.
 1. Log in `D6ElesisS` (the socketed unit). Open the character window (C) once and look at the attack numbers: the physical attack is the one the sockets raise.
-2. Normal monster: enter **Altera Plain (Normal)** from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
+2. Level-89 monster: enter **Elysion: Soless (Expert)** (dungeon 33892, monsters level 89) from the world map, stage 0. On the first monster you reach, do the 7 hit kinds above.
 3. Leave. Enter **Elder Secret Dungeon (Hell)** (dungeon 33031), stage 0. On `Bunker` (the first monster, NPC 1466) do the 7 hit kinds.
 4. Type `/stage 2`. On the boss (NPC 1470, `Punch Boss`) do the 7 hit kinds again.
 5. Leave the dungeon. Log in `D6ElesisN` (no sockets). Look at the character window: the physical attack is lower than D6ElesisS's.
 6. Repeat step 2 with `D6ElesisN`: hit kinds (1) normal, (2) command, (3) D, (6) F only.
 7. Repeat steps 3 and 4 with `D6ElesisN`: hit kinds (1) normal, (3) D, (6) F only, on `Bunker` and on the boss.
 8. Incoming damage, `D6ElesisN`: type `/invin 0`, enter **Elder Secret Dungeon (Hell)** stage 0, stand in front of `Bunker` and take 3 hits (do not attack back), then `/stage 2` and take 3 hits from the boss.
-9. Leave, enter **Altera Plain (Normal)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
+9. Leave, enter **Elysion: Soless (Expert)** stage 0 with `/invin 0` still on, stand in front of a normal monster and take 3 hits. Then close the game.
 
 ### Expect
-- On screen: every hit shows a number and the monster's HP bar moves. Normal monster: five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
+- On screen: every hit shows a number and the monster's HP bar moves. Normal monster (level 89): five to six digits per skill hit. `Bunker` (secret, k 1.0) takes less per point of attack than the normal monster (D1's run read `rate=0.5526` on it at level 104); the boss shows `state=0.3000` on `GFD2` (its 70 % reduce, D2b).
 - Log lines, one `HIT` + `GFD` + `GFD2` per hit kind per monster (`python tools/logs.py --tag JUNE_STATCALC`): `HIT att=218 lv=99 def=NPCID dlv=LEVEL` (`att` is `D6ElesisS`'s unit uid, and the plain unit's is `219`; `NPCID` is the monster's id, `LEVEL` its level).
 - `rate` = defence / ( dlv x 39.35 + 258.65 + defence ), to 4 decimals, on every line; `march=` is March's old rate and is only for comparison.
 - `GFD2`: `base` = `motion x drate`, and its last `dmg` equals the `HIT` line's `dmg` on every line.
