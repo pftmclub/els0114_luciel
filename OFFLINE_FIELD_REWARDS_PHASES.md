@@ -355,7 +355,7 @@ row counts and `check` passes on the dry output; no row is written to the server
 **Build.** Full build skipped: no code change; deployed exe is R3's (`DEPLOY OK` md5 b525d2f1, `EXESTR OK` for `[DROP_STANDIN]` from R3). Gates: `finish.py --no-flag "data-only"`.
 
 **How to see it.** Log: `[DROP_STANDIN] loaded: 412 dungeon row(s) over 39 key(s), 58 field row(s) over 7 field(s), 46 static row(s), 67 group(s)`; per-kill lines; no `no reward row` for 33330-33352 / 33870-33902 / 40035-40037.
-**Play-test:** pending.
+**Play-test:** deferred to the end of the plan (user 2026-11-16); R5 may start without it.
 
 ### Phase R2 - Done (2026-11-16)
 

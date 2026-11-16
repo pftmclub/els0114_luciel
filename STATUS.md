@@ -256,8 +256,8 @@ Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | R3 | done 2026-11-16: Lanox rows packed + deployed, play-test passed (one-kill boss result accepted); owes nothing | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` | `R3.md` |
-| R4 | rows packed + copied 2026-11-16 (21 keys, 3 fields; gate PASS but Expert stage-boss 1.17); owes the play-test, then say "check logs" | Sonnet 5.5 / medium | R3 | same two server Lua files | `R4.md` |
-| R5 | blocked (R3): secret dungeon rows + play-test | Sonnet 5.5 / high | R1, R3 | same two server Lua files | `R5.md` |
+| R4 | rows packed + copied 2026-11-16 (21 keys, 3 fields; gate PASS but Expert stage-boss 1.17); play-test deferred to the end of the plan (user 2026-11-16); owes nothing now | Sonnet 5.5 / medium | R3 | same two server Lua files | `R4.md` |
+| R5 | ready (R3, R4 done): secret dungeon rows; play-tests batched at the end (user 2026-11-16) | Sonnet 5.5 / high | R1, R3 | same two server Lua files | `R5.md` |
 | R6 | blocked (R3): June-only monsters in old dungeons + smoke; its review covers R3-R6 | Sonnet 5.5 / high; review Opus 5.5 / high | R0, R3 | same two server Lua files | `R6.md` |
 | R7 | blocked (heroic dungeons are not registered in the live `DungeonData.lua` yet: june-dungeons) | Opus 5.5 / high | june-dungeons heroic rows, R5 | sheets + the two server Lua files | `R7.md` |
 | Z | blocked (R6 review): close | Sonnet 5.5 / medium | R6 review | `MODS.md`, backlog, `tools/README.md` | `Z.md` |
@@ -274,8 +274,8 @@ Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 /
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | S0 | reviewed 2026-11-16: pass after map fixes (13 rows: roll index, 4 reader lists, phase names; `320839e0` row -> S4); owes: the designed-attack-range decision before S1 (Done note) | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0-review.md` |
-| S2 | play-test passed 2026-11-16 ( item range per item, resists, emulator = window ); review first finds why the window skips testlu1's Henir weapon 62119 | Opus 5.5 / high, Opus review | S1b review | `X2Unit.*`, `X2Item.*`, `X2ItemStatCalculator.*`, `X2UICharInfo.cpp`, `Offline/*` | `S2.md`, review `S2-review.md` |
-| S3 | blocked (S2): socket aggregate and option vectors (+0x94a0, MP / HP-up entries and timers); 320839e0 is already June | Opus 5.5 / high, Opus review | S2 review | `X2SocketItem.*`, `X2GUUser.*`, `X2Unit.*` | `S3.md` |
+| S2 | reviewed 2026-11-16: pass after one emulator fix ( 62119 is use type 0: June's unit never lists it, the emulator now skips it too ); owes: play-test, window = emulator with 62119 on | Opus 5.5 / high, Opus review | S1b review | `X2Unit.*`, `X2Item.*`, `X2ItemStatCalculator.*`, `X2UICharInfo.cpp`, `Offline/*` | `S2.md`, review `S2-review.md` |
+| S3 | blocked (S2 review play-test): socket aggregate and option vectors (+0x94a0, MP / HP-up entries and timers); 320839e0 is already June | Opus 5.5 / high, Opus review | S2 review | `X2SocketItem.*`, `X2GUUser.*`, `X2Unit.*` | `S3.md` |
 | S4 | blocked (S3): re-reads (buff member functions, two SetFactors) and leftovers (socket skill levels, option-form fallbacks, stale divergence rows) | Opus 5.5 / high, Opus review | S3 review | `X2GameUnit.*`, `X2BuffFinalizer*`, `X2Unit.*`, `X2SocketItem.*`, `june_march_divergent.tsv` | `S4.md` |
 | R1 | blocked (S4): MP and awakening gain on hit and on hit taken, absorb | Opus 5.5 / high, Opus review | S4 review | `X2GameUnit.*`, `X2GUUser.*`, `X2DamageEffect.*` | `R1.md` |
 | R1b | blocked (R1): MP cost (GetActualMPConsume + June's buff reader), ResetMPChangeRate, SetMPChangeRateValue | Opus 5.5 / high, Opus review | R1 review | `X2GUUser.*`, `X2GageData.*`, class MP blocks | `R1b.md` |
