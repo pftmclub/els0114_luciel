@@ -4532,7 +4532,10 @@ review retires it ), `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( 7 BFI + 3 BTI names in `X
 - **Gates ( worktree, `finish.py --files` 4 files `--with JUNE_CHAR_LUCIEL_PASSIVE _PASSIVE_DEBUG JUNE_CHAR_LUCIEL_CORE` ):** junediverge PASS, enumscan exit 0;
   flagcheck 2 PASS each but 1 ERROR on `Always.h` from the peer's uncommitted CH3a0 hunks; the committed range below is the verdict. 57 deleted lines = the renamed
   lines ( 38 cpp, 19 h ) and the two ctor inits. `/Zs` probe of `X2GULuciel.cpp`: 0 errors, `_PASSIVE` proven on by an `#error` probe.
-- **Gate on the commit:** pending ( the follow-up commit fills it ).
+- **Gate on the commit ( `finish.py --range a31855e9^..a31855e9 --with JUNE_CHAR_LUCIEL_PASSIVE _PASSIVE_DEBUG -v` ):** FINISH RESULT PASS ( 6 gates, 3 skipped:
+  no state, no skill, no script ); flagcheck `_PASSIVE` 1 DEFINE + 3 OTHER ( the class files under `_CORE`, `X2BuffFactor.h` under `JUNE_ENUM_NAMES` ), 0 FAIL;
+  junediverge PASS, enumscan exit 0. With `_CORE` added the class files PASS ( flag-off = base ) and `Always.h` reports ERROR on the old compound guard
+  `#if defined( _LIVE ) && !defined( _CORE )` ( line 13445 ): flagcheck cannot unifdef `_CORE` through it; not a change of this phase.
 - **Build:** `BUILD OK: X2/US_SERVICE/x2.exe 27,090,432 B, 2026-11-16 09:22:01` ( deploy first refused: the game was open ), then `DEPLOY OK: X2_offline.exe is 27,090,432 B,
   dated 2026-11-16 09:23:17, md5 65db270adcaffe9c32baccee653ab7f4, equal to X2/US_SERVICE/x2.exe (2026-11-16 09:22:01); built at main ca2afe20 + 5 uncommitted code file(s)`.
   `EXESTR OK: 2 of 2 found in X2_offline.exe` wide ( the init and soul extortion debug lines ); on the built exe 4 of 4 ( + the madness crave line, `DamageEffect_SI_P_LLC_SEIZED_BY_FEAR_BurstFear` ).
