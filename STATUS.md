@@ -283,7 +283,7 @@ Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 /
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | D6 | **ready** (D5 review PASS 2026-11-15): damage smoke on every ported character; its review covers D1-D5 and retires `_DEBUG` | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |
-| S0 | **review ready** (2026-11-16): stat / resource map filled (39 rows), S1 and R1 split; 1 decision for the user (designed attack range, see the Done note) | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0-review.md` |
+| S0 | reviewed 2026-11-16: pass after map fixes (13 rows: roll index, 4 reader lists, phase names; `320839e0` row -> S4); owes: the designed-attack-range decision before S1 (Done note) | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0-review.md` |
 | S1 | blocked (S0 review, Stages 7 + 8 closed, D6 review): the stat block (Stat [9] / [10], 7-field KStat, SetGameStats, SetGameStat, readers, SHEET) | Opus 5.5 / high, Opus review | S0 review, Stages 7 + 8, D6 review | `X2Stat.*`, `X2Unit.*`, `X2GameUnit.*`, `CommonPacket.h`, `Offline/*` | `S1.md` |
 | S1b | blocked (S1): ResetMaxHP, CalcHitDodgePercent + the +0xe8 roll offset, the ability map | Opus 5.5 / high, Opus review | S1 review | `X2GUUser.*`, `X2DamageManager.*`, `X2UnitManager.*`, `X2GUNPC.*` | `S1b.md` |
 | S2 | blocked (S1b): equipment, set items, enchant stat | Opus 5.5 / high, Opus review | S1b review | `X2Unit.*`, `X2Item.*`, `X2ItemStatCalculator.*` | `S2.md` |
