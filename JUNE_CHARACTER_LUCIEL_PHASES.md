@@ -4767,6 +4767,8 @@ Opus 5.5 high. Covers CH4a ( `a31855e9` ) and CH4b ( `5d07d7dc`, `9bdc3e6a` ). *
   `SetBuffFactorToGameUnitByBuffFactorID_LUA( 55, 1, 0, true )`: `tribute: BTI 58 landed, debuff 58 erased, one soul collector stack spent ( chance 0.28 )` x4,
   each with `noble devotion: 1 point(s), mp +10.0`; `soul extortion drain ( stacks 5 / 5, mp 20.00, soul 1 )` x12 after the fix.
 - **Next:** CH4c ( kickoff amended: `_PASSIVE_DEBUG` is retired; re-enable it for CH4c's lines and its review retires it again ).
+- **Commit `df5fa9be`** ( `finish.py --range df5fa9be^..df5fa9be --with JUNE_CHAR_LUCIEL_PASSIVE_DEBUG --skip-flag JUNE_CHAR_LUCIEL_PASSIVE` ): FINISH RESULT PASS;
+  `_PASSIVE_DEBUG` retired ( nothing to check ), `_PASSIVE` skipped: the only line is the commented define, and its compound `#error` guard is not unifdef-able.
 
 ## Phase CH5 - UI and data
 
