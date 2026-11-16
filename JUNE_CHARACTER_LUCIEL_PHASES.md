@@ -1871,7 +1871,9 @@ Opus 5.5 high. Reviewed `b7dfce78` against June's listing (`disasm_range.py`, re
   INFO: `DUO_VIEW`, `DUO_VIEWER`, `UNIT_TYPE_RANGE`, `JUNE_ENUM_NAMES` ( the `#error` guard's needs and the enclosing block ).
 - **Build:** `/Zs` probe of `X2TFieldGame.cpp`: 0 errors. Full build skipped: the fix is one comment; the deployed exe ( md5 `2f5527f0...` ) is DU5c's
   code unchanged.
-- **Play-test:** still owed ( the logs predate the DU5c deploy ); DU5c's checks are handed off with this review.
+- **Play-test: passed** (user, 2026-11-16, logs read): `LuDbA` ( unit 202 ) entered as Ciel ( `SD mesh Mesh_Ciel_Base_SD.X ( form 1 ) loaded` ),
+  four window switches each logged `LUCIEL DUO FORM ... saved, NOT sent` then the matching Lu / Ciel `SD mesh ... loaded`, the relog loaded Ciel again
+  ( 08:32:55 ); no `LUCIEL DUO AVATAR` line for another unit; ErrorLog 0 matching lines, packets 0 EXCEPTION.
 
 ### DU5e - Done (2026-11-15)
 
