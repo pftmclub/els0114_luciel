@@ -432,7 +432,10 @@ Wave list from `p0_census.tsv` (june-only, june kom in the 15): 4,422 names; 1 l
 reads each kom's directory (167 MB for 243 koms), so a large rise is not expected; P4 is not blocked on P11 unless the line says otherwise.
 **Not exercised by anything yet:** nothing in March names these files (Ain / Rose voices and motions wait for their class ports; `Photo_*.Y` for the photo feature; data196's fonts are June's CN / KR fonts); no visible change is expected.
 
-**Open for the user:** the play-test below, then "check logs".
+**Play-test result (2026-11-16 15:48 run, exe f87b25c6, 258 mounted):** `logs.py --kom-mount`: **258 live koms, 258 `[KOM_MOUNT]` lines, `KOM_MOUNT CHECK: PASS`**; total line `koms=258 entries=186867 mount_ms=963 private_MB=169`
+(baseline 243 koms, 1,158 ms, 167 MB: **+2 MB private**, mount time within cache noise). 0 KEM_ERROR in `ErrorLog.txt`; `existfileinfo.txt` unchanged (414 B, md5 64e18d8b); clean exit, 0 EXCEPTION, 0 unbound Lua.
+The 2 `UNHANDLED E_DISABLE_HB_CHECK_REQ` packets are not P2's (a heartbeat packet the emulator never answers; no effect seen).
+**P11 decision: not needed before P4** (+2 MB, far below the +300 MB / 1.4 GB triggers). Re-measure after each P4 wave.
 
 ## Phase P3 - Retired (merged into P2, 2026-11-16)
 
