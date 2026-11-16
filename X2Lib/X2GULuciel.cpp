@@ -22182,7 +22182,7 @@ void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
 				stateData.Init();
 				stateData.stateID					= LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK;
 				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK", stateData.stateID );
-				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture );	// June 32b4e450
+				stateData.StateStartFuture				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture );	// June 32b4e450
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess );	// June 32b4c770
 				m_StateList[stateData.stateID] = stateData;
 
@@ -22197,7 +22197,7 @@ void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
 				stateData.stateID					= LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK;
 				m_LuaManager.MakeTableReference( "LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK", stateData.stateID );
 				stateData.m_bSkillState				= true;	// June @32b4a05c byte +0x11
-				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture );	// June 32b4e450
+				stateData.StateStartFuture				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture );	// June 32b4e450
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess );	// June 32b4c770
 				m_StateList[stateData.stateID] = stateData;
 			} break;
@@ -22257,7 +22257,7 @@ void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START", stateData.stateID );
-				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStartFuture );	// June 32b4e750
+				stateData.StateStartFuture				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStartFuture );	// June 32b4e750
 				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStart );	// June 32b4e760
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_EventProcess );	// June 32b4c4f0
 				m_StateList[stateData.stateID] = stateData;
@@ -22455,21 +22455,21 @@ void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A", stateData.stateID );
-				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture );	// June 32b4c620
+				stateData.StateStartFuture				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture );	// June 32b4c620
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess );	// June 32b4cfa0
 				m_StateList[stateData.stateID] = stateData;
 
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B", stateData.stateID );
-				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture );	// June 32b4c620
+				stateData.StateStartFuture				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture );	// June 32b4c620
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_EventProcess );	// June 32b4cfa0
 				m_StateList[stateData.stateID] = stateData;
 
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END", stateData.stateID );
-				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture );	// June 32b4e3b0
+				stateData.StateStartFuture				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture );	// June 32b4e3b0
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess );	// June 32b4c5f0
 				m_StateList[stateData.stateID] = stateData;
 
