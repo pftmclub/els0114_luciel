@@ -60,3 +60,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Amended by the CH1b review (2026-11-15)
 
 - The ctor `32a22170` stores 0 to `+0x98e4` at `32a22ffc` (`mov [esi + 0x98e4], bl`, EBX cleared at `32a221d0`): that member is CH1b's `m_bApocalypseFinishBlocked` (`X2GUAdd.h`, `_CORE`); initialise it to `false` in the ctor (the only store outside `329f52b7` / `329fb6c8`; ReInit `329ffcd0` only calls `FinishSummonedNPC`). Until then it is unread (only the `_LIVE` Die Starts reach `FinishSummonedNPC`).
+
+## Added by CH1d (2026-11-16)
+
+- CH1d added three `CX2GUAdd` members the ctor must clear ( `_CORE`, end of the class ): `m_bComboXXAfterDashComboZBackX` ( June `+0x9698`; June also clears it in `ReInit` `329ffe5c` and `DamageReact` `32a07fde` ), `m_bEnableNasodArmorModeOverlimit` ( `+0x98f8`, ctor `32a2301c` ) and the empty map `m_mapTranscendedPassiveAbilityValue` ( `+0x9668`, built by the ctor `32a23b06` ).

@@ -57,3 +57,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - Class map: **35** functions (2 listing-only; 0 `inside`, 35 `new`), filter `awk -F'\t' '$7=="CH1g"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
 - Script states: 26 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
 - `ATT` / `ADE` states; the ADE formation-mode combos (`ANSI_ADE_COMBO_XXXZ_` / `XXXX_FORMATION_MODE` / `_NO_FORMATION_MODE`) carry DP lines under `_DP`. `ANSI_ADE_COMBO_XXXX_FORMATION_MODE` (id 265) is a `~` row. June registers `ANSI_ADE_COMBO_ZZXXX` (285) / `_END` (286) with no table.
+
+## Added by CH1d (2026-11-16)
+
+- The enum already holds `ANSI_ADE_COMBO_ZZX` ( 283 ) and `ANSI_ADE_COMBO_XXXZ / XXXX _FORMATION_MODE / _NO_FORMATION_MODE` ( 262-265 ), added by CH1d under `_CORE`: do not add them again.

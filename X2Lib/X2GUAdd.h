@@ -480,6 +480,17 @@ public:
 		ANSI_SA_ALP_PSYCHIC_STORM_FINISH,	/// ªÁ¿Ã≈± Ω∫≈Ë ∏∂¡ˆ∏∑ ≈∏∞›
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 		ANSI_CAN_NOT_ATTACK_JUMP_DOWN,		/// char-add CH1a: June script id 194 ( CH1m maps; CH1a owns the state )
+		/// char-add CH1d: the June state names its combo functions switch to; the id is June's script id ( CH1m maps; the state's own phase writes its functions )
+		ANSI_AAT_COMBO_NASOD_ARMOR_X,					/// 222
+		ANSI_AAT_COMBO_NASOD_ARMOR_Z,					/// 225
+		ANSI_AMM_COMBO_XXDownX_START,					/// 235
+		ANSI_ADE_COMBO_XXXZ_NO_FORMATION_MODE,			/// 262
+		ANSI_ADE_COMBO_XXXZ_FORMATION_MODE,				/// 263
+		ANSI_ADE_COMBO_XXXX_NO_FORMATION_MODE,			/// 264
+		ANSI_ADE_COMBO_XXXX_FORMATION_MODE,				/// 265
+		ANSI_ALP_COMBO_ZZX,								/// 271
+		ANSI_AMM_COMBO_ZZX,								/// 277
+		ANSI_ADE_COMBO_ZZX,								/// 283
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 	};
 
@@ -798,6 +809,23 @@ protected:
 	void ComboXXZZFinishStateStartFuture();
 	void ComboXXZZFinishStateStart();
 	void ComboXXZZFinishEventProcess();
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+	/// char-add CH1d: the combo states June has a function for and March has not, and the helpers the June bodies call
+	void ANSI_COMBO_XX_StateEnd();						/// June 329d2010
+	void ANSI_COMBO_XX_FrameMove();						/// June 329ecb70
+	void ANSI_COMBO_XXZ_StateStart();					/// June 329e8c90
+	void ANSI_COMBO_XXZ_StateEndFuture();				/// June 329d2030
+	void ANSI_COMBO_ZZX_FrameMove();					/// June 329ec3d0
+	void ANSI_COMBO_ZZXX_FrameMove();					/// June 329ec650
+	void ANSI_COMBO_X_FrameMove();						/// June 329ec8e0
+	void ANSI_COMBO_XXX_FrameMove();					/// June 329ece00
+	void ANSI_COMBO_XXZZ_LOOP_FrameMove();				/// June 329ed0f0
+	bool IsNasodArmorAttackPossible();					/// June 329e2e90
+	bool GetTranscendedPassiveAbilityValue( const CX2SkillTree::SKILL_ID eSkillID_, const CX2SkillTree::SKILL_ABILITY_TYPE eAbilityType_, OUT float& fValue_ ) const;	/// June 329e6f80
+	void ConsumeMutationCountByNasodArmorAttack();		/// June 32a088c0 @32a08950, inlined at each site
+	D3DXVECTOR3 GetNearestLinePosForNasodArmorAttack( D3DXVECTOR3 vPos_ ) const;	/// June 329edde0, inlined twice
+	bool IsInJobLine( int iJobLine_ );					/// June 329e3190 ( vslot 0x670 ): body in CH1i
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 	/// ANSI_JUMP_ATTACK_Z
 	void JumpComboZEventMoveFuture();
@@ -1385,6 +1413,9 @@ protected:
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 	bool					m_bApocalypseFinishBlocked;	/// char-add CH1b: June +0x98e4, only ever stored false; FinishSummonedNPC skips the Apocalypse end while true ( CH1h clears it in the ctor )
+	bool					m_bComboXXAfterDashComboZBackX;	/// char-add CH1d: June +0x9698, set by ANSI_AAT_DASH_COMBO_ZBackX ( CH1f ), cleared by ANSI_COMBO_XX_StateEnd, DamageReact and ReInit ( CH1h clears it in the ctor )
+	bool					m_bEnableNasodArmorModeOverlimit;	/// char-add CH1d: June +0x98f8, set by InitPassiveSkillState for RNSI_P_ATT_NASOD_ARMOR_MODE ( CH4a; CH1h clears it in the ctor )
+	std::map< int, std::map< int, float > >	m_mapTranscendedPassiveAbilityValue;	/// char-add CH1d: June +0x9668, skill id -> ability type -> value, filled by InitPassiveSkillState ( CH4a )
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// protected Valuable End
 

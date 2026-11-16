@@ -57,3 +57,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - Class map: **41** functions (0 listing-only; 0 `inside`, 41 `new`), filter `awk -F'\t' '$7=="CH1f"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
 - Script states: 19 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
 - CH0 split: CH1f = the `AAT` / `AMM` states and their non-container helpers (41); CH1f2 = the container helpers at `0x32a2c000`+ they reach (21). `ANSI_AAT_CREATE_DYNAMO_FACTORY` is registered five times (ids 291-294, 299; Start `32a288d0` via thunk `32a31730`, EventProcess `32a18ec0`): key by id. `ANSI_AMM_COMBO_XXDownX_END` (id 237) is a `~` row. June registers `ANSI_AMM_DASH_COMBO_XX` (279) with no table.
+
+## Added by CH1d (2026-11-16)
+
+- The enum already holds `ANSI_AMM_COMBO_ZZX` ( 277 ), `ANSI_AMM_COMBO_XXDownX_START` ( 235 ), `ANSI_AAT_COMBO_NASOD_ARMOR_X` ( 222 ) and `_Z` ( 225 ), added by CH1d under `_CORE`: do not add them again.
+- `ANSI_AAT_DASH_COMBO_ZBackX` ( `329dc020` @`329dc09b` ) sets `CX2GUAdd::m_bComboXXAfterDashComboZBackX` ( June `+0x9698`, member added by CH1d ) to true before `StateChange( ANSI_COMBO_XX )`; ComboXX's Z and down + X arms read it.

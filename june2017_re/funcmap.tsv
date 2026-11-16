@@ -12557,3 +12557,49 @@ viewer+0xd84 (DU5d2 fix)	CX2UnitViewerUI::m_fBackUnitOffsetRate	confirmed	Char L
 32b33bf0 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END_StateStartFuture	PORTED	Char Luciel CH3c2: future position = land position; off an enabled normal line the lock-on safe position ( +45 ) and state 499
 32b07c30 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess	PORTED	Char Luciel CH3c2: animation end WAIT on the line / JUMP_DOWN; cancel chain; also the Shrewd Cutter end and Silent Rage states
 32b33b00 (CH3c2)	CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateEnd	PORTED	Char Luciel CH3c2: CommonStateEnd; UpNowMp( accumulated damage ) and DisplayAddMPInformation
+329d5b30	CX2GUAdd::ComboZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flag 0 via the animation-end macro, on-line walk / dash cancels
+329d5db0	CX2GUAdd::ComboZZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flags 2 / 3 / 4 = Lunatic Psyker / Mastermind / Diabolic Esper X arms ( class test ), then 0 / 1
+329d62e0	CX2GUAdd::ComboZZZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March's chain; the 550 air speed and the on-line cancels
+32a088c0	CX2GUAdd::ComboZZZZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); the nasod armor arm: target != 0, Overlimit / formation key test, mutation spend
+32a08bd0	CX2GUAdd::ComboZZZXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); as 32a088c0
+329d6610	CX2GUAdd::ComboZZXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flag 0 -> ZZXX
+32a08ee0	CX2GUAdd::ComboZZXXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); as 32a088c0
+329d6890	CX2GUAdd::ComboXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flag 0 -> XX
+329d6b10	CX2GUAdd::ComboXXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flag 0 fires on the time only ( no clear ); flags 2 ( down + X, job line 2 ) / 1 ( Z ) are off while +0x9698 is set
+32a091f0	CX2GUAdd::ComboXXXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); nasod arm minus Diabolic Esper; flags 1 / 2 ( job line 3 ) fire on the time only into the XXXZ / XXXX states by the formation mode
+329d6ef0	CX2GUAdd::ComboXXZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March; 550 air speed
+329d7180	CX2GUAdd::ComboXXZZStartEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329e47e0	CX2GUAdd::ComboXXZZStartStateEndFuture (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March ( PlayLoopSound 329e2660 inlined )
+329d71e0	CX2GUAdd::ComboXXZZLoopStateStart (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329d7200	CX2GUAdd::ComboXXZZLoopStateEnd (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329e8db0	CX2GUAdd::ComboXXZZLoopEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March ( 2.0 = MIN_COUNT - 1, 8.0 = MAX_COUNT - 2 )
+329e8f40	CX2GUAdd::ComboXXZZFinishStateStartFuture (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March; listing-only
+329d2050	CX2GUAdd::ComboXXZZFinishStateStart (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+32a09680	CX2GUAdd::ComboXXZZFinishEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); as 32a088c0
+329d95c0	CX2GUAdd::NasodArmorReadyEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March ( SERV_ADD_LUNATIC_PSYKER drops the cancel tail )
+329d95f0	CX2GUAdd::NasodArmorAttackEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329edde0	CX2GUAdd::NasodArmorAttackStartFuture (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); target slot 94 GetInvincible( AT_COMMAND ), GetBoneLinePos, line start height vs the bone position, 500.0 swap, walk, line snap ( GetNearestLinePosForNasodArmorAttack )
+329d9620	CX2GUAdd::NasodArmorLandingEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); four arms: GetX2UnitClassCompatibility( Lunatic Psyker / Mastermind, my class ) -> NASOD_ARMOR Z / X and AAT Z / X
+32a00130	CX2GUAdd::NasodArmorLandingEndFuture (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); facing from the target's bone line position and CheckPosAlongLastTouchLine ( CH1d0 )
+329d9af0	CX2GUAdd::NasodArmorComboZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flag 0 -> NASOD_ARMOR_ZZ
+329d9d70	CX2GUAdd::NasodArmorComboZZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flag 2 = Lunatic Psyker front Z arm, then 0 / 1
+329da170	CX2GUAdd::NasodArmorComboZZZEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329da340	CX2GUAdd::NasodArmorComboZZXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329da5d0	CX2GUAdd::NasodArmorComboZZXXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329da790	CX2GUAdd::NasodArmorComboXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); flag 1 = Lunatic Psyker direction X arm, then 0
+329e9000	CX2GUAdd::NasodArmorComboXStateEndFuture (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329dab00	CX2GUAdd::NasodArmorComboXXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329dad90	CX2GUAdd::NasodArmorComboXXXEventProcess (CH1d)	PORTED	Char Add CH1d: inert under _LIVE ( June body in March's own function ); = March
+329d2010	CX2GUAdd::ANSI_COMBO_XX_StateEnd (CH1d)	PORTED	Char Add CH1d: new under _CORE; clears +0x9698 ( m_bComboXXAfterDashComboZBackX ), then CommonStateEnd
+329d2030	CX2GUAdd::ANSI_COMBO_XXZ_StateEndFuture (CH1d)	PORTED	Char Add CH1d: new under _CORE; nowSpeed.x = 0, then CommonStateEndFuture
+329e8c90	CX2GUAdd::ANSI_COMBO_XXZ_StateStart (CH1d)	PORTED	Char Add CH1d: new under _CORE; CommonStateStart, then job line 1 ( IsInJobLine, body CH1i; the call waits for _LIVE ): bSuperArmor ( +0x7ff4 ) = 1, bSuperArmorNotRed = 0, m_bStateSuperArmor ( +0x89fc ) = 1
+329ec3d0	CX2GUAdd::ANSI_COMBO_ZZX_FrameMove (CH1d)	PORTED	Char Add CH1d: new under _CORE; EventTimerOneshot( 0.2 ), IsEnoughMPForAttack( 2.0, Bip01 ), EffectSet_AN_Combo_ZZX_Attack
+329ec650	CX2GUAdd::ANSI_COMBO_ZZXX_FrameMove (CH1d)	PORTED	Char Add CH1d: new under _CORE; 0.3, y + 30, EffectSet_AN_Combo_ZZXX_Projectile
+329ec8e0	CX2GUAdd::ANSI_COMBO_X_FrameMove (CH1d)	PORTED	Char Add CH1d: new under _CORE; 0.333, y - 30, EffectSet_AN_Combo_X_Projectile
+329ecb70	CX2GUAdd::ANSI_COMBO_XX_FrameMove (CH1d)	PORTED	Char Add CH1d: new under _CORE; 0.47, y - 75, EffectSet_AN_Combo_XX_Projectile
+329ece00	CX2GUAdd::ANSI_COMBO_XXX_FrameMove (CH1d)	PORTED	Char Add CH1d: new under _CORE; 0.41, y - 30, EffectSet_AN_Combo_XXX_Projectile ( Diabolic Esper: EffectSet_ADE_Combo_XXX_Projectile )
+329ed0f0	CX2GUAdd::ANSI_COMBO_XXZZ_LOOP_FrameMove (CH1d)	PORTED	Char Add CH1d: new under _CORE; 0.01, y + 130, MP cost 1.0, EffectSet_AN_Combo_XXZZ_Loop
+329e2e90	CX2GUAdd::IsNasodArmorAttackPossible (CH1d)	PORTED	Char Add CH1d: new under _CORE; GetIsFormationMode ( vslot 0x6c8 ) or ( +0x98f8 Overlimit passive flag and the gauge's mutation count > 0 )
+329e6f80	CX2GUAdd::GetTranscendedPassiveAbilityValue( skill, ability type, OUT float& ) (CH1d)	PORTED	Char Add CH1d: new under _CORE; unit +0x3c ( m_iUnitClassTran ) != 0, then the map at +0x9668 ( skill id -> ability type -> float ); false and 0 otherwise; filled by CH4a
+329f78a0	CX2GUAdd::NasodArmorAttackTargetData::GetTargetUnit (CH1d)	confirmed	Char Add CH1d: = March's ( uid 0 -> null, NPC / user lookup by the uid ); no new code
+32a01b40	CX2GUAdd::UpMutationCount ( June namesake ) (CH1d)	candidate	Char Add CH1d: candidate; wider than March's ( spec B display, vslot 0x2a4 on a negative step, 329fbaa0 ); CH1q replaces March's body; ConsumeMutationCountByNasodArmorAttack calls it under _DP

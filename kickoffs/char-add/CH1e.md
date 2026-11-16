@@ -57,3 +57,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 - Class map: **19** functions (2 listing-only; 8 `inside`, 11 `new`), filter `awk -F'\t' '$7=="CH1e"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
 - Script states: 14 (`june2017_re/char_add/ch0_state_skill.tsv` part 1, col 8).
 - `APT` / `ALP` combo states. `ANSI_APT_DASH_JUMP_COMBO_ZX_LANDING` (id 270) is a `~` registration row (passed the listing check).
+
+## Added by CH1d (2026-11-16)
+
+- The enum already holds `ANSI_ALP_COMBO_ZZX` ( June script id 271 ), added by CH1d under `_CORE` for ComboZZ's flag-2 arm: write its functions ( `329de850` ... ) without adding the name again. CH1d's `ANSI_COMBO_XXZ_StateStart` ( `329e8c90` ) and the FrameMoves are written.
