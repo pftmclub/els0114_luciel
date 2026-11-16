@@ -4710,6 +4710,7 @@ Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( no new define ); 
 - **Play-test save ( applied 11:38 with the game closed; backups `db_backup/els_db_20261116_113844_pre_createchar.sql`, `..113848_pre_createchar.sql`, integrity ok ):** `python tools/elsdb.py x --file kickoffs/char-luciel/CH3b_save.sql` ( file kept ): `LuNoA` ( unit 225, Lu / Noblesse, level 70, base skills )
   and `LuNoB` ( unit 226, the enhanced skills ), 3 / 2 skill pages, slots 0-3 on keys A S D C and the same on 5-8 ( Q W E R ), slots 4 / 9 empty.
 - **Play-test hand-off:** in the message that closes the session ( per page and key, the log lines to expect ). Logs to read: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
+- **Commit** `d4b36b07`. **Range gate** `d4b36b07^..d4b36b07` ( `--with` the `_SKILL`, `_SKILL_DEBUG`, `_CORE`, `_PASSIVE` and `JUNE_ENUM_NAMES` flags, `--state`, `--icons` as above ): FINISH RESULT PASS ( 9 gates, 0 failed, 1 skipped = luabind ); flagcheck `_SKILL` / `_CORE` / `_PASSIVE` PASS ( 2 PASS, 0 FAIL; the 10 deleted lines are the 2 renamed member lines and the declaration move ), `JUNE_ENUM_NAMES` PASS, junediverge, enumscan, stateends, skillicons PASS.
 - **Review:** `kickoffs/char-luciel/CH3b-review.md` ( Opus; covers CH3a and CH3b, retires `_SKILL_DEBUG` ). Next: CH3c waits on the review.
 
 ## Phase CH4 - Passives and class mechanics
