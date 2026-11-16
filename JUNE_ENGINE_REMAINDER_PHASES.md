@@ -2532,6 +2532,9 @@ FINISH RESULT: PASS. stateends skipped: no skill states. **Compile:** `/Zs` prob
 sub-equips), Aisha `jtVoidPrincess` with Evil Tracer Coral Serpent Wings 82035, Ara `arasss` with Heavenly Priestess Spear 285144 (three weapon
 particles, once): village, field, dungeon and the character window.
 
+**Play-test 2026-11-16: passed** (user: all four checks work: 88622 / 88402 on Elsword, 82035 on Aisha in village / field / dungeon, the
+character window shows them once, 285144's particles once). No log line to read: R14f has none.
+
 ## Phase R14e - InitEqip and the character viewer's slot visibility (Raven left arm)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Added by R14c (2026-11-15) from the char-raven CH4c and char-luciel DU3c amendments of
