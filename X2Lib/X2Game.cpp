@@ -19013,6 +19013,36 @@ void CX2Game::SetUserSummonedNPCInfo( CX2NPCAI::NPC_AI_TYPE eAIType, UidType iAl
 				} break;
 #endif SERV_IRUHADEV_JUNE_CHAR_ELESIS_SUMMON
 #endif //SERV_ELESIS_SECOND_CLASS_CHANGE //김창한
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
+			// char-luciel CH3a0: June 3230c1a0 0x772 / 0x791 -> 3230cd2d: flags 0x40 with Summon Darkness
+			case CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS:
+			case CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP:
+				{
+					pUser->SetSummonHelperInfo( pNPC, npcStat, fStatScale * fHyperModeStatScale, fStatAtkRate, CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS, CX2GUUser::SHF_SKILL_ABILITY_REL );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SUMMON set npc %d skill %d flags 0x40 owner type %d hp %.0f", static_cast<int>( unitID ), static_cast<int>( CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS ), static_cast<int>( pUser->GetUnitType() ), pNPC->GetMaxHp() );	// char-luciel CH3a0
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+				} break;
+			// char-luciel CH3a0: June 3230c1a0 0x774 -> 3230cb47: flag 1 ( fixed HP ) with Shadow Bolt; a Lu/Ciel owner keeps the spear's UID ( +0x9690 )
+			case CX2UnitManager::NUI_SI_SA_LCN_SHADOW_BOLT:
+				{
+					pUser->SetSummonHelperInfo( pNPC, npcStat, fStatScale * fHyperModeStatScale, fStatAtkRate, CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT, CX2GUUser::SHF_FIXED_HP );
+					if ( CX2Unit::UT_LUCIEL == pUser->GetUnitType() )
+						static_cast<CX2GULuciel*>( pUser )->SetShadowBoltNpcUID( pNPC->GetUID() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SUMMON set npc %d skill %d flags 0x1 owner type %d uid %d", static_cast<int>( unitID ), static_cast<int>( CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT ), static_cast<int>( pUser->GetUnitType() ), pNPC->GetUID() );	// char-luciel CH3a0
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+				} break;
+			// char-luciel CH3a0: June 3230c1a0 0x8dd / 0x8de -> 3230cd3a: flags 0x50 with Garden of Haures
+			case CX2UnitManager::NUI_SA_LDN_GARDEN_OF_HAURES:
+			case CX2UnitManager::NUI_SA_LDN_GARDEN_OF_HAURES_ADD:
+				{
+					pUser->SetSummonHelperInfo( pNPC, npcStat, fStatScale * fHyperModeStatScale, fStatAtkRate, CX2SkillTree::RNSI_SA_LDN_GARDEN_OF_HAURES, CX2GUUser::SHF_PASSIVE_SUMMON_RATE | CX2GUUser::SHF_SKILL_ABILITY_REL );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SUMMON set npc %d skill %d flags 0x50 owner type %d hp %.0f", static_cast<int>( unitID ), static_cast<int>( CX2SkillTree::RNSI_SA_LDN_GARDEN_OF_HAURES ), static_cast<int>( pUser->GetUnitType() ), pNPC->GetMaxHp() );	// char-luciel CH3a0
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+				} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
 #ifdef SERV_9TH_NEW_CHARACTER
 			case CX2UnitManager::NUI_PARTICLE_PRISM_START: // 파티클 프리즘
 			case CX2UnitManager::NUI_PARTICLE_PRISM_END:

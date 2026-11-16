@@ -31351,11 +31351,26 @@ void CX2GUUser::SetSummonHelperInfo( CX2GUNPC* pNPC_, const CX2Stat::Stat& npcSt
 	if( NULL != pSkillTemplet )
 	{
 		fStatScale *= pSkillTemplet->GetSkillPowerRateValue( iSkillLevel );
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
+		if( 0 == ( uFlags_ & SHF_NO_ATK_RATE ) )
+		{
+			// char-luciel CH3a0: June @322ed0a4: 0x10 scales the stats by +0x4074 and starts the attack rate from +0x4068
+			float fAtkRateBase = 1.f;
+			if( 0 != ( uFlags_ & SHF_PASSIVE_SUMMON_RATE ) )
+			{
+				fStatScale *= m_SkillRelatedData.m_fSummonedStatRateByPassive;
+				fAtkRateBase = m_SkillRelatedData.m_fSummonedAtkRateByPassive;
+			}
+			fAtkPhysicRel = fAtkRateBase * fStatAtkRate_;
+			fAtkMagicRel = fAtkRateBase * fStatAtkRate_;
+		}
+#else SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
 		if( 0 == ( uFlags_ & SHF_NO_ATK_RATE ) )
 		{
 			fAtkPhysicRel = fStatAtkRate_;
 			fAtkMagicRel = fStatAtkRate_;
 		}
+#endif SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
 
 		if( 0 != ( uFlags_ & SHF_SKILL_ABILITY_REL ) )
 		{

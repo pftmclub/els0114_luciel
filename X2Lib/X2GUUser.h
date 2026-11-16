@@ -3825,7 +3825,11 @@ public:
 		static bool							IsSummonSkillBy( const int iSkillID_ );
 #ifdef SERV_IRUHADEV_JUNE_CHAR_CHUNG_SKILL
 		bool								TryGetEquippedSkillAbilityValue( const CX2SkillTree::SKILL_ABILITY_TYPE eType_, const int iSkillID_, const bool bUpgradeSwap_, float& fOut_ ) const;	/// June 32007ce0
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
+		enum SUMMON_HELPER_FLAG { SHF_FIXED_HP = 0x1, SHF_OWN_HP = 0x2, SHF_OWN_ATK = 0x4, SHF_OWN_DEF = 0x8, SHF_PASSIVE_SUMMON_RATE = 0x10, SHF_NO_ATK_RATE = 0x20, SHF_SKILL_ABILITY_REL = 0x40, SHF_NUMBER_STORE = 0x200, SHF_POWER_RATE_LESS_ONE = 0x400 };	// char-luciel CH3a0: June 322ece70 flag bits, 0x10 added
+#else SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
 		enum SUMMON_HELPER_FLAG { SHF_FIXED_HP = 0x1, SHF_OWN_HP = 0x2, SHF_OWN_ATK = 0x4, SHF_OWN_DEF = 0x8, SHF_NO_ATK_RATE = 0x20, SHF_SKILL_ABILITY_REL = 0x40, SHF_NUMBER_STORE = 0x200, SHF_POWER_RATE_LESS_ONE = 0x400 };	/// June 322ece70 flag bits
+#endif SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
 #ifdef SERV_IRUHADEV_JUNE_CHAR_RENA_TRAP
 		void								SetSummonHelperInfo( CX2GUNPC* pNPC_, const CX2Stat::Stat& npcStat_, const float fStatScale_, const float fStatAtkRate_, const int iSkillID_, const unsigned int uFlags_, const float fRate_ = 1.f );	/// char-rena CH2d0: June 322ece70's rate argument ( 1.0 except Rena's traps )
 #else SERV_IRUHADEV_JUNE_CHAR_RENA_TRAP

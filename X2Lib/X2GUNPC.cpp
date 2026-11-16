@@ -28861,6 +28861,33 @@ void CX2GUNPC::DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageD
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+// char-luciel CH3a0: June 32778fe0 ( unit vslot 0x300 ): an ally NPC whose ally is a user hands the hit's damage data to that user
+void CX2GUNPC::AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData_ )
+{
+	if ( NULL == pDamageData_ || NULL == GetNPCAI() || CX2NPCAI::NAT_ALLY != GetNPCAI()->GetAIType() )
+		return;
+
+	const CX2AllyNPCAI* pAllyAI = dynamic_cast<const CX2AllyNPCAI*>( GetNPCAI() );
+	if ( NULL == pAllyAI || CX2GameUnit::GUT_USER != pAllyAI->GetAllyUnitType() )
+		return;
+
+	CX2GameUnit* pOwner = g_pX2Game->GetUnitByUIDAndType( pAllyAI->GetAllyUnitUID(), CX2GameUnit::GUT_USER );
+	if ( NULL == pOwner )
+		return;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+	static DWORD s_dwLastSummonHitLogTime = 0;
+	const DWORD dwNow = ::GetTickCount();
+	if ( 1000 <= dwNow - s_dwLastSummonHitLogTime )
+	{
+		s_dwLastSummonHitLogTime = dwNow;
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SUMMON hit npc %d -> owner %I64d unit type %d", GetNPCTemplet().m_nNPCUnitID, static_cast<__int64>( pAllyAI->GetAllyUnitUID() ), static_cast<int>( static_cast<CX2GUUser*>( pOwner )->GetUnitType() ) );	// char-luciel CH3a0
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+	pOwner->AdjustDamageDataBeforeDamageReact( pDamageData_ );
+}
+#endif SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 float CX2GUNPC::GetActionSpeedUpValue()
 {
 	float fActionSpeedUpValue = 0.0f;

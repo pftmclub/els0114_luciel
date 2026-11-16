@@ -1907,6 +1907,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 			float m_fSummonedAtkRateByPassive;	/// June +0x4068 ( ctor 1.0 ): Grace of Queen 25408 SA_SUMMON_ATK_REL, written by Eve's InitPassiveSkillState 3297f290 ( CH4a )
 			float m_fSummonedCriticalRateByPassive;	/// June +0x406c ( ctor 0.0 ): Grace of Queen 25408 SA_ATK_CRITICAL_RATE_ABS, written by 3297f290 @3297f722 ( CH4a )
 #endif SERV_IRUHADEV_JUNE_NPC_LUA_SUMMON_RATE
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
+			float m_fSummonedStatRateByPassive;	// char-luciel CH3a0: June +0x4074 ( ctor 1.0 ), Rose's Mechanic Mastery 31413 ability 0xb8 ( 32ad23a8 ); read by 322ece70 flag 0x10
+#endif SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
 
 		public: 
 			SkillRelatedData()
@@ -1926,6 +1929,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 				m_fSummonedAtkRateByPassive = 1.f;	// June ctor 322a434b
 				m_fSummonedCriticalRateByPassive = 0.f;	// June ctor 322a4357
 #endif SERV_IRUHADEV_JUNE_NPC_LUA_SUMMON_RATE
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
+				m_fSummonedStatRateByPassive = 1.f;	// char-luciel CH3a0: June ctor 322a4351
+#endif SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
 			}
 
 			float GetForceDownValueRateOfRenaArrowAttack() const { return m_fForceDownValueRateOfRenaArrowAttack; }
@@ -4103,6 +4109,9 @@ class CX2GameUnit : public CKTDGObject, public CKTDXDeviceHolder, public KObserv
 		virtual void DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ ) {}	// char-luciel CH1o: June unit vslot 0x2fc ( base 3208ddc0, empty )
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+		virtual void AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData_ ) {}	// char-luciel CH3a0: June unit vslot 0x300 ( base 3208ddc0, empty ), called on every attacker unit
+#endif SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 #ifdef SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS
 		virtual void DoProcessWhenDamageDataReset( const CX2DamageManager::DamageData* pDamageData_ ) {}	// char-luciel CH1o: June unit vslot 0x2e4 ( base 3208ddc0, empty ), called on the old attacker by DamageData::SimpleInit
 #endif SERV_IRUHADEV_JUNE_USER_VIRTUAL_HOOKS

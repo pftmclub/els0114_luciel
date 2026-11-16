@@ -14025,3 +14025,50 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              the onepiece slot 35 and the second rings. Revert: comment out the #define.
 #define SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SIZE
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel CH3a0 - June calls the attacker's vslot 0x300 ( AdjustDamageDataBeforeDamageReact ) on every unit before the
+//              defender's DamageReact ( @3262546d / @32628652 / @3262f1e6 ), not only on users; the base is now on CX2GameUnit and an ally
+//              NPC hands the damage data to its user owner ( 32778fe0 ). Every class's summons then reach their owner's override.
+//              Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+#if defined( SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER ) && !( defined( ADD_RENA_SYSTEM ) && defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ) )
+#error SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER needs ADD_RENA_SYSTEM ( the user virtual and the three call sites ) and SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ( CX2Game::GetUnitByUIDAndType ), char-luciel CH3a0
+#endif SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel CH3a0 - June 322ece70's summon flag 0x10: the summon's stat scale x the owner's passive summon stat rate ( +0x4074,
+//              ctor 1.0, Rose's Mechanic Mastery writes it ) and its attack rate x the passive summon attack rate ( +0x4068 ). First caller:
+//              Garden of Haures ( 2269 / 2270, flags 0x50 ). Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
+#if defined( SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_CHUNG_SKILL ) && defined( SERV_IRUHADEV_JUNE_NPC_LUA_SUMMON_RATE ) )
+#error SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE needs SERV_IRUHADEV_JUNE_CHAR_CHUNG_SKILL ( CX2GUUser::SetSummonHelperInfo ) and SERV_IRUHADEV_JUNE_NPC_LUA_SUMMON_RATE ( m_fSummonedAtkRateByPassive ), char-luciel CH3a0
+#endif SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel CH3a0 - Lu/Ciel's summons: June 3230c1a0's cases for Summon Darkness ( 1906 / 1937, flags 0x40 ), Shadow Bolt ( 1908,
+//              flag 1, a Lu/Ciel owner keeps the spear's UID ) and Garden of Haures ( 2269 / 2270, flags 0x50 ) in CX2Game::SetUserSummonedNPCInfo.
+//              Data ( Enum.lua names, NPCTemplet.lua rows ) is in the koms. Revert: comment out the #define ( JUNE_CHAR_LUCIEL_SUMMON ).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) && defined( SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE ) && defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ( the class ), SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE ( flag 0x10 ) and SERV_IRUHADEV_JUNE_ENUM_NAMES ( the NUI names ), char-luciel CH3a0
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel CH3a0 - temporary [JUNE_CHAR] LUCIEL SUMMON lines ( a summon's setup, a summon hit handed to its owner, at most once a
+//              second ) for the play-test; the CH3a0 review retires it. Revert: comment out the #define ( JUNE_CHAR_LUCIEL_SUMMON_DEBUG ).
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON ) && defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+//////////////////////////////////////////////////////////////////////////

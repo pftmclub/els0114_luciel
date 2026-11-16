@@ -3575,6 +3575,9 @@ class CX2GUNPC : public CX2GameUnit
 		virtual void				DoProcessWhenDamageDataDestroyed( const CX2DamageManager::DamageData* pDamageData_ );	// char-luciel CH1o: June 3275a410 ( unit vslot 0x2fc: the owner's )
 #endif SERV_IRUHADEV_JUNE_CHAR_ARA_LIVE
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+		virtual void				AdjustDamageDataBeforeDamageReact( CX2DamageManager::DamageData* pDamageData_ );	// char-luciel CH3a0: June 32778fe0 ( unit vslot 0x300: the ally owner's )
+#endif SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 		
 		float						GetActionSpeedUpValue();
 		bool						GetIsAlwaysSuperArmor();

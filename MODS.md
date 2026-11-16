@@ -7263,3 +7263,11 @@ Six flags in `Always.h`: `SERV_IRUHADEV_JUNE_RENDER_PARTICLE_ADD_TYPES`, `_PARTI
 - **Differs from March.** March accepted only four mesh render types, skipped the option in the RHW and skin-mesh draws, had no outline cap, reset the state manager from the renderer, appended `ET` to the id and closed by id.
 - **Files.** `KTDGParticleSystem.h/.cpp` (parser, draws, `m_fSequenceAlphaRate`, `m_iSystemKind`), `X2Data.cpp` (the four Reset functions set the kind), `KTDXApp.cpp` / `KTDGXRenderer.cpp` (lost device), `KTDXDeviceXSkinMesh.cpp` (XET name, close by pointer).
 - **Revert:** comment out the flag(s) (and `_RENDER_SMALL_DELTAS_DEBUG`), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`. Each item reverts on its own.
+
+## Stage 8 Lu/Ciel, CH3a0: summoned NPCs (char-luciel CH3a0, 2026-11-16)
+
+Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON`, `SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE`, `SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER` (`Always.h`, each with its `#error` guard) and the temporary `..._LUCIEL_SUMMON_DEBUG` (`[JUNE_CHAR] LUCIEL SUMMON` lines; the CH3a0 review retires it). Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH3a0 - Done".
+- **What changes in game.** Lu/Ciel's summons ( Darkness 1906 / 1937, Shadow Bolt spear 1908, Garden of Haures 2269 and its plants 2270 ) have NPC rows and names and take June's stats when spawned ( `SetUserSummonedNPCInfo` cases: flags 0x40 / 1 / 0x50; the spear's UID goes to Lu ). Any class's ally summon now hands each hit's damage data to its owner before the defender reacts ( June calls the hook on every unit, March only on users ).
+- **Data.** data036 `Enum.lua` 3 `NPC_UNIT_ID` names; data037 `NPCTemplet.lua` June's 5 rows verbatim ( marked block at the end ).
+- **Differs from March.** March had no Lu/Ciel; the summon hook reached users only; `SetSummonHelperInfo` had no flag 0x10 ( a new `m_fSummonedStatRateByPassive`, 1.0 until Rose's Mechanic Mastery writes it ).
+- **Revert:** comment out the flag(s), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`; the Lua rows are inert without a spawn ( restore the koms from `kom_backup_tools\data036.kom.20261116_090330` / `data037.kom.20261116_090331` to drop them ).

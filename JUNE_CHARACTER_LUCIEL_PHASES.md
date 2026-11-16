@@ -4408,6 +4408,49 @@ Opus 5.5 high. Reviewed commit `b4f80375` against June's listing (`disasm_range.
   replaced line inside the flag's own block ). Commit `191732e7`, range gate `191732e7^..191732e7`: the same, `FINISH RESULT: PASS`.
 - **Second fix ( found by the full build ):** `Always.h`'s `_NPC_LUA_BINDS` guard named three `ServerDefine.h` flags ( `SERV_INSERT_GLOBAL_SERVER`,
   `SERV_TRAPPING_RANGER_TEST`, `SERV_NEW_DEFENCE_DUNGEON` ) that KTDXLIB never sees ( `C1189` ); the CH3c20 probes compiled X2Lib files only. Those three now
+### CH3a0 - Done (2026-11-16)
+
+Opus 5.5. Lu/Ciel's summoned NPCs exist and are set up as June does; Lu has no skill that spawns them until CH3a (Darkness), CH3b (Shadow Bolt) and CH3c2
+(Garden of Haures), so the play-test spawns them from the dev console. Read from Ghidra (read-only): `3230c1a0`, `322ece70`, `32778fe0`, `32ad1080`, `322a2700`.
+- **Data ( kickoff scope ):** data036 `Enum.lua` `NPC_UNIT_ID` gains `NUI_SI_SA_LLD_SUMMON_DARKNESS = 1906`, `NUI_SI_SA_LCN_SHADOW_BOLT = 1908`,
+  `NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP = 1937` (2269 / 2270 were CH3c20's); data037 `NPCTemplet.lua` gains June's five rows verbatim, June's order (1906, 1908,
+  1937, 2269, 2270; `NPCTemplet.src.lua:17190 / 17208 / 17469 / 20300 / 20309`). 1907 gets nothing (kickoff). `luasrc refresh` both, `ledger --check` and
+  `core --check` PASS. `PACK OK data036` (1 changed: `Enum.lua`), `PACK OK data037` (1 changed: `NPCTemplet.lua`), `COPY OK data036` md5 `3c141682`,
+  `COPY OK data037` md5 `fff26354`.
+- **Assets:** the five scripts are in data037 (June bytecode). The templet `MOTION` names (`Motion_SA_LLD_SUMMON_DARKNESS.x`, `Motion_SA_LCN_SHADOW_BOLT.x`,
+  `Motion_SA_LDN_GARDEN_OF_HAURES(_ADD).x`) are in no June kom either (`stage-june --dry-run`: 4 refused); the NPC loads the script's `INIT_MOTION`
+  (`X2GUNPC.cpp:3367`): `Motion_SUMMON_DARKNESS.x`, `CDC_AS_ROCKON_DUMMY.X`, `Motion_HAURES1_Ciel_LDN.x`, `Motion_HAURES2_Ciel_LDN.x` and every texture / sound in
+  the five `INIT_DEVICE` tables are staged (data157 / data117 / data069 / data068 / data048 / data045). The kickoff's "motions in CH0b's list" was wrong; nothing to stage.
+- **luabind** the five scripts: 11 / 11 / 6 / 24 / 0 methods, 0 unbound, ENUM 0 missing, `RESULT: PASS`.
+- **`SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON`** (new, beside `_SKILL`, as Elesis CH3b0's `_SUMMON`; the kickoff named `_SKILL`, a separate flag keeps the guard
+  on the flag-0x10 port honest). `X2Game.cpp` `SetUserSummonedNPCInfo`, June `3230c1a0` (checklist L253, which no phase owned): 0x772 / 0x791 (1906 / 1937)
+  -> `3230cd2d` flags 0x40 (`SHF_SKILL_ABILITY_REL`); 0x774 (1908) `3230cb47` flags 1 (`SHF_FIXED_HP`) and, owner type 10, user `+0x9690` = NPC UID
+  (`CX2GULuciel::SetShadowBoltNpcUID`, new one-line setter of CH1l3's `m_iShadowBoltNpcUID`); 0x8dd / 0x8de (2269 / 2270) -> `3230cd3a` flags 0x50. Skills from
+  June's `31fcf520` map (`summon_npc_skill_map.tsv`): 30013 / 30016 / 30053, `SetSummonHelperInfo` does the upgrade swap. The 54-id `IsSummonSkillBy` already
+  had the three. `X2UnitManager.h` `NUI_SA_LDN_GARDEN_OF_HAURES_ADD = 2270` under `JUNE_ENUM_NAMES`.
+- **`SERV_IRUHADEV_JUNE_SUMMON_HELPER_PASSIVE_RATE`** (class-agnostic): `322ece70` flag 0x10 (`@322ed0a4`), no caller until 2269 / 2270: without 0x20, the stat
+  scale x user `+0x4074` and the attack rate starts from `+0x4068` before x `+0x4064`. `SHF_PASSIVE_SUMMON_RATE = 0x10` (`X2GUUser.h`, enum line in `#else`);
+  `+0x4074` = new `SkillRelatedData::m_fSummonedStatRateByPassive` (ctor 1.0 `@322a4351`; only writer Rose's Mechanic Mastery 31413 ability 0xb8, `32ad23a8`:
+  char-rose's), `+0x4068` = Eve's `m_fSummonedAtkRateByPassive`. For Lu/Ciel both stay 1.0 (no writer), so Garden's numbers equal flags 0x40's.
+- **`SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER`** (class-agnostic, CH1o amendment): `CX2GameUnit::AdjustDamageDataBeforeDamageReact` virtual (June unit
+  vslot 0x300, base `3208ddc0` empty); the three `ADD_RENA_SYSTEM` sites in `X2DamageManager.cpp` (`@3262546d` / `@3262f1e6` / `@32628652`) call it on every
+  attacker (March's `GUT_USER` test in `#else`); `CX2GUNPC` override = June `32778fe0`: AI `+0x7c98` type `+0x38` == `NAT_ALLY`, `dynamic_cast` to `CX2AllyNPCAI`
+  (`32fe2daa`), ally unit type `+0x80` == `GUT_USER`, `GetUnitByUIDAndType( +0x78 uid, GUT_USER )` (game vslot 0xc8, june-stat-calc D4a), that unit's 0x300.
+  The user virtual (`X2GUUser.h`, Lire / Raven / Ara / Lu overrides) now overrides the base; no signature change. Every class's ally summons reach their owner.
+- **`_SUMMON_DEBUG`** (temporary; the CH3a0 review retires it): `[JUNE_CHAR] LUCIEL SUMMON set npc ...` per Lu case, `... hit npc N -> owner UID unit type T`
+  (any class, once a second).
+- **No JUNE_BUGS row** (nothing odd copied). **funcmap:** 4 rows `(CH3a0)`; the char-raven CH1o row of `32778fe0` ("not ported") is superseded by them.
+- **Gates (worktree):** `finish.py --files <10 code files> --with JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER JUNE_SUMMON_HELPER_PASSIVE_RATE JUNE_CHAR_LUCIEL_SUMMON
+  JUNE_CHAR_LUCIEL_SUMMON_DEBUG --lua <5 scripts>`: `FINISH RESULT: PASS (8 gates, 0 failed, 2 skipped)`; flagcheck `_LUCIEL_SUMMON` 3 PASS, 1 DEFINE, 6 OTHER;
+  `_ADJUST_BY_OWNER` 4 PASS, 1 DEFINE, 5 OTHER; `_PASSIVE_RATE` 3 PASS, 1 DEFINE, 6 OTHER; 0 FAIL each (OTHER = the partner flags' files); junediverge PASS,
+  enumscan exit 0, luabind PASS; stateends / skillicons skipped (no state, no skill). Every edit insert-only (`git diff --stat`: 101 insertions, 0 deletions in the
+  CP949 files). `Always.h` / `funcmap.tsv` / `STATUS.md` hold a peer's uncommitted DU5c2 hunks: the commit stages this phase's hunks only.
+- **Compile:** `/Zs` probes (census `cl_cmd`) `X2Game.cpp`, `X2GUNPC.cpp`, `X2GUUser.cpp`, `X2DamageManager.cpp`, `X2GULuciel.cpp`: 5 x 0 errors; a flag probe has all
+  four flags on. Guard dependencies are all top-level `Always.h` defines (`ADD_RENA_SYSTEM` under `JUNE_CHAR_RENA_NF`, defined just above), none from `ServerDefine.h`.
+- **Build:** `build.py --deploy` BUILD FAILED at the X2 link on a peer's in-progress CH4a edit (`CX2GULuciel::InitPassiveSkillState` declared, no body; `_LUCIEL_PASSIVE`), not this phase's: X2Lib with this phase's code built `ok in 560s`. Nothing deployed; the re-run after CH4a's body lands adds the `DEPLOY OK` / `EXESTR OK` lines below.
+- **Play-test:** the hand-off's 4 checks (Darkness, Shadow Bolt, Garden + its plants on Lu/Ciel `testlu1`; an Eve Nasod Watch for the owner hand-off on another
+  class). Review: `kickoffs/char-luciel/CH3a0-review.md` (Opus); CH3a waits on it.
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, Opus review, user play-test.

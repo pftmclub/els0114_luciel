@@ -2917,6 +2917,7 @@ class CX2UnitManager
 			NUI_SI_SA_LCN_SHADOW_BOLT               = 1908,
 			NUI_SA_LDN_GARDEN_OF_HAURES             = 2269,	// char-luciel CH1a: the Lu/Ciel dtor ( 32b39380 @32b394c7 ) and ReInit look it up
 			NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP       = 1937,
+			NUI_SA_LDN_GARDEN_OF_HAURES_ADD         = 2270,	// char-luciel CH3a0: SetUserSummonedNPCInfo's Garden case ( 3230c1a0 0x8de )
 			NUI_RENA_TARGETING_GUNGNIR              = 2083,
 			NUI_SI_SA_RG_RX78_LAND_RUNNER           = 2175,
 			NUI_PROTON_BOMB                         = 2192,

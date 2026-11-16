@@ -755,6 +755,9 @@ public:
 			iFrameBufferNum_, pUnit_ );
 	}
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_LIVE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
+	void				SetShadowBoltNpcUID( const int iShadowBoltNpcUID_ ) { m_iShadowBoltNpcUID = iShadowBoltNpcUID_; }	// char-luciel CH3a0: June 3230c1a0 0x774 writes +0x9690
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON
 
 private:
 	CX2GULuciel( int iUnitIndex_, int iTeamNum_,

@@ -2248,12 +2248,16 @@ bool CX2DamageManager::UnitToUnit( DamageData* pDamageData, bool bAttackOnlyThis
 			{
 #ifdef ADD_RENA_SYSTEM //김창한
 				//DamageReact 함수가 실행되어 State등이 바뀌기 전에 적용될 DamageData를 수정
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+				pAttacker->AdjustDamageDataBeforeDamageReact( pDamageData );	// char-luciel CH3a0: June @3262546d, vslot 0x300 on every attacker unit
+#else SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 				if ( pAttacker->GetGameUnitType() == CX2GameUnit::GUT_USER )
 				{
 					CX2GUUser* pUser = static_cast<CX2GUUser*>(pAttacker);
 					if( NULL != pUser )
 						pUser->AdjustDamageDataBeforeDamageReact(pDamageData);
 				}
+#endif SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 #endif //ADD_RENA_SYSTEM
 #ifdef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
 #ifndef ADD_RENA_SYSTEM
@@ -3151,12 +3155,16 @@ bool CX2DamageManager::EffectToUnit( DamageData* pDamageData )
 			{
 #ifdef ADD_RENA_SYSTEM //김창한
 				//DamageReact 함수가 실행되어 State등이 바뀌기 전에 적용될 DamageData를 수정
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+				pAttackerGameUnit->AdjustDamageDataBeforeDamageReact( pDamageData );	// char-luciel CH3a0: June @3262f1e6, vslot 0x300 on every attacker unit
+#else SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 				if ( pAttackerGameUnit->GetGameUnitType() == CX2GameUnit::GUT_USER )
 				{
 					CX2GUUser* pUser = static_cast<CX2GUUser*>(pAttackerGameUnit);
 					if( NULL != pUser )
 						pUser->AdjustDamageDataBeforeDamageReact(pDamageData);
 				}
+#endif SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 #endif //ADD_RENA_SYSTEM
 #ifdef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
 #ifndef ADD_RENA_SYSTEM
@@ -3631,12 +3639,16 @@ bool CX2DamageManager::MeshToUnit( DamageData* pDamageData )
 			{
 #ifdef ADD_RENA_SYSTEM //김창한
 				//DamageReact 함수가 실행되어 State등이 바뀌기 전에 적용될 DamageData를 수정
+#ifdef SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
+				pAttacker->AdjustDamageDataBeforeDamageReact( pDamageData );	// char-luciel CH3a0: June @32628652, vslot 0x300 on every attacker unit
+#else SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 				if ( pAttacker->GetGameUnitType() == CX2GameUnit::GUT_USER )
 				{
 					CX2GUUser* pUser = static_cast<CX2GUUser*>(pAttacker);
 					if( NULL != pUser )
 						pUser->AdjustDamageDataBeforeDamageReact(pDamageData);
 				}
+#endif SERV_IRUHADEV_JUNE_SUMMON_DAMAGE_ADJUST_BY_OWNER
 #endif //ADD_RENA_SYSTEM
 #ifdef SERV_IRUHADEV_JUNE_CHAR_RAVEN_LIVE
 #ifndef ADD_RENA_SYSTEM
