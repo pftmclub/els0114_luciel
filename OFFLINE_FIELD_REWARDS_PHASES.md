@@ -343,7 +343,7 @@ row counts and `check` passes on the dry output; no row is written to the server
 **Gates.** `finish.py --no-flag "data-only"`: PASS (no client file changed).
 
 **How to see it.** Log tag `DROP_STANDIN`: expect `loaded:` 174 / 33 / 22 / 28 (per the loader's wording), per-kill lines, and no `no reward row` for keys 33270-33322 / 40029-40032.
-**Play-test:** pending the user (hand-off below in the reply). The debug define stays on until the R6 review.
+**Play-test PASSED 2026-11-16 (user accepted the one-kill result).** `loaded:` 174 / 33 / 22 / 28; field 40029 mobs EXP 12591 / ED 2712; 33272 mobs EXP 9111 / ED 3486; boss 1686 EXP 109332 / ED 44424, items 130047 + 70058 + 99811; `no reward row` empty. No Kenta entry-list item on the one kill (0.6-3 %), accepted; fields 40030-40032 not walked. The debug define stays on until the R6 review.
 
 ### Phase R2 - Done (2026-11-16)
 
