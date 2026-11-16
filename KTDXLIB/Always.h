@@ -14045,7 +14045,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-16
 // Description: char-luciel CH4a - [JUNE_CHAR] LUCIEL PASSIVE lines: the values InitPassiveSkillState read and the delegates it pushed, and
 //              each delegate's effect ( throttled ). Retired by the CH4b review. Revert: comment out the #define.
-#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+//#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG	// retired by the char-luciel CH4b review ( 2026-11-16 )
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE ) && defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG

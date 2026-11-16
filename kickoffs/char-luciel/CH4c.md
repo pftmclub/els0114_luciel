@@ -21,6 +21,10 @@ Then the planning digests in `june2017_re/char_luciel/` the task names, and the 
 
 Do the `CH4c` row of "Phase CH4" from the class map. The Done note names, per passive, the stat or log line that shows it.
 
+Amended by the CH4b review (2026-11-16): `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG` is retired (`//#define` in `Always.h`). Uncomment it for this
+phase's log lines; the CH4c review retires it again. June's unit vslot 0x3e4 with a bone name is `GetNamedBoneAimPos` in `X2GULuciel.cpp` (an NPC answers
+its nearest collision bone, not the named one): use it wherever June calls 0x3e4, never `GetBonePos` or `GetPos`.
+
 No hardcoded enum literals (user, 2026-10-26; CLAUDE.md): an id that has a name in an Enum (June's
 `Enum.lua`, or a C++ enum) is never written as a number, in any new or touched code: use the member, and
 register it under a `SERV_IRUHADEV_` flag with June's value and name if C++ lacks it. A value with no Enum

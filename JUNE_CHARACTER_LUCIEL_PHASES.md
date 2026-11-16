@@ -4737,6 +4737,37 @@ Review: `CH4b-review.md` covers CH4a and CH4b.
   Shot `4405.0 -> 5065.7` ( x1.15 ); `backstab from behind ... ignore defence, critical rate 0.00` then `skill 30205 ... 8873.6 -> 12068.1` ( x1.36 ), from behind only;
   `lord of fear effect ( 1 stack(s), power x4.320 )` ( on the CH3a peer's `LuDlB`, same path ). Not reached: Shadow and Tribute / Noblesse Oblige ( `LuPasCN` 221 ).
 
+### CH4b - Review (2026-11-16)
+
+Opus 5.5 high. Covers CH4a ( `a31855e9` ) and CH4b ( `5d07d7dc`, `9bdc3e6a` ). **Pass after one fix** ( `98433528` ), `_PASSIVE_DEBUG` retired.
+- **Fix ( CH4a, `PlaySoulExtortionDrain` `32b435f0` ):** the soul's start is the defender's vslot 0x3e4 aim point for `Bip01`, asked from the Lu/Ciel's
+  own `GetPos` ( vslot 0x138 on `this`, not on the defender ). CH4a read 0x3e4 as "bone or GetPos", which is only the user's form ( `31fd61a0` ). The NPC's
+  `3275ac50` with a name answers the bone of the collision frame nearest the query point ( `32278580` ), unless `Bip01` is over 700 ( `3344ce98` ) from it,
+  then whichever of the two is nearer the query ( tie: the frame bone ). New `GetNamedBoneAimPos` in the CH4a namespace; funcmap row 12390 corrected.
+  `/Zs` probe of `X2GULuciel.cpp`: 0 errors.
+- **CH4a = June ( Ghidra + capstone `32b45820..32b46570` ):** the 20 reads in June's order ( ids 30401 / 30205 / 30010 / 30406 / 30019 swapped / 30402 / 30407
+  / 30403 / 30404 / 30408 / 30410 / 30015 / 30007 / 30411 / 30217 / 30413 / 30414 / 30415 / 30412 / 30417, all `/Zs`-probed ), 22 ability ids, every reset value
+  ( soul collector 0 / 1 / 0 / 1 / 0 / 0, invasion -1 / 9999 / 9999 / -1 / -1, madness crave 0 x5 / 9999, destroy -1 / -1, absorb 100 ), the PvP pick ( state 9 or
+  0x17 -> `+0x9644` + SA 160, else `+0x9648` + SA 43 ), the force-down clamp ( = March's setter ), delegate order and lists ( `+0x66ac`, crave on `+0x66cc` ).
+  `ApplyFearOnHit` `32b3d380` = June ( the 517 x stacks loop vs 926 under Dead Hands read from the listing: the decompile shows 926 always, the listing does not ),
+  `CreateFearDamageEffect` `32b3ca30` = June, the 7 groups `3226e230..90` = 19 table entries `3373daa4..e8` ( 184 twice ) = the 18-id list, `FrameMoveMadnessCrave`
+  `32b3e470` = June ( 300.0 offset, 0x21c arguments mapped to March's order ).
+- **CH4b = June:** both Backstab blocks ( `+0x528` word = `m_bIgnoreDefence` + `_OnPvp`, `+0x534` `_Decline`, `+0x510` 1.0 ), both behind-hit blocks ( `32070510`
+  maps type 13 alone to 5, so `== 5` is `ST_HYPER_ACTIVE_SKILL`; null templet multiplies ), Shadow step ( 0.2 / 0.8 read from the exe ), `32aebaf0`, `32ae5120`,
+  slot 251 ( `+0x3ec`, templet `+0x34` id, before slot 7 `@322a8885`, inside `SetBuffFactorToGameUnit` ), `3204dcd0` ( SA 5 / 154 / 79 / 172, BFI 523, unit type 10,
+  MP text on `+0x68ac` ), `SimpleInit` `@31f8f34c` zeroes the word `+0x5c0`.
+- **Gates ( `finish.py --review --commits a31855e9 5d07d7dc 9bdc3e6a 98433528 --with JUNE_CHAR_LUCIEL_PASSIVE _PASSIVE_DEBUG -v` ):** FINISH RESULT PASS ( 7 gates, 3
+  skipped: no state, skill or script ); flagcheck 8 PASS, 1 PASS~ ( a blank line in `X2GUUser.cpp` ), 1 DEFINE, 3 OTHER: `X2BuffFactor.h` = `JUNE_ENUM_NAMES`
+  ( CH4a's names ), `X2GULuciel.cpp` / `.h` = the class file under `_CORE`; 4 deleted lines = CH4b's stand-in + the fix's 3. junediverge PASS, `--check-all` PASS
+  ( the first run's `LoadAttached` hit was the R14f peer's tree, gone at `99448c4b` ), enumscan exit 0. `X2GameUnit.cpp`'s other hunks are the stat-calc peer's.
+- **Build ( the fix ):** `DEPLOY OK: X2_offline.exe is 27,136,000 B, dated 2026-11-16 11:14:20, md5 c10aa50ed839729974a90b96ba577df3, equal to X2/US_SERVICE/x2.exe
+  (2026-11-16 11:14:13); built at main 0e01528e + 1 uncommitted code file(s)`. The debug retire: build skipped: debug retire only.
+- **Play-test ( 2026-11-16, user: all passed; logs 11:17-11:23 on the 11:14 deploy, clean exit, 0 EXCEPTION, no phase line in ErrorLog ), `LuPasCN` 221:** Shadow
+  `shadow shield took 2015.0, left 37235.0` x5 ( pool 39250, the buff ended by time: the break line was not reached ); `/buffFactor` replaced by the Lua line
+  `SetBuffFactorToGameUnitByBuffFactorID_LUA( 55, 1, 0, true )`: `tribute: BTI 58 landed, debuff 58 erased, one soul collector stack spent ( chance 0.28 )` x4,
+  each with `noble devotion: 1 point(s), mp +10.0`; `soul extortion drain ( stacks 5 / 5, mp 20.00, soul 1 )` x12 after the fix.
+- **Next:** CH4c ( kickoff amended: `_PASSIVE_DEBUG` is retired; re-enable it for CH4c's lines and its review retires it again ).
+
 ## Phase CH5 - UI and data
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI`, sub-tag `UI`. The skill and hyper cut-in
