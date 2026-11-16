@@ -1431,6 +1431,8 @@ data (`ElResonanceTable.lua`), but with no resonance system the map is empty: Ju
 DEBUG`: `FINISH RESULT: PASS` (flagcheck HIT_DODGE PASS: 1 PASS, 1 DEFINE, 0 deleted; UNIT_STAT PASS: 1 PASS, 1 PASS~, 1 DEFINE, 0 deleted;
 junediverge `RESULT: PASS`; enumscan exit 0). The 12 "EOL-mismatched" lines are LF lines beside the CRLF `{` anchors in the mixed-EOL
 `X2DamageManager.cpp` (the file is LF bar 289 lines; D3's lines there are LF too). `flagcheck JUNE_ENUM_NAMES --files X2Lib/X2PVPRoom.h`: PASS.
+Range gate (`finish.py --range 51715265^..51715265 --with ...`): flagcheck HIT_DODGE / UNIT_STAT `RESULT: PASS`, junediverge `RESULT: PASS`,
+enumscan exit 0, `FINISH RESULT: PASS`.
 Build (coalesced into a run started after this phase's last edit): `DEPLOY OK: X2_offline.exe is 27,159,552 B, dated 2026-11-16 11:50:04, md5
 dc655e7b67f7b84d92c5e37548fb4a8d, equal to X2/US_SERVICE/x2.exe (2026-11-16 11:49:57); built at main 3e9fa56d + 17 uncommitted code file(s).`
 `EXESTR OK: 4 of 4 found in X2_offline.exe, 27159552 B, dated 2026-11-16 11:50:04, md5 dc655e7b67f7b84d92c5e37548fb4a8d` (HITRATE, DODGEROLL,
