@@ -5160,6 +5160,16 @@ after in the Done note. Walk **the becoming-transcended transition** on un-trans
 (`/qdone 42030`), book 288493 (`/additem 288493 1`), one per second job, with the guide popup and that class's picture, the new tree rows, the HUD
 portrait, and a relog. **Done gate:** the walk passes; 0 unexplained `no_state` rows; no new `KEM_ERROR`.
 
+## CH6 - Scans rerun, walk handed off (2026-11-16)
+
+No code change, no flag, no build ( full build skipped: the walk is the phase's play-test of what CH3d / CH4c / CH5 already deployed; `X2_offline.exe` is the CH5 deploy ). Save backed up first ( `els_db_20261116_173939_pre_ch6_walk.sql` ).
+- **S3 baseline ( `s3_no_state.py --family X2GULuciel.cpp`, `ch6_s3_rows.tsv` ):** before ( CH0 ) 301 rows / 301 `no_state`; after 301 / 75 `no_state` ( DREAD_LORD, NOBLESSE, DEMONIO 19 each; CHILIARCH, ROYAL_GUARD, DIABLURA 6 each ), 226 `has_state`. The 75 are 55 distinct ids, none unexplained: 21 passives 30401-30421 ( no state by design, token in the class file ), 33 "[Enhanced]" upgrade rows ( 30061-30081, 30307-30315, 30603 / 30604 / 30606: June's Lu/Ciel memo reads are stubs, no variant plays ) and 106 ( the shared awakening passive ).
+- **Key scan ( `charport_keys.py` ):** Luciel_Duo june-only 23 -> 6, neither 3, march-only-site 4, both 217; Luciel_Demonio june-only 12 -> 0, neither 1 ( `STOP_TIME_ATK` ). Duo's 6: `RETAIN_CAMERA_STATE` / `FORCE_DYNAMIC_CAMERA_INDEX` ( routed, every June class has them ), `IMMUNE_TO_SUPER_ARMOR_DOWN` / `IMMUNITY_EDT_LIST_AT_THIS_STATE` ( `31fdaaa0` state helper, no March reader; engine drift, not a Lu/Ciel script gap ), `BBT_CHANGE_NOW_HP_PER_SECOND` / `BFT_TIME` ( stringized buff keys March reads by type name: false positives ).
+- **`charport_scan.py`:** Luciel_Duo no gap row; Luciel_Demonio `{'CUSTOM_RENDER_STATE': 3}` = same as CH0, explained: the engine parses it ( CH3c note, `ParseCustomRenderState` ), nothing class-side.
+- **`census.py`:** not recorded. I started a full run by mistake with `--help` and never saw its summary; no census-driven row is in Lu/Ciel's scope, so the number is owed to the user's say-so, not a gate.
+- **Walk units ( save ):** untranscended `LuPasLD` 220 ( Dread Lord 70 ), `LuGuideCN` 184 ( Noblesse, raised to 70 / SP 494 ), `LuPasDN` 222 ( Demonio 70 ); transcended `LuDlA/B` 223 / 224, `LuNoA/B` 225 / 226, `LuDnA/B` 228 / 229, `LuPasCN` 221.
+- **Open:** the user walk ( below ). Done gate "the walk passes; no new `KEM_ERROR`" is owed after "check logs".
+
 ## Phase Z - Close-out
 
 **Run with:** Sonnet 5.5 medium. Write the `MODS.md` "June character: Lu/Ciel" section (flags, files, data, starter stand-in, the DU4
