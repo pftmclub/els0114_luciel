@@ -5168,7 +5168,7 @@ No code change, no flag, no build ( full build skipped: the walk is the phase's 
 - **`charport_scan.py`:** Luciel_Duo no gap row; Luciel_Demonio `{'CUSTOM_RENDER_STATE': 3}` = same as CH0, explained: the engine parses it ( CH3c note, `ParseCustomRenderState` ), nothing class-side.
 - **`census.py --summary` ( run after the first draft of this note ):** every line PASS ( open rows owned, code-built keys covered, KTDGXMeshPlayer / KTDGParticleSystem 0 `to-implement`, definition items 1-4 ); no tracked file changed. An earlier `--help` call only printed usage, so the first draft said not recorded.
 - **Walk units ( save ):** untranscended `LuPasLD` 220 ( Dread Lord 70 ), `LuGuideCN` 184 ( Noblesse, raised to 70 / SP 494 ), `LuPasDN` 222 ( Demonio 70 ); transcended `LuDlA/B` 223 / 224, `LuNoA/B` 225 / 226, `LuDnA/B` 228 / 229, `LuPasCN` 221.
-- **Open:** the user walk ( below ). Done gate "the walk passes; no new `KEM_ERROR`" is owed after "check logs".
+- **Walk passed ( user, 2026-11-16 ), logs read:** `LUCIEL` lines present ( select screen both bodies, `STAT`, `SKILL` equip, `DATA` class 129, `AVATAR` Lu / Ciel meshes ); `/qdone 42030` first refused ( accept NetError 158, prerequisite quests ) then NetError 0 after 41990-42020; `KEM_ERROR` count 0 in `ErrorLog.txt` and the server logs. Done gate met.
 
 ## Phase Z - Close-out
 
