@@ -4809,6 +4809,11 @@ Files: `X2GULuciel.h` / `.cpp`, `Always.h`, `MODS.md`, `funcmap.tsv` ( `grep "(C
   Stable Dark Energy ( 30421 ) learned on both: `python tools/elsdb.py x --file kickoffs/char-luciel/CH3c_save.sql` ( file kept ).
 - **Play-test hand-off:** in the message that closes the session ( per page and key ). Logs to read: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
 
+- **Fix after the first play-test ( 2026-11-16, commit `a6edaf9d` ):** Sinister Mind, Garden of Haures and Punisher showed no effect: their frame moves were CH3c2's rows. Written now ( June `32b32fe0` Sinister Mind + fly state, `32b32800` / `32b32b30` Punisher Lu / Ciel,
+  `32b33dc0` Garden of Haures: the old garden killed, NPC 2269 120 in front with the 45-high ground probe, key = the skill's effective time ) and registered; CH3c2 no longer owns them ( `CH3c2.md` amended ). Debug line `garden of haures spawn ( ground G, my unit M ) at x y z`.
+  `DEPLOY OK: X2_offline.exe is 27,204,608 B, dated 2026-11-16 15:19:16, md5 9eb54c83c98ae8a5a9d0b93db6be19a4`, `EXESTR OK: 4 of 4 found` ( wide: the garden debug line, three effect set names ); gates `finish.py` PASS ( 9 gates, 0 failed ), `stateends` PASS.
+  **Play-test ( 2026-11-16, user ): everything on pages 1 and 2 works now** ( Rapid Fury's effect needed no change: its effect set, projectile and hit were already in the log ). Desperado still does not shoot ( its start / frame moves stay CH3c2's ).
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, Opus review, user play-test.

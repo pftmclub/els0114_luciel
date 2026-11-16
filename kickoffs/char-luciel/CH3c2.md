@@ -91,3 +91,8 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 - **Written here, unused until the held cases land:** the Transcendence form's jump, combo and start event processes ( June's `32ae95a0` .. `32b06cd0` ), the three state starts, and `m_ptrShrewdCutterLockOn = SLockOnSystem::CreateLockOnSystem()` ( in the held case ).
 - **`m_bSkillState`** is also set on 494, 495, 500 ( Transcendence ) and on the Punisher Ciel state ( 467 ): the CH1o3 digest listed only 466 and 581.
 - `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` is on ( `Always.h` ); your review retires it.
+
+## Amended by char-luciel CH3c fix ( 2026-11-16 )
+
+- Already written and registered by the CH3c fix ( commit `a6edaf9d`, play-tested ): `LSI_SA_LDN_SINISTER_MIND_FrameMove` ( `32b32fe0` ), `LSI_A_LDN_F_PUNISHER_FrameMove` ( `32b32800` ), `LSI_A_LDN_M_PUNISHER_FrameMove` ( `32b32b30` ),
+  `LSI_SA_LDN_GARDEN_OF_HAURES_FrameMove` ( `32b33dc0` ). Skip them; the remaining `body in CH3c2` comments are yours ( Desperado's start / frame moves, Rapid Impact's move-attack start future ) plus the three held cases.
