@@ -65,7 +65,8 @@ Backlog Stage 33 (`JUNE_PORT_BACKLOG_ORDER.md`, "Stage 33: June damage and chara
 - **New in this plan.** `june2017_re/statcalc/statcalc_map.tsv` (the map; seeded 2026-11-12), `june2017_re/statcalc/gfd_blocks.tsv` (D0:
   `GetFinalDamage` block by block), `june2017_re/statcalc/emu_*.py` (the comparison scripts), funcmap rows tagged `StatCalc S33`.
 - **Flag family.** `SERV_IRUHADEV_JUNE_STATCALC_*`: `_DEFENCE_CURVE` (D1), `_FINAL_DAMAGE` (D2), `_HIT_PIPELINE` (D3), `_DAMAGE_REACT`
-  (D4), `_EXTRA_DAMAGE` (D5), `_UNIT_STAT` (S1), `_EQUIP_STAT` (S2), `_SOCKET` (S3), `_BUFF_FACTOR` (S4), `_RESOURCE` (R1), `_DEBUG`.
+  (D4), `_EXTRA_DAMAGE` (D5), `_UNIT_STAT` (S1, S1b), `_HIT_DODGE` (S1b), `_EQUIP_STAT` (S2), `_SOCKET` (S3, S4), `_BUFF_FACTOR` (S4),
+  `_RESOURCE` (R1), `_MP_COST` (R1b), `_DEBUG`.
   **Log tag** `[JUNE_STATCALC]` in `offline_server.log` (`CX2OfflineLog::Server`, throttled to about one line a second per pair).
 
 ## Measurement (planning session, 2026-11-12)
@@ -1118,6 +1119,65 @@ members (`32270dd0`, `32271540`, `322718e0`, `32290950`), the three `SetFactor` 
 
 **Done gate.** Every item above has a row with a state and readers; the S and R kickoffs are amended. Full build skipped.
 
+### Phase S0 - Done (2026-11-16)
+
+Read-only. No client code, no flag; full build skipped: no play-test. `finish.py`: `FINISH RESULT: PASS` (no source file among the
+changes). The map `june2017_re/statcalc/statcalc_map.tsv` loses the 20 seed
+rows of its stat / resource area (and D3's dodge row) and gains 39 rows, each with June address, March site, state, last flag, readers and
+phase (78 rows in all). March sites and readers came from three census passes (`cl /P`-resolved flags); every June claim below was read in
+the exe this session (`funcdis.py` / `disasm_range.py` / Ghidra). New addresses: `funcmap.tsv`, tag `StatCalc S33 (S0)`.
+
+**What the map now says (state of the 39 rows).** June 15, mixed 12, March 7, absent 3 (Stat [9] / [10], the ability map, user
+`+0x94a0`), unknown 1 (awakening gain on hit), n/a 1 (the server-side base stat). By phase: S1 5, S1b 4, S2 4, S3 5, S4 8, R1 5,
+R1b 4, nothing left 4. Already June and only re-read later: the option-data
+template `320839e0`, `GetEqipStat`, `ResetMaxMP`, the character window, the per-hit MP refresh, the four buff member functions, the
+Time and ChangeAttackByType `SetFactor`s, `GetActualMPConsume`'s base, regen's gage tick, and the six `GetSkillMpDecreaseRate` sites.
+
+**Corrections to the plan's inputs.**
+- `320839e0` (June's option-data rewrite, the user's 2026-11-12 decision) is already live: `X2BuffTemplet.h:1206-1244` under
+  `SERV_IRUHADEV_JUNE_SOCKET_PARITY`; re-read here against the asm (SWAP, the +1 lift, option + FIX + RELATION, curve( value, level, unit
+  type ), the modifier on PERCENT >= 1, the > 0 product, max 0), and buff Phase 16's Unicorn run (360 sets) stands. Divergence rows 39
+  (`320839e0`), 86 (`32ec27d0`), 142 (`3234e210`) and 331 (`323571c0` is `UnitData::SetGameStats`, not `Stat::SetKStat`) are stale; S4
+  corrects them (peers hold uncommitted edits in that tsv today).
+- `SERV_BALANCE_FINALITY_SKILL_EVENT` is **on** (flagprobe; `ServerDefine_Global.h:1238` via `SERV_GLOBAL_COMMON`), not undefined. The
+  six June `GetSkillMpDecreaseRate` calls are live in the char ports' `GetActualMPConsume` bodies; Aisha's and Elsword's March calls are
+  in dead `#else` branches, as June has none. The row is closed. Side note for the owner: the `Always.h:10796` comment on
+  `SERV_IRUHADEV_JUNE_DIVERGE_SKILL_COOL_TIME_RATE` says the flag is not defined.
+
+**Spot-checks of the inherited areas (exe vs port).** Buff members: `320839e0` and the Time finalizer's debuff multiplier
+(@32ec33bd) and full duration (@32ec34a5). Socket parity: `322b4130` / `322b4170` / `320870a0` = the port; `3204f190` holds a gap
+(below). ExtraNPCStat: `323752f0` writes the NPC stat byte `+0xe8` = 1 (new, the dodge row) beside the grade `+0xdc` the port reads.
+Stage 3 skill values: `31fd2810` = the port; `32610a00` reads Raven's Exquisite Swordmanship as 24406 and has no Chung Deadly Chaser
+block. CharInfo C3: `3291eb50` / `322a8b60` (float-exact constants) and `32913df0` = the port. Transcendence: no stat row depends on
+it; not spot-checked.
+
+**Pairs like the MP bug (a June seed or table read by a March reader).**
+1. Socket MP-up-when-hit: June entries are 12 bytes (chance, MP, cool time) with one timer each in user `+0x87b8` (resized by
+   `32077f50` after every `ConvertAndAdd` in `3204f190`, checked by `31fd9100` @32047d55); the port keeps March's 2-float entries and
+   no cool time (`X2GUUser.cpp:11418`). S3.
+2. `GetEqipStat` (June, S7k) sums March's `CX2Item::GetStat`. S2 moves them together.
+3. `SetGameStats` (June, DU5e) feeds two KStats through March's 5-field `SetKStat`: June's range pair is dropped. S1.
+4. The emulator's game stat (StatTable + gear) against June's character window (adds skill, guild-skill, title, socket-base stats). S1's
+   `SHEET` line compares them.
+5. `CX2BuffChangeConsumeMpRate` stores June's rate; its reader `GetSkillRateByBuffBehavior` reads the factor dump. R1b.
+
+**Sizing (kickoffs amended, STATUS rows added).** S1 splits into S1 (the stat block: Stat [9] / [10], 7-field KStat, `SetGameStats`,
+`SetGameStat`, every reader, `SHEET`) and S1b (`ResetMaxHP`, `CalcHitDodgePercent` with the `+0xe8` roll offset, the ability map).
+S2 unchanged. S3 becomes the socket aggregate and option vectors (`InitSocketData`, `+0x94a0`, the MP / HP-up entries, `SumSocketOption`'s
+gaps). S4 becomes re-reads and leftovers (the four buff member functions, the two `SetFactor`s, `ResetIncreaseSkillLevelBySocket`, the
+`IsSocketOptionFormLoaded` fallbacks, the stale divergence rows). R1 splits into R1 (MP and awakening gain: `AttackResult`, the damage
+effect, the DamageReact block @32049d8a, the `SetDamageExceptionProcess` terms, absorb) and R1b (MP cost and rate: `GetActualMPConsume`
+with June's buff reader `32039a50`, `ResetMPChangeRate`, `SetMPChangeRateValue`).
+
+**Decisions for the user (before S1; neither blocks S0's review).**
+1. The designed attack range (10% of attack, user 2026-10-04) has lived in `SetGameStat`. June's `SetGameStat` reads the range from
+   the 7-field KStat. Recommended: the emulator fills KStat's range pair with the same 10%, so the client keeps June's body whole; the
+   numbers do not change.
+2. None for the ability map: it keeps June's absent value 0 unless S1b finds the table is client data.
+
+Not ported, routed: none outside this plan. Class lines met here (Chung Deadly Chaser's dropped accuracy block, Raven's 24406 id) ride
+with June's whole `CalcHitDodgePercent` in S1b and are named in its hand-off for char-chung / char-raven.
+
 ## Phases S1-S4, R1 - Stat sheet and resource gain (after Stages 7 and 8)
 
 Each phase: the map's rows for its area, June's whole bodies under its flag, a `SHEET` or per-event debug line, one emulation script per
@@ -1125,11 +1185,13 @@ pure function, an Opus review, and a play-test on every character (level 99, wit
 
 | Phase | Area | Flag | Main files |
 |---|---|---|---|
-| S1 | unit stat core: `SetKStat`, `SetGameStat`, `ResetMaxHP` / `ResetMaxMP`, `Stat` [9] / [10] | `_UNIT_STAT` | `X2Stat.*`, `X2Unit.*`, `X2GameUnit.*`, `X2GUUser.*` |
+| S1 | stat block: `Stat` [9] / [10], 7-field `KStat`, `SetGameStats`, `SetGameStat`, every reader, `SHEET` (S0 split) | `_UNIT_STAT` | `X2Stat.*`, `X2Unit.*`, `X2GameUnit.*`, `CommonPacket.h`, `Offline/*` |
+| S1b | `ResetMaxHP`, `CalcHitDodgePercent` + the `+0xe8` roll offset, the ability map `32358970` (added by S0) | `_UNIT_STAT`, `_HIT_DODGE` | `X2GUUser.*`, `X2DamageManager.*`, `X2UnitManager.*`, `X2GUNPC.*` |
 | S2 | equipment, set items, enchant stat | `_EQUIP_STAT` | `X2Unit.*`, `X2Item.*`, `X2ItemStatCalculator.*` |
-| S3 | sockets and options: `320839e0` (June's rewrite, approved 2026-11-12), `SumSocketOption`, socket skill levels | `_SOCKET` | `X2SocketItem.*`, `X2GameUnit.*`, `X2GUUser.*`, `X2Unit.*` |
-| S4 | buff finalizers `SetFactor` x3, buff stat members re-read | `_BUFF_FACTOR` | `X2BuffFinalizer*`, `X2GameUnit.*` |
-| R1 | MP / awakening gain, regen, MP cost, MP change rate, absorb | `_RESOURCE` | `X2GameUnit.*`, `X2GUUser.*`, `X2GageData.*`, class MP blocks |
+| S3 | socket aggregate and option vectors: `InitSocketData`, user `+0x94a0`, the MP / HP-up entries and timers, `SumSocketOption`'s gaps (S0: `320839e0` is already June) | `_SOCKET` | `X2SocketItem.*`, `X2GUUser.*`, `X2Unit.*` |
+| S4 | re-reads and leftovers: buff member functions, two `SetFactor`s, `ResetIncreaseSkillLevelBySocket`, the `IsSocketOptionFormLoaded` fallbacks, stale divergence rows | `_BUFF_FACTOR`, `_SOCKET` | `X2GameUnit.*`, `X2BuffFinalizer*`, `X2Unit.*`, `X2SocketItem.*` |
+| R1 | MP and awakening gain: `AttackResult`, the damage effect, DamageReact @32049d8a, `SetDamageExceptionProcess` terms, absorb | `_RESOURCE` | `X2GameUnit.*`, `X2GUUser.*`, `X2DamageEffect.*` |
+| R1b | MP cost and rate: `GetActualMPConsume` + June's buff reader `32039a50`, `ResetMPChangeRate`, `SetMPChangeRateValue` (added by S0) | `_MP_COST` | `X2GUUser.*`, `X2GageData.*`, class MP blocks |
 
 **Run with.** Opus 5.5 / high each, Opus review each. **Depends.** S0 review, Stage 7 and Stage 8 closed, D6 review. One at a time
 (shared files). S0 may split or merge them.

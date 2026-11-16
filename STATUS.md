@@ -277,22 +277,24 @@ Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]
 | Z | blocked (R6 review): close | Sonnet 5.5 / medium | R6 review | `MODS.md`, backlog, `tools/README.md` | `Z.md` |
 
 ## june-stat-calc - June damage and character stat calculation
-Plan `JUNE_STAT_CALC_PHASES.md` - branch `main` - log tag `[JUNE_STATCALC]` (`offline_server.log`) - flags `SERV_IRUHADEV_JUNE_STATCALC_*` (`_DEFENCE_CURVE`, `_FINAL_DAMAGE`, `_HIT_PIPELINE`, `_DAMAGE_REACT`, `_EXTRA_DAMAGE`, `_UNIT_STAT`, `_EQUIP_STAT`, `_SOCKET`, `_BUFF_FACTOR`, `_RESOURCE`, + `_DEBUG`) - kickoffs `kickoffs/june-stat-calc/` - map `june2017_re/statcalc/statcalc_map.tsv` - backlog Stage 33 - created 2026-11-12.
+Plan `JUNE_STAT_CALC_PHASES.md` - branch `main` - log tag `[JUNE_STATCALC]` (`offline_server.log`) - flags `SERV_IRUHADEV_JUNE_STATCALC_*` (`_DEFENCE_CURVE`, `_FINAL_DAMAGE`, `_HIT_PIPELINE`, `_DAMAGE_REACT`, `_EXTRA_DAMAGE`, `_UNIT_STAT`, `_HIT_DODGE`, `_EQUIP_STAT`, `_SOCKET`, `_BUFF_FACTOR`, `_RESOURCE`, `_MP_COST`, + `_DEBUG`) - kickoffs `kickoffs/june-stat-calc/` - map `june2017_re/statcalc/statcalc_map.tsv` - backlog Stage 33 - created 2026-11-12.
 
-**Scope:** every stat and damage formula becomes June's whole calculation. Damage track D0-D6 runs now (user 2026-11-12: secret-dungeon monsters take 0 or tiny damage; cause = March's straight-line defence formula reading June's monster defence, fix = D1). Stat-sheet and resource track S1-S4 / R1: code after Stages 7 and 8 (user 2026-10-27). D1-D5 all edit `X2GameUnit.cpp` / `X2GUNPC.cpp` / `X2GUUser.cpp`: one at a time, and not beside a char-port phase that edits the same file.
+**Scope:** every stat and damage formula becomes June's whole calculation. Damage track D0-D6 runs now (user 2026-11-12: secret-dungeon monsters take 0 or tiny damage; cause = March's straight-line defence formula reading June's monster defence, fix = D1). Stat-sheet and resource track S1-S4 / R1 (S0 split S1b and R1b off): code after Stages 7 and 8 (user 2026-10-27). D1-D5 all edit `X2GameUnit.cpp` / `X2GUNPC.cpp` / `X2GUUser.cpp`: one at a time, and not beside a char-port phase that edits the same file.
 
 Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 / 31 / 32 were already ported, set June; march_lines remapped past D1), D1 (2026-11-12, reviewed: compiled rate and floor = June's instructions; level gap none, re-proved; 939 emu sets; play-test passed), D2a + D2b (2026-11-12, reviewed in `D2-review`: no transcription error; hook 1.0 and boss 1470 = June; 50 emu review sets), D3 (2026-11-12, reviewed: all 8 items = June's exe, no code change; play-test passed), D4 cut (2026-11-12: `dr_blocks.tsv`, 51 blocks; split into D4a / D4b), D4a + D4b (2026-11-13, reviewed in `D4-review`: pass, no code change; ledger holds, every absent / mixed block = the exe; play-test passed), D5 (2026-11-15, reviewed: five June functions re-read = the port; both tick sites = June, map row 60 closed; play-test passed).
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | D6 | **ready** (D5 review PASS 2026-11-15): damage smoke on every ported character; its review covers D1-D5 and retires `_DEBUG` | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |
-| S0 | ready: stat-sheet and resource map (read-only); runs beside anything | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0.md` |
-| S1 | blocked (S0 review, Stages 7 + 8 closed, D6 review): unit stat core | Opus 5.5 / high, Opus review | S0 review, Stages 7 + 8, D6 review | `X2Stat.*`, `X2Unit.*`, `X2GameUnit.*`, `X2GUUser.*` | `S1.md` |
-| S2 | blocked (S1): equipment, set items, enchant stat | Opus 5.5 / high, Opus review | S1 review | `X2Unit.*`, `X2Item.*`, `X2ItemStatCalculator.*` | `S2.md` |
-| S3 | blocked (S2): sockets and options, incl. June's `320839e0` rewrite (user approved 2026-11-12) | Opus 5.5 / high, Opus review | S2 review | `X2SocketItem.*`, `X2GameUnit.*`, `X2GUUser.*`, `X2Unit.*` | `S3.md` |
-| S4 | blocked (S3): buff finalizers | Opus 5.5 / high, Opus review | S3 review | `X2BuffFinalizer*`, `X2GameUnit.*` | `S4.md` |
-| R1 | blocked (S4): MP / awakening gain, regen, MP cost | Opus 5.5 / high, Opus review | S4 review | `X2GameUnit.*`, `X2GUUser.*`, `X2GageData.*`, class MP blocks | `R1.md` |
-| Z | blocked (R1 review): close | Sonnet 5.5 / medium | R1 review, D6 review | `MODS.md`, backlog, STATUS archive | `Z.md` |
+| S0 | **review ready** (2026-11-16): stat / resource map filled (39 rows), S1 and R1 split; 1 decision for the user (designed attack range, see the Done note) | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0-review.md` |
+| S1 | blocked (S0 review, Stages 7 + 8 closed, D6 review): the stat block (Stat [9] / [10], 7-field KStat, SetGameStats, SetGameStat, readers, SHEET) | Opus 5.5 / high, Opus review | S0 review, Stages 7 + 8, D6 review | `X2Stat.*`, `X2Unit.*`, `X2GameUnit.*`, `CommonPacket.h`, `Offline/*` | `S1.md` |
+| S1b | blocked (S1): ResetMaxHP, CalcHitDodgePercent + the +0xe8 roll offset, the ability map | Opus 5.5 / high, Opus review | S1 review | `X2GUUser.*`, `X2DamageManager.*`, `X2UnitManager.*`, `X2GUNPC.*` | `S1b.md` |
+| S2 | blocked (S1b): equipment, set items, enchant stat | Opus 5.5 / high, Opus review | S1b review | `X2Unit.*`, `X2Item.*`, `X2ItemStatCalculator.*` | `S2.md` |
+| S3 | blocked (S2): socket aggregate and option vectors (+0x94a0, MP / HP-up entries and timers); 320839e0 is already June | Opus 5.5 / high, Opus review | S2 review | `X2SocketItem.*`, `X2GUUser.*`, `X2Unit.*` | `S3.md` |
+| S4 | blocked (S3): re-reads (buff member functions, two SetFactors) and leftovers (socket skill levels, option-form fallbacks, stale divergence rows) | Opus 5.5 / high, Opus review | S3 review | `X2GameUnit.*`, `X2BuffFinalizer*`, `X2Unit.*`, `X2SocketItem.*`, `june_march_divergent.tsv` | `S4.md` |
+| R1 | blocked (S4): MP and awakening gain on hit and on hit taken, absorb | Opus 5.5 / high, Opus review | S4 review | `X2GameUnit.*`, `X2GUUser.*`, `X2DamageEffect.*` | `R1.md` |
+| R1b | blocked (R1): MP cost (GetActualMPConsume + June's buff reader), ResetMPChangeRate, SetMPChangeRateValue | Opus 5.5 / high, Opus review | R1 review | `X2GUUser.*`, `X2GageData.*`, class MP blocks | `R1b.md` |
+| Z | blocked (R1b review): close | Sonnet 5.5 / medium | R1b review, D6 review | `MODS.md`, backlog, STATUS archive | `Z.md` |
 
 ## Other plans (no STATUS rows)
 
