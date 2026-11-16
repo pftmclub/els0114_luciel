@@ -4264,6 +4264,13 @@ Opus 5.5 high. Covers CH2d ( `6d84c3d5` ), CH2d2 ( `95f548ff` ) and CH2d3 ( `c46
 - **`_SKILL_DEBUG`:** stays on for this review's play-test ( the second Phantom Rush use and the altar projectile have never logged ); retired after the logs are read, in a commit with no build.
 - **Play-test owed:** the closing message ( `LuDbA` / `LuDbB`, page 1 and page 2, the form's XXX combo, Phantom Rush twice ). Logs: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
 - **Next:** CH3a0 and CH4a are ready ( their kickoffs checked ); CH4a edits `X2GULuciel.*`, so it waits for this review's debug retire.
+- **Play-test ( 2026-11-16, user: all passed; logs 08:30-08:33 on the 08:10 deploy, clean exit ):** 0 EXCEPTION, 0 ErrorLog lines, 0 unbound Lua names; UNHANDLED only `E_DISABLE_HB_CHECK_REQ`.
+  `LuDbA` page 1: Phantom Rush 30216 on both bodies with the second use ( `phantom rush target body L found 1`, state 460, the user could move ), Abyss Strike 30215 ( `abyss strike end body L foot 1` ),
+  Nightmare 30042 x2, Altar of Evil 30043 x2 ( form start / end, form states 432 / 435 / 436 / 440 / 446 / 447 / 448 ), `death touch beam body L range 1200 time 5.00` once for its one cast.
+  **Not in the logs:** page 2 ( slots 5-8 ), `LuDbB` ( 30076 / 30077 / 30219 / 30220 ), `altar projectile` ( the XXX combo was not reached ), `nightmare target`. Passed by sight; routed to CH3a's play-test
+  ( `CH3a.md` amended: one page-2 cast and one Diablura upgrade with the debug define off, by sight ).
+- **Gate on the commit ( `finish.py --range 9309a878^..9309a878 --with _SKILL _SKILL_DEBUG` ):** FINISH RESULT PASS ( 6 gates, 3 skipped ); flagcheck `_SKILL` PASS ( 6 deleted lines = the 6 replaced ), junediverge PASS, enumscan exit 0.
+- **`_SKILL_DEBUG` retired** ( `//#define` in `Always.h`; the lines it guards stay ): build skipped: debug retire only.
 
 ## Phase CH3 - Skills: second jobs (127, 128, 129), hyper actives, transcendence
 

@@ -54,3 +54,7 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1o3 (2026-11-15)
 
 - **Skill-state byte:** June marks some extra states as skill states ( byte `+0x11`, now `UserUnitStateData::m_bSkillState`, flag `SERV_IRUHADEV_JUNE_USER_SKILL_STATE_BYTE` ). In your cases set `stateData.m_bSkillState = true;` on: 377@32b49a4b, 575@32b4a25e ( `ch1n_skill_cases.tsv` column `skill_state_extra`, state id @ June store ). The slot states already get it from CH1n's head.
+
+## Amended by char-luciel CH2d2 review (2026-11-16)
+
+- **Owed by CH2d2 ( passed by sight, never logged ):** in your play-test also cast one Diablura skill from skill page 2 ( keys Q W E R, `LuDbA` ) and one upgrade on `LuDbB` ( 30076 / 30077 / 30219 / 30220 ), plus the Altar of Evil form's X X X ( the altars fire ); the `use` line of each is enough.
