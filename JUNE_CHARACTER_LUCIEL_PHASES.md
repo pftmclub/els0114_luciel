@@ -711,6 +711,7 @@ Opus 5.5 high. **Verdict: pass after one hygiene fix** (a missing flag-dependenc
 | DU5c | (split from DU5) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the village avatar (`323f3290` rest: `323f1490`, the viewer rebuild; `323fa700` / `323fad80`; SD mesh table `31ee3470`). | DU5b's, or `_DUO_AVATAR` |
 | DU5c2 | (split from DU5c, 2026-11-16) Both bodies on the create screen (`@32555fe8`) and select screen (`32564400`, `3255e570`), the viewer's back body (frame move, draw, `+0xd82` writers, equip copies), `CX2Eqip::SetFixed` `3295a560`, R14e's select-screen onepiece. | DU5b's |
 | DU5d | (split from DU5) Viewer weapon effects case 10 (`X2UnitViewerUI.cpp:960`, `:6255`, `:8559`, `:8681`) and CH0's checklist viewer rows (CharCustomData, UnitViewerEffectSetTable, `IS_FOR_MINOR_UNIT` slot key, glow). | DU5b's |
+| DU5d2 | (split from DU5d, 2026-11-16) The back body's emotions (`+0xd82` writers, `31fa64f0`), the window's equip tint `31f93920`, June's other `SetUnitScale` callers; after june-engine R14f. | DU5b's / DU5c2's |
 | DU5e | (split from DU5) Each body's game stat: `SetGameStats` second `KStat` `323571c0`, the packet fields and the seven sites, the emulator's per-body numbers. | `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` |
 | DU5f | (split from DU5e, 2026-11-15) Each body's sockets: the type-10 socket aggregate and the HUD's second gage, the set-socket count `3286a6b0` and the per-body socket record `3271a060`, the window's other-form set sum `@3291bf2d`. | `SERV_IRUHADEV_JUNE_CHAR_DUO_SOCKET` |
 
@@ -1970,6 +1971,45 @@ flag-nesting move, all under `SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY` (`X2UnitViewerU
 - **Play-test passed** (user, 2026-11-16, md5 `65db270a`): create screen, select screen ( `testlu1`, `jtLordKnight` ), the enchant glow, other
   classes. Log: `[09:38:09.717] [JUNE_CHAR] LUCIEL DUO LOBBY create screen: both bodies, Ciel turned 30.0 deg`, `[09:39:11.757] ... select screen: unit
   166 class 200, both bodies, minor body turned 30.0 deg`; 0 EXCEPTION, 0 ErrorLog lines. DU5c2 done; next DU5d (`DU5d.md`).
+
+### DU5d - Done (2026-11-16)
+
+Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's). Files: `X2UnitViewerUI.cpp` (+223 / -10), `X2UnitViewerUI.h` (+10). funcmap rows:
+`grep "(DU5d)" june2017_re/funcmap.tsv` (6); divergent row `CX2UnitViewerUI::InitWeaponTrace` (replaced in this commit). No log line added.
+- **Weapon trace (`InitWeaponTrace` = June `31f9a2a0`, whole body under the flag):** bodies 0-2 in turn, fashion slot first, the 8 normal anims'
+  TRACE / weapon-bone frames; Ara's model 0 line frames; Lu's model 0 `ATTACK_LINE_END0` / `START0_LWeapon` (June keeps it in Ara's `+0xed0` =
+  `m_pFrame_ATTACK_LINE_START0_FRONT`) and model 1 `END0` / `START0_RWeapon` (new `m_pFrame_ATTACK_LINE_END0_RWeapon` / `_START0_RWeapon`,
+  `+0xefc` / `+0xf00`). **Corrects DU5b2's amendment:** June keeps one frame set, not one per body; a later body's weapon overwrites (Ciel's when she
+  has one). DU5b2's two stand-in hunks were replaced by June's body (the 10 deleted lines flagcheck counts are those flag-on lines and their
+  markers; March's lines stay whole in the `#else`). Other classes fill body 0 only: same frames as March.
+- **Enchant fire, case 10:** new `ProcessEnchantWeaponEffectForLuciel` (`31f93050`, OnFrameMove case `@31fa96fe`): Ciel shown -> middle of
+  `TRACE_START[0]` / `TRACE_END[0]`, else Lu's `Bone_RFinger2` (skin `+0x1e8`); emit 10. Init stays the Sword one (June's default).
+- **Hand sparks, case 10** (`31f961a0 @31f96536`): Ciel shown -> her own skin's `Dummy1_Rhand`, else Lu's `Bone_RFinger2`; rates 15 / 30 / 60 / 25 / 15
+  (read from the exe). The March stub comment `UT_LUCIEL / UT_ROSE / UT_AIN cases: checklist 7as` stays for Rose / Ain.
+- **+11 / +13 particles:** `InitUpgradeWeaponParticle` puts Lu/Ciel in the first group (`31f92910`); `ProcessUpgradeWeaponParticle` case 10
+  (`31f9a900 @31f9b488`, handles mapped from the listing's registers): cash shop / state 10 -> Lu's fingers (second group emits 0) or Ciel's
+  `Dummy3_RWeapon` / `Dummy4_LWeapon`; elsewhere Ciel's form -> middles of the two line pairs (missing frames: InitWeaponTrace after 2 s), Lu's
+  form -> fingers. Groups: handles 1 2 5 6 9 / 3 4 7 8 10; the +13 six only when all exist. Helper `PlaceUpgradeWeaponSequences` in
+  `_CONST_UNITVIEWER_DU5D_`.
+- **Checklist (CH0):** UnitViewerEffectSetTable: the loader, the duo column and filter were in (`JUNE_UNIT_VIEWER_EFFECT_TABLE`, `DUO_BODY`); the two
+  viewer lookups passed 0, now the shown body as June (`31fa3010 @31fa3219`, `31fa8ce0 @31fa92e9`; the one `DT_MINOR` row is `LDN_LobbyWait`).
+  `IS_FOR_MINOR_UNIT`: already read (`X2SlotItem.cpp:63-65`, `JUNE_CHARINFO_SHOW`). Form-change portrait `328dcba0`: already ported (CH5,
+  `UpdateCharacterPortraitByForm`). CharCustomData `DUO_TYPE` (`326525d0`): March has no customize reader, nothing reaches it offline: Stage 12
+  (`JUNE_PORT_BACKLOG_ORDER.md` "Stage 12"), no change. Glow (§7as): the four sites above.
+- **Split (one logical change):** the DU5c2 amendment's back-body emotions (`+0xd82` writers, `31fa64f0`), the window's equip tint `31f93920` (walks
+  each equip's sub-equip list `+0x8dc`, which june-engine R14f's `LoadAttached` brings) and the other `SetUnitScale` callers -> **DU5d2**
+  (kickoff written, after R14f).
+- **Gates:** `finish.py --files X2Lib/X2UnitViewerUI.cpp X2Lib/X2UnitViewerUI.h --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER`: `FINISH RESULT: PASS (6
+  gates, 0 failed, 3 skipped)`; flagcheck 1 PASS, 1 PASS~ (blank / marker), 0 OTHER, 0 FAIL, 10 deleted lines (above), 0 EOL-mismatched; INFO
+  `CHARINFO_VIEW_ATTRIB_ENCHANT`, `DIVERGE_UPGRADE_WEAPON_PARTICLE`, `UNIT_VIEWER_EFFECT_PLAYER` (enclosing, not this change's); junediverge PASS;
+  enumscan exit 0; stateends / skillicons / luabind n/a. New local `#error` in `X2UnitViewerUI.h` (needs `CHARINFO_VIEW_ATTRIB_ENCHANT`,
+  `ADD_UPGRADE_WEAPON_PARTICLE`, `ARA_CHARACTER_BASE`): all three on at that line by a `cl` probe.
+- **Compile:** `/Zs` probe of `X2UnitViewerUI.cpp`: 0 errors.
+- **Build:** `DEPLOY OK: X2_offline.exe is 27,104,768 B, dated 2026-11-16 10:16:26, md5 65ccb63e7b13cee700e2ae15090828c5` (built at main 63e45d19 +
+  28 uncommitted code files: this phase's and peers' in-progress files). `EXESTR OK: 3 of 3 found in X2_offline.exe` (`ATTACK_LINE_START0_RWeapon`,
+  `ATTACK_LINE_START0_LWeapon`, `Dummy3_RWeapon`, wide).
+- **Play-test:** handed off 2026-11-16 (character window, `testlu1`); review `DU5d-review.md` after it passes.
+- **Save:** `testlu1` (166) normal weapon 62119 set to +13, fire attribute (`attrib0` 1); backup `db_backup\els_db_20261116_100555_pre_sql.sql`.
 
 ### DU5e - Done (2026-11-15)
 

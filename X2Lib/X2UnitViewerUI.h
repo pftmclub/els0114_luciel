@@ -298,6 +298,12 @@
 #ifdef SERV_9TH_NEW_CHARACTER // ±Ë≈¬»Ø
 		void ProcessEnchantWeaponEffectForAdd();
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+#if !defined( SERV_IRUHADEV_JUNE_CHARINFO_VIEW_ATTRIB_ENCHANT ) || !defined( ADD_UPGRADE_WEAPON_PARTICLE ) || !defined( ARA_CHARACTER_BASE )
+#error SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER needs SERV_IRUHADEV_JUNE_CHARINFO_VIEW_ATTRIB_ENCHANT, ADD_UPGRADE_WEAPON_PARTICLE and ARA_CHARACTER_BASE ( Lu's weapon effects and trace )
+#endif
+		void ProcessEnchantWeaponEffectForLuciel();	// char-luciel DU5d: June 31f93050
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 		void InitWeaponTrace();
 
@@ -484,6 +490,10 @@
 #ifdef ADD_UPGRADE_WEAPON_PARTICLE		/// ∞≠»≠ π´±‚ ¿Ã∆Â∆Æ ∞¥√º
 		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_ATTACK_LINE_END0;
 		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_ATTACK_LINE_START0_FRONT;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_ATTACK_LINE_END0_RWeapon;		// char-luciel DU5d: June +0xefc, Lu's second weapon model
+		CKTDXDeviceXSkinMesh::MultiAnimFrame*			m_pFrame_ATTACK_LINE_START0_RWeapon;	// June +0xf00
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 
 		CKTDGParticleSystem::CParticleEventSequenceHandle 	m_hSeqUpgradeWeapon;
 		CKTDGParticleSystem::CParticleEventSequenceHandle 	m_hSeqUpgradeWeapon2;

@@ -208,6 +208,10 @@ CX2UnitViewerUI::CX2UnitViewerUI(void)
 
 	m_pFrame_ATTACK_LINE_START0_FRONT	= NULL;
 	m_pFrame_ATTACK_LINE_END0			= NULL;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	m_pFrame_ATTACK_LINE_END0_RWeapon	= NULL;	// char-luciel DU5d
+	m_pFrame_ATTACK_LINE_START0_RWeapon	= NULL;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 #endif ADD_UPGRADE_WEAPON_PARTICLE
 
 #ifdef SERV_ELESIS_SECOND_CLASS_CHANGE	  // ±èÁ¾ÈÆ, ¿¤¸®½Ã½º 1-2 ±×·£µå ¸¶½ºÅÍ, 2-2 ºí·¹ÀÌÂ¡ ÇÏÆ®
@@ -579,8 +583,14 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 		std::wstring wstrFxSet;
 		float fFxStart = 0.f;
 		bool bFxLoop = false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5d: June 31fa8ce0 @31fa92e9 looks the row up for the shown body
+		if( true == g_pData->GetUnitManager()->GetUnitViewerEffectSet( m_pXSkinAnim->GetNowAnimName(), m_pUnit->GetClass(),
+				( true == m_bSwitchingView ) ? CX2Unit::DT_MINOR : CX2Unit::DT_MAJOR, wstrFxSet, fFxStart, bFxLoop ) && true == bFxLoop )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		if( true == g_pData->GetUnitManager()->GetUnitViewerEffectSet( m_pXSkinAnim->GetNowAnimName(), m_pUnit->GetClass(), 0,
 				wstrFxSet, fFxStart, bFxLoop ) && true == bFxLoop )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		{
 			ViewerFxRequest kFxRequest;
 			kFxRequest.m_wstrSetName = wstrFxSet;
@@ -1043,6 +1053,12 @@ HRESULT CX2UnitViewerUI::OnFrameMove( double fTime, float fElapsedTime )
 				ProcessEnchantWeaponEffectForAdd();
 			} break;
 #endif //SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		case CX2Unit::UT_LUCIEL:	// char-luciel DU5d: June 31fa8ce0 @31fa96fe case 10
+			{
+				ProcessEnchantWeaponEffectForLuciel();
+			} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		}
 
 #ifdef ADD_UPGRADE_WEAPON_PARTICLE
@@ -2253,7 +2269,13 @@ void CX2UnitViewerUI::PlayAnim( const WCHAR* pName, CKTDGXSkinAnim::XSKIN_ANIM_P
 		std::wstring wstrFxSet;
 		float fFxStart = 0.f;
 		bool bFxLoop = false;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+		// char-luciel DU5d: June 31fa3010 @31fa3219 looks the row up for the shown body
+		if( true == g_pData->GetUnitManager()->GetUnitViewerEffectSet( pName, m_pUnit->GetClass(),
+				( true == m_bSwitchingView ) ? CX2Unit::DT_MINOR : CX2Unit::DT_MAJOR, wstrFxSet, fFxStart, bFxLoop ) )
+#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		if( true == g_pData->GetUnitManager()->GetUnitViewerEffectSet( pName, m_pUnit->GetClass(), 0, wstrFxSet, fFxStart, bFxLoop ) )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		{
 			ViewerFxRequest kFxRequest;
 			kFxRequest.m_wstrSetName = wstrFxSet;
@@ -7760,6 +7782,21 @@ void CX2UnitViewerUI::ProcessEnchantedWeaponEffectAtHand( CX2Unit::UNIT_TYPE uni
 			vecEmitRate.push_back( 15.f );
 		} break;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	case CX2Unit::UT_LUCIEL:	// char-luciel DU5d: June 31f961a0 case 10, Ciel shown: her own skin's hand
+		{
+			if( true == m_bSwitchingView )
+				vHandPos = m_pMinorUnitXSkinAnim->GetCloneFramePosition( L"Dummy1_Rhand" );
+			else
+				vHandPos = m_pXSkinAnim->GetCloneFramePosition( L"Bone_RFinger2" );
+			vecEmitRate.push_back( 15.f );
+			vecEmitRate.push_back( 30.f );
+			vecEmitRate.push_back( 60.f );
+			vecEmitRate.push_back( 25.f );
+			vecEmitRate.push_back( 15.f );
+		} break;
+
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	// UT_LUCIEL / UT_ROSE / UT_AIN cases: checklist 7as
 	default:
 		break;
@@ -8121,6 +8158,45 @@ void CX2UnitViewerUI::ProcessEnchantWeaponEffectForAdd()
 }
 #endif //SERV_9TH_NEW_CHARACTER
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+void CX2UnitViewerUI::ProcessEnchantWeaponEffectForLuciel()
+{
+	// char-luciel DU5d: June 31f93050; Ciel shown: the middle of the weapon trace, else Lu's right finger
+	if( true == m_vecSeqWeaponFire.empty() || INVALID_PARTICLE_SEQUENCE_HANDLE == m_vecSeqWeaponFire[0] )
+		return;
+
+	if( m_pXSkinAnim == NULL )
+		return;
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeqWeaponFire1 = g_pData->GetUIMajorParticle()->GetInstanceSequence( m_vecSeqWeaponFire[0] );
+	if( NULL == pSeqWeaponFire1 )
+		return;
+
+	if( true == CanShowWeaponEffect() )
+	{
+		D3DXVECTOR3 vWeaponPos( 0.f, 0.f, 0.f );
+		if( true == m_bSwitchingView )
+		{
+			D3DXVECTOR3 vTraceEnd( 0.f, 0.f, 0.f );
+			GetFramePos( &vTraceEnd, m_pFrame_TRACE_END[0] );
+			D3DXVECTOR3 vTraceStart( 0.f, 0.f, 0.f );
+			GetFramePos( &vTraceStart, m_pFrame_TRACE_START[0] );
+			vWeaponPos = ( vTraceStart - vTraceEnd ) * 0.5f + vTraceEnd;
+		}
+		else
+		{
+			vWeaponPos = m_pXSkinAnim->GetCloneFramePosition( L"Bone_RFinger2" );
+		}
+		pSeqWeaponFire1->SetPosition( vWeaponPos );
+		pSeqWeaponFire1->SetEmitRate( 10, 10 );
+	}
+	else
+	{
+		pSeqWeaponFire1->SetEmitRate( 0, 0 );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+
 
 void CX2UnitViewerUI::ProcessEnchantWeaponEffectForSword()
 {
@@ -8311,15 +8387,71 @@ void CX2UnitViewerUI::ProcessEnchantWeaponEffectForBow()
 void CX2UnitViewerUI::InitWeaponTrace()
 {
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
-	// char-luciel DU5b2: stand-in, June 31f9a2a0 builds trace frames for bodies 0-2; Lu's weapon only until DU5d
-	if ( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ][0] != 0 )
+	// char-luciel DU5d: June 31f9a2a0, each body's weapon in turn ( fashion first ); a later body's frames overwrite an earlier one's
+	for( int iBody = 0; iBody < ARRAY_SIZE( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ] ); ++iBody )
 	{
-		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ][0] );
+		const UidType iWeaponUID = ( 0 != m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ][ iBody ] ) ?
+			m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ][ iBody ] : m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ][ iBody ];
+		if ( 0 == iWeaponUID )
+			continue;
+
+		ViewEquipMap::iterator iter = m_ViewEquipMap.find( iWeaponUID );
+		if ( iter == m_ViewEquipMap.end() )
+			continue;
+
+		CX2EqipPtr pX2Eqip = iter->second;
+		if ( NULL == _GetSafeEquipItemTemplet( pX2Eqip ) )
+			continue;
+
+		for( int i = 0; i < CX2Item::MAX_MODEL_COUNT_A_ITEM; i++ )
+		{
+			if ( pX2Eqip->GetNormalAnim(i) != NULL )
+			{
+				wstring	wstrTraceStartName, wstrTraceEndName;
+				GetWeaponTraceStartAndEndName( &wstrTraceStartName, &wstrTraceEndName );
+				m_pFrame_TRACE_START[i]		= pX2Eqip->GetNormalAnim(i)->GetCloneFrame( wstrTraceStartName.c_str() );
+				m_pFrame_TRACE_END[i]		= pX2Eqip->GetNormalAnim(i)->GetCloneFrame( wstrTraceEndName.c_str() );
+				m_pFrame_WEAPON_BONE[i]		= pX2Eqip->GetNormalAnim(i)->GetCloneFrame( L"DummyTopPoint" );
+			}
+			else
+			{
+				m_pFrame_TRACE_START[i]		= NULL;
+				m_pFrame_TRACE_END[i]		= NULL;
+				m_pFrame_WEAPON_BONE[i]		= NULL;
+			}
+		}
+
+		if ( NULL == GetUnit() )
+			continue;
+
+		if ( NULL != pX2Eqip->GetNormalAnim(0) )
+		{
+			switch ( GetUnit()->GetType() )
+			{
+			case CX2Unit::UT_ARA:
+				{
+					m_pFrame_ATTACK_LINE_END0	= pX2Eqip->GetNormalAnim(0)->GetCloneFrame( L"ATTACK_LINE_END0" );
+					m_pFrame_ATTACK_LINE_START0_FRONT = pX2Eqip->GetNormalAnim(0)->GetCloneFrame( L"ATTACK_LINE_START0_FRONT" );
+				} break;
+
+			case CX2Unit::UT_LUCIEL:	// June keeps Lu's left-weapon line start in Ara's +0xed0
+				{
+					m_pFrame_ATTACK_LINE_END0	= pX2Eqip->GetNormalAnim(0)->GetCloneFrame( L"ATTACK_LINE_END0" );
+					m_pFrame_ATTACK_LINE_START0_FRONT = pX2Eqip->GetNormalAnim(0)->GetCloneFrame( L"ATTACK_LINE_START0_LWeapon" );
+				} break;
+			}
+		}
+
+		if ( NULL != pX2Eqip->GetNormalAnim(1) && CX2Unit::UT_LUCIEL == GetUnit()->GetType() )
+		{
+			m_pFrame_ATTACK_LINE_END0_RWeapon	= pX2Eqip->GetNormalAnim(1)->GetCloneFrame( L"ATTACK_LINE_END0" );
+			m_pFrame_ATTACK_LINE_START0_RWeapon	= pX2Eqip->GetNormalAnim(1)->GetCloneFrame( L"ATTACK_LINE_START0_RWeapon" );
+		}
+	}
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	if ( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ] != 0 )
 	{
 		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipFashion[ CX2Unit::EP_WEAPON_HAND ] );
-#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		if ( iter != m_ViewEquipMap.end() )
 		{
 			CX2EqipPtr pX2Eqip = iter->second;
@@ -8376,15 +8508,9 @@ void CX2UnitViewerUI::InitWeaponTrace()
 			}//if
 		}//if
 	}//if
-#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
-	else if ( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ][0] != 0 )	// char-luciel DU5b2
-	{
-		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ][0] );
-#else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	else if ( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ] != 0 )
 	{
 		ViewEquipMap::iterator iter = m_ViewEquipMap.find( m_ViewEquipNormal[ CX2Unit::EP_WEAPON_HAND ] );
-#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		if ( iter != m_ViewEquipMap.end() )
 		{
 			CX2EqipPtr pX2Eqip = iter->second;
@@ -8441,6 +8567,7 @@ void CX2UnitViewerUI::InitWeaponTrace()
 		}//if
 	}//if
 
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 }
 //}} robobeg : 2008-10-18
 
@@ -10194,6 +10321,27 @@ namespace _CONST_UNITVIEWER_D13C_
 }
 using namespace _CONST_UNITVIEWER_D13C_;
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+namespace _CONST_UNITVIEWER_DU5D_
+{
+	// char-luciel DU5d: June 31f9a900 case 10, one hand's sequences at one position and one emit rate
+	void PlaceUpgradeWeaponSequences( const D3DXVECTOR3& vPos_, const float fEmitRate_, CKTDGParticleSystem::CParticleEventSequence* pSeq1_,
+		CKTDGParticleSystem::CParticleEventSequence* pSeq2_, CKTDGParticleSystem::CParticleEventSequence* pSeq3_ = NULL )
+	{
+		CKTDGParticleSystem::CParticleEventSequence* apSeq[] = { pSeq1_, pSeq2_, pSeq3_ };
+		for( int i = 0; i < ARRAY_SIZE( apSeq ); ++i )
+		{
+			if( NULL == apSeq[i] )
+				continue;
+
+			apSeq[i]->SetPosition( vPos_ );
+			apSeq[i]->SetEmitRate( fEmitRate_, fEmitRate_ );
+		}
+	}
+}
+using namespace _CONST_UNITVIEWER_DU5D_;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+
 void CX2UnitViewerUI::InitUpgradeWeaponParticle()
 {
 	// June 31f92910: +13 adds the spark tier; Lu/Ciel, Rose and Ain ( June cases 10-12 ) wait for their ports
@@ -10224,6 +10372,9 @@ void CX2UnitViewerUI::InitUpgradeWeaponParticle()
 	case CX2Unit::UT_CHUNG:
 	case CX2Unit::UT_ARA:
 	case CX2Unit::UT_ELESIS:
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	case CX2Unit::UT_LUCIEL:	// char-luciel DU5d: June 31f92910 puts case 10 in the first group
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		{
 			if( false == bSparkTier )
 				CreateUpgradeWeaponParticle( L"11Gang_Weapon_Effect_Lightning", L"11Gang_Weapon_Effect_Lightning02",
@@ -10377,6 +10528,68 @@ void CX2UnitViewerUI::ProcessUpgradeWeaponParticle()
 					ShowUpgradeWeaponSequences( vBonePos2, pSeqUpgradeWeapon7, pSeqUpgradeWeapon8, pSeqUpgradeWeapon10 );
 			}
 		} break;
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
+	case CX2Unit::UT_LUCIEL:	// char-luciel DU5d: June 31f9a900 @31f9b488
+		{
+			if( NULL == pSeqUpgradeWeapon || NULL == pSeqUpgradeWeapon2 || NULL == pSeqUpgradeWeapon3 || NULL == pSeqUpgradeWeapon4 )
+				return;
+
+			// the first group is sequences 1 / 2 / 5 / 6 / 9, the second 3 / 4 / 7 / 8 / 10
+			D3DXVECTOR3 vFirstGroupPos( 0.f, 0.f, 0.f );
+			D3DXVECTOR3 vSecondGroupPos( 0.f, 0.f, 0.f );
+			float fSecondGroupEmitRate = 10.f;
+			if( UVS_CASHSHOP == m_eUnitViewerState || 10 == static_cast<int>( m_eUnitViewerState ) )	// 10: a June-only viewer state
+			{
+				if( false == m_bSwitchingView )
+				{
+					vFirstGroupPos = m_pXSkinAnim->GetCloneFramePosition( L"Bone_RFinger2" );
+					vSecondGroupPos = m_pXSkinAnim->GetCloneFramePosition( L"Bone_LFinger2" );
+					fSecondGroupEmitRate = 0.f;
+				}
+				else
+				{
+					vFirstGroupPos = m_pMinorUnitXSkinAnim->GetCloneFramePosition( L"Dummy3_RWeapon" );
+					vSecondGroupPos = m_pMinorUnitXSkinAnim->GetCloneFramePosition( L"Dummy4_LWeapon" );
+				}
+			}
+			else if( true == m_pUnit->IsMinorUnitForm() )
+			{
+				if( NULL == m_pFrame_ATTACK_LINE_START0_FRONT || NULL == m_pFrame_ATTACK_LINE_END0 ||
+					NULL == m_pFrame_ATTACK_LINE_START0_RWeapon || NULL == m_pFrame_ATTACK_LINE_END0_RWeapon )
+				{
+					if( m_TimerResetWeaponTraceFrame.elapsed() > 2.f )
+						InitWeaponTrace();
+					return;
+				}
+
+				D3DXVECTOR3 vLineEnd( 0.f, 0.f, 0.f );
+				GetFramePos( &vLineEnd, m_pFrame_ATTACK_LINE_END0 );
+				D3DXVECTOR3 vLineStart( 0.f, 0.f, 0.f );
+				GetFramePos( &vLineStart, m_pFrame_ATTACK_LINE_START0_FRONT );
+				vFirstGroupPos = ( vLineStart - vLineEnd ) * 0.5f + vLineEnd;
+
+				GetFramePos( &vLineEnd, m_pFrame_ATTACK_LINE_END0_RWeapon );
+				GetFramePos( &vLineStart, m_pFrame_ATTACK_LINE_START0_RWeapon );
+				vSecondGroupPos = ( vLineStart - vLineEnd ) * 0.5f + vLineEnd;
+			}
+			else
+			{
+				vFirstGroupPos = m_pXSkinAnim->GetCloneFramePosition( L"Bone_RFinger2" );
+				vSecondGroupPos = m_pXSkinAnim->GetCloneFramePosition( L"Bone_LFinger2" );
+				fSecondGroupEmitRate = 0.f;
+			}
+
+			PlaceUpgradeWeaponSequences( vFirstGroupPos, 10.f, pSeqUpgradeWeapon, pSeqUpgradeWeapon2 );
+			PlaceUpgradeWeaponSequences( vSecondGroupPos, fSecondGroupEmitRate, pSeqUpgradeWeapon3, pSeqUpgradeWeapon4 );
+			if( NULL == pSeqUpgradeWeapon5 || NULL == pSeqUpgradeWeapon6 || NULL == pSeqUpgradeWeapon7 ||
+				NULL == pSeqUpgradeWeapon8 || NULL == pSeqUpgradeWeapon9 || NULL == pSeqUpgradeWeapon10 )
+				return;
+
+			PlaceUpgradeWeaponSequences( vFirstGroupPos, 10.f, pSeqUpgradeWeapon5, pSeqUpgradeWeapon6, pSeqUpgradeWeapon9 );
+			PlaceUpgradeWeaponSequences( vSecondGroupPos, fSecondGroupEmitRate, pSeqUpgradeWeapon7, pSeqUpgradeWeapon8, pSeqUpgradeWeapon10 );
+		} break;
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	}
 }
 
