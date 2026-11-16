@@ -4,7 +4,7 @@
 |---|---|
 | Start | new conversation on **Opus 5.5, high** effort, then type `/x2-phase char-luciel CH3d` |
 | Plan doc | `JUNE_CHARACTER_LUCIEL_PHASES.md` (branch `main`) |
-| Depends on | CH3c2 review
+| Depends on | CH3c2 review (done 2026-11-16) |
 | Flag | `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` |
 | Log tag | `[JUNE_CHAR]` (`LUCIEL SKILL` / `NUM`) (`python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`) |
 | Review | kickoffs/char-luciel/CH3d-review.md (Opus 5.5 high; the phase writes it when done) |
@@ -50,3 +50,9 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 ## Amended by char-luciel CH1n (2026-11-15)
 
 - **Your cases in the skill setter** ( `CX2GULuciel::SetEquippedSkillFuncBySkillSlotIndex`, June `32b46580`; CH1n wrote the head and the base-callback cases ): `awk -F'	' '$6=="CH3d"' june2017_re/char_luciel/ch1n_skill_cases.tsv` ( 3: 30601 / 30603 LSI_HA_LLD_DESCENT_DARKNESS; 30602 / 30604 LSI_HA_LCN_CASTLE_OF_ABADDON; 30605 / 30606 LSI_HA_LDN_DIABOLIC_DISASTER ). Write each at the `// June @32b469d6` marker inside a `switch ( iBaseSkillID )` ( the first skill phase to land creates it, with `default: break;` ) and keep the `return;` after it. Read each case from `ghidra/disasm_32b46580_SetEquippedSkillFunc_capstone.txt` at its entry ( the `ch0_skill.tsv` digest is a lead ): the label is the base id ( `32207210` ), the two slot `MakeTableReference` calls, the callbacks, what June copies to the hyper state ( often not the Init ), and each extra state as CH1m writes one ( `stateID`, `MakeTableReference`, `m_StateList[ id ] = stateData` ) with the listing's `+0xc` ( `m_eSkillID`: a constant or the raw id ) and byte `+0x11` stores ( no March member: note the state for CH1o's decision ). Slot ids are the class's `USI_SPECIAL_ATTACK_*` ( June's 50-69 ).
+
+## Amended by the char-luciel CH3c2 review (2026-11-16)
+
+- `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` is retired ( commented out ): for the play-test add one new `#define` line under the three commented ones, as CH3a / CH3c did; the CH3d review retires it.
+- The CH3c2 review's one-line fix ( Rapid Impact's stand point, `JUNE_BUGS.md` 784 ) is not built yet: this phase's `build.py --deploy` carries it.
+- Setter slots: `python june2017_re/char_luciel/setter_slotcheck.py <dir> "RNSI_HA_LLD_DESCENT_DARKNESS:,..."` compares a case's `SET_CB_FUNC` lines with June's listing ( its docstring says how to make `adis/setter.txt` ); delegate-maker cases are read by hand.

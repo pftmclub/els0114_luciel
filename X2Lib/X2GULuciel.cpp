@@ -21830,7 +21830,7 @@ void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture()
 
 		vStandPos.y = vTargetPos.y;
 		int iLandLineIndex = -1;
-		vStandPos = pLineMap->GetLandPosition( vStandPos, true, BOUNDING_TARGET_LAND_RADIUS, &iLandLineIndex );
+		pLineMap->GetLandPosition( vStandPos, true, BOUNDING_TARGET_LAND_RADIUS, &iLandLineIndex );	// char-luciel CH3c2 review: June @32b32747 keeps only the line index, the point stays unlanded ( JUNE_BUGS 784 )
 
 		const CKTDGLineMap::LineData* pLandLineData = pLineMap->GetLineData( iLandLineIndex );
 		if ( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
