@@ -154,6 +154,7 @@
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		void BackUnitFrameMove( double fTime, float fElapsedTime );	// char-luciel DU5c2: June 31fa8ce0( t, dt, 0 )
 		void SetUnitScale( const D3DXVECTOR3& vScale_ );	// char-luciel DU5c2: June 31f969a0
+		void SetBackUnitOffsetRate( const float fBackUnitOffsetRate_ ) { m_fBackUnitOffsetRate = fBackUnitOffsetRate_; }	// char-luciel DU5d2 fix: June +0xd84 writes ( cash shop 0.33, class change 1.5 )
 		void SetMinorUnitRotation( const D3DXVECTOR3& vRotation_ ) { if ( NULL != m_pMinorUnitXSkinAnim ) m_pMinorUnitXSkinAnim->GetMatrix().Rotate( vRotation_ ); }	// char-luciel DU5c2: June 31f90fb0
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
@@ -363,6 +364,9 @@
 		bool					m_bShowDuoBackUnit;			// June +0xd82, the back body's emotion gate ( its writers are DU5c's )
 		bool					m_bEmotionOnBackUnitOnly;	// char-luciel DU5d2: June +0xe60, the emotion end waits on the back body ( setter: backlog Stage 10 )
 		bool					m_bShowFormEquipOnly;		// char-luciel DU5b2: June +0x118c, a field / room viewer adds only the shown body's equipment ( writers: DU5c )
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		float					m_fBackUnitOffsetRate;		// char-luciel DU5d2 fix: June +0xd84, the back body sits at ( rate + 1 ) x its offset
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 		D3DXVECTOR3				m_LightPos;
 

@@ -82,6 +82,9 @@ CX2UnitViewerUI::CX2UnitViewerUI(void)
 	m_bShowDuoBackUnit		= true;
 	m_bEmotionOnBackUnitOnly	= false;	// char-luciel DU5d2: June ctor @31fab62e
 	m_bShowFormEquipOnly	= false;	// char-luciel DU5b2: June @31fab7d2
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+	m_fBackUnitOffsetRate	= 0.f;	// char-luciel DU5d2 fix: June ctor @31fab78d
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER
 	//m_pXSkinAnim			= NULL;
 	INIT_VECTOR3( m_LightPos, 1000,1000,1000 );
@@ -9094,7 +9097,7 @@ void CX2UnitViewerUI::BackUnitFrameMove( double fTime, float fElapsedTime )
 	if ( NULL == pBackXSkinAnim || NULL == m_pUnit )
 		return;
 
-	pBackXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() + BACK_UNIT_POSITION_OFFSET );
+	pBackXSkinAnim->GetMatrix().Move( GetMatrix().GetPos() + BACK_UNIT_POSITION_OFFSET * ( m_fBackUnitOffsetRate + 1.f ) );	// char-luciel DU5d2 fix: June @31fa8e4b
 	pBackXSkinAnim->OnFrameMove( fTime, fElapsedTime );
 
 	const bool bBackUnitIsMinorUnit = ( false == m_bSwitchingView );

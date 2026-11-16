@@ -3324,6 +3324,9 @@ void CX2CashShop::ResetUnitViewer( CX2Unit* pUnit )
 #endif
 		m_pUnitViewerUI->GetMatrix().Move(  D3DXVECTOR3( -250 -105, -60 + 39 + 20 -5000, 200 ) );
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		m_pUnitViewerUI->SetBackUnitOffsetRate( 0.33f );	// char-luciel DU5d2 fix: June 32233f70 @32234125 ( 33483504 )
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		m_pUnitViewerUI->SetUnitScale( D3DXVECTOR3( 1.5f, 1.5f, 1.5f ) );	// char-luciel DU5d2: June 32233f70 @32234150, both bodies
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 		m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( 1.5f, 1.5f, 1.5f ) );
@@ -3332,6 +3335,9 @@ void CX2CashShop::ResetUnitViewer( CX2Unit* pUnit )
 		m_pUnitViewerUI->GetXSkinAnim()->SetApplyMotionOffset( false );
 
 		m_pUnitViewerUI->OnFrameMove( g_pKTDXApp->GetTime(),g_pKTDXApp->GetElapsedTime() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		m_pUnitViewerUI->ApplySwitchingViewFilter( std::vector<CX2Unit::EQIP_POSITION>() );	// char-luciel DU5d2 fix: June 31f94190( empty ) after the first frame move
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	}
 	else
 	{
@@ -3347,6 +3353,9 @@ void CX2CashShop::ResetUnitViewer( CX2Unit* pUnit )
 	if ( m_pUnitViewerUI != NULL )
 	{
 		m_pUnitViewerUI->SetShowObject( m_bOpen, true );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		m_pUnitViewerUI->SetEnableDuoView( false );	// char-luciel DU5d2 fix: June @32234246, no back body in the cash shop
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	}
 }
 

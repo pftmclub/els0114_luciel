@@ -884,6 +884,7 @@ void CX2ClassChangePopup::SetShow( bool bShow )
 			const float fScale = ( static_cast<int>( CX2Unit::UC_CHUNG_TACTICAL_TROOPER ) == static_cast<int>( g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_UnitClass ) ) ? 1.4f : 1.5f;
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			m_pUnitViewerUI->SetUnitScale( D3DXVECTOR3( fScale, fScale, fScale ) );	// char-luciel DU5d2: June 31f969a0 @32488b3d, both bodies
+			m_pUnitViewerUI->SetBackUnitOffsetRate( 1.5f );	// char-luciel DU5d2 fix: June @32488b4b
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 			m_pUnitViewerUI->GetMatrix().Scale( D3DXVECTOR3( fScale, fScale, fScale ) );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY

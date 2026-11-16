@@ -2100,6 +2100,16 @@ Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's: viewer, equip
   (2026-11-16 11:49:57); built at main 3e9fa56d + 17 uncommitted code file(s).` (this phase's 9 and peers' in-progress files; every edited
   `.obj` is newer than its source). No exestr line: no string added.
 - **Commit** `990fc1e3`; `finish.py --range 990fc1e3^..990fc1e3` (same flags): DUO_LOBBY / DUO_VIEWER / SKILL_CLASS_POPUP PASS with the tallies above, junediverge PASS, enumscan the same 229 older rows (none on a changed line).
+- **Play-test** (user, 2026-11-16, md5 `dc655e7b`): checks 1, 3, 4 and 5 passed. Check 2 failed: Ciel was drawn headless behind Lu in the cash shop.
+- **Fix (same flags):** June's cash shop shows no back body. `ResetUnitViewer` (`32233f70`) runs the switching-view filter after the first frame move
+  (`31f94190( empty )`), writes `+0xd84` = 0.33 (`@32234125`, `33483504`), and turns the second body off at the end (`+0xd81` = 0, `@32234246`).
+  March drew Ciel behind Lu. All three are ported. `+0xd84` is now `m_fBackUnitOffsetRate`, read only by `BackUnitFrameMove` (`@31fa8e4b`: offset x
+  ( rate + 1 )). The move `31f99f70` adds the plain offset, so it is unchanged. DU5c2 said `+0xd84` had no writer after the ctor (its code comment
+  stays as written). June's writers are the cash shop, the class-change popup (1.5, `@32488b4b`, now ported) and the GFx handler (`3224d0f0`,
+  Stage 12). Gates (`--files` of the 4, same `--with`): DUO_LOBBY PASS (4 PASS, 1 deleted = DU5c2's back-body `Move` line, now times the rate),
+  DUO_VIEWER PASS, SKILL_CLASS_POPUP PASS, junediverge PASS, enumscan the same older rows (none on a changed line). `/Zs` probes 0 errors.
+  `DEPLOY OK: X2_offline.exe is 27,159,552 B, dated 2026-11-16 12:19:43, md5 451483489dd8639d115fa6b7fd5d5d10, equal to X2/US_SERVICE/x2.exe
+  (2026-11-16 12:19:36); built at main 65abbe87 + 4 uncommitted code file(s).` (this fix's 4).
 - **Not done here:** MODS.md's R14f entry still lists the viewer `SetFixed` as "not ported yet"; MODS.md has a peer's uncommitted edits, so char-luciel Z
   updates that line. Review: `DU5d2-review.md`.
 
