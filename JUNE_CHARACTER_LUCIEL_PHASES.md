@@ -4902,6 +4902,7 @@ Opus 5.5 high, covers CH3d ( `6f52676e`; notes `98fbac7d`, `ef747f54` ). **Verdi
 - **Play-test logs ( 17:17-17:22, `logs.py --grep` ):** `use skill 30605 slot 4 body L` -> `diabolic disaster hide body L` ( +0.2 s ) / `show body L` ( +6.0 s ); cut-ins `body L state 23` / `body C state 204` for 127-129, `state 450 ... LDN_LU_Transcendence_Trans`, `state 502 ... LDN_CIEL_Transcendence_Trans`; `IMAGE class 128 / 129` types 2 and 7 = the tables. The `ARME UI hyper cut-in` line after each is Aisha's older log, not CH3d's.
 - **Gates:** `finish.py --review --commits 6f52676e --with _LUCIEL_SKILL _SKILL_DEBUG _LUCIEL_TRANSCEND JUNE_CHAR_DUO_HYPER_CUT_IN -v`: junediverge PASS, `--check-all` PASS; flagcheck `_SKILL` 3 PASS, `_TRANSCEND` 2 PASS, `_DUO_HYPER_CUT_IN` 1 PASS, 0 FAIL, 0 deleted lines; `OTHER` rows = each file's other CH3d flag; 1 `ERROR` per flag on `Always.h` @14053 ( `_LUCIEL_PASSIVE`'s compound guard, the tool limit the CH3b / CH3c2 reviews recorded ); enumscan the 4 pre-existing rows ( `Handlers_Quest.cpp:1424`, `X2Data.cpp` 104 / 105 / 113 ). FINISH reads FAIL on those only.
 - **Build skipped: debug retire only.**
+- **Commit** `cf46f354`. **Range gate** `cf46f354^..cf46f354`: `_SKILL_DEBUG` retired ( nothing to check ), junediverge PASS, enumscan exit 0; FINISH PASS.
 
 ## Phase CH4 - Passives and class mechanics
 
