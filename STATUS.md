@@ -239,7 +239,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5c2 | **user play-test** (2026-11-16): create / select screens show both bodies (back body move, draw, rotation), inventory default 50 (R14e onepiece); `SetFixed` -> R14f, emotions -> DU5d; then review | Opus 5.5 / high, Opus review, user play-test | DU5c | `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2UnitViewerUI.*`, `X2Inventory.cpp` | `DU5c2.md`, `DU5c2-review.md` |
+| DU5c2 | **user play-test** (2026-11-16): passed except Ciel bare on the create screen; fix deployed (Ciel's promotion items, `3254e1a0`), owes that re-check; then review | Opus 5.5 / high, Opus review, user play-test | DU5c | `X2StateCreateUnit.cpp`, `X2StateServerSelect.cpp`, `X2UnitViewerUI.*`, `X2Inventory.cpp` | `DU5c2.md`, `DU5c2-review.md` |
 | DU5d | **ready** (DU5b2 review pass 2026-11-16; after DU5c, same viewer file): viewer weapon effects case 10, CH0's viewer checklist rows | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2UnitViewerUI.cpp`, `X2SlotItem.cpp` | `DU5d.md` |
 | CH3a0 | ready (CH2d2 review passed 2026-11-16): summoned NPCs (moved from CH2a0): NPCTemplet / Enum.lua rows for 1906 / 1937 / 1908 / 2269 / 2270 | Opus 5.5 / high, Opus review, user play-test | CH2d2 review | `NPCTemplet.lua`, `Enum.lua`, `X2UnitManager.h`, data036 / data037 | `CH3a0.md` |
 | CH3a | blocked (CH3a0 review; CH2d2 review passed): Dread Lord (127) skills | Sonnet 5.5 / high, no review of its own (CH3b review covers it), user play-test | CH2d2 review, CH3a0 review | `X2GULuciel.*` | `CH3a.md` |

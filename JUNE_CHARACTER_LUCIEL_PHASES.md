@@ -1917,6 +1917,15 @@ line by a `/Zs` flag probe) and `SERV_IRUHADEV_JUNE_DIVERGE_INVENTORY_DEFAULT_SI
   uncommitted code files, DU5c2's); `EXESTR OK: 2 of 2` (the two `LUCIEL DUO LOBBY` lines, wide).
 - **Play-test:** create screen (Lu + Ciel side by side, Ciel turned), select screen (`testlu1`: both bodies, Ciel's shoes and weapon from slots 24-25;
   `jtLordKnight`: Spa Wear 163569 alone), other classes unchanged. Review: `DU5c2-review.md`.
+- **Play-test passed** (user, 2026-11-16, md5 `22bcc29d`): create screen both bodies, select screen both bodies with Ciel's gear, onepiece, other
+  classes unchanged. One defect: Ciel bare on the create screen.
+- **Fix (same flag):** `EquipPromotionItemByUnitTemplet` = June `3254e1a0` (Lu's five promotion items, then the minor body's five, templet
+  `+0x1cc..+0x1dc`; `AddEquipByTID` skips 0 for one-body classes). It covers SelectLuciel's stand-in (June calls the by-class `3254e410`, same items for
+  class 200) and the job preview (June `325519d0` calls `3254e1a0`). Divergent rows: `EquipPromotionItemByUnitTemplet` (ported) and `EquipPromotionItem`
+  (`3254e410`, by-class templet items instead of March's arrays: routed to each character port's creation screen). `finish.py --files
+  X2StateCreateUnit.cpp --with SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY`: PASS (6 gates); `/Zs` probe 0 errors.
+  `DEPLOY OK: X2_offline.exe is 27,075,584 B, dated 2026-11-16 09:04:05, md5 2a1a963a14c71dc33eeb4df476a7a3d7` (built at main 6e440d0a + 12 uncommitted
+  code files: this fix and 11 of peers' in-progress files).
 
 ### DU5e - Done (2026-11-15)
 

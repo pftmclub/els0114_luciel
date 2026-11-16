@@ -3580,6 +3580,14 @@ void CX2StateCreateUnit::EquipPromotionItemByUnitTemplet ( const CX2Unit::UnitTe
 		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_PromotionLegItemID );		// 하의
 		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_PromotionHandItemID );		// 장갑
 		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_PromotionFootItemID );		// 신발
+#ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+		// char-luciel DU5c2: June 3254e1a0 then adds the minor body's five ( templet +0x1cc..+0x1dc; 0 for one-body classes, AddEquipByTID skips it )
+		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_MinorUnitPromotionWeaponItemID );
+		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_MinorUnitPromotionBodyItemID );
+		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_MinorUnitPromotionLegItemID );
+		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_MinorUnitPromotionHandItemID );
+		m_pUnitViewerUI->AddEquipByTID( pUnitTemplet_->m_MinorUnitPromotionFootItemID );
+#endif SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
 	}
 }
 
