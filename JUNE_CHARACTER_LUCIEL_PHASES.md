@@ -4718,6 +4718,9 @@ Review: `CH4b-review.md` covers CH4a and CH4b.
 - **Gates ( worktree, `finish.py --files` 8 files `--with JUNE_CHAR_LUCIEL_PASSIVE _PASSIVE_DEBUG` ):** flagcheck PASS ( 6 PASS, 1 PASS~ = the blank line before the hook
   body, 1 OTHER = `X2GameUnit.cpp`, whose other 31 lines are a peer's uncommitted `JUNE_STATCALC_UNIT_STAT` ); the one deleted line is CH4a's stand-in inside `_PASSIVE`;
   junediverge PASS after the `GT_PVP` allow row ( Ghidra: `322cc180` = `GetGameType() - 1 == 0` ); enumscan exit 0. `/Zs` probes of the 4 `.cpp`: 0 errors.
+- **Commit `5d07d7dc`** ( `finish.py --range 5d07d7dc^..5d07d7dc --with JUNE_CHAR_LUCIEL_PASSIVE _PASSIVE_DEBUG` ): FINISH RESULT PASS ( 6 gates, 3 skipped: no state,
+  no skill, no script ); flagcheck 7 PASS, 1 PASS~, 0 OTHER, 0 FAIL ( the deleted line = CH4a's stand-in ); junediverge PASS; enumscan exit 0. JUNE_BUGS 769 and the 5
+  `(CH4b)` funcmap rows landed in the CH3a peer's commit `c63ae472` ( it committed the shared files from the work tree ).
 - **Build:** my first run hit `LOCK TIMEOUT` ( a peer's build ); re-run: `BUILD OK: X2/US_SERVICE/x2.exe 27,133,440 B, 2026-11-16 10:38:01` then `DEPLOY OK: X2_offline.exe is
   27,133,440 B, dated 2026-11-16 10:38:08, md5 85d46dcf40f1843140ce152466d7cc5c, equal to X2/US_SERVICE/x2.exe (2026-11-16 10:38:01); built at main 9fb16748 + 10 uncommitted code file(s)`
   ( peers' too ). `EXESTR OK: 5 of 5 found in X2_offline.exe` wide ( hit from behind, backstab, shadow shield, tribute, noble devotion ).
