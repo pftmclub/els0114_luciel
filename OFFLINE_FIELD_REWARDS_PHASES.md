@@ -195,6 +195,54 @@ and the server-row state (`specific`, `wildcard`, `none`). Covers every dungeon 
   question, answered here).
 - Full build skipped: no play-test.
 
+### Phase R0 - Done (2026-11-16)
+
+**What landed.** `python tools/droptable.py census` writes `tools/data/drop_census.tsv` (12,090 rows: 10,882 dungeon, 1,208 field; one per key x
+stage x sub-stage x NPC: level, spawn count, role, the marks that decided it, state, `gap`). `census --gaps` prints the second section,
+`summary` the in-scope groups from the sheet, `explain <key>` one key. The server tables are read from the staged data036 files (the ones the
+loader mounts) and cross-checked against the loose `KncWX2Server/ServerResource/US` copies: same 2,127 monster + 397 field-NPC rows and 144
+static keys. Two additive dump modes, old output proven unchanged (md5 of `calls` on 3 files, default `dungeon_npc_dump.lua` on 3 scripts):
+`dungeon_npc_dump.lua ... marks` (entry marks, `NPC_REWARD_RATE`) and `lua_registry_dump.lua deep` (table rows; `DropTable:` calls). No
+client code, no Lua data edit, no flag. Full build skipped: no play-test. `flagcheck` / `junediverge` / `finish.py`: no client source changed.
+
+**Totals against the plan.**
+- Fields: 34 in `BattleFieldData.lua`; no row of their own for 40029-40032 and 40035-40037 (as planned) and 40026 (the raid field, out of scope).
+- Dungeons: the live registry holds **282** ids (284 `AddDungeonData` rows, 2 commented out), not 272; **154** have a row under their own key
+  (plan 153). The 1 extra with rows is 41270 (registered through `UNUSED_DUNGEON_ID`, the plan's groups leave it out). The 9 further
+  ids are all no-reward-by-design content: the gap groups reproduce exactly (Lanox 18, Elysion 9 + 12, Hamel common / hell + Ranox hell 3,
+  Henir 1, Defence 3 = 46) and the remainder is 82 against the plan's "about 73" (tests, tutorials, training, retired secrets, events,
+  arcade); the Lu/Ciel tutorial 41240 (TU, 2026-11-15) is one of them, the other 8 are not traced.
+- **Key 41270's 5 rows are not Ranox's monsters.** They are Halloween event monsters 4014-4018 (`EVENT_GLITER_ZOMBIE`, `_HALLOWEEN_LINKER`,
+  `_PUMPKIN_MAGICIAN`, `_PUMPKIN_MIMIC`, `_GANGSHI_PPORU`); `Dungeon_Ranox_Secret_Hell.lua` spawns none of them. 41270 and 41271 both register
+  that script (common and hell), so **R5 covers 41270 as well**, and its 5 stale rows stay as they are or are replaced (R5 decides).
+- Behemoth Heart 33250 reproduces the plan's template from the marks alone: stage-boss 1387 / 1388 / 1389 / 1409, final-boss 1411
+  (`HAVE_BOSS_GAGE` + `SHOW_BOSS_NAME` + `MONSTER_GRADE` + the clear-cond kill target), `CHEST` 20 a box.
+- NPC levels: Lanox 70-76, Elysion 80-84 and 83-89, as planned. The four secret dungeons (33260, 33261, 41270, 41271) have no `LEVEL` or `m_NPCLevel` and are
+  party-scaled: the sheet gives the band (99) and marks `level=band relative`; R5 settles what that means for the rows.
+
+**Roles** (rows): mob 6568, none 2215, field-mob 989, box 907, mob-minor 582, stage-boss 431, final-boss 245, field-boss 153, **unknown 0**.
+In scope, per `summary`: Lanox dungeons 591 rows (18 keys), Lanox fields 89, Elysion dungeons 1,117 (21 keys), Elysion fields 104, secret 499
+(4 keys); every one has a role.
+
+**For R1.**
+- `none` NPCs (no row wanted) are gates, traps, dummies, scene actors and `NO_DROP` bosses of event cut-scenes: `droptable.py summary`
+  lists each with its mark. Boxes in scope are `CHEST` 20 (every dungeon) and `ELSION_CHEST` 2176 (9 Elysion keys, 1 field).
+- **`mob-card` is left to R1:** it needs an item.kim lookup (does a card exist for the NPC), not a script mark; R0 gives `mob`. A mob a unit
+  script summons never appears in the stage entries, so the plan's "summoned" half of `mob-minor` is not derived (the `REWARD_RATE` below 1 half is).
+- Field bosses follow the script, not the `_BOSS` name: 40035 `Scout Dekal Fyuta` 2135 and 40036 `Tube Processing Defender` 2162 / `Onlooker
+  High Templar` 2165 sit in `IS_BOSS_MONSTER_GROUP` groups, so they are `field-boss` (the plan's field table listed them as plain mobs).
+- `count` is the spawn number per run (a rate-form group counts its largest group; a `SUB_NPC` entry counts its `SUB_NPC_RATE`).
+- Scripts carry `NPC_REWARD_RATE` as repeated keys, so only the last row of a sub-stage survives the run; the sheet marks `REWARD_RATE=` from
+  what executes. Nothing in the offline path reads it.
+
+**Second section (R6's input; june-dungeons C3z-2b's question).** `gap = R6` marks 676 rows (mob 643, stage-boss 14, mob-minor 11,
+final-boss 8; 100 distinct NPC ids) in 61 dungeon keys that have rows for other NPCs: Druid Forest (6 NPCs), Altera air ship / below tunnel /
+plain / core, Peita under garden, Velder bridge of hope / gate, Hamel waterway / frozen water temple / hall, Sander dry sander / Garpai rock /
+den of Trock / Santilus ship (8) / Behemoth Heart (1), the Elder / Besma / Altera / Velder secret common and hell dungeons, the tree-day event.
+
+**How to see it.** `python tools/droptable.py census` (8 s; same bytes on a re-run), `... summary`, `... census --gaps`.
+Next: `/x2-phase field-rewards R1` on Opus 5.5 / high (R2 can run beside it).
+
 ## Phase R1 - Item pools and the rate sheet (user approves)
 
 **Scope.** Write `tools/data/drop_item_pools.tsv` (pool, region, level band, item id, name, type, grade, source) with `droptable.py
