@@ -2523,7 +2523,8 @@ are visual. 8 funcmap rows `(R14f)`; JUNE_BUGS 771; tsv rows below; MODS.md entr
 **Gates** (worktree, `finish.py --files <6 files> --with ..._EQIP_LOAD_ATTACHED ..._DIVERGE_EQIP_SET_FIXED --skip-flag ..._JUNE_ENUM_NAMES`):
 JUNE_EQIP_LOAD_ATTACHED PASS (4 PASS, 1 DEFINE, 1 OTHER = the two enum lines), JUNE_DIVERGE_EQIP_SET_FIXED PASS (1 PASS, 1 DEFINE, 4 OTHER = the
 other flag's files); 548 lines inserted, 0 deleted; junediverge RESULT: PASS (15 allow-listed); enumscan exit 0.
-**Compile:** `/Zs` probes of `X2Eqip.cpp` and `X2SubEquip.cpp`: 0 errors, the flag on.
+**Commit `99448c4b`**; `finish.py --range 99448c4b^..99448c4b` (same flags): both flags PASS (same tallies), junediverge PASS, enumscan exit 0,
+FINISH RESULT: PASS. stateends skipped: no skill states. **Compile:** `/Zs` probes of `X2Eqip.cpp` and `X2SubEquip.cpp`: 0 errors, the flag on.
 **Build:** `DEPLOY OK: X2_offline.exe is 27,134,464 B, dated 2026-11-16 11:10:30, md5 186cb75298e733fa0fbb899e1acb6d31` (built at main
 `92ae38b5` + these edits). No exestr line: R14f adds no string.
 
