@@ -20423,6 +20423,47 @@ namespace _CONST_LUCIEL_CH4A_
 		return g_pData->GetSkillTree()->GetSkillTemplet( eSkillID_ );
 	}
 
+	const double	AIM_POINT_BONE_RANGE					= 700.0;	// char-luciel CH4b review: June 3344ce98
+	const float		AIM_POINT_NEAREST_START					= 99999.f;	// char-luciel CH4b review: June 32278580's start distance
+
+	// char-luciel CH4b review: June unit vslot 0x3e4 with a bone name ( user 31fd61a0, NPC 3275ac50 ); an NPC answers the collision bone nearest vFrom_
+	D3DXVECTOR3 GetNamedBoneAimPos( CX2GameUnit* pUnit_, const WCHAR* pwszBoneName_, const D3DXVECTOR3& vFrom_ )
+	{
+		D3DXVECTOR3 vNamedBonePos;
+		if ( false == pUnit_->GetBonePos( pwszBoneName_, vNamedBonePos ) )
+			vNamedBonePos = pUnit_->GetPos( false );
+
+		if ( CX2GameUnit::GUT_NPC != pUnit_->GetGameUnitType() )
+			return vNamedBonePos;
+
+		std::wstring wstrNearestFrame;
+		float fNearestDistance = AIM_POINT_NEAREST_START;
+		BOOST_FOREACH( const CKTDXCollision::CollisionDataList* pCollisionDataList, pUnit_->GetCollisionListSet() )
+		{
+			if ( NULL == pCollisionDataList )
+				continue;
+
+			BOOST_FOREACH( CKTDXCollision::CollisionData* pCollisionData, *pCollisionDataList )
+			{
+				if ( NULL == pCollisionData )
+					continue;
+
+				const float fDistance = GetDistance( vFrom_, pCollisionData->GetPointStart() );
+				if ( fDistance < fNearestDistance )
+				{
+					fNearestDistance = fDistance;
+					wstrNearestFrame = pCollisionData->m_FrameName;
+				}
+			}
+		}
+
+		const D3DXVECTOR3 vNearestBonePos = pUnit_->GetBonePos( wstrNearestFrame.c_str() );
+		if ( GetDistance( vNamedBonePos, vNearestBonePos ) <= AIM_POINT_BONE_RANGE )
+			return vNearestBonePos;
+
+		return ( GetDistance( vFrom_, vNearestBonePos ) > GetDistance( vFrom_, vNamedBonePos ) ) ? vNamedBonePos : vNearestBonePos;
+	}
+
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
 	bool IsPassiveLogDue( DWORD& dwLastLogTime_ )
 	{
@@ -20960,9 +21001,7 @@ void CX2GULuciel::PlaySoulExtortionDrain( const CX2DamageManager::DamageData& da
 	if ( NULL == pDefender )
 		return;
 
-	D3DXVECTOR3 vSoulPosition;
-	if ( false == pDefender->GetBonePos( L"Bip01", vSoulPosition ) )
-		vSoulPosition = pDefender->GetPos( false );
+	D3DXVECTOR3 vSoulPosition = GetNamedBoneAimPos( pDefender, L"Bip01", GetPos( false ) );	// char-luciel CH4b review: June vslot 0x3e4 asked from this unit's position
 	vSoulPosition.y = static_cast<float>( vSoulPosition.y + SOUL_EXTORTION_SOUL_HEIGHT );
 
 	CKTDGParticleSystem::CParticleEventSequence* pSoulSeq = g_pX2Game->GetMajorParticle()->CreateSequence( this, L"LCG_SOUL_EXTORTION_Soul_M", vSoulPosition );
