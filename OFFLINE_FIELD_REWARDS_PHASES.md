@@ -391,6 +391,39 @@ monsters, left as they are). Besma / Altera NORMAL-HARD-EXPERT 30290-30292, 3290
 **Play-test:** deferred to the end of the plan (user 2026-11-16). Units level 99 band (no NPC `LEVEL`, party-scaled); look for the entry items: Hamel common 133537 Guardian Stone Fragments, 133535 Bethbite, 117418 / 117419
 Ancient Guardian Gloves / Shoes; Hamel / Ranox hell 154066 Barrier's Fragment, 700009 / 700010 / 700013 / 700014 Sacrificed Adventurer's top / bottom / accessory / weapon; Ranox common = Hamel common's four.
 
+### Phase R6 - Done (2026-11-16)
+
+**What landed.** `tools/droptable.py` only (no client code, no flag): scope `old` in `gen` (also inside `--only all`). R0's second sheet is 196 NPC-in-dungeon pairs (676 census
+rows, 61 keys). Each pair copies one studio row, verbatim, from a same-role sibling: **133 from the same key, 33 from the same dungeon's other difficulty** (user decision
+2026-11-16: Hell borrows from Common, Hard from Normal), **30 pairs get no row** (below). A row carries `-- source: DungeonID K MonsterID N (role)` above it, so the source is in the file.
+Sibling rule (`pick_sibling`): same role and key first, then the other difficulties nearest first; inside one key a row with no monster card (a card belongs to its own monster),
+then the row nearest the key's spawn-weighted median items per kill (a one-off 100 % reagent mob is never the template: the first version picked one in Sander Dry Sander, 18x the
+dungeon's rate), then the row most NPCs share, then same stage, nearest level, lowest id. Group ids in a copied row are the studio's own (`check` now accepts a studio group).
+`simulate` knows old keys: generated rows against the spawn-weighted median of the source dungeon's same-role rows. Block regenerated as the union (`gen --only all`):
+**664 dungeon rows / 93 keys (+166 rows, +50 keys)**, 58 field, 50 static, 67 groups. BOM + CRLF intact, `DropTable.lua` +2,158 insertions / 0 deletions, `StaticDropTable.lua` unchanged.
+`droptable.py check` PASS (rows 722, static 50, groups 67), `pools --check` YES, `rates --check` YES (635 lines).
+
+**Proofs.** All 166 rows equal their source row read from the executed studio table (Exp / ED / EDProperty / items / groups: 0 mismatches), none holds a monster card, none sums over 100.
+Census re-run after the pack (written outside the repo; `tools/data/drop_census.tsv` stays the R0 baseline `gen` reads): staged == loose copy YES (2,791 monster rows), gap rows 676 -> 42
+(**30 distinct pairs, exactly the unresolved list**), 0 `none` rows left in the Lanox / Elysion / secret scope. Roles made: mob 159, final-boss 5, stage-boss 1, mob-minor 1.
+
+**Fairness gate (`simulate`, 61 keys; items per kill, generated vs the source dungeon's median row).** 56 role lines PASS (within 15 %), **0 FAIL**, 21 n/a (the roles with no row). The mob
+lines are the dungeon's own typical row (Sander 0.0368 = the Behemoth Heart template row).
+
+**No row, reported (nothing guessed): 30 pairs, 11 keys have no stand-in row at all.** No same-role studio row exists in the key or its other difficulties:
+Druid Forest 30070-30072 (only chest rows exist: 1608-1611 mob, 1610 mob-minor, 1612 Kira Kira stage-boss, 1613 Enraged Ent final-boss; 17 pairs), stage bosses with no boss sibling:
+30241 / 30242 Commanding Slash 1636, 30261 / 30262 Giant Contaminated Excavator 1637 (the key keeps its other rows), 30270-30272 Fire Nasod: Ignis 249 and Water Nasod: Leviathan 250,
+33180-33182 Mana Linker 793 (mob-minor, no mob-minor row in the hall). They stay at no EXP, no ED, no drops (census state `none`, no wildcard row either). A source for them needs a user rule
+(a stage boss takes the key's final-boss row, Mana Linker the key's mob row halved ...) or the dungeon's data from the live DB; Druid Forest has none to borrow at all.
+Also seen, left as R0 classified: 33170 `CHILLING_SPINE_TRAP` 710, 33140 `PIRANHA_HOUSE` 737, 33200 `RED_ANGLER_DP` 1190 are internal-name NPCs R0 calls `mob`; they now pay a mob row.
+
+**Pack.** `stage-server` DropTable.lua md5 cebd5df7 (1,118,405 B); StaticDropTable.lua unchanged (md5 2caa1589); `PACK OK data036`; `COPY OK data036` md5 a48bfea5de60e0255423972934e1ee3f
+(275 entries: a peer staged `General_LA.ess` and one more entry into `data036_kom` between my two packs, so they went out with this copy; `kom.py status data036`: in sync).
+**Build.** Full build skipped: no code change, deployed exe is R3's loader build (`EXESTR OK` `[DROP_STANDIN]`, wide x3, X2_offline.exe md5 f87b25c6). Gates: `finish.py --no-flag "data-only"`: PASS.
+
+**How to see it.** Log: `[DROP_STANDIN] loaded: 664 dungeon row(s) over 93 key(s), 58 field row(s) over 7 field(s), 50 static row(s), 67 group(s)`; per-kill lines; `no reward row` empty for the
+50 keys that got rows. **Play-test:** handed to the user (one smoke: Sander Garpai Rock Normal, 33210, Fogta Trock 1154 / Flame Tooth Caskey 1159 = June-only NPCs copied from 1155 / 1171). R4 and R5 smokes stay deferred to the plan's end.
+
 ### Phase R2 - Done (2026-11-16)
 
 **What landed.** Flags `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` and `_DEBUG` (end of `Always.h`; `_DEBUG` is on for R3's play-test and retires in

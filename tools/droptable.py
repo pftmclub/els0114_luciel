@@ -515,7 +515,8 @@ DIFF_STEP = {"NORMAL": 0, "HARD": 1, "EXPERT": 2}
 ROLE_PRIORITY = ["final-boss", "stage-boss", "field-boss", "mob", "field-mob", "mob-minor", "box"]   # one row per (key, NPC): first wins
 NO_ROW_ROLES = ("none", "unknown")
 KEEP_WILDCARD_REGIONS = ("secret",)     # the studio's key-0 rows (CHEST 20, CHEST_MONSTER 29) already answer these dungeons: no row of their own
-GEN_REGIONS = ("lanox", "elysion", "secret")
+GEN_REGIONS = ("lanox", "elysion", "secret", "old")
+OLD_REGION = "old"      # R6: the NPCs June added to dungeons that already have studio rows (census `gap`); a row copied from a studio sibling
 POOL_COLS = ["pool", "region", "band", "key", "npc", "item_id", "name", "type", "grade", "source"]
 SHEET_COLS = ["kind", "region", "role", "diff", "pool", "exp", "ed", "ed_property", "prob", "inner", "source"]
 
@@ -651,14 +652,87 @@ def read_server_text(path):
     return b[3:].decode("utf-8").replace("\r\n", "\n")          # the text is LF inside; write_server puts CRLF back
 
 
+def studio_rows_text(text):
+    """-> {(dungeon id, npc id): (Exp, ED, EDProperty, [(item, prob text)], [(group, prob text)])} of the studio's monster rows in a file's text
+    (the stand-in block already cut out); numbers stay as the text the studio wrote."""
+    pair = re.compile(r"\{\s*(\d+)\s*,\s*([0-9.]+)\s*\}")
+    out = {}
+    for m in re.finditer(r"^DropTable:AddMonsterDropInfo\s*\{(.*?)^\}", text, re.S | re.M):
+        b = m.group(1)
+        d, n = re.search(r"DungeonID\s*=\s*(\d+)", b), re.search(r"MonsterID\s*=\s*(\d+)", b)
+        if not (d and n):
+            continue
+        num = {f: re.search(r"^\s*%s\s*=\s*([0-9.]+)\s*," % f, b, re.M) for f in ("Exp", "ED", "EDProperty")}
+        il = re.search(r"^\s*DropItemList\s*=\s*(.*),\s*$", b, re.M)
+        gl = re.search(r"^\s*DropGroupList\s*=\s*(.*),\s*$", b, re.M)
+        out[(int(d.group(1)), int(n.group(1)))] = tuple(num[f].group(1) if num[f] else "0" for f in ("Exp", "ED", "EDProperty")) + (
+            [(int(x), p) for x, p in pair.findall(il.group(1))] if il else [], [(int(x), p) for x, p in pair.findall(gl.group(1))] if gl else [])
+    return out
+
+
+def old_family(by_key, key):
+    """The other difficulties of one dungeon, nearest first (a Hell secret dungeon's family is its Common)."""
+    stem = re.sub(r"_(NORMAL|HARD|EXPERT|COMMON|HELL)$", "", by_key[("dungeon", key)][0]["key_name"])
+    fam = [k for (sc, k), rs in by_key.items() if sc == "dungeon" and k != key and re.sub(r"_(NORMAL|HARD|EXPERT|COMMON|HELL)$", "", rs[0]["key_name"]) == stem]
+    return sorted(fam, key=lambda k: (abs(k - key), k))
+
+
+def weighted_median(points):
+    """Value of (value, weight) pairs where the sorted running weight first reaches half the total (the lower median); 0 when empty."""
+    total, acc = sum(w for _, w in points), 0.0
+    for v, w in sorted(points):
+        acc += w
+        if acc >= total / 2.0:
+            return v
+    return 0.0
+
+
+def pick_sibling(by_key, srows, key, role, gap_row, is_card):
+    """The studio row an R6 NPC copies: same role, same dungeon and difficulty first, then the same dungeon's other difficulties
+    (nearest first); within one key a row with no monster card first (a card belongs to its own monster), then the row nearest the
+    dungeon's median items per kill for that role (the typical row, not a one-off), then the row the most NPCs share, then the same
+    stage and sub-stage, then the same stage, then the nearest NPC level, then the lowest id. -> (dungeon id, npc id, tier) or None."""
+    def lv(r):
+        return int(r["level"]) if r["level"].isdigit() else 0
+    for tier, k in enumerate([key] + old_family(by_key, key)):
+        best = None
+        cands, spawns = {}, collections.Counter()
+        for r in by_key[("dungeon", k)]:
+            if r["state"] == "specific" and r["role"] == role and (k, int(r["npc_id"])) in srows:
+                cands.setdefault(int(r["npc_id"]), r)
+                spawns[int(r["npc_id"])] += float(r["count"])
+        shared = collections.Counter(repr(srows[(k, n)]) for n in cands)
+
+        def per_kill(n):
+            row = srows[(k, n)]
+            return sum(float(p) for _, p in row[3]) + sum(float(p) for _, p in row[4])
+        mid = weighted_median([(per_kill(n) / 100.0, spawns[n]) for n in cands]) * 100.0
+        for r in cands.values():
+            same = 0 if (r["stage"], r["sub"]) == (gap_row["stage"], gap_row["sub"]) else 1 if r["stage"] == gap_row["stage"] else 2
+            card = 1 if any(is_card(i) for i, _ in srows[(k, int(r["npc_id"]))][3]) else 0
+            rank = (card, round(abs(per_kill(int(r["npc_id"])) - mid), 6), -shared[repr(srows[(k, int(r["npc_id"]))])], same,
+                    abs(lv(r) - lv(gap_row)), int(r["npc_id"]))
+            if best is None or rank < best[0]:
+                best = (rank, int(r["npc_id"]))
+        if best:
+            return k, best[1], 1 if tier else 0
+    return None
+
+
 def gen_blocks(only, keys, census, pools, sheet, drop_text, static_text):
     """-> (drop block text or None, static block text or None, stats dict). Text uses \\n; callers convert to CRLF."""
     st = collections.OrderedDict(dungeon_rows=0, dungeon_keys=set(), field_rows=0, field_keys=set(), static_rows=0, groups=0,
-                                 skipped_studio=0, mixed_roles=0, no_sheet=collections.Counter(), warn=[])
+                                 skipped_studio=0, mixed_roles=0, no_sheet=collections.Counter(), warn=[], no_sibling=[], borrowed=0)
     smon, sfld, sstatic, sgroups = studio_pairs(drop_text)
     _, _, sstatic2, _ = studio_pairs(static_text)
     sstatic = sstatic | sstatic2
     scope = scope_keys(only, keys)
+    if only in (None, "all", OLD_REGION):
+        scope += [(OLD_REGION, "dungeon", k) for k in sorted({int(r["key"]) for r in census if r["gap"]}) if not keys or k in keys]
+    srows, is_card = {}, None
+    if any(t[0] == OLD_REGION for t in scope):
+        srows, kim_items = studio_rows_text(drop_text), Items()
+        is_card = lambda i: kim_items.has(i) and kim_items.get(i, "name").startswith("Monster Card")
     by_key = collections.defaultdict(list)
     for r in census:
         by_key[(r["scope"], int(r["key"]))].append(r)
@@ -680,6 +754,33 @@ def gen_blocks(only, keys, census, pools, sheet, drop_text, static_text):
     for region, kind, key in scope:
         rows = by_key.get((kind, key), [])
         if not rows:
+            continue
+        if region == OLD_REGION:
+            gaps = collections.OrderedDict()
+            for r in rows:
+                if r["gap"]:
+                    gaps.setdefault(int(r["npc_id"]), []).append(r)
+            made = 0
+            for npc in sorted(gaps):
+                role = next((x for x in ROLE_PRIORITY if x in {r["role"] for r in gaps[npc]}), None)
+                if role is None or (key, npc) in smon:
+                    continue
+                src = pick_sibling(by_key, srows, key, role, gaps[npc][0], is_card)
+                if src is None:
+                    st["no_sibling"].append((key, npc, role))
+                    continue
+                skey, snpc, tier = src
+                exp, ed, edp, items, groups = srows[(skey, snpc)]
+                st["borrowed"] += tier
+                drow_text.append("\n".join(["-- source: DungeonID %d MonsterID %d (%s)" % (skey, snpc, role), "DropTable:AddMonsterDropInfo", "{",
+                                            "\tDungeonID = %d," % key, "\tMonsterID = %d," % npc, "\tStandIn = 1,", "\tExp = %s," % exp,
+                                            "\tED = %s," % ed, "\tEDProperty = %s," % edp,
+                                            "\tDropItemList = %s," % ("{ " + "".join("{ %d, %s }," % e for e in items) + "}"),
+                                            "\tDropGroupList = %s," % ("{ " + "".join("{ %d, %s }," % e for e in groups) + "}"), "}", ""]))
+                made += 1
+            if made:
+                st["dungeon_rows"] += made
+                st["dungeon_keys"].add(key)
             continue
         diff = rows[0]["diff"] if kind == "dungeon" else "FIELD"
         base = key - DIFF_STEP.get(diff, 0) if kind == "dungeon" else key
@@ -814,6 +915,11 @@ def cmd_gen(a):
         print("     WARNING no param line for %s / %s / %s: %d NPC(s) get no row" % (reg, role, diff, n))
     for w in st["warn"]:
         print("     WARNING " + w)
+    if st["borrowed"] or st["no_sibling"]:
+        print("     old: %d row(s) borrowed from the same dungeon's other difficulty; %d NPC(s) with no same-role sibling get no row" % (
+            st["borrowed"], len(st["no_sibling"])))
+        for key, npc, role in st["no_sibling"]:
+            print("     NO SIBLING %d npc %d (%s)" % (key, npc, role))
     if a.out_dir:
         os.makedirs(a.out_dir, exist_ok=True)
         write_server(os.path.join(a.out_dir, "DropTable.lua"), new_d)
@@ -924,8 +1030,8 @@ def cmd_check(a):
                 if iid not in index:
                     fails.append("%s: item %d is not in item.kim" % (name, iid))
             for g, _ in grps:
-                if g not in defined:
-                    fails.append("%s: key %d npc %d names group %d the block never defines" % (name, key, npc, g))
+                if g not in defined and g not in groups:        # an R6 row copies its sibling's studio group ids
+                    fails.append("%s: key %d npc %d names group %d that no file defines" % (name, key, npc, g))
         for g, iid, _ in parse_block_groups(blk):
             if iid not in index:
                 fails.append("%s: group %d item %d is not in item.kim" % (name, g, iid))
@@ -1542,6 +1648,45 @@ def simulate_studio(key, census, items, tab, secret=False):
     return out, roles
 
 
+def simulate_old(key, census, blk):
+    """R6 gate for one dungeon key: per role, expected items per kill of the generated rows (spawn-weighted) against the studio rows of the
+    same role in the dungeon each was copied from (spawn-weighted). Same 15 % band as the other regions."""
+    gap = collections.OrderedDict()
+    for r in census:
+        if int(r["key"]) == key and r["gap"]:
+            gap.setdefault(int(r["npc_id"]), []).append(r)
+    made = {}
+    for m in re.finditer(r"^-- source: DungeonID (\d+) MonsterID (\d+) \((.*?)\)\nDropTable:AddMonsterDropInfo\n\{\n(.*?)^\}", blk, re.S | re.M):
+        d, n = re.search(r"DungeonID = (\d+)", m.group(4)), re.search(r"MonsterID = (\d+)", m.group(4))
+        if int(d.group(1)) == key:
+            row = parse_block_rows("DropTable:AddMonsterDropInfo\n{\n" + m.group(4) + "}\n")[0]
+            made[int(n.group(1))] = (int(m.group(1)), m.group(3), sum(float(p) for _, p in row[3]) + sum(float(p) for _, p in row[4]))
+    roles = collections.OrderedDict()
+    for npc, rs in gap.items():
+        if npc not in made:
+            roles.setdefault(rs[0]["role"], [0.0, 0.0, 0.0, set()])[0] += 0     # listed as no row
+            continue
+        skey, role, tot = made[npc]
+        cnt = sum(float(r["count"]) for r in rs)
+        e = roles.setdefault(role, [0.0, 0.0, 0.0, set()])
+        e[0] += cnt
+        e[1] += cnt * tot / 100.0
+        e[3].add(skey)
+    st = studio()
+    out = []
+    for role, (s, it, _, skeys) in roles.items():
+        pts = []                                    # (items per kill, spawns) of the studio rows of this role in the source dungeon(s)
+        for r in census:
+            if int(r["key"]) in skeys and r["role"] == role and r["state"] == "specific" and (int(r["key"]), int(r["npc_id"])) in st["mon"]:
+                _, _, _, cases = studio_row("mon", int(r["key"]), int(r["npc_id"]))
+                pts.append((sum(cases.values()) / 100.0, float(r["count"])))
+        bs, base = sum(c for _, c in pts), weighted_median(pts)      # one-off rows (a 100 % reagent mob) do not set the baseline
+        mine = it / s if s else 0.0
+        ratio = mine / base if base else (1.0 if not mine else float("inf"))
+        out.append((role, s, mine, base, ratio, "n/a" if not s or not bs else ("PASS" if abs(ratio - 1) <= 0.15 else "FAIL")))
+    return out
+
+
 def cmd_simulate(a):
     census = read_tsv(a.census, COLUMNS, "census")
     pools = read_tsv(a.pools, R1_POOL_COLS, "pools")
@@ -1550,6 +1695,12 @@ def cmd_simulate(a):
     for key in a.keys:
         if key_info(census, key) is None:
             print("%d: no census rows" % key)
+            continue
+        if any(int(r["key"]) == key and r["gap"] for r in census):
+            blk = split_block(read_server_text(a.drop_file))[1] or ""
+            print("== %d %s (old dungeon, rows copied from a studio sibling)" % (key, next(r["key_name"] for r in census if int(r["key"]) == key)))
+            for role, s, mine, base, ratio, verdict in simulate_old(key, census, blk):
+                print("   %-11s %7s %10.4f %10.4f %6.2f  %s" % (role, _fmt(s), mine, base, ratio, verdict))
             continue
         out, roles, notes, (kind, region, diff, level) = simulate_stand_in(key, census, pools, sheet)
         bkey, btab = (40024, "fld") if kind == "field" else (DIFF3.get(diff, 33250), "mon")
@@ -1600,6 +1751,7 @@ def main():
     s.add_argument("--census", default=OUT_DEFAULT)
     s.add_argument("--pools", default=R1_POOLS)
     s.add_argument("--sheet", default=R1_SHEET)
+    s.add_argument("--drop-file", default=os.path.join(SERVER_DIR, "DropTable.lua"))
     s.set_defaults(fn=cmd_simulate)
     c = sub.add_parser("census")
     c.add_argument("--out", default=OUT_DEFAULT)

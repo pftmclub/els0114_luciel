@@ -37658,6 +37658,2164 @@ DropTable:AddMonsterDropInfo
 	DropGroupList = { },
 }
 
+-- source: DungeonID 30260 MonsterID 196 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 30260,
+	MonsterID = 224,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 85, 0.4 },{ 86, 0.08 },{ 88, 0.4 },{ 89, 0.4 },{ 91, 0.4 },{ 93, 0.4 },{ 95, 0.4 },{ 4002, 0.76 },{ 4014, 0.76 },},
+}
+
+-- source: DungeonID 30261 MonsterID 196 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 30261,
+	MonsterID = 224,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 85, 0.4 },{ 86, 0.08 },{ 88, 0.4 },{ 89, 0.4 },{ 91, 0.4 },{ 93, 0.4 },{ 95, 0.4 },{ 4002, 0.76 },{ 4014, 0.76 },},
+}
+
+-- source: DungeonID 30262 MonsterID 196 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 30262,
+	MonsterID = 224,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 97, 0.4 },{ 98, 0.08 },{ 100, 0.4 },{ 101, 0.4 },{ 103, 0.4 },{ 105, 0.4 },{ 107, 0.4 },{ 4002, 0.76 },{ 4014, 0.76 },},
+}
+
+-- source: DungeonID 30300 MonsterID 259 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 30300,
+	MonsterID = 289,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 97, 0.4 },{ 98, 0.08 },{ 100, 0.4 },{ 101, 0.4 },{ 103, 0.4 },{ 105, 0.4 },{ 107, 0.4 },{ 4002, 0.76 },{ 4014, 0.76 },},
+}
+
+-- source: DungeonID 30301 MonsterID 259 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 30301,
+	MonsterID = 289,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 97, 0.4 },{ 98, 0.08 },{ 100, 0.4 },{ 101, 0.4 },{ 103, 0.4 },{ 105, 0.4 },{ 107, 0.4 },{ 4002, 0.76 },{ 4014, 0.76 },},
+}
+
+-- source: DungeonID 30302 MonsterID 259 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 30302,
+	MonsterID = 289,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 97, 0.4 },{ 98, 0.08 },{ 100, 0.4 },{ 101, 0.4 },{ 103, 0.4 },{ 105, 0.4 },{ 107, 0.4 },{ 4002, 0.76 },{ 4014, 0.76 },},
+}
+
+-- source: DungeonID 32960 MonsterID 359 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 32960,
+	MonsterID = 358,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { { 91840, 0.8 },},
+	DropGroupList = { { 109, 0.4 },{ 110, 0.08 },{ 112, 0.4 },{ 113, 0.4 },{ 115, 0.4 },{ 117, 0.4 },{ 119, 0.4 },{ 4003, 0.76 },{ 4015, 0.76 },},
+}
+
+-- source: DungeonID 32961 MonsterID 359 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 32961,
+	MonsterID = 358,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { { 91840, 0.8 },},
+	DropGroupList = { { 109, 0.4 },{ 110, 0.08 },{ 112, 0.4 },{ 113, 0.4 },{ 115, 0.4 },{ 117, 0.4 },{ 119, 0.4 },{ 4003, 0.76 },{ 4015, 0.76 },},
+}
+
+-- source: DungeonID 32962 MonsterID 359 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 32962,
+	MonsterID = 358,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { { 91840, 0.8 },},
+	DropGroupList = { { 121, 0.4 },{ 122, 0.08 },{ 124, 0.4 },{ 125, 0.4 },{ 127, 0.4 },{ 129, 0.4 },{ 131, 0.4 },{ 4003, 0.76 },{ 4015, 0.76 },},
+}
+
+-- source: DungeonID 33010 MonsterID 474 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33010,
+	MonsterID = 1645,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { { 91880, 8 },},
+	DropGroupList = { { 121, 0.4 },{ 122, 0.08 },{ 124, 0.4 },{ 125, 0.4 },{ 127, 0.4 },{ 129, 0.4 },{ 131, 0.4 },{ 4003, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33011 MonsterID 474 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33011,
+	MonsterID = 1645,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { { 91880, 8 },},
+	DropGroupList = { { 133, 0.4 },{ 134, 0.08 },{ 136, 0.4 },{ 137, 0.4 },{ 139, 0.4 },{ 141, 0.4 },{ 143, 0.4 },{ 4003, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33012 MonsterID 474 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33012,
+	MonsterID = 1645,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { { 91880, 8 },},
+	DropGroupList = { { 133, 0.4 },{ 134, 0.08 },{ 136, 0.4 },{ 137, 0.4 },{ 139, 0.4 },{ 141, 0.4 },{ 143, 0.4 },{ 4003, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1459,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1460,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1463,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1464,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1467,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1468,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1469,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33030,
+	MonsterID = 1470,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 526,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 527,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 528,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 529,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 530,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 531,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 532,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 533,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33031 MonsterID 523 (stage-boss)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 534,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132119, 40 },{ 111610, 0.1 },{ 132116, 6 },},
+	DropGroupList = { { 3270, 35 },{ 3030, 0.5 },{ 3060, 0.5 },{ 3070, 0.2 },{ 3080, 0.2 },},
+}
+
+-- source: DungeonID 33030 MonsterID 521 (final-boss)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 599,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132119, 40 },{ 111076, 0.1 },{ 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 25 },{ 3040, 0.2 },{ 3050, 0.2 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 1459,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 1460,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 1463,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 1464,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 1469,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33030 MonsterID 529 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33031,
+	MonsterID = 1470,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132048, 3 },{ 132116, 2.3 },},
+	DropGroupList = { { 3270, 2 },{ 5002, 0.01087 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33040,
+	MonsterID = 606,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 545 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33040,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33040,
+	MonsterID = 1539,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33040,
+	MonsterID = 1540,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33040,
+	MonsterID = 1543,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 544,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 545 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 545,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 546,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 547,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 545 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 549,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 545 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 551,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 553,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 554 (final-boss)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 600,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 25 },},
+}
+
+-- source: DungeonID 33040 MonsterID 554 (final-boss)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 601,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 25 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 606,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 545 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 1539,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 1540,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33040 MonsterID 544 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33041,
+	MonsterID = 1543,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132049, 2.1 },{ 132117, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33050 MonsterID 572 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33050,
+	MonsterID = 566,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132050, 2 },{ 132118, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33050 MonsterID 572 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33050,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132050, 2 },{ 132118, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33050 MonsterID 572 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33050,
+	MonsterID = 1547,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132050, 2 },{ 132118, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33050 MonsterID 572 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33050,
+	MonsterID = 1548,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132050, 2 },{ 132118, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33050 MonsterID 575 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33050,
+	MonsterID = 1549,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132050, 2 },{ 132118, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33050 MonsterID 572 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33050,
+	MonsterID = 1551,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132050, 2 },{ 132118, 1.5 },},
+	DropGroupList = { { 3270, 2 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 564,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 572,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 573,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 574,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 575,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 576,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33050 MonsterID 571 (final-boss)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 598,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132121, 20 },{ 111076, 0.1 },{ 132050, 2 },{ 132118, 1.5 },},
+	DropGroupList = { { 3270, 25 },{ 3160, 0.2 },{ 3170, 0.2 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 1547,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 1549,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33051 MonsterID 566 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33051,
+	MonsterID = 1551,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 132118, 4.7 },},
+	DropGroupList = { { 3270, 5 },},
+}
+
+-- source: DungeonID 33090 MonsterID 474 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33090,
+	MonsterID = 1646,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 91880, 8 },},
+	DropGroupList = { { 133, 0.4 },{ 134, 0.08 },{ 136, 0.4 },{ 137, 0.4 },{ 139, 0.4 },{ 141, 0.4 },{ 143, 0.4 },{ 4003, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33091 MonsterID 458 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33091,
+	MonsterID = 1646,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 91880, 8 },},
+	DropGroupList = { { 145, 0.4 },{ 146, 0.08 },{ 148, 0.4 },{ 149, 0.4 },{ 151, 0.4 },{ 153, 0.4 },{ 155, 0.4 },{ 4003, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33092 MonsterID 458 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33092,
+	MonsterID = 1646,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 91880, 8 },},
+	DropGroupList = { { 145, 0.4 },{ 146, 0.08 },{ 148, 0.4 },{ 149, 0.4 },{ 151, 0.4 },{ 153, 0.4 },{ 155, 0.4 },{ 4003, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33140 MonsterID 691 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33140,
+	MonsterID = 737,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 145, 0.4 },{ 146, 0.08 },{ 148, 0.4 },{ 149, 0.4 },{ 151, 0.4 },{ 153, 0.4 },{ 155, 0.4 },{ 4004, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33141 MonsterID 691 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33141,
+	MonsterID = 737,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 157, 0.4 },{ 158, 0.08 },{ 160, 0.4 },{ 161, 0.4 },{ 163, 0.4 },{ 165, 0.4 },{ 167, 0.4 },{ 4004, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33142 MonsterID 691 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33142,
+	MonsterID = 737,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 157, 0.4 },{ 158, 0.08 },{ 160, 0.4 },{ 161, 0.4 },{ 163, 0.4 },{ 165, 0.4 },{ 167, 0.4 },{ 4004, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33170 MonsterID 691 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33170,
+	MonsterID = 710,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 157, 0.4 },{ 158, 0.08 },{ 160, 0.4 },{ 161, 0.4 },{ 163, 0.4 },{ 165, 0.4 },{ 167, 0.4 },{ 4004, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33170 MonsterID 691 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33170,
+	MonsterID = 870,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 157, 0.4 },{ 158, 0.08 },{ 160, 0.4 },{ 161, 0.4 },{ 163, 0.4 },{ 165, 0.4 },{ 167, 0.4 },{ 4004, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33171 MonsterID 691 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33171,
+	MonsterID = 710,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 157, 0.4 },{ 158, 0.08 },{ 160, 0.4 },{ 161, 0.4 },{ 163, 0.4 },{ 165, 0.4 },{ 167, 0.4 },{ 4004, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33172 MonsterID 691 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33172,
+	MonsterID = 710,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4004, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33190 MonsterID 459 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33190,
+	MonsterID = 943,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 78331, 1.8 },{ 111700, 1.3 },},
+	DropGroupList = { { 3280, 2 },},
+}
+
+-- source: DungeonID 33190 MonsterID 918 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33190,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 78331, 1.8 },{ 111700, 1.3 },},
+	DropGroupList = { { 3280, 2 },},
+}
+
+-- source: DungeonID 33190 MonsterID 918 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33190,
+	MonsterID = 1535,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 78331, 1.8 },{ 111700, 1.3 },},
+	DropGroupList = { { 3280, 2 },},
+}
+
+-- source: DungeonID 33190 MonsterID 927 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33190,
+	MonsterID = 1536,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 78331, 1.8 },{ 111700, 1.3 },},
+	DropGroupList = { { 3280, 2 },},
+}
+
+-- source: DungeonID 33190 MonsterID 918 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33190,
+	MonsterID = 1537,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 78331, 1.8 },{ 111700, 1.3 },},
+	DropGroupList = { { 3280, 2 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 918,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 919,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 920,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 922,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 923,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 924,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 925,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 926,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 927,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 937,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 943,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33190 MonsterID 944 (mob-minor)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 944,
+	StandIn = 1,
+	Exp = 0,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 0.5 },},
+}
+
+-- source: DungeonID 33190 MonsterID 948 (final-boss)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 985,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { { 111926, 9 },{ 111610, 4 },{ 78331, 1.8 },{ 111700, 1.3 },},
+	DropGroupList = { { 3280, 25 },{ 3220, 0.2 },{ 3230, 0.2 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 1462,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 1535,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 1536,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33191 MonsterID 936 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33191,
+	MonsterID = 1537,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 3280, 5 },},
+}
+
+-- source: DungeonID 33200 MonsterID 1154 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33200,
+	MonsterID = 1190,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33201 MonsterID 1154 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33201,
+	MonsterID = 1190,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33202 MonsterID 1154 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33202,
+	MonsterID = 1190,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33210 MonsterID 1155 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33210,
+	MonsterID = 1154,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33210 MonsterID 1165 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33210,
+	MonsterID = 1156,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33210 MonsterID 1171 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33210,
+	MonsterID = 1159,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33210 MonsterID 1171 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33210,
+	MonsterID = 1160,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33210 MonsterID 1171 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33210,
+	MonsterID = 1161,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33211 MonsterID 1155 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33211,
+	MonsterID = 1154,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33211 MonsterID 1165 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33211,
+	MonsterID = 1156,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33211 MonsterID 1155 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33211,
+	MonsterID = 1159,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33212 MonsterID 1155 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33212,
+	MonsterID = 1154,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33212 MonsterID 1165 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33212,
+	MonsterID = 1156,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33212 MonsterID 1155 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33212,
+	MonsterID = 1159,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33220 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33220,
+	MonsterID = 1220,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33220 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33220,
+	MonsterID = 1221,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33220 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33220,
+	MonsterID = 1222,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33220 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33220,
+	MonsterID = 1223,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33220 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33220,
+	MonsterID = 1224,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 169, 0.4 },{ 170, 0.08 },{ 172, 0.4 },{ 173, 0.4 },{ 175, 0.4 },{ 177, 0.4 },{ 179, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33221 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33221,
+	MonsterID = 1220,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33221 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33221,
+	MonsterID = 1221,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33221 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33221,
+	MonsterID = 1222,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33221 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33221,
+	MonsterID = 1223,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33221 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33221,
+	MonsterID = 1224,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33222 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33222,
+	MonsterID = 1220,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33222 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33222,
+	MonsterID = 1221,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33222 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33222,
+	MonsterID = 1222,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33222 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33222,
+	MonsterID = 1223,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33222 MonsterID 1193 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33222,
+	MonsterID = 1224,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33240 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33240,
+	MonsterID = 1390,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33240 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33240,
+	MonsterID = 1392,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33240 MonsterID 1378 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33240,
+	MonsterID = 1399,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33240 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33240,
+	MonsterID = 1430,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33240 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33240,
+	MonsterID = 1455,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33240 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33240,
+	MonsterID = 1457,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1390,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1392,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1394,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1378 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1399,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1430,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1455,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1456,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33241 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33241,
+	MonsterID = 1457,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1390,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1392,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1394,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1378 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1399,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1430,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1455,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1456,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33242 MonsterID 1380 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33242,
+	MonsterID = 1457,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33250 MonsterID 1382 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33250,
+	MonsterID = 1410,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33251 MonsterID 1382 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33251,
+	MonsterID = 1410,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 33252 MonsterID 1382 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 33252,
+	MonsterID = 1410,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { { 181, 0.4 },{ 182, 0.08 },{ 184, 0.4 },{ 185, 0.4 },{ 187, 0.4 },{ 189, 0.4 },{ 191, 0.4 },{ 4005, 0.6 },{ 4015, 0.6 },},
+}
+
+-- source: DungeonID 39500 MonsterID 504 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 39500,
+	MonsterID = 787,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { },
+}
+
+-- source: DungeonID 39510 MonsterID 504 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 39510,
+	MonsterID = 787,
+	StandIn = 1,
+	Exp = 1,
+	ED = 17,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { },
+}
+
+-- source: DungeonID 39520 MonsterID 504 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 39520,
+	MonsterID = 787,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { },
+}
+
+-- source: DungeonID 39530 MonsterID 504 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 39530,
+	MonsterID = 787,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { },
+}
+
+-- source: DungeonID 39540 MonsterID 504 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 39540,
+	MonsterID = 787,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { },
+}
+
+-- source: DungeonID 39550 MonsterID 504 (mob)
+DropTable:AddMonsterDropInfo
+{
+	DungeonID = 39550,
+	MonsterID = 787,
+	StandIn = 1,
+	Exp = 1,
+	ED = 16,
+	EDProperty = 100,
+	DropItemList = { },
+	DropGroupList = { },
+}
+
 DropTable:AddBattleFieldNpcDropInfo
 {
 	BattleFieldID = 40029,

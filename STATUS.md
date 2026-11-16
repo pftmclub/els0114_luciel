@@ -257,7 +257,7 @@ Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]
 | R3 | done 2026-11-16: Lanox rows packed + deployed, play-test passed (one-kill boss result accepted); owes nothing | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` | `R3.md` |
 | R4 | rows packed + copied 2026-11-16 (21 keys, 3 fields; gate PASS but Expert stage-boss 1.17); play-test deferred to the end of the plan (user 2026-11-16); owes nothing now | Sonnet 5.5 / medium | R3 | same two server Lua files | `R4.md` |
 | R5 | rows packed + copied 2026-11-16 (4 secret keys, +86 rows; Velder template, gate PASS except common `mob` 0.74 / 0.77, explained); play-test deferred to the end of the plan; owes nothing now | Sonnet 5.5 / high | R1, R3 | same two server Lua files | `R5.md` |
-| R6 | ready (R3-R5 done): June-only monsters in old dungeons + smoke; its review covers R3-R6 | Sonnet 5.5 / high; review Opus 5.5 / high | R0, R3 | same two server Lua files | `R6.md` |
+| R6 | rows packed + copied 2026-11-16 (50 keys, +166 sibling rows; 30 pairs with no sibling listed); user smoke owed (Garpai Rock Normal), then the review of R3-R6 | Sonnet 5.5 / high; review Opus 5.5 / high (`R6-review.md`) | R0, R3 | same two server Lua files | `R6.md` |
 | R7 | blocked (heroic dungeons are not registered in the live `DungeonData.lua` yet: june-dungeons) | Opus 5.5 / high | june-dungeons heroic rows, R5 | sheets + the two server Lua files | `R7.md` |
 | Z | blocked (R6 review): close | Sonnet 5.5 / medium | R6 review | `MODS.md`, backlog, `tools/README.md` | `Z.md` |
 
