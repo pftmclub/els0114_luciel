@@ -745,6 +745,7 @@ All 27 class-map rows of phase CH1d2 are accounted for: 15 `inside` with a June 
 
 **Gates.** `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE`: `_CORE` PASS ( `files: 2 PASS, 0 OTHER, 0 FAIL` ), `_LIVE` INERT ( `//#define`; `files: 1 PASS`, 0 deleted / non-ASCII / EOL-mismatched, 0 `#else`/`#endif` without the token ), `junediverge` PASS, `enumscan` PASS; `stateends` skipped ( no skill state registered ), `skillicons` / `luabind` skipped. `git diff --minimal --numstat`: `X2GUAdd.cpp` 339 / 0, `X2GUAdd.h` 19 / 0.
 - One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off, with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` and with `_LIVE` + `_DP`. `/P` counts, off / on: `ANSI_AAT_DASH_COMBO_ZBackX` 1 / 2, `m_eCustomRenderStateOnStateStart` 1 / 4, `FlushMp( 2.f )` 0 / 1, `ConsumeMutationCountByNasodArmorAttack` 2 / 11 ( 7 + the 4 new arms ).
+- Range `finish.py --range 47e9494e^..47e9494e` ( same `--with` ): `_CORE` PASS, `_LIVE` INERT, `junediverge` PASS, `enumscan` PASS.
 - Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line.
 
 **Nothing to play-test.** No `_DEBUG` define here. Next: `/x2-phase char-add CH1d2 review` ( `CH1d2-review.md`, Opus 5.5 high; covers CH1c-CH1d2 ), then CH1e.
