@@ -4489,6 +4489,10 @@ Opus 5.5. Lu/Ciel's summoned NPCs exist and are set up as June does; Lu has no s
 - **Build:** `build.py --deploy` BUILD FAILED at the X2 link on a peer's in-progress CH4a edit (`CX2GULuciel::InitPassiveSkillState` declared, no body; `_LUCIEL_PASSIVE`), not this phase's: X2Lib with this phase's code built `ok in 560s`. Re-run: `COALESCED` into a peer's full build at `ca2afe20`, then `DEPLOY OK: X2_offline.exe is 27,090,432 B, dated 2026-11-16 09:23:17, md5 65db270adcaffe9c32baccee653ab7f4, equal to X2/US_SERVICE/x2.exe (2026-11-16 09:22:01); built at main ca2afe20 + 5 uncommitted code file(s)` (the peer's CH4a files); `EXESTR OK: 2 of 2 found in X2_offline.exe` (`LUCIEL SUMMON hit npc ...`, `... set npc ... flags 0x50 ...`, wide).
 - **Play-test:** the hand-off's 4 checks (Darkness, Shadow Bolt, Garden + its plants on Lu/Ciel `testlu1`; an Eve Nasod Watch for the owner hand-off on another
   class). Review: `kickoffs/char-luciel/CH3a0-review.md` (Opus); CH3a waits on it.
+- **Play-test passed** (2026-11-16): Lu/Ciel `testlu1` console spawns: `set npc 1908 skill 30016 flags 0x1 owner type 10 uid 1000029`, `set npc 2269 ... flags 0x50 ... hp 154200`,
+  five `set npc 2270 ... flags 0x50 ... hp 128500` (the Garden script's plants), `hit npc 1906 -> owner 166 unit type 10` and `hit npc 2270 -> owner 166 unit type 10`; Eve `Iivue`:
+  `hit npc 384 -> owner 19 unit type 5` (EFFECT_TO_UNIT site). No packet EXCEPTION. One crash in the first Eve run was the console's stale `jU` (Lu's freed unit; the dump
+  faults in Lua's `GetPos` binder from `CX2GameEdit::ExecCommand`, no phase code on the stack); a fresh `jU` on Eve ran clean. The 1906 `set` line fell in the earlier log run.
 
 ## Phase CH4 - Passives and class mechanics
 
