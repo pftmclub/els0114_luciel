@@ -1605,6 +1605,8 @@ Build: `DEPLOY OK: X2_offline.exe is 27,204,608 B, dated 2026-11-16 15:20:03, md
 X2/US_SERVICE/x2.exe (2026-11-16 15:19:56); built at main a6edaf9d + 3 uncommitted code file(s)` (`X2OfflineInventory.obj` 15:19:33, after the
 fix; peers' files built in too). No new strings (the fix logs nothing; `SHEET emu` names the counted weapon). `_STATCALC_DEBUG` stays on (Z).
 S3 kickoff: Depends now names this review and its play-test.
+Range gate (`finish.py --range 37663a7b^..37663a7b --with EQUIP_STAT`): flagcheck `RESULT: PASS` (1 PASS, 0 OTHER), junediverge `RESULT: PASS`,
+enumscan exit 0, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 Play-test owed: testlu1 with 62119 equipped, `SHEET window` total = `SHEET emu` game, `weapon=0`.
 
 ## Phase Z - Close
