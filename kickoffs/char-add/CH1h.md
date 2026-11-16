@@ -64,3 +64,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Added by CH1d (2026-11-16)
 
 - CH1d added three `CX2GUAdd` members the ctor must clear ( `_CORE`, end of the class ): `m_bComboXXAfterDashComboZBackX` ( June `+0x9698`; June also clears it in `ReInit` `329ffe5c` and `DamageReact` `32a07fde` ), `m_bEnableNasodArmorModeOverlimit` ( `+0x98f8`, ctor `32a2301c` ) and the empty map `m_mapTranscendedPassiveAbilityValue` ( `+0x9668`, built by the ctor `32a23b06` ).
+
+## Added by the CH1d2 review (2026-11-16)
+
+- `ApplyRenderParam` `329d5240` ( `inside` ): June's Add keeps no render state of its own. While the user's `m_iBuffCustomRenderState` ( `+0x8e64` ) is not 4 it sets `m_RenderParam.color.a` = 1.0 when byte `+0x144` is clear and calls the base `31fd4460` = `CX2GUUser::ApplyRenderParam` ( june-engine R5, live ); state 4 is the Quicksilver Frenzy colour ( helper `329d43b0` ). March's override switches on Add's own `m_eCustomRenderState` and hands its default to `CX2GameUnit::`, which skips the engine: the June body must reach `CX2GUUser::ApplyRenderParam`, or the dash X / ZX / ZBackX `CRS_INVISIBLE` ( CH1d2, CH1f ) never renders. Where else March writes `m_eCustomRenderState` ( the Quicksilver Frenzy buff ) follows June's `+0x8e64` = 4.
+- The ctor clears `m_iCustomRenderStateOnStateStart` ( `+0x95b4` ) and `m_fRenderParamColorAOnStateStart` ( `+0x95b8` ) ( the stores around `32a223d5` / `32a223db` ).

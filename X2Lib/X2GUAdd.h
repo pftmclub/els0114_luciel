@@ -1433,8 +1433,8 @@ protected:
 	bool					m_bComboXXAfterDashComboZBackX;	/// char-add CH1d: June +0x9698, set by ANSI_AAT_DASH_COMBO_ZBackX ( CH1f ), cleared by ANSI_COMBO_XX_StateEnd, DamageReact and ReInit ( CH1h clears it in the ctor )
 	bool					m_bEnableNasodArmorModeOverlimit;	/// char-add CH1d: June +0x98f8, set by InitPassiveSkillState for RNSI_P_ATT_NASOD_ARMOR_MODE ( CH4a; CH1h clears it in the ctor )
 	std::map< int, std::map< int, float > >	m_mapTranscendedPassiveAbilityValue;	/// char-add CH1d: June +0x9668, skill id -> ability type -> value, filled by InitPassiveSkillState ( CH4a )
-	CUSTOM_RENDER_STATE		m_eCustomRenderStateOnStateStart;	/// char-add CH1d2: June +0x95b4, the render state ANSI_DASH_COMBO_X starts with ( CH1h clears it in the ctor )
-	float					m_fRenderParamColorAOnStateStart;	/// char-add CH1d2: June +0x95b8, the alpha it starts with, 1.0 after its end ( CH1h clears it in the ctor )
+	int						m_iCustomRenderStateOnStateStart;	/// char-add CH1d2 review: June +0x95b4, the user's custom render state a dash X / ZX / ZBackX starts with ( CH1h ctor clears it )
+	float					m_fRenderParamColorAOnStateStart;	/// char-add CH1d2 review: June +0x95b8, the render colour alpha it starts with, 1.0 after its end ( CH1h ctor clears it )
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// protected Valuable End
 

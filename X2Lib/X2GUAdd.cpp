@@ -7413,9 +7413,9 @@ void CX2GUAdd::DashComboZZZEventProcess()
 void CX2GUAdd::DashComboXStateStart()
 {
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
-	// char-add CH1d2: June 329d20a0 ( keeps the render state and alpha the state starts with )
-	m_eCustomRenderStateOnStateStart	= m_eCustomRenderState;
-	m_fRenderParamColorAOnStateStart	= m_fRenderParamColorA;
+	// char-add CH1d2 review: June 329d20a0 ( keeps the user's custom render state +0x8e64 and the render colour alpha +0xc44 )
+	m_iCustomRenderStateOnStateStart	= m_iBuffCustomRenderState;
+	m_fRenderParamColorAOnStateStart	= m_RenderParam.color.a;
 
 	CommonStateStart();
 #else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
@@ -7428,13 +7428,13 @@ void CX2GUAdd::DashComboXStateStart()
 void CX2GUAdd::DashComboXFrameMove()
 {
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
-	// char-add CH1d2: June 329d7f20 ( June sets CRS_INVISIBLE here: CRS_COMBO_DASH_X is its stand-in until june-engine R5 reaches Add; outside the window the start's state returns )
+	// char-add CH1d2 review: June 329d7f20 ( the engine's CRS_INVISIBLE in the window, else the start's state; Add's ApplyRenderParam hands it on in CH1h )
 	CommonFrameMove();
 
 	if( 0.085f <= m_pXSkinAnim->GetNowAnimationTime() && 0.43f > m_pXSkinAnim->GetNowAnimationTime() )
-		m_eCustomRenderState	= CRS_COMBO_DASH_X;
+		m_iBuffCustomRenderState	= CX2GUUser::CRS_INVISIBLE;
 	else
-		m_eCustomRenderState	= m_eCustomRenderStateOnStateStart;
+		m_iBuffCustomRenderState	= m_iCustomRenderStateOnStateStart;
 #else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	CommonFrameMove();
 
@@ -7496,9 +7496,9 @@ void CX2GUAdd::DashComboXEventProcess()
 void CX2GUAdd::DashComboXStateEnd()
 {
 #ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
-	// char-add CH1d2: June 329d20d0 ( puts back what the start kept )
-	m_fRenderParamColorA				= m_fRenderParamColorAOnStateStart;
-	m_eCustomRenderState				= m_eCustomRenderStateOnStateStart;
+	// char-add CH1d2 review: June 329d20d0 ( puts back what the start kept )
+	m_RenderParam.color.a				= m_fRenderParamColorAOnStateStart;
+	m_iBuffCustomRenderState			= m_iCustomRenderStateOnStateStart;
 	m_fRenderParamColorAOnStateStart	= 1.f;
 
 	CommonStateEnd();

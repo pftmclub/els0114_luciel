@@ -750,6 +750,39 @@ All 27 class-map rows of phase CH1d2 are accounted for: 15 `inside` with a June 
 
 **Nothing to play-test.** No `_DEBUG` define here. Next: `/x2-phase char-add CH1d2 review` ( `CH1d2-review.md`, Opus 5.5 high; covers CH1c-CH1d2 ), then CH1e.
 
+### CH1d2 - Review (2026-11-16, covers CH1c-CH1d2)
+
+**Verdict: pass after one fix.** Reviewed commits `b8d17bd8` ( CH1c ), `7a1cfcd2` ( CH1d ), `47e9494e` ( CH1d2 ) against Ghidra and `charport_adis.py add` listings.
+
+**Every row is written.** 74 class-map rows ( CH1c 2, CH1d 45, CH1d2 27 ): 64 carry a tag naming their own VA and phase; the 10 without one are the Done notes' "= March" rows ( CH1d2's 9, CH1d's `329f78a0` ) and have no code. Every `inside` tag sits in a `_LIVE` block with March's `#else`; every `new` row is under `_CORE`, except `329f5490` ( CH0 said `new`, March has the function: `inside`, as the CH1c note says). Enum: the 23 state names appended by CH1d / CH1d2 carry `/// N` ids that all equal `ch0_state_skill.tsv`'s; their C++ values are positional after `ANSI_BASE` as for every Add state ( CH1m registers them by name ). `RNSI_P_ADE_TRANSCENDENCE` = 29419 = June's `Enum.src.lua`.
+
+**Spot checks, all = June:**
+- CH1d2 "= March" ( 3 of 9 ): `329d9520` foot on the line -> `DASH_JUMP_LANDING`, else X up or state time >= 3.0 -> `XX_FINISH` ( NaN keeps the state, both sides ); `329d2100` `CommonStateStartFuture`, `bIsRight` flipped, `dirDegree.y` + 180; `329e48d0` is `PlayLoopSound( Add_Effect10.ogg )` inlined ( device `PlaySound( name, 0, 0, 1 )` = March's call with the default 1, JUNE_BUGS 125 ).
+- `329d7720` DashComboZ: flag order 0, 2, 1, 3, 4; flag 2 = time window, X, class 33 / 123, then back ( left while facing right or right while facing left ); flags 3 / 4 = X + vslot 0x670 ( `IsInJobLine` 1 / 3 ); the key-set ( start <= t < end ), flag-fire ( change < t or animation end ), hyper ( `SKILL_CANCEL_AFTER_ONLY_ADD` ) and on-line walk / dash cancels expand to June's compares, NaN included.
+- `329d9020` jump X: flags 1 / 2 / 3 test Z + class 0x7b / 0x7a / 0x7e ( Mastermind / Lunatic Psyker / Diabolic Esper ) -> `AMM / ALP / ADE_DASH_JUMP_COMBO_XZ`.
+- `329edb00` XX finish: bone first, then game + damage effect manager + `FlushMp( 2.0, 0 )` ( vslot 0xe4 ); any miss plays `CreateNotEnoughMPEffect( EF01, 0, 0, -45 )`; charge rate 2.0 at 3.0 s else 1 + 0.25 x charge.
+- `329ed380` / `329ed600` / `329ed880`: 182 instructions each to the `ret`, identical but for their SEH handler push ( JUNE_BUGS 783 holds ).
+- CH1c `329f5490`: world colour 0x22 / 255 inlined, two separate oneshots, shock block ( awakening set present -> play, else the three minor shock waves ), ToKang on both paths, item effect, camera, trace without the set, sounds on `bSound_`.
+- CH1d nasod arm `32a088c0` @`32a0891d`-`32a08a50`: change < t, 64-bit target != 0, vslot 0x6c8 ( formation mode ) else `GetTranscendedPassiveAbilityValue( 29419, SA_EFFECTIVE_RATE = 5 )` roll on random table 6 saves the count, `UpMutationCount( -1 / 0 )`, `NASOD_ARMOR_READY`; key arm order oneZ / oneX, window, class, possible. `329edde0`: bone line position, `<= 500.0`, walk 100.0 toward `!GetIsRight()` through the CH1i2 walk, `CanDown` snap.
+
+**Fix ( under `_LIVE` / `_CORE`, the phase's own lines ): the dash X render state.** June's `329d20a0` / `329d20d0` / `329d7f20` save and write the **user's** custom render state `+0x8e64` ( here `CX2GUUser::m_iBuffCustomRenderState`, june-engine R5, live ) and `+0xc44` = `m_RenderParam.color.a`; June's Add has no render state of its own ( its `ApplyRenderParam` `329d5240` hands everything but state 4 to `31fd4460` ). CH1d2 had written Add's own `m_eCustomRenderState` with `CRS_COMBO_DASH_X` as a stand-in and read `+0xc44` as Add's `m_fRenderParamColorA` ( a constant 1.0 ). The stand-in was not the same render either: June's 5 draws the outline at alpha 0 ( fully invisible, and R5b's equip pass hides the equips and after-image ), `CRS_COMBO_DASH_X` draws it at 1.0. Now: `m_iBuffCustomRenderState = CX2GUUser::CRS_INVISIBLE` in 0.085 <= t < 0.43, the start keeps `m_iBuffCustomRenderState` and `m_RenderParam.color.a` in `m_iCustomRenderStateOnStateStart` ( renamed, `int` ) / `m_fRenderParamColorAOnStateStart`, the end puts both back. New `Always.h` guard: `_LIVE` needs `SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE` ( defined above it: the `_LIVE` probe passes the guard ). No other class function reads `+0x95b4` / `+0x95b8` except CH1f's `AAT_DASH_COMBO_ZX` / `ZBackX` Start / End / FrameMove ( the same pattern ) and the ctor ( byte scan of `329cf870`-`32a316dd` ).
+- **Routed:** CH1h `ApplyRenderParam` must reach `CX2GUUser::ApplyRenderParam` or state 5 never renders, and the ctor clears both members; CH1f writes ZX / ZBackX the same way ( both kickoffs amended ). `ch1_offsets.tsv` rows `0x95b4` / `0x95b8` and funcmap rows `329d20a0` / `329d20d0` / `329d7f20` corrected.
+
+**Gates.** Review: `finish.py --review --commits b8d17bd8 7a1cfcd2 47e9494e --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE JUNE_CHAR_ADD_DP -v`:
+```
+flagcheck JUNE_CHAR_ADD_CORE   PASS     files: 5 PASS, 1 OTHER, 0 FAIL, 0 ERROR; 0 deleted, 0 non-ASCII, 0 EOL-mismatched
+flagcheck JUNE_CHAR_ADD_DP     FAIL     define NOT FOUND (//#define until CH1q); files: 3 PASS, 3 OTHER, 0 FAIL, 0 ERROR; 0 deleted
+flagcheck JUNE_CHAR_ADD_LIVE   INERT    files: 3 PASS, 3 OTHER, 0 FAIL; 0 deleted
+junediverge / --check-all      PASS / PASS
+enumscan                       PASS
+```
+- The `_DP` FAIL is its only complaint, "not #defined" ( `//#define`, `Always.h:13951`, by design until CH1q; `finish.py` marks only `_LIVE` flags INERT ), as in the CH1d0 review. OTHER rows: `X2GUAdd.h` belongs to `_CORE` ( the members and enum names ), `X2SkillTree.h` to `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( `RNSI_P_ADE_TRANSCENDENCE` ).
+- Fix: `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h KTDXLIB/Always.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE --skip-flag JUNE_CHAR_ADD_DP`: `_CORE` PASS ( `files: 3 PASS` ), `_LIVE` FAIL only on "not #defined" ( `files: 2 PASS, 1 OTHER, 0 FAIL` ), `junediverge` PASS, `enumscan` PASS. Its 11 deleted lines are the replaced CH1d2 lines themselves ( 9 inside the `_LIVE` bodies, 2 `_CORE` member lines ); March's `#else` text and the flag-off build are unchanged.
+- One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off, with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`, and with `_LIVE` + `_DP`.
+- Full build skipped: no play-test ( `_LIVE` is off ). No `_DEBUG` define for these phases.
+
+**Nothing to play-test.** Next: `/x2-phase char-add CH1e` ( Sonnet 5.5 high; kickoff ready ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.

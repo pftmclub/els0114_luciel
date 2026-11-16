@@ -13929,6 +13929,9 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CHAR_ADD_CORE )
 #error SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE needs SERV_IRUHADEV_JUNE_CHAR_ADD_CORE ( the June state name and EventProcess its bodies use )
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE ) && !defined( SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE )
+#error SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE needs SERV_IRUHADEV_JUNE_CUSTOM_RENDER_STATE ( m_iBuffCustomRenderState, CRS_INVISIBLE for the dash X states )
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////

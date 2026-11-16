@@ -62,3 +62,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - The enum already holds `ANSI_AMM_COMBO_ZZX` ( 277 ), `ANSI_AMM_COMBO_XXDownX_START` ( 235 ), `ANSI_AAT_COMBO_NASOD_ARMOR_X` ( 222 ) and `_Z` ( 225 ), added by CH1d under `_CORE`: do not add them again.
 - `ANSI_AAT_DASH_COMBO_ZBackX` ( `329dc020` @`329dc09b` ) sets `CX2GUAdd::m_bComboXXAfterDashComboZBackX` ( June `+0x9698`, member added by CH1d ) to true before `StateChange( ANSI_COMBO_XX )`; ComboXX's Z and down + X arms read it.
+
+## Added by the CH1d2 review (2026-11-16)
+
+- `ANSI_AAT_DASH_COMBO_ZX` Start / End / FrameMove ( `329d2190` / `329d2200` / `329dbce0` ) and `ZBackX` Start / End / FrameMove ( `329d2230` / `329d2260` / `329dbfc0` ) are the dash X render pattern: write them exactly as the reviewed `DashComboXStateStart` / `End` / `FrameMove` ( `X2GUAdd.cpp`, tag `char-add CH1d2 review` ): `+0x8e64` is the user's `m_iBuffCustomRenderState`, `+0xc44` is `m_RenderParam.color.a` ( not Add's `m_fRenderParamColorA` ), state 5 is `CX2GUUser::CRS_INVISIBLE`, the members are `m_iCustomRenderStateOnStateStart` / `m_fRenderParamColorAOnStateStart`. Never Add's own `m_eCustomRenderState` / `CRS_COMBO_DASH_X`.
