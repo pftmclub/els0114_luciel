@@ -67,3 +67,10 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   June's direct sites in the Transcendence form ( `june2017_re/char_luciel/` has no table; regenerate with the CH2d3 Done note's method ): `32ae95a0`, `32b059a0`-`32b07eb0`,
   `32b13730`, `32b13860`, `32b15290`, `32b33480`, `32b336a0`, `32b338c0`, `32b33bf0`. Common ids ( `LSI_LU_*` ) stay on the virtual call, as June. Tag each such line
   `// char-luciel <phase>: June calls the base, not the form mapper`.
+
+## Amended by char-luciel CH3b review (2026-11-16)
+
+- `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` is retired ( commented out in `Always.h` ). For this phase's play-test turn it on again with one inserted `#define` line under the
+  retired ones ( as CH3a did, by bytepatch ); it stays on until the CH3c2 review retires it.
+- ErrorLog `ErrorEnum(381)` lines ( `Update3DPosition`, FMOD result 47 = `FMOD_ERR_NEEDS3D`, one per sound play ) come from engine phase C9h-8's damage-effect sound path, not
+  from class code: a damage effect's `SOUNDn` whose file was first opened 2D. Do not count them as a CH3c failure and do not fix them under `_SKILL` ( "CH3b - Review" ).
