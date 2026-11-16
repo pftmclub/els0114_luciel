@@ -57,9 +57,9 @@ Plan `JUNE_ASSET_PORT_PHASES.md` (brought up to date 2026-11-16: "Amended 2026-1
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| P1 | review (done 2026-11-16, play-tested: 243 / 243 `[KOM_MOUNT]` lines, 1,158 ms, 167 MB private; first trigger was too early, moved to the first frame) | Sonnet 5.5 / high | P0 (done) | `KTDXLIB/KGCMassFileManager.cpp`, `KTDXApp.cpp`, `Always.h`, `tools/logs.py` | `P1.md` |
-| P1 review | ready (P1 done) | Sonnet 5.5 / high | P1 | review (P1 files only if a fix) | `P1-review.md` |
-| P2 | waiting (P1 review): the 15 June kom numbers with no live archive (rewritten 2026-11-16; 243 of 258 are live) | Sonnet 5.5 / high, then user play-test | P1 review | new `kom_contents/data169,170,...,datai026,032_kom`, game dir koms | `P2.md` |
+| P1 | done 2026-11-16 (play-tested, reviewed: 243 / 243 `[KOM_MOUNT]` lines, 1,158 ms, 167 MB private) | Sonnet 5.5 / high | P0 (done) | `KTDXLIB/KGCMassFileManager.cpp`, `KTDXApp.cpp`, `Always.h`, `tools/logs.py` | `P1.md` |
+| P1 review | done 2026-11-16 (PASS, no fix, no build; nit: `Always.h` define comment is stale, fix at P12) | Sonnet 5.5 / high | P1 | review (P1 files only if a fix) | `P1-review.md` |
+| P2 | ready (P1 review done): the 15 June kom numbers with no live archive (rewritten 2026-11-16; 243 of 258 are live) | Sonnet 5.5 / high, then user play-test | P1 review | new `kom_contents/data169,170,...,datai026,032_kom`, game dir koms | `P2.md` |
 | P3 | retired 2026-11-16 (merged into P2; GodBeast Fire moved to P4) | - | - | - | `P3.md` (stub) |
 | P4a | waiting (P2) | Sonnet 5.5 / medium, then user play-test | P2 | `kom_contents/data001-150_kom`, game dir koms | `P4a.md` |
 | P4b | waiting (P4a) | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data151-185_kom`, game dir koms | `P4b.md` |

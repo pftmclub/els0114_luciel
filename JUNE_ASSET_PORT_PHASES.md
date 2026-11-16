@@ -357,7 +357,27 @@ Fix commit (`2292741d`): `finish.py --range 2292741d^..2292741d --with KOM_MOUNT
 0 unbound Lua in that run. The first run (exe b525d2f1, 15:04) booted to the village and walked about a minute with no crash or MessageBox (server log clean exit); it only lacked the lines.
 These are P2's numbers to compare against; P11 triggers on private memory up about 300 MB or past about 1.4 GB, read from this line after each wave.
 
-**Still open:** the P1 review (`kickoffs/june-asset-port/P1-review.md`, written). The debug define stays on through P2-P10; P12 retires it.
+**Still open:** nothing (reviewed below). The debug define stays on through P2-P10; P12 retires it.
+
+## Phase P1 - Review (2026-11-16, Sonnet 5.5 high; commits `5866cb7d`, `2292741d`; verdict: PASS, no code fix, no build)
+
+Read `KGCMassFileManager.cpp` `AddMassFile` (`:546-719`), `LockMassFileMap`, the `LoadDataFile` hook (`:1019`) and the `KTDXApp.cpp` hook.
+- **Counts at the real insert:** `registered` is bumped right after the `#ifdef SERV_IRUHADEV_KOM_LONG_NAMES` / `#else` pair (`:620-623`), so it reads the one `ib` both
+  branches define; a long-name duplicate (`ib.second == false`) is not counted. An `INT_KOM_DUPLICATE` `break` (not defined here) would leave `registered < files`, which the comparator flags.
+- **Cost and once-only:** the vector is filled only inside `AddMassFile`, which refuses after `LockMassFileMap` (`:553`), so it is immutable by the first frame. `OnFrameMove` pays one
+  `static bool` test; `LogKomMountOnce` is an `InterlockedExchange` latch, so two threads cannot both write. The `LoadDataFile` hook is two volatile reads per lookup (no log, no allocation); since the
+  first-frame move it is redundant, harmless, left in (its comment is stale: it now only fires after the first frame).
+- **psapi:** `KTDXCommonFunc.h:4` has `#pragma comment(lib,"Psapi.lib")`; the exe linked and logged `private=167`, so `GetProcessMemoryInfo` resolves in `US_SERVICE`.
+- **Deleted duplicate kom is absent:** `NOT_ALLOW_DUPLICATE_FILES` is defined (`Always.h:3245`), so the duplicate branch does `delete pMassFile; return NULL` (`:668-691`) before the
+  record push (`:700`): no `[KOM_MOUNT]` line, and `logs.py --kom-mount` fails on the missing kom. (March's own bug stays: `m_vecMassFile` keeps the deleted pointer; not P1's.)
+- **Namespace:** `_CONST_KOMMOUNT_P1_` plus `using namespace`; no anonymous namespace, no `June` or address in a name.
+- **Nit, not fixed:** the `Always.h` define block still says "first LoadDataFile after LockMassFileMap". A comment-only edit there would rebuild the whole PCH for nothing; fix it when P12 retires the define.
+- **Gates:** `finish.py --review --commits 5866cb7d 2292741d --with KOM_MOUNT_DEBUG -v`: flagcheck PASS (`3 PASS, 1 DEFINE, 0 OTHER, 0 FAIL`; 0 deleted, 0 non-ASCII, 0 EOL-mismatched
+  inserted lines; the one DEFINE row is the +8 `Always.h` block), `junediverge` PASS, `junediverge --check-all` PASS, `enumscan` PASS (7 gates, 0 failed, 3 skipped as not applicable).
+  Every OTHER row: none. Every deleted line: none.
+- **Comparator re-run on the current log:** `logs.py --kom-mount` = 243 koms, 243 lines, `KOM_MOUNT CHECK: PASS`, `total koms=243 entries=182446 mount_ms=861 private_MB=167`
+  (the 15:24 run; the baseline run read 1,158 ms: mount time varies with disk cache, memory does not).
+- **Build:** full build skipped: no code change, no play-test. The deployed exe stays f87b25c6 (P1's fix build). `P2.md` checked: its dependency, flag note and gates are current.
 
 ## Phase P2 - New kom numbers (rewritten 2026-11-16; was "Pilot: 5 new kom numbers" plus P3's 61)
 
