@@ -1322,9 +1322,9 @@ Map: the 7 S1 rows updated (SetGameStats, SetGameStat, Stat [9] / [10], stat blo
 `//#define SERV_IRUHADEV_JUNE_STATCALC_DEBUG` uncommented; the 2 OTHER rows were a peer's uncommitted char-luciel CH4b hunks, not committed
 here); junediverge `RESULT: PASS`; enumscan exit 1 on 192 pre-existing rows, 0 on lines this phase changed. Range gate (`--range 3f2911a9^..3f2911a9`): flagcheck `RESULT: PASS` (13 PASS, 3 PASS~, 2 DEFINE, 0 OTHER), junediverge `RESULT: PASS`,
 enumscan the same 192 pre-existing rows; stateends SKIPPED (X2GUUser.cpp only gains a log line, no skill state registered).
-Build: `BUILD OK: X2/US_SERVICE/x2.exe 27,124,224 B, 2026-11-16 10:26:54`; deploy refused (the game was running), `build.py --deploy-only`
-owed before the play-test. `EXESTR OK: 3 of 3 found in x2.exe, 27124224 B, dated 2026-11-16 10:26:54, md5 d22e408925cd8ae2e9b433dc7c3df1eb`
-(the three SHEET strings, wide, `--exe build`).
+Build: `DEPLOY OK: X2_offline.exe is 27,133,440 B, dated 2026-11-16 10:38:08, md5 85d46dcf40f1843140ce152466d7cc5c, equal to
+X2/US_SERVICE/x2.exe (2026-11-16 10:38:01); built at main 9fb16748 + 10 uncommitted code file(s)` (a peer's build; 3f2911a9 is its ancestor).
+`EXESTR OK: 3 of 3 found in X2_offline.exe, 27133440 B, dated 2026-11-16 10:38:08, md5 85d46dcf40f1843140ce152466d7cc5c` (the SHEET strings).
 
 **Not ported, routed.** Socket option data's range ([9] / [10] of the option stat, `+0x314` / `+0x318` in `328842f0`'s sum) -> S3 with the
 option vectors. Item-side `KItemFormatStatData` has no range slot (June's templet slots are 0) -> nothing. A weapon swap in the village
