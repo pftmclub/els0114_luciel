@@ -13686,6 +13686,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //              Revert: comment out the #define ( JUNE_CHAR_LUCIEL_SKILL_DEBUG ).
 //#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG	// retired by the char-luciel CH2d2 review ( 2026-11-16 )
 //#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG	// char-luciel CH3a: on again for the play-test; retired by the char-luciel CH3b review ( 2026-11-16 )
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG // char-luciel CH3c: on again for the play-test; retired by the char-luciel CH3c2 review
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG ) && ( !defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) || !defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG

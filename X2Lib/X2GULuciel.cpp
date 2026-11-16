@@ -20073,6 +20073,780 @@ void CX2GULuciel::RegisterDancingBladeStates( UserUnitStateData& rNormalStateDat
 	m_StateList[stateData.stateID] = stateData;
 }
 
+
+// char-luciel CH3c: Demonio ( 129 ) skills ( Desperado, Sinister Mind, Transcendence and its form, Garden of Haures, Abyss Sniping, Demonic Rush, Abyss Extinction, Rapid Impact, Punisher, Rapid Fury )
+namespace _CONST_LUCIEL_CH3C_
+{
+	const double	DESPERADO_AIM_UP_VALUE						= 30.0;		// June 32ae9ea0 ( 33439c68 ): above it the up shot state
+	const float		DESPERADO_AIM_DOWN_VALUE					= -20.f;	// June 32ae9ea0 ( 334ed434 ): below it the down shot state
+	const float		TRANSFORM_JUMP_CAN_NOT_JUMP_TIME			= 0.2f;		// June 32b05a40 ( 3346eeb8 ), 32b05e60
+	const double	TRANSFORM_LANDING_FALL_DISTANCE				= 45.0;		// June 32b05af0 ( 33472998 )
+	const double	TRANSFORM_TURN_DEGREE						= 180.0;	// June 32b061c0 ( 33438080 )
+	const int		TRANSFORM_SHREWD_CUTTER_END_SECOND_STATE_ID	= 499;		// June @32b48f1e ( 0x1f3 ): Enum.lua has no name for it ( between SHREWD_CUTTER_END 498 and SILENT_RAGE 500 )
+}
+using namespace _CONST_LUCIEL_CH3C_;
+
+// char-luciel CH3c: June 32ae8e20, the preload ( thunk 32b4b230 )
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_Init()
+{
+	XMeshReadyInBackground( L"ADD_MAGNETRON_DYNAMO_Spark2.Y" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"DESPERADO_BRAKE_Dark.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x100x50.X" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"White_Pulse01.dds" );
+	XSkinMeshReadyInBackground( L"DESPERADO_BRAKE_Guide.X" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	XSkinMeshReadyInBackground( L"LDB_ALTAR_OF_EVIL_X_Position.X" );
+	TextureReadyInBackground( L"Colorballgray.dds" );
+	XSkinMeshReadyInBackground( L"LDN_Ciel_Gun.x" );
+	XSkinMeshReadyInBackground( L"Spin_Liner03.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	TextureReadyInBackground( L"Gear_Water.tga" );
+	TextureReadyInBackground( L"Light_Impact01.dds" );
+	TextureReadyInBackground( L"Particle_Blur.dds" );
+	TextureReadyInBackground( L"Riding_Pet_LAVA_Hit02.dds" );
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XMeshReadyInBackground( L"Gunner_FootSmoke03.Y" );
+	XMeshReadyInBackground( L"Gunner_SilverBulletFire02.Y" );
+	TextureReadyInBackground( L"Gunner_Sphere01.dds" );
+	XSkinMeshReadyInBackground( L"NBG_Buster_Shell2.X" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+}
+
+// char-luciel CH3c: June 32ae9170, the preload ( thunk 32b4b4e0 )
+void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_Init()
+{
+	XMeshReadyInBackground( L"ALS_RESTRAINTS_SPECTER_TRACE04.Y" );
+	XSkinMeshReadyInBackground( L"WindWard_XMesh01.X" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"Gunner_FootSmoke03.Y" );
+	TextureReadyInBackground( L"HA_RRF_Reckless_Fiste_FX_Map01.tga" );
+	TextureReadyInBackground( L"eve_particleRay_spark.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"DRYAD_Fire01.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	XSkinMeshReadyInBackground( L"LDB_ABYSSSTRIKE_Toe.X" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+}
+
+// char-luciel CH3c: June 32ae9210, the preload ( thunk 32b4b4f0 )
+void CX2GULuciel::LSI_A_LDN_F_PUNISHER_Init()
+{
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XMeshReadyInBackground( L"Gunner_FootSmoke03.Y" );
+	XMeshReadyInBackground( L"Gunner_SilverBulletFire02.Y" );
+	XSkinMeshReadyInBackground( L"LDN_Ciel_Gun.x" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+	XSkinMeshReadyInBackground( L"LCG_SoulStrike_Projectile_AttackBox.X" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	TextureReadyInBackground( L"LDB_EvilFace01.dds" );
+	XMeshReadyInBackground( L"LLG_EvilFace_M01.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"Sprriggan_Light_Ball_02.tga" );
+	TextureReadyInBackground( L"raven_powrUp_circle_Gray.dds" );
+	TextureReadyInBackground( L"ALS_SLICER_01.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	TextureReadyInBackground( L"LDN_PUNISHER_Ready_2.dds" );
+	TextureReadyInBackground( L"SDK_AIRWAVE_T01.dds" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning02.Y" );
+}
+
+// char-luciel CH3c: June 32ae9320, the preload ( thunk 32b4b240 )
+void CX2GULuciel::LSI_SA_LDN_SINISTER_MIND_Init()
+{
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	XSkinMeshReadyInBackground( L"WindWard_XMesh01.X" );
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XMeshReadyInBackground( L"Gunner_FootSmoke03.Y" );
+	XMeshReadyInBackground( L"Gunner_SilverBulletFire02.Y" );
+	XSkinMeshReadyInBackground( L"LCG_SoulStrike_Projectile_AttackBox.X" );
+	TextureReadyInBackground( L"LDB_EvilFace01.dds" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+	XMeshReadyInBackground( L"Sinister_Mind_Plant_2.Y" );
+	XSkinMeshReadyInBackground( L"A_RNW_THORNS_TRAP.X" );
+	TextureReadyInBackground( L"NUI_BUGI_TROCK_piece.dds" );
+	XMeshReadyInBackground( L"Sinister_Mind_Plant_1.Y" );
+	XMeshReadyInBackground( L"Sinister_Mind_Plant_3.Y" );
+}
+
+// char-luciel CH3c: June 32ae93f0, the preload ( thunk 32b4b250 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XSkinMeshReadyInBackground( L"CTT_SA_CROSS_FIRE_circleSpark.X" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"Ice_Particle01.dds" );
+	TextureReadyInBackground( L"LCN_MagicSquare_Bondage.dds" );
+	XMeshReadyInBackground( L"LDB_ALTAROFEVIL_Body_Ciel.Y" );
+	XMeshReadyInBackground( L"LDB_ALTAROFEVIL_Bomb.Y" );
+	XMeshReadyInBackground( L"LDB_ALTAROFEVIL_BombInvert.Y" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	TextureReadyInBackground( L"SKA_flame2_White.dds" );
+	XSkinMeshReadyInBackground( L"LDN_Ciel_Horn.X" );
+	XMeshReadyInBackground( L"Lire_FeatherA.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_100x50x50_front.X" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	XSkinMeshReadyInBackground( L"LDN_Combo_Z_Shadow.X" );
+	TextureReadyInBackground( L"Energy_Blue.dds" );
+	XSkinMeshReadyInBackground( L"LCN_SPECTRAL_SPEAR_M02.X" );
+	TextureReadyInBackground( L"LDN_Combo_X_Project.tga" );
+	XMeshReadyInBackground( L"LDN_Combo_X_Trace.Y" );
+	XMeshReadyInBackground( L"LDN_Combo_XXXLoop_Knife_L.Y" );
+	XMeshReadyInBackground( L"LDN_Combo_XXXLoop_Knife_R.Y" );
+	TextureReadyInBackground( L"LD_M_Slicer01.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_100x50x50_center.X" );
+	XMeshReadyInBackground( L"Gunner_FootSmoke03.Y" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"LDN_Combo_JumpZ_Knife_L.Y" );
+	TextureReadyInBackground( L"ALS_SLICER_01.dds" );
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XMeshReadyInBackground( L"LDN_Combo_XXX_trace.Y" );
+	TextureReadyInBackground( L"LD_Slicer_trace_01.dds" );
+}
+
+// char-luciel CH3c: June 32ae9670, the preload ( thunk 32b4b2b0 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_Init()
+{
+	TextureReadyInBackground( L"ALS_NECROMANCY_SMILE_FOX_Cycle01.dds" );
+	TextureReadyInBackground( L"ALS_SLICER_01.dds" );
+	XMeshReadyInBackground( L"LDN_SHADOW_FURY_M_Side.Y" );
+	XSkinMeshReadyInBackground( L"Position_LDN_SHADOW_FURY.X" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"Circle_Light01.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_300x50x50.X" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+}
+
+// char-luciel CH3c: June 32ae9710, the preload ( thunk 32b4b2d0 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_Init()
+{
+	XSkinMeshReadyInBackground( L"CTT_SA_CROSS_FIRE_circleSpark.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	TextureReadyInBackground( L"Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	TextureReadyInBackground( L"Ice_Particle01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	XSkinMeshReadyInBackground( L"LDN_SHREWD_CUTTER_A_Knife_1.X" );
+	TextureReadyInBackground( L"LDN_SHREWD_CUTTER_A_Knife_1.tga" );
+	TextureReadyInBackground( L"Particle_Blur.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	TextureReadyInBackground( L"raven_beed_hit_circle.DDS" );
+	XSkinMeshReadyInBackground( L"LDN_SHREWD_CUTTER_B_Knife_1.X" );
+}
+
+// char-luciel CH3c: June 32ae97b0, the preload ( thunk 32b4b2e0 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_Init()
+{
+	XSkinMeshReadyInBackground( L"CTT_SA_CROSS_FIRE_circleSpark.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x100x50.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XMeshReadyInBackground( L"Eltrion2p_S2EX_Ready_Sign.Y" );
+	TextureReadyInBackground( L"Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	XSkinMeshReadyInBackground( L"LCN_SWIFT_SMASH_MagicSquare.X" );
+	XMeshReadyInBackground( L"LDB_ALTAROFEVIL_Bomb.Y" );
+	TextureReadyInBackground( L"LDN_SHREWD_CUTTER_A_Knife_1.tga" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_DarkRune.Y" );
+	TextureReadyInBackground( L"LDN_SILENT_RAGE_DarkRune.dds" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_FLOOR_UP_Wild.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Shadow_1.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Shadow_2.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Shadow_3.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Shadow_4.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Shadow_5.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Shadow_6.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Shadow_7.Y" );
+	XMeshReadyInBackground( L"LDN_SILENT_RAGE_Star.Y" );
+	TextureReadyInBackground( L"LDN_SILENT_RAGE_Star.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	TextureReadyInBackground( L"ScreenLayer_Black.dds" );
+	XMeshReadyInBackground( L"Up_Light01_Mesh.Y" );
+	TextureReadyInBackground( L"eve_particleRay_spark.dds" );
+	TextureReadyInBackground( L"secretVelder_alchemystBoss_magicAttackE_waveBlack.dds" );
+}
+
+// char-luciel CH3c: June 32ae9920, the preload ( thunk 32b4b300 )
+void CX2GULuciel::LSI_SA_LDN_GARDEN_OF_HAURES_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_300x50x50.x" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	TextureReadyInBackground( L"Black_pulse.dds" );
+	TextureReadyInBackground( L"CHUNG_GIGANTIC_IMPACT_Bottom_Broken.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_100x50x50_center.X" );
+	XMeshReadyInBackground( L"LDN_GARDEN_OF_HAURES_FloorADD.Y" );
+	XMeshReadyInBackground( L"LDN_GARDEN_OF_HAURES_FloorFloor.Y" );
+	XSkinMeshReadyInBackground( L"__Motion_HAURES2_Ciel_LDN.X" );
+	XSkinMeshReadyInBackground( L"Motion_HAURES1_Ciel_LDN.x" );
+	XSkinMeshReadyInBackground( L"Motion_HAURES2_Ciel_LDN.x" );
+	SoundReady( L"Ciel_Garden_Plant01.ogg" );
+	SoundReady( L"Ciel_Garden_Plant02.ogg" );
+	SoundReady( L"Ciel_Garden_Plant03.ogg" );
+}
+
+// char-luciel CH3c: June 32aea060, the preload ( thunk 32b4b520 )
+void CX2GULuciel::LSI_A_LDN_RAPID_FURY_LU_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"ALS_RESTRAINTS_SPECTER_TRACE04.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	XMeshReadyInBackground( L"Gunner_FootSmoke03.Y" );
+	TextureReadyInBackground( L"HA_RRF_Reckless_Fiste_FX_Map01.tga" );
+	XMeshReadyInBackground( L"ALS_SHAKE_CHAOS_02.Y" );
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XMeshReadyInBackground( L"Gunner_SilverBulletFire02.Y" );
+	XMeshReadyInBackground( L"LDB_ABYSS_STRIKE_Ciel_Pro.Y" );
+	XSkinMeshReadyInBackground( L"LDN_Ciel_Gun.x" );
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XSkinMeshReadyInBackground( L"WindWard_XMesh01.X" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+}
+
+// char-luciel CH3c: June 32aea3b0, the preload ( thunk 32b4b350 )
+void CX2GULuciel::LSI_SA_LDN_ABYSS_SNIPING_READY_Init()
+{
+	XSkinMeshReadyInBackground( L"LDN_Ciel_Gun.x" );
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XMeshReadyInBackground( L"Gunner_SilverBulletFire02.Y" );
+	XMeshReadyInBackground( L"LDB_ABYSS_STRIKE_Ciel_Pro.Y" );
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XSkinMeshReadyInBackground( L"WindWard_XMesh01.X" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning02.Y" );
+}
+
+// char-luciel CH3c: June 32aea440, the preload ( thunk 32b4b360 )
+void CX2GULuciel::LSI_SA_LDN_DEMONIC_RUSH_START_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"ALS_NECROMANCY_SMILE_FOX_Cycle01.dds" );
+	XSkinMeshReadyInBackground( L"CTT_SA_CROSS_FIRE_circleSpark.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_150x50x50.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"Field_Boss_Dark_Snake_Smoke01.dds" );
+	TextureReadyInBackground( L"GuideArrow02.dds" );
+	TextureReadyInBackground( L"IceHit_Impact01.dds" );
+	XMeshReadyInBackground( L"LDB_ALTAROFEVIL_Body.Y" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XMeshReadyInBackground( L"Up_Impact01.Y" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning02.Y" );
+	TextureReadyInBackground( L"secretVelder_alchemystBoss_magicAttackC_circleLine.dds" );
+	TextureReadyInBackground( L"secretVelder_alchemystBoss_magicAttackE_waveBlack.dds" );
+}
+
+// char-luciel CH3c: June 32aea600 ( thunk 32b4b3b0 ): Abyss Extinction has nothing to preload ( a bare ret )
+void CX2GULuciel::LSI_SA_LDN_ABYSS_EXTINCTION_Init()
+{
+}
+
+// char-luciel CH3c: June 32ae9ea0 ( the class map's `helper` ): the aim value picks the shot state, up above 30, down below -20
+void CX2GULuciel::ChangeDesperadoAttackState()
+{
+	if ( m_fDesperadoAttackTime > DESPERADO_AIM_UP_VALUE )
+		StateChange( LSI_SA_LDN_DESPERADO_ATTACK_UP );
+	else if ( DESPERADO_AIM_DOWN_VALUE > m_fDesperadoAttackTime )
+		StateChange( LSI_SA_LDN_DESPERADO_ATTACK_DOWN );
+	else
+		StateChange( LSI_SA_LDN_DESPERADO_ATTACK );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL desperado aim value %.1f targets %d", m_fDesperadoAttackTime, static_cast<int>( m_vecDesperadoTarget.size() ) );	// char-luciel CH3c
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+}
+
+// char-luciel CH3c: June 32b04950 ( thunk 32b4c480 ): the animation end waits; at the state change time the first shot state starts; a key press in its window arms that change ( only with a
+// target count to shoot ), then the cancel chain
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		StateChange( LSI_SA_LDN_DESPERADO_ATTACK_READY );
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+	}
+	else if ( GetXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= GetXSkinAnimFuture()->GetNowAnimationTime()
+		&& 0 == m_iDesperadoAttackCount && 0 != m_iDesperadoMaxAttackCount )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b04c90 ( thunk 32b4c490 ): the animation end picks the shot state by the aim value
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_READY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+		ChangeDesperadoAttackState();
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b04cd0 ( thunk 32b4c4a0, the up and down shot states register it too ): the animation end shoots the next target, the last one ends the skill;
+// June's listing has no CommonEventProcess here ( JUNE_BUGS 777 )
+void CX2GULuciel::LSI_SA_LDN_DESPERADO_ATTACK_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( m_iDesperadoAttackCount < static_cast<int>( m_vecDesperadoTarget.size() ) )
+			ChangeDesperadoAttackState();
+		else
+			StateChange( LSI_SA_LDN_DESPERADO_ATTACK_END );
+	}
+}
+
+// char-luciel CH3c: June 32b04fc0 ( thunk 32b4c760, both bodies ): the animation end lands or falls; at the state change time ( the hit armed the event flag ) the move-attack state of the body starts
+void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& m_fEventTime[0].stateChange <= m_FrameDataFuture.unitCondition.fStateTime )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+		StateChange( true == IsMinorUnitActive() ? LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK : LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL rapid impact move attack body %c", ( true == IsMinorUnitActive() ? L'C' : L'L' ) );	// char-luciel CH3c
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b05290 ( thunk 32b4c770, both bodies ): the animation end lands or falls; the sit key checks the bounding target
+void CX2GULuciel::LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	else if ( true == m_InputData.oneSit )
+	{
+		CheckBoundingTarget();
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b05520 ( thunk 32b4c4b0 ): with Stable Dark Energy learned, a cast in the air starts the fly state
+void CX2GULuciel::LSI_SA_LDN_SINISTER_MIND_StateStartFuture()
+{
+	if ( 0 < GetUnit()->AccessUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true )
+		&& false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		StateChange( LSI_SA_LDN_SINISTER_MIND_FLY );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL sinister mind fly state" );	// char-luciel CH3c
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH3c: June 32b05570 ( thunk 32b4c4c0 ): the animation end lands or falls; this class's chain tests the dash before the back walk
+void CX2GULuciel::LSI_SA_LDN_SINISTER_MIND_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b057f0 ( thunk 32b4c4d0 ): the animation end lands; the dash, the walk and the fly cancel follow, and CommonEventProcess runs only when the fly cancel does
+// ( SKILL_CANCEL_AFTER_FLY takes the next statement as its body, as Raven's air states have it; JUNE_BUGS 776 )
+void CX2GULuciel::LSI_SA_LDN_SINISTER_MIND_FLY_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_JUMP_LANDING );
+	}
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	SKILL_CANCEL_AFTER_FLY( m_fSkillCancelAfterFly )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b05950 ( thunk 32b4c4e0 ): after the state change time the transformed form starts
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_EventProcess()
+{
+	if ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() )
+	{
+		StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL transcendence form start" );	// char-luciel CH3c
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b059a0 ( thunk 32b4c4f0 ): the animation end on Ciel's body goes to the form's wait
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() && true == IsTransformed( CX2Unit::DT_MINOR ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32ae95a0 ( thunk 32b4b260 ): the rise ends in the jump-down state; Z / X while still rising start the jump attacks
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP_EventProcess()
+{
+	if ( 0.f < m_PhysicParam.nowSpeed.y )
+	{
+		if ( true == m_InputData.oneZ )
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z );	// char-luciel CH3c: June calls the base, not the form mapper
+		else if ( true == m_InputData.oneX )
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b059f0 ( thunk 32b4c500 ): the landing on the ground, or Z / X in the air
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN_EventProcess()
+{
+	if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING );	// char-luciel CH3c: June calls the base, not the form mapper
+	else if ( true == m_InputData.oneZ )
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z );	// char-luciel CH3c: June calls the base, not the form mapper
+	else if ( true == m_InputData.oneX )
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X );	// char-luciel CH3c: June calls the base, not the form mapper
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b05a40 ( thunk 32b4c510 ): the form's buff gone ends the form; the ground ends the jump Z ( the event flag sets the can-not-jump time ); the animation end loops
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+			m_fCanNotJumpTime = TRANSFORM_JUMP_CAN_NOT_JUMP_TIME;
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b05af0 ( thunk 32b4c520, the jump X landing registers it too: June 32b05ee0 is byte-equal ): the form's buff gone ends the form; off the line the jump-down state starts
+// and the position drops 45; the animation end waits; then the cancel chain with the linked skill
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c: June calls the base, not the form mapper
+		m_FrameDataFuture.syncData.position.y -= TRANSFORM_LANDING_FALL_DISTANCE;
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b05dd0 ( thunk 32b4c530 ): the form's buff gone ends the form; the animation end loops
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b05e60 ( thunk 32b4c540 ): the form's buff gone ends the form; the ground lands ( the event flag sets the can-not-jump time )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+	{
+		if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+			m_fCanNotJumpTime = TRANSFORM_JUMP_CAN_NOT_JUMP_TIME;
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LANDING );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b061c0 ( thunk 32b4c560 ): the form's combo, Z continues to ZZ; ZZ / ZZZ are this listing with another next state. The buff check comes first, the animation end waits,
+// and the held direction opposite to the facing turns the unit round when the next hit starts
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z_EventProcess()
+{
+	if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ );	// char-luciel CH3c: June calls the base, not the form mapper
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+		TurnTransformComboToHeldDirection();
+	}
+	else if ( GetXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= GetXSkinAnimFuture()->GetNowAnimationTime() && true == m_InputData.oneZ )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b06570 ( thunk 32b4c570 ): ZZ continues to ZZZ
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_EventProcess()
+{
+	if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ );	// char-luciel CH3c: June calls the base, not the form mapper
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+		TurnTransformComboToHeldDirection();
+	}
+	else if ( GetXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= GetXSkinAnimFuture()->GetNowAnimationTime() && true == m_InputData.oneZ )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b06920 ( thunk 32b4c580 ): ZZZ continues to ZZZZ
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ_EventProcess()
+{
+	if ( false == HaveThisBuff( BTI_BUFF_TRANSCENDENCE ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ );	// char-luciel CH3c: June calls the base, not the form mapper
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+		TurnTransformComboToHeldDirection();
+	}
+	else if ( GetXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= GetXSkinAnimFuture()->GetNowAnimationTime() && true == m_InputData.oneZ )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b06cd0 ( thunk 32b4c590 ): the last Z hit; the form's buff gone ends the form, the animation end waits on the line or falls ( the position drops 30 ), then the cancel chain
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ_EventProcess()
+{
+	if ( false == HaveThisBuff( true == IsMinorUnitActive() ? BTI_BUFF_TRANSCENDENCE : BTI_BUFF_ALTAR_OF_EVIL ) )
+	{
+		CX2GUUser::StateChange( true == IsMinorUnitActive() ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END : LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_END );	// char-luciel CH3c: June calls the base, not the form mapper
+	}
+	else if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT );	// char-luciel CH3c: June calls the base, not the form mapper
+		}
+		else
+		{
+			CX2GUUser::StateChange( LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN );	// char-luciel CH3c: June calls the base, not the form mapper
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+	}
+	TRANSFORM_SKILL_CANCEL_AFTER_( m_fSkillCancelAfter )
+	HYPER_MODE_CANCEL_AFTER_( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3c: June 32b061c0 @32b0627e-32b062d2 ( inline; the same block sits in 32b06570 and 32b06920 ): a held direction opposite to the facing turns the unit round when the next hit starts
+void CX2GULuciel::TurnTransformComboToHeldDirection()
+{
+	if ( ( true == m_InputData.pureLeft && true == GetIsRight() ) || ( true == m_InputData.pureRight && false == GetIsRight() ) )
+	{
+		m_FrameDataFuture.syncData.bIsRight = !m_FrameDataFuture.syncData.bIsRight;
+		m_FrameDataFuture.unitCondition.dirDegree.y = static_cast<float>( m_FrameDataFuture.unitCondition.dirDegree.y + TRANSFORM_TURN_DEGREE );
+	}
+}
+
+// char-luciel CH3c: June 32ae95f0 ( thunk 32b4b270, the ZZ and ZZZ states ): with no held direction the unit turns round
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_StateEndFuture()
+{
+	if ( false == m_InputData.pureLeft && false == m_InputData.pureRight )
+	{
+		m_FrameDataFuture.syncData.bIsRight = !m_FrameDataFuture.syncData.bIsRight;
+		m_FrameDataFuture.unitCondition.dirDegree.y = static_cast<float>( m_FrameDataFuture.unitCondition.dirDegree.y + TRANSFORM_TURN_DEGREE );
+	}
+
+	CommonStateEndFuture();
+}
+
+// char-luciel CH3c: June 32ae9630 ( thunk 32b4b280 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_StateStart()
+{
+	m_usStateLoopCount = 0;
+
+	CommonStateStart();
+}
+
+// char-luciel CH3c: June 32ae9650 ( thunk 32b4b290 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_StateEnd()
+{
+	CommonStateEnd();
+}
+
+// char-luciel CH3c: June 32ae9660 ( thunk 32b4b2a0 )
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_StateStart()
+{
+	CommonStateStart();
+}
+
+// char-luciel CH3c: June 32ae96e0 ( thunk 32b4b2c0 ): the linked skill pays its MP and cool time; the damage is counted from zero
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateStart()
+{
+	CommonStateStart();
+	ApplyTransformSkillCost();
+	SetEquippedSkillLevel( CX2SkillTree::SI_NONE, true );	// June 31fc9f80
+	m_fShadowFuryAccumulatedDamage = 0.f;
+}
+
+// char-luciel CH3c: June 32ae9900 ( thunk 32b4b2f0 ): the linked skill pays its MP and cool time
+void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
+{
+	CommonStateStart();
+	ApplyTransformSkillCost();
+	SetEquippedSkillLevel( CX2SkillTree::SI_NONE, true );	// June 31fc9f80
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
@@ -20297,6 +21071,180 @@ void CX2GULuciel::RegisterDancingBladeStates( UserUnitStateData& rNormalStateDat
 
 				normalStateData.m_eSkillID		= eSkillID_;	// June @32b46de2 ( shared tail ): the raw id on both states
 				hyperStateData.m_eSkillID		= eSkillID_;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_DESPERADO:	// char-luciel CH3c: June @32b4857b ( ids 30047 / 30078 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_Init );	// June 32b4b230
+				// June 32b4d330 ( Start ): LSI_SA_LDN_DESPERADO_StateStart, body in CH3c2
+				// June 32b4ce20 ( FrameMove ): LSI_SA_LDN_DESPERADO_FrameMove, body in CH3c2
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_EventProcess );	// June 32b4c480
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_READY", stateData.stateID );
+				// June 32b4e340 ( Start ): LSI_SA_LDN_DESPERADO_ATTACK_READY_StateStart, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_READY_EventProcess );	// June 32b4c490
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK", stateData.stateID );
+				// June 32b4e350 ( FrameMove ): LSI_SA_LDN_DESPERADO_ATTACK_FrameMove, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_EventProcess );	// June 32b4c4a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_END", stateData.stateID );
+				// June 32b4d340 ( Start ): LSI_SA_LDN_DESPERADO_ATTACK_END_StateStart, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_UP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_UP", stateData.stateID );
+				// June 32b4e350 ( FrameMove ): LSI_SA_LDN_DESPERADO_ATTACK_FrameMove, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_EventProcess );	// June 32b4c4a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DESPERADO_ATTACK_DOWN;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DESPERADO_ATTACK_DOWN", stateData.stateID );
+				// June 32b4e350 ( FrameMove ): LSI_SA_LDN_DESPERADO_ATTACK_FrameMove, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DESPERADO_ATTACK_EventProcess );	// June 32b4c4a0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_SINISTER_MIND:	// char-luciel CH3c: June @32b48711 ( ids 30048 / 30079 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_SINISTER_MIND", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_Init );	// June 32b4b240
+				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_StateStartFuture );	// June 32b4c4b0
+				// June 32b4e360 ( FrameMove ): LSI_SA_LDN_SINISTER_MIND_FrameMove, body in CH3c2
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_EventProcess );	// June 32b4c4c0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_SINISTER_MIND", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_SINISTER_MIND_FLY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_SINISTER_MIND_FLY", stateData.stateID );
+				// June 32b4e360 ( FrameMove ): LSI_SA_LDN_SINISTER_MIND_FrameMove, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_FLY_EventProcess );	// June 32b4c4d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_GARDEN_OF_HAURES:	// char-luciel CH3c: June @32b49123 ( ids 30053 / 30081 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_GARDEN_OF_HAURES", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_GARDEN_OF_HAURES_Init );	// June 32b4b300
+				// June 32b4e3c0 ( FrameMove ): LSI_SA_LDN_GARDEN_OF_HAURES_FrameMove, body in CH3c2
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_GARDEN_OF_HAURES", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		// char-luciel CH3c: Transcendence ( 30049 ), Abyss Sniping ( 30059 ) and Demonic Rush ( 30060 ) are held for CH3c2: their states need its event processes ( stateends gate ); the cases are in june2017_re/char_luciel/ch3c_held_cases.txt
+
+		case CX2SkillTree::RNSI_SA_LDN_ABYSS_EXTINCTION:	// char-luciel CH3c: June @32b49577 ( id 30085 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_EXTINCTION", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_EXTINCTION_Init );	// June 32b4b3b0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_EXTINCTION", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateInit			= normalStateData.StateInit;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LDN_RAPID_IMPACT:	// char-luciel CH3c: June @32b49ee6 ( ids 30217 / 30314 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_RAPID_IMPACT", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_Init );	// June 32b4b4e0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_EventProcess );	// June 32b4c760
+
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_RAPID_IMPACT", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateInit			= normalStateData.StateInit;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK;
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK", stateData.stateID );
+				// June 32b4e450 ( StartFuture slot, June's own name StateStart ): 32b32550, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess );	// June 32b4c770
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDN_M_RAPID_IMPACT;
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_M_RAPID_IMPACT", stateData.stateID );
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_Init );	// June 32b4b4e0 ( the delegate maker 32b4c8b0 fills the Init slot, +0x18 )
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_EventProcess );	// June 32b4c760
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK;
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_M_RAPID_IMPACT_MOVEATTACK", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b4a05c byte +0x11
+				// June 32b4e450 ( StartFuture slot ): 32b32550, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess );	// June 32b4c770
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LDN_PUNISHER:	// char-luciel CH3c: June @32b4a07d ( ids 30218 / 30315 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_PUNISHER", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_PUNISHER_Init );	// June 32b4b4f0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				// June 32b4e460 ( FrameMove ): LSI_A_LDN_F_PUNISHER_FrameMove, body in CH3c2
+
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_PUNISHER", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateInit			= normalStateData.StateInit;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDN_M_PUNISHER;
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_M_PUNISHER", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b4a179 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_PUNISHER_Init );	// June 32b4b4f0 ( the delegate maker 32b4c910 fills the Init slot, +0x18 )
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				// June 32b4e470 ( FrameMove ): LSI_A_LDN_M_PUNISHER_FrameMove, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LDN_RAPID_FURY:	// char-luciel CH3c: June @32b4a2a2 ( id 30306 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_RAPID_FURY_LU", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_RAPID_FURY_LU_Init );	// June 32b4b520
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_RAPID_FURY_LU", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LDN_RAPID_FURY_CIEL;
+				m_LuaManager.MakeTableReference( "LSI_A_LDN_RAPID_FURY_CIEL", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b4a35c byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_RAPID_FURY_LU_Init );	// June 32b4b520 ( the delegate maker 32b4c9f0 fills the Init slot, +0x18 )
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
 			} break;
 
 		case CX2SkillTree::RNSI_A_LUCIEL_HEAVY_HIT:	// char-luciel CH2a: June @32b495ab ( ids 30201 / 30212 )

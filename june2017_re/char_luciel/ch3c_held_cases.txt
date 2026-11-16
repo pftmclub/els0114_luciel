@@ -1,0 +1,349 @@
+char-luciel CH3c: setter cases written from June's listing (32b46580) and held back, because every one registers states whose event process is a CH3c2 function (no body yet: the states
+would run XAP_ONE_WAIT forever, tools/stateends.py FAIL). CH3c2 pastes them into SetEquippedSkillFuncBySkillSlotIndex's switch (before the HEAVY_HIT case), replaces each
+"body in CH3c2" comment with the SET_CB_FUNC line of its function, and runs stateends again.
+Slot attribution of the delegate-maker cases is the physical stack depth (cdecl makers: the pair pushes stay until the add esp), not ch0_skill.tsv's.
+Skill-state byte +0x11 (m_bSkillState) in the Transcendence case: states 494, 495, 500 (the digest listed none).
+
+		case CX2SkillTree::RNSI_SA_LDN_TRANSCENDENCE:	// char-luciel CH3c: June @32b487cf ( ids 30049 / 30080 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_Init );	// June 32b4b250
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_EventProcess );	// June 32b4c4e0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START", stateData.stateID );
+				// June 32b4e750 ( StartFuture ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStartFuture, body in CH3c2
+				// June 32b4e760 ( Start ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_StateStart, body in CH3c2
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_EventProcess );	// June 32b4c4f0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT", stateData.stateID );
+				// June 32b4e370 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WAIT_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, WalkFrameMoveFuture );	// June 329cadf0 > 31fd23e0
+				// June 32b4e380 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_WALK_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY", stateData.stateID );
+				// June 32b4ce30 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_READY_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );	// June 329cae00 > 31fd2470
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP_EventProcess );	// June 32b4b260
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN", stateData.stateID );
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, JumpFrameMoveFuture );	// June 329cae00 > 31fd2470
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN_EventProcess );	// June 32b4c500
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, JumpLandingStart );	// June 329cae20 > 31fc7f30
+				// June 32b4e390 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_LANDING_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashStartFuture );	// June 329cc580 > 329cc1f0
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, DashStart );	// June 329cae30 > 31fc7fa0
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, DashFrameMoveFuture );	// June 329cae40 > 31fd25e0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_EventProcess );	// June 32b4e300 ( Lu's form shares it )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_END", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, DashEndStartFuture );	// June 32b4aa90 > 31fd2680
+				// June 32b4aaa0 > 31fc7fc0 ( StateStart ): = CommonStateStart, which an empty slot runs
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_LU_DASH_END_FrameMove );	// June 32b4cbe0 > 32b0fef0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_END_EventProcess );	// June 32b4e310 ( Lu's form shares it )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashJumpStartFuture );	// June 32a2b990 > 31fc7f50
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, DashJumpStart );	// June 32a2b9a0 > 31fcbdf0
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, DashJumpFrameMoveFuture );	// June 32a2b9b0 > 31fd2520
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_EventProcess );	// June 32b4ce00 ( Lu's form shares it )
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GUUser, DashJumpEndFuture );	// June 32a2b9c0 > 31fc7f80
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_DASH_JUMP_LANDING", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, DashJumpLandingStartFuture );	// June 329cae70 > 31fcbe40
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, JumpLandingStart );	// June 329cae20 > 31fc7f30
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDB_ALTAR_OF_EVIL_TRANSFORM_DASH_JUMP_LANDING_EventProcess );	// June 32b4e320 ( Lu's form shares it )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_EventProcess );	// June 32b4c510
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP", stateData.stateID );
+				// June 32b4ce40 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LOOP_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING_EventProcess );	// June 32b4c520
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_EventProcess );	// June 32b4c530
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP_EventProcess );	// June 32b4c540
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LANDING", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING_EventProcess );	// June 32b4c550 ( byte-equal to the jump Z landing's 32b4c520 )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z_EventProcess );	// June 32b4c560
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_EventProcess );	// June 32b4c570
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_StateEndFuture );	// June 32b4b270
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ_EventProcess );	// June 32b4c580
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_StateEndFuture );	// June 32b4b270
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ_EventProcess );	// June 32b4c590
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X", stateData.stateID );
+				// June 32b4c5a0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_X_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX", stateData.stateID );
+				// June 32b4c5b0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XX_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_StateStart );	// June 32b4b280
+				// June 32b4c5c0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP", stateData.stateID );
+				// June 32b4c5d0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_EventProcess, body in CH3c2
+				stateData.StateEnd					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_StateEnd );	// June 32b4b290
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_StateStart );	// June 32b4b2a0
+				// June 32b4c5e0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b48e15 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_Init );	// June 32b4b2b0
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateStart );	// June 32b4b2c0
+				// June 32b4c5f0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess, body in CH3c2
+				// June 32b4e3a0 ( StateEnd ): 32b33b00, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b48e60 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_Init );	// June 32b4b2d0
+				// June 32b4c600 ( Start ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_StateStart, body in CH3c2
+				// June 32b4c610 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A", stateData.stateID );
+				// June 32b4c620 ( StartFuture ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture, body in CH3c2
+				// June 32b4cfa0 ( EventProcess ): 32b15290, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_B", stateData.stateID );
+				// June 32b4c620 ( StartFuture ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_ATTACK_A_StateStartFuture, body in CH3c2
+				// June 32b4cfa0 ( EventProcess ): 32b15290, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END", stateData.stateID );
+				// June 32b4e3b0 ( StartFuture ): 32b33bf0, body in CH3c2
+				// June 32b4c5f0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= TRANSFORM_SHREWD_CUTTER_END_SECOND_STATE_ID;	// June @32b48f1e: the Shrewd Cutter end table again
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_END", stateData.stateID );
+				// June 32b4c5f0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b48f71 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_Init );	// June 32b4b2e0
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart );	// June 32b4b2f0
+				// June 32b4c5f0 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				const bool bTranscendedUnit = ( NULL != GetUnit() && 0 != GetUnit()->GetUnitData().m_iUnitClassTran );	// June 32070d40 @32b48fd0
+				stateData.stateID					= ( true == bTranscendedUnit ) ? LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE_TR : LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE;
+				m_LuaManager.MakeTableReference( ( true == bTranscendedUnit ) ? "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE_TR" : "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_HYPER_MODE", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GUUser, HyperModeStartFuture );	// June 329caf10
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, HyperModeStart );	// June 329caef0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, HyperModeFrameMove );	// June 32bd5f20
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, HyperModeEventProcess );	// June 329caf00
+				stateData.StateEnd					= SET_CB_FUNC( CX2GUUser, HyperModeEnd );	// June 329cc5a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_THROW_ITEM;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_THROW_ITEM", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateStart );	// June 329cb120
+				stateData.OnFrameMoveFuture			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMoveFuture );	// June 329cb130
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_FrameMove );	// June 329cb140
+				stateData.OnCameraMove				= SET_CB_FUNC( CX2GUUser, THROW_ITEM_CameraMove );	// June 329cb150
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, THROW_ITEM_EventProcess );	// June 329cb160
+				stateData.StateEnd					= SET_CB_FUNC( CX2GUUser, THROW_ITEM_StateEnd );	// June 329cb170
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END", stateData.stateID );
+				// June 32b4c630 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_END_EventProcess, body in CH3c2
+				// June 32b4e640 ( StateEnd ): 32b3a2f0, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_TRANSCENDENCE_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_TRANSCENDENCE_END", stateData.stateID );
+				// June 32b4c640 ( EventProcess ): LSI_SA_LDN_TRANSCENDENCE_END_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				m_ptrShrewdCutterLockOn = SLockOnSystem::CreateLockOnSystem();	// June @32b490e0-32b49108: the temp is moved in and released
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_ABYSS_SNIPING:	// char-luciel CH3c: June @32b492fa ( id 30059 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_READY", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_ABYSS_SNIPING_READY_Init );	// June 32b4b350
+				// June 32b4d350 ( FrameMove ): LSI_SA_LDN_ABYSS_SNIPING_READY_FrameMove, body in CH3c2
+				// June 32b4c660 ( EventProcess ): LSI_SA_LDN_ABYSS_SNIPING_READY_EventProcess, body in CH3c2
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_READY", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_UP;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_UP", stateData.stateID );
+				// June 32b4e3d0 ( FrameMove ): LSI_SA_LDN_ABYSS_SNIPING_UP_FrameMove, body in CH3c2
+				// June 32b4c670 ( EventProcess ): LSI_SA_LDN_ABYSS_SNIPING_UP_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_ATTACK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_ATTACK", stateData.stateID );
+				// June 32b4e3d0 ( FrameMove ), 32b4c670 ( EventProcess ): the up state's, bodies in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_DOWN;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_DOWN", stateData.stateID );
+				// June 32b4e3d0 ( FrameMove ), 32b4c670 ( EventProcess ): the up state's, bodies in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_ABYSS_SNIPING_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_ABYSS_SNIPING_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LDN_DEMONIC_RUSH:	// char-luciel CH3c: June @32b49443 ( id 30060 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_START", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_DEMONIC_RUSH_START_Init );	// June 32b4b360
+				// June 32b4c680 ( EventProcess ): LSI_SA_LDN_DEMONIC_RUSH_START_EventProcess, body in CH3c2
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_START", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DEMONIC_RUSH_LAST;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_LAST", stateData.stateID );
+				// June 32b4c690 ( EventProcess ): LSI_SA_LDN_DEMONIC_RUSH_LAST_EventProcess, body in CH3c2
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LDN_DEMONIC_RUSH_LANDING;
+				m_LuaManager.MakeTableReference( "LSI_SA_LDN_DEMONIC_RUSH_LANDING", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+

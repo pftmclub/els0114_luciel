@@ -79,3 +79,15 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
   June's direct sites in the Transcendence form ( `june2017_re/char_luciel/` has no table; regenerate with the CH2d3 Done note's method ): `32ae95a0`, `32b059a0`-`32b07eb0`,
   `32b13730`, `32b13860`, `32b15290`, `32b33480`, `32b336a0`, `32b338c0`, `32b33bf0`. Common ids ( `LSI_LU_*` ) stay on the virtual call, as June. Tag each such line
   `// char-luciel <phase>: June calls the base, not the form mapper`.
+
+## Amended by char-luciel CH3c (2026-11-16)
+
+- **Three cases are yours to land.** Transcendence ( 30049 / 30080 ), Abyss Sniping ( 30059 ) and Demonic Rush ( 30060 ) are not registered in `SetEquippedSkillFuncBySkillSlotIndex`: their states would run `XAP_ONE_WAIT`
+  forever without your event processes ( `stateends.py` FAIL ). The finished case bodies, from June's listing with the physical stack offsets, are in `june2017_re/char_luciel/ch3c_held_cases.txt`: paste them into the switch
+  ( before the HEAVY_HIT case ), turn each `// June <thunk> ( <slot> ): <name>, body in CH3c2` line into its `SET_CB_FUNC` line as you write the function, and run `stateends.py check` ( it must print PASS ).
+- **The other cases are written** and wait for your callbacks the same way: every `body in CH3c2` comment in the seven registered Demonio cases ( Desperado, Sinister Mind, Garden of Haures, Rapid Impact, Punisher; Abyss Extinction and Rapid Fury have none ).
+- **Slot attribution:** `ch0_skill.tsv` puts the preload of the male / Ciel states ( Rapid Impact 465, Punisher 467, Rapid Fury 581 ) in StartFuture and the move-attack start ( 464 / 466 ) in Start: the physical depth of the cdecl delegate makers says
+  **Init** for the preloads and **StartFuture** for 32b32550 ( the class map's `..._MOVEATTACK_StateStart` is a StateStartFuture ). The registered cases already use that; name your function `LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_StateStartFuture`.
+- **Written here, unused until the held cases land:** the Transcendence form's jump, combo and start event processes ( June's `32ae95a0` .. `32b06cd0` ), the three state starts, and `m_ptrShrewdCutterLockOn = SLockOnSystem::CreateLockOnSystem()` ( in the held case ).
+- **`m_bSkillState`** is also set on 494, 495, 500 ( Transcendence ) and on the Punisher Ciel state ( 467 ): the CH1o3 digest listed only 466 and 581.
+- `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG` is on ( `Always.h` ); your review retires it.

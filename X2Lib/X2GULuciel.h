@@ -1469,6 +1469,48 @@ protected:
 	void				LSI_SA_LCN_RAIN_OF_CHAOS_Init();	// June 32aea5c0
 	void				LSI_SA_LCN_RAIN_OF_CHAOS_StateStart();	// June 32aea5d0
 	void				LSI_SA_LCN_RAIN_OF_CHAOS_StateEnd();	// June 32aea5e0
+	// char-luciel CH3c: Demonio ( 129 ) skills
+	void				LSI_SA_LDN_DESPERADO_Init();	// June 32ae8e20
+	void				LSI_A_LDN_F_RAPID_IMPACT_Init();	// June 32ae9170
+	void				LSI_A_LDN_F_PUNISHER_Init();	// June 32ae9210
+	void				LSI_SA_LDN_SINISTER_MIND_Init();	// June 32ae9320
+	void				LSI_SA_LDN_TRANSCENDENCE_Init();	// June 32ae93f0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_Init();	// June 32ae9670
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHREWD_CUTTER_Init();	// June 32ae9710
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_Init();	// June 32ae97b0
+	void				LSI_SA_LDN_GARDEN_OF_HAURES_Init();	// June 32ae9920
+	void				LSI_A_LDN_RAPID_FURY_LU_Init();	// June 32aea060
+	void				LSI_SA_LDN_ABYSS_SNIPING_READY_Init();	// June 32aea3b0
+	void				LSI_SA_LDN_DEMONIC_RUSH_START_Init();	// June 32aea440
+	void				LSI_SA_LDN_ABYSS_EXTINCTION_Init();	// June 32aea600
+	void				ChangeDesperadoAttackState();	// June 32ae9ea0
+	void				LSI_SA_LDN_DESPERADO_EventProcess();	// June 32b04950
+	void				LSI_SA_LDN_DESPERADO_ATTACK_READY_EventProcess();	// June 32b04c90
+	void				LSI_SA_LDN_DESPERADO_ATTACK_EventProcess();	// June 32b04cd0
+	void				LSI_A_LDN_F_RAPID_IMPACT_EventProcess();	// June 32b04fc0
+	void				LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess();	// June 32b05290
+	void				LSI_SA_LDN_SINISTER_MIND_StateStartFuture();	// June 32b05520
+	void				LSI_SA_LDN_SINISTER_MIND_EventProcess();	// June 32b05570
+	void				LSI_SA_LDN_SINISTER_MIND_FLY_EventProcess();	// June 32b057f0
+	void				LSI_SA_LDN_TRANSCENDENCE_EventProcess();	// June 32b05950
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_START_EventProcess();	// June 32b059a0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_UP_EventProcess();	// June 32ae95a0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_DOWN_EventProcess();	// June 32b059f0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_EventProcess();	// June 32b05a40
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_Z_LANDING_EventProcess();	// June 32b05af0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_EventProcess();	// June 32b05dd0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_JUMP_X_LOOP_EventProcess();	// June 32b05e60
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_Z_EventProcess();	// June 32b061c0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_EventProcess();	// June 32b06570
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZ_EventProcess();	// June 32b06920
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ_EventProcess();	// June 32b06cd0
+	void				TurnTransformComboToHeldDirection();	// June 32b061c0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZ_StateEndFuture();	// June 32ae95f0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_READY_StateStart();	// June 32ae9630
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_LOOP_StateEnd();	// June 32ae9650
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_XXX_END_StateStart();	// June 32ae9660
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SHADOW_FURY_StateStart();	// June 32ae96e0
+	void				LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart();	// June 32ae9900
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 	// char-luciel CH4a: the passives and the delegates InitPassiveSkillState pushes ( thunks 32b4cd90 .. 32b4e720 )
