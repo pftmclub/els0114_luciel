@@ -1451,6 +1451,49 @@ EXCEPTION.
 
 Review: `kickoffs/june-stat-calc/S1b-review.md`.
 
+### Phase S1b - Review (2026-11-16)
+
+**Verdict: pass, no code change.** Reviewed commit `51715265` (the two follow-ups are doc-only) against June's exe in Ghidra (read-only).
+
+- **`ResetMaxHP` `31feba70`** = the port. `SetMaxHp` is inlined behind the gage-data test (`+0xc04`, the out-of-line `31e8cdc0`) = March's
+  `SetMaxHp`. Block 1: `g_pInstanceData` (`33775864`) `IsEnableCode( 0x891 )` (map find `322aa950`, end `+0xa1c`, node byte `+0x10`), then
+  no room -> return (skips block 2 too: same result, it needs the room), room `+0xd8` == 4, slot (`31ed18b0`) `+0x58` == 1 and `+0x10` == 1,
+  `FMUL double [3344af88]` = 0.699999988 (0.7f widened). Block 2 is outside the code-event test: `+0xd8` == 5, room `+0xf8` == 0x8a9, slot
+  `+0x58`, `FMUL double [334396c8]` = 1.5. `emu_hit_dodge.py` re-run: `EMU_HIT_DODGE: 1800 hit-rate sets, 50 max-HP sets, 0 mismatch(es) -> PASS`.
+- **The PvP-room-only read is right.** Probe (`/Zs`, `#define private public`): `sizeof( CX2Room )` = `offsetof( CX2PVPRoom, m_PVPGameType )` =
+  `offsetof( CX2DungeonRoom, m_DifficultyLevel )` = `offsetof( CX2BattleFieldRoom, m_uiBattleFieldId )` = 0xd8. June's PvP room has its game
+  type at 0xd8 too, so June's base is the same size: a dungeon room holds `DL_NORMAL`-`DL_EXPERT` (0-2) there, a field room a `VMI_*` id (0
+  or >= 1000). Never 4 / 5. Both stand-ins (`false` / 0) stay: slot `+0x50` = `m_pUnit` (funcmap `31ed18b0`), `+0x54` `m_pUnitViewer`, so
+  `+0x58` is where March's commented-out `m_bIsBoss` would sit; its June writer was not named (optional; nothing reachable offline).
+- **Emulator stand-in `AddPassiveSkillStat`** = `CX2Unit::GetUnitStat` (`X2Unit.cpp`, `_SKILL_STAT_GETTERS`): same four ids, order, and
+  `( rate - 1.0 + 5e-8 ) x base` arithmetic, game stat only, before the gear, called for Lu's and Ciel's stat. Two differences, both moot: the
+  defence lands in `KStat`'s int fields (the wire type); the stand-in also takes the upgraded skill's templet where the window keeps the base
+  id's, but none of 21403 / 26403 / 7407 / 106 is an `m_DeleteSkillIDByUpgrade` target in June's `NewSkillTempletVer2`, so the swap never fires.
+  Play-test proof stands (jtLordKnight game = MAXHP = window = 235624).
+- **`CalcHitDodgePercent` `32610a00`** line by line = the port: attacker NULL -> 1; a user defender with no skin anim -> 1; revenge and reflex
+  windows (strict `<` both ends, `+0x80cd` attacker-front == 1) -> 1; reflect-by-buff vector (`+0x679c` begin == end) tested for every
+  defender type; NPC attacker -> defender vslot `0x1fc` with the templet id; blind (vslot `0x1d0`) x accuracy, minus ( avoid + extra - 1.0 );
+  Raven: unit `+0x38` == 0x6a, level at unit `+0x494` `( 0x5f56, 1, 0, 1 )`, templet `( id, 1 )`, value `( 0x68, level, 0, 0.0 )` (`RET 0x10`:
+  June's 4th argument is a not-found default 0.0 = the port's 3-argument body's `return 0.f`); Get Chance the same with id 0x68; add-accuracy
+  `FCOM double [334350e8]` = 0.0, `TEST AH,0x41` = strictly greater (NaN skips) = `0 < f`; defender vslot `0x180` -> 1.0. Probe: `SA_ACCURACY_PERCENT_ABS`
+  = `SI_P_COMMON_GET_CHANCE` = 104, `RNSI_P_RST_EXQUISITE_SWORDMANSHIP` = 24406, `UC_RAVEN_BLADE_MASTER` = 106, unit `m_UnitData.m_UserSkillTree` = 0x494.
+- **Dodge offset, all four rolls** (@326253e2 / @326285b9 / @3262b2fe / @3262f11a) have one shape: defender `+0x264` == 1 (NPC), the templet
+  byte `+0xe8`, attacker user -> vslot `0x1c8( 0 )`, else `32759f00` (owner) twice, NULL -> 0; roll vslot `0x1cc( offset + 2 )` (`SRO_HIT_DODGE`
+  = 2). The effect path's attacker is a local, with no NULL test (`JUNE_BUGS` 775 stands). `HasExtraNPCStat( id )` is a fair stand-in: the byte
+  sits in the per-ID struct `+0x85f8` points at (its first dword is the id `CalcHitDodgePercent` reads). June calls `SetDefenderDamageRateOfPart`
+  (`32621f40`) on the NPC branch only and jumps past it for a user defender; the port calls it for both, but its body returns at once for a
+  non-NPC, so the order and result equal June's (D3's line, unchanged).
+- **Ability map**: `32356640` (the map assign) has exactly two callers, `3260c140` (from dispatcher `3260e0c0`) and the NOT `31f1ed70`, as the
+  Done note says; readers are with `kickoffs/june-backlog/stage30-plan.md`. No client code.
+
+**Gates** (`finish.py --review --commits 51715265 --with UNIT_STAT HIT_DODGE DEBUG -v`): flagcheck HIT_DODGE `RESULT: PASS` (1 PASS, 1 DEFINE,
+3 OTHER, 0 deleted; the 3 OTHER are `X2OfflineServer.cpp` / `X2GUUser.cpp` / `X2PVPRoom.h`, owned by UNIT_STAT and JUNE_ENUM_NAMES); flagcheck
+UNIT_STAT `RESULT: PASS` (1 PASS, 1 PASS~ one blank line outside the flag, 1 DEFINE, 2 OTHER = `X2DamageManager.cpp` (HIT_DODGE) and
+`X2PVPRoom.h`, 0 deleted); the 12 EOL-mismatched lines are the LF lines in the mixed-EOL `X2DamageManager.cpp` (Done note); junediverge
+`--check` and `--check-all` `RESULT: PASS`; enumscan exit 0; `FINISH RESULT: PASS (8 gates, 0 failed, 3 skipped)` (stateends / skillicons /
+luabind: no skill states, skills or June scripts). `flagcheck JUNE_ENUM_NAMES --range 51715265^..51715265 --files X2Lib/X2PVPRoom.h`: `RESULT: PASS`.
+Build: none (no code change, no play-test). `_STATCALC_DEBUG` stays on for S2 (Z retires it). S2 kickoff checked: Depends now names this review.
+
 ## Phase Z - Close
 
 **Scope.** `MODS.md` complete, the map has no `March` / `mixed` / `unknown` row, `tools/data/june_diverge_allow.tsv` holds no `stage33`
