@@ -146,7 +146,9 @@ offset	kind	name	note
 0x9598	field	m_iPreComboCount	CX2GUEL ( March, Way of the Sword combo count ); ctor -1; GaleBuffFrameMove skips an unchanged count
 0x959c	field	unnamed_959c	Elesis ctor 32b70ee0 constructs a KProtectedType, vtable 3348a3f0 ( 12 B ), dtor 32b70990 destroys it; member named and declared by the phase that reads it ( CH1h offset map )
 0x95a8	field	unnamed_95a8	Elesis ctor 32b70ee0 constructs a KProtectedType, vtable 3348a3f0 ( 12 B ), dtor 32b70990 destroys it; member named and declared by the phase that reads it ( CH1h offset map )
-0x95b4	field	unnamed_95b4	Elesis ctor 32b70ee0 constructs a KProtectedType, vtable 3348a3f0 ( 12 B ), dtor 32b70990 destroys it; member named and declared by the phase that reads it ( CH1h offset map )
+0x95b4	field	m_eCustomRenderStateOnStateStart	Add ( CH1d2 ): the render state ANSI_DASH_COMBO_X starts with ( 329d20a0 ), put back by 329d20d0 / 329d7f20; CH1h clears it in the ctor. Elesis text: Elesis ctor 32b70ee0 constructs a KProtectedType, vtable 3348a3f0 ( 12 B ), dtor 32b70990 destroys it; member named and declared by the phase that reads it ( CH1h offset map )
+0x95b8	field	m_fRenderParamColorAOnStateStart	Add ( CH1d2 ): the alpha ( +0xc44 = m_fRenderParamColorA ) ANSI_DASH_COMBO_X starts with, 1.0 after its end; CH1h clears it in the ctor
+0x95bc	field	m_fChargeTime	Add ( CH1d2 ): the dash-jump XX charge time ( March name )
 0x8d64	field	unnamed_8d64	Elesis ctor 32b70ee0 stores 130.0 ( size 4 ); member named and declared by the phase that reads it ( CH1h offset map )
 0x8d68	field	unnamed_8d68	Elesis ctor 32b70ee0 stores 0.0 ( size 4 ); member named and declared by the phase that reads it ( CH1h offset map )
 0x8d70	field	unnamed_8d70	Elesis ctor 32b70ee0 stores 100.0 ( size 4 ); member named and declared by the phase that reads it ( CH1h offset map )

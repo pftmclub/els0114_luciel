@@ -7202,6 +7202,58 @@ void CX2GUAdd::ANSI_CAN_NOT_ATTACK_JUMP_DOWN_EventProcess()
 	CommonEventProcess();
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+// char-add CH1d2: June 329ed380 ( ANSI_DASH_JUMP_COMBO_Z.FrameMove )
+void CX2GUAdd::ANSI_DASH_JUMP_COMBO_Z_FrameMove()
+{
+	if( m_pXSkinAnim->EventTimerOneshot( 0.166f ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() )
+		{
+			if( true == IsEnoughMPForAttack( 3.f, vBonePos, 0.f, D3DXVECTOR3( 0.f, 0.f, -45.f ) ) )
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_AN_DashJump_Combo_Z_Start", this, NULL, IsHyperState(), GetPowerRate() );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-add CH1d2: June 329ed600 ( ANSI_DASH_JUMP_COMBO_ZZ.FrameMove, the same body as Z: JUNE_BUGS 783 )
+void CX2GUAdd::ANSI_DASH_JUMP_COMBO_ZZ_FrameMove()
+{
+	if( m_pXSkinAnim->EventTimerOneshot( 0.166f ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() )
+		{
+			if( true == IsEnoughMPForAttack( 3.f, vBonePos, 0.f, D3DXVECTOR3( 0.f, 0.f, -45.f ) ) )
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_AN_DashJump_Combo_Z_Start", this, NULL, IsHyperState(), GetPowerRate() );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-add CH1d2: June 329ed880 ( ANSI_DASH_JUMP_COMBO_ZZZ.FrameMove, the same body as Z: JUNE_BUGS 783 )
+void CX2GUAdd::ANSI_DASH_JUMP_COMBO_ZZZ_FrameMove()
+{
+	if( m_pXSkinAnim->EventTimerOneshot( 0.166f ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() )
+		{
+			if( true == IsEnoughMPForAttack( 3.f, vBonePos, 0.f, D3DXVECTOR3( 0.f, 0.f, -45.f ) ) )
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_AN_DashJump_Combo_Z_Start", this, NULL, IsHyperState(), GetPowerRate() );
+		}
+	}
+
+	CommonFrameMove();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// ANSI_DASH_COMBO_Z
 void CX2GUAdd::DashComboZFrameMoveFuture()
 {
@@ -7216,6 +7268,34 @@ void CX2GUAdd::DashComboZFrameMoveFuture()
 
 void CX2GUAdd::DashComboZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d7720 ( flag 2 = back + X, flag 1 = X on the Arc Tracer / Mastermind line, flags 3 / 4 by job line )
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ANSI_DASH_COMBO_ZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneX == true && NULL != GetUnit() && ( CX2Unit::UC_ADD_ARC_TRACER == GetUnit()->GetClass() || CX2Unit::UC_ADD_MASTERMIND == GetUnit()->GetClass() ) &&
+		( ( m_InputData.pureLeft == true && true == m_FrameDataFuture.syncData.bIsRight ) || ( m_InputData.pureRight == true && false == m_FrameDataFuture.syncData.bIsRight ) ), ANSI_AAT_DASH_COMBO_ZBackX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && NULL != GetUnit() && ( CX2Unit::UC_ADD_ARC_TRACER == GetUnit()->GetClass() || CX2Unit::UC_ADD_MASTERMIND == GetUnit()->GetClass() ), ANSI_AAT_DASH_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 1 ), ANSI_APT_DASH_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 4, m_fEventTime[4].keyInputStart, m_fEventTime[4].keyInputEnd, m_fEventTime[4].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 3 ), ANSI_ATT_DASH_COMBO_ZX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -7236,11 +7316,31 @@ void CX2GUAdd::DashComboZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_COMBO_ZZ
 void CX2GUAdd::DashComboZZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d7ca0
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ANSI_DASH_COMBO_ZZZ )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -7261,11 +7361,31 @@ void CX2GUAdd::DashComboZZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_COMBO_ZZZ
 void CX2GUAdd::DashComboZZZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 32a09990 ( the nasod armor arm of CH1d )
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_MUTATION( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_NasodArmorAttackTargetData.m_uidTargetUID, true )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -7286,18 +7406,36 @@ void CX2GUAdd::DashComboZZZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_COMBO_X
 void CX2GUAdd::DashComboXStateStart()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d20a0 ( keeps the render state and alpha the state starts with )
+	m_eCustomRenderStateOnStateStart	= m_eCustomRenderState;
+	m_fRenderParamColorAOnStateStart	= m_fRenderParamColorA;
+
+	CommonStateStart();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	m_eCustomRenderState	= CRS_NONE;
 
 	CommonStateStart();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::DashComboXFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d7f20 ( June sets CRS_INVISIBLE here: CRS_COMBO_DASH_X is its stand-in until june-engine R5 reaches Add; outside the window the start's state returns )
+	CommonFrameMove();
+
+	if( 0.085f <= m_pXSkinAnim->GetNowAnimationTime() && 0.43f > m_pXSkinAnim->GetNowAnimationTime() )
+		m_eCustomRenderState	= CRS_COMBO_DASH_X;
+	else
+		m_eCustomRenderState	= m_eCustomRenderStateOnStateStart;
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	CommonFrameMove();
 
 	/// 특정 애니메이션 시간 동안은 숨기자!
@@ -7306,10 +7444,32 @@ void CX2GUAdd::DashComboXFrameMove()
 	{
 		m_eCustomRenderState	= CRS_COMBO_DASH_X;
 	}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::DashComboXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d7f80 ( flag 1 = X as Diabolic Esper )
+	if ( false == IsOnSomethingFuture() && 0.45f <= m_pXSkinAnimFuture->GetNowAnimationTime() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && NULL != GetUnit() && CX2Unit::UC_ADD_DIABOLIC_ESPER == GetUnit()->GetClass(), ANSI_ADE_DASH_COMBO_XX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ANSI_DASH_COMBO_XX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( false == IsOnSomethingFuture() && 0.45f <= m_pXSkinAnimFuture->GetNowAnimationTime() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -7330,13 +7490,23 @@ void CX2GUAdd::DashComboXEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::DashComboXStateEnd()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d20d0 ( puts back what the start kept )
+	m_fRenderParamColorA				= m_fRenderParamColorAOnStateStart;
+	m_eCustomRenderState				= m_eCustomRenderStateOnStateStart;
+	m_fRenderParamColorAOnStateStart	= 1.f;
+
+	CommonStateEnd();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	m_fRenderParamColorA	= 1.f;		/// 알파값 초기화
 
 	CommonStateEnd();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::DashComboXStateEndFuture()
@@ -7351,6 +7521,29 @@ void CX2GUAdd::DashComboXStateEndFuture()
 /// ANSI_DASH_COMBO_XX
 void CX2GUAdd::DashComboXXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d82e0 ( flag 1 = X as Lunatic Psyker, flag 2 = X as Mastermind; listing-only )
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && NULL != GetUnit() && CX2Unit::UC_ADD_LUNATIC_PSYKER == GetUnit()->GetClass(), ANSI_ALP_DASH_COMBO_XXX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneX == true && NULL != GetUnit() && CX2Unit::UC_ADD_MASTERMIND == GetUnit()->GetClass(), ANSI_AMM_DASH_COMBO_XXX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ANSI_DASH_COMBO_XXX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -7371,11 +7564,31 @@ void CX2GUAdd::DashComboXXEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_COMBO_XXX
 void CX2GUAdd::DashComboXXXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 32a09ca0 ( the nasod armor arm of CH1d )
+	if ( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_MUTATION( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_NasodArmorAttackTargetData.m_uidTargetUID, true )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if ( false == IsOnSomethingFuture() )
 	{
 		StateChange( USI_JUMP_DOWN );
@@ -7396,11 +7609,32 @@ void CX2GUAdd::DashComboXXXEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_JUMP_COMBO_Z
 void CX2GUAdd::DashJumpComboZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d86c0 ( flags 1 / 2 / 3 = X by job line 1 / 2 / 3 )
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ANSI_DASH_JUMP_COMBO_ZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 1 ), ANSI_APT_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 2 ), ANSI_AAT_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 3 ), ANSI_ATT_DASH_JUMP_COMBO_ZX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( true == IsOnSomethingFuture() )
 	{
 		StateChange( USI_DASH_JUMP_LANDING );
@@ -7416,11 +7650,32 @@ void CX2GUAdd::DashJumpComboZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_JUMP_COMBO_ZZ
 void CX2GUAdd::DashJumpComboZZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d8b70 ( listing-only; flags 1 / 2 / 3 as ZZ's neighbour Z )
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ANSI_DASH_JUMP_COMBO_ZZZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 1 ), ANSI_APT_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 2 ), ANSI_AAT_DASH_JUMP_COMBO_ZX )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneX == true && true == IsInJobLine( 3 ), ANSI_ATT_DASH_JUMP_COMBO_ZX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( true == IsOnSomethingFuture() )
 	{
 		StateChange( USI_DASH_JUMP_LANDING );
@@ -7437,11 +7692,26 @@ void CX2GUAdd::DashJumpComboZZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_JUMP_COMBO_ZZZ
 void CX2GUAdd::DashJumpComboZZZEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 32a09fb0 ( the nasod armor arm of CH1d )
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_MUTATION( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_NasodArmorAttackTargetData.m_uidTargetUID, true )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( true == IsOnSomethingFuture() )
 	{
 		StateChange( USI_DASH_JUMP_LANDING );
@@ -7457,11 +7727,32 @@ void CX2GUAdd::DashJumpComboZZZEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_JUMP_COMBO_X
 void CX2GUAdd::DashJumpComboXEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329d9020 ( listing-only; flags 1 / 2 / 3 = Z as Mastermind / Lunatic Psyker / Diabolic Esper )
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ANSI_DASH_JUMP_COMBO_XX_START )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 1, m_fEventTime[1].keyInputStart, m_fEventTime[1].keyInputEnd, m_fEventTime[1].stateChange,
+		m_InputData.oneZ == true && NULL != GetUnit() && CX2Unit::UC_ADD_MASTERMIND == GetUnit()->GetClass(), ANSI_AMM_DASH_JUMP_COMBO_XZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 2, m_fEventTime[2].keyInputStart, m_fEventTime[2].keyInputEnd, m_fEventTime[2].stateChange,
+		m_InputData.oneZ == true && NULL != GetUnit() && CX2Unit::UC_ADD_LUNATIC_PSYKER == GetUnit()->GetClass(), ANSI_ALP_DASH_JUMP_COMBO_XZ )
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 3, m_fEventTime[3].keyInputStart, m_fEventTime[3].keyInputEnd, m_fEventTime[3].stateChange,
+		m_InputData.oneZ == true && NULL != GetUnit() && CX2Unit::UC_ADD_DIABOLIC_ESPER == GetUnit()->GetClass(), ANSI_ADE_DASH_JUMP_COMBO_XZ )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( true == IsOnSomethingFuture() )
 	{
 		StateChange( USI_DASH_JUMP_LANDING );
@@ -7478,6 +7769,7 @@ void CX2GUAdd::DashJumpComboXEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_DASH_JUMP_COMBO_XX_START
@@ -7552,6 +7844,36 @@ void CX2GUAdd::DashJumpComboXXFinishStateStartFuture()
 
 void CX2GUAdd::DashJumpComboXXFinishFrameMove()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 329edb00 ( listing-only; the bullet costs 2.0 MP, a miss plays the no-MP effect at EF01 )
+	if( m_pXSkinAnim->EventTimerOneshot( 0.01f ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"EF01" );
+
+		if ( NULL != g_pX2Game && NULL != g_pX2Game->GetDamageEffect() && true == FlushMp( 2.f ) )
+		{
+			float fChargeRate = 1.f;
+
+			if ( _CONST_ADD_::DASH_JUMP_COMBO_X2_MAX_REMAIN_TIME <= m_fChargeTime )
+				fChargeRate = 2.f;
+			else
+				fChargeRate = 1.f + ( 0.25f * m_fChargeTime );
+
+			const float fPowerRate = GetPowerRate() * fChargeRate;
+
+			CX2DamageEffect::CEffect* pDamageEffect = 
+				g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_AN_Dash_Jump_Combo_XX_Bullet", fPowerRate, vBonePos, 
+															  GetRotateDegree(), GetRotateDegree(), m_FrameDataNow.unitCondition.landPosition.y );
+
+			if ( NULL != pDamageEffect && NULL != pDamageEffect->GetMainEffect() )
+				pDamageEffect->SetScale( pDamageEffect->GetMainEffect()->GetScale() * fChargeRate );
+		}
+		else
+			CreateNotEnoughMPEffect( vBonePos, 0.f, 0.f, -45.f );
+	}
+
+	CommonFrameMove();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( m_pXSkinAnim->EventTimerOneshot( 0.01f ) )
 	{
 		if ( NULL != g_pX2Game && NULL != g_pX2Game->GetDamageEffect() )
@@ -7578,10 +7900,26 @@ void CX2GUAdd::DashJumpComboXXFinishFrameMove()
 	}
 
 	CommonFrameMove();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 void CX2GUAdd::DashJumpComboXXFinishEventProcess()
 {
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
+	// char-add CH1d2: June 32a0a290 ( the nasod armor arm of CH1d )
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() &&
+		true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_MUTATION( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_NasodArmorAttackTargetData.m_uidTargetUID, true )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+#else SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 	if( true == m_pXSkinAnimFuture->IsAnimationEnd() &&
 		true == IsOnSomethingFuture() )
 	{
@@ -7598,6 +7936,7 @@ void CX2GUAdd::DashJumpComboXXFinishEventProcess()
 	DASH_CANCEL_AFTER( m_fDashCancelAfter )
 
 	CommonEventProcess();
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE
 }
 
 /// ANSI_NP_BARRIER_ACTIVE

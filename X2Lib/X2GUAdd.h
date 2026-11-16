@@ -491,6 +491,20 @@ public:
 		ANSI_ALP_COMBO_ZZX,								/// 271
 		ANSI_AMM_COMBO_ZZX,								/// 277
 		ANSI_ADE_COMBO_ZZX,								/// 283
+		/// char-add CH1d2: the June state names the dash combo functions switch to ( ids are June's script ids )
+		ANSI_AMM_DASH_JUMP_COMBO_XZ,					/// 238
+		ANSI_AAT_DASH_COMBO_ZX,							/// 228
+		ANSI_AAT_DASH_COMBO_ZBackX,						/// 229
+		ANSI_APT_DASH_COMBO_ZX,							/// 267
+		ANSI_APT_DASH_JUMP_COMBO_ZX,					/// 269
+		ANSI_ALP_DASH_JUMP_COMBO_XZ,					/// 274
+		ANSI_ALP_DASH_COMBO_XXX,						/// 275
+		ANSI_AAT_DASH_JUMP_COMBO_ZX,					/// 276
+		ANSI_AMM_DASH_COMBO_XXX,						/// 280
+		ANSI_ATT_DASH_COMBO_ZX,							/// 281
+		ANSI_ATT_DASH_JUMP_COMBO_ZX,					/// 282
+		ANSI_ADE_DASH_COMBO_XX,							/// 287
+		ANSI_ADE_DASH_JUMP_COMBO_XZ,					/// 289
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 	};
 
@@ -825,6 +839,9 @@ protected:
 	void ConsumeMutationCountByNasodArmorAttack();		/// June 32a088c0 @32a08950, inlined at each site
 	D3DXVECTOR3 GetNearestLinePosForNasodArmorAttack( D3DXVECTOR3 vPos_ ) const;	/// June 329edde0, inlined twice
 	bool IsInJobLine( int iJobLine_ );					/// June 329e3190 ( vslot 0x670 ): body in CH1i
+	void ANSI_DASH_JUMP_COMBO_Z_FrameMove();			/// char-add CH1d2: June 329ed380
+	void ANSI_DASH_JUMP_COMBO_ZZ_FrameMove();			/// char-add CH1d2: June 329ed600
+	void ANSI_DASH_JUMP_COMBO_ZZZ_FrameMove();			/// char-add CH1d2: June 329ed880
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 	/// ANSI_JUMP_ATTACK_Z
@@ -1416,6 +1433,8 @@ protected:
 	bool					m_bComboXXAfterDashComboZBackX;	/// char-add CH1d: June +0x9698, set by ANSI_AAT_DASH_COMBO_ZBackX ( CH1f ), cleared by ANSI_COMBO_XX_StateEnd, DamageReact and ReInit ( CH1h clears it in the ctor )
 	bool					m_bEnableNasodArmorModeOverlimit;	/// char-add CH1d: June +0x98f8, set by InitPassiveSkillState for RNSI_P_ATT_NASOD_ARMOR_MODE ( CH4a; CH1h clears it in the ctor )
 	std::map< int, std::map< int, float > >	m_mapTranscendedPassiveAbilityValue;	/// char-add CH1d: June +0x9668, skill id -> ability type -> value, filled by InitPassiveSkillState ( CH4a )
+	CUSTOM_RENDER_STATE		m_eCustomRenderStateOnStateStart;	/// char-add CH1d2: June +0x95b4, the render state ANSI_DASH_COMBO_X starts with ( CH1h clears it in the ctor )
+	float					m_fRenderParamColorAOnStateStart;	/// char-add CH1d2: June +0x95b8, the alpha it starts with, 1.0 after its end ( CH1h clears it in the ctor )
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// protected Valuable End
 

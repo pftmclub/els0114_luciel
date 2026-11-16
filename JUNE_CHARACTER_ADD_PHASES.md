@@ -722,6 +722,33 @@ All 45 class-map rows of phase CH1d are written: 33 `inside` (June's body in Mar
 
 **Nothing to play-test.** No review of its own ( the CH1d2 review covers CH1c-CH1d2; no `_DEBUG` define here ). Next: `/x2-phase char-add CH1d2` ( Sonnet 5.5 high ).
 
+### CH1d2 - Done (2026-11-16)
+
+All 27 class-map rows of phase CH1d2 are accounted for: 15 `inside` with a June body ( inside March's own `CX2GUAdd` function under `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`, March's in `#else`, tag `// char-add CH1d2: June <va>` ), 3 `new` under `_CORE` ( the three dash-jump Z / ZZ / ZZZ FrameMoves ) and 9 that are March's own text ( no code: `329d2060`, `329d2100`, `329d2140`, `329d94d0`, `329d9500`, `329d9520`, `329d9570`, `329d9590`, `329e48d0` ). 23 carved ( decompile + listing ), 4 listing-only ( `329d82e0`, `329d8b70`, `329d9020`, `329edb00`, `charport_adis.py add` ). None needed "this needs Opus". `_LIVE` stays `//#define`; 27 funcmap rows `Char Add CH1d2`; the CH1d macros ( `ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_`, the `_ON_LINE_` cancels, `ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_MUTATION` ) cover every state, so no new macro.
+
+**Rows** ( June `CX2GUAdd::` -> March name; `inside` unless noted ):
+- Ground dash: `329d7720` DashComboZEventProcess, `329d7ca0` ZZ, `32a09990` ZZZ ( nasod arm ), `329d7f80` XEventProcess, `329d82e0` XX ( listing-only ), `32a09ca0` XXX ( nasod arm ), `329d7f20` XFrameMove, `329d20a0` XStateStart, `329d20d0` XStateEnd.
+- Dash jump: `329d86c0` Z, `329d8b70` ZZ ( listing-only ), `32a09fb0` ZZZ ( nasod arm ), `329d9020` X ( listing-only ), `32a0a290` XXFinishEventProcess ( nasod arm ), `329edb00` XXFinishFrameMove ( listing-only ).
+- New under `_CORE`: `ANSI_DASH_JUMP_COMBO_Z_FrameMove` `329ed380`, `..._ZZ_` `329ed600`, `..._ZZZ_` `329ed880`. New members ( `_CORE`; CH1h clears them in the ctor ): `m_eCustomRenderStateOnStateStart` ( `+0x95b4` ), `m_fRenderParamColorAOnStateStart` ( `+0x95b8` ). Enum: 13 June state names appended under `_CORE` with June's script ids ( `ANSI_AAT_DASH_COMBO_ZX` 228, `..._ZBackX` 229, `ANSI_APT_DASH_COMBO_ZX` 267, `ANSI_ATT_DASH_COMBO_ZX` 281, `ANSI_ADE_DASH_COMBO_XX` 287, `ANSI_ALP_DASH_COMBO_XXX` 275, `ANSI_AMM_DASH_COMBO_XXX` 280, `ANSI_APT / AAT / ATT_DASH_JUMP_COMBO_ZX` 269 / 276 / 282, `ANSI_AMM / ALP / ADE_DASH_JUMP_COMBO_XZ` 238 / 274 / 289; CH1m maps them, CH1e-CH1g write the states' own functions ).
+
+**Where June differs from March** ( every function read branch by branch; the other lines are March's text ):
+- **Every dash state with a key flag:** the flag also fires on the animation end ( time tests first ); the walk ( `+0x8c98` ) and dash ( `+0x8c9c` ) cancels also test `bFootOnLine`; June's key tests read `oneX` before the class test where both appear.
+- **Z `329d7720`:** flag 2 ( back + X as Arc Tracer / Mastermind, back = left while facing right ) -> `ZBackX`, flag 1 ( X, same classes ) -> `ZX`, flags 3 / 4 ( X, job line 1 / 3 ) -> APT / ATT `ZX`; the flag order is 0, 2, 1, 3, 4. **X `329d7f80`:** flag 1 ( X as Diabolic Esper ) -> `ADE_DASH_COMBO_XX` before flag 0. **XX `329d82e0`:** flags 1 / 2 ( X as Lunatic Psyker / Mastermind ) -> `ALP / AMM_DASH_COMBO_XXX` before flag 0.
+- **Jump Z / ZZ `329d86c0` / `329d8b70`:** flags 1 / 2 / 3 ( X by job line 1 / 2 / 3 ) -> APT / AAT / ATT `DASH_JUMP_COMBO_ZX`. **Jump X `329d9020`:** flags 1 / 2 / 3 ( Z as Mastermind / Lunatic Psyker / Diabolic Esper ) -> `AMM / ALP / ADE_DASH_JUMP_COMBO_XZ`.
+- **Nasod arms ( ZZZ, XXX, jump ZZZ, jump XX finish ):** June's arm as CH1d; the jump XX finish also needs the animation end to land.
+- **Render state:** `DashComboXStateStart` keeps `m_eCustomRenderState` and the alpha ( `+0xc44` ) instead of resetting the state to none, `DashComboXStateEnd` puts both back ( saved alpha becomes 1.0 ), and `DashComboXFrameMove` sets state 5 inside 0.085-0.43 s and the kept state outside. June's 5 is `CRS_INVISIBLE` ( its engine enum ); `CRS_COMBO_DASH_X` is the stand-in ( same render: cartoon, outline alpha = the alpha, colour alpha 0, blend ) until june-engine R5 reaches Add ( CH1h `ApplyRenderParam` decides ).
+- **Dash-jump Z / ZZ / ZZZ FrameMove:** new; 0.166 s oneshot, `IsEnoughMPForAttack( 3.0, Bip01, 0, ( 0, 0, -45 ) )`, `EffectSet_AN_DashJump_Combo_Z_Start` in all three ( JUNE_BUGS 783 ).
+- **`329edb00` XX finish:** the bullet now needs `FlushMp( 2.0 )` ( vslot 0xe4 ); a miss, or no game / damage effect manager, plays `CreateNotEnoughMPEffect( EF01, 0, 0, -45 )`. Charge rate ( 1 + 0.25 * charge, 2.0 at 3.0 s ), power rate, scale = March.
+- **= March:** the 9 rows above ( `329e48d0` holds the inlined `PlayLoopSound` copy, JUNE_BUGS 125, CH1q2 ), `DashComboX`'s foot test ( `0.45` ), the loop's 3.0 s limit.
+
+**Routed:** CH1h's ctor map must confirm `+0x95b4`-`+0x95bf` as three 4-byte Add members: `char_add/ch1_offsets.tsv` still carries Elesis's 12-byte `KProtectedType` text for neighbouring rows ( `+0x959c`, `+0x95a8` ); the rows for `+0x95b4`, `+0x95b8`, `+0x95bc` now carry Add's names. `IsInJobLine` ( CH1i ) is called under `_LIVE` only.
+
+**Gates.** `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE`: `_CORE` PASS ( `files: 2 PASS, 0 OTHER, 0 FAIL` ), `_LIVE` INERT ( `//#define`; `files: 1 PASS`, 0 deleted / non-ASCII / EOL-mismatched, 0 `#else`/`#endif` without the token ), `junediverge` PASS, `enumscan` PASS; `stateends` skipped ( no skill state registered ), `skillicons` / `luabind` skipped. `git diff --minimal --numstat`: `X2GUAdd.cpp` 339 / 0, `X2GUAdd.h` 19 / 0.
+- One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off, with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` and with `_LIVE` + `_DP`. `/P` counts, off / on: `ANSI_AAT_DASH_COMBO_ZBackX` 1 / 2, `m_eCustomRenderStateOnStateStart` 1 / 4, `FlushMp( 2.f )` 0 / 1, `ConsumeMutationCountByNasodArmorAttack` 2 / 11 ( 7 + the 4 new arms ).
+- Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** No `_DEBUG` define here. Next: `/x2-phase char-add CH1d2 review` ( `CH1d2-review.md`, Opus 5.5 high; covers CH1c-CH1d2 ), then CH1e.
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.
