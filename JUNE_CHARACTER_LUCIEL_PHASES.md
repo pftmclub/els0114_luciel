@@ -2114,6 +2114,49 @@ Opus 5.5 high. Flags `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's: viewer, equip
 - **Not done here:** MODS.md's R14f entry still lists the viewer `SetFixed` as "not ported yet"; MODS.md has a peer's uncommitted edits, so char-luciel Z
   updates that line. Review: `DU5d2-review.md`.
 
+### DU5d2 - Review (2026-11-16)
+
+Opus 5.5 high. Reviewed `990fc1e3` and the fix `ab16f820` against June (`disasm_range.py`, constants read from the exe). Verdict: **pass, no code
+change** (flags `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` / `_DUO_LOBBY`; no debug define to retire).
+- **`31f93920`:** map `+0x1fc`, NULL equip skipped with no flag write; `CMP bl, [ +0x15d4 ]` -> `3295a9e0( colour )`, then `SETE` into `+0x190` for
+  both outcomes (match 1, else 0). **`3295a9e0`:** `+0x8dc` sub-equips, NULL skipped; `+0x240 == 1` -> vslot 0x14 (`GetRenderParam`, funcmap row
+  `327a8fff`) else `+0x198`; NULL param skipped; colour at `+0x28..+0x34`. Port = June.
+- **`UpdateSwitchingView`:** `@31f93cf8` pushes `[ +0xd80 ]` with `fld1` x 4; `@31f93e4b` pushes `+0xd80 == 0` with `3345993c` = 0.3 x 4, in that order.
+  **`AddEqip` tail `@31f9e859`:** `+0xf14` 1 (`UVS_CASHSHOP`) with `+0xd82 == 0` -> `fldz` x 4; 7 (`UVS_CHARINFO`) -> 0.3 x 4; both push `+0xd80 == 0`.
+  Enum values checked: `UVS_CASHSHOP` 1, `UVS_CHARINFO` 7.
+- **`+0x190`:** readers and ctor as the Done note; Stage 11 bullet stands.
+- **`31f933c0`:** `+0xe40` = arg; true: `+0x1c8` 2 / 3 fix, else type 1 with sub-equips (`+0x8dc` / `+0x8e0`) or particles (`+0x8f0` / `+0x8f4`) fix
+  (`3295a560`); then `31f91f90( 0 )`; false: `31f91f90( 1 )` only when shown (`31fae370` / `+0x172`) = March's false path. `USE_TYPE`: `UT_SKIN` 1,
+  `UT_ATTACH_ANIM` 2, `UT_ATTACH_NORMAL` 3. Port = June.
+- **`31fa5c90`:** `+0xe5c` cleared unless state 10, then `+0xe60` = 0 (`@31fa5cdb`) unconditionally; type 6 / 8 skip; 7 -> `+0xd82` = 1 (`@31fa5d4d`);
+  others stop the groups (state 1: 0..2, else `31fac190`) then `+0xd82` = 1 (`@31fa5d36`). `UVUMT_HABIT` 6, `SIT_READY` 7, `SIT_WAIT` 8 under
+  `JUNE_ANIMATION_NAME_TABLE`. June's types 1-2 custom-WAIT early return (`+0xf74`, after the `+0xe60` write) is Stage 12 and never taken in March, so
+  the port's placement is equal on every reachable path. `@31fa61d0` and PlayEmotion's 8 writes: behind the custom sit names, Stage 12 route stands.
+- **`31fa64f0`:** shown skin (`31fac430`) `+0x2ac`, NULL -> ended; `+0xe60 == 1` replaces it with the back skin's (`31f91020`), NULL -> ended; the ended
+  default clears `+0xe5c` and `+0xe60` (`@31fa68ca`). Port's ternary = June.
+- **Fix `ab16f820`:** `32233f70`: `Move` (`31f99f70`), `+0xd84` = `33483504` = 0.33 (`@32234125`), `SetUnitScale` (`337335e0` = 1.5 x 3); in the
+  unit branch the frame move (vslot 1) then `31f94190( empty )` (`@32234214`); after the branch `SetShowObject( +0xd8, 1 )` then `+0xd81` = 0
+  (`@32234246`), both inside the viewer test. Class change `@32488b4b` = `33471a1c` = 1.5. `BackUnitFrameMove @31fa8e4b`: `+0xd84` + 1.0 (qword
+  `334355b0`) times `33732708` = ( 50, 0, 70 ). Port = June.
+- **`SetUnitScale` sites:** class change 1.5, or `3344f240` = 1.4 when class `0x75` (`UC_CHUNG_TACTICAL_TROOPER`); cash shop 1.5; square
+  `323f2b86` `GetScale` x `+0x358..+0x360` (`m_Scale`); result `3250e770` `334a1a44` = 1.9; create `32551bb7` `3344ce94` = 1.2. All five = June. The
+  left-alone list (one body, same value, no March counterpart, PvP) stands.
+- **Flag-off = March:** `cl /P` of `X2UnitViewerUI.cpp` and `X2CashShop.cpp` from trees extracted at `ab16f820` and `990fc1e3^`, `DUO_VIEWER` and
+  `DUO_LOBBY` commented out (the peer `#error` guards on `DUO_VIEWER` disarmed in the flag-off copies only): token-identical (366,315 / 368,864 lines)
+  after `#line` / `__LINE__` / FOREACH-counter masking; flag on differs (1,285 / 80 diff lines).
+- **Gates:** `finish.py --review --commits 990fc1e3 ab16f820 --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY
+  SERV_IRUHADEV_JUNE_SKILL_CLASS_POPUP --skip-flag SERV_IRUHADEV_JUNE_DIVERGE_EQIP_SET_FIXED "#error guard target" -v`: DUO_LOBBY PASS (11 PASS,
+  2 OTHER, 4 deleted), DUO_VIEWER PASS (6 PASS, 7 OTHER, 3 deleted), SKILL_CLASS_POPUP PASS (2 PASS, 11 OTHER, 1 deleted), junediverge PASS,
+  `--check-all` PASS; enumscan exit 1 = the 229 older rows in `X2StateClassChange.cpp` / `X2CashShop.cpp` (none on a changed line, as the Done
+  note). Every OTHER row is a file of this change owned by one of the other two `--with` flags. Deleted lines: DU5b's two stand-in comments (inside
+  DU5b's flagged `AddEqip` / `UpdateSwitchingView`), the `117` line (inside S7h's `SKILL_CLASS_POPUP` block, now the enum), and DU5c2's back-body
+  `Move` line (inside the flagged `BackUnitFrameMove`, now times the rate): no March line is lost. `JUNE_DIVERGE_EQIP_SET_FIXED` SKIPPED: the `#error`
+  guard's target, not this change's flag.
+- **Kept as written:** `X2UnitViewerUI.cpp:9`'s comment ("`+0xd84` is 0 outside the customize preview") and PlayByMotionType's head comment ("`+0xe60`
+  and `+0xd82` have no March member") are older text this phase made stale; old comments are not rewritten, the Done note and this review hold the
+  current facts.
+- **Build:** none (no code change; no play-test). Next: CH3c.
+
 ### DU5e - Done (2026-11-15)
 
 Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_STAT` (defined; second homes `ServerDefine.h`, `SECOND_HOMES`, `X2ServerProtocol_2010.vcxproj` X2TOOL;
