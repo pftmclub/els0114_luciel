@@ -345,6 +345,7 @@ flags' lines in Always.h, none mine), junediverge PASS, enumscan PASS, 0 deleted
 `DEPLOY OK: X2_offline.exe is 27,199,488 B, dated 2026-11-16 15:03:03, md5 b525d2f18f70b977cf430339d5627662` (build: KTDXLIB 64 s, X2Lib 592 s, both PCHs touched
 because `Always.h` changed).
 `EXESTR OK: 5 of 5 found in X2_offline.exe` (`[KOM_MOUNT] `, ` files=`, ` registered=`, `total koms=`, ` private=`).
+After the commit (`5866cb7d`): `finish.py --range 5866cb7d^..5866cb7d --with KOM_MOUNT_DEBUG` = flagcheck PASS (`1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL`), junediverge PASS, enumscan PASS.
 
 **How to see it in game.** Boot and walk one village, close the game normally, then "check logs": `python tools/logs.py --kom-mount`. Expected: 243 lines with
 `registered == files`, a total line, **no** duplicate-name MessageBox at boot, `existfileinfo.txt` not grown.
