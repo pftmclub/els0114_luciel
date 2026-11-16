@@ -11,7 +11,7 @@ tree its level allows (tools/data/june_skill_autolearn.tsv, the rows the v17 mig
 SeedJuneAutoLearn grant), castable ones in the free A slots. SP defaults to June's rule: the 1 SP a new
 character starts with plus GetCalcInitSkillPoint(level) (tools/data/june_skill_init_sp.tsv).
 Items: the class's own promotion costume (the create screen's job preview: promotion*ItemID of its row in the live
-UnitTemplet.lua; PROMO, the base class's GBase_Item set, only when the row is missing) is worn in the fashion slots, and the class's
+UnitTemplet.lua; PROMO, the base class's GBase_Item set, only when the row is missing) is worn in the fashion slots (Lu/Ciel's second body, Ciel, also wears her m_MinorUnitPromotion* set in slots 25/21/22/23/24), and the class's
 top-tier weapon + a complete 4-piece armor set go into the equip bag at +10 (top_gear: highest item_level / grade /
 use_level in item.kim that the job can wear, use level <= 99). --no-costume / --no-gear / --enchant N / --kim X adjust it.
 It does NOT seed hotkeys or the beginner gear. Gear is bagged, not worn: equip it in game once the level allows.
@@ -175,9 +175,12 @@ PROMO = {
 UNIT_TEMPLET = os.path.join(os.path.dirname(DATA), 'kom_contents', 'data036_kom', 'UnitTemplet.lua')
 PROMO_FIELDS = ('promotionWeaponItemID', 'promotionBodyItemID', 'promotionLegItemID', 'promotionHandItemID',
                 'promotionFootItemID')
+# Lu/Ciel's second body (Ciel): the same row's m_MinorUnitPromotion* fields (EquipPromotionItemByUnitTemplet adds both sets).
+MINOR_PROMO_FIELDS = ('m_MinorUnitPromotionWeaponItemID', 'm_MinorUnitPromotionBodyItemID', 'm_MinorUnitPromotionLegItemID',
+                      'm_MinorUnitPromotionHandItemID', 'm_MinorUnitPromotionFootItemID')
 
 
-def templet_promo(cls, path=UNIT_TEMPLET):
+def templet_promo(cls, path=UNIT_TEMPLET, fields=PROMO_FIELDS):
     """(weapon, body, leg, hand, foot) of the class's own UnitTemplet row, or None if the file / row / a field is absent."""
     try:
         with open(path, 'rb') as f:
@@ -190,7 +193,7 @@ def templet_promo(cls, path=UNIT_TEMPLET):
         if not m or m.group(1) != want:
             continue
         ids = []
-        for field in PROMO_FIELDS:
+        for field in fields:
             v = re.search(r'\b%s\s*=\s*(\d+)' % field, block)
             ids.append(int(v.group(1)) if v else 0)
         return tuple(ids) if all(ids) else None
@@ -208,6 +211,13 @@ def promo_costume(cls):
 
 # NESI_*_FASHION worn slots in the same order (X2Unit.h): weapon 10, body 2, leg 4, hand 6, foot 8.
 COSTUME_SLOTS = (10, 2, 4, 6, 8)
+# Ciel's NESI_MINORUNIT_*_FASHION slots, same order: weapon 25, body 21, leg 22, hand 23, foot 24.
+MINOR_COSTUME_SLOTS = (25, 21, 22, 23, 24)
+
+
+def minor_promo_costume(cls):
+    """Ciel's five promotion items from the class's UnitTemplet row, or None for a one-body class."""
+    return templet_promo(cls, fields=MINOR_PROMO_FIELDS)
 WORN, BAG_EQUIP = 9, 1
 GEAR_POSITIONS = ('EP_WEAPON_HAND', 'EP_DEFENCE_BODY', 'EP_DEFENCE_LEG', 'EP_DEFENCE_HAND', 'EP_DEFENCE_FOOT')
 USAGE = {'PT_INFINITY': 0, 'PT_ENDURANCE': 1, 'PT_QUANTITY': 2}
@@ -273,9 +283,11 @@ def put_item(c, uid, cat, slot, item_id, enchant, usage, endurance):
               (uid, cat, slot, item_id, 1 if cat == WORN else 0, endurance, enchant, usage))
 
 
-def seed_items(c, k, uid, costume, gear, enchant):
+def seed_items(c, k, uid, costume, gear, enchant, minor_costume=None):
     """Worn promotion costume (infinite, endurance -1 as the emulator seeds it) + enchanted gear in the equip bag."""
     for item_id, slot in zip(costume or (), COSTUME_SLOTS):
+        put_item(c, uid, WORN, slot, item_id, 0, USAGE['PT_INFINITY'], -1)
+    for item_id, slot in zip(minor_costume or (), MINOR_COSTUME_SLOTS):
         put_item(c, uid, WORN, slot, item_id, 0, USAGE['PT_INFINITY'], -1)
     if gear:
         size = c.execute('SELECT size FROM inventory_size WHERE unit_uid=? AND category=?', (uid, BAG_EQUIP)).fetchone()
@@ -332,7 +344,7 @@ def main():
 
     print('create %s  class %d %s  level %d  exp %d  sp %d  ed %d  (user %d, slot %d/%d)'
           % (a.nickname, cls, CLASSES[cls], a.level, exp, sp, ed, user, live + 1, slots))
-    k = costume = gear = None
+    k = costume = gear = minor_costume = None
     if not (a.no_costume and a.no_gear):
         k, kimmod = load_kim(a.kim)
     if not a.no_costume:
@@ -343,6 +355,14 @@ def main():
         print('costume (worn, from %s):' % src)
         for i in costume:
             print('  ' + describe(k, i))
+        minor_costume = minor_promo_costume(cls)
+        if minor_costume:
+            missing = [i for i in minor_costume if k.record(i) is None]
+            if missing:
+                die('Ciel promotion costume ids %s are not in kim %s (try --kim june, or --no-costume)' % (missing, a.kim))
+            print("Ciel's costume (worn, second body, UnitTemplet.lua m_MinorUnitPromotion*):")
+            for i in minor_costume:
+                print('  ' + describe(k, i))
     if not a.no_gear:
         weapon, armor = top_gear(k, kimmod, cls)
         gear = [weapon] + armor
@@ -376,14 +396,14 @@ def main():
         c.executemany('INSERT OR REPLACE INTO inventory_size(unit_uid,category,size) VALUES(?,?,?)',
                       [(uid, cat, size) for cat, size in sizes])
         granted, slotted = seed_skills(c, uid, cls, a.level)
-        seed_items(c, k, uid, costume, gear, a.enchant)
+        seed_items(c, k, uid, costume, gear, a.enchant, minor_costume)
     row = c.execute('SELECT unit_uid,unit_class,nickname,level,exp,sp,ed FROM unit WHERE unit_uid=?', (uid,)).fetchone()
     ok = c.execute('PRAGMA integrity_check').fetchone()[0]
     c.close()
     print('inserted unit_uid=%d class=%d nick=%s level=%d exp=%d sp=%d ed=%d | integrity_check: %s' % (row + (ok,)))
     print('skills: %d free June row(s) granted, %d on the bar' % (granted, slotted))
     print('items: %d costume piece(s) worn, %d gear piece(s) in the equip bag%s'
-          % (len(costume or ()), len(gear or ()), ' at +%d' % a.enchant if gear else ''))
+          % (len(costume or ()) + len(minor_costume or ()), len(gear or ()), ' at +%d' % a.enchant if gear else ''))
 
 
 if __name__ == '__main__':

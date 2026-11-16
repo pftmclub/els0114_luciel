@@ -32,6 +32,8 @@ What it does (mirrors `CX2OfflineDB::CreateUnit`): one `unit` row on the first a
   (`CX2StateCreateUnit::EquipPromotionItemByUnitTemplet`), so Grand Master wears the Grand Master costume, not Elesis's.
   The base class's set (`PROMO` in the script, the `GBase_Item` rows) is only the fallback when the file or the row is
   missing; the dry run names the source line (`from UnitTemplet.lua row UC_...`).
+  Lu/Ciel also gets **Ciel's** set (the row's `m_MinorUnitPromotion*` fields, e.g. 41900-41904) in her slots 25/21/22/23/24
+  (`NESI_MINORUNIT_*_FASHION`), as the create screen shows both bodies.
 - **Top-tier gear, +10, in the equip bag** (category 1, slots 0-4, not worn): a weapon plus a complete 4-piece
   armor set. `top_gear` picks from `item.kim` (`--kim`, default `staged`) the highest item_level / grade / use_level
   the job can wear: enchantable, not fashion / pc-bang / test / `[event]` / untranslated, use level <= 99.
