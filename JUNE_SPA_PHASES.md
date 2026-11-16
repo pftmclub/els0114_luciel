@@ -233,6 +233,41 @@ one other village still load, the Ruben sign and the spa houses appear, nothing 
 **Done gate.** The gates above PASS (paste them), `PACK OK` / `COPY OK` per kom, `MODS.md` entry, the replaced files listed in the Done note.
 Full build skipped: no play-test yet (batch at S2b).
 
+## Phase S1 - Done
+
+2026-11-16, Sonnet 5.5 / high. Data only: no client source, so no flag, `finish.py` / `flagcheck` / `junediverge` do not apply, and the full build is
+skipped (no play-test yet; the S1 regression section is in `kickoffs/june-spa/playtest.md`, batch at S2b).
+- **Core-list Lua merged (BOM source, June's rows verbatim).**
+  - `Enum.lua` (data036): `NUI_WISP_EVENT` 10191, `NUI_SAYRENA_EVENT` 10192, `NUI_SHY_WISP_EVENT` 10193, `NUI_SPA_PPORU` 10196, `HI_SPA_SIGN_RUBEN` 40141,
+    `HI_SPA_INNER_NPC_RUBEN` 40143, `HI_SPA_INNER_NPC_RANOX` 40144, `HI_SPA_PPORU` 40147, `VMI_SPA_RUBEN` 1500, table `UI_SPA_CUSTOM_MSG` (`USCM_ENTER` 75000). No value collides.
+  - `DLG_Map_Village.lua` (data034): `Village[1500]` / `[1501]`, Ruben's door (start pos 5, `IsSpaEnter`) and `HI_SPA_SIGN_RUBEN` in Ruben's house list. June's
+    `OtherPlaceID` / `OtherPlaceStartLineIndex` are written as March's `BattleFieldId` / `BattleFieldStartLineIndex` (the only keys `VillageParsing` reads; the
+    spa rows themselves have none). Ranox's existing door (146) had June's keys, which the parser ignored: renamed the same way, so `GetMapId( 146 )` is now 1501 as in June.
+  - `DLG_Map_House.lua` (data034; the only house file March loads): 40141, 40143, 40144, 40147. `_1` / `_2` are not read. The file's one bare-LF line (:1108) is untouched.
+  - `NPCTemplet.lua` (data037): the wisp, Sirena, shy wisp and Pporu rows (Mei and Meiseu's row was there). `MapData.lua` (data036): both `AddMapData` and Cobo zones 1 (Ruben spa) / 15
+    (Ranox spa), as June. `WorldData.lua` (data040): `WI_SPA_RUBEN` / `WI_SPA_RANOX` with their snow variants (the snow file is read only under code event 46, which stays off).
+  - `DLG_Map_Local_Ruben.lua` (data034): converted from its sidecar (T0, sidecar folded away), then `SpaData.ID = VMI_SPA_RUBEN` restored, as a June-parity line.
+  - Rows in `tools/data/lua_core_list.tsv` updated for all seven; `DLG_Map_Local_Ruben.lua` added to the list by `convert`.
+- **Adopted as June's bytecode (`adopt-june`, run record `june2017_re/june_adopt_20261116_212244.tsv`).** data040: the four spa world luas and the two line maps; data039: `UI_MULSAYRENA`,
+  `UI_NPC_SHY_WISP`, `UI_WISP`. Byte-equal to June's already (not touched): `UI_MUL_MAI`, `UI_NPC_BILLBOARD_SPA`, `DLG_Map_House_NPC_RelationData` (it already holds the spa billboard rows;
+  no core-list row needed), `DLG_UI_Field_Title`; `DLG_Destination_byButton` (core, June's whole file) already has `Village_1500` / `_1501`.
+- **Assets.** Closure over the four spa world luas, both line maps, the five NPC / UI luas, the five spa meshes and the loading images / `SPA_PPORU_*.DDS` / `Alarm_SpaPporu.ogg`,
+  walking every mesh's and `.xet`'s embedded textures: 106 names, **0 missing except two June does not have** (below). The files the plan listed as missing were mostly there already (June asset
+  port): meshes, the loading images (Ruben's two as well), the `SPA_PPORU` pictures with their `.TET`, the alarm sound, `Amb_Ruben_Spring_Bird0*`. Only `li_spa_ruben001.ogg` was absent: it is loose
+  music, copied with `kom.py copy-loose --dest music` (`COPY-LOOSE OK`; the Ranox one was already identical). `Motion_Wisp_EVENT*.xet` is not named by any spa file (it is `Wisp_EVENT.lua`'s,
+  another NPC): not staged.
+- **June has two dangling names (JUNE_BUGS #785, #786), kept:** `Amb_Ruben_Spring_Bird04.ogg` (June's file is `Bird04..ogg`) and `NUI_SPA_PPORU`'s `Motion_Spa_Bboru.x` / `UI_SPA_PPORU.lua`.
+- **Gates.**
+  - `luabind.py check` on the 11 NPC / UI / world / line-map luas: 0 unbound methods, ENUM 0 missing, `RESULT: PASS` (the STATE gate has no class script here).
+  - `luasrc.py core --check`: `CORE CHECK PASS: 0 FAIL, 0 WARN`. `luasrc.py ledger --check`: `LEDGER CHECK PASS: 0 FAIL, 0 WARN`.
+  - Load test (vendored luajit, Enum + DungeonEnum + `DLG_Map_Village.lua` + `DLG_Map_House.lua` as packed text): `Village[1500]` / `[1501]` with 5 start positions each, Ruben's door 5 -> 1500, the five spa
+    houses present, no nil house id.
+- **Packed and copied.** `COPY OK data034` (md5 946358ce), `data036` (00b2c16b), `data037` (b921ccc7), `data039` (35ac9a01), `data040` (5f251c2c); each `PACK OK`. data039 +3 files, data040 +6.
+  Existing files replaced (backups in `kom_backup_tools\`): data034 `DLG_Map_House.lua`, `DLG_Map_Village.lua`, `DLG_Map_Local_Ruben.lua` (bytecode -> BOM source); data036 `Enum.lua`, `MapData.lua`; data037 `NPCTemplet.lua`; data040 `WorldData.lua`.
+- **How to see it in game.** Nothing new is visible: the spa signs and door prompts need code event 31 (S2a's save table) and the door code (S2b). The S1 section is a regression check.
+- **Left for S2a (noticed, in scope there).** `STR_ID_43064` ... `43091` exist in `StringID_def.lua` but their texts live in the client string table: S2b's first look at the OK box must read them. `Village[1500]` rows
+  are parsed by `VillageParsing` only when `SpaData.ID` is read (S2a's first row). No open question for the user.
+
 ## Phase S2a - Code events, spa village plumbing, Ruben omissions
 
 **Scope.** Flags `SERV_IRUHADEV_OFFLINE_CODE_EVENTS`, `SERV_IRUHADEV_JUNE_SPA_ENTRY`, `SERV_IRUHADEV_JUNE_SPA_DEBUG`; the map rows marked S2a:

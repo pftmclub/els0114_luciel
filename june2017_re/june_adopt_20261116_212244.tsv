@@ -1,0 +1,12 @@
+# adopt-june --bytecode run 2026-11-16 (LUA_SOURCE_PHASES.md L3)
+# mode bytecode = ljconv(June bytecode), shipped_sha1 is its sha1; mode source = BOM + decompile proven at `tier`, shipped_sha1 is the staged file's
+name	kom	state	june_koms	size	shipped_sha1	mode	tier	note
+UI_MULSAYRENA.lua	data039	new	data039	650	ea8e4adc50cf20d9c3bfac9bfce72820de3fe4cd	bytecode		ljconv
+UI_NPC_SHY_WISP.lua	data039	new	data039	559	bd6a74c2c1682d115d8f735428b1601389ce1360	bytecode		ljconv
+UI_WISP.lua	data039	new	data039	376	e7eff29dc73a9bed1beeffce7f4c2895900b52f2	bytecode		ljconv
+Spa_Ranox.lua	data040	new	data040	12591	d43bc0be481cb2a78c96d9542aa9d77427285847	bytecode		ljconv
+Spa_Ranox_LineMap.lua	data040	new	data040	4582	a5b8133a6828602f19dd840ff0d8aae367eedb6c	bytecode		ljconv
+Spa_Ranox_Snow.lua	data040	new	data040	13330	ea7133ba12a84c4e0a8310ed79aafe1ceb78d9c2	bytecode		ljconv
+Spa_Ruben.lua	data040	new	data040	14314	f6d59e509a47dc593a84bd72f59645126894ef5f	bytecode		ljconv
+Spa_Ruben_LineMap.lua	data040	new	data040	6713	5e3799aeb30b08eba05270e584c8bcf3a477f2b0	bytecode		ljconv
+Spa_Ruben_Snow.lua	data040	new	data040	15073	4664c9dd52a18df6dca1a6ffae54f32a7a8bc45e	bytecode		ljconv
