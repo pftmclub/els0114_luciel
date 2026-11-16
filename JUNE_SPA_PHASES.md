@@ -317,7 +317,8 @@ No door code (S2b), `+0x624` null (S4b), no soak (S3b).
   `CEI_SPA_ON_OFF`. June's guild agit (village 25000, state 15) seen in the loader tail, the Cobo list and the warp case -> backlog Stage 38 bullet.
 - **Gates.** `finish.py --with` the three flags: flagcheck `JUNE_SPA_ENTRY` PASS (9 PASS, 1 DEFINE, 4 OTHER), `OFFLINE_CODE_EVENTS` PASS (1 PASS, 3 PASS~,
   1 DEFINE, 9 OTHER), `JUNE_SPA_DEBUG` PASS by hand (3 OTHER: its lines sit inside the other two flags' blocks), junediverge `RESULT: PASS`, enumscan exit 0;
-  `FINISH RESULT: PASS`. CP949 files through `bytepatch.py`: 152 inserted lines, 0 deleted. Range lines: see the commit's run below.
+  `FINISH RESULT: PASS`. CP949 files through `bytepatch.py`: 152 inserted lines, 0 deleted. Commit `d33805a3`: `finish.py --range d33805a3^..d33805a3`
+  `FINISH RESULT: PASS` (same tallies).
 - **Build.** Full build skipped: no play-test yet (batch at S2b). `/Zs` probe of the 10 changed `.cpp` (stdafx context): 0 errors, all three flags on.
 - **Play-test:** deferred, section S2a in `playtest.md` (`playtest.py check` PASS), batch at S2b.
 - **Open questions:** none.
