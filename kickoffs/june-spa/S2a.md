@@ -30,6 +30,9 @@ Then the map rows marked `S2a` in `june2017_re/spa/spa_map.tsv` (`awk -F'\t' '$5
      (S0's rule note: same value, different meaning).
 2. **`SpaData`** (`32501bb0` @325024dc-32502f9e): read it in March's local-map loader (`X2LocationManager.cpp:265-365`), pass it to the
    templet and call `VillageParsing` for it as June does, so `GetVillageMapTemplet( 1500 / 1501 )` is not null.
+   Also in `VillageParsing` (`X2LocationManager.cpp:481-482`): read June's `OtherPlaceID` / `OtherPlaceStartLineIndex` keys (`@32500ac4` /
+   `@32500be0`) as June does. S1 left them verbatim on the Ruben (5) and Ranox (146) doors; March's parser reads only `BattleFieldId` /
+   `BattleFieldStartLineIndex`, so the doors' destination is not stored until this lands (user, 2026-11-16: follow June, never rename its keys).
 3. **The S2a rows outside the field game**, June's spa cases inside March's functions: `IsValidWarpField`, `WarpByCommand` position 19,
    `CX2UIInventory::CreateWarpDest`, `CX2StateMenu::CreateWarpDest` (with June's code-event 31 gate on both rows), the warp-destination
    level-10 gate in `CX2StateMenu::UICustomEventProc`, `LoadFieldImage`, `LoadUI`'s loading-screen clause, `OpenFieldName`, both

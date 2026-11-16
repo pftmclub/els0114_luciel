@@ -241,8 +241,8 @@ skipped (no play-test yet; the S1 regression section is in `kickoffs/june-spa/pl
   - `Enum.lua` (data036): `NUI_WISP_EVENT` 10191, `NUI_SAYRENA_EVENT` 10192, `NUI_SHY_WISP_EVENT` 10193, `NUI_SPA_PPORU` 10196, `HI_SPA_SIGN_RUBEN` 40141,
     `HI_SPA_INNER_NPC_RUBEN` 40143, `HI_SPA_INNER_NPC_RANOX` 40144, `HI_SPA_PPORU` 40147, `VMI_SPA_RUBEN` 1500, table `UI_SPA_CUSTOM_MSG` (`USCM_ENTER` 75000). No value collides.
   - `DLG_Map_Village.lua` (data034): `Village[1500]` / `[1501]`, Ruben's door (start pos 5, `IsSpaEnter`) and `HI_SPA_SIGN_RUBEN` in Ruben's house list. June's
-    `OtherPlaceID` / `OtherPlaceStartLineIndex` are written as March's `BattleFieldId` / `BattleFieldStartLineIndex` (the only keys `VillageParsing` reads; the
-    spa rows themselves have none). Ranox's existing door (146) had June's keys, which the parser ignored: renamed the same way, so `GetMapId( 146 )` is now 1501 as in June.
+    `OtherPlaceID` / `OtherPlaceStartLineIndex` are kept verbatim on both doors (user, 2026-11-16: follow June; Ranox's door 146 is as it was). March's `VillageParsing` reads only
+    `BattleFieldId` / `BattleFieldStartLineIndex`, so the destination is not stored yet: **S2a makes the parser read June's two keys** (`@32500ac4` / `@32500be0`), under its flag.
   - `DLG_Map_House.lua` (data034; the only house file March loads): 40141, 40143, 40144, 40147. `_1` / `_2` are not read. The file's one bare-LF line (:1108) is untouched.
   - `NPCTemplet.lua` (data037): the wisp, Sirena, shy wisp and Pporu rows (Mei and Meiseu's row was there). `MapData.lua` (data036): both `AddMapData` and Cobo zones 1 (Ruben spa) / 15
     (Ranox spa), as June. `WorldData.lua` (data040): `WI_SPA_RUBEN` / `WI_SPA_RANOX` with their snow variants (the snow file is read only under code event 46, which stays off).
@@ -274,6 +274,7 @@ skipped (no play-test yet; the S1 regression section is in `kickoffs/june-spa/pl
 - the code-event table, its migration, the login send and the `elsdb.py` command ("Design"); `IsEnableCode( 31 )` reads true offline;
   `CEI_SPA_ON_OFF` registered beside March's 31 (S0's rule note);
 - `SpaData` in the local-map loader (`32501bb0`: templet arg + `VillageParsing`), so 1500 / 1501 get templets;
+- `VillageParsing` reads June's `OtherPlaceID` / `OtherPlaceStartLineIndex` keys (S1 left them verbatim on the Ruben and Ranox spa doors; March's parser reads only the `BattleField*` names);
 - March's Ruben omissions and the spa cases of the shared functions: `IsValidWarpField`, `WarpByCommand` 19, both `CreateWarpDest`s (with the
   code-event 31 gate), the warp-destination level-10 gate, `LoadFieldImage`, `LoadUI`'s loading-screen clause, `OpenFieldName`,
   `X2FieldMapBase` (two), the minimap channel combo, the offline enum seed; `VMI_SPA_RUBEN` registered where C++ lacks it (`JUNE_ENUM_NAMES`);
