@@ -62,6 +62,16 @@
 
 #ifdef SERV_IRUHADEV_OFFLINE
 
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
+namespace _CONST_ROOM_DROP_STANDIN_R2_
+{
+	// field-rewards R2: items the monster row drew for the kill in progress, and when each npc id last logged.
+	int						s_iStandInDrawnItems = 0;
+	std::map< int, DWORD >	s_mapStandInLastLogTick;
+}
+using namespace _CONST_ROOM_DROP_STANDIN_R2_;
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
+
 namespace
 {
 	/// Never dialled. CX2Room::ApplyRoomPacketData hands this to
@@ -298,7 +308,11 @@ void CX2OfflineServer::MakeRoomUserInfo( const KOfflineUnitRow& kRow, OUT KRoomU
 		CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel, kBase );
 		KStat kRange;
 		const int iEquipGroup = ( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) ) ? 0 : 2;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
+		const int iWeaponItemID = CX2OfflineInventory::Instance()->AddEquippedWeaponRange( kRange, iEquipGroup, kRow.m_iUnitClass, kRow.m_iLevel );	// june-stat-calc S2
+#else SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		const int iWeaponItemID = CX2OfflineInventory::Instance()->AddEquippedWeaponRange( kRange, iEquipGroup, kRow.m_iUnitClass );
+#endif SERV_IRUHADEV_JUNE_STATCALC_EQUIP_STAT
 		const CX2Item::ItemTemplet* pWeaponTemplet = ( 0 != iWeaponItemID && NULL != g_pData && NULL != g_pData->GetItemManager() ) ? g_pData->GetItemManager()->GetItemTemplet( iWeaponItemID ) : NULL;
 		const KStat& kGame = kOut.m_kGameStat;
 		CX2OfflineLog::Server( L"[JUNE_STATCALC] SHEET emu unit=%I64d class=%d lv=%d base hp=%d atk=%d/%d def=%d/%d | game hp=%d atk=%d/%d range=%d/%d def=%d/%d | weapon=%d damage_range=%g",
@@ -3485,10 +3499,29 @@ bool CX2OfflineServer::Handler_EGS_NPC_UNIT_DIE_REQ( KOfflineSession& kSes, cons
 			}
 		}
 
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
+		s_iStandInDrawnItems = 0;
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
 		PushNpcDrop( kSes, kReq.m_nDieNPCUID, iNpcID, iED, kReq.m_DiePos, fContribution, cDieState );
 #else SERV_IRUHADEV_OFFLINE_MONSTER_GRADE
 		PushNpcDrop( kSes, kReq.m_nDieNPCUID, iNpcID, iED, kReq.m_DiePos );
 #endif SERV_IRUHADEV_OFFLINE_MONSTER_GRADE
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
+		// field-rewards R2: one line per second per npc id for a kill paid from a stand-in row.
+		if( true == CX2OfflineDropTable::Instance()->IsStandInRow( iKey, bBattleField, iNpcID ) )
+		{
+			const DWORD dwNow = ::GetTickCount();
+			DWORD& dwLast = s_mapStandInLastLogTick[ iNpcID ];
+
+			if( 0 == dwLast || dwNow - dwLast >= 1000 )
+			{
+				dwLast = dwNow;
+				CX2OfflineLog::Server( L"[DROP_STANDIN] key %d npc %d -> exp %d ed %d item(s) %d",
+					iKey, iNpcID, iEXP, iED, s_iStandInDrawnItems );
+			}
+		}
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
 
 #ifdef SERV_IRUHADEV_OFFLINE_MONSTER_GRADE
 		// Phase 3c: the hunt count follows its own rule (bCountQuest), after this
@@ -3733,6 +3766,10 @@ void CX2OfflineServer::PushNpcDrop( KOfflineSession& kSes, int iNpcUID, int iNpc
 
 	std::vector<int> vecItemID;
 	CX2OfflineDropTable::Instance()->GetNpcItemDrop( iKey, bBattleField, iNpcID, vecItemID );
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
+	s_iStandInDrawnItems = (int)vecItemID.size();
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
 
 #ifdef SERV_IRUHADEV_OFFLINE_MONSTER_GRADE
 	char cGrade = 0;

@@ -43,6 +43,16 @@ namespace
 #endif SERV_IRUHADEV_JUNE_ITEM_KIM
 }
 
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+namespace _CONST_DROPTABLE_STANDIN_R2_
+{
+	// field-rewards R2: group ids the generated block may use; the studio's own ids jump from 10250 to 28260.
+	const int STAND_IN_GROUP_FIRST	= 20000;
+	const int STAND_IN_GROUP_LAST	= 20999;
+}
+using namespace _CONST_DROPTABLE_STANDIN_R2_;
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+
 //////////////////////////////////////////////////////////////////////////
 
 CX2OfflineDropTable::CX2OfflineDropTable()
@@ -52,6 +62,11 @@ CX2OfflineDropTable::CX2OfflineDropTable()
 , m_iItemCaseRows( 0 )
 , m_iStaticRows( 0 )
 , m_iStaticCaseRows( 0 )
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+, m_iStandInDungeonRows( 0 )
+, m_iStandInFieldRows( 0 )
+, m_iStandInStaticRows( 0 )
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 {
 }
 
@@ -203,6 +218,12 @@ void CX2OfflineDropTable::EnsureLoaded()
 		&CX2OfflineDropTable::AddBattleFieldStaticDropInfo_LUA );
 	lua_tinker::decl( pLuaState, "DropTable", this );
 
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	// field-rewards R2: the NUMBER 1, never a Lua boolean (KLuaManager's lua_isnumber gate, see CX2OfflineLuaEnum::Publish).
+	lua_pushnumber( pLuaState, 1 );
+	lua_setglobal( pLuaState, "DROP_STANDIN" );
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+
 	// Order matters only for the log: the three files are independent.
 	RunScript( SCRIPT_NPC_EXP );
 	RunScript( SCRIPT_DROP_TABLE );
@@ -234,6 +255,32 @@ void CX2OfflineDropTable::EnsureLoaded()
 		L" %d item case(s) in %u group(s), %d static row(s) with %d case(s)",
 		m_iNpcExpRows, m_iMonsterRows, m_iItemCaseRows,
 		(unsigned int)m_mapDropGroup.size(), m_iStaticRows, m_iStaticCaseRows );
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	{
+		int iStandInGroups = 0;
+		for( std::map< int, std::vector<KDropCase> >::const_iterator mitGroup = m_mapDropGroup.begin();
+			 mitGroup != m_mapDropGroup.end(); ++mitGroup )
+		{
+			if( mitGroup->first >= STAND_IN_GROUP_FIRST && mitGroup->first <= STAND_IN_GROUP_LAST )
+				++iStandInGroups;
+		}
+
+		if( 0 == m_iStandInDungeonRows && 0 == m_iStandInFieldRows && 0 == m_iStandInStaticRows )
+		{
+			CX2OfflineLog::Server( L"[DROP_STANDIN] no stand-in rows - pack KncWX2Server/ServerResource/US/DropTable.lua"
+				L" and StaticDropTable.lua into data036.kom" );
+		}
+		else
+		{
+			CX2OfflineLog::Server( L"[DROP_STANDIN] loaded: %d dungeon row(s) over %d key(s), %d field row(s) over %d field(s),"
+				L" %d static row(s), %d group(s)",
+				m_iStandInDungeonRows, (int)m_setStandInDungeonKey.size(),
+				m_iStandInFieldRows, (int)m_setStandInFieldKey.size(),
+				m_iStandInStaticRows, iStandInGroups );
+		}
+	}
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 
 #ifdef SERV_IRUHADEV_JUNE_ITEM_KIM
 	// K3. The row counts above are the same under either item.kim (no templet gate
@@ -313,6 +360,11 @@ void CX2OfflineDropTable::ReadDropBlock( const char* szKeyField, bool bBattleFie
 	LUA_GET_VALUE( luaManager, "ED",		iED,			0 );
 	LUA_GET_VALUE( luaManager, "EDProperty",fEDProperty,	0.0f );
 
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	int		iStandIn		= 0;
+	LUA_GET_VALUE( luaManager, "StandIn",	iStandIn,		0 );
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+
 	if( iMonsterID <= 0 )
 		return;
 
@@ -320,6 +372,9 @@ void CX2OfflineDropTable::ReadDropBlock( const char* szKeyField, bool bBattleFie
 	kReward.m_iExpGate		= iExp;
 	kReward.m_iEDPerLevel	= iED;
 	kReward.m_fEDProperty	= fEDProperty;
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	kReward.m_bStandIn		= ( 0 != iStandIn );
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 
 	// DropItemList: { itemID, probability } pairs, read by position exactly as
 	// KDropTable::AddMonsterDropInfo_LUA reads them (Inventory-side sibling at
@@ -405,6 +460,22 @@ void CX2OfflineDropTable::ReadDropBlock( const char* szKeyField, bool bBattleFie
 		m_mapMonsterDrop[ std::make_pair( iKey, iMonsterID ) ] = kReward;
 
 	++m_iMonsterRows;
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	if( true == kReward.m_bStandIn )
+	{
+		if( true == bBattleField )
+		{
+			++m_iStandInFieldRows;
+			m_setStandInFieldKey.insert( iKey );
+		}
+		else
+		{
+			++m_iStandInDungeonRows;
+			m_setStandInDungeonKey.insert( iKey );
+		}
+	}
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 }
 
 void CX2OfflineDropTable::AddMonsterDropInfo_LUA()
@@ -457,6 +528,11 @@ void CX2OfflineDropTable::ReadStaticBlock( const char* szKeyField, bool bBattleF
 
 	LUA_GET_VALUE( luaManager, szKeyField,	iKey,		-1 );
 	LUA_GET_VALUE( luaManager, "Enable",	bEnable,	true );
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	int		iStandIn	= 0;
+	LUA_GET_VALUE( luaManager, "StandIn",	iStandIn,	0 );
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 
 	// -1 rather than 0 is the real loader's invalid marker, and it has to be:
 	// 0 is a legitimate key here (the event-drop row). Defaulting to 0 the way
@@ -517,7 +593,27 @@ void CX2OfflineDropTable::ReadStaticBlock( const char* szKeyField, bool bBattleF
 	mapTarget[ iKey ] = vecCase;
 
 	++m_iStaticRows;
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	if( 0 != iStandIn )
+		++m_iStandInStaticRows;
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 }
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+bool CX2OfflineDropTable::IsStandInRow( int iKey, bool bBattleField, int iNpcID ) const
+{
+	const std::map< std::pair< int, int >, KNpcReward >& mapDrop =
+		( true == bBattleField ) ? m_mapBattleFieldDrop : m_mapMonsterDrop;
+
+	// Specific row first, then the wildcard, as GetNpcReward does.
+	std::map< std::pair< int, int >, KNpcReward >::const_iterator mit = mapDrop.find( std::make_pair( iKey, iNpcID ) );
+	if( mit == mapDrop.end() )
+		mit = mapDrop.find( std::make_pair( 0, iNpcID ) );
+
+	return ( mit != mapDrop.end() && true == mit->second.m_bStandIn );
+}
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 
 void CX2OfflineDropTable::AddStaticDropInfo_LUA()
 {

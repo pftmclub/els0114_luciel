@@ -287,6 +287,60 @@ the four decisions are in the Done note and the hand-off; STATUS row `decision`.
 **Done gate.** `flagcheck` PASS for both flags, `junediverge --check` PASS, one-file probe build with 0 errors; `gen --dry-run` prints
 row counts and `check` passes on the dry output; no row is written to the server Lua yet. Full build skipped: no play-test.
 
+### Phase R2 - Done (2026-11-16)
+
+**What landed.** Flags `SERV_IRUHADEV_OFFLINE_DROP_STANDIN` and `_DEBUG` (end of `Always.h`; `_DEBUG` is on for R3's play-test and retires in
+the R6 review). `X2OfflineDropTable.cpp/.h`: `EnsureLoaded` publishes `DROP_STANDIN` as the number 1 before `DropTable.lua` runs; `ReadDropBlock` /
+`ReadStaticBlock` read the optional `StandIn` int; the row keeps `m_bStandIn`; counters per dungeon row / key, field row / field, static row, and
+groups counted by id in 20000-20999 (named namespace `_CONST_DROPTABLE_STANDIN_R2_`); `IsStandInRow` for the handler. The summary line and the "no
+stand-in rows - pack ..." line are as the phase section words them. `Handlers_Room.cpp`: under `_DEBUG` one `[DROP_STANDIN] key %d npc %d -> exp %d
+ed %d item(s) %d` line per kill from a stand-in row, throttled to one per second per NPC id (item count = what the monster row drew, handed from
+`PushNpcDrop` through a file-local counter). `tools/droptable.py gen` and `check`. No server Lua written, no `.lua` created, no pack.
+
+**Generator contract (R1 writes these two files to this shape; `gen_blocks` has the column text).**
+- `drop_item_pools.tsv`: `pool region band key npc item_id name type grade source` (band `lo-hi` of the dungeon's level or `*`; key = dungeon /
+  field id, difficulty-less base id or exact key, or `*`; npc = NPC id or `*`, for monster cards).
+- `drop_rate_sheet.tsv`: `kind region role diff pool exp ed ed_property prob inner source`; kind `param` (row's Exp / ED / EDProperty per region x role x
+  diff; **no param line = no row for that role**, printed as a WARNING with the NPC count), `item` (each pool item in `DropItemList` at `prob`), `group`
+  (the pool becomes a group, `inner` each or 100 / n, named in `DropGroupList` at `prob`), `static` (pool items in the key's static row at `prob`).
+  Role `mob-card` adds to a `mob` / `mob-minor` whose pool rows name the NPC. Probabilities are written exactly as the sheet spells them.
+- One row per (key, NPC); a NPC with several census roles takes the first of final-boss, stage-boss, field-boss, mob, field-mob, mob-minor, box
+  (18 such NPCs in scope); `none` / `unknown` roles never get a row. A (key, NPC) pair or static key the studio rows already hold is skipped
+  (read from the studio text of the loose server files with the block cut out, never from the census `state`, so a re-gen after packing is stable).
+- Groups are deduplicated by content and numbered from 20000; every `AddToGroup` precedes the rows that name it. `--only lanox|elysion|secret|all`,
+  `--keys`, `--dry-run`, `--out-dir DIR` (writes the two resulting files there, server files untouched). The block header line records the scope,
+  so `check` regenerates exactly it. Without `--dry-run` the block is replaced or appended with BOM and CRLF kept; an empty result removes it.
+
+**Proof.**
+- Real pools and sheet do not exist yet (R1), so `gen --dry-run` on the real inputs prints 0 rows and the note. The logic is proved on a throwaway fixture
+  outside the repo (7 pool rows, 13 sheet lines, real census, `--only lanox`): `GEN scope=lanox: 156 dungeon row(s) over 18 key(s), 33 field row(s) over
+  4 field(s), 22 static row(s), 2 group(s)`; `check` on its `--out-dir` files: `CHECK rows 189, static rows 22, groups in block 2 ... RESULT: PASS`.
+- `check` fails on each of: a hand edit of one row, a group id outside 20000-20999, a missing BOM, three bare LF lines, a studio pair repeated, a
+  non-ASCII byte in the block, an item not in item.kim, outer probabilities over 100 (8 of 8 negatives). Write path on copies: gen, regen (same md5),
+  gen with empty inputs (md5 equals the original studio file). The real `DropTable.lua` / `StaticDropTable.lua` are untouched (same md5).
+- Lua: the fixture output run in LuaJIT against a counting stub: `DROP_STANDIN` unset gives the studio counts exactly (2127 monster, 397 field, 1623
+  groups, 144 + 26 static); set adds 156 + 33 rows, 22 static, 4 `AddToGroup` and every added row carries `StandIn = 1`. That is the flag-off proof for rule 7.
+- Flags are defined at the end of `Always.h` (a `cl /Zs` probe including `stdafx.h` with `#ifndef` -> `#error` for OFFLINE, DROP_STANDIN and `_DEBUG`: 0 errors).
+
+**Hygiene.**
+- `finish.py --files <4 files> --with ...DROP_STANDIN ...DROP_STANDIN_DEBUG`: `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`; flagcheck PASS (3 files
+  PASS~ blank / marker only, `Always.h` OTHER = peers' defines), `junediverge --check` `RESULT: PASS`, enumscan exit 0. `flagcheck ..._DEBUG --worktree` PASS (0 deleted lines).
+  `flagcheck ...DROP_STANDIN` alone flags the `_DEBUG` guard `#if` as an ERROR; that is the pair, run as `--with` it passes. stateends / skillicons / luabind not applicable.
+- One-file probe build (`cl /Zs`, same defines as the build): `X2OfflineDropTable.cpp` 0 errors. `Handlers_Room.cpp` shows 3 errors, all `X2Unit.h(1446)`
+  `CX2SocketItem` (june-stat-calc S2's uncommitted `IsShowDungeonOnly` declaration, a peer's edit, flag `JUNE_STATCALC_EQUIP_STAT`); the same 3 appear on the
+  untouched `git show HEAD:` copy and none points at a line of this phase. Not mine to fix (shared-builds rule 4): R3's full build needs that peer fixed.
+- Full build skipped: no play-test. No `exestr` line (no build).
+
+**How to see it.** Nothing in game yet: with no stand-in rows packed the load log gains `[DROP_STANDIN] no stand-in rows - pack ...`; R3 writes the rows.
+`python tools/droptable.py gen --dry-run`, `... check`.
+
+**For R1 / R3 (open: the two formats differ).** R1 was editing `tools/droptable.py` in the same tree while R2 ran (uncommitted `pools` / `rates` / `simulate`,
+not part of this commit). Its columns are not the contract above: pools `pool region band item_id name type grade level unit_class weight source` (no `key` / `npc`
+columns, `region` is a region or a dungeon / NPC id, `weight` = inner probability), rates `role pool diff prob per source` (`per` = row / item / class-item / set /
+card; Exp / ED / EDProperty are lines of pool `exp` / `ed` / `edproperty`). `gen` reads the files named by `--pools` / `--sheet` and stops with `lacks column(s)` on
+any other shape, so nothing is misread. Whoever commits second reconciles in `gen_inputs` / `gen_blocks` (one adapter, the group / tier / card rules R1 settles are
+not guessed here); R3 cannot run `gen --only lanox` before that, and the sheet needs `static` lines. Review: `kickoffs/field-rewards/R2-review.md` (Opus 5.5 / medium).
+
 ## Phase R3 - Lanox: six dungeons and four fields
 
 **Scope.** `gen --only lanox`: keys 33270-33322 (18), fields 40029-40032, their static rows and groups. `check` and `simulate` every

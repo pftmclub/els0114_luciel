@@ -156,6 +156,12 @@ public:
 	/// to the attribute drop, with no event step).
 	void	GetEventDrop( OUT std::vector<int>& vecItemID );
 
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	/// field-rewards R2: whether the reward row GetNpcReward / GetNpcItemDrop would use
+	/// (specific key, then key 0) was written with StandIn = 1 by the generated block.
+	bool	IsStandInRow( int iKey, bool bBattleField, int iNpcID ) const;
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+
 	bool	IsLoaded() const					{ return false == m_mapNpcExp.empty(); }
 
 	/// Whether StaticDropTable.lua arrived. False means the file is not packed
@@ -251,10 +257,17 @@ private:
 
 		std::vector<KDropCase>	m_vecItemCase;
 
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+		bool	m_bStandIn;			///< field-rewards R2: row came from the generated stand-in block
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+
 		KNpcReward()
 			: m_iExpGate( 0 )
 			, m_iEDPerLevel( 0 )
 			, m_fEDProperty( 0.0f )
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+			, m_bStandIn( false )
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 		{
 		}
 	};
@@ -291,6 +304,15 @@ private:
 	int		m_iItemCaseRows;
 	int		m_iStaticRows;
 	int		m_iStaticCaseRows;
+
+#ifdef SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+	/// field-rewards R2: what the generated block added, for the one summary line.
+	int				m_iStandInDungeonRows;
+	int				m_iStandInFieldRows;
+	int				m_iStandInStaticRows;
+	std::set< int >	m_setStandInDungeonKey;
+	std::set< int >	m_setStandInFieldKey;
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
 };
 
 #endif SERV_IRUHADEV_OFFLINE

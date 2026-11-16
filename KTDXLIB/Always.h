@@ -14142,3 +14142,24 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT needs June's PvP game type names and the upgrade swap / skill templet calls ( june-stat-calc S1b )
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: field-rewards R2 - the offline drop loader publishes the Lua global DROP_STANDIN (the number 1) before DropTable.lua
+//              and StaticDropTable.lua run, so the generated stand-in block in those files executes; it reads the optional StandIn
+//              field of a row and logs [DROP_STANDIN] counts. Flag off: the global stays nil, Lua skips the block, the loader is as before.
+#define SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+#if defined( SERV_IRUHADEV_OFFLINE_DROP_STANDIN ) && !defined( SERV_IRUHADEV_OFFLINE )
+#error SERV_IRUHADEV_OFFLINE_DROP_STANDIN needs SERV_IRUHADEV_OFFLINE ( the offline drop table )
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: field-rewards R2 - debug: one throttled [DROP_STANDIN] line per kill of a stand-in monster (key, npc, exp, ed, items).
+//              On for the R3 play-test; retired by the field-rewards R6 review.
+#define SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
+#if defined( SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG ) && !defined( SERV_IRUHADEV_OFFLINE_DROP_STANDIN )
+#error SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG needs SERV_IRUHADEV_OFFLINE_DROP_STANDIN
+#endif SERV_IRUHADEV_OFFLINE_DROP_STANDIN_DEBUG
+//////////////////////////////////////////////////////////////////////////

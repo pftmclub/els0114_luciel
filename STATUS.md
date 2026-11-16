@@ -254,7 +254,7 @@ Plan `OFFLINE_FIELD_REWARDS_PHASES.md` - branch `main` - log tag `[DROP_STANDIN]
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
 | R1 | ready (R0 done): item pools + rate sheet, then 4 decisions for the user | Opus 5.5 / high | R0 | `tools/data/drop_item_pools.tsv`, `drop_rate_sheet.tsv`, `tools/droptable.py` | `R1.md` |
-| R2 | ready (R0 done): loader flag + generator, no rows yet; can run beside R1 | Sonnet 5.5 / high; review Opus 5.5 / medium | R0 | `X2OfflineDropTable.*`, `Handlers_Room.cpp`, Always.h, `tools/droptable.py` | `R2.md` |
+| R2 | done 2026-11-16 (loader flag, `gen` / `check`, probe only, no build); review ready; owes nothing but the review | Sonnet 5.5 / high; review Opus 5.5 / medium | R0 | `X2OfflineDropTable.*`, `Handlers_Room.cpp`, Always.h, `tools/droptable.py` | `R2.md`, review `R2-review.md` |
 | R3 | blocked (R1 approved, R2 review): Lanox rows, first full build + play-test | Sonnet 5.5 / medium | R1, R2 review | server `DropTable.lua`, `StaticDropTable.lua` (user packs) | `R3.md` |
 | R4 | blocked (R3): Elysion rows + play-test | Sonnet 5.5 / medium | R3 | same two server Lua files | `R4.md` |
 | R5 | blocked (R3): secret dungeon rows + play-test | Sonnet 5.5 / high | R1, R3 | same two server Lua files | `R5.md` |
