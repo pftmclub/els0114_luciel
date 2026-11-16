@@ -183,7 +183,7 @@ Done: stage2-plan, stage3-plan, stage4-plan, stage29-plan, stage5-plan, stage6-p
 ## june-engine - June engine remainder: renderer contract, render types, UI framework, world timeline
 Plan `JUNE_ENGINE_REMAINDER_PHASES.md` · branch `main` · log tag `[JUNE_ENGINE]` (sub-tags `CTT`, `FX`, `ENVBOX`, `SHIMMER`, `CRS`, `SMRT`, `UI`, `WORLD`) · flags `SERV_IRUHADEV_JUNE_RENDER_*` / `_JUNE_UI_*` / `_JUNE_WORLD_*` · kickoffs `kickoffs/june-engine/` · backlog Stage 2 · created 2026-10-16.
 
-Done: R0, R0b, R1, R2, R3, R4, R4e, R4f, R5, R5b, R9 (reviewed 2026-11-15: pass, debug retired), R10, R11, R12, R12b, R14, R14b, R14c, R14d, R14e (reviewed 2026-11-15: pass, no code change), R13, R13b, R13c, R13d, U0, U1, W0, W1, W1b, W1g, W3.
+Done: R0, R0b, R1, R2, R3, R4, R4e, R4f, R5, R5b, R9 (reviewed 2026-11-15: pass, debug retired), R10, R11, R12, R12b, R14, R14b, R14c, R14d, R14e (reviewed 2026-11-15: pass, no code change), R14f (reviewed 2026-11-16: pass, no code change; play-test passed), R13, R13b, R13c, R13d, U0, U1, W0, W1, W1b, W1g, W3.
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
@@ -200,7 +200,6 @@ Done: R0, R0b, R1, R2, R3, R4, R4e, R4f, R5, R5b, R9 (reviewed 2026-11-15: pass,
 | R6 | built + deployed 2026-10-28 (flag `JUNE_SKIN_MESH_RENDER_TYPE` + short-lived `_DEBUG`; 10 funcmap rows `(R6)`; JUNE_BUGS 455-459): June's whole skin-anim draw 31d30380 (frame copy, hide, RenderParam pass 31d2f000, ...) | **Opus 5.5 / high**, then user play-test | R0, R0b | `KTDGXSkinAnim.h/.cpp`, `KTDXDeviceXSkinMesh.*`, `KTDGXRenderer.cpp`, `KTDGXSkinAfterImage.cpp`, ... | `R6.md`, review `R6-review.md` |
 | R6b | ready (R6 review PASS 2026-10-28) (added by R6 2026-10-28): June writers of the mesh fields R6 reads: CX2Eqip mesh-flag switch 32964ae0 (alpha ids, Ara cases gone), equip glow 3295b970 (mesh +0x980 / +0xa2c), ... | Opus 5.5 / high (map, then port), Opus review, then ... | R6 + its review | `X2Eqip.*`, `X2GUUser.cpp`, Always.h | `R6b.md`, review `R6b-review.md` |
 | R6c | waiting (routed from june-march-divergence D1-3e, tsv 263): June's equip enchant-particle list `+0x8f0` (3295cd30 / 3295bf90) in place of `Weapon::SetEnchantParticleShow`'s three handles | Opus 5.5 / high (map, then port), Opus review | R6b | `X2Eqip.*`, `X2GameUnit.cpp`, Always.h | `R6c.md` |
-| R14f | built + deployed 2026-11-16 (flags `JUNE_EQIP_LOAD_ATTACHED` + `JUNE_DIVERGE_EQIP_SET_FIXED`): June's whole `LoadAttached` 32961c80 (DITT 29 / 83, item switch, DG-chain gate), sub-equip XET, `SetFixed`; play-test passed 2026-11-16, review ready | Opus 5.5 / high, Opus review, user play-test | R14d + its review | `X2Eqip.cpp`, `X2SubEquip.*`, Always.h | `R14f.md`, review `R14f-review.md` |
 | R15 | ready (routed from june-march-divergence D2 review): June's `CX2GameUnit::PlaySound` (32276220) puts looped sounds on the unit's close list too; caller audit first (Chung's `SAFE_CLOSE`) | Opus 5.5 / high, Opus review | - | `X2GameUnit.cpp`, looped callers, Always.h | `R15.md` |
 | R12c | waiting (routed from june-march-divergence D1-3d): June's `SetpHairSkinMesh` (3322a5d0) refs the after-image hair mesh and closes the old one; March only stores it | Opus 5.5 / high, Opus review | R12 | `KTDGXSkinAfterImage.*`, Always.h | `R12c.md` |
 | R7 | ready (R0b and R2 done) | **Opus 5.5 / high** (map, then port), then user play-test | R0b, R2 | `KTDGXRenderer.cpp`, `KTDXDeviceManager.*`, `KTDXDeviceXSkinMesh.*`, unit face / equip code, ... | `R7.md`, review `R7-review.md` |
@@ -239,7 +238,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5d2 | blocked (june-engine R14f; split from DU5d; DU5d review passed 2026-11-16): back body's emotions, window equip tint `31f93920`, other `SetUnitScale` callers | Opus 5.5 / high, Opus review, user play-test | R14f | `X2UnitViewerUI.*`, create / select states | `DU5d2.md` |
+| DU5d2 | ready (june-engine R14f reviewed 2026-11-16; split from DU5d): back body's emotions, window equip tint `31f93920`, other `SetUnitScale` callers | Opus 5.5 / high, Opus review, user play-test | R14f | `X2UnitViewerUI.*`, create / select states | `DU5d2.md` |
 | CH3a | done (2026-11-16, play-test passed, logs read): Dread Lord (127) skills; `_SKILL_DEBUG` stays on until the CH3b review ( it covers CH3a ) | Sonnet 5.5 / high, no review of its own (CH3b review covers it), user play-test | CH2d2 review, CH3a0 review | `X2GULuciel.*` | `CH3a.md` |
 | CH3b | ready (CH3a play-test passed 2026-11-16): Noblesse (128) skills | Sonnet 5.5 / high, Opus review (also covers CH3a), user play-test | CH3a | `X2GULuciel.*` | `CH3b.md` |
 | CH3c | blocked (CH3b review; CH1i2 + review, DU1 review done): Demonio (129) skills part 1, `CUSTOM_RENDER_STATE` | Sonnet 5.5 / high, no review of its own (CH3c2 review covers it), user play-test | CH3b review, CH1i2, DU1 review | `X2GULuciel.*` | `CH3c.md` |

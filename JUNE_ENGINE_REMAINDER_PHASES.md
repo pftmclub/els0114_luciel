@@ -2535,6 +2535,37 @@ particles, once): village, field, dungeon and the character window.
 **Play-test 2026-11-16: passed** (user: all four checks work: 88622 / 88402 on Elsword, 82035 on Aisha in village / field / dungeon, the
 character window shows them once, 285144's particles once). No log line to read: R14f has none.
 
+### Phase R14f -- Review
+
+**2026-11-16, Opus 5.5 high. Verdict: pass, no code change.** Reviewed `99448c4b` against June `32961c80`, `32f09170` and `3295a560` in Ghidra
+(decompile + disassembly, read-only).
+- **Passes and frame:** `32961cdd-32961d09` = 8 only for templet `+0xd2 == 9` and item-type nibble (`+0x6 & 0xf`) `== 1`, else 1. Rose doubling
+  (`+0xd2 == 0xb`, `+0xd5 == 2`) is applied to the meshes and the particles (`329629b8`). Frame (`32961dbb-32961e3b`): skin -> `+0x1c0`, else
+  `+0x544[ slot ]`, then `[ ESI = i ]` when i > 0 and either not Add or not the 8-pass case (`32961e03` / `32961e1b`). The port's
+  `false == bEveryWeaponSlot` test is the same. The `i < 8` bound is JUNE_BUGS 771.
+- **Forced skin and ctor:** custom (`+0xa9` from `3295c130`, a Stage 11 stand-in), then DITT `0x1d`, then `0x53` -> bSkin 1. The ctor's extra stack
+  argument is eqip `+0x804`, pushed by `32f09170` @`32f092c9` as `AddModelXSkinMesh`'s 4th argument (`pModelTexChangeXET`). Sub-equip `+0x240` = bSkin.
+- **Item switch:** walked both compare trees and the decoded case lists. All 14 groups (outer 13, plus the DITT inner 7 with its default) match
+  the port id for id (28 / 2 / 15 / 1 / 2 / 33 / 1 / 2 / 2 / 1 / 10 / 12 / 2 / 1; inner 26 / 8 / 6 / 3 / 2 / 1). Each group matches on which
+  param it writes (normal `+0x198` vs vslot `0x14`), byte vs word at `+0x64` (word 1 = blend on and Z-write off, `0x101` = both on), `+0xa4`,
+  cull and blend values, and `100003637`'s colour (`334c9a0c` read from the exe: `9a99993e` = 0.3f, plus `+0x66` bZEnable).
+- **Enums and offsets** (`cl /Zs` probe): UT_ADD 9, UT_LUCIEL 10, UT_ROSE 11, IT_WEAPON 1, UT_SKIN 1, UC_ANYONE 1, EP_WEAPON_HAND 2,
+  EP_DEFENCE_BODY 8, EP_AC_TITLE..TEMP3 15..27 (= June's tail cases), RT_CARTOON_COLOR_EDGE 2. RenderParam color 0x28, bAlphaBlend 0x64,
+  bZWriteEnable 0x65, bZEnable 0x66, cull 0x68, src 0x6c, dest 0x70, bAlphaTestEnable 0xa4: all equal June's offsets.
+- **Exits:** the only jump to the epilogue from inside the loop is the NULL `GetRenderParam` @`32962782` (the port's `return`). `SetDefaultRenderParam`
+  @`32962937-32962958` = the port. Particle tail: `( 0, 0, 0 )` position. The Lu / Ciel test (`+0x1b4` owner -> templet type 10, UID > 0, minor
+  bit != `+0x15d4`, use condition != 1) matches `3295bf90( 0, -1 )`. Both R6c stand-ins are labelled.
+- **SetFixed:** `3295a560` writes only `+0x8ec`. The fixed draw (`X2Eqip.cpp` `if( m_bFixed )`) draws the sub-equips and attached particles once.
+  Every live `SetFixed` caller's viewer is unchained (CHARINFO / WATCH, also community and web avatar) except the class-change screen
+  (`UVS_CLASSCHANGE`, chained by June's own viewer test), which may draw an alpha sub-equip twice. That is June's own behaviour, noted only.
+  `AddEqip` at `X2UnitViewerUI.cpp:4048` sits in the dead `#else` of `JUNE_CHAR_DUO_VIEWER`.
+- **Gates** (`finish.py --review --commits 99448c4b --with ..._EQIP_LOAD_ATTACHED ..._DIVERGE_EQIP_SET_FIXED --skip-flag ..._JUNE_ENUM_NAMES -v`):
+  JUNE_EQIP_LOAD_ATTACHED PASS (4 PASS, 1 DEFINE, 1 OTHER: `X2ItemManager.h`, the two DITT lines under the skipped `JUNE_ENUM_NAMES`);
+  JUNE_DIVERGE_EQIP_SET_FIXED PASS (1 PASS, 1 DEFINE, 4 OTHER: `X2GUUser.cpp`, `X2SubEquip.*` = `_LOAD_ATTACHED`, `X2ItemManager.h` as above);
+  0 deleted lines; junediverge PASS, `--check-all` PASS; enumscan exit 0; FINISH RESULT: PASS (9 gates, 0 failed, 4 skipped: ENUM_NAMES by
+  choice, stateends / skillicons / luabind not applicable).
+- Build skipped: no code change, no play-test.
+
 ## Phase R14e - InitEqip and the character viewer's slot visibility (Raven left arm)
 
 **Run with:** Opus 5.5 high, Opus review, user play-test. Added by R14c (2026-11-15) from the char-raven CH4c and char-luciel DU3c amendments of
