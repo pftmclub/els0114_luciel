@@ -1552,6 +1552,17 @@ amended). Socket option data's range stays with S3. Play-test units: testlu1 and
 
 Play-test: below; review `kickoffs/june-stat-calc/S2-review.md`.
 
+**Play-test passed (user, 2026-11-16; logs of the deployed exe, run 14:58-15:00).** jtLordKnight: `ITEMSTAT item=163450 unit=100 lv=99
+enchant=10 atk=16899/13443 range=9294/7394`; `SHEET window total=235624/19438/15725/9294/7394/...`, `unit` range 0, `equip` range 9294/7394 (the
+range moved from the base to the gear, total unchanged from S1); `RESIST group=0 resist=165 x 6`. testlu1 (lv 99): `ITEMSTAT item=62119 unit=200
+lv=99 enchant=13 atk=19574/18662 range=10765/10264` (the item stat is right now; S1's near-zero lead was not GetStat); RESIST 50 x 6 (form 0), 10/0/...
+(form 1, group 1). After the user swapped in the Cobo weapon 113300: window `total=157000/1669/1651/61/58/396/390` = `SHEET emu` / `SHEET game`
+`atk=1669/1651 range=61/58` (Ciel: game 1589/1571). ErrorLog 0 matching lines; packets 0 EXCEPTION.
+**Open finding -> S2 review, first task.** While 62119 was equipped (select 14:58:38, first slot change 14:59:11) the window's gear sum skipped
+it (`equip=0/107/106/0/0/95/89`, as in S1's `0/7/6/...`): no `ITEMSTAT` line came from that `GetEqipStat` call, so the item is dropped before
+`GetStat` (list, usable, group or PvP test), while the Cobo weapon in the same slot counts. The emulator would count 62119 ( same filters on
+the save row ), so window and game stat disagree with that weapon equipped. Not June ( June's window sums the equipped weapon ).
+
 ## Phase Z - Close
 
 **Scope.** `MODS.md` complete, the map has no `March` / `mixed` / `unknown` row, `tools/data/june_diverge_allow.tsv` holds no `stage33`

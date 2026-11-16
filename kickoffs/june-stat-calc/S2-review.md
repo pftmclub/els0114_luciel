@@ -18,7 +18,14 @@ Then the map rows with `phase = S2` in `june2017_re/statcalc/statcalc_map.tsv` a
 
 ## Task
 
-Review Phase S2's commit against June's exe:
+**First, the open play-test finding (Done note, "Open finding").** With testlu1's +13 Henir dual weapon 62119 equipped, the character window's
+gear sum (`CX2Unit::GetEqipStat`, `X2Unit.cpp`) skips it although its item stat is right (`ITEMSTAT ... atk=19574/18662`); the Cobo weapon in
+the same slot counts. Add a throttled `[JUNE_STATCALC] EQIPSKIP` line under `_STATCALC_DEBUG` naming each skipped item and the test that
+dropped it (not in the list / GetItem NULL / IsUsableEquip false and why / group / PvP-equip), build, and hand off: testlu1 re-equips 62119
+( `/additem` is not needed, it is in her bag ), opens the character window. Fix the cause under the flag it belongs to (June's window sums
+the equipped weapon), then re-check `SHEET window` total = `SHEET emu` game with 62119 equipped.
+
+Then review Phase S2's commit against June's exe:
 - `CX2Item::GetStat` `328842f0` and `CX2Item::GetEnchantStat` `32882630` (`X2Item.cpp`): the unit (owner `+0xc4`, else my selected unit), its level
   (`+0xb4`), the calculator choice (PvP-equip bit 7 or the 22 ids at `334c0cb8` -> `328d6d70`, else `328d6f60`), the uncached path's type / class
   (owner templet `+0xaf0`) against the cached path's 0 / 0, the "no unit -> stat stays 0" branches, the range term (`(double)atk * damage_range *
