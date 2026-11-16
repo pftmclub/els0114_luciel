@@ -2004,6 +2004,8 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's). Files: `X2Uni
   `CHARINFO_VIEW_ATTRIB_ENCHANT`, `DIVERGE_UPGRADE_WEAPON_PARTICLE`, `UNIT_VIEWER_EFFECT_PLAYER` (enclosing, not this change's); junediverge PASS;
   enumscan exit 0; stateends / skillicons / luabind n/a. New local `#error` in `X2UnitViewerUI.h` (needs `CHARINFO_VIEW_ATTRIB_ENCHANT`,
   `ADD_UPGRADE_WEAPON_PARTICLE`, `ARA_CHARACTER_BASE`): all three on at that line by a `cl` probe.
+- **Commit** `0ebcfdff`; `finish.py --range 0ebcfdff^..0ebcfdff --with SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER`: `FINISH RESULT: PASS (6 gates, 0 failed,
+  3 skipped)`, flagcheck 1 PASS, 1 PASS~, 0 OTHER, 0 FAIL, the same 10 deleted lines.
 - **Compile:** `/Zs` probe of `X2UnitViewerUI.cpp`: 0 errors.
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,104,768 B, dated 2026-11-16 10:16:26, md5 65ccb63e7b13cee700e2ae15090828c5` (built at main 63e45d19 +
   28 uncommitted code files: this phase's and peers' in-progress files). `EXESTR OK: 3 of 3 found in X2_offline.exe` (`ATTACK_LINE_START0_RWeapon`,
