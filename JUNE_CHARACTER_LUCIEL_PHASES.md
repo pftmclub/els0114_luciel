@@ -4572,6 +4572,13 @@ review retires it ), `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( 7 BFI + 3 BTI names in `X
   `EXESTR OK: 2 of 2 found in X2_offline.exe` wide ( the init and soul extortion debug lines ); on the built exe 4 of 4 ( + the madness crave line, `DamageEffect_SI_P_LLC_SEIZED_BY_FEAR_BurstFear` ).
 - **Play-test saves ( `elsdb addchar` + `x --file` ):** `LuPasLD` 220 ( Dread Lord 127 ), `LuPasCN` 221 ( Noblesse 128 ), `LuPasDN` 222 ( Demonio 129 ), level 70, the job's five
   passives at 4 ( 30401-30405 / 30406-30410 / 30411-30415 ), Power of Oriax 30010 and Soul Extortion 30019 added; slots in the hand-off.
+- **Play-test ( 2026-11-16, user: all checks passed; logs 09:37-09:45 on the 09:23 deploy, clean exit, 0 EXCEPTION, 0 ErrorLog lines ):** init lines for
+  `LuPasLD` 220 ( x9 ), `LuPasCN` 221 ( x3 ), `LuPasDN` 222 ( x7 ), each repeat identical ( force down 0.710, crit x1.080: the base resets what the passives add, nothing
+  stacks across the re-inits March's callers make ); `fear: seized by fear` x25 ( range 350, limit 5; 1 / 2 / 5 stacks per hit = base / Lord of Fear / Dead Hands ),
+  `burst fear` x19, `threat of fear` x7 ( cool times -2.00, next in 5.00 s ), `blasting fear range 460, 3 unit(s) burst`, `power of oriax stun` x10 ( level 4 ),
+  `ruinous impact target` x4, `soul collector stack` x13 ( 1, 2, ... ), `soul extortion drain` x18 ( `stacks 5 / 5, mp 20.00, soul 1` ), `invasion of dark energy mark`
+  x7 ( 3.00 s, next in 10.00 s ), `madness crave` x51 ( near range 700 / far 1200: `nearest 391, near 1 value 9.266` = 12 x ( 1 - 91 / 400 ), `nearest 1376 ... far 1` ),
+  `LUCIEL DUO point: +1 on hit` x5 ( CH2a2's owed check, Lu and Ciel units ). `_PASSIVE_DEBUG` stays on; the CH4b review retires it.
 - **How to see it in game:** the hand-off in the closing message ( units `LuPasLD` / `LuPasCN` / `LuPasDN` ). Logs: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`.
   Per passive: init lines `LUCIEL PASSIVE init` / `init 2` ( every value ); Seized by Fear / Lord / Aura / Threat `fear: seized by fear ...`, `burst fear`, `threat of fear`;
   Power of Oriax `power of oriax stun`; Soul Collector `soul collector stack N`; Soul Extortion `soul extortion drain`; Communion Recovery `rest mp` in `init`;
