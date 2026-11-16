@@ -1326,6 +1326,14 @@ Build: `DEPLOY OK: X2_offline.exe is 27,133,440 B, dated 2026-11-16 10:38:08, md
 X2/US_SERVICE/x2.exe (2026-11-16 10:38:01); built at main 9fb16748 + 10 uncommitted code file(s)` (a peer's build; 3f2911a9 is its ancestor).
 `EXESTR OK: 3 of 3 found in X2_offline.exe, 27133440 B, dated 2026-11-16 10:38:08, md5 85d46dcf40f1843140ce152466d7cc5c` (the SHEET strings).
 
+**Play-test fix (2026-11-16).** Check 1 failed: the window showed min = max. Log: `SHEET game ... range=9294/7394` (in game: right) but
+`SHEET window ... unit=166419/1202/1202/0/0/...` (base range 0). Cause: the emulator builds the unit info at character select, before the
+client sets the item-stat calculator's current unit (June 328d6f60 falls back to `+0x50 / +0x54`), so the weapon's attack and range came
+out 0 there. `AddEquippedWeaponRange` now passes the character's own unit type and class, and `MakeGameStat` / `MakeMinorUnitGameStat`
+call it directly (no longer from `AddEquippedStat`). /Zs probes 0 errors. `DEPLOY OK: X2_offline.exe is 27,133,440 B, dated 2026-11-16
+10:58:37, md5 a50a8e6072cc3582b8de569eabd44325, equal to X2/US_SERVICE/x2.exe (2026-11-16 10:58:29); built at main 132e6b1e + 11 uncommitted
+code file(s)`.
+
 **Not ported, routed.** Socket option data's range ([9] / [10] of the option stat, `+0x314` / `+0x318` in `328842f0`'s sum) -> S3 with the
 option vectors. Item-side `KItemFormatStatData` has no range slot (June's templet slots are 0) -> nothing. A weapon swap in the village
 refreshes the game stat at once; the base stat (window range) follows on the next unit info / level-up, as no NOT carries the base.

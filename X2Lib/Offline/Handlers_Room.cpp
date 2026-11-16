@@ -298,7 +298,7 @@ void CX2OfflineServer::MakeRoomUserInfo( const KOfflineUnitRow& kRow, OUT KRoomU
 		CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel, kBase );
 		KStat kRange;
 		const int iEquipGroup = ( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) ) ? 0 : 2;
-		const int iWeaponItemID = CX2OfflineInventory::Instance()->AddEquippedWeaponRange( kRange, iEquipGroup );
+		const int iWeaponItemID = CX2OfflineInventory::Instance()->AddEquippedWeaponRange( kRange, iEquipGroup, kRow.m_iUnitClass );
 		const CX2Item::ItemTemplet* pWeaponTemplet = ( 0 != iWeaponItemID && NULL != g_pData && NULL != g_pData->GetItemManager() ) ? g_pData->GetItemManager()->GetItemTemplet( iWeaponItemID ) : NULL;
 		const KStat& kGame = kOut.m_kGameStat;
 		CX2OfflineLog::Server( L"[JUNE_STATCALC] SHEET emu unit=%I64d class=%d lv=%d base hp=%d atk=%d/%d def=%d/%d | game hp=%d atk=%d/%d range=%d/%d def=%d/%d | weapon=%d damage_range=%g",

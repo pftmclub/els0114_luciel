@@ -124,7 +124,7 @@ public:
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	/// june-stat-calc S1 stand-in: adds the equipped weapon's attack range to the KStat range pair; returns the weapon's item id ( 0: none )
-	int		AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup ) const;
+	int		AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup, const int iUnitClass ) const;
 #endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	//////////////////////////////////////////////////////////////////////////

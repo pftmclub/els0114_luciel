@@ -534,7 +534,7 @@ namespace _CONST_OFFLINE_SERVER_S1_
 		CX2OfflineInventory* pInven = CX2OfflineInventory::Instance();
 		if( false == pInven->Load( kRow_.m_nUnitUID ) )
 			return 0;
-		return pInven->AddEquippedWeaponRange( kBaseStat_, iEquipGroup );
+		return pInven->AddEquippedWeaponRange( kBaseStat_, iEquipGroup, kRow_.m_iUnitClass );
 	}
 }
 using namespace _CONST_OFFLINE_SERVER_S1_;
@@ -555,6 +555,9 @@ using namespace _CONST_OFFLINE_SERVER_S1_;
 	const int iEquipGroup = ( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) ) ? 0 : 2;
 	if( true == pInven->Load( kRow.m_nUnitUID ) )
 		pInven->AddEquippedStat( kOut, iEquipGroup );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	AddBaseWeaponRange( kRow, kOut );	// june-stat-calc S1: the game stat carries the weapon range ( the same group test )
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 #else SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	if( true == pInven->Load( kRow.m_nUnitUID ) )
 		pInven->AddEquippedStat( kOut );
@@ -574,6 +577,9 @@ using namespace _CONST_OFFLINE_SERVER_S1_;
 	CX2OfflineInventory* pInven = CX2OfflineInventory::Instance();
 	if( true == pInven->Load( kRow.m_nUnitUID ) )
 		pInven->AddEquippedStat( kOut, 1 );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	pInven->AddEquippedWeaponRange( kOut, 1, kRow.m_iUnitClass );	// june-stat-calc S1: Ciel's slots and the shared ones
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	KStat kMajor;
 	MakeGameStat( kRow, kMajor );

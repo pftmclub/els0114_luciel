@@ -444,14 +444,11 @@ void CX2OfflineInventory::AddEquippedStat( IN OUT KStat& kInOut ) const
 	kInOut.m_iAtkMagic	+= (int)fAtkMagic;
 	kInOut.m_iDefPhysic	+= (int)fDefPhysic;
 	kInOut.m_iDefMagic	+= (int)fDefMagic;
-#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
-	AddEquippedWeaponRange( kInOut, iEquipGroup );	// june-stat-calc S1: stand-in for June's server range
-#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
 
 #ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 // june-stat-calc S1 stand-in ( no June server ): range = the weapon's own attack x item.kim damage_range / 100 ( cobodex.eu calculator )
-int CX2OfflineInventory::AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup ) const
+int CX2OfflineInventory::AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup, const int iUnitClass ) const
 {
 	if( NULL == g_pData )
 		return 0;
@@ -480,8 +477,10 @@ int CX2OfflineInventory::AddEquippedWeaponRange( IN OUT KStat& kInOut, const int
 		if( NULL == pTemplet || true == pTemplet->GetFashion() || CX2Unit::EP_WEAPON_HAND != pTemplet->GetEqipPosition() )
 			continue;
 
+		// the character's own unit key: at character select the calculator's current unit is not set yet ( June 328d6f60 falls back to +0x50 / +0x54 )
 		CX2Item::KItemFormatStatData kStatData;
-		g_pData->GetItemStatCalculator().CalculateItemStat( kStatData, pTemplet );
+		g_pData->GetItemStatCalculator().CalculateItemStat( kStatData, pTemplet,
+			static_cast<CX2Unit::UNIT_TYPE>( CX2OfflineStatTable::UnitTypeOf( iUnitClass ) ), static_cast<CX2Unit::UNIT_CLASS>( iUnitClass ) );
 
 		const float fEnchantScale = EnchantStatScale( pRow->m_iEnchantLevel, pTemplet );
 		const float fDamageRangeRate = pTemplet->GetDamageRange() / 100.0f;
