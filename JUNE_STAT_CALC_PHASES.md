@@ -1668,10 +1668,19 @@ Build: `DEPLOY OK: X2_offline.exe is 27,238,400 B, dated 2026-11-16 16:18:45, md
 second while the unit has entries.
 
 **Play-test save** (backup `db_backup/els_db_20261116_155716_pre_pre_s3-socket-mpup.sql`): D6RavenN (211) weapon 163453 sockets 72400 (5 %, +10 MP,
-10 s), 72405 (5 %, +20 MP, 10 s), 10351 (18 %, +1 MP, no cool time); top 62106 socket 74059 (5 %, +50 MP, dungeon only; June's data gives it no
-`m_fIntervalTime` although its text says 10 s: data, kept).
+10 s), 72405 (5 %, +20 MP, 10 s), 10351 (18 %, +1 MP, no cool time); top 62106 socket 74059 (5 %, +50 MP, 10 s, dungeon only).
 
 Play-test: below; review `kickoffs/june-stat-calc/S3-review.md`.
+
+**Play-test passed (user, 2026-11-16; logs of the deployed exe cffe3cab, run 16:29-16:30, Elysion: Soless Expert, D6RavenN).** 14 `MPUP`
+lines, entries in equip order 74059 / 72400 / 72405 / 10351:
+- 74059 fired at 16:30:03.357 (`mp=50`, timer 10); its timer ran 8.60 -> 5.39 -> 3.97 -> 2.03 -> 0.37 -> 0.014 at 16:30:13.170 (10 s), and every
+  hit in between rolled 3 times, not 4 (the running entry is skipped without a roll, as `31fd9100`).
+- 10351 (no cool time) fired four times in 0.33 s (16:30:12.843-13.170, `mp=1` each) while 74059's timer ran.
+- 72405 fired at 16:30:14.516 (`mp=20`, timer 10, back to 4 rolls once 74059 was at 0), then 8.43 -> 6.46. 72400 did not fire this run (5 %).
+- The user saw the MP+ numbers and the tooltip lines. ErrorLog 0 matching lines; packets 0 EXCEPTION (2 UNHANDLED `E_DISABLE_HB_CHECK_REQ`, as
+  every run).
+Correction: the earlier note said 74059 has no `m_fIntervalTime`; June's row has it (= 10) before the `ID` line, as the log shows.
 
 ## Phase Z - Close
 
