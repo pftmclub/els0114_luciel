@@ -682,6 +682,9 @@ bool CX2SocketItem::AddSocketData_LUA()
 	}
 
 	D3DXVECTOR2 vRateAndMPValue;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+	// june-stat-calc S3: June reads m_fPercentMPUpByAttacked only beside m_fIntervalTime ( @327321fe ), below
+#else SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 #ifndef ADJUST_SECRET_ITEM_OPTION //±èÃ¢ÇÑ
 	LUA_GET_VALUE(		luaManager, "m_fPercentMPUpByAttacked",				vRateAndMPValue.x,		0.0f );
 
@@ -692,6 +695,7 @@ bool CX2SocketItem::AddSocketData_LUA()
 		pSocketData->m_vecMpUpByAttacked.push_back( vRateAndMPValue );
 	}
 #endif //ADJUST_SECRET_ITEM_OPTION
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 
 	// °ø°ÝÀ» ÇßÀ» ¶§ MP°¡ Áõ°¡ÇÒ È®·üÀÌ 0º¸´Ù Å©¸é
 	LUA_GET_VALUE(		luaManager, "m_fPercentMPUpByAttack",					vRateAndMPValue.x,		0.0f );
@@ -988,6 +992,19 @@ bool CX2SocketItem::AddSocketData_LUA()
 	LUA_GET_VALUE(		luaManager, "m_fIncOrDecVal",							pSocketData->m_fIncOrDecVal,				0.0f );
 	LUA_GET_VALUE(		luaManager, "m_iCount",								pSocketData->m_iCount,						0 );
 	LUA_GET_VALUE(		luaManager, "m_fIntervalTime",							pSocketData->m_fIntervalTime,				0.0f );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+	{
+		// june-stat-calc S3: June 32726850 @32732152-3273256a, ( chance, MP, m_fIntervalTime ) pushed when the chance is above 0
+		D3DXVECTOR3 vRateAndMPValueAndCoolTime( 0.0f, 0.0f, 0.0f );
+		LUA_GET_VALUE(		luaManager, "m_fPercentMPUpByAttacked",				vRateAndMPValueAndCoolTime.x,		0.0f );
+		if ( 0.0f < vRateAndMPValueAndCoolTime.x )
+		{
+			LUA_GET_VALUE(		luaManager, "m_fMPUpByAttacked",						vRateAndMPValueAndCoolTime.y,		0.0f );
+			vRateAndMPValueAndCoolTime.z = pSocketData->m_fIntervalTime;
+			pSocketData->m_vecMpUpByAttacked.push_back( vRateAndMPValueAndCoolTime );
+		}
+	}
+#else SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 
 #ifdef ADJUST_SECRET_ITEM_OPTION //±èÃ¢ÇÑ
 	D3DXVECTOR4 vRateAndMPValueAndCooltime;
@@ -1003,6 +1020,7 @@ bool CX2SocketItem::AddSocketData_LUA()
 		pSocketData->m_vecMpUpByAttacked.push_back( vRateAndMPValueAndCooltime );
 	}
 #endif //ADJUST_SECRET_ITEM_OPTION
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 
 #ifdef SERV_IRUHADEV_JUNE_SOCKET_PARITY
 	/// June reads EFFECT_NAME later, after m_fAllSkillDamageIncreaseRate (@32736174): see there
@@ -2127,6 +2145,21 @@ void CX2SocketItem::PrintOptionInfo_ToExcel( KProtectedType<int> iLevel )
 	}
 	else if ( false == m_vecMpUpByAttacked.empty() )
 	{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+		// june-stat-calc S3: June 3271f8c1-3271fa0d, the chance rounded ( x 100 + 0.5 )
+		const D3DXVECTOR3& vRateAndValue = m_vecMpUpByAttacked[0];
+		const int iRatePercent = static_cast<int>( static_cast<float>( vRateAndValue.x * 100.0 + 0.5 ) );
+		if( vRateAndValue.z > 0.0f )
+		{
+			wstrstm << GET_REPLACED_STRING( ( STR_ID_28643, "iSii", iRatePercent,
+				( ( vRateAndValue.y >= 0 ) ? L"+" : L"-" ), abs( static_cast<int>( vRateAndValue.y ) ), static_cast<int>( vRateAndValue.z ) ) );
+		}
+		else
+		{
+			wstrstm << GET_REPLACED_STRING( ( STR_ID_505, "iSi", iRatePercent,
+				( ( vRateAndValue.y >= 0 ) ? L"+" : L"-" ), abs( static_cast<int>( vRateAndValue.y ) ) ) );
+		}
+#else SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 #ifdef ADJUST_SECRET_ITEM_OPTION //±èÃ¢ÇÑ
 		const D3DXVECTOR4& vRateAndValue = m_vecMpUpByAttacked[0];
 
@@ -2148,6 +2181,7 @@ void CX2SocketItem::PrintOptionInfo_ToExcel( KProtectedType<int> iLevel )
 			( ( vRateAndValue.y >= 0 ) ? L"+" : L"-" ),
 			abs( ( int )vRateAndValue.y ) ) );
 #endif //ADJUST_SECRET_ITEM_OPTION
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 	}
 	else if ( false == m_vecMpUpByAttack.empty() )
 	{

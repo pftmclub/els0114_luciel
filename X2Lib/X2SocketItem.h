@@ -753,7 +753,11 @@ class CX2SocketItem
 #ifdef ADJUST_SECRET_ITEM_OPTION //김창한
 			vector<D3DXVECTOR4>		m_vecMpUpByAttacked;			// 공격을 당했을 때 증가하는 MP양 x: 발동확률, y: 증가하는 MP양, z: 제한 쿨타임, w: 현재 쿨타임.
 #else //ADJUST_SECRET_ITEM_OPTION
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+			vector<D3DXVECTOR3>		m_vecMpUpByAttacked;			// june-stat-calc S3: June +0x114, 12-byte entries ( chance, MP, cool time = m_fIntervalTime )
+#else SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 			vector<D3DXVECTOR2>		m_vecMpUpByAttacked;			// 공격을 당했을 때 증가하는 MP양 x: 발동확률, y: 증가하는 MP양
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 #endif //ADJUST_SECRET_ITEM_OPTION
 
 			//}} kimhc // 2011-05-25 // SetOption, TitleOption에만 적용 되는 option 모든 itemOption에 적용 되도록 수정

@@ -3687,6 +3687,9 @@ void CX2GUUser::SumSocketOption( const vector<int>& vecSocketOption, const float
 #else SERV_9TH_NEW_CHARACTER
 				m_SocketData.ConvertAndAdd( kScaledSocketData, iSocketLevel_ );
 #endif SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+				m_vecSocketMpUpAttackedCoolTime.resize( m_SocketData.m_vecMpUpByAttacked.size(), 0.0f );	// june-stat-calc S3: June 32077f50 after each ConvertAndAdd ( @3204f329, @3204f428 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 			}
 		}
 		else
@@ -3699,6 +3702,9 @@ void CX2GUUser::SumSocketOption( const vector<int>& vecSocketOption, const float
 #else SERV_9TH_NEW_CHARACTER
 			m_SocketData.ConvertAndAdd( kSocketData, iSocketLevel_ );
 #endif SERV_9TH_NEW_CHARACTER
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+			m_vecSocketMpUpAttackedCoolTime.resize( m_SocketData.m_vecMpUpByAttacked.size(), 0.0f );	// june-stat-calc S3: June 32077f50 @3204f480
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 		}
 #else SERV_IRUHADEV_JUNE_SOCKET_PARITY
 
@@ -8481,6 +8487,9 @@ HRESULT CX2GUUser::OnFrameMove( double fTime, float fElapsedTime )
 	/// June buff port 16-step3b4: June OnFrameMove 3206eaf0 ticks the per-socket cool times right after the bone shield (31fd7bd0 @3206f71a)
 	CheckSocketCoolTime( fElapsedTime );
 #endif SERV_IRUHADEV_JUNE_SOCKET_PARITY
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+	CheckSocketMpUpAttackedCoolTime( fElapsedTime );	// june-stat-calc S3: June 31fda180 @3206f728
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 
 #ifdef ADJUST_SECRET_ITEM_OPTION //김창한
 	CheckSocketOptionCoolTime( fElapsedTime );
@@ -11393,12 +11402,18 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 #ifdef FIX_ADD_MANA_WHEN_ATTACKED
 		if ( pAttackerUnit != NULL )
 		{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+			// june-stat-calc S3: June 320462a0 @32047b00-32047b4d also skips an our-team hit and DT_BUFF
+			if ( false == pDamageData->m_bAttackOurTeam && 0.f >= pDamageData->m_fHpPercentUp && 0.f >= pDamageData->m_fMpPercentUp &&
+				0.f >= pDamageData->m_fIncreaseMP && CX2DamageManager::DT_BUFF != pDamageData->damageType )
+#else SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 #ifdef SERV_CHUNG_TACTICAL_TROOPER				/// 택티컬 필드는 예외
 			if ( 0.f >= pDamageData->m_fHpPercentUp && 0.f >= pDamageData->m_fMpPercentUp && 
 				0.f >= pDamageData->m_fIncreaseMP )
 #else  SERV_CHUNG_TACTICAL_TROOPER
 			if ( 0.f >= pDamageData->m_fHpPercentUp && 0.f >= pDamageData->m_fMpPercentUp )
 #endif SERV_CHUNG_TACTICAL_TROOPER
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 			{
 				//{{ kimhc // 2011-05-25 // SetOption, TitleOption에만 적용 되는 option 모든 itemOption에 적용 되도록 수정
 
@@ -11426,7 +11441,11 @@ void CX2GUUser::DamageReact( CX2DamageManager::DamageData* pDamageData )
 #ifdef ADJUST_SECRET_ITEM_OPTION //김창한
 				fMPUp = CalculateMpUpAttackedBySocketOption( m_SocketData.m_vecMpUpByAttacked );
 #else //ADJUST_SECRET_ITEM_OPTION
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+				fMPUp = CalculateMpUpAttackedBySocketOption( m_SocketData.m_vecMpUpByAttacked, m_vecSocketMpUpAttackedCoolTime );	// june-stat-calc S3: June @32047d40-32047d55
+#else SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 				fMPUp = CalculateMpUpBySocketOption( m_SocketData.m_vecMpUpByAttacked );
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 #endif //ADJUST_SECRET_ITEM_OPTION
 
 				//}} kimhc // 2011-05-25 // SetOption, TitleOption에만 적용 되는 option 모든 itemOption에 적용 되도록 수정
@@ -15797,6 +15816,61 @@ float CX2GUUser::CalculateMpUpAttackedBySocketOption( vector<D3DXVECTOR4>& vecMp
 	return fMpUp;
 }
 #endif //ADJUST_SECRET_ITEM_OPTION
+
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+// june-stat-calc S3: June 31fd9100, a running cool time skips its entry without a roll
+float CX2GUUser::CalculateMpUpAttackedBySocketOption( const vector<D3DXVECTOR3>& vecMpUpAttackedBySocketOption_, vector<float>& vecCoolTime_ )
+{
+	vecCoolTime_.resize( vecMpUpAttackedBySocketOption_.size(), 0.0f );
+
+	float fMpUp = 0.0f;
+	int iRandomSeed = 0;
+	for ( UINT i = 0; i < vecMpUpAttackedBySocketOption_.size(); ++i )
+	{
+		const D3DXVECTOR3& vRateAndValueAndCoolTime = vecMpUpAttackedBySocketOption_[i];
+		if ( 0.0f < vRateAndValueAndCoolTime.z && 0.0f < vecCoolTime_[i] )
+			continue;
+
+		if ( GetRandomFloat( CKTDXRandomNumbers::SRO_ADD_MANA_ON_ATTACK + iRandomSeed++ ) < vRateAndValueAndCoolTime.x )
+		{
+			vecCoolTime_[i] = vRateAndValueAndCoolTime.z;
+			fMpUp += vRateAndValueAndCoolTime.y;
+		}
+	}
+
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_OFFLINE )
+	static DWORD s_dwMpUpLogged = 0;
+	if ( false == vecMpUpAttackedBySocketOption_.empty() && ( 0.0f < fMpUp || ::GetTickCount() - s_dwMpUpLogged >= 1000 ) )
+	{
+		s_dwMpUpLogged = ::GetTickCount();
+		std::wstringstream wstrEntries;
+		for ( UINT i = 0; i < vecMpUpAttackedBySocketOption_.size(); ++i )
+			wstrEntries << L" " << vecMpUpAttackedBySocketOption_[i].x << L"/" << vecMpUpAttackedBySocketOption_[i].y << L"/" << vecMpUpAttackedBySocketOption_[i].z << L":" << vecCoolTime_[i];
+		CX2OfflineLog::Server( L"[JUNE_STATCALC] MPUP unit=%I64d rolls=%d mp=%.0f entries=%d%s", GetUnitUID(), iRandomSeed, fMpUp,
+			static_cast<int>( vecMpUpAttackedBySocketOption_.size() ), wstrEntries.str().c_str() );
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+
+	return fMpUp;
+}
+
+// june-stat-calc S3: June 31fda180
+void CX2GUUser::CheckSocketMpUpAttackedCoolTime( const float fElpasedTime_ )
+{
+	const vector<D3DXVECTOR3>& vecMpUpByAttacked = m_SocketData.m_vecMpUpByAttacked;
+	m_vecSocketMpUpAttackedCoolTime.resize( vecMpUpByAttacked.size(), 0.0f );
+	for ( UINT i = 0; i < vecMpUpByAttacked.size(); ++i )
+	{
+		float& fCoolTime = m_vecSocketMpUpAttackedCoolTime[i];
+		if ( 0.0f < vecMpUpByAttacked[i].z && 0.0f < fCoolTime )
+		{
+			fCoolTime -= fElpasedTime_;
+			if ( fCoolTime <= 0.0f )
+				fCoolTime = 0.0f;
+		}
+	}
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 
 //}} kimhc // 2011-05-25 // SetOption, TitleOption에만 적용 되는 option 모든 itemOption에 적용 되도록 수정
 
@@ -39881,6 +39955,9 @@ void CX2GUUser::ResetMPChangeRate( float fMPChangeRate )
 void CX2GUUser::UpdateSocketDataAndEnchantData()
 {
 	m_SocketData.ReInit();
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+	m_vecSocketMpUpAttackedCoolTime.resize( 0 );	// june-stat-calc S3: June 3204b4c0 @3204b4d3
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 	m_vecTitleOptions.resize( 0 );
 	m_mapDefenceEnchantData.clear();
 	m_mapNpcIdNDamageUpPercent.clear();

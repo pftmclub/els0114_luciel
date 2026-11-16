@@ -918,6 +918,10 @@ Found by june-effect C9g (`JUNE2017_EFFECT_COMPLETION_PHASES.md`, "C9g - Done"; 
 `CX2CustomizeManager` (embedded in `CX2Main` at `+0x9e4`, Lua `g_pCustomizeManager`) applies cash "custom" items to a character:
 lobby motions, sit motions, face and texture, skill cut-ins and viewer effect sets. March has none of it. Planned under the standing
 rule that an unowned June system gets its own stage. What it covers:
+- **From june-stat-calc S3 (2026-11-16): customize items' socket options.** `InitSocketData` `3206d770` @3206e6a0-3206e859: when
+  `g_pData +0x34` is set, each entry of the applied-customize list (CX2Unit `+0xa48`) is matched through `GetCustomizeManager`
+  (`31d70b60`) `3264cb50`, and the options found are summed once (`3204f190`), after the riding pet and before the title. The port has
+  no customize source; add it to `CX2GUUser::InitSocketData` in June's place.
 - **From june-charinfo C0 (2026-10-30):** the character window's Customize button (a STUB there): REQ `0x62b` `32914690`, ACK / NOT `0x62c` / `0x62d`
   parsed by `32914fe0` / `3291ece0` into CharInfo `+0x25c`, then the customize window `3214f3a0`; and the customize window's light branch `32d76da0`
   (`CustomCharLightSet`) of the UI-manager light toggle `32150e30`.
@@ -1058,6 +1062,13 @@ the record itself and every field March already reads. The rest has no March own
   (52 `SAT_ELIANODE_PIECE_EQUIP_TYPE` has no item yet). 41 `SAT_ADD_DP_PERCENT_UP` goes to the character-port checklist (Add).
 - **Set item groups.** `SetItemGroup.lua` (`g_pCX2SetItemManager:AddSetItemGroupData`: linked items and a replacement string per set).
 - **Item lock.** `ItemManager.lua` (`SetItemLock_MaxDay`, `SetItemLock_EDPerDay`).
+- **From june-stat-calc S3 (2026-11-16): the user's second socket-id list (user `+0x94a0`) and its only reader, the Lanox Secret Ammo
+  set effect.** `InitSocketData` `3206d770` clears it (@3206d914) and appends each equip's socket ids, the item vectors `+0x5c` /
+  `+0x8c` / `+0x9c` / set-gated `+0xac` included (@3206dd52-3206de11); the set-option function `32050230` appends the set options
+  beside `+0x893c` (@320503bb / @320505a6). Read only by `32011280` (AttackResultByType @32014507: sockets 87012 / 87002, BTI 794) and
+  `322a0180` (user / NPC Process_ExtraDamage @320392c3 / @3279d465: sockets 87010 / 87000 / 87011 / 87001, BTI 793 / 794 stacks, buff
+  0x333); funcmap rows 1470 / 1471 (their decimal ids are off by 16) and `user +0x94a0 (StatCalc S33 S3)`. June's data: 87010-87012 are
+  the "Demon Spirit Orb" options (`EDT_MAGI_HIT_COUNT_ATTACK`, 7 hits, max 3). No stat reads the list: port it with the set effect.
 - **Coordi catalogue.** `CoordiItem.lua` (`g_pCoordi_ItemManager:AddCoordiItemTemplet`; June builds the file name XOR-encrypted).
 - **Other June-only item tables** opened by `ResetItemManager` `31edda90`: `PackageItemData_INT`, `IceHeaterPreView_INT`,
   `ItemEtcAccessory` (voice packs), `CanUseInventoryItem` (right-click opens the cash shop), `GuildAgitShopItem`,

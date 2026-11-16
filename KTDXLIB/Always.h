@@ -14189,6 +14189,18 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-16
+// Description: june-stat-calc S3 - June's socket MP-up-when-hit with a cool time: the 12-byte option entry (chance, MP, m_fIntervalTime;
+//              loader 32726850 @32732152-3273256a), one timer per entry in the user (+0x87b8), resized after every ConvertAndAdd in
+//              SumSocketOption (32077f50) and cleared in UpdateSocketDataAndEnchantData, the roll in DamageReact (31fd9100, June's our-team
+//              and DT_BUFF tests), the tick in OnFrameMove (31fda180) and the tooltip line (3271f8c1).
+#define SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_SOCKET ) && !defined( SERV_IRUHADEV_JUNE_SOCKET_PARITY )
+#error SERV_IRUHADEV_JUNE_STATCALC_SOCKET needs June's socket parity ( the per-socket cool-time tick and the SumSocketOption branches )
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
 // Description: june-asset-port P1 - debug: per-kom [KOM_MOUNT] counters (files, registered, mount ms) and the process private memory after the last
 //              mount, logged once at the first LoadDataFile after LockMassFileMap (use-time, so ErrorLog.txt keeps them). Every asset wave's log
 //              check reads them; retired (commented out) by june-asset-port P12.

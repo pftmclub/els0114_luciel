@@ -2034,6 +2034,10 @@ public:
 #ifdef ADJUST_SECRET_ITEM_OPTION //김창한
 		float						CalculateMpUpAttackedBySocketOption( vector<D3DXVECTOR4>& vecMpUpAttackedBySocketOption );
 #endif //ADJUST_SECRET_ITEM_OPTION
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+		float						CalculateMpUpAttackedBySocketOption( const vector<D3DXVECTOR3>& vecMpUpAttackedBySocketOption_, vector<float>& vecCoolTime_ );	// june-stat-calc S3: June 31fd9100
+		void						CheckSocketMpUpAttackedCoolTime( const float fElpasedTime_ );	// june-stat-calc S3: June 31fda180
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 
 		//}} kimhc // 2011-05-25 // SetOption, TitleOption에만 적용 되는 option 모든 itemOption에 적용 되도록 수정
 
@@ -4036,6 +4040,9 @@ public:
 		bool	m_bSocketCoolTimeOnHit;
 		float	m_fSocketCoolTimeOnHitCool;
 #endif SERV_IRUHADEV_JUNE_SOCKET_COOLTIME_ON_HIT
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_SOCKET
+		vector<float>	m_vecSocketMpUpAttackedCoolTime;	// june-stat-calc S3: June +0x87b8, one timer per m_vecMpUpByAttacked entry
+#endif SERV_IRUHADEV_JUNE_STATCALC_SOCKET
 #ifdef SERV_IRUHADEV_JUNE_TRANSCEND_ENGINE
 		float	m_fTranscendSlotBuffTime;		/// June +0x9328
 		bool	m_bTranscendSlotBuffRolled;		/// June +0x932c

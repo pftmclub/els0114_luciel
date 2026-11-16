@@ -1279,6 +1279,7 @@ pure function, an Opus review, and a play-test on every character (level 99, wit
 | S1b | `ResetMaxHP`, `CalcHitDodgePercent` + the `+0xe8` roll offset, the ability map `32358970` (added by S0) | `_UNIT_STAT`, `_HIT_DODGE` | `X2GUUser.*`, `X2DamageManager.*`, `X2UnitManager.*`, `X2GUNPC.*` |
 | S2 | equipment, set items, enchant stat | `_EQUIP_STAT` | `X2Unit.*`, `X2Item.*`, `X2ItemStatCalculator.*` |
 | S3 | socket aggregate and option vectors: `InitSocketData`, user `+0x94a0`, the MP / HP-up entries and timers, `SumSocketOption`'s gaps (S0: `320839e0` is already June) | `_SOCKET` | `X2SocketItem.*`, `X2GUUser.*`, `X2Unit.*` |
+| S3b | the socket flat stat in the emulator's game stat (split from S3: the D6 lead; March's server rule) | `_SOCKET` | `Offline/X2OfflineInventory.*`, `Offline/X2OfflineServer.cpp` |
 | S4 | re-reads and leftovers: buff member functions, two `SetFactor`s, `ResetIncreaseSkillLevelBySocket`, the `IsSocketOptionFormLoaded` fallbacks, stale divergence rows | `_BUFF_FACTOR`, `_SOCKET` | `X2GameUnit.*`, `X2BuffFinalizer*`, `X2Unit.*`, `X2SocketItem.*` |
 | R1 | MP and awakening gain: `AttackResult`, the damage effect, DamageReact @32049d8a, `SetDamageExceptionProcess` terms, absorb | `_RESOURCE` | `X2GameUnit.*`, `X2GUUser.*`, `X2DamageEffect.*` |
 | R1b | MP cost and rate: `GetActualMPConsume` + June's buff reader `32039a50`, `ResetMPChangeRate`, `SetMPChangeRateValue` (added by S0) | `_MP_COST` | `X2GUUser.*`, `X2GageData.*`, class MP blocks |
@@ -1611,6 +1612,65 @@ enumscan exit 0, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
 `CanEquipAsParts` `3234e750`, which needs `templet +4 & 0xf00` != 0 (March's `CX2Unit::CanEquipAsParts` tests `UT_NONE` the same way). The earlier
 "62119 equipped" state came from the save (the item was already in the weapon slot at select). So the window-vs-emulator case is reachable only
 by a save edit; the fix covers it, and S2's Cobo-weapon result (window = `SHEET emu` = `SHEET game`) stands for normal play. Owes nothing.
+
+### Phase S3 - Done (2026-11-16)
+
+Flag `SERV_IRUHADEV_JUNE_STATCALC_SOCKET` (`Always.h`, guard on `_JUNE_SOCKET_PARITY`); `_STATCALC_DEBUG` stays on. Commit: `git log --grep
+"june-stat-calc Phase S3:"`. Each item read in the exe this session; map: 3 S3 rows -> `June`, `+0x94a0` -> Stage 16, one new row (S3b); funcmap
+rows tagged `StatCalc S33 S3`.
+
+**Socket MP up when hit, ported whole (the S0 pair).** June is March's `ADJUST_SECRET_ITEM_OPTION` form (off in US by `Always_US.h`) with the timer
+moved out of the entry:
+- Loader `32726850` @32732152-3273256a: `m_fIntervalTime` first, then `m_fPercentMPUpByAttacked` > 0 -> `m_fMPUpByAttacked`, push ( chance, MP,
+  interval ); June's only read of the key (xorstrings `327321fe`), so March's early pair is compiled out. `m_vecMpUpByAttacked` is a
+  `vector<D3DXVECTOR3>` under the flag; ReInit / both ConvertAndAdd inserts are type-agnostic; the rank-scaled copy has no vectors (JUNE_BUGS #50).
+- User timers `m_vecSocketMpUpAttackedCoolTime` (June `+0x87b8`): resized after each `ConvertAndAdd` in `SumSocketOption` (`32077f50`; June after all
+  three, the port's rank and PVE branches share one call), cleared in `UpdateSocketDataAndEnchantData` (@3204b4d3, after the ReInit).
+- Roll `CalculateMpUpAttackedBySocketOption` = `31fd9100` (March's ADJUST name): skip while cool time > 0 and timer > 0 (no roll), seed 8 + rolls,
+  a hit sets the timer to the cool time. Tick `CheckSocketMpUpAttackedCoolTime` = `31fda180`, OnFrameMove @3206f728 right after
+  `CheckSocketCoolTime` (`31fd7bd0` ticks the per-socket store `+0x8b9c`, not these timers: S0's candidate was the neighbour).
+- DamageReact guard @32047b00-32047b4d adds two tests March lacked: not `m_bAttackOurTeam` (June DD `+0x500`; March 0x43c, right before
+  `m_fHpPercentUp`, by offsetprobe) and `damageType != DT_BUFF`. HP part = March (`31fd5620`; no negative branch in either, `FIX_HP_DOWN_SOCKET_OPTION`
+  off by cl /P).
+- Tooltip `3271f8c1`: STR_ID_28643 with the cool time when it is > 0, else STR_ID_505; June rounds the chance `(int)(float)( x * 100.0 + 0.5 )`.
+- Checked, = March: `m_vecHpUpByAttacked` / `m_vecHpUpByAttack` / `m_vecMpUpByAttack` (8-byte entries, `31fd5620` / `31fd5680`). The on-attack caller
+  `3202d670` has a June guard (`+0x8a0` byte) that belongs to R1 (AttackResult); funcmap row written.
+
+**`SumSocketOption`'s second gap: none.** The live `EQUIPPED_SKILL_SLOT_COUNT` is 5 (`CommonPacket.h` under `SERV_IRUHADEV_JUNE_SKILL_SLOT_10`, ON
+by cl /P) = June's 5 per bar; the comment at `X2GUUser.cpp:3655` ("March has 4", "not ported: the resize") is stale, left as is.
+
+**`InitSocketData` `3206d770` re-read:** sources and order = the port (equipment, party share, pet aura in states 0xb / 0x12 / 0x15, riding pet,
+title = `g_pData +0x28c` lookup copied to `+0x894c` = `m_vecTitleOptions`, set items vslot `+0x798`, extra-damage copies, premium buffs,
+LimitMaximum, InitAdditionalStatOptionValue, ResetIncreaseSkillLevelBySocket). Not in the port, routed: the customize items' socket source
+(@3206e6a0-3206e859) -> backlog Stage 12; the `+0x94a0` appends -> Stage 16.
+
+**User `+0x94a0` identified:** the user's full socket-id list (equip sockets, set options), read only by the Lanox Secret Ammo set effect
+(`32011280`, `322a0180`: sockets 87000-87002 / 87010-87012, BTI 793 / 794). No stat reads it, so it is routed with the set effect to backlog Stage 16
+(bullet added), not ported here.
+
+**D6 lead -> S3b (split, same flag).** No client path adds a socket's flat stat to the game stat; June's came from the server. March's server
+(`KInventory::GetEquippedStat`, `CXSLSocketItem::GetSocketOptionStat`, title and pet aura) sums equipment / set / title / pet-aura socket stats raw
+(x level only when level-linked); the emulator never did, hence 204 = 205. That is a new emulator stand-in: `kickoffs/june-stat-calc/S3b.md`.
+
+**Proof.** `python june2017_re/statcalc/emu_socket_mpup.py`: `EMU_SOCKET_MPUP: 600 roll sets, 600 tick sets, 0 mismatch(es) -> PASS` (Unicorn: both
+June functions whole, vslot 0x1cc stubbed by seed). /Zs probes 0 errors: `X2SocketItem.cpp`, `X2GUUser.cpp`, `X2UICharInfo.cpp`, `X2Unit.cpp`.
+flagprobe: `_STATCALC_SOCKET` / `_DEBUG` ON.
+
+**Gates** (`finish.py --files <5 files> --with _STATCALC_SOCKET _STATCALC_DEBUG -v`): flagcheck `RESULT: PASS` (3 PASS, 1 PASS~ = one blank line
+before the new functions, 1 DEFINE, 0 OTHER, 0 deleted, 0 non-ASCII); junediverge `RESULT: PASS`; enumscan exit 0; `FINISH RESULT: PASS (6 gates, 0
+failed, 3 skipped)` (no skill states, skills or June scripts).
+Build: `DEPLOY OK: X2_offline.exe is 27,238,400 B, dated 2026-11-16 16:18:45, md5 107a47da43b99d42f7016726a2a7c497, equal to X2/US_SERVICE/x2.exe
+(2026-11-16 16:18:37); built at main 69ab5cfd + 6 uncommitted code file(s)` (peers' files built in too). `EXESTR OK: 1 of 1 found in X2_offline.exe,
+27238400 B, dated 2026-11-16 16:18:45, md5 107a47da43b99d42f7016726a2a7c497` (the MPUP line).
+
+**Debug line** (`[JUNE_STATCALC]`): `MPUP unit=<uid> rolls=<n> mp=<sum> entries=<n> <chance/MP/cool:timer ...>` on every hit that adds MP, else once a
+second while the unit has entries.
+
+**Play-test save** (backup `db_backup/els_db_20261116_155716_pre_pre_s3-socket-mpup.sql`): D6RavenN (211) weapon 163453 sockets 72400 (5 %, +10 MP,
+10 s), 72405 (5 %, +20 MP, 10 s), 10351 (18 %, +1 MP, no cool time); top 62106 socket 74059 (5 %, +50 MP, dungeon only; June's data gives it no
+`m_fIntervalTime` although its text says 10 s: data, kept).
+
+Play-test: below; review `kickoffs/june-stat-calc/S3-review.md`.
 
 ## Phase Z - Close
 
