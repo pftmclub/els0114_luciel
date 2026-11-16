@@ -4879,6 +4879,7 @@ Files: `X2GULuciel.h` / `.cpp`, `X2GUUser.cpp`, `X2Data.cpp`, `Offline/Handlers_
 - **Play-test save ( applied 17:02, game closed; backup `db_backup/els_db_20261116_170251_pre_sql.sql`, integrity ok ):** six level-70 units set transcended: LuDlA / LuDlB ( 223 / 224 ), LuNoA / LuNoB ( 225 / 226 ), LuDnA / LuDnB ( 228 / 229 ); page 1 = the job's four hyper-class actives on A S D C and Q W E R, the hyper active ( A units base, B units enhanced ) on F ( slot 4 ) and T ( slot 9 ); Demonio page 2 = Altar of Evil / Transcendence: `python tools/elsdb.py x --file kickoffs/char-luciel/CH3d_save.sql` ( file kept ).
 - **Play-test hand-off:** in the message that closes the session. Logs: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"` and `--grep "JUNE_TRANSCEND\] IMAGE"`.
 - **Not ported / routed:** none new. The becoming-transcended walk ( `/tc 1`, quest 42030, book 288493 on un-transcended units ) is CH6's. `LevelUpEvent.lua`'s TYPE8 is taken: char-add CH3d appends its row as TYPE9.
+- **Commit** `6f52676e` ( also amends `kickoffs/char-add/CH3d.md`: Add's row is TYPE9 ). **Range gate** `6f52676e^..6f52676e`: junediverge PASS; flagcheck `_SKILL` 3 PASS, `_TRANSCEND` 2 PASS, `_DUO_HYPER_CUT_IN` 1 PASS, 0 FAIL, 0 deleted lines; 1 `ERROR` each on `Always.h` @14053 ( `_LUCIEL_PASSIVE`'s compound guard the tool cannot evaluate, the CH3b / CH3c2 reviews' limit ); enumscan the 4 pre-existing rows. FINISH reads FAIL on those only.
 
 ## Phase CH4 - Passives and class mechanics
 
