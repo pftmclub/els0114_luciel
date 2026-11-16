@@ -350,6 +350,7 @@ dated 2026-11-16 15:20:03, md5 f87b25c6abac0bdbb76342573579294e = X2/US_SERVICE/
 Proof the fix is in it: `X2.map` lists `KomMountOnFirstFrame`, and the play-test below logged from the first frame.
 `EXESTR OK: 3 of 3 found in X2_offline.exe` md5 f87b25c6 (`[KOM_MOUNT] `, `total koms=`, ` registered=`); the first exe had 5 of 5.
 After the commit (`5866cb7d`): `finish.py --range 5866cb7d^..5866cb7d --with KOM_MOUNT_DEBUG` = flagcheck PASS (`1 PASS, 1 DEFINE, 0 OTHER, 0 FAIL`), junediverge PASS, enumscan PASS.
+Fix commit (`2292741d`): `finish.py --range 2292741d^..2292741d --with KOM_MOUNT_DEBUG` = flagcheck PASS (`2 PASS, 0 DEFINE, 0 OTHER, 0 FAIL`), junediverge PASS, enumscan PASS.
 
 **Play-test and baseline (2026-11-16 15:20 run, exe f87b25c6).** `python tools/logs.py --kom-mount`: **243 live koms, 243 `[KOM_MOUNT]` lines, `KOM_MOUNT CHECK: PASS`** (every kom `files == inspect`,
 `registered == files`; no kom absent). Total line: **koms=243 entries=182,446 mount_ms=1,158 private_MB=167** (private memory sampled right after the last mount). 0 UNHANDLED, 0 EXCEPTION,
