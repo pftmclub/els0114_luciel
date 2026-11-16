@@ -712,6 +712,13 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_POWER_OF_ORIAX_MEMO                   = 520,	// June's Enum.lua; the same test
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-16 // char-luciel CH4a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_DEBUFF_CHAIN_OF_BONDAGE                    = 483,	// June's Enum.lua; Chains of Bondage adds the fear stacks to its time
+	BTI_BUFF_MADNESS_CRAVE_ADDITIONAL_BUFF         = 775,	// June's Enum.lua; Madness Crave near an enemy
+	BTI_BUFF_MADNESS_CRAVE_SPEED_BUFF              = 776,	// June's Enum.lua; Madness Crave with no enemy near
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID
@@ -1036,6 +1043,17 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_NOBLE_BEING                  = 540,	// June's Enum.lua; applied by Tribute ( 30409 ) once the Soul Collector stack is full
 	BFI_BUFF_SHADOW_LU                    = 545,	// June's Enum.lua; Shadow's factor on Lu
 	BFI_BUFF_SHADOW_CIEL                  = 546,	// June's Enum.lua; Shadow's factor on Ciel
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-16 // char-luciel CH4a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_DEBUFF_SEIZED_BY_FEAR             = 517,	// June's Enum.lua; Seized by Fear's stack
+	BFI_DEBUFF_POWER_OF_ORIAX_STUN        = 526,	// June's Enum.lua; Power of Oriax's stun on hit
+	BFI_DEBUFF_CHAIN_OF_BONDAGE           = 550,	// June's Enum.lua; Chains of Bondage's hold
+	BFI_DEBUFF_BLASTING_FEAR_MEMO         = 607,	// June's Enum.lua; Blasting Fear's burst on the units around
+	BFI_BUFF_MADNESS_CRAVE_ADDITIONAL_BUFF = 801,	// June's Enum.lua; Madness Crave near an enemy
+	BFI_BUFF_MADNESS_CRAVE_SPEED_BUFF     = 802,	// June's Enum.lua; Madness Crave with no enemy near
+	BFI_DEBUFF_SEIZED_BY_FEAR_DEAD_HANDS  = 926,	// June's Enum.lua; Seized by Fear while Dead Hands runs
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 //{{ Iruha : 2026-11-16 // char-luciel CH2d2

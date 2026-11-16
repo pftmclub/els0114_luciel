@@ -14029,6 +14029,30 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 //////////////////////////////////////////////////////////////////////////
 // Author: Iruha
 // Date: 2026-11-16
+// Description: char-luciel CH4a - Lu/Ciel's passives: June's InitPassiveSkillState ( 32b45820, vslot 0x690 ) reads the 20 RNSI_P
+//              passives into the class members and registers the ten delegates ( the hit points, Seized by Fear / Blasting Fear /
+//              Fear Absorption / Chains of Bondage, Power of Oriax stun, Soul Collector stack, Soul Extortion drain, Phantom Blade /
+//              Rapid Impact make target, Ruinous Impact target, Invasion of Dark Energy mark, Madness Crave ). Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL ) && defined( SERV_IRUHADEV_JUNE_SOCKET_PARITY ) && defined( SERV_IRUHADEV_JUNE_STATCALC_DAMAGE_REACT ) && defined( SERV_IRUHADEV_JUNE_ENCHANT_PARITY ) && defined( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY ) && defined( SERV_IRUHADEV_JUNE_CHAR_ENEMY_SCAN ) && defined( SERV_IRUHADEV_JUNE_CHAR_BUFF_TIME_PASS ) && defined( SERV_IRUHADEV_JUNE_DAMAGEDATA ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE needs _CHAR_LUCIEL_SKILL ( AddSoulCollectorStack ), _JUNE_SOCKET_PARITY / _STATCALC_DAMAGE_REACT ( the two user rates ), _ENCHANT_PARITY ( SetBehaviorValue ), _BUFF_BEHAVIOR_PARITY ( SetBuffAccumulationCount ), _CHAR_ENEMY_SCAN, _CHAR_BUFF_TIME_PASS and _JUNE_DAMAGEDATA ( SetMakeTarget ), char-luciel CH4a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: char-luciel CH4a - [JUNE_CHAR] LUCIEL PASSIVE lines: the values InitPassiveSkillState read and the delegates it pushed, and
+//              each delegate's effect ( throttled ). Retired by the CH4b review. Revert: comment out the #define.
+#define SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+#if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE ) && defined( SERV_IRUHADEV_OFFLINE ) )
+#error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
 // Description: char-luciel CH3a0 - June calls the attacker's vslot 0x300 ( AdjustDamageDataBeforeDamageReact ) on every unit before the
 //              defender's DamageReact ( @3262546d / @32628652 / @3262f1e6 ), not only on users; the base is now on CX2GameUnit and an ally
 //              NPC hands the damage data to its user owner ( 32778fe0 ). Every class's summons then reach their owner's override.

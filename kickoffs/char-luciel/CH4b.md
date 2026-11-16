@@ -37,3 +37,16 @@ Run `python tools/junediverge.py --list` before transcribing; a newly found dive
 
 - **Checklist rows** (`ch0_checklist_rows.tsv` col 5): §7 L256 death prevention: gauge snapshot override vslot 0x740 Luciel 32aeb410 (and the r; §7b L327 SetDamageExceptionProcess per-class block; §7d L379 DamageReact 320483e4 (user) / 327b33cf (NPC): type-10 attacker with USED_SKILL_I; §7j L454 inline user-DamageReact step 320462a0 @3204963d + 32aebaf0: a type-10 unit absor.
 - No class function carries CH4b: SetDamageExceptionProcess 0x2b8 `32aea530` is transcribed in CH1k. This phase wires the damage-exception checklist rows below.
+
+## Amended by char-luciel CH4a (2026-11-16)
+
+- **DamageData `+0x5c0`, the hit-from-behind byte ( funcmap row `DD +0x5c0 (StatCalc S33 D4a)` ):** June's `SimpleInit` zeroes it and both DamageReacts set it
+  when the defender's `bAttackerFront` is clear ( user `@32048ceb`, NPC `@327b39dc` ). Its only reader is Lu/Ciel's `CreateFearDamageEffect` `32b3ca30` ( third
+  argument, from `ApplyFearOnHit` `32b3d380` ): with it set and any crowd-control debuff held, Lord of Fear's damage effect plays. CH4a passes a stand-in `false`
+  ( `bHitFromBehind` in `X2GULuciel.cpp`, comment `stand-in: DamageData +0x5c0 ... char-luciel CH4b` ). Add the member to `CX2DamageManager::DamageData`, the two
+  writes and the reset, then replace the stand-in with `damageData_.<member>`. Play-test: Dread Lord with Lord of Fear, hit a stunned / slept monster from behind
+  with a feared stack on it -> `[JUNE_CHAR] LUCIEL PASSIVE lord of fear effect ( N stack(s), power xP )`.
+- **`CX2GUUser` slot-251 post-apply hook `3204dcd0` ( checklist §7 L257 ):** March runs no hook after a buff applies ( `X2GameUnit.cpp:15006` notes it ). June's
+  only body is `CX2GUUser`'s: a debuff templet with Tribute ( 30409 ) learned and BTI 462 held may erase one debuff and stack Soul Collector ( BFI 523 via
+  `322a8a70` ), and Noble Devotion ( 30419 ) reads its values `0x9a` / `0x4f` / `0xac`. Port it with the virtual slot ( Ain's override `32a3d220` waits for her port ).
+  It is the only reader of `RNSI_P_LCN_NOBLE_DEVOTION` besides Shadow Bolt's state ( `32b2fe8c`, CH3b ). CH4a could not take it: a peer phase held `X2GUUser.*`.

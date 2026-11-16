@@ -61,11 +61,11 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fSeizedByFearRate( 1.f )
 , m_fSeizedByFearTimer( 0.f )
 , m_iSoulCollectorSkillLevel( 0 )
-, m_fPowerOfOriaxTime( 0.f )
+, m_fSoulCollectorStackCoolTime( 0.f )	// char-luciel CH4a: renamed from its writer
 , m_ucSoulCollectorCount( 0 )
-, m_fPowerOfOriaxDamageRate( 1.f )
 , m_fSoulCollectorDamageRate( 1.f )
-, m_usSoulCollectorMaxCount( 0 )
+, m_fSoulCollectorRangeRate( 1.f )	// char-luciel CH4a: renamed from its writer
+, m_usSoulCollectorPiercingCount( 0 )	// char-luciel CH4a: renamed from its writer
 , m_fSoulExtortionDrainRate( 0.f )
 , m_hDemonicBreathChargeEffectSet( INVALID_EFFECTSET_HANDLE )
 , m_fFantasieImpromptuWaitTime( 0.f )
@@ -117,23 +117,21 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fDeathTouchRange( 1200.f )
 , m_hDeathTouchBeamEffect( INVALID_DAMAGE_EFFECT_HANDLE )
 , m_hDeathTouchTargetEffect( INVALID_DAMAGE_EFFECT_HANDLE )
-, m_fRapidImpactCoolTime( -1.f )
-, m_fRapidImpactRange( 9999.f )
-, m_fRapidImpactMaxRange( 9999.f )
-, m_fInvasionOfDarkEnergyTime( -1.f )
-, m_fInvasionOfDarkEnergyDuration( -1.f )
+, m_fInvasionOfDarkEnergyTargetTime( -1.f )	// char-luciel CH4a: renamed from its writer
+, m_fInvasionOfDarkEnergyCoolTimeLeft( 9999.f )	// char-luciel CH4a: renamed from its writer
+, m_fInvasionOfDarkEnergyCoolTime( 9999.f )	// char-luciel CH4a: renamed from its writer
+, m_fInvasionOfDarkEnergyDamageRate( -1.f )	// char-luciel CH4a: renamed from its writer
+, m_fInvasionOfDarkEnergyForceDownValue( -1.f )	// char-luciel CH4a: renamed from its writer
 , m_iDesperadoAttackCount( 0 )
 , m_iDesperadoMaxAttackCount( 0 )
 , m_fMadnessCraveAttackRate( 0.f )
-, m_fMadnessCraveMagicAttackRate( 0.f )
-, m_fMadnessCraveDefenceRate( 0.f )
-, m_fMadnessCraveMagicDefenceRate( 0.f )
-, m_fMadnessCraveHpRate( 0.f )
-, m_fMadnessCraveCoolTime( 9999.f )
-, m_fMadnessCraveElapsedTime( 0.f )
-, m_fMadnessCraveDuration( 0.f )
-, m_fMadnessDestroyRate( -1.f )
-, m_fMadnessDestroyCoolTime( -1.f )
+, m_fMadnessCraveDamagedRate( 0.f )	// char-luciel CH4a: renamed from its writer
+, m_fMadnessCraveMoveSpeedRate( 0.f )	// char-luciel CH4a: renamed from its writer
+, m_fMadnessCraveJumpSpeedRate( 0.f )	// char-luciel CH4a: renamed from its writer
+, m_fMadnessCraveNearRange( 0.f )	// char-luciel CH4a: renamed from its writer
+, m_fMadnessCraveFarRange( 9999.f )	// char-luciel CH4a: renamed from its writer
+, m_fMadnessDestroyCoolTimeRate( -1.f )	// char-luciel CH4a: renamed from its writer
+, m_fMadnessDestroyDebuffTimeRate( -1.f )	// char-luciel CH4a: renamed from its writer
 , m_iShrewdCutterAttackCount( 0 )
 , m_hTransformedFormEffectSet( INVALID_EFFECTSET_HANDLE )
 , m_hPunisherEffectSet( INVALID_EFFECTSET_HANDLE )
@@ -151,7 +149,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fSkillCameraOverrideSecondValue( 0.f )	// char-luciel CH2c
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 {
-	m_afSeizedByFearValue[0] = m_afSeizedByFearValue[1] = 1.f;
+	m_fBackstabAttackRate = m_fPowerOfOriaxAttackRate = 1.f;	// char-luciel CH4a: renamed from its writer
 
 #ifdef SPECIAL_USE_ITEM
 	m_fThrowStartTime		= 0.66f;
@@ -5187,18 +5185,18 @@ using namespace _CONST_LUCIEL_CH1G2_;
 // char-luciel CH1g2: the projectile effect set of the Royal Guard and Chiliarch combos, no MP test ( the callers test it ); PlayComboProjectileEffectSet runs it after its own test
 CX2EffectSet::Handle CX2GULuciel::PlayRatedProjectileEffectSet( const WCHAR* pwszEffectSetName_, const bool bAddMaxCountModifier_ )
 {
-	// June passes m_fSoulCollectorDamageRate as the life time too ( JUNE_BUGS 699 )
+	// char-luciel CH4a: June passes m_fSoulCollectorRangeRate as the life time too ( JUNE_BUGS 699 )
 	const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( pwszEffectSetName_, this, NULL, IsHyperState(),
-		GetPowerRate() * m_fPowerOfOriaxDamageRate, m_fSoulCollectorDamageRate, D3DXVECTOR3( 1.f, 1.f, 1.f ) );
+		GetPowerRate() * m_fSoulCollectorDamageRate, m_fSoulCollectorRangeRate, D3DXVECTOR3( 1.f, 1.f, 1.f ) );	// char-luciel CH4a: renamed from its writer
 
-	g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME, m_fSoulCollectorDamageRate, false );
+	g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME, m_fSoulCollectorRangeRate, false );	// char-luciel CH4a: renamed from its writer
 
 	if( true == bAddMaxCountModifier_ )
 	{
 #ifdef SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
-		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorPiercingCount ), true );	// char-luciel CH4a: renamed from its writer
 #else SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
-		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_SOUL_COLLECTOR_MAX_COUNT, static_cast<float>( m_usSoulCollectorPiercingCount ), true );	// char-luciel CH4a: renamed from its writer
 #endif SERV_IRUHADEV_JUNE_EFFECT_MODIFIER_TAG_ENUM
 	}
 
@@ -8071,10 +8069,10 @@ void CX2GULuciel::SetNowCombinationPoint( const int iCombinationPoint_ )
 {
 	UNREFERENCED_PARAMETER( pDefender_ );
 
-	if ( true == IsTransformed( CX2Unit::DT_BOTH ) && 0.f < m_fMadnessDestroyRate )
+	if ( true == IsTransformed( CX2Unit::DT_BOTH ) && 0.f < m_fMadnessDestroyCoolTimeRate )	// char-luciel CH4a: renamed from its writer
 	{
-		MultiplyAllDebuffTimeFinalizerDuration( m_fMadnessDestroyCoolTime );
-		ApplyTransformSkillCoolTime( m_fMadnessDestroyRate, false );
+		MultiplyAllDebuffTimeFinalizerDuration( m_fMadnessDestroyDebuffTimeRate );	// char-luciel CH4a: renamed from its writer
+		ApplyTransformSkillCoolTime( m_fMadnessDestroyCoolTimeRate, false );	// char-luciel CH4a: renamed from its writer
 	}
 }
 
@@ -8228,9 +8226,9 @@ void CX2GULuciel::EraseInvasionOfDarkEnergyTarget( const CX2GameUnit* pGameUnit_
 		CX2GameUnit* pDefenderUnit = pDamageData_->optrDefenderGameUnit.GetObservable();
 		if ( true == IsInvasionOfDarkEnergyTarget( pDefenderUnit ) )
 		{
-			pDamageData_->m_fDecreaseForceDown += m_fInvasionOfDarkEnergyDuration;
-			pDamageData_->damage.fPhysic *= m_fInvasionOfDarkEnergyTime;
-			pDamageData_->damage.fMagic *= m_fInvasionOfDarkEnergyTime;
+			pDamageData_->m_fDecreaseForceDown += m_fInvasionOfDarkEnergyForceDownValue;	// char-luciel CH4a: renamed from its writer
+			pDamageData_->damage.fPhysic *= m_fInvasionOfDarkEnergyDamageRate;	// char-luciel CH4a: renamed from its writer
+			pDamageData_->damage.fMagic *= m_fInvasionOfDarkEnergyDamageRate;	// char-luciel CH4a: renamed from its writer
 			EraseInvasionOfDarkEnergyTarget( pDefenderUnit );
 		}
 	}
@@ -8574,7 +8572,7 @@ using namespace _CONST_LUCIEL_CH1K2_;
 // char-luciel CH1k2: June 32b4b580; the time is a damage multiplier ( -1 = off ), June tests 0 <= time where CH0's hint read 0 < time
 bool CX2GULuciel::IsInvasionOfDarkEnergyActive() const
 {
-	return 0.f <= m_fInvasionOfDarkEnergyTime;
+	return 0.f <= m_fInvasionOfDarkEnergyDamageRate;	// char-luciel CH4a: renamed from its writer
 }
 
 // char-luciel CH1k2: June 32b4db90 ( vslot 0x5c ); the state id is mapped for the body in play before the base queues it
@@ -11015,11 +11013,11 @@ bool CX2GULuciel::IsInJobLine( int iJobLine_ )
 			m_fSeizedByFearTimer = 0.f;
 	}
 
-	if ( 0.f < m_fPowerOfOriaxTime )
+	if ( 0.f < m_fSoulCollectorStackCoolTime )	// char-luciel CH4a: renamed from its writer
 	{
-		m_fPowerOfOriaxTime -= m_fElapsedTime;
-		if ( m_fPowerOfOriaxTime < 0.f )
-			m_fPowerOfOriaxTime = 0.f;
+		m_fSoulCollectorStackCoolTime -= m_fElapsedTime;	// char-luciel CH4a: renamed from its writer
+		if ( m_fSoulCollectorStackCoolTime < 0.f )	// char-luciel CH4a: renamed from its writer
+			m_fSoulCollectorStackCoolTime = 0.f;	// char-luciel CH4a: renamed from its writer
 	}
 
 	CX2DamageEffect::CEffect* pSoulShockDamageEffect = g_pX2Game->GetDamageEffect()->GetInstance( m_hSoulShockDamageEffect, true );
@@ -11500,8 +11498,8 @@ void CX2GULuciel::UpdateInvasionOfDarkEnergyTargetTime()
 			vit = m_vecInvasionOfDarkEnergyTarget.erase( vit );
 	}
 
-	if ( 0.f < m_fRapidImpactRange )	// June counts it down every frame ( CH4a names the member with its readers )
-		m_fRapidImpactRange -= m_fElapsedTime;
+	if ( 0.f < m_fInvasionOfDarkEnergyCoolTimeLeft )	// char-luciel CH4a: the Invasion of Dark Energy mark's cool time ( June 32b17f90 ), CH1a named it a Rapid Impact range
+		m_fInvasionOfDarkEnergyCoolTimeLeft -= m_fElapsedTime;	// char-luciel CH4a: renamed from its writer
 }
 
 // char-luciel CH1l3: June 32b16880; a damage effect hit of a skill that gains combination points pays them once and drops its counter entry
@@ -16410,7 +16408,7 @@ void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_ACCELERANDO_WAIT_FrameMove()
 		const float fRollDegree = static_cast<float>( GetRandomFloat( 0 ) * ACCELERANDO_RANDOM_ROTATE_RANGE - ACCELERANDO_RANDOM_ROTATE_OFFSET );
 
 		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_Accelerando_Projectile", this );
-		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorPiercingCount ), true );	// char-luciel CH4a: renamed from its writer
 		if ( CX2EffectSet::EffectSetInstance* pEffectSetInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hEffectSet ) )
 			pEffectSetInstance->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, fRollDegree ) );
 
@@ -16608,7 +16606,7 @@ void CX2GULuciel::LSI_SA_LCG_DEATH_CRISIS_OF_MARBAS_SMALL_FIRE_FrameMove()
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
 
 		const CX2EffectSet::Handle hProjectileEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_M_Marbas_Z_Projectile", this );
-		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hProjectileEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorMaxCount ), true );
+		g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hProjectileEffectSet, EFFECT_MODIFIER_TAG_DAMAGE_TIME, static_cast<float>( m_usSoulCollectorPiercingCount ), true );	// char-luciel CH4a: renamed from its writer
 		if ( CX2EffectSet::EffectSetInstance* pProjectileInstance = g_pX2Game->GetEffectSet()->GetEffectSetInstance( hProjectileEffectSet ) )
 			pProjectileInstance->SetLocalRotateDegree( D3DXVECTOR3( 0.f, 0.f, fProjectileRoll ) );
 
@@ -19565,6 +19563,791 @@ void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture()
 		return;
 	}
 }
+
+//{{ Iruha : 2026-11-16 // char-luciel CH4a
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+namespace _CONST_LUCIEL_CH4A_
+{
+	const double	FORCE_DOWN_RATE_ROUND					= 5e-8;		// June 3346ed68: SA_FORCE_DOWN_REL - 1.0 + 5e-8 goes onto both force-down rates
+	const double	NO_DOWN_DAMAGE_PERCENT_SCALE			= 100.0;	// June 3342f360: SA_EFFECTIVE_RATE x 100, truncated
+	const int		COMMUNION_ABSORB_NO_DOWN_DAMAGE_PERCENT	= 100;		// June 32b4650e
+	const float		INVASION_OF_DARK_ENERGY_IDLE_COOL_TIME	= 9999.f;	// June 3346ede8
+	const float		MADNESS_CRAVE_DEFAULT_FAR_RANGE			= 9999.f;	// June 3346ede8
+	const float		MADNESS_CRAVE_CHECK_TIME				= 0.5f;		// June 334ed42c
+	const double	MADNESS_CRAVE_RANGE_OFFSET				= 300.0;	// June 334577c8: the attack value fades from this distance to the near range
+	const int		BEHAVIOR_VALUE_OPERATION_SET			= 2;		// June 32d418a0's third argument: value[1] = value
+	const float		AURA_OF_FEAR_START_TIME					= 0.01f;	// June 33437810: Fear Absorption restarts the Aura of Fear time
+	const UINT		SEIZED_BY_FEAR_MISSING_TEMPLET_LIMIT	= 9999;		// June 32b3d8c6 ( 0x270f )
+	const USHORT	SEIZED_BY_FEAR_DEAD_HANDS_STACK			= 5;		// June 32b3d901
+	const USHORT	SEIZED_BY_FEAR_LORD_OF_FEAR_STACK		= 2;		// June 32b3da5e
+	const int		PHANTOM_BLADE_FEAR_STACK				= 5;		// June 32b3d782
+	const float		SEIZED_BY_FEAR_COOL_TIME				= 1.f;		// June 32b3dac0
+	const UCHAR		SOUL_COLLECTOR_HITS_PER_STACK			= 5;		// June 32b435b1
+	const float		SOUL_COLLECTOR_STACK_COOL_TIME			= 1.f;		// June 32b435d0
+	const double	SOUL_EXTORTION_SOUL_HEIGHT				= 100.0;	// June 3342f360
+	const float		SOUL_EXTORTION_LEFT_ROTATE_Y			= -180.f;	// June 33477e98
+	const int		SKILL_SLOT_COUNT						= 10;		// June 32b3cf5b: slots A 0-4, then B 0-4
+	const int		SKILL_SLOT_COUNT_PER_BANK				= 5;
+
+	// June 3226e230 .. 3226e290: the seven BTI groups ( tables 3373daa4 .. 3373dae8 ) of the Lord of Fear test
+	const BUFF_TEMPLET_ID	CROWD_CONTROL_DEBUFF_LIST[] =
+	{
+		BTI_DEBUFF_STUN, BTI_BUFF_TROCKTA_MAGICATTACKB_STUN, BTI_STONE_GOD_ANGER, BTI_DEBUFF_FATE_SPACE, BTI_DEBUFF_RAINCOAT_CAT_STEB1_ATTACK_A,
+		BTI_DEBUFF_RAINCOAT_CAT_STEB2_ATTACK_A, BTI_DEBUFF_RAINCOAT_CAT_STEB3_ATTACK_A, BTI_DEBUFF_ANCIENT_FIRE, BTI_DEBUFF_POWER_STUN, BTI_DEBUFF_ERDA_RAUL,
+		BTI_DEBUFF_SLEEP, BTI_DEBUFF_CONFUSION, BTI_DEBUFF_PANIC, BTI_DEBUFF_PANDEMONIUM_FEAR, BTI_DEBUFF_SUPPRESSION, BTI_DEBUFF_AGING, BTI_DEBUFF_CURSE,
+		BTI_DEBUFF_CURSE_OF_ABYSS,
+	};
+
+	bool HaveCrowdControlDebuff( CX2GameUnit* pGameUnit_ )
+	{
+		for ( UINT i = 0; i < ARRAY_SIZE( CROWD_CONTROL_DEBUFF_LIST ); ++i )
+		{
+			if ( true == pGameUnit_->HaveThisBuff( CROWD_CONTROL_DEBUFF_LIST[i] ) )
+				return true;
+		}
+		return false;
+	}
+
+	// June 32205510: the special active types
+	bool IsSpecialActiveSkillType( const CX2SkillTree::SKILL_TYPE eSkillType_ )
+	{
+		switch ( eSkillType_ )
+		{
+		case CX2SkillTree::ST_SPECIAL_ACTIVE:
+		case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_1:
+		case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_2:
+		case CX2SkillTree::ST_SPECIAL_ACTIVE_GRADE_3:
+			return true;
+
+		default:
+			return false;
+		}
+	}
+
+	// June 32b3d4f9 .. 32b3d545: another team's unit, and of the NPCs only the basic class
+	bool IsFearTarget( CX2GameUnit* pGameUnit_, const int iMyTeam_ )
+	{
+		if ( NULL == pGameUnit_ || iMyTeam_ == pGameUnit_->GetTeam() )
+			return false;
+
+		if ( CX2GameUnit::GUT_NPC == pGameUnit_->GetGameUnitType()
+			&& CX2UnitManager::NCT_BASIC != static_cast<CX2GUNPC*>( pGameUnit_ )->GetNPCTemplet().m_ClassType )
+			return false;
+
+		return true;
+	}
+
+	// June's learned test at every passive: the level ( kept for the caller ), then the templet
+	const CX2SkillTree::SkillTemplet* GetLearnedPassiveTemplet( const CX2UserSkillTree& userSkillTree_, const CX2SkillTree::SKILL_ID eSkillID_, int& iSkillLevel_ )
+	{
+		iSkillLevel_ = userSkillTree_.GetSkillLevel( eSkillID_, false, 0, true );
+		if ( iSkillLevel_ <= 0 )
+			return NULL;
+
+		return g_pData->GetSkillTree()->GetSkillTemplet( eSkillID_ );
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	bool IsPassiveLogDue( DWORD& dwLastLogTime_ )
+	{
+		const DWORD dwNow = timeGetTime();
+		if ( dwNow - dwLastLogTime_ < 1000 )
+			return false;
+		dwLastLogTime_ = dwNow;
+		return true;
+	}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+using namespace _CONST_LUCIEL_CH4A_;
+
+// char-luciel CH4a: June 32b45820 ( vslot 0x690 ); the passives into the members, and the ten delegates in June's order
+/*virtual*/ void CX2GULuciel::InitPassiveSkillState()
+{
+	CX2GUUser::InitPassiveSkillState();
+
+	InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, AddCombinationPointOnHit ) );
+
+	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = NULL;
+	int iSkillLevel = 0;
+
+	m_fSeizedByFearRate = 1.f;
+	m_fSeizedByFearTimer = 0.f;
+	m_iSeizedByFearSkillLevel = 0;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLC_SEIZED_BY_FEAR, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_iSeizedByFearSkillLevel = iSkillLevel;
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, ApplyFearOnHit ) );
+		m_fSeizedByFearRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+	}
+
+	m_fBackstabAttackRate = 1.f;
+	TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_ATK_REL, CX2SkillTree::RNSI_A_LLC_BACKSTAB, true, m_fBackstabAttackRate );
+	m_fPowerOfOriaxAttackRate = 1.f;
+	if ( true == TryGetAcquiredSkillAbilityValue( GetUnit(), CX2SkillTree::SA_ATK_REL, CX2SkillTree::RNSI_SA_LLC_POWER_OF_ORIAX, true, m_fPowerOfOriaxAttackRate ) )
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, ApplyPowerOfOriaxStunOnHit ) );
+
+	m_fSoulCollectorStackCoolTime = 0.f;
+	m_fSoulCollectorDamageRate = 1.f;
+	m_usSoulCollectorPiercingCount = 0;
+	m_fSoulCollectorRangeRate = 1.f;
+	m_iSoulCollectorSkillLevel = 0;
+	m_ucSoulCollectorCount = 0;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LCG_SOUL_COLLECTOR, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_iSoulCollectorSkillLevel = iSkillLevel;
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, AddSoulCollectorStackOnHit ) );
+		m_fSoulCollectorDamageRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+		m_fSoulCollectorRangeRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_RANGE_REL, iSkillLevel, false );
+		m_usSoulCollectorPiercingCount = static_cast<USHORT>( static_cast<int>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_PIERCING, iSkillLevel, false ) ) );
+	}
+
+	m_fSoulExtortionDrainRate = 0.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION ), iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, PlaySoulExtortionDrain ) );
+		m_fSoulExtortionDrainRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_RECOVER_MP_ABS, iSkillLevel, false );
+	}
+
+	m_fCommunionRate = 1.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLC_COMMUNION_EXPAND, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_fCommunionRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+		m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent += static_cast<int>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false ) * NO_DOWN_DAMAGE_PERCENT_SCALE );
+		const float fForceDownRate = static_cast<float>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_FORCE_DOWN_REL, iSkillLevel, false ) - 1.0 + FORCE_DOWN_RATE_ROUND );
+		m_SkillRelatedData.SetForceDownValueRateOfMeleeAttack( m_SkillRelatedData.GetForceDownValueRateOfMeleeAttack() + fForceDownRate );
+		m_SkillRelatedData.SetForceDownValueRateOfRangeAttack( m_SkillRelatedData.GetForceDownValueRateOfRangeAttack() + fForceDownRate );
+	}
+
+	// June also takes the PvP values in its state 0x17 ( XS_PVE_GAME ), which March lacks
+	const bool bPvpGame = ( CX2Main::XS_PVP_GAME == g_pMain->GetNowStateID() );
+	float fRestFormMpPerSecond = ( true == bPvpGame ) ? m_afFormMpRegenerationRate[0] : m_afFormMpRegenerationRate[1];
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LCG_COMMUNION_RECOVERY, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_fCommunionRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+		if ( true == bPvpGame )
+			fRestFormMpPerSecond = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MP_REGENERATION_ABS_PVP, iSkillLevel, false ) + m_afFormMpRegenerationRate[0];
+		else
+			fRestFormMpPerSecond = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MP_REGENERATION_ABS, iSkillLevel, false ) + m_afFormMpRegenerationRate[1];
+
+		m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent += static_cast<int>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false ) * NO_DOWN_DAMAGE_PERCENT_SCALE );
+		const float fForceDownRate = static_cast<float>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_FORCE_DOWN_REL, iSkillLevel, false ) - 1.0 + FORCE_DOWN_RATE_ROUND );
+		m_SkillRelatedData.SetForceDownValueRateOfMeleeAttack( m_SkillRelatedData.GetForceDownValueRateOfMeleeAttack() + fForceDownRate );
+		m_SkillRelatedData.SetForceDownValueRateOfRangeAttack( m_SkillRelatedData.GetForceDownValueRateOfRangeAttack() + fForceDownRate );
+	}
+	if ( NULL != m_pGageData )
+		static_cast<CX2LucielGageData*>( m_pGageData )->SetRestFormMpPerSecond( fRestFormMpPerSecond );
+
+	// June resets none of the Lord of Fear, Aura of Fear and Enhanced Specter values when the passive is not learned
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLD_LORD_OF_FEAR, iSkillLevel );
+	m_iLordOfFearSkillLevel = iSkillLevel;
+	if ( NULL != pSkillTemplet )
+	{
+		m_fReduceDebuffDurationRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_REDUCE_EDT_TIME_REL, iSkillLevel, false );
+		m_fLordOfFearDamageRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+	}
+
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLD_AURA_OF_FEAR, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		m_fAddPhysicAttackCriticalDamageRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_CRITICAL_DAM_ABS, iSkillLevel, false );
+
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LCN_ENHANCED_SPECTER, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_fEnhancedSpecterRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+		m_fEnhancedSpecterRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_SIZE, iSkillLevel, false );
+	}
+
+	m_fDamagedRateBySpecialActive = 1.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LCN_NOBILITY, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		m_fDamagedRateBySpecialActive = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGED_REL, iSkillLevel, false );
+
+	if ( 0 < userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE, false, 0, true ) )
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, SetMakeTargetOnPhantomBladeHit ) );
+
+	if ( 0 < userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LLC_RUINOUS_IMPACT, false, 0, true ) )
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, AddDarkCrescentTargetOnRuinousImpactHit ) );
+
+	m_fBoundingDamageRateEx = -1.f;
+	m_fFreeBoundingStrikeRate = -1.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LDB_CHEMISTRY, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_fBoundingDamageRateEx = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_FORCE_DOWN_REL, iSkillLevel, false );
+		m_fFreeBoundingStrikeRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+	}
+
+	if ( 0 < userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_LDN_RAPID_IMPACT, false, 0, true ) )
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, SetMakeTargetOnRapidImpactHit ) );
+
+	m_fInvasionOfDarkEnergyTargetTime = -1.f;
+	m_fInvasionOfDarkEnergyCoolTimeLeft = INVASION_OF_DARK_ENERGY_IDLE_COOL_TIME;
+	m_fInvasionOfDarkEnergyCoolTime = INVASION_OF_DARK_ENERGY_IDLE_COOL_TIME;
+	m_fInvasionOfDarkEnergyDamageRate = -1.f;
+	m_fInvasionOfDarkEnergyForceDownValue = -1.f;
+	m_vecInvasionOfDarkEnergyTarget.clear();
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LDN_INVASION_OF_DARKENERGY, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_fInvasionOfDarkEnergyDamageRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_SKILLDAMAGE_MULTIPLE_01, iSkillLevel, false );
+		m_fInvasionOfDarkEnergyForceDownValue = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_FORCE_DOWN_ABS, iSkillLevel, false );
+		m_fInvasionOfDarkEnergyTargetTime = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_1, iSkillLevel, false );
+		m_fInvasionOfDarkEnergyCoolTime = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_2, iSkillLevel, false );
+		m_fInvasionOfDarkEnergyCoolTimeLeft = 0.f;
+		InsertDelegateProcessToAttackResult( SET_DELEGATE_PROCESS_WITH_DAMAGE_DATA( CX2GULuciel, AddInvasionOfDarkEnergyTargetOnHit ) );
+	}
+
+	m_fMadnessCraveAttackRate = 0.f;
+	m_fMadnessCraveDamagedRate = 0.f;
+	m_fMadnessCraveMoveSpeedRate = 0.f;
+	m_fMadnessCraveJumpSpeedRate = 0.f;
+	m_fMadnessCraveNearRange = 0.f;
+	m_fMadnessCraveFarRange = MADNESS_CRAVE_DEFAULT_FAR_RANGE;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LDN_MADNESS_CRAVE, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_fMadnessCraveAttackRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGE_REL, iSkillLevel, false );
+		m_fMadnessCraveDamagedRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGED_REL, iSkillLevel, false );
+		m_fMadnessCraveMoveSpeedRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_MOVE_SPEED, iSkillLevel, false );
+		m_fMadnessCraveJumpSpeedRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_JUMP_SPEED, iSkillLevel, false );
+		m_fMadnessCraveNearRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_RANGE_REL, iSkillLevel, false );
+		m_fMadnessCraveFarRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_PROJECTILE_RANGE_REL_2, iSkillLevel, false );
+		m_MadnessCraveCheckTime.SetTargetTime( MADNESS_CRAVE_CHECK_TIME );
+		InsertDelegateProcessToCommonFrameMove( SET_DELEGATE_PROCESS( CX2GULuciel, FrameMoveMadnessCrave ) );
+	}
+
+	m_fMadnessDestroyCoolTimeRate = -1.f;
+	m_fMadnessDestroyDebuffTimeRate = -1.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LDN_MADNESS_DESTROY, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+	{
+		m_fMadnessDestroyCoolTimeRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_1, iSkillLevel, false );
+		m_fMadnessDestroyDebuffTimeRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, iSkillLevel, false );
+		m_AdditionalCriticalRate.SetPassiveMultiple( m_AdditionalCriticalRate.GetPassiveMultiple() * pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_CRITICAL_RATE_ABS, iSkillLevel, false ) );
+	}
+
+	m_fCombinationPointOverflowCoolTime = 0.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LDB_COMMUNION_ABSORB, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent = COMMUNION_ABSORB_NO_DOWN_DAMAGE_PERCENT;
+
+	m_fThroneAuthorityRate = 0.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLD_THRONE_AUTHORITY, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		m_fThroneAuthorityRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE init ( unit %I64d class %d: seized by fear %d x%.3f, backstab x%.3f, oriax x%.3f, soul collector %d x%.3f range x%.3f pierce %d, drain %.2f, communion x%.3f rest mp %.2f, lord of fear %d x%.3f edt x%.3f, crit dmg %.3f, specter x%.3f, nobility x%.3f )",
+		GetUnitUID(), static_cast<int>( GetUnitClass() ), m_iSeizedByFearSkillLevel, m_fSeizedByFearRate, m_fBackstabAttackRate, m_fPowerOfOriaxAttackRate, m_iSoulCollectorSkillLevel, m_fSoulCollectorDamageRate,
+		m_fSoulCollectorRangeRate, static_cast<int>( m_usSoulCollectorPiercingCount ), m_fSoulExtortionDrainRate, m_fCommunionRate, fRestFormMpPerSecond, m_iLordOfFearSkillLevel, m_fLordOfFearDamageRate,
+		m_fReduceDebuffDurationRate, m_fAddPhysicAttackCriticalDamageRate, m_fEnhancedSpecterRate, m_fDamagedRateBySpecialActive );
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE init 2 ( bounding x%.3f free %.3f, invasion x%.3f force down %.2f time %.2f cool %.2f, madness crave x%.3f range %.0f / %.0f, madness destroy %.3f / %.3f, throne %.3f, no-down %d%%, force down %.3f / %.3f, crit rate x%.3f )",
+		static_cast<float>( m_fBoundingDamageRateEx ), static_cast<float>( m_fFreeBoundingStrikeRate ), m_fInvasionOfDarkEnergyDamageRate, m_fInvasionOfDarkEnergyForceDownValue, m_fInvasionOfDarkEnergyTargetTime,
+		m_fInvasionOfDarkEnergyCoolTime, m_fMadnessCraveAttackRate, m_fMadnessCraveNearRange, m_fMadnessCraveFarRange, m_fMadnessDestroyCoolTimeRate, m_fMadnessDestroyDebuffTimeRate, m_fThroneAuthorityRate,
+		m_SkillRelatedData.m_iNoDownDamageAtStandUpAttackPercent, m_SkillRelatedData.GetForceDownValueRateOfMeleeAttack(), m_SkillRelatedData.GetForceDownValueRateOfRangeAttack(), m_AdditionalCriticalRate.GetPassiveMultiple() );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b3d380 ( thunk 32b4e6c0 ); Blasting Fear, Fear Absorption and Chains of Bondage spend the fear stacks, a special active bursts them, other hits spread them
+void CX2GULuciel::ApplyFearOnHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() )
+		return;
+
+	CX2GameUnit* pDefender = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefender )
+		return;
+
+	const bool bHitFromBehind = false;	// stand-in: DamageData +0x5c0 ( hit from behind, both DamageReacts set it ) is not ported, char-luciel CH4b
+	const CX2UserSkillTree& userSkillTree = GetUnit()->GetUnitData().m_UserSkillTree;
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = NULL;
+	int iSkillLevel = 0;
+
+	float fThreatOfFearRate = 0.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLD_THREAT_OF_FEAR, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		fThreatOfFearRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+
+	switch ( damageData_.m_eUsedSkillID )
+	{
+	case CX2SkillTree::RNSI_A_LLC_BLASTING_FEAR:
+		{
+			// June also asks for the equipped memo 610016 here ( 32b3d4c3 ) and drops the answer
+			float fBlastingFearRange = 0.f;
+			pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_A_LLC_BLASTING_FEAR ), iSkillLevel );
+			if ( NULL != pSkillTemplet )
+				fBlastingFearRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_SCOPE_ABS, iSkillLevel, false );
+
+			int iBurstCount = 0;
+			for ( int iUnit = 0; iUnit < g_pX2Game->GetUnitNum(); ++iUnit )
+			{
+				CX2GameUnit* pUnit = g_pX2Game->GetUnit( iUnit );
+				if ( false == IsFearTarget( pUnit, GetTeam() ) )
+					continue;
+
+				const float fDistance = GetDistance( pUnit->GetPos( false ), pDefender->GetPos( false ) );
+				if ( true == pUnit->GetInvincible() || false == ( fDistance < fBlastingFearRange ) )
+					continue;
+
+				if ( true == CreateFearDamageEffect( pUnit, fThreatOfFearRate, bHitFromBehind ) )
+				{
+					pUnit->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_BLASTING_FEAR_MEMO, 1, this, 0, false );	// 7ai arguments
+					++iBurstCount;
+				}
+			}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE fear: blasting fear range %.0f, %d unit(s) burst", fBlastingFearRange, iBurstCount );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+		} return;
+
+	case CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION:
+		{
+			if ( 0 < userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION, false, 0, true ) && false == ( 0.f < m_fAuraOfFearDuration ) )
+			{
+				if ( false == ( 0.f < m_fAuraOfFearTime ) )
+				{
+					m_ucAuraOfFearStackCount = 0;
+					m_fAuraOfFearTime = AURA_OF_FEAR_START_TIME;
+				}
+
+				m_ucAuraOfFearStackCount = static_cast<UCHAR>( m_ucAuraOfFearStackCount + pDefender->GetBuffAccumulationCountNowInFactor( BTI_DEBUFF_SEIZED_BY_FEAR ) );
+				pDefender->EraseBuffTempletFromGameUnit( BTI_DEBUFF_SEIZED_BY_FEAR );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+				CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE fear: fear absorption, aura of fear stacks %d", static_cast<int>( m_ucAuraOfFearStackCount ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			}
+		} return;
+
+	case CX2SkillTree::RNSI_A_LLD_CHAINS_OF_BONDAGE:
+		{
+			iSkillLevel = userSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_LLD_CHAINS_OF_BONDAGE, false, 0, true );
+			if ( iSkillLevel <= 0 )
+				return;
+
+			pSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( damageData_.m_eUsedSkillID );
+			if ( NULL == pSkillTemplet )
+				return;
+
+			const float fTimePerStack = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_TIME_ABS, iSkillLevel, false );
+			const UCHAR ucFearStackCount = pDefender->GetBuffAccumulationCountNowInFactor( BTI_DEBUFF_SEIZED_BY_FEAR );
+			pDefender->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_CHAIN_OF_BONDAGE, iSkillLevel, this, 0, false );	// 7ai arguments
+			pDefender->AddBuffTimeFinalizerDuration( BTI_DEBUFF_CHAIN_OF_BONDAGE, static_cast<float>( ucFearStackCount ) * fTimePerStack );
+			pDefender->EraseBuffTempletFromGameUnit( BTI_DEBUFF_SEIZED_BY_FEAR );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE fear: chains of bondage, %d stack(s) add %.2f s", static_cast<int>( ucFearStackCount ), static_cast<float>( ucFearStackCount ) * fTimePerStack );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+		} return;
+
+	default:
+		break;
+	}
+
+	const CX2SkillTree::SkillTemplet* pUsedSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( damageData_.m_eUsedSkillID );
+	if ( NULL != pUsedSkillTemplet && true == IsSpecialActiveSkillType( pUsedSkillTemplet->m_eType ) )
+	{
+		CreateFearDamageEffect( pDefender, fThreatOfFearRate, bHitFromBehind );
+		if ( CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE == damageData_.m_eUsedSkillID )
+		{
+			pDefender->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_SEIZED_BY_FEAR, m_iSeizedByFearSkillLevel, this, 0, false );	// 7ai arguments
+			pDefender->SetBuffAccumulationCount( BFI_DEBUFF_SEIZED_BY_FEAR, PHANTOM_BLADE_FEAR_STACK, m_iSeizedByFearSkillLevel, CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE );
+		}
+		return;
+	}
+
+	if ( NULL != pUsedSkillTemplet && ( CX2SkillTree::ST_HYPER_ACTIVE_SKILL == pUsedSkillTemplet->m_eType || CX2SkillTree::ST_RELATIONSHIP_SKILL == pUsedSkillTemplet->m_eType
+		|| CX2SkillTree::RNSI_P_LLC_SEIZED_BY_FEAR == damageData_.m_eUsedSkillID || CX2SkillTree::RNSI_P_LLD_LORD_OF_FEAR == damageData_.m_eUsedSkillID ) )
+		return;
+
+	if ( 0.f < m_fSeizedByFearTimer )
+		return;
+
+	float fLordOfFearRate = 0.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLD_LORD_OF_FEAR, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		fLordOfFearRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+
+	float fAuraOfFearRate = 0.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLD_AURA_OF_FEAR, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		fAuraOfFearRate = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_RATE, iSkillLevel, false );
+
+	UINT uiFearStackLimit = SEIZED_BY_FEAR_MISSING_TEMPLET_LIMIT;
+	const CX2BuffTempletPtr ptrSeizedByFear = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( BTI_DEBUFF_SEIZED_BY_FEAR );
+	if ( NULL != ptrSeizedByFear )
+		uiFearStackLimit = ptrSeizedByFear->GetAccumulationLimit();
+
+	USHORT usFearStackPerHit = 1;
+	if ( true == HaveThisBuff( BTI_BUFF_DEAD_HANDS ) )
+		usFearStackPerHit = SEIZED_BY_FEAR_DEAD_HANDS_STACK;
+
+	float fSeizedByFearRange = 0.f;
+	pSkillTemplet = GetLearnedPassiveTemplet( userSkillTree, CX2SkillTree::RNSI_P_LLC_SEIZED_BY_FEAR, iSkillLevel );
+	if ( NULL != pSkillTemplet )
+		fSeizedByFearRange = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_SCOPE_ABS, iSkillLevel, false );
+
+	int iFearedCount = 0;
+	int iBurstCount = 0;
+	for ( int iUnit = 0; iUnit < g_pX2Game->GetUnitNum(); ++iUnit )
+	{
+		CX2GameUnit* pUnit = g_pX2Game->GetUnit( iUnit );
+		if ( false == IsFearTarget( pUnit, GetTeam() ) )
+			continue;
+
+		const float fDistance = GetDistance( pUnit->GetPos( false ), pDefender->GetPos( false ) );
+		if ( true == pUnit->GetInvincible() || false == ( fDistance < fSeizedByFearRange ) )
+			continue;
+
+		// June keeps the raised stack count for the units after this one
+		if ( GetRandomFloat( static_cast<int>( pUnit->GetUnitUID() * 2 ) ) < fLordOfFearRate && usFearStackPerHit <= SEIZED_BY_FEAR_LORD_OF_FEAR_STACK )
+			usFearStackPerHit = SEIZED_BY_FEAR_LORD_OF_FEAR_STACK;
+
+		if ( pUnit->GetBuffAccumulationCountNowInFactor( BTI_DEBUFF_SEIZED_BY_FEAR ) >= uiFearStackLimit
+			&& GetRandomFloat( static_cast<int>( pUnit->GetUnitUID() ) ) < fAuraOfFearRate )
+		{
+			CreateFearDamageEffect( pUnit, fThreatOfFearRate, bHitFromBehind );
+			m_fSeizedByFearTimer = SEIZED_BY_FEAR_COOL_TIME;
+			++iBurstCount;
+			continue;
+		}
+
+		if ( true == HaveThisBuff( BTI_BUFF_DEAD_HANDS ) )
+		{
+			pUnit->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_SEIZED_BY_FEAR_DEAD_HANDS, m_iSeizedByFearSkillLevel, this, 0, false );	// 7ai arguments
+		}
+		else
+		{
+			for ( USHORT usStack = 0; usStack < usFearStackPerHit; ++usStack )
+				pUnit->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_SEIZED_BY_FEAR, m_iSeizedByFearSkillLevel, this, 0, false );	// 7ai arguments
+		}
+		++iFearedCount;
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	static DWORD s_dwFearLogTime = 0;
+	if ( true == IsPassiveLogDue( s_dwFearLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE fear: seized by fear ( skill %d, range %.0f, %d stack(s) per hit, limit %u ): %d unit(s) feared, %d burst",
+			static_cast<int>( damageData_.m_eUsedSkillID ), fSeizedByFearRange, static_cast<int>( usFearStackPerHit ), uiFearStackLimit, iFearedCount, iBurstCount );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b3ca30; a held crowd-control debuff makes Lord of Fear's effect, the fear stacks burst, Threat of Fear cuts the cool times and may keep the stacks
+bool CX2GULuciel::CreateFearDamageEffect( CX2GameUnit* pDefender_, const float fThreatOfFearRate_, const bool bHitFromBehind_ )
+{
+	if ( true == bHitFromBehind_ && true == HaveCrowdControlDebuff( pDefender_ ) )
+	{
+		// June also fetches the Lord of Fear templet here ( 32b3cad7 ) and never reads it
+		vector<KBuffFactor> vecLordOfFearDebuffFactor;
+		pDefender_->GetBuffFactorOnlyDebuff( vecLordOfFearDebuffFactor );
+		BOOST_FOREACH( const KBuffFactor& kFactor_, vecLordOfFearDebuffFactor )
+		{
+			if ( BTI_DEBUFF_SEIZED_BY_FEAR != kFactor_.m_BuffIdentity.m_eBuffTempletID )
+				continue;
+
+			const float fLordOfFearPowerRate = static_cast<float>( static_cast<double>( m_fLordOfFearDamageRate ) * kFactor_.m_ucAccumulationCountNow * GetPowerRate() );
+			g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SI_P_LLD_LORD_OF_FEAR", fLordOfFearPowerRate, pDefender_->GetBonePos( L"Bip01" ), GetRotateDegree(), GetRotateDegree(),
+				GetLandPos().y, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE lord of fear effect ( %d stack(s), power x%.3f )", static_cast<int>( kFactor_.m_ucAccumulationCountNow ), fLordOfFearPowerRate );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			break;
+		}
+	}
+
+	const CX2SkillTree::SkillTemplet* pSeizedByFearTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_LLC_SEIZED_BY_FEAR );
+	vector<KBuffFactor> vecDebuffFactor;
+	pDefender_->GetBuffFactorOnlyDebuff( vecDebuffFactor );
+	const KBuffFactor* pFearFactor = NULL;
+	BOOST_FOREACH( const KBuffFactor& kFactor_, vecDebuffFactor )
+	{
+		if ( BTI_DEBUFF_SEIZED_BY_FEAR == kFactor_.m_BuffIdentity.m_eBuffTempletID )
+		{
+			pFearFactor = &kFactor_;
+			break;
+		}
+	}
+	if ( NULL == pFearFactor )
+		return false;
+
+	if ( NULL != pSeizedByFearTemplet )	// June reads the templet unchecked ( JUNE_BUGS 766 )
+	{
+		const float fBurstPowerRate = static_cast<float>( GetPowerRate() * static_cast<double>( pSeizedByFearTemplet->GetSkillPowerRateValue( m_iSeizedByFearSkillLevel ) * pFearFactor->m_ucAccumulationCountNow ) );
+		g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SI_P_LLC_SEIZED_BY_FEAR_BurstFear", fBurstPowerRate, pDefender_->GetBonePos( L"Bip01" ), GetRotateDegree(), GetRotateDegree(),
+			GetLandPos().y, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE burst fear ( unit %I64d, %d stack(s), power x%.3f )", pDefender_->GetUnitUID(), static_cast<int>( pFearFactor->m_ucAccumulationCountNow ), fBurstPowerRate );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	}
+
+	if ( false == ( 0.f < m_fFearDamageEffectCoolTime ) )
+	{
+		CX2UserSkillTree& accessUserSkillTree = GetUnit()->AccessUnitData().m_UserSkillTree;
+		int iSkillLevel = 0;
+		const CX2SkillTree::SkillTemplet* pThreatOfFearTemplet = GetLearnedPassiveTemplet( accessUserSkillTree, CX2SkillTree::RNSI_P_LLD_THREAT_OF_FEAR, iSkillLevel );
+		if ( NULL != pThreatOfFearTemplet )
+		{
+			m_fFearDamageEffectCoolTime = pThreatOfFearTemplet->GetSkillAbilityValue( CX2SkillTree::SA_COOLTIME_1, iSkillLevel, false );
+			const float fCoolTimeChange = pThreatOfFearTemplet->GetSkillAbilityValue( CX2SkillTree::SA_TIME_ABS, iSkillLevel, false );
+			for ( int iSlot = 0; iSlot < SKILL_SLOT_COUNT; ++iSlot )
+			{
+				const CX2UserSkillTree::SkillSlotData* pSkillSlotData = accessUserSkillTree.GetSkillSlot( iSlot % SKILL_SLOT_COUNT_PER_BANK, SKILL_SLOT_COUNT_PER_BANK <= iSlot );
+				if ( NULL == pSkillSlotData )
+					continue;
+
+				const CX2SkillTree::SkillTemplet* pSlotSkillTemplet = g_pData->GetSkillTree()->GetSkillTemplet( pSkillSlotData->m_eID );
+				if ( NULL == pSlotSkillTemplet || CX2SkillTree::ST_HYPER_ACTIVE_SKILL == pSlotSkillTemplet->m_eType
+					|| CX2SkillTree::ST_RELATIONSHIP_SKILL == pSlotSkillTemplet->m_eType )
+					continue;
+
+				float fCoolTimeLeft = 0.f;
+				if ( 0.f <= pSkillSlotData->m_fCoolTimeLeft + fCoolTimeChange )
+					fCoolTimeLeft = pSkillSlotData->m_fCoolTimeLeft + fCoolTimeChange;
+
+				accessUserSkillTree.SetSkillCoolTimeLeft( pSlotSkillTemplet->m_eID, fCoolTimeLeft, true );
+			}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE threat of fear: cool times %+.2f, next in %.2f s", fCoolTimeChange, m_fFearDamageEffectCoolTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+		}
+	}
+
+	if ( false == ( GetRandomFloat( static_cast<int>( pDefender_->GetUnitUID() * 2 - 1 ) ) < fThreatOfFearRate_ ) )
+		pDefender_->EraseBuffTempletFromGameUnit( BTI_DEBUFF_SEIZED_BY_FEAR );
+
+	return true;
+}
+
+// char-luciel CH4a: June 32b0fc50 ( thunk 32b4cd90 ); under Power of Oriax a hit stuns ( at Seized by Fear's level, JUNE_BUGS 767 )
+void CX2GULuciel::ApplyPowerOfOriaxStunOnHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() )
+		return;
+
+	if ( false == HaveThisBuff( BTI_BUFF_POWER_OF_ORIAX ) && false == HaveThisBuff( BTI_BUFF_POWER_OF_ORIAX_MEMO ) )
+		return;
+
+	CX2GameUnit* pDefender = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( CX2DamageManager::AT_SPECIAL == damageData_.attackType || NULL == pDefender )
+		return;
+
+	pDefender->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_POWER_OF_ORIAX_STUN, m_iSeizedByFearSkillLevel, this, 0, false );	// 7ai arguments
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	static DWORD s_dwOriaxLogTime = 0;
+	if ( true == IsPassiveLogDue( s_dwOriaxLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE power of oriax stun on %I64d ( level %d )", pDefender->GetUnitUID(), m_iSeizedByFearSkillLevel );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b43590 ( thunk 32b4e710 ); every fifth non-special hit adds a Soul Collector stack, at most one a second
+void CX2GULuciel::AddSoulCollectorStackOnHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() || CX2DamageManager::AT_SPECIAL == damageData_.attackType )
+		return;
+
+	++m_ucSoulCollectorCount;
+	if ( m_ucSoulCollectorCount < SOUL_COLLECTOR_HITS_PER_STACK || 0.f < m_fSoulCollectorStackCoolTime )
+		return;
+
+	AddSoulCollectorStack();
+	m_fSoulCollectorStackCoolTime = SOUL_COLLECTOR_STACK_COOL_TIME;
+	m_ucSoulCollectorCount = 0;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE soul collector stack %d ( level %d )", static_cast<int>( GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR ) ), m_iSoulCollectorSkillLevel );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b435f0 ( thunk 32b4e720 ); a Soul Extortion hit adds a stack, a full stack pays MP, and a soul flies from the target to the left hand
+void CX2GULuciel::PlaySoulExtortionDrain( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() || CX2SkillTree::RNSI_SA_LCG_SOUL_EXTORTION != damageData_.m_iAppliedSkillID )
+		return;
+
+	const UCHAR ucStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR );
+	AddSoulCollectorStack();
+
+	UINT uiStackLimit = SOUL_COLLECTOR_MISSING_TEMPLET_LIMIT;
+	const CX2BuffTempletPtr ptrSoulCollector = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( BTI_BUFF_SOUL_COLLECTOR );
+	if ( NULL != ptrSoulCollector )
+		uiStackLimit = ptrSoulCollector->GetAccumulationLimit();
+
+	// June converts the difference unsigned: below the limit the product leaves int range and _ftol2's 0x80000000 pays nothing
+	const float fDrainMp = static_cast<float>( static_cast<double>( static_cast<UINT>( ucStackCount - uiStackLimit + 1 ) ) * m_fSoulExtortionDrainRate );
+	if ( 0 < static_cast<int>( fDrainMp ) )
+		UpNowMpWithText( fDrainMp );
+
+	CX2GameUnit* pDefender = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefender )
+		return;
+
+	D3DXVECTOR3 vSoulPosition;
+	if ( false == pDefender->GetBonePos( L"Bip01", vSoulPosition ) )
+		vSoulPosition = pDefender->GetPos( false );
+	vSoulPosition.y = static_cast<float>( vSoulPosition.y + SOUL_EXTORTION_SOUL_HEIGHT );
+
+	CKTDGParticleSystem::CParticleEventSequence* pSoulSeq = g_pX2Game->GetMajorParticle()->CreateSequence( this, L"LCG_SOUL_EXTORTION_Soul_M", vSoulPosition );
+	if ( NULL != pSoulSeq )
+	{
+		PlaySound( L"LuCiel_SP_SoulExtortion02_Drain.ogg", true, false );
+		pSoulSeq->SetBlackHolePosition( GetBonePos( L"Bip01_L_Hand" ) );
+		if ( false == GetIsRight() )
+		{
+			D3DXVECTOR3 vRotateDegree = GetRotateDegree();
+			vRotateDegree.y = SOUL_EXTORTION_LEFT_ROTATE_Y;
+			pSoulSeq->SetAxisAngle( vRotateDegree );
+			pSoulSeq->SetAddRotate( vRotateDegree );
+		}
+	}
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE soul extortion drain ( stacks %d / %u, mp %.2f, soul %d )", static_cast<int>( ucStackCount ), uiStackLimit, fDrainMp, static_cast<int>( NULL != pSoulSeq ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b0fce0 ( thunk 32b4cda0 ); a Phantom Blade hit marks its target for the state
+void CX2GULuciel::SetMakeTargetOnPhantomBladeHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() || CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE != damageData_.m_eUsedSkillID )
+		return;
+
+	CX2GameUnit* pDefender = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefender )
+		return;
+
+	m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	SetMakeTarget( pDefender->GetUnitUID(), pDefender->GetGameUnitType() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE phantom blade target %I64d", pDefender->GetUnitUID() );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b177b0 ( thunk 32b4d360 ); a Ruinous Impact hit clears the make target and adds its unit to the Dark Crescent targets once
+void CX2GULuciel::AddDarkCrescentTargetOnRuinousImpactHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() || CX2SkillTree::RNSI_SA_LLC_RUINOUS_IMPACT != damageData_.m_iAppliedSkillID )
+		return;
+
+	CX2GameUnit* pDefender = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefender )
+		return;
+
+	SetMakeTarget( -1, CX2GameUnit::GUT_USER );
+
+	SGameUnitKey targetKey;
+	targetKey.m_uidGameUnit = pDefender->GetUnitUID();
+	targetKey.m_eGameUnitType = pDefender->GetGameUnitType();
+	for ( std::vector<SGameUnitKey>::const_iterator vit = m_vecDarkCrescentTargetUnit.begin(); vit != m_vecDarkCrescentTargetUnit.end(); ++vit )
+	{
+		if ( targetKey.m_uidGameUnit == vit->m_uidGameUnit && targetKey.m_eGameUnitType == vit->m_eGameUnitType )
+			return;
+	}
+	m_vecDarkCrescentTargetUnit.push_back( targetKey );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE ruinous impact target %I64d ( %u target(s) )", targetKey.m_uidGameUnit, static_cast<UINT>( m_vecDarkCrescentTargetUnit.size() ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b13c80 ( thunk 32b4cdb0 ); a Rapid Impact hit marks its target for the state
+void CX2GULuciel::SetMakeTargetOnRapidImpactHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( true == GetRidingOn() || CX2SkillTree::RNSI_A_LDN_RAPID_IMPACT != damageData_.m_iAppliedSkillID )
+		return;
+
+	CX2GameUnit* pDefender = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefender )
+		return;
+
+	m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	SetMakeTarget( pDefender->GetUnitUID(), pDefender->GetGameUnitType() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE rapid impact target %I64d", pDefender->GetUnitUID() );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b17f90 ( thunk 32b4d370 ); off cool time, a non-special hit marks a new unit with Invasion of Dark Energy
+void CX2GULuciel::AddInvasionOfDarkEnergyTargetOnHit( const CX2DamageManager::DamageData& damageData_ )
+{
+	if ( false == IsInvasionOfDarkEnergyActive() || 0.f < m_fInvasionOfDarkEnergyCoolTimeLeft )
+		return;
+
+	CX2GameUnit* pDefender = damageData_.optrDefenderGameUnit.GetObservable();
+	if ( NULL == pDefender || CX2DamageManager::AT_SPECIAL == damageData_.attackType || true == IsInvasionOfDarkEnergyTarget( pDefender ) )
+		return;
+
+	STimedGameUnitKey timedTargetKey;
+	timedTargetKey.m_fTime = m_fInvasionOfDarkEnergyTargetTime;
+	timedTargetKey.m_GameUnitKey.m_uidGameUnit = pDefender->GetUnitUID();
+	timedTargetKey.m_GameUnitKey.m_eGameUnitType = pDefender->GetGameUnitType();
+	m_vecInvasionOfDarkEnergyTarget.push_back( timedTargetKey );
+	m_fInvasionOfDarkEnergyCoolTimeLeft = m_fInvasionOfDarkEnergyCoolTime;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE invasion of dark energy mark on %I64d ( %.2f s, next in %.2f s )", timedTargetKey.m_GameUnitKey.m_uidGameUnit, m_fInvasionOfDarkEnergyTargetTime, m_fInvasionOfDarkEnergyCoolTime );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+
+// char-luciel CH4a: June 32b3e470 ( the frame-move list ); every 0.5 s near an enemy the attack buff fades with the distance, with no enemy near the speed buff
+void CX2GULuciel::FrameMoveMadnessCrave()
+{
+	m_MadnessCraveCheckTime.OnFrameMove( m_fElapsedTime );
+	if ( false == m_MadnessCraveCheckTime.CheckElapsedTime() )
+		return;
+
+	m_MadnessCraveCheckTime.ResetSumOfElapsedTime();
+	if ( false == ( 0.f < GetNowHp() ) )
+		return;
+
+	float fNearestDistance = 0.f;
+	bool bEnemyNear = false;
+	bool bNoEnemyNear = true;
+	if ( true == GetNearestEnemyUnitDistance( fNearestDistance ) )
+	{
+		bEnemyNear = ( fNearestDistance < m_fMadnessCraveNearRange );
+		bNoEnemyNear = ( m_fMadnessCraveFarRange < fNearestDistance );
+	}
+
+	const int iMadnessCraveLevel = GetSkillLevelValue( CX2SkillTree::RNSI_P_LDN_MADNESS_CRAVE );
+	float fAttackValue = 0.f;
+	if ( true == bEnemyNear )
+	{
+		CX2BuffFactorPtr ptrBuffFactor = CX2BuffTempletManager::GetInstance()->GetBuffFactorPtr( BFI_BUFF_MADNESS_CRAVE_ADDITIONAL_BUFF );
+		if ( NULL != ptrBuffFactor )
+		{
+			CX2BuffFactorPtr ptrBuffFactorClone = ptrBuffFactor->GetClonePtr( static_cast<UINT>( iMadnessCraveLevel ) );
+			if ( NULL != ptrBuffFactorClone )
+			{
+				const float fOverOffset = static_cast<float>( fNearestDistance - MADNESS_CRAVE_RANGE_OFFSET );
+				const float fFadeDistance = ( 0.f <= fOverOffset ) ? fOverOffset : 0.f;
+				const float fNearRangeOverOffset = static_cast<float>( m_fMadnessCraveNearRange - MADNESS_CRAVE_RANGE_OFFSET );
+				const float fFadeRange = ( fNearRangeOverOffset < 0.f ) ? 1.f : fNearRangeOverOffset;
+				fAttackValue = m_fMadnessCraveAttackRate * ( 1.f - fFadeDistance / fFadeRange );
+				ptrBuffFactorClone->SetBehaviorValue( BBT_CHANGE_ADDITIONAL_ATTACK, fAttackValue, BEHAVIOR_VALUE_OPERATION_SET );
+				ptrBuffFactorClone->SetBehaviorValue( BBT_CHANGE_ADDITIONAL_DEFENCE, fAttackValue, BEHAVIOR_VALUE_OPERATION_SET );
+				ptrBuffFactorClone->SetGameUnitBuffFactor( this );
+				SetBuffFactorToGameUnit( *ptrBuffFactorClone );
+			}
+		}
+	}
+	else
+	{
+		EraseBuffTempletFromGameUnit( BTI_BUFF_MADNESS_CRAVE_ADDITIONAL_BUFF );
+	}
+
+	if ( false == bNoEnemyNear )
+		EraseBuffTempletFromGameUnit( BTI_BUFF_MADNESS_CRAVE_SPEED_BUFF );
+	else if ( false == HaveThisBuff( BTI_BUFF_MADNESS_CRAVE_SPEED_BUFF ) )
+		SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_MADNESS_CRAVE_SPEED_BUFF, iMadnessCraveLevel, NULL, 0, false );	// 7ai arguments
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+	static DWORD s_dwMadnessLogTime = 0;
+	if ( true == IsPassiveLogDue( s_dwMadnessLogTime ) )
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL PASSIVE madness crave ( nearest %.0f, near %d value %.3f, far %d )", fNearestDistance, static_cast<int>( bEnemyNear ), fAttackValue, static_cast<int>( bNoEnemyNear ) );
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+//}}
 
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_CORE
 //}}

@@ -1386,6 +1386,20 @@ protected:
 	virtual void		SetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ );	// June 32b37d40 ( override 0x24c )
 	void				StartTransformedForm( const int iForm_ );	// June 32b34fe0
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+	// char-luciel CH4a: the passives and the delegates InitPassiveSkillState pushes ( thunks 32b4cd90 .. 32b4e720 )
+	virtual void		InitPassiveSkillState();	// June 32b45820 ( vslot 0x690 )
+	void				ApplyFearOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b3d380
+	bool				CreateFearDamageEffect( CX2GameUnit* pDefender_, const float fThreatOfFearRate_, const bool bHitFromBehind_ );	// June 32b3ca30
+	void				ApplyPowerOfOriaxStunOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b0fc50
+	void				AddSoulCollectorStackOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b43590
+	void				PlaySoulExtortionDrain( const CX2DamageManager::DamageData& damageData_ );	// June 32b435f0
+	void				SetMakeTargetOnPhantomBladeHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b0fce0
+	void				AddDarkCrescentTargetOnRuinousImpactHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b177b0
+	void				SetMakeTargetOnRapidImpactHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b13c80
+	void				AddInvasionOfDarkEnergyTargetOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b17f90
+	void				FrameMoveMadnessCrave();	// June 32b3e470 ( the frame-move list )
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
 	// char-luciel CH1l: helpers the CH1l overrides call, bodies in CH1l3 ( names by what each does; CH1l3 keeps them )
 	CKTDGParticleSystem::CParticleEventSequence*	SetLucielMinorParticleByEnum( LUCIEL_MINOR_PARTICLE_INSTANCE_ID eVal_, wstring wstrParticleName_, int iDrawCount_ = -1 );	// June 32b1eca0: body in CH1l3
 	void				CreateChaserOfDarknessDamageEffect( const CX2DamageManager::DamageData* pDamageData_ );	// June 32b1f800: body in CH1l3
@@ -1417,13 +1431,14 @@ protected:
 	int									m_iSeizedByFearSkillLevel;			// +0x95f4
 	float								m_fSeizedByFearRate;				// +0x95f8
 	float								m_fSeizedByFearTimer;				// +0x95fc
-	float								m_afSeizedByFearValue[2];			// +0x9600
+	float								m_fBackstabAttackRate;				// +0x9600: char-luciel CH4a: Backstab ( 30205 ) SA_ATK_REL, CH1a named the pair a Seized by Fear array
+	float								m_fPowerOfOriaxAttackRate;			// +0x9604: char-luciel CH4a: Power of Oriax ( 30010 ) SA_ATK_REL
 	int									m_iSoulCollectorSkillLevel;			// +0x9608
-	float								m_fPowerOfOriaxTime;				// +0x960c
+	float								m_fSoulCollectorStackCoolTime;				// char-luciel CH4a: +0x960c
 	UCHAR								m_ucSoulCollectorCount;				// +0x9610
-	float								m_fPowerOfOriaxDamageRate;			// +0x9614
-	float								m_fSoulCollectorDamageRate;			// +0x9618
-	USHORT								m_usSoulCollectorMaxCount;			// +0x961c
+	float								m_fSoulCollectorDamageRate;			// char-luciel CH4a: +0x9614
+	float								m_fSoulCollectorRangeRate;			// char-luciel CH4a: +0x9618
+	USHORT								m_usSoulCollectorPiercingCount;			// char-luciel CH4a: +0x961c
 	float								m_fSoulExtortionDrainRate;			// +0x9620
 	CX2EffectSet::Handle				m_hDemonicBreathChargeEffectSet;	// +0x9624
 	float								m_fFantasieImpromptuWaitTime;		// +0x9628
@@ -1486,11 +1501,11 @@ protected:
 	SGameUnitKey						m_DeathTouchTarget;					// +0x97a8
 	CX2DamageEffect::CEffectHandle		m_hDeathTouchBeamEffect;			// +0x97b8: char-luciel CH1l3: damage effect handles ( June 32b349f0 / 32b34a90 ); CH1a named the pair one UidType
 	CX2DamageEffect::CEffectHandle		m_hDeathTouchTargetEffect;			// +0x97bc
-	float								m_fRapidImpactCoolTime;				// +0x97c0
-	float								m_fRapidImpactRange;				// +0x97c4
-	float								m_fRapidImpactMaxRange;				// +0x97c8
-	float								m_fInvasionOfDarkEnergyTime;		// +0x97cc
-	float								m_fInvasionOfDarkEnergyDuration;	// +0x97d0
+	float								m_fInvasionOfDarkEnergyTargetTime;				// char-luciel CH4a: +0x97c0
+	float								m_fInvasionOfDarkEnergyCoolTimeLeft;				// char-luciel CH4a: +0x97c4
+	float								m_fInvasionOfDarkEnergyCoolTime;				// char-luciel CH4a: +0x97c8
+	float								m_fInvasionOfDarkEnergyDamageRate;		// char-luciel CH4a: +0x97cc
+	float								m_fInvasionOfDarkEnergyForceDownValue;	// char-luciel CH4a: +0x97d0
 	std::vector<STimedGameUnitKey>		m_vecInvasionOfDarkEnergyTarget;	// +0x97d4
 	int									m_iDesperadoAttackCount;			// +0x97e4
 	int									m_iDesperadoMaxAttackCount;			// +0x97e8
@@ -1499,15 +1514,14 @@ protected:
 	float								m_fDesperadoAimDegreeY;				// +0x9800: June's ctor leaves it unset
 	float								m_fDesperadoAttackTime;				// +0x9804: June's ctor leaves it unset
 	float								m_fMadnessCraveAttackRate;			// +0x9808
-	float								m_fMadnessCraveMagicAttackRate;		// +0x980c
-	float								m_fMadnessCraveDefenceRate;			// +0x9810
-	float								m_fMadnessCraveMagicDefenceRate;	// +0x9814
-	float								m_fMadnessCraveHpRate;				// +0x9818
-	float								m_fMadnessCraveCoolTime;			// +0x981c
-	float								m_fMadnessCraveElapsedTime;			// +0x9820
-	float								m_fMadnessCraveDuration;			// +0x9824
-	float								m_fMadnessDestroyRate;				// +0x9828
-	float								m_fMadnessDestroyCoolTime;			// +0x982c
+	float								m_fMadnessCraveDamagedRate;		// char-luciel CH4a: +0x980c
+	float								m_fMadnessCraveMoveSpeedRate;			// char-luciel CH4a: +0x9810
+	float								m_fMadnessCraveJumpSpeedRate;	// char-luciel CH4a: +0x9814
+	float								m_fMadnessCraveNearRange;				// char-luciel CH4a: +0x9818
+	float								m_fMadnessCraveFarRange;			// char-luciel CH4a: +0x981c
+	CKTDXCheckElapsedTime				m_MadnessCraveCheckTime;			// +0x9820: char-luciel CH4a: June's frame move runs it ( 3322a380 ), CH1a named its two floats
+	float								m_fMadnessDestroyCoolTimeRate;				// char-luciel CH4a: +0x9828
+	float								m_fMadnessDestroyDebuffTimeRate;			// char-luciel CH4a: +0x982c
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
 	sLockOnSystemPtr					m_ptrShrewdCutterLockOn;			// char-luciel CH3c20: +0x9830, CX2GUUser's type
 #else SERV_IRUHADEV_JUNE_CHAR_LOCKON_SYSTEM
