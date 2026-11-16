@@ -17,7 +17,7 @@ Then `kickoffs/char-luciel/CH4b.md` (the amendments), the `funcmap.tsv` rows tag
 
 ## Task
 
-Review CH4a's commit (`a31855e9`) and CH4b's commit against June in Ghidra (read-only) and the exe listing. One stage review: CH4a has none of its own.
+Review CH4a's commit (`a31855e9`) and CH4b's (`5d07d7dc`) against June in Ghidra (read-only) and the exe listing. One stage review: CH4a has none of its own.
 - CH4a: `InitPassiveSkillState` `32b45820` ( the 15 passive reads in June's order, the resets, the ten delegates ), 3 of the delegates spot-checked line by line
   ( `ApplyFearOnHit` `32b3d380`, `PlaySoulExtortionDrain` `32b435f0`, `FrameMoveMadnessCrave` `32b3e470` ), `CreateFearDamageEffect` `32b3ca30`, the 18-entry debuff
   group list against `3373daa4..e8`.
@@ -30,8 +30,15 @@ Review CH4a's commit (`a31855e9`) and CH4b's commit against June in Ghidra (read
   `SA_RECOVER_MP_ABS` or `_2` by `322cc180`, `UT_LUCIEL` -> `UpCombinationPoint`, `SetNowMp`, the MP text push ).
 - `DamageData::m_bHitFromBehind` reset in `SimpleInit` ( June zeroes the word `+0x5c0` / `+0x5c1` = `m_bMakeTarget` ).
 
-Hygiene is one command: `python tools/finish.py --review --commits a31855e9 <CH4b's commit> --with JUNE_CHAR_LUCIEL_PASSIVE JUNE_CHAR_LUCIEL_PASSIVE_DEBUG -v`;
+Hygiene is one command: `python tools/finish.py --review --commits a31855e9 5d07d7dc 9bdc3e6a --with JUNE_CHAR_LUCIEL_PASSIVE JUNE_CHAR_LUCIEL_PASSIVE_DEBUG -v`;
 explain every OTHER row and deleted line ( CH4b's `X2GameUnit.cpp` file holds a peer's `JUNE_STATCALC_UNIT_STAT` hunks: only the 3-line slot-251 call is CH4b's ).
+
+**Owed play-test checks ( user, 2026-11-16: skipped in CH4b, the review hands them off before retiring the debug define ):** on `LuPasCN` ( unit 221, Noblesse,
+level 99, transcended; keys A Soul Extortion, S Stomp, D Strong Strike, C Flick Shot, Q Triple Shot, W Shadow ):
+- Shadow: W, then take monster hits ( no `/invin` ) -> `shadow shield took X, left Y`, then `, broken: both shadow buffs erased`.
+- Tribute / Noblesse Oblige: hit monsters until `soul collector stack` lines, then `/buffFactor 55 10` several times ( 27.5% each ) -> `tribute: BTI ... landed,
+  debuff ... erased, one soul collector stack spent ( chance 0.28 )` and `noble devotion: 1 point(s), mp +10.0` ( MP +10 text, gauge +1 ).
+So the review keeps `_PASSIVE_DEBUG` on until those lines are read: hand off, read the logs, then retire it.
 
 Read the play-test's `[JUNE_CHAR] LUCIEL PASSIVE` lines ( CH4a's checks and CH4b's: `backstab from behind`, `hit from behind`, `lord of fear effect`, `shadow
 shield`, `tribute`, `noble devotion` ). Retire `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE_DEBUG` ( comment out the define: no build ). Fix clear transcription

@@ -4732,6 +4732,10 @@ Review: `CH4b-review.md` covers CH4a and CH4b.
 - **How to see it in game:** the hand-off in the closing message. Logs: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL PASSIVE"`. Per item: `hit from behind on
   npc ...: damage A -> B` ( 7aw ), `backstab from behind on npc ...` ( 7d ), `lord of fear effect ( N stack(s) ... )` ( CH4a's fear effect, now reachable ), `shadow shield
   took ...` ( 7j ), `tribute: BTI ... erased` and `noble devotion: N point(s), mp +M` ( slot 251 ).
+- **Play-test ( 2026-11-16, logs 10:47-10:53 on the 10:38 deploy, 0 EXCEPTION, 0 ErrorLog lines ):** checks 1-3 passed, 4-5 skipped by the user and owed to the
+  CH4b review. `LuPasLD` 220 ( seized x1.150, backstab x1.360, oriax x2.000 ): combo from behind `986.7 -> 986.7` before Oriax, `2971.0 -> 5942.1` after ( x2 ); Triple
+  Shot `4405.0 -> 5065.7` ( x1.15 ); `backstab from behind ... ignore defence, critical rate 0.00` then `skill 30205 ... 8873.6 -> 12068.1` ( x1.36 ), from behind only;
+  `lord of fear effect ( 1 stack(s), power x4.320 )` ( on the CH3a peer's `LuDlB`, same path ). Not reached: Shadow and Tribute / Noblesse Oblige ( `LuPasCN` 221 ).
 
 ## Phase CH5 - UI and data
 
