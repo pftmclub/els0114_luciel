@@ -1392,13 +1392,6 @@ protected:
 	// char-luciel CH2d3: the transformed form's start, from the form buff's hook
 	virtual void		SetSpecificValueByBuffTempletID( const BUFF_TEMPLET_ID eBuffTempletId_ );	// June 32b37d40 ( override 0x24c )
 	void				StartTransformedForm( const int iForm_ );	// June 32b34fe0
-#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
-#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
-	// char-luciel CH4a: the passives and the delegates InitPassiveSkillState pushes ( thunks 32b4cd90 .. 32b4e720 )
-	virtual void		InitPassiveSkillState();	// June 32b45820 ( vslot 0x690 )
-	void				ApplyFearOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b3d380
-	bool				CreateFearDamageEffect( CX2GameUnit* pDefender_, const float fThreatOfFearRate_, const bool bHitFromBehind_ );	// June 32b3ca30
-	void				ApplyPowerOfOriaxStunOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b0fc50
 	// char-luciel CH3a: Dread Lord ( 127 ) skills
 	void				LSI_SA_LLC_OBLIVION_Init();	// June 32ae6cf0
 	void				LSI_SA_LLC_OBLIVION_FrameMove();	// June 32b2b9c0
@@ -1427,6 +1420,62 @@ protected:
 	void				LSI_A_LLD_F_CHAINS_OF_BONDAGE_FrameMove();	// June 32b30970, both bodies
 	void				LSI_A_LLD_F_CHAINS_OF_BONDAGE_EventProcess();	// June 32b021a0, both bodies
 	void				LSI_A_LLD_BLUFF_LU_Init();	// June 32ae9f40, both bodies
+	// char-luciel CH3b: Noblesse ( 128 ) skills
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_Init();	// June 32ae77f0
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_FrameMove();	// June 32b2d2a0
+	void				LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_EventProcess();	// June 32b1e200
+	void				LSI_SA_LCN_F_SWIFT_SMASH_Init();	// June 32ae7f00
+	void				LSI_SA_LCN_F_SWIFT_SMASH_FrameMove();	// June 32b3e120, both bodies
+	void				LSI_SA_LCN_F_SWIFT_SMASH_EventProcess();	// June 32b01b50, both bodies
+	void				LSI_SA_LCN_SPECTRAL_SPEAR_Init();	// June 32ae7f30
+	void				LSI_SA_LCN_SPECTRAL_SPEAR_FrameMove();	// June 32b2f4b0
+	void				CreateSpectralSpearSpecter();	// June 32b2f4b0: the block it inlines twice
+	void				LSI_SA_LCN_SHADOW_BOLT_START_Init();	// June 32ae7fd0
+	void				LSI_SA_LCN_SHADOW_BOLT_START_StateStartFuture();	// June 32ae80a0
+	void				LSI_SA_LCN_SHADOW_BOLT_START_FrameMove();	// June 32b2fba0
+	void				LSI_SA_LCN_SHADOW_BOLT_START_EventProcess();	// June 32b2ff50
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_StateStartFuture();	// June 32b30560
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess();	// June 32b30090
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_IDLE_StateStart();	// June 32b30500, also the end state's
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_LEFT_StateStart();	// June 32b305c0
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_RIGHT_StateStart();	// June 32b30620
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_StateStart();	// June 32b30680
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_StateStart();	// June 32b306e0
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_LEFT_StateStart();	// June 32b30740
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_RIGHT_StateStart();	// June 32b307a0
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_LEFT_StateStart();	// June 32b30800
+	void				LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_RIGHT_StateStart();	// June 32b30860
+	void				StateChangeShadowBoltSpear( const char* pszSpearStateName_ );	// June 32b30500 .. 32b30860: the tail the nine state starts share
+	void				LSI_SA_LCN_SHADOW_BOLT_END_EventProcess();	// June 32b01d60
+	void				LSI_SA_LCN_SHADOW_BOLT_END_StateEndFuture();	// June 32b30000
+	void				LSI_SA_LCN_TWILIGHT_JUDGEMENT_Init();	// June 32ae80d0
+	void				LSI_SA_LCN_TWILIGHT_JUDGEMENT_StateStart();	// June 32b308c0
+	void				StartTwilightJudgementBuff();	// June 32b20a10
+	void				LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_StateStart();	// June 32b308e0, both bodies
+	void				LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_EventProcess();	// June 32b01f80, both bodies
+	void				LSI_A_LCN_F_SUMMON_FAMILIAR_Init();	// June 32ae8390
+	void				LSI_A_LCN_F_SUMMON_FAMILIAR_FrameMove();	// June 32b39e90, both bodies
+	void				LSI_A_LCN_SOUL_SPREAD_LU_READY_Init();	// June 32aea000, both bodies
+	void				SoulSpreadReadyEventProcess( const int iLoopStateID_ );	// June 32b0e710 / 32b0e850
+	void				SoulSpreadLoopEventProcess( const int iLoopStateID_, const int iEndStateID_ );	// June 32b0e7f0 / 32b0e930
+	void				LSI_A_LCN_SOUL_SPREAD_LU_READY_EventProcess();	// June 32b0e710
+	void				LSI_A_LCN_SOUL_SPREAD_LU_LOOP_EventProcess();	// June 32b0e7f0
+	void				LSI_A_LCN_SOUL_SPREAD_CIEL_READY_EventProcess();	// June 32b0e850
+	void				LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP_EventProcess();	// June 32b0e930
+	void				LSI_A_LCN_SOUL_SPREAD_LU_LOOP_FrameMove();	// June 32b369b0, both loops
+	void				LSI_SA_LCN_SOUL_LOCK_Init();	// June 32aea270
+	void				LSI_SA_LCN_MAGDONIC_CANNON_Init();	// June 32aea2f0, also the fly state's
+	void				LSI_SA_LCN_MAGDONIC_CANNON_EventProcess();	// June 32b0e990, also the fly state's
+	void				LSI_SA_LCN_RAIN_OF_CHAOS_Init();	// June 32aea5c0
+	void				LSI_SA_LCN_RAIN_OF_CHAOS_StateStart();	// June 32aea5d0
+	void				LSI_SA_LCN_RAIN_OF_CHAOS_StateEnd();	// June 32aea5e0
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE
+	// char-luciel CH4a: the passives and the delegates InitPassiveSkillState pushes ( thunks 32b4cd90 .. 32b4e720 )
+	virtual void		InitPassiveSkillState();	// June 32b45820 ( vslot 0x690 )
+	void				ApplyFearOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b3d380
+	bool				CreateFearDamageEffect( CX2GameUnit* pDefender_, const float fThreatOfFearRate_, const bool bHitFromBehind_ );	// June 32b3ca30
+	void				ApplyPowerOfOriaxStunOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b0fc50
 	void				AddSoulCollectorStackOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b43590
 	void				PlaySoulExtortionDrain( const CX2DamageManager::DamageData& damageData_ );	// June 32b435f0
 	void				SetMakeTargetOnPhantomBladeHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b0fce0
@@ -1501,7 +1550,7 @@ protected:
 	float								m_fShadowShieldAmount;				// char-luciel CH2c2 review: +0x968c, Shadow's absorb pool ( max HP x rate ), drained by June 32aebaf0
 	int									m_iShadowBoltNpcUID;				// +0x9690: char-luciel CH1l3: the Shadow Bolt spear's NPC UID ( June 32b20780 looks it up by UID ), CH1a named it an index
 	float								m_fShadowBoltTime;					// +0x9694
-	float								m_fShadowBoltDuration;				// +0x9698
+	float								m_fShadowBoltPowerRate;				// +0x9698: char-luciel CH3b: the spear's power rate ( June 32b2fba0 stores GetPowerRate() ), CH1a named it a duration
 	UCHAR								m_ucTwilightJudgementStackCount;	// +0x969c: char-luciel CH1l3: the Twilight Judgement buff's stack count ( June 32aebb60 ), CH1a named it a bool
 	float								m_fTwilightJudgementTime;			// +0x96a0
 	float								m_fSoulStrikeCoolTime;				// +0x96a4

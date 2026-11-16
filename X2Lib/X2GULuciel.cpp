@@ -92,7 +92,7 @@ CX2GULuciel::CX2GULuciel( int iUnitIndex_, int iTeamNum_,
 , m_fShadowShieldAmount( 0.f )
 , m_iShadowBoltNpcUID( -1 )
 , m_fShadowBoltTime( 0.f )
-, m_fShadowBoltDuration( 0.f )
+, m_fShadowBoltPowerRate( 0.f )
 , m_ucTwilightJudgementStackCount( 0 )
 , m_fTwilightJudgementTime( 0.f )
 , m_fSoulStrikeCoolTime( 0.f )
@@ -11751,7 +11751,7 @@ void CX2GULuciel::FrameMoveShadowBoltSpear()
 				CX2GUNPC* pStackNpc = g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID );
 				if ( NULL != pStackNpc )
 				{
-					g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_SA_LCN_SHADOW_BOLT_Spear", this, pStackNpc, IsHyperState(), m_fShadowBoltDuration, -1.f,
+					g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_SA_LCN_SHADOW_BOLT_Spear", this, pStackNpc, IsHyperState(), m_fShadowBoltPowerRate, -1.f,
 						D3DXVECTOR3( 1.f, 1.f, 1.f ), true, pStackNpc->GetPos( false ) );
 				}
 			}
@@ -14447,7 +14447,17 @@ void CX2GULuciel::InitStateCommon()
 	// June 32b3e8b0 @1916 LSI_SA_LCG_ESCHATON ( id 363 ): registered by CH2c / CH2c2 with its callbacks
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+	stateData.Init();
+	stateData.stateID			= LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT;
+	m_LuaManager.MakeTableReference( "LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT", stateData.stateID );
+	stateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_Init );	// char-luciel CH3b: June 32b4ae50
+	stateData.OnFrameMove		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_FrameMove );	// June 32b4e0d0
+	stateData.OnEventProcess	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_EventProcess );	// June 32b4dc70
+	m_StateList[stateData.stateID] = stateData;
+#else SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 	// June 32b3e8b0 @1922 LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT ( id 364 ): registered by CH3b with its callbacks
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 }
 
 #ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
@@ -19150,6 +19160,894 @@ void CX2GULuciel::LSI_A_LLD_BLUFF_LU_Init()
 	XSkinMeshReadyInBackground( L"LD_M_DashJumpComboZX01.X" );
 }
 
+// char-luciel CH3b: Noblesse ( 128 ) skills ( Fantasie Impromptu 2nd Movement, Swift Smash, Spectral Spear, Shadow Bolt, Twilight Judgement, Summon Familiar, Soul Spread, Soul Lock, Magdonic Cannon, Rain of Chaos )
+namespace _CONST_LUCIEL_CH3B_
+{
+	const float		FANTASIE_2ND_MOVEMENT_EFFECT_TIME_1				= 1.f;		// June 32b2d2a0
+	const float		FANTASIE_2ND_MOVEMENT_EFFECT_TIME_2				= 1.26f;	// June 32b2d2a0 ( 334395f4 )
+	const float		FANTASIE_2ND_MOVEMENT_EFFECT_TIME_3				= 1.37f;	// June 32b2d2a0 ( 334d9ccc )
+	const float		FANTASIE_2ND_MOVEMENT_EFFECT_TIME_4				= 3.5f;		// June 32b2d2a0 ( 334f2588 )
+	const float		SWIFT_SMASH_EFFECT_TIME							= 0.01f;	// June 32b3e120 ( 33437810 )
+	const float		SPECTRAL_SPEAR_UPGRADED_SPECTER_TIME_1			= 0.36f;	// June 32b2f4b0 ( 33479018 )
+	const float		SPECTRAL_SPEAR_UPGRADED_SPECTER_TIME_2			= 0.56f;	// June 32b2f4b0 ( 334ccc90 )
+	const float		SPECTRAL_SPEAR_SOUL_SPECTER_TIME_1				= 0.31f;	// June 32b2f4b0 ( 334d79ac )
+	const float		SPECTRAL_SPEAR_SOUL_SPECTER_TIME_2				= 0.41f;	// June 32b2f4b0 ( 334d7484 )
+	const float		SPECTRAL_SPEAR_SOUL_SPECTER_TIME_3				= 0.51f;	// June 32b2f4b0 ( 334f2a1c )
+	const float		SPECTRAL_SPEAR_SOUL_SPECTER_TIME_4				= 0.61f;	// June 32b2f4b0 ( 334e0cc0 )
+	const float		SPECTRAL_SPEAR_SOUL_SPECTER_TIME_5				= 0.71f;	// June 32b2f4b0 ( 334ad098 )
+	const double	SPECTRAL_SPEAR_SEED_START_TIME					= 0.30000001192092896;	// June 32b2f4b0 ( 3343bd78 ): the random seed counts the 0.1 s steps of the animation after this time
+	const double	SPECTRAL_SPEAR_SEED_STEP_TIME					= 0.10000000149011612;	// June 32b2f4b0 ( 334395e8 )
+	const double	SPECTRAL_SPEAR_SEED_ROUND						= 0.5;		// June 32b2f4b0 ( 3342ebc8 )
+	const int		SPECTRAL_SPEAR_SEED_OFFSET_Y					= 10;		// June 32b2f4b0
+	const int		SPECTRAL_SPEAR_SEED_OFFSET_Z					= 20;		// June 32b2f4b0
+	const double	SPECTRAL_SPEAR_RANDOM_DEGREE_X					= 360.0;	// June 32b2f4b0 ( 33438268 )
+	const double	SPECTRAL_SPEAR_RANDOM_DEGREE_YZ					= 110.0;	// June 32b2f4b0 ( 3346ef40 )
+	const double	SPECTRAL_SPEAR_BASE_DEGREE_YZ					= 120.0;	// June 32b2f4b0 ( 33439d10 )
+	const float		SHADOW_BOLT_SPAWN_TIME							= 0.001f;	// June 32b2fba0 ( 33431564 )
+	const double	SHADOW_BOLT_FRONT_DISTANCE						= 120.0;	// June 32b2fba0 ( 33439d10 )
+	const double	SHADOW_BOLT_PROBE_HEIGHT						= 300.0;	// June 32b2fba0 ( 334577c8 )
+	const float		SHADOW_BOLT_PROBE_RADIUS						= 30.f;		// June 32b2fba0 ( 334ed3f8 )
+	const double	SHADOW_BOLT_NO_GROUND_HEIGHT					= 240.0;	// June 32b2fba0 ( 33475900 )
+	const float		SHADOW_BOLT_SPAWN_DELAY							= 0.3f;		// June 32b2fba0 ( 3345993c )
+	const float		SHADOW_BOLT_STACK_TIME							= 1.f;		// June 32b2fba0
+	const double	SHADOW_BOLT_ROUND_UP							= 1.0;		// June 32b2fba0 ( 334355b0 )
+	const int		SHADOW_BOLT_BASE_STACK_COUNT					= 12;		// June 32b2fba0
+	const float		SHADOW_BOLT_AIM_START_TIME						= 0.6f;		// June 32b2ff50 ( 3343bd80 ): the spear's control starts after it
+	const float		SHADOW_BOLT_CONTROL_NEAR_DISTANCE				= -750.f;	// June 32b30090 ( 33476834 ): a distance is never at or below it ( JUNE_BUGS )
+	const double	SHADOW_BOLT_CONTROL_HEIGHT_LIMIT				= 1500.0;	// June 32b30090 ( 33459a10 )
+	const float		SUMMON_FAMILIAR_BUFF_TIME						= 0.8f;		// June 32b39e90 ( 3343b240 )
+	const float		SUMMON_FAMILIAR_PARTNER_RANGE					= 800.f;	// June 32b39e90 ( 33471300 )
+	const double	SUMMON_FAMILIAR_DURATION_RATE					= 1.5;		// June 32b39e90 ( 334396c8 )
+	const float		SOUL_SPREAD_EFFECT_TIME							= 0.01f;	// June 32b369b0 / 32b36ba0 ( 33437810 )
+
+	// the Shadow Bolt control states June registers with no name: 405 + the spear's move ( the state starts name the spear's own states )
+	const int		SHADOW_BOLT_CONTROL_LEFT_STATE_ID				= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 1;	// June @32b4795a ( 406 )
+	const int		SHADOW_BOLT_CONTROL_RIGHT_STATE_ID				= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 2;	// June @32b47993 ( 407 )
+	const int		SHADOW_BOLT_CONTROL_UP_STATE_ID					= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 3;	// June @32b479cc ( 408 )
+	const int		SHADOW_BOLT_CONTROL_DOWN_STATE_ID				= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 4;	// June @32b47a05 ( 409 )
+	const int		SHADOW_BOLT_CONTROL_UP_LEFT_STATE_ID			= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 5;	// June @32b47a3e ( 410 )
+	const int		SHADOW_BOLT_CONTROL_UP_RIGHT_STATE_ID			= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 6;	// June @32b47a77 ( 411 )
+	const int		SHADOW_BOLT_CONTROL_DOWN_LEFT_STATE_ID			= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 7;	// June @32b47ab0 ( 412 )
+	const int		SHADOW_BOLT_CONTROL_DOWN_RIGHT_STATE_ID			= CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL + 8;	// June @32b47ae9 ( 413 )
+}
+using namespace _CONST_LUCIEL_CH3B_;
+
+// char-luciel CH3b: June 32ae77f0, the preload ( thunk 32b4ae50 )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_Init()
+{
+	TextureReadyInBackground( L"eve_A_blink_light.dds" );
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam01.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_Attack.Y" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LCG_M_FI_FuriosoDummy01.X" );
+	XSkinMeshReadyInBackground( L"LCG_M_FI_FuriosoPathWeapon01.X" );
+	XSkinMeshReadyInBackground( L"LCG_M_FI_FuriosoWeapon01.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon.X" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon_Cross.X" );
+	XSkinMeshReadyInBackground( L"LD_Attack_Cross01.X" );
+	XSkinMeshReadyInBackground( L"LLC_DARK_CRESCENT_M01.X" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+}
+
+// char-luciel CH3b: June 32ae7f00, the preload ( thunk 32b4b130 )
+void CX2GULuciel::LSI_SA_LCN_F_SWIFT_SMASH_Init()
+{
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XSkinMeshReadyInBackground( L"LCN_SWIFT_SMASH_Shadow.X" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+}
+
+// char-luciel CH3b: June 32ae7f30, the preload ( thunk 32b4b140 )
+void CX2GULuciel::LSI_SA_LCN_SPECTRAL_SPEAR_Init()
+{
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XSkinMeshReadyInBackground( L"LCN_SPECTRAL_SPEAR_M01.X" );
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+	XSkinMeshReadyInBackground( L"LCN_SpectralSpear_StartCross.X" );
+	XMeshReadyInBackground( L"LCN_SpectralSpear_StartM.Y" );
+}
+
+// char-luciel CH3b: June 32ae7fd0, the preload ( thunk 32b4b150 )
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_START_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XSkinMeshReadyInBackground( L"SUMMON_FAMILIAR_Mesh01.X" );
+	XMeshReadyInBackground( L"SUMMON_FAMILIAR_Mesh02.Y" );
+	XSkinMeshReadyInBackground( L"LCN_MagicSquareM01.X" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"ColorBallFire.dds" );
+	XSkinMeshReadyInBackground( L"LCN_SPECTRAL_SPEAR_M01.X" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	XSkinMeshReadyInBackground( L"SHOOTING_STAR_Shell_Dummy.X" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+}
+
+// char-luciel CH3b: June 32ae80d0, the preload ( thunk 32b4b170 )
+void CX2GULuciel::LSI_SA_LCN_TWILIGHT_JUDGEMENT_Init()
+{
+	XSkinMeshReadyInBackground( L"LCG_Weapon.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	XMeshReadyInBackground( L"LCG_M_Beam02.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam03.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam04.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_Attack.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_CrossY.Y" );
+	TextureReadyInBackground( L"LD_Blade_Liner01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	XMeshReadyInBackground( L"LCG_M_Beam01.Y" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon_Ammo01.X" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	XSkinMeshReadyInBackground( L"aisha_SA_SCREWDRIVER_circle.X" );
+}
+
+// char-luciel CH3b: June 32ae8390, the preload ( thunk 32b4b490 )
+void CX2GULuciel::LSI_A_LCN_F_SUMMON_FAMILIAR_Init()
+{
+	TextureReadyInBackground( L"Stat_LegShot.tga" );
+	XSkinMeshReadyInBackground( L"LCG_SoulStrike_Projectile_AttackBox.X" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XSkinMeshReadyInBackground( L"SUMMON_FAMILIAR_Mesh01.X" );
+	XMeshReadyInBackground( L"SUMMON_FAMILIAR_Mesh02.Y" );
+	TextureReadyInBackground( L"Stat_LegShot.tga" );
+	XSkinMeshReadyInBackground( L"LCG_SoulStrike_Projectile_AttackBox.X" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XSkinMeshReadyInBackground( L"SUMMON_FAMILIAR_Mesh01.X" );
+	XMeshReadyInBackground( L"SUMMON_FAMILIAR_Mesh02.Y" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	XSkinMeshReadyInBackground( L"LCN_SummonFamiliar_Start.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_100x50x50_center.X" );
+	XMeshReadyInBackground( L"AAS_NINE_TAILED_FOX_P02.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+}
+
+// char-luciel CH3b: June 32aea000, the preload ( thunk 32b4b510, both bodies )
+void CX2GULuciel::LSI_A_LCN_SOUL_SPREAD_LU_READY_Init()
+{
+	TextureReadyInBackground( L"CenterLight_Gray01.dds" );
+	XSkinMeshReadyInBackground( L"LCN_SPECTRAL_SPEAR_M02.X" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+}
+
+// char-luciel CH3b: June 32aea270, the preload ( thunk 32b4b330 )
+void CX2GULuciel::LSI_SA_LCN_SOUL_LOCK_Init()
+{
+	XSkinMeshReadyInBackground( L"ABOX_350x50x50_Center.x" );
+	TextureReadyInBackground( L"Explosion_Light02.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	XMeshReadyInBackground( L"LLG_EvilFace_M01.Y" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	TextureReadyInBackground( L"SpreadLight03_Gray.dds" );
+}
+
+// char-luciel CH3b: June 32aea2f0, the preload ( thunk 32b4b340, also the fly state )
+void CX2GULuciel::LSI_SA_LCN_MAGDONIC_CANNON_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	XSkinMeshReadyInBackground( L"LCG_Weapon.X" );
+	XMeshReadyInBackground( L"LCG_Weapon_Attack.Y" );
+	XMeshReadyInBackground( L"LCG_Weapon_CrossY.Y" );
+	TextureReadyInBackground( L"LCN_MagicSquare001.dds" );
+	XMeshReadyInBackground( L"LDB_ABYSS_STRIKE_Ciel_Pro.Y" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare08.dds" );
+	TextureReadyInBackground( L"RG_FIRE_E01.dds" );
+	TextureReadyInBackground( L"StarCross_White.tga" );
+	XSkinMeshReadyInBackground( L"WindWard_XMesh01.X" );
+}
+
+// char-luciel CH3b: June 32b2d2a0 ( thunk 32b4e0d0 ): the four attack boxes of the 2nd movement play at 1.0, 1.26, 1.37 and 3.5 s; June plays the memo variant of each when its memo is equipped
+// and the synced short is 5 ( the memo reader answers 0, so the plain one always plays )
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( FANTASIE_2ND_MOVEMENT_EFFECT_TIME_1 ) )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL fantasie 2nd movement attackbox 1" );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_Fantasie_Impromptu_2nd_Movement_Attackbox_1", this );
+	}
+	else if ( true == GetXSkinAnimPtr()->EventTimerOneshot( FANTASIE_2ND_MOVEMENT_EFFECT_TIME_2 ) )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL fantasie 2nd movement attackbox 2" );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_Fantasie_Impromptu_2nd_Movement_Attackbox_2", this );
+	}
+	else if ( true == GetXSkinAnimPtr()->EventTimerOneshot( FANTASIE_2ND_MOVEMENT_EFFECT_TIME_3 ) )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL fantasie 2nd movement attackbox 3" );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_Fantasie_Impromptu_2nd_Movement_Attackbox_3", this );
+	}
+	else if ( true == GetXSkinAnimPtr()->EventTimerOneshot( FANTASIE_2ND_MOVEMENT_EFFECT_TIME_4 ) )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL fantasie 2nd movement attackbox 4" );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_LCG_Fantasie_Impromptu_2nd_Movement_Attackbox_4", this );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3b: June 32b1e200 ( thunk 32b4dc70 ): the animation end waits and clears the synced short; the cancel chain has no back-walk and no attack entry
+void CX2GULuciel::LSI_SA_LCG_FANTASIE_IMPROMPTU_2ND_MOVEMENT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+		m_FrameDataFuture.syncData.sClassSyncShort = 0;
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3b: June 32b3e120 ( thunk 32b4e6f0, both bodies ): once, at 0.01 s, for the female body only: the effect set; with the skill upgraded one Soul Collector stack comes first,
+// and at the stack limit the skill's attack value multiplies the power and the stacks go
+void CX2GULuciel::LSI_SA_LCN_F_SWIFT_SMASH_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SWIFT_SMASH_EFFECT_TIME ) && false == IsMinorUnitActive() )
+	{
+		float fPowerRate = GetPowerRate();
+		if ( true == IsNowStateSkillUpgraded() )
+			AddSoulCollectorStack();
+
+		UINT uiStackLimit = SOUL_COLLECTOR_MISSING_TEMPLET_LIMIT;
+		const CX2BuffTempletPtr ptrSoulCollector = CX2BuffTempletManager::GetInstance()->GetBuffTempletPtr( BTI_BUFF_SOUL_COLLECTOR );
+		if ( NULL != ptrSoulCollector )
+			uiStackLimit = ptrSoulCollector->GetAccumulationLimit();
+
+		if ( uiStackLimit <= GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR ) )
+		{
+			const CX2SkillTree::SkillTemplet* pSwiftSmashTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_A_LCN_SWIFT_SMASH, true );
+			if ( NULL != pSwiftSmashTemplet && NULL != GetUnit() )
+			{
+				int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( pSwiftSmashTemplet->m_eID, false, 0, true );
+				if ( iSkillLevel < 1 )
+					iSkillLevel = 1;
+
+				fPowerRate *= pSwiftSmashTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_REL, iSkillLevel, false );
+				EraseBuffTempletFromGameUnit( BTI_BUFF_SOUL_COLLECTOR );
+			}
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL swift smash effect set power rate %.2f hyper %d", fPowerRate, static_cast<int>( IsHyperState() ) );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_SA_LCN_SWIFT_SMASH", this, NULL, IsHyperState(), fPowerRate );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3b: June 32b01b50 ( thunk 32b4c320, both bodies ): the animation end on the ground lands; the cancel chain has no back-walk and no attack entry
+void CX2GULuciel::LSI_SA_LCN_F_SWIFT_SMASH_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_DASH_JUMP_LANDING );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3b: June 32b2f4b0 ( the inlined block, twice in the frame move ): a specter at the user's bone with the rotation spread by a seed of the animation time
+void CX2GULuciel::CreateSpectralSpearSpecter()
+{
+	D3DXVECTOR3 vRotateDegree = GetRotateDegree();
+	const float fAnimTime = GetXSkinAnimPtr()->GetNowAnimationTime();
+	const int iRandomSeed = static_cast<int>( ( static_cast<double>( fAnimTime ) - SPECTRAL_SPEAR_SEED_START_TIME ) / SPECTRAL_SPEAR_SEED_STEP_TIME + SPECTRAL_SPEAR_SEED_ROUND );
+
+	vRotateDegree.x = static_cast<float>( GetRandomFloat( iRandomSeed ) * SPECTRAL_SPEAR_RANDOM_DEGREE_X + vRotateDegree.x );
+	vRotateDegree.y = static_cast<float>( ( GetRandomFloat( iRandomSeed + SPECTRAL_SPEAR_SEED_OFFSET_Y ) * SPECTRAL_SPEAR_RANDOM_DEGREE_YZ + SPECTRAL_SPEAR_BASE_DEGREE_YZ ) + vRotateDegree.y );
+	vRotateDegree.z = static_cast<float>( ( GetRandomFloat( iRandomSeed + SPECTRAL_SPEAR_SEED_OFFSET_Z ) * SPECTRAL_SPEAR_RANDOM_DEGREE_YZ + SPECTRAL_SPEAR_BASE_DEGREE_YZ ) + vRotateDegree.z );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL spectral spear specter seed %d", iRandomSeed );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_SI_SA_LCN_SPECTRAL_SPEAR_Specter", GetPowerRate(), GetBonePos( L"Bip01" ), vRotateDegree, vRotateDegree,
+		m_FrameDataNow.unitCondition.landPosition.y, false, -1.f, 1.f, 1.f, -1, -1.f, 0, -1.f );
+}
+
+// char-luciel CH3b: June 32b2f4b0 ( thunk 32b4e1b0 ): an upgraded skill plays a specter at 0.36 s and at 0.56 s; five more times ( 0.31 .. 0.71 s ) a specter and one Soul Collector stack go when the buff is on
+void CX2GULuciel::LSI_SA_LCN_SPECTRAL_SPEAR_FrameMove()
+{
+	bool bUpgradedSpecter = false;
+	if ( true == IsNowStateSkillUpgraded() && true == GetXSkinAnimPtr()->EventTimerOneshot( SPECTRAL_SPEAR_UPGRADED_SPECTER_TIME_1 ) )
+		bUpgradedSpecter = true;
+	else if ( true == IsNowStateSkillUpgraded() && true == GetXSkinAnimPtr()->EventTimerOneshot( SPECTRAL_SPEAR_UPGRADED_SPECTER_TIME_2 ) )
+		bUpgradedSpecter = true;
+
+	if ( true == bUpgradedSpecter )
+		CreateSpectralSpearSpecter();
+
+	const bool bSoulSpecter = ( true == GetXSkinAnimPtr()->EventTimerOneshot( SPECTRAL_SPEAR_SOUL_SPECTER_TIME_1 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( SPECTRAL_SPEAR_SOUL_SPECTER_TIME_2 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( SPECTRAL_SPEAR_SOUL_SPECTER_TIME_3 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( SPECTRAL_SPEAR_SOUL_SPECTER_TIME_4 )
+		|| true == GetXSkinAnimPtr()->EventTimerOneshot( SPECTRAL_SPEAR_SOUL_SPECTER_TIME_5 ) );
+
+	if ( true == bSoulSpecter && true == HaveThisBuff( BTI_BUFF_SOUL_COLLECTOR ) )
+	{
+		CreateSpectralSpearSpecter();
+		AddBuffAccumulationCount( BFI_BUFF_SOUL_COLLECTOR, -1, 1, 0 );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3b: June 32ae80a0 ( thunk 32b4b160 ): the held key follows the slot the skill was cast from
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_START_StateStartFuture()
+{
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+
+	CommonStateStartFuture();
+}
+
+// char-luciel CH3b: June 32b2fba0 ( thunk 32b4e1c0 ): once, at 0.001 s: the spear is created 120 in front of the user ( on the ground below it, else 240 above the user ),
+// the stack timer starts and one Shadow Bolt buff stack per count ( 12 and the Noble Devotion count ) is applied
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_START_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SHADOW_BOLT_SPAWN_TIME ) )
+	{
+		m_fShadowBoltPowerRate = GetPowerRate();
+
+		const bool bIsRight = GetIsRight();
+		D3DXVECTOR3 vSpawnPos = GetPos( false );
+		const D3DXVECTOR3 vDirection = GetDirVector();
+		const D3DXVECTOR3 vFrontOffset(
+			static_cast<float>( vDirection.x * SHADOW_BOLT_FRONT_DISTANCE ),
+			static_cast<float>( vDirection.y * SHADOW_BOLT_FRONT_DISTANCE ),
+			static_cast<float>( vDirection.z * SHADOW_BOLT_FRONT_DISTANCE ) );
+		if ( true == bIsRight )
+			vSpawnPos += vFrontOffset;
+		else
+			vSpawnPos -= vFrontOffset;
+
+		vSpawnPos.y = static_cast<float>( vSpawnPos.y + SHADOW_BOLT_PROBE_HEIGHT );
+
+		const int iLastTouchLineIndex = static_cast<int>( m_FrameDataNow.syncData.lastTouchLineIndex );
+		D3DXVECTOR3 vLandPos = vSpawnPos;
+		const bool bGroundFound = g_pX2Game->GetWorld()->GetLineMap()->CanDown( vSpawnPos, SHADOW_BOLT_PROBE_RADIUS, &vLandPos, &iLastTouchLineIndex, NULL, true, false, true, false );
+		if ( false == bGroundFound )
+		{
+			vSpawnPos = GetPos( false );
+			vSpawnPos.y = static_cast<float>( vSpawnPos.y + SHADOW_BOLT_NO_GROUND_HEIGHT );
+		}
+
+		if ( true == IsMyUnit() )
+		{
+			g_pX2Game->CreateNPCReq( CX2UnitManager::NUI_SI_SA_LCN_SHADOW_BOLT, ( true == IsHyperState() ? 1 : 0 ), true, vSpawnPos, bIsRight, SHADOW_BOLT_SPAWN_DELAY, true, -1,
+				(CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID(), false, CX2Room::TN_NONE, CX2GUNPC::NCT_NONE );
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL shadow bolt spawn ( ground %d, my unit %d ) power rate %.2f", static_cast<int>( bGroundFound ), static_cast<int>( IsMyUnit() ), m_fShadowBoltPowerRate );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		m_fShadowBoltTime = SHADOW_BOLT_STACK_TIME;
+
+		int iExtraStackCount = 0;
+		const int iNobleDevotionLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LCN_NOBLE_DEVOTION, false, 0, true );
+		if ( 0 < iNobleDevotionLevel )
+		{
+			const CX2SkillTree::SkillTemplet* pNobleDevotionTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_P_LCN_NOBLE_DEVOTION );
+			if ( NULL != pNobleDevotionTemplet )
+				iExtraStackCount = static_cast<int>( pNobleDevotionTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_COUNT, iNobleDevotionLevel, false ) + SHADOW_BOLT_ROUND_UP );
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL shadow bolt stacks %d", iExtraStackCount + SHADOW_BOLT_BASE_STACK_COUNT );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		const int iShadowBoltLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT, false, 0, true );
+		const int iStackCount = iExtraStackCount + SHADOW_BOLT_BASE_STACK_COUNT;
+		for ( UCHAR ucStackIndex = 0; ucStackIndex < iStackCount; ++ucStackIndex )
+			SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_SHADOW_BOLT, iShadowBoltLevel, NULL, 0, false );	// 7ai arguments
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3b: June 32b2ff50 ( thunk 32b4e1d0 ): from 0.6 s the control state starts when the spear is there; else the end state, unless the buff is on and the game is still playable;
+// the input is cleared
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_START_EventProcess()
+{
+	if ( SHADOW_BOLT_AIM_START_TIME <= GetXSkinAnimFuture()->GetNowAnimationTime() )
+	{
+		if ( NULL != g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID ) )
+			StateChange( LSI_SA_LCN_SHADOW_BOLT_CONTROL, false );
+		else if ( false == HaveThisBuff( BTI_BUFF_SHADOW_BOLT ) || false == IsEventGamePlayable( false ) )
+			StateChange( LSI_SA_LCN_SHADOW_BOLT_END, false );
+	}
+
+	m_InputData.Init();
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3b: June 32b30560 ( thunk 32b4e1f0 ): the spear takes the camera
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	CX2GUNPC* pSpearNpc = g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID );
+	if ( NULL != pSpearNpc )
+	{
+		pSpearNpc->SetFocusCamera( true );
+		pSpearNpc->SetFocusCameraForce( true );
+		pSpearNpc->SetApplyCinematicUI( false );
+	}
+}
+
+// char-luciel CH3b: June 32b30500, 32b305c0 .. 32b30860 ( thunks 32b4e1e0 .. 32b4e280 ): each control state starts the spear's own state of the move ( StateChange_LUA by name )
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_IDLE_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_IDLE" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_LEFT_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_LEFT" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_RIGHT_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_RIGHT" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_UP" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_DOWN" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_LEFT_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_UP_LEFT" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_RIGHT_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_UP_RIGHT" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_LEFT_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_DOWN_LEFT" );
+}
+
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_RIGHT_StateStart()
+{
+	CommonStateStart();
+	StateChangeShadowBoltSpear( "SHOT_SHADOW_BOLT_DOWN_RIGHT" );
+}
+
+// char-luciel CH3b: June's inlined tail of the nine control state starts ( 32b30500 .. 32b30860 ): the spear, when it is there, goes to its own state at once
+void CX2GULuciel::StateChangeShadowBoltSpear( const char* pszSpearStateName_ )
+{
+	CX2GUNPC* pSpearNpc = g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID );
+	if ( NULL != pSpearNpc )
+		pSpearNpc->StateChange_LUA( pszSpearStateName_, true );
+}
+
+// char-luciel CH3b: June 32b30090 ( thunk 32b4e200, all control states ): while the held key stays down and the buff is on, the keys pick the spear's move; the spear's offset to the user
+// ( June multiplies the positions by the user's direction one component at a time ) only blocks the upward moves once the spear is 1500 above the user; the end state when the key is released
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess()
+{
+	int iNextStateID = LSI_SA_LCN_SHADOW_BOLT_END;
+	bool bTestSameState = false;
+
+	if ( false == m_kSkillSlotKey.IsKeyReleased( m_InputData ) && true == HaveThisBuff( BTI_BUFF_SHADOW_BOLT ) )
+	{
+		float fHorizontalOffset = 0.f;
+		float fVerticalOffset = 0.f;
+		bool bTestUpLeft = true;
+
+		CX2GUNPC* pSpearNpc = g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID );
+		if ( NULL != pSpearNpc )
+		{
+			const D3DXVECTOR3 vDirection = GetDirVector();
+			const D3DXVECTOR3 vUserPos = GetPos( false );
+			const D3DXVECTOR3 vSpearPos = pSpearNpc->GetPos( false );
+			const D3DXVECTOR3 vUserPosOnDirection( vUserPos.x * vDirection.x, vUserPos.y * vDirection.y, vUserPos.z * vDirection.z );
+			const D3DXVECTOR3 vSpearPosOnDirection( vSpearPos.x * vDirection.x, vSpearPos.y * vDirection.y, vSpearPos.z * vDirection.z );
+
+			// June compares the distance with -750 ( JUNE_BUGS ): the offsets below are never taken
+			if ( GetDistance( vUserPosOnDirection, vSpearPosOnDirection ) <= SHADOW_BOLT_CONTROL_NEAR_DISTANCE )
+			{
+				const float fDeltaX = vUserPosOnDirection.x - vSpearPosOnDirection.x;
+				fVerticalOffset = vUserPosOnDirection.y - vSpearPosOnDirection.y;
+				fHorizontalOffset = ( vUserPosOnDirection.z - vSpearPosOnDirection.z ) + fDeltaX;
+			}
+
+			if ( false == ( static_cast<double>( vUserPos.y ) + SHADOW_BOLT_CONTROL_HEIGHT_LIMIT > static_cast<double>( vSpearPos.y ) ) )
+				fVerticalOffset = static_cast<float>( fVerticalOffset - ( fVerticalOffset - SHADOW_BOLT_CONTROL_HEIGHT_LIMIT ) );
+
+			bTestUpLeft = ( 0.f <= fHorizontalOffset && fVerticalOffset <= 0.f );
+		}
+
+		bTestSameState = true;
+		if ( true == bTestUpLeft && true == m_InputData.pureUp && true == m_InputData.pureLeft )
+			iNextStateID = SHADOW_BOLT_CONTROL_UP_LEFT_STATE_ID;
+		else if ( fHorizontalOffset <= 0.f && fVerticalOffset <= 0.f && true == m_InputData.pureUp && true == m_InputData.pureRight )
+			iNextStateID = SHADOW_BOLT_CONTROL_UP_RIGHT_STATE_ID;
+		else if ( 0.f <= fHorizontalOffset && 0.f <= fVerticalOffset && true == m_InputData.pureDown && true == m_InputData.pureLeft )
+			iNextStateID = SHADOW_BOLT_CONTROL_DOWN_LEFT_STATE_ID;
+		else if ( fHorizontalOffset <= 0.f && 0.f <= fVerticalOffset && true == m_InputData.pureDown && true == m_InputData.pureRight )
+			iNextStateID = SHADOW_BOLT_CONTROL_DOWN_RIGHT_STATE_ID;
+		else if ( 0.f <= fHorizontalOffset && true == m_InputData.pureLeft )
+			iNextStateID = SHADOW_BOLT_CONTROL_LEFT_STATE_ID;
+		else if ( fHorizontalOffset <= 0.f && true == m_InputData.pureRight )
+			iNextStateID = SHADOW_BOLT_CONTROL_RIGHT_STATE_ID;
+		else if ( fVerticalOffset <= 0.f && true == m_InputData.pureUp )
+			iNextStateID = SHADOW_BOLT_CONTROL_UP_STATE_ID;
+		else if ( 0.f <= fVerticalOffset && true == m_InputData.pureDown )
+			iNextStateID = SHADOW_BOLT_CONTROL_DOWN_STATE_ID;
+		else
+			iNextStateID = LSI_SA_LCN_SHADOW_BOLT_CONTROL;
+	}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL shadow bolt control state %d ( now %d )", iNextStateID, GetNowStateID() );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	if ( false == bTestSameState || GetNowStateID() != iNextStateID )
+		StateChange( iNextStateID, false );
+
+	m_InputData.Init();
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3b: June 32b01d60 ( thunk 32b4c330 ): the animation end goes to the wait or the jump-down state by the foot; the cancel chain has no back-walk and no attack entry
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_END_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3b: June 32b30000 ( thunk 32b4e290 ): the spear gives the camera back, the user's camera follows the game's focus again
+void CX2GULuciel::LSI_SA_LCN_SHADOW_BOLT_END_StateEndFuture()
+{
+	CX2GUNPC* pSpearNpc = g_pX2Game->GetNPCUnitByUID( m_iShadowBoltNpcUID );
+	if ( NULL != pSpearNpc )
+	{
+		pSpearNpc->SetFocusCamera( false );
+		pSpearNpc->SetFocusCameraForce( false );
+		pSpearNpc->SetApplyCinematicUI( true );
+	}
+
+	g_pX2Game->InitFocusUnit();
+
+	CommonStateEndFuture();
+}
+
+// char-luciel CH3b: June 32b20a10 ( the class map's `?`, called by Twilight Judgement's state start ): the buff starts again with two stacks ( three when the skill is upgraded ) and the slot icons refresh
+void CX2GULuciel::StartTwilightJudgementBuff()
+{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL twilight judgement start ( upgraded %d )", static_cast<int>( IsNowStateSkillUpgraded() ) );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	m_fTwilightJudgementTime = 0.f;
+	EraseBuffTempletFromGameUnit( BTI_BUFF_TWILIGHT_JUDGEMENT );
+	SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_TWILIGHT_JUDGEMENT, 1, NULL, 0, false );	// 7ai arguments
+	SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_TWILIGHT_JUDGEMENT, 1, NULL, 0, false );	// 7ai arguments
+	if ( true == IsNowStateSkillUpgraded() )
+		SetBuffFactorToGameUnitByBuffFactorID( BFI_BUFF_TWILIGHT_JUDGEMENT, 1, NULL, 0, false );	// 7ai arguments
+
+	if ( true == IsMyUnit() )
+		g_pX2Game->UpdateSkillSlotUI( false );
+}
+
+// char-luciel CH3b: June 32b308c0 ( thunk 32b4e2a0 )
+void CX2GULuciel::LSI_SA_LCN_TWILIGHT_JUDGEMENT_StateStart()
+{
+	StartTwilightJudgementBuff();
+
+	CommonStateStart();
+}
+
+// char-luciel CH3b: June 32b308e0 ( thunk 32b4e2b0, both bodies ): each reattack uses one stack; June refreshes the slot icons a second time for every unit
+void CX2GULuciel::LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_StateStart()
+{
+	AddBuffAccumulationCount( BFI_BUFF_TWILIGHT_JUDGEMENT, -1, 1, 0 );
+	m_ucTwilightJudgementStackCount = GetBuffAccumulationCountNowInFactor( BTI_BUFF_TWILIGHT_JUDGEMENT );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL twilight judgement reattack stacks left %d", static_cast<int>( m_ucTwilightJudgementStackCount ) );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+
+	if ( true == IsMyUnit() )
+		g_pX2Game->UpdateSkillSlotUI( false );
+
+	g_pX2Game->UpdateSkillSlotUI( false );
+
+	CommonStateStart();
+}
+
+// char-luciel CH3b: June 32b01f80 ( thunk 32b4c340, both bodies ): the same listing as 32b01d60
+void CX2GULuciel::LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_EventProcess()
+{
+	LSI_SA_LCN_SHADOW_BOLT_END_EventProcess();
+}
+
+// char-luciel CH3b: June 32b39e90 ( thunk 32b4e650, both bodies ): once, at 0.8 s: the body's familiar buff goes to the last team mate in the list within 800 who can take a buff and to the user ( the mate's from the user ),
+// else to the user alone, its time grown by half
+void CX2GULuciel::LSI_A_LCN_F_SUMMON_FAMILIAR_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SUMMON_FAMILIAR_BUFF_TIME ) )
+	{
+		UINT uiBuffFactorID = BFI_BUFF_SUMMON_FAMILIAR_LU;
+		BUFF_TEMPLET_ID eBuffTempletID = BTI_BUFF_SUMMON_FAMILIAR_LU;
+		if ( true == IsMinorUnitActive() )
+		{
+			uiBuffFactorID = BFI_BUFF_SUMMON_FAMILIAR_CIEL;
+			eBuffTempletID = BTI_BUFF_SUMMON_FAMILIAR_CIEL;
+		}
+
+		EraseBuffTempletFromGameUnit( BTI_BUFF_SUMMON_FAMILIAR_LU );
+		EraseBuffTempletFromGameUnit( BTI_BUFF_SUMMON_FAMILIAR_CIEL );
+
+		CX2GameUnit* pPartnerUser = NULL;
+		for ( int iUserIndex = 0; iUserIndex < g_pX2Game->GetUserUnitNum(); ++iUserIndex )
+		{
+			CX2GameUnit* pUserUnit = g_pX2Game->GetUserUnit( iUserIndex );
+			if ( NULL != pUserUnit && pUserUnit->GetTeam() == GetTeam() )
+			{
+				if ( GetDistance( pUserUnit->GetPos( false ), GetPos( false ) ) < SUMMON_FAMILIAR_PARTNER_RANGE )
+				{
+					if ( true == pUserUnit->CanApplyBuffToGameUnit( BTI_NONE ) && pUserUnit != this && CX2GameUnit::GUT_USER == pUserUnit->GetGameUnitType() )
+						pPartnerUser = pUserUnit;
+				}
+			}
+		}
+
+		const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_LCN_SUMMON_FAMILIAR, false, 0, true );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL summon familiar body %c partner %d level %d", ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( NULL != pPartnerUser ), iSkillLevel );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		if ( NULL == pPartnerUser )
+		{
+			SetBuffFactorToGameUnitByBuffFactorID( uiBuffFactorID, iSkillLevel, NULL, 0, false );	// 7ai arguments
+
+			std::vector<CX2BuffFinalizerTempletPtr> vecFinalizer;
+			GetBuffFinalizerTempletPtrList( eBuffTempletID, vecFinalizer );
+			for ( std::vector<CX2BuffFinalizerTempletPtr>::iterator vit = vecFinalizer.begin(); vit != vecFinalizer.end(); ++vit )
+			{
+				CX2BuffTimeFinalizerTemplet* pTimeFinalizer = dynamic_cast<CX2BuffTimeFinalizerTemplet*>( vit->get() );
+				if ( NULL != pTimeFinalizer )
+					pTimeFinalizer->SetDurationTime( static_cast<float>( pTimeFinalizer->GetDurationTime() * SUMMON_FAMILIAR_DURATION_RATE ) );
+			}
+			ChangeBuffFinalizerTempletPtrList( eBuffTempletID, vecFinalizer );
+		}
+		else
+		{
+			pPartnerUser->EraseBuffTempletFromGameUnit( BTI_BUFF_SUMMON_FAMILIAR_LU );
+			pPartnerUser->EraseBuffTempletFromGameUnit( BTI_BUFF_SUMMON_FAMILIAR_CIEL );
+			SetBuffFactorToGameUnitByBuffFactorID( uiBuffFactorID, iSkillLevel, NULL, 0, false );	// 7ai arguments
+			pPartnerUser->SetBuffFactorToGameUnitByBuffFactorID( uiBuffFactorID, iSkillLevel, this, 0, false );	// 7ai arguments
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3b: June 32b0e710 ( thunk 32b4c780 ) / 32b0e850 ( thunk 32b4c7a0 ): the ready state's animation end lands on the ground and starts the loop with the count of the skill's attack
+// number ( the Soul Collector stacks add to it ); in the air it falls
+void CX2GULuciel::SoulSpreadReadyEventProcess( const int iLoopStateID_ )
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( false == m_FrameDataFuture.unitCondition.bFootOnLine )
+		{
+			StateChange( LSI_LU_JUMP_DOWN );
+		}
+		else
+		{
+			const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_A_LCN_SOUL_SPREAD, false, 0, true );
+			if ( 0 < iSkillLevel )
+			{
+				const CX2SkillTree::SkillTemplet* pSoulSpreadTemplet = g_pData->GetSkillTree()->GetSkillTemplet( CX2SkillTree::RNSI_A_LCN_SOUL_SPREAD );
+				if ( NULL != pSoulSpreadTemplet )
+					m_iSoulSpreadCount = static_cast<int>( pSoulSpreadTemplet->GetSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_COUNT, iSkillLevel, false ) );
+			}
+
+			if ( true == HaveThisBuff( BTI_BUFF_SOUL_COLLECTOR ) )
+				m_iSoulSpreadCount += GetBuffAccumulationCountNowInFactor( BTI_BUFF_SOUL_COLLECTOR );
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL soul spread loops %d", m_iSoulSpreadCount );	// char-luciel CH3b
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			StateChange( iLoopStateID_ );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3b: June 32b0e7f0 ( thunk 32b4c790 ) / 32b0e930 ( thunk 32b4c7b0 ), the class map's StateEndFuture ( June registers them in the event process slot ): each animation end
+// starts the loop again while more than one count is left, else the end state
+void CX2GULuciel::SoulSpreadLoopEventProcess( const int iLoopStateID_, const int iEndStateID_ )
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( 0 < m_iSoulSpreadCount - 1 )
+		{
+			StateChange( iLoopStateID_ );
+			--m_iSoulSpreadCount;
+		}
+		else
+		{
+			StateChange( iEndStateID_ );
+		}
+	}
+
+	CommonEventProcess();
+}
+
+void CX2GULuciel::LSI_A_LCN_SOUL_SPREAD_LU_READY_EventProcess()
+{
+	SoulSpreadReadyEventProcess( LSI_A_LCN_SOUL_SPREAD_LU_LOOP );
+}
+
+void CX2GULuciel::LSI_A_LCN_SOUL_SPREAD_LU_LOOP_EventProcess()
+{
+	SoulSpreadLoopEventProcess( LSI_A_LCN_SOUL_SPREAD_LU_LOOP, LSI_A_LCN_SOUL_SPREAD_LU_END );
+}
+
+void CX2GULuciel::LSI_A_LCN_SOUL_SPREAD_CIEL_READY_EventProcess()
+{
+	SoulSpreadReadyEventProcess( LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP );
+}
+
+void CX2GULuciel::LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP_EventProcess()
+{
+	SoulSpreadLoopEventProcess( LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP, LSI_A_LCN_SOUL_SPREAD_CIEL_END );
+}
+
+// char-luciel CH3b: June 32b369b0 ( thunk 32b4e480; the Ciel loop's 32b36ba0 is the same listing ): once, at 0.01 s of each loop: the effect set, and one Soul Collector stack goes when the buff is on
+void CX2GULuciel::LSI_A_LCN_SOUL_SPREAD_LU_LOOP_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SOUL_SPREAD_EFFECT_TIME ) )
+	{
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LCN_Soul_Spread", this );
+
+		if ( true == HaveThisBuff( BTI_BUFF_SOUL_COLLECTOR ) )
+			AddBuffAccumulationCount( BFI_BUFF_SOUL_COLLECTOR, -1, 1, 0 );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3b: June 32b0e990 ( thunk 32b4c650, the fly state too ): the animation end waits or falls by the foot; the full cancel chain with the Z and X attacks
+void CX2GULuciel::LSI_SA_LCN_MAGDONIC_CANNON_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	else if ( m_fAttackCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfter
+		&& true == m_FrameDataFuture.unitCondition.bFootOnLine && true == m_InputData.pureZ )
+	{
+		StateChange( GetComboZStateID() );
+	}
+	else if ( m_fAttackCancelAfter >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfter
+		&& true == m_FrameDataFuture.unitCondition.bFootOnLine && true == m_InputData.pureX )
+	{
+		StateChange( GetComboXStateID() );
+	}
+	else if ( m_fAttackCancelAfterEx >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfterEx
+		&& true == m_FrameDataFuture.unitCondition.bFootOnLine && true == m_InputData.oneZ )
+	{
+		StateChange( GetComboZStateID() );
+	}
+	else if ( m_fAttackCancelAfterEx >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfterEx
+		&& true == m_FrameDataFuture.unitCondition.bFootOnLine && true == m_InputData.oneX )
+	{
+		StateChange( GetComboXStateID() );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3b: June 32aea5c0 ( thunk 32b4b380 ): Rain of Chaos has nothing to preload ( a bare ret )
+void CX2GULuciel::LSI_SA_LCN_RAIN_OF_CHAOS_Init()
+{
+}
+
+// char-luciel CH3b: June 32aea5d0 ( thunk 32b4b390 )
+void CX2GULuciel::LSI_SA_LCN_RAIN_OF_CHAOS_StateStart()
+{
+	CommonStateStart();
+}
+
+// char-luciel CH3b: June 32aea5e0 ( thunk 32b4b3a0 ): the Soul Collector stacks are used up
+void CX2GULuciel::LSI_SA_LCN_RAIN_OF_CHAOS_StateEnd()
+{
+	CommonStateEnd();
+
+	EraseBuffTempletFromGameUnit( BTI_BUFF_SOUL_COLLECTOR );
+}
+
 // char-luciel CH3a: June @32b466c5 ( the transcendence memo ) and @32b46ab5 ( id 10018 ), the same registration: Dancing Blade on both slot states and its loop state
 void CX2GULuciel::RegisterDancingBladeStates( UserUnitStateData& rNormalStateData_, UserUnitStateData& rHyperStateData_ )
 {
@@ -20303,6 +21201,263 @@ void CX2GULuciel::RegisterDancingBladeStates( UserUnitStateData& rNormalStateDat
 				stateData.m_bSkillState				= true;	// June @32b4a25e byte +0x11
 				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_BLUFF_LU_Init );	// June 32b4b500: Lu's preload, through the delegate maker 32b4c930
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LCN_SWIFT_SMASH:	// char-luciel CH3b: June @32b47749 ( ids 30210 / 30312 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_F_SWIFT_SMASH", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_SWIFT_SMASH_Init );	// June 32b4b130
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_SWIFT_SMASH_EventProcess );	// June 32b4c320
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_SWIFT_SMASH_FrameMove );	// June 32b4e6f0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_F_SWIFT_SMASH", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCN_M_SWIFT_SMASH;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_M_SWIFT_SMASH", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b477d4 byte +0x11
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_SWIFT_SMASH_EventProcess );	// June 32b4c320: the female body's
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_SWIFT_SMASH_FrameMove );	// June 32b4e6f0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCN_SPECTRAL_SPEAR:	// char-luciel CH3b: June @32b477f9 ( ids 30024 / 30074 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SPECTRAL_SPEAR", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SPECTRAL_SPEAR_Init );	// June 32b4b140
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SPECTRAL_SPEAR_FrameMove );	// June 32b4e1b0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SPECTRAL_SPEAR", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCN_SHADOW_BOLT:	// char-luciel CH3b: June @32b47851 ( ids 30016 / 30071 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_START", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_START_Init );	// June 32b4b150
+				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_START_StateStartFuture );	// June 32b4b160
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_START_FrameMove );	// June 32b4e1c0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_START_EventProcess );	// June 32b4e1d0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_START", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateStartFuture		= normalStateData.StateStartFuture;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				// June @32b47921 .. @32b47ae9: nine control states ( 405 .. 413 ) on one Lua table; the first also has the start future; every one has the control event process
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCN_SHADOW_BOLT_CONTROL;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_IDLE_StateStart );	// June 32b4e1e0
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_StateStartFuture );	// June 32b4e1f0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_LEFT_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_LEFT_StateStart );	// June 32b4e210
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_RIGHT_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_RIGHT_StateStart );	// June 32b4e220
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_UP_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_StateStart );	// June 32b4e230
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_DOWN_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_StateStart );	// June 32b4e240
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_UP_LEFT_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_LEFT_StateStart );	// June 32b4e250
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_UP_RIGHT_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_UP_RIGHT_StateStart );	// June 32b4e260
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_DOWN_LEFT_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_LEFT_StateStart );	// June 32b4e270
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= SHADOW_BOLT_CONTROL_DOWN_RIGHT_STATE_ID;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_CONTROL", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_DOWN_RIGHT_StateStart );	// June 32b4e280
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_EventProcess );	// June 32b4e200
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCN_SHADOW_BOLT_END;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SHADOW_BOLT_END", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_CONTROL_IDLE_StateStart );	// June 32b4e1e0: the control state's idle start
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_END_EventProcess );	// June 32b4c330
+				stateData.StateEndFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SHADOW_BOLT_END_StateEndFuture );	// June 32b4e290
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCN_TWILIGHT_JUDGEMENT:	// char-luciel CH3b: June @32b47b40 ( ids 30022 / 30072 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_TWILIGHT_JUDGEMENT", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_TWILIGHT_JUDGEMENT_Init );	// June 32b4b170
+				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_TWILIGHT_JUDGEMENT_StateStart );	// June 32b4e2a0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_TWILIGHT_JUDGEMENT", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.StateStart			= normalStateData.StateStart;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_StateStart );	// June 32b4e2b0
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_EventProcess );	// June 32b4c340
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCN_M_TWILIGHT_JUDGEMENT_REATTACK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_M_TWILIGHT_JUDGEMENT_REATTACK", stateData.stateID );
+				stateData.StateStart				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_StateStart );	// June 32b4e2b0: the female body's
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_F_TWILIGHT_JUDGEMENT_REATTACK_EventProcess );	// June 32b4c340
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCN_SOUL_LOCK:	// char-luciel CH3b: June @32b4920e ( id 30057 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SOUL_LOCK", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_SOUL_LOCK_Init );	// June 32b4b330
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_SOUL_LOCK", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCN_MAGDONIC_CANNON:	// char-luciel CH3b: June @32b49261 ( id 30058 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_MAGDONIC_CANNON", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_MAGDONIC_CANNON_Init );	// June 32b4b340
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_MAGDONIC_CANNON_EventProcess );	// June 32b4c650
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_MAGDONIC_CANNON", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LCN_MAGDONIC_CANNON_FLY;
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_MAGDONIC_CANNON_FLY", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b492d9 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_MAGDONIC_CANNON_Init );	// June 32b4b340
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_MAGDONIC_CANNON_EventProcess );	// June 32b4c650
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LCN_RAIN_OF_CHAOS:	// char-luciel CH3b: June @32b49532 ( id 30084 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_RAIN_OF_CHAOS", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_RAIN_OF_CHAOS_Init );	// June 32b4b380
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				normalStateData.StateStart			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_RAIN_OF_CHAOS_StateStart );	// June 32b4b390
+				normalStateData.StateEnd			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LCN_RAIN_OF_CHAOS_StateEnd );	// June 32b4b3a0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LCN_RAIN_OF_CHAOS", hyperStateData.stateID );
+				CopyStateCallbacks( hyperStateData, normalStateData );	// June 329cc2c0: the hyper state takes all nine
+			} break;
+
+		case CX2SkillTree::RNSI_A_LCN_SUMMON_FAMILIAR:	// char-luciel CH3b: June @32b49b78 ( ids 30208 / 30311 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_F_SUMMON_FAMILIAR", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_F_SUMMON_FAMILIAR_Init );	// June 32b4b490
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_F_SUMMON_FAMILIAR_FrameMove );	// June 32b4e650
+
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_F_SUMMON_FAMILIAR", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCN_M_SUMMON_FAMILIAR;
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_M_SUMMON_FAMILIAR", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b49c03 byte +0x11
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_F_SUMMON_FAMILIAR_FrameMove );	// June 32b4e650: the female body's
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LCN_SOUL_SPREAD:	// char-luciel CH3b: June @32b4a37d ( id 30305 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_LU_READY", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_LU_READY_Init );	// June 32b4c950 > 32b4b510
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_LU_READY_EventProcess );	// June 32b4c970 > 32b4c780
+
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_LU_READY", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCN_SOUL_SPREAD_LU_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_LU_LOOP", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_LU_LOOP_EventProcess );	// June 32b4c990 > 32b4c790 ( the class map's StateEndFuture, registered in this slot )
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_LU_LOOP_FrameMove );	// June 32b4e500 > 32b4e480
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCN_SOUL_SPREAD_LU_END;
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_LU_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cd4a0 > 329cba60
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCN_SOUL_SPREAD_CIEL_READY;
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_CIEL_READY", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b4a4d3 byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_LU_READY_Init );	// June 32b4c950 > 32b4b510: Lu's preload
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_CIEL_READY_EventProcess );	// June 32b4c9b0 > 32b4c7a0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP;
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_CIEL_LOOP_EventProcess );	// June 32b4c9d0 > 32b4c7b0
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LCN_SOUL_SPREAD_LU_LOOP_FrameMove );	// June 32b4e520 > 32b4e490 ( 32b36ba0 = 32b369b0's listing )
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LCN_SOUL_SPREAD_CIEL_END;
+				m_LuaManager.MakeTableReference( "LSI_A_LCN_SOUL_SPREAD_CIEL_END", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cd4a0 > 329cba60
 				m_StateList[stateData.stateID] = stateData;
 			} break;
 

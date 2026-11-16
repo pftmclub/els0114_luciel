@@ -681,6 +681,12 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_TWILIGHT_JUDGEMENT                    = 482,	// June's Enum.lua; Lu/Ciel's Twilight Judgement reattack needs it
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-16 // char-luciel CH3b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_BUFF_SUMMON_FAMILIAR_LU                    = 476,	// June's Enum.lua; Summon Familiar's buff on Lu
+	BTI_BUFF_SUMMON_FAMILIAR_CIEL                  = 477,	// June's Enum.lua; Summon Familiar's buff on Ciel
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-15 // char-luciel CH2c2
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	BTI_BUFF_SHADOW_LU                             = 478,	// June's Enum.lua; Shadow's buff on Lu
@@ -1043,6 +1049,13 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_NOBLE_BEING                  = 540,	// June's Enum.lua; applied by Tribute ( 30409 ) once the Soul Collector stack is full
 	BFI_BUFF_SHADOW_LU                    = 545,	// June's Enum.lua; Shadow's factor on Lu
 	BFI_BUFF_SHADOW_CIEL                  = 546,	// June's Enum.lua; Shadow's factor on Ciel
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-16 // char-luciel CH3b
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_BUFF_SUMMON_FAMILIAR_LU           = 543,	// June's Enum.lua; Summon Familiar's factor on Lu
+	BFI_BUFF_SUMMON_FAMILIAR_CIEL         = 544,	// June's Enum.lua; Summon Familiar's factor on Ciel
+	BFI_BUFF_TWILIGHT_JUDGEMENT           = 549,	// June's Enum.lua; Twilight Judgement's stacks
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 //{{ Iruha : 2026-11-16 // char-luciel CH4a

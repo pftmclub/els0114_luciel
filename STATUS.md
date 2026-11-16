@@ -240,7 +240,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 |---|---|---|---|---|---|
 | DU5d2 | ready (june-engine R14f reviewed 2026-11-16; split from DU5d): back body's emotions, window equip tint `31f93920`, other `SetUnitScale` callers | Opus 5.5 / high, Opus review, user play-test | R14f | `X2UnitViewerUI.*`, create / select states | `DU5d2.md` |
 | CH3a | done (2026-11-16, play-test passed, logs read): Dread Lord (127) skills; `_SKILL_DEBUG` stays on until the CH3b review ( it covers CH3a ) | Sonnet 5.5 / high, no review of its own (CH3b review covers it), user play-test | CH2d2 review, CH3a0 review | `X2GULuciel.*` | `CH3a.md` |
-| CH3b | ready (CH3a play-test passed 2026-11-16): Noblesse (128) skills | Sonnet 5.5 / high, Opus review (also covers CH3a), user play-test | CH3a | `X2GULuciel.*` | `CH3b.md` |
+| CH3b | built (2026-11-16), play-test owed on `LuNoA` / `LuNoB`: Noblesse (128) skills; `_SKILL_DEBUG` stays on until the CH3b review ( it covers CH3a ) | Sonnet 5.5 / high, Opus review (also covers CH3a), user play-test | CH3a | `X2GULuciel.*` | `CH3b.md` |
 | CH3c | blocked (CH3b review; CH1i2 + review, DU1 review done): Demonio (129) skills part 1, `CUSTOM_RENDER_STATE` | Sonnet 5.5 / high, no review of its own (CH3c2 review covers it), user play-test | CH3b review, CH1i2, DU1 review | `X2GULuciel.*` | `CH3c.md` |
 | CH3c2 | blocked (CH3c): Demonio (129) skills part 2 | Sonnet 5.5 / high, Opus review (also covers CH3c), user play-test | CH3c, CH3c20 review (done) | `X2GULuciel.*` | `CH3c2.md` |
 | CH3d | blocked (CH3c2 review): hyper actives + transcendence rows, both bodies' cut-ins | Opus 5.5 / high, Opus review, user play-test | CH3c2 review | `X2GULuciel.*`, `X2GUUser.cpp`, data koms | `CH3d.md` |
