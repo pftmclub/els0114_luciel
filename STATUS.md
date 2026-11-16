@@ -239,7 +239,7 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| DU5d | **user play-test** (2026-11-16): Lu / Ciel weapon glow, enchant, +11 / +13 particles on the shown body; trace per body; effect-set duo arg; then `DU5d-review.md` | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2UnitViewerUI.*` | `DU5d.md` |
+| DU5d | **review ready** (play-test passed 2026-11-16): Lu / Ciel weapon glow, enchant, +11 / +13 particles on the shown body; trace per body; effect-set duo arg; next `DU5d-review.md` | Opus 5.5 / high, Opus review, user play-test | DU5b2 review | `X2UnitViewerUI.*` | `DU5d.md` |
 | DU5d2 | blocked (DU5d review, june-engine R14f; split from DU5d): back body's emotions, window equip tint `31f93920`, other `SetUnitScale` callers | Opus 5.5 / high, Opus review, user play-test | DU5d review, R14f | `X2UnitViewerUI.*`, create / select states | `DU5d2.md` |
 | CH3a | ready (CH3a0 review passed 2026-11-16): Dread Lord (127) skills; Summon Darkness spawns 1906 / 1937 ( CH3a0 set them up ) | Sonnet 5.5 / high, no review of its own (CH3b review covers it), user play-test | CH2d2 review, CH3a0 review | `X2GULuciel.*` | `CH3a.md` |
 | CH3b | blocked (CH3a): Noblesse (128) skills | Sonnet 5.5 / high, Opus review (also covers CH3a), user play-test | CH3a | `X2GULuciel.*` | `CH3b.md` |
