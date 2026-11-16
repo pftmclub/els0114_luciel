@@ -1563,6 +1563,50 @@ it (`equip=0/107/106/0/0/95/89`, as in S1's `0/7/6/...`): no `ITEMSTAT` line cam
 `GetStat` (list, usable, group or PvP test), while the Cobo weapon in the same slot counts. The emulator would count 62119 ( same filters on
 the save row ), so window and game stat disagree with that weapon equipped. Not June ( June's window sums the equipped weapon ).
 
+### Phase S2 - Review (2026-11-16)
+
+**Verdict: pass after one fix (the emulator).** Reviewed `39ba4025` (+ the `Handlers_Room.cpp` hunk in `c3b7e545`) against June's exe in Ghidra
+(read-only).
+
+**The open finding: the window is June; the emulator was not.** 62119 never enters the unit's normal equip list. June's item.kim gives it use type
+0 (`UT_NONE`; flags `0x21112006`, bits 8-11 = 0; no model name), as every Henir's Time and Space piece (432 weapons, 1,373 armour pieces with use
+type 0 in the staged kim; the Cobo weapon 113300 is `UT_SKIN`). June refuses such an item in both list builders: `AddEqip` `323574c0` with
+`bCheck` (`templet +4 & 0xf00` == 0 -> return 0, before the `+0x284` push) and `ResetEqip` `32355e40` (the same test before the fashion /
+normal push). Every own-unit packet caller passes `bCheck` 1 (@31ed4b1a, @323baad5, @323bd35a). March's `IsPossibleAddEqip` (`GetUseType() ==
+UT_NONE`) is the same test, so `GetEqipStat` (June `3234e210` reads the filtered `+0xcb0` list) never sees 62119, in June as in the port. The
+kickoff's premise "June's window sums the equipped weapon" was wrong; no `EQIPSKIP` line was needed. Flag layout re-checked: `FLAG_POS_USE_TYPE`
+8 / 4 bits, `FLAG_BIT_NO_EQUIP` 4 (`X2Item_Preprocessing.inl:484-495`).
+**Fix (`_EQUIP_STAT`, `X2OfflineInventory.cpp` `SumEquippedItemStat`):** the emulator skips a use-type-0 item as June's list builders do, and a
+PC-bang-only equip (the client's item has an owner, so `IsUsableEquip` = 328825c0's stand-in refuses it; the emulator's ownerless item passed).
+`EqipAbility` / `EqipConflict` (class, level, slot clash) stay unmirrored: the client's equip UI enforces them and a saved slot cannot break them
+later. Side note, not routed: the emulator lets a use-type-0 item into an equip slot (it shows in the slot, adds nothing).
+
+**Spot-checks (Ghidra).**
+- `GetStat` `328842f0` = the port: templet `+0xc0` NULL -> zero stat; PvP bit 7 or the 22 ids (`334c0cb8`-`334c0d10`) -> `328d6d70` with the owner
+  (`+0xc4`) or `g_pData +0x68 +0x90`, nothing when neither; else `328d6f60( 0, 0 )` with that unit's level or 0; floats [6..12] `+= `, then
+  `32882630( stat, added )`; the socket loops test game types 2 / 3 / 5 (vslot `0x10c`).
+- Level rule @328d71ac: `use level == 0` and `!( templet +4 >> 4 & 1 )` (NoEquip) -> the unit level (`[esp+0xf0]`) = the port. Range @32882841:
+  `atk * templet +0x2c * (double)[334436a0]` stored as float into `+0x24` / `+0x28` = `GetDamageRangeStat`.
+- `CX2Unit::GetEnchantStat` `32358df0`: the show tests' 16 calls all take the function's own option bytes; its only callers pass 0 / 1
+  (CharInfo `32916160` @329161dd-329161ff: bytes `+0x259` / `+0x258` and the group; Elesis @32b8119a: `( 1, 0, 0, 0 )`), so June's tail for another
+  flag byte is unreachable. The 45-case switch runs @32358efa-32359588, the first show test @323595cf: the emulation covers the whole tree.
+- `python june2017_re/statcalc/emu_equip_stat.py`: `EMU_EQUIP_STAT: 96 resist sets ( 45 EDT cases in the port ), 300 range sets, 133 enchant sets, 0
+  mismatch(es) -> PASS`.
+- Emulator `GetEquippedItemStat` = the two client bodies for the character's own class and level (the client's UT_NONE resolves to the calculator's
+  selected unit = the same class; enchant added level 0); base stat carries no range (S1's `AddBaseWeaponRange` compiled out at both sites).
+
+**Gates** (`finish.py --review --commits 39ba4025 c3b7e545 --with EQUIP_STAT DEBUG -v`): flagcheck EQUIP_STAT `RESULT: PASS` (9 PASS, 2 PASS~
+blank / marker lines outside the flag, 1 DEFINE, 3 OTHER = `c3b7e545`'s `Always.h` and drop-table files, owned by field-rewards R2; 0 deleted;
+the 38 EOL-mismatched lines are LF lines in the mixed-EOL sources, as the Done note says); `_STATCALC_DEBUG` sits on no changed directive line
+(its blocks are inside EQUIP_STAT); junediverge `--check` and `--check-all` `RESULT: PASS`; enumscan exit 1 on the same 190 rows from before S2
+(e.g. `X2Unit.cpp:6591` skill ids), none on S2's lines. Fix gate (`finish.py --files X2Lib/Offline/X2OfflineInventory.cpp --with EQUIP_STAT -v`): flagcheck `RESULT:
+PASS` (1 PASS, 0 OTHER, 0 deleted), junediverge `RESULT: PASS`, enumscan exit 0, `FINISH RESULT: PASS (6 gates, 0 failed, 3 skipped)`.
+Build: `DEPLOY OK: X2_offline.exe is 27,204,608 B, dated 2026-11-16 15:20:03, md5 f87b25c6abac0bdbb76342573579294e, equal to
+X2/US_SERVICE/x2.exe (2026-11-16 15:19:56); built at main a6edaf9d + 3 uncommitted code file(s)` (`X2OfflineInventory.obj` 15:19:33, after the
+fix; peers' files built in too). No new strings (the fix logs nothing; `SHEET emu` names the counted weapon). `_STATCALC_DEBUG` stays on (Z).
+S3 kickoff: Depends now names this review and its play-test.
+Play-test owed: testlu1 with 62119 equipped, `SHEET window` total = `SHEET emu` game, `weapon=0`.
+
 ## Phase Z - Close
 
 **Scope.** `MODS.md` complete, the map has no `March` / `mixed` / `unknown` row, `tools/data/june_diverge_allow.tsv` holds no `stage33`

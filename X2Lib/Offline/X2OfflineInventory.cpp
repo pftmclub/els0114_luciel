@@ -569,6 +569,9 @@ CX2Stat::Stat CX2OfflineInventory::SumEquippedItemStat( const int iEquipGroup, c
 		if( NULL == pTemplet )
 			continue;
 
+		if( CX2Item::UT_NONE == pTemplet->GetUseType() )
+			continue;	// june-stat-calc S2 review: June's unit lists no use-type-0 item ( AddEqip 323574c0, ResetEqip 32355e40: templet +4 & 0xf00 )
+
 		if( false == pTemplet->GetFashion() )
 		{
 			KInventoryItemInfo kInfo;
@@ -577,6 +580,8 @@ CX2Stat::Stat CX2OfflineInventory::SumEquippedItemStat( const int iEquipGroup, c
 			const CX2Item kItem( kItemData, NULL );
 			if( false == kItem.IsUsableEquip() || true == pTemplet->GetPvpEquip() )
 				continue;
+			if( true == g_pData->GetItemManager()->IsDivisionItem( CX2ItemManager::DITT_PC_BANG_ONLY_EQUIPMENT, pTemplet->GetItemID() ) )
+				continue;	// june-stat-calc S2 review: the client's item has an owner, so 328825c0 never passes a PC-bang-only equip
 		}
 
 		CX2Stat::Stat kItemStat;
