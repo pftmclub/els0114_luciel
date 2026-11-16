@@ -247,8 +247,8 @@ Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` · branch `main` · log tag `[JUNE_CHAR]`
 | CH3c | blocked (CH3b review; CH1i2 + review, DU1 review done): Demonio (129) skills part 1, `CUSTOM_RENDER_STATE` | Sonnet 5.5 / high, no review of its own (CH3c2 review covers it), user play-test | CH3b review, CH1i2, DU1 review | `X2GULuciel.*` | `CH3c.md` |
 | CH3c2 | blocked (CH3c): Demonio (129) skills part 2 | Sonnet 5.5 / high, Opus review (also covers CH3c), user play-test | CH3c, CH3c20 review (done) | `X2GULuciel.*` | `CH3c2.md` |
 | CH3d | blocked (CH3c2 review): hyper actives + transcendence rows, both bodies' cut-ins | Opus 5.5 / high, Opus review, user play-test | CH3c2 review | `X2GULuciel.*`, `X2GUUser.cpp`, data koms | `CH3d.md` |
-| CH4a | ready (CH2d2 review done 2026-11-16): passive state, delegate lists (9 of InitState's 10), flag `_PASSIVE` | Opus 5.5 / high, no review of its own (CH4b review covers it), user play-test | CH2d2 review | `X2GULuciel.*` | `CH4a.md` |
-| CH4b | blocked (CH4a): damage exception + overrides | Opus 5.5 / high, Opus review (also covers CH4a), user play-test | CH4a | `X2GULuciel.*`, `X2GUUser.*` | `CH4b.md` |
+| CH4a | **user play-test** (2026-11-16): InitPassiveSkillState + the 10 delegates, 15 passives; hit-from-behind byte + slot-251 hook routed to CH4b; then CH4b | Opus 5.5 / high, no review of its own (CH4b review covers it), user play-test | CH2d2 review | `X2GULuciel.*` | `CH4a.md` |
+| CH4b | blocked (CH4a play-test): damage exception + overrides, + DD `+0x5c0` hit-from-behind byte and slot-251 hook `3204dcd0` (from CH4a) | Opus 5.5 / high, Opus review (also covers CH4a), user play-test | CH4a | `X2GULuciel.*`, `X2GUUser.*`, `X2GameUnit.*`, `X2DamageManager.h`, `X2GUNPC.cpp` | `CH4b.md` |
 | CH4c | blocked (CH4b review): memo and item readers (`MemoConditionLuciel`) | Opus 5.5 / high, Opus review, user play-test | CH4b review | `X2GULuciel.*`, `X2BuffTemplet.cpp`, `X2Game.cpp` | `CH4c.md` |
 | CH6 | blocked: scans rerun + user walk incl. creation, tutorial, job change and the becoming-transcended transition | Sonnet 5.5 / medium, user walk | CH3d, CH4c, CH5, TU reviews | docs, save | `CH6.md` |
 | Z | blocked (CH6): close-out, `MODS.md`, "Template for Stage 8", `stage8-plan` -> `char-rose` | Sonnet 5.5 / medium | CH6 | `MODS.md`, backlog, docs | `Z.md` |
@@ -281,7 +281,7 @@ Done: D0 (2026-11-12, reviewed: ledger 55 ranges holds in the exe; map rows 12 /
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| D6 | **sheets written 2026-11-16** (8 in `playtest.md`, 16 units D6<Name>S/N uid 204-219); owes: play-test each sheet one at a time, then "check logs" per character; review writes after all 8 | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |
+| D6 | **Elsword sheet passed 2026-11-16** (308 hits: rate, chain, react, 0 failures; sockets add nothing -> lead to S3); other 7 sheets not run (user: too long); owes: D6 review decides the gate | Sonnet 5.5 / high; review Opus 5.5 / high | D5 review | docs, save DB | `D6.md` |
 | S0 | reviewed 2026-11-16: pass after map fixes (13 rows: roll index, 4 reader lists, phase names; `320839e0` row -> S4); owes: the designed-attack-range decision before S1 (Done note) | Opus 5.5 / xhigh; review Opus 5.5 / high | - | `june2017_re/statcalc/statcalc_map.tsv`, funcmap rows, kickoffs | `S0-review.md` |
 | S1 | blocked (S0 review, Stages 7 + 8 closed, D6 review): the stat block (Stat [9] / [10], 7-field KStat, SetGameStats, SetGameStat, readers, SHEET) | Opus 5.5 / high, Opus review | S0 review, Stages 7 + 8, D6 review | `X2Stat.*`, `X2Unit.*`, `X2GameUnit.*`, `CommonPacket.h`, `Offline/*` | `S1.md` |
 | S1b | blocked (S1): ResetMaxHP, CalcHitDodgePercent + the +0xe8 roll offset, the ability map | Opus 5.5 / high, Opus review | S1 review | `X2GUUser.*`, `X2DamageManager.*`, `X2UnitManager.*`, `X2GUNPC.*` | `S1b.md` |

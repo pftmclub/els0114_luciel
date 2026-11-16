@@ -1119,7 +1119,14 @@ the next uid, no sockets. Skill ids were read from June's `NewSkillTempletVer2.s
 **Map gate:** the one damage row still `March`, `dodge roll index offset (NPC stat byte +0xe8)`, is routed to S1b by the S0 review.
 **Throttle:** the debug lines print once a second per attacker / monster pair, so the sheets say to pause 2 s between hit kinds; the log does not name normal vs command.
 
-**Results per character:** (filled in as each sheet is run).
+**Results.** `python tools/statcalc_check.py --units 204 205 --socket 204 205` (new; rules RATE / CHAIN / ZERO / REACT / SOCKET) over the Elsword run
+(2026-11-16 09:15-09:22, exe md5 2a1a963a, log copy kept in the session scratchpad; 308 hits: units 204 / 205 against Soless monsters 2350-2354 (level 89), 530-533,
+1466 / 1469 / 1470 (Elder Secret Hell, level 104) and the incoming hits): RATE 308 / 308 = defence / ( dlv x 39.35 + 258.65 + defence ); CHAIN 308 / 308 (`GFD2 base` = motion x drate,
+`GFD2 dmg` = `HIT dmg`); REACT 308 / 308 (HP before - after = `dmg` +-1); every `dmg=0` has `motion=0` or, for six incoming hits, `state=0.0000` (the player's own state takes no
+damage: not a formula fault). **Elsword: pass.** Lead for S3: the socketed unit 204 reads the same `patk` as the plain 205 (21299 on both; sockets 20 / 220 are in the save), so flat
+socket attack / defence did not reach the unit's attack here (`socket=0.0000` rates too); S3 checks the socket aggregate with a real socketed item (reyaa, unit 12).
+**The other seven sheets are not run (user, 2026-11-16: too long).** The shared formula (rate, chain, react) is proven on 308 hits; D2b / D4b already played Raven, Aisha and Eve, and
+the class blocks are the char ports' own (each play-tested there). The D6 review decides whether that closes the gate.
 
 ## Phase S0 - Stat-sheet and resource map (read-only)
 
