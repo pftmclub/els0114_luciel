@@ -7271,3 +7271,10 @@ Flags `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON`, `SERV_IRUHADEV_JUNE_SUMMON_HELPER
 - **Data.** data036 `Enum.lua` 3 `NPC_UNIT_ID` names; data037 `NPCTemplet.lua` June's 5 rows verbatim ( marked block at the end ).
 - **Differs from March.** March had no Lu/Ciel; the summon hook reached users only; `SetSummonHelperInfo` had no flag 0x10 ( a new `m_fSummonedStatRateByPassive`, 1.0 until Rose's Mechanic Mastery writes it ).
 - **Revert:** comment out the flag(s), `touch X2Lib/stdafx.cpp`, `python tools/build.py --deploy`; the Lua rows are inert without a spawn ( restore the koms from `kom_backup_tools\data036.kom.20261116_090330` / `data037.kom.20261116_090331` to drop them ).
+
+## Stage 8 Lu/Ciel, CH3a: Dread Lord skills (char-luciel CH3a, 2026-11-16)
+
+Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` (no new define); `SERV_IRUHADEV_JUNE_ENUM_NAMES` for `BFI_DEBUFF_SUPPRESSION_OBLIVION` ( 529 ); `..._LUCIEL_SKILL_DEBUG` is on again for the play-test ( the CH3b review retires it ). Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` "CH3a - Done".
+- **What changes in game.** A Dread Lord ( 127 ) can equip and cast Supreme Punishment, Summon Darkness ( the summon is created at 0.01 s; a second cast ends it ), Phantom Blade ( a hit arms the attack, a miss returns half the cost ), Oblivion ( Ciel's execution: enemies within 800 of the point 500 in front of the user whose HP is under the attack-rate line die, bosses and enchanted units get a debuff ), Fear Tomorrow, Dead Cross, Demonic Cannon, Terror Absorption, Shackling Chain ( the held key starts the dash attack ), Bluff and Dancing Blade ( id 10018 and the transcendence memo's path ), with their enhanced versions.
+- **Differs from March.** March had no Lu/Ciel. June's memo reader is a stub, so Oblivion's memo branches ( x1.3, range 960 ) never run; Dancing Blade's loop needs the transcendence memo ( CH4c's readers ), without it the key shows the lack-of-MP pop-up as June does.
+- **Revert:** back out the commit `char-luciel Phase CH3a` ( every CH3a hunk is insert-only inside `_SKILL`, plus the setter cases ); `LuDlA` / `LuDlB` ( units 223 / 224 ) are test characters only.

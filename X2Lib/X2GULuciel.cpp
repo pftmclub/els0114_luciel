@@ -18569,6 +18569,612 @@ void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture()
 
 	ResetPhantomRushReady();
 }
+
+// char-luciel CH3a: Dread Lord ( 127 ) skills ( Oblivion, Dancing Blade, Phantom Blade, Summon Darkness, Supreme Punishment, Fear Tomorrow, Dead Cross, Demonic Cannon, Fear Absorption, Chains of Bondage, Bluff )
+namespace _CONST_LUCIEL_CH3A_
+{
+	const float		OBLIVION_EXECUTE_TIME					= 2.1f;		// June 32b2b9c0 ( 334f20cc ): the oneshot timer of Oblivion's frame move
+	const double	OBLIVION_FRONT_DISTANCE					= 500.0;	// June 32b1fc90 ( 33458fa8 ): the point the enemies are measured from, in front of the user
+	const float		OBLIVION_RANGE							= 800.f;	// June 32b1fc90 ( 33471300 ); the memo's 960 never applies ( June's memo reader is a stub )
+	const float		SUMMON_DARKNESS_SPAWN_TIME				= 0.01f;	// June 32b2f3f0 ( 33437810 )
+	const double	SUMMON_DARKNESS_SHARE_KEY_CODE_SCALE	= 100.0;	// June 32b20260 ( 3342f360 ): the damage share rate x 100 is the summon's key code
+	const float		CHAINS_OF_BONDAGE_PROJECTILE_TIME		= 0.01f;	// June 32b30970 ( 33437810 )
+	const double	PHANTOM_BLADE_FAIL_MP_REFUND_RATE		= 0.5;		// June 32ae7c90 ( 3342ebc8 ): a missed Phantom Blade gives half of its cost back
+	const double	PHANTOM_BLADE_UNIT_WIDTH_RATE			= 0.5;		// June 32b2f1c0 ( 3342ebc8 )
+	const double	PHANTOM_BLADE_STAND_MARGIN				= 30.0;		// June 32b2f1c0 ( 33439c68 )
+	const float		PHANTOM_BLADE_STAND_LAND_RADIUS			= 30.f;		// June 32b2f1c0 ( 334ed3f8 )
+	const double	PHANTOM_BLADE_STAND_MAX_DISTANCE		= 500.0;	// June 32b2f1c0 ( 33458fa8 )
+	const int		DANCING_BLADE_MAX_LOOP_COUNT			= 3;		// June 32b3c3b0 @32b3c497
+}
+using namespace _CONST_LUCIEL_CH3A_;
+
+// char-luciel CH3a: June 32ae6cf0, the preload ( thunk 32b4afb0 )
+void CX2GULuciel::LSI_SA_LLC_OBLIVION_Init()
+{
+	TextureReadyInBackground( L"DRYAD_Fire01.dds" );
+	TextureReadyInBackground( L"KA_EvilFace01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece02.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"LLC_Slicer01.dds" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	TextureReadyInBackground( L"SlashLight.dds" );
+	TextureReadyInBackground( L"Star.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam02.Y" );
+	XMeshReadyInBackground( L"LCG_M_Beam04.Y" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XSkinMeshReadyInBackground( L"ANGER_FOREST_ENT_Special_Attack.X" );
+	XSkinMeshReadyInBackground( L"LD_Attack_Cross01.X" );
+	XSkinMeshReadyInBackground( L"LLC_DARK_CRESCENT_M01.X" );
+	XSkinMeshReadyInBackground( L"LLC_OBLIVION_Cross_M.X" );
+	XSkinMeshReadyInBackground( L"SI_SA_LLC_OBLIVION_MASIN.X" );
+}
+
+// char-luciel CH3a: June 32b2b9c0 ( thunk 32b4e120 ): once, at 2.1 s of the animation, the execution
+void CX2GULuciel::LSI_SA_LLC_OBLIVION_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( OBLIVION_EXECUTE_TIME ) )
+		ApplyOblivionToEnemies();
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3a: June 32b000f0 ( thunk 32b4c250 ): the animation end goes to wait; the cancel chain has no back-walk entry
+void CX2GULuciel::LSI_SA_LLC_OBLIVION_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3a: June 32b1fc90 ( the class map's `?`, called by Oblivion's frame move ): every enemy within 800 of the point 500 in front of the user dies when its HP is
+// under the skill's attack-rate line ( the PvP line in a PvP-or-PvE game ); a boss or enchanted unit, or one above the line, gets the suppression debuff instead
+void CX2GULuciel::ApplyOblivionToEnemies()
+{
+	if ( true == GetRidingOn() )
+		return;
+
+	// June reads memo 0x94edf here ( x1.3 on both lines, range 960 ); its reader 31fca9e0 is a stub that answers 0, so the memo is never applied
+	float fHpLineOnPve = 1.f;
+	float fHpLineOnPvp = 1.f;
+	const int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_SA_LLD_OBLIVION, false, 0, true );
+	if ( iSkillLevel > 0 )
+	{
+		const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LLD_OBLIVION, true );
+		if ( NULL != pSkillTemplet )
+		{
+			const float fAtkPhysic = GetStat().GetStat().m_fAtkPhysic;
+			fHpLineOnPve = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_PHYSIC_REL, iSkillLevel, false ) * fAtkPhysic;
+			fHpLineOnPvp = pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_ATK_PHYSIC_REL_PVP, iSkillLevel, false ) * fAtkPhysic;
+		}
+	}
+
+	for ( int iUnitIndex = 0; iUnitIndex < g_pX2Game->GetUnitNum(); ++iUnitIndex )
+	{
+		CX2GameUnit* pEnemyUnit = g_pX2Game->GetUnit( iUnitIndex );
+		if ( NULL == pEnemyUnit || pEnemyUnit->GetTeam() == GetTeam() )
+			continue;
+
+		D3DXVECTOR3 vFrontPos = GetPos( false );
+		const D3DXVECTOR3& vDir = GetDirVector();
+		if ( true == GetIsRight() )
+		{
+			vFrontPos.x += static_cast<float>( vDir.x * OBLIVION_FRONT_DISTANCE );
+			vFrontPos.y += static_cast<float>( vDir.y * OBLIVION_FRONT_DISTANCE );
+			vFrontPos.z += static_cast<float>( vDir.z * OBLIVION_FRONT_DISTANCE );
+		}
+		else
+		{
+			vFrontPos.x -= static_cast<float>( vDir.x * OBLIVION_FRONT_DISTANCE );
+			vFrontPos.y -= static_cast<float>( vDir.y * OBLIVION_FRONT_DISTANCE );
+			vFrontPos.z -= static_cast<float>( vDir.z * OBLIVION_FRONT_DISTANCE );
+		}
+
+		const float fDistance = GetDistance( vFrontPos, pEnemyUnit->GetPos( false ) );
+		if ( true == pEnemyUnit->GetInvincible() )
+			continue;
+
+		if ( false == ( fDistance < OBLIVION_RANGE ) )
+			continue;
+
+		bool bResistsExecution = false;	// June reads GetInvincible again here ( every true answer was skipped above )
+		if ( CX2GameUnit::GUT_NPC == pEnemyUnit->GetGameUnitType() )
+		{
+			// June vslot 0x1bc ( the weapon's extra damage type ) and the NPC grade member +0x8f08 ( grades 1 and 2 are March's two raid getters; grade 3 is never set offline )
+			if ( CX2DamageManager::EDT_NONE != pEnemyUnit->GetEnchantExtraDamageType() || true == pEnemyUnit->GetIsBosRaidNPC() || true == pEnemyUnit->GetIsMiddleBosRaidNPC() )
+				bResistsExecution = true;
+		}
+
+		const float fHpLine = ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ? fHpLineOnPvp : fHpLineOnPve );
+		if ( fHpLine < pEnemyUnit->GetNowHp() || true == bResistsExecution )
+		{
+			pEnemyUnit->SetBuffFactorToGameUnitByBuffFactorID( BFI_DEBUFF_SUPPRESSION_OBLIVION, iSkillLevel, this, 0, false );	// 7ai arguments
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL oblivion debuff unit hp %.0f line %.0f resists %d", pEnemyUnit->GetNowHp(), fHpLine, static_cast<int>( bResistsExecution ) );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		}
+		else
+		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL oblivion kill unit hp %.0f line %.0f", pEnemyUnit->GetNowHp(), fHpLine );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			pEnemyUnit->SetNowHp( 0.f );
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LLC_OBLIVION_Death", pEnemyUnit );
+		}
+	}
+}
+
+// char-luciel CH3a: June 32ae7b50, the preload ( thunk 32b4ae60 )
+void CX2GULuciel::LSI_SA_LLD_DANCING_BLADE_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"PET_SILVERFOX_MIHOEffect02.tga" );
+	XSkinMeshReadyInBackground( L"SA_LLD_DANCING_BLADE_Ground.x" );
+	XSkinMeshReadyInBackground( L"SA_LLD_DANCING_BLADE_Shadow.x" );
+	XMeshReadyInBackground( L"SA_LLD_PHANTOM_BLADE_DashWind.Y" );
+	TextureReadyInBackground( L"Smoke.dds" );
+}
+
+// char-luciel CH3a: June 32ae7bc0 ( thunk 32b4ae70 ): the held key follows the slot the skill was cast from; each cast counts one loop
+void CX2GULuciel::LSI_SA_LLD_DANCING_BLADE_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	++m_usDancingBladeLoopCount;
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+}
+
+// char-luciel CH3a: June 32ae7bf0 ( thunk 32b4ae90 )
+void CX2GULuciel::LSI_SA_LLD_DANCING_BLADE_LOOP_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	++m_usDancingBladeLoopCount;
+}
+
+// char-luciel CH3a: June 32ae7c10 ( thunk 32b4ae80, both states ): the count restarts unless the next state is the loop
+void CX2GULuciel::LSI_SA_LLD_DANCING_BLADE_StateEndFuture()
+{
+	if ( LSI_SA_LLD_DANCING_BLADE_LOOP != m_FrameDataFuture.syncData.nowState )
+		m_usDancingBladeLoopCount = 0;
+
+	CommonStateEndFuture();
+}
+
+// char-luciel CH3a: June 32b3c3b0 ( thunk 32b4e6a0, the loop state registers it too ): the key pressed in its window arms the next strike; at the strike time the memo's
+// skill pays its cost and the loop state starts ( 3 loops at most ), or the lack of MP is shown; the animation end turns the user round and waits
+void CX2GULuciel::LSI_SA_LLD_DANCING_BLADE_EventProcess()
+{
+	m_kSkillSlotKey.FollowSlotSwap();
+
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		m_FrameDataFuture.syncData.bIsRight = !m_FrameDataFuture.syncData.bIsRight;
+		StateChange( LSI_LU_WAIT );
+	}
+	else if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0]
+		&& ( m_fEventTime[0].stateChange < GetXSkinAnimFuture()->GetNowAnimationTime() || true == GetXSkinAnimFuture()->IsAnimationEnd() ) )
+	{
+		if ( m_usDancingBladeLoopCount < DANCING_BLADE_MAX_LOOP_COUNT )
+		{
+			const int iMemoSkillID = GetTranscendenceMemoSkillID( GetNowStateSkillID() );
+			bool bLoopStarted = false;
+			if ( 0 != iMemoSkillID )
+			{
+				const double dNowMp = GetNowMp();
+				if ( false == ( GetActualMPConsume( static_cast<CX2SkillTree::SKILL_ID>( iMemoSkillID ), 1 ) > dNowMp ) )
+				{
+					m_FrameDataFuture.syncData.bIsRight = !m_FrameDataFuture.syncData.bIsRight;
+					UpNowMp( -GetActualMPConsume( CX2SkillTree::SI_SA_LLD_DANCING_BLADE, 1 ) );
+					StateChange( LSI_SA_LLD_DANCING_BLADE_LOOP );
+					bLoopStarted = true;
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL dancing blade loop start count %d", static_cast<int>( m_usDancingBladeLoopCount ) );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+				}
+			}
+
+			if ( false == bLoopStarted )
+			{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+				CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL dancing blade no loop ( memo skill %d, count %d )", iMemoSkillID, static_cast<int>( m_usDancingBladeLoopCount ) );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+				PushInfoText( GET_STRING( STR_ID_2549 ) );
+			}
+		}
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = false;
+	}
+	else if ( true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData )
+		&& GetXSkinAnimFuture()->GetNowAnimationTime() < m_fEventTime[0].keyInputEnd
+		&& m_fEventTime[0].keyInputStart <= GetXSkinAnimFuture()->GetNowAnimationTime() )
+	{
+		m_FrameDataFuture.stateParam.bEventFlagList[0] = true;
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	else if ( m_fAttackCancelAfterEx >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfterEx
+		&& true == m_FrameDataFuture.unitCondition.bFootOnLine && true == m_InputData.oneZ )
+	{
+		StateChange( GetComboZStateID() );
+	}
+	else if ( m_fAttackCancelAfterEx >= 0.f && GetXSkinAnimFuture()->GetNowAnimationTime() > m_fAttackCancelAfterEx
+		&& true == m_FrameDataFuture.unitCondition.bFootOnLine && true == m_InputData.oneX )
+	{
+		StateChange( GetComboXStateID() );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3a: June 32ae7c40, the preload ( thunk 32b4b0f0 )
+void CX2GULuciel::LSI_SA_LLD_PHANTOM_BLADE_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	XMeshReadyInBackground( L"SA_LLD_PHANTOM_BLADE_DashWind.Y" );
+	TextureReadyInBackground( L"Smoke.dds" );
+}
+
+// char-luciel CH3a: June 32ae7c90 ( thunk 32b4b100 ): a hit armed the attack ( event flag 0 ); at the event time without one the skill fails and half of its cost comes back
+void CX2GULuciel::LSI_SA_LLD_PHANTOM_BLADE_EventProcess()
+{
+	if ( true == m_FrameDataFuture.stateParam.bEventFlagList[0] )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL phantom blade attack ( hit armed )" );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		StateChange( LSI_SA_LLD_PHANTOM_BLADE_ATTACK );
+	}
+	else if ( m_fEventTime[0].stateChange <= m_FrameDataFuture.unitCondition.fStateTime )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL phantom blade fail ( no hit, half the cost returns )" );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		UpNowMpWithText( static_cast<float>( GetActualMPConsume( GetUpgradeSwappedSkillID( CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE ), 1 ) * PHANTOM_BLADE_FAIL_MP_REFUND_RATE ) );
+		StateChange( LSI_SA_LLD_PHANTOM_BLADE_FAIL );
+	}
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3a: June 32b2f1c0 ( thunk 32b4e190 ): the attack starts in front of the make-target, facing it; the position changes only when a normal enabled line lies within 500
+void CX2GULuciel::LSI_SA_LLD_PHANTOM_BLADE_ATTACK_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	CX2GameUnit* pTargetUnit = g_pX2Game->GetUnitByUIDAndType( GetMakeTargetUnitUID(), GetMakeTargetGameUnitType() );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL phantom blade attack start target found %d", static_cast<int>( NULL != pTargetUnit ) );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	if ( NULL == pTargetUnit )
+		return;
+
+	const D3DXVECTOR3 vTargetPos = pTargetUnit->GetPos( false );
+	D3DXVECTOR3 vStandPos = GetPos( false );
+	const float fStandDistance = static_cast<float>( pTargetUnit->GetUnitWidth( false ) * PHANTOM_BLADE_UNIT_WIDTH_RATE + PHANTOM_BLADE_STAND_MARGIN );
+	g_pX2Game->GetWorld()->GetLineMap()->GetFixedDistancePositionForWeaponTaker( &vTargetPos, fStandDistance, !pTargetUnit->GetIsRight(), vStandPos );	// June ignores the result
+
+	int iLandLineIndex = -1;
+	vStandPos = g_pX2Game->GetWorld()->GetLineMap()->GetLandPosition( vStandPos, true, PHANTOM_BLADE_STAND_LAND_RADIUS, &iLandLineIndex );
+
+	const CKTDGLineMap::LineData* pLandLineData = g_pX2Game->GetWorld()->GetLineMap()->GetLineData( iLandLineIndex );
+	if ( NULL != pLandLineData && CKTDGLineMap::LT_NORMAL == pLandLineData->lineType && true == pLandLineData->bEnable )
+	{
+		if ( GetDistance( GetPos( false ), vStandPos ) < PHANTOM_BLADE_STAND_MAX_DISTANCE )
+		{
+			m_FrameDataFuture.syncData.position = vStandPos;
+			m_FrameDataFuture.syncData.bIsRight = !pTargetUnit->GetIsRight();
+		}
+	}
+}
+
+// char-luciel CH3a: June 32ae7d20, the preload ( thunk 32b4b110 )
+void CX2GULuciel::LSI_SA_LLD_SUMMON_DARKNESS_Init()
+{
+	XSkinMeshReadyInBackground( L"LLD_SummonDarknessAttackA_T01.X" );
+	XSkinMeshReadyInBackground( L"LLD_SummonDarknessAttackA_T02.X" );
+	XSkinMeshReadyInBackground( L"LLD_SummonDarknessAttackA2_T01.X" );
+	XSkinMeshReadyInBackground( L"LLD_SummonDarknessAttackA2_T02.X" );
+	TextureReadyInBackground( L"DRYAD_Fire01.dds" );
+	XSkinMeshReadyInBackground( L"Demension_Blader_Laser.X" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	XMeshReadyInBackground( L"ADE_FORCE_NOVA_P01.Y" );
+	XMeshReadyInBackground( L"LLD_SummonDarknessC_Wave01.Y" );
+	XSkinMeshReadyInBackground( L"SKA_flame_spark.X" );
+	XSkinMeshReadyInBackground( L"Summon_SKA_Effect_Rock.X" );
+	TextureReadyInBackground( L"WhitePoint.dds" );
+	XSkinMeshReadyInBackground( L"rena_A_karma_sparkLight.X" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+}
+
+// char-luciel CH3a: June 32b2f3f0 ( thunk 32b4e1a0 ): once, at 0.01 s: a second cast while the buff runs ends it, else the summon is created
+void CX2GULuciel::LSI_SA_LLD_SUMMON_DARKNESS_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SUMMON_DARKNESS_SPAWN_TIME ) )
+	{
+		if ( true == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+			CancelSummonDarkness();
+		else
+			CreateSummonDarknessNPC();
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3a: June 32b20260 ( the class map's `?` ): the summon of the first cast ( the PvP one in a PvP-or-PvE game ) with the damage share rate as its key code; the slot icons refresh
+void CX2GULuciel::CreateSummonDarknessNPC()
+{
+	m_fSummonedDarknessElapsedTime = 0.f;
+
+	const CX2SkillTree::SkillTemplet* pSkillTemplet = GetEquippedActiveSkillTemplet( CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS, true );
+	if ( NULL == pSkillTemplet || NULL == GetUnit() )
+		return;
+
+	int iSkillLevel = GetUnit()->GetUnitData().m_UserSkillTree.GetSkillLevel( pSkillTemplet->m_eID, false, 0, true );
+	if ( iSkillLevel < 1 )
+		iSkillLevel = 1;
+
+	const int iDamageShareKeyCode = static_cast<int>( pSkillTemplet->GetSkillAbilityValue( CX2SkillTree::SA_DAMAGED_REL, iSkillLevel, false ) * SUMMON_DARKNESS_SHARE_KEY_CODE_SCALE );
+	if ( false == HaveThisBuff( BTI_BUFF_SUMMON_DARKNESS ) )
+	{
+		const CX2UnitManager::NPC_UNIT_ID eSummonNpcID = ( true == g_pX2Game->GetIsNowPVPCorrectionGame()
+			? CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS_PVP : CX2UnitManager::NUI_SI_SA_LLD_SUMMON_DARKNESS );
+		const D3DXVECTOR3 vSummonPos = GetPos( false );
+		if ( true == IsMyUnit() )	// June's gate ( vslot 0x198 ) is the first argument of CreateNPCReq
+		{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL summon darkness create npc %d key %d body %c", static_cast<int>( eSummonNpcID ), iDamageShareKeyCode, ( true == IsMinorUnitActive() ? L'C' : L'L' ) );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+			g_pX2Game->CreateNPCReq( eSummonNpcID, ( true == IsHyperState() ? 1 : 0 ), true, vSummonPos, GetIsRight(), 0.f, true, iDamageShareKeyCode,
+				(CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID(), false, CX2Room::TN_NONE, CX2GUNPC::NCT_CHANGESTAGE_REMAIN );
+		}
+	}
+
+	if ( true == IsMyUnit() )
+		g_pX2Game->UpdateSkillSlotUI( false );
+}
+
+// char-luciel CH3a: June 32ae7e30, the preload ( thunk 32b4b120 )
+void CX2GULuciel::LSI_SA_LLD_SUPREME_PUNISHMENT_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"Arme_ComboX3Up.tga" );
+	TextureReadyInBackground( L"Curse02.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare02.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	XSkinMeshReadyInBackground( L"SA_LLD_DANCING_BLADE_Ground.x" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	TextureReadyInBackground( L"WhitePointSmall.dds" );
+	TextureReadyInBackground( L"secretVelder_alchemystBoss_magicAttackA_dust.dds" );
+	XSkinMeshReadyInBackground( L"RVC_SA_ignitionCrow_crow.X" );
+}
+
+// char-luciel CH3a: June 32b018d0 ( thunk 32b4c310 ): the animation end goes to the wait or the jump-down state by the foot, then the full cancel chain
+void CX2GULuciel::LSI_SA_LLD_SUPREME_PUNISHMENT_EventProcess()
+{
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		if ( true == m_FrameDataFuture.unitCondition.bFootOnLine )
+			StateChange( LSI_LU_WAIT );
+		else
+			StateChange( LSI_LU_JUMP_DOWN );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	BWALK_CANCEL_AFTER_ON_LINE_( m_fBWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3a: June 32aea120, the preload ( thunk 32b4b310 )
+void CX2GULuciel::LSI_SA_LLD_FEAR_TOMORROW_Init()
+{
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	TextureReadyInBackground( L"Explosion_Light02.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	XSkinMeshReadyInBackground( L"LD_M_DashJumpComboZX01.X" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"LD_Slicer_trace_01.dds" );
+	TextureReadyInBackground( L"RingAlpha.dds" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"SpreadLight03_Gray.dds" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning02.Y" );
+}
+
+// char-luciel CH3a: June 32aea1b0, the preload ( thunk 32b4b320 )
+void CX2GULuciel::LSI_SA_LLD_DEAD_CROSS_Init()
+{
+	XSkinMeshReadyInBackground( L"ABOX_150x50x50_Center.x" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"DRYAD_Fire01.dds" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare09.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	XSkinMeshReadyInBackground( L"LLC_DARK_CRESCENT_M01.X" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XMeshReadyInBackground( L"Roo_highLightMagical.Y" );
+	TextureReadyInBackground( L"Roo_highLightMagical02.dds" );
+	XSkinMeshReadyInBackground( L"SI_SA_LLD_DEAD_CROSS_EFFECT.X" );
+	XMeshReadyInBackground( L"raven_powrUp_M_lightning02.Y" );
+}
+
+// char-luciel CH3a: June 32aea5b0 ( thunk 32b4b370 ): Demonic Cannon has nothing to preload ( a bare ret )
+void CX2GULuciel::LSI_SA_LLD_DEMONIC_CANNON_Init()
+{
+}
+
+// char-luciel CH3a: June 32ae81b0, the preload ( thunk 32b4b460 )
+void CX2GULuciel::LSI_A_LLD_F_FEAR_ABSORPTION_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XMeshReadyInBackground( L"SA_LLD_PHANTOM_BLADE_DashWind.Y" );
+	TextureReadyInBackground( L"Smoke.dds" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare_Piece01.dds" );
+	TextureReadyInBackground( L"LD_STR_TuKang.dds" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+}
+
+// char-luciel CH3a: June 32ae8240, the preload ( thunk 32b4b470 )
+void CX2GULuciel::LSI_A_LLD_F_CHAINS_OF_BONDAGE_Init()
+{
+	TextureReadyInBackground( L"LCG_Ring01.dds" );
+	TextureReadyInBackground( L"LCN_MagicSquare001.dds" );
+	TextureReadyInBackground( L"LD_Explosion_Sphere.dds" );
+	TextureReadyInBackground( L"LD_MagicSquare06.dds" );
+	XSkinMeshReadyInBackground( L"LLC_M_BACKSTAB_Mesh01.X" );
+	XSkinMeshReadyInBackground( L"LLC_M_BACKSTAB_Mesh02.X" );
+	XMeshReadyInBackground( L"Lire_Uplight01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.x" );
+	XSkinMeshReadyInBackground( L"A_LLD_CHAINS_OF_BONDAGE_RESTRICTION.x" );
+	TextureReadyInBackground( L"LD_MagicSquare02.dds" );
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	TextureReadyInBackground( L"Curse02.dds" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_M_Trace01.dds" );
+	TextureReadyInBackground( L"PET_SILVERFOX_MIHOEffect02.tga" );
+	XMeshReadyInBackground( L"SA_LLD_PHANTOM_BLADE_DashWind.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"Smoke.dds" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	TextureReadyInBackground( L"ALS_NECROMANCY_SMILE_FOX_Cycle01.dds" );
+	TextureReadyInBackground( L"Gate_Light02_Gray.dds" );
+	TextureReadyInBackground( L"secretVelder_alchemystBoss_magicAttackA_dust.dds" );
+}
+
+// char-luciel CH3a: June 32ae8360 ( thunk 32b4b480, both bodies ): the held key follows the slot the skill was cast from
+void CX2GULuciel::LSI_A_LLD_F_CHAINS_OF_BONDAGE_StateStartFuture()
+{
+	CommonStateStartFuture();
+
+	m_kSkillSlotKey.Set( m_iNowSpecialAttack - 1 );
+}
+
+// char-luciel CH3a: June 32b30970 ( thunk 32b4e420, both bodies ): once, at 0.01 s: the projectile effect set; an upgraded skill widens its life time by the skill's range value
+void CX2GULuciel::LSI_A_LLD_F_CHAINS_OF_BONDAGE_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( CHAINS_OF_BONDAGE_PROJECTILE_TIME ) )
+	{
+		const CX2EffectSet::Handle hEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SI_A_LLD_CHAINS_OF_BONDAGE_Projectile", this );
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL chains of bondage projectile body %c upgraded %d", ( true == IsMinorUnitActive() ? L'C' : L'L' ), static_cast<int>( IsNowStateSkillUpgraded() ) );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		if ( true == IsNowStateSkillUpgraded() )
+		{
+			g_pX2Game->GetEffectSet()->AddDamageEffectModifier( hEffectSet, EFFECT_MODIFIER_TAG_MAIN_MAX_LIFE_TIME,
+				GetLearnedSkillAbilityValue( CX2SkillTree::SA_SCOPE_ABS, GetNowStateSkillID() ), false );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3a: June 32b021a0 ( thunk 32b4c740, both bodies ): the held key at the event time starts the dash attack of the body; the cancel chain follows
+void CX2GULuciel::LSI_A_LLD_F_CHAINS_OF_BONDAGE_EventProcess()
+{
+	m_kSkillSlotKey.FollowSlotSwap();
+
+	if ( true == GetXSkinAnimFuture()->IsAnimationEnd() )
+	{
+		StateChange( LSI_LU_WAIT );
+	}
+
+	if ( m_fEventTime[0].stateChange <= GetXSkinAnimFuture()->GetNowAnimationTime() && true == m_kSkillSlotKey.IsKeyPressedOnce( m_InputData ) )
+	{
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL chains of bondage dash attack body %c", ( true == IsMinorUnitActive() ? L'C' : L'L' ) );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		StateChange( true == IsMinorUnitActive() ? LSI_A_LLD_M_CHAINS_OF_BONDAGE_DASH_ATTACK : LSI_A_LLD_F_CHAINS_OF_BONDAGE_DASH_ATTACK );
+	}
+	SKILL_CANCEL_AFTER( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-luciel CH3a: June 32ae9f40, the preload ( thunk 32b4b500 )
+void CX2GULuciel::LSI_A_LLD_BLUFF_LU_Init()
+{
+	XMeshReadyInBackground( L"ADE_PE01.Y" );
+	XMeshReadyInBackground( L"ADE_PS01.Y" );
+	XSkinMeshReadyInBackground( L"DummyAttackBox_50x50x50.X" );
+	TextureReadyInBackground( L"ELK_WIND_SLICER_01.dds" );
+	TextureReadyInBackground( L"LD_RingAlpha.dds" );
+	TextureReadyInBackground( L"Roo_flame01.dds" );
+	XSkinMeshReadyInBackground( L"Wind_Liner03.X" );
+	TextureReadyInBackground( L"eve_A_blink_light.dds" );
+	TextureReadyInBackground( L"LD_Slicer_trace_01.dds" );
+	XMeshReadyInBackground( L"ADE_FORCE_NOVA_P01.Y" );
+	XMeshReadyInBackground( L"SCA_CRIMSON_BREAK_P01.Y" );
+	TextureReadyInBackground( L"VERITABLE_PANDEMONIUM_T02.dds" );
+	TextureReadyInBackground( L"WhitePoint.dds" );
+	XSkinMeshReadyInBackground( L"LD_M_DashJumpComboZX01.X" );
+}
+
+// char-luciel CH3a: June @32b466c5 ( the transcendence memo ) and @32b46ab5 ( id 10018 ), the same registration: Dancing Blade on both slot states and its loop state
+void CX2GULuciel::RegisterDancingBladeStates( UserUnitStateData& rNormalStateData_, UserUnitStateData& rHyperStateData_ )
+{
+	m_LuaManager.MakeTableReference( "LSI_SA_LLD_DANCING_BLADE", rNormalStateData_.stateID );
+	rNormalStateData_.StateInit				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DANCING_BLADE_Init );	// June 32b4ae60
+	rNormalStateData_.StateStartFuture		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DANCING_BLADE_StateStartFuture );	// June 32b4ae70
+	rNormalStateData_.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DANCING_BLADE_EventProcess );	// June 32b4e6a0
+	rNormalStateData_.StateEndFuture		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DANCING_BLADE_StateEndFuture );	// June 32b4ae80
+
+	m_LuaManager.MakeTableReference( "LSI_SA_LLD_DANCING_BLADE", rHyperStateData_.stateID );
+	rHyperStateData_.m_bHyperState			= true;
+	rHyperStateData_.StateStartFuture		= rNormalStateData_.StateStartFuture;
+	rHyperStateData_.OnEventProcess			= rNormalStateData_.OnEventProcess;
+	rHyperStateData_.StateEndFuture			= rNormalStateData_.StateEndFuture;
+
+	UserUnitStateData stateData;
+	stateData.Init();
+	stateData.stateID						= LSI_SA_LLD_DANCING_BLADE_LOOP;
+	m_LuaManager.MakeTableReference( "LSI_SA_LLD_DANCING_BLADE_LOOP", stateData.stateID );
+	stateData.StateStartFuture				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DANCING_BLADE_LOOP_StateStartFuture );	// June 32b4ae90
+	stateData.OnEventProcess				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DANCING_BLADE_EventProcess );	// June 32b4e6a0
+	stateData.StateEndFuture				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DANCING_BLADE_StateEndFuture );	// June 32b4ae80
+	m_StateList[stateData.stateID] = stateData;
+}
+
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 
 // char-luciel CH1n: June 32b46580 ( vslot 0x7b4 ); its batch 3207c1a0 / 31fdf970 only re-protects the edited entries ( anti-tamper ), nothing to port
@@ -18606,6 +19212,9 @@ void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture()
 			return;
 
 		// June @32b466c5: LSI_SA_LLD_DANCING_BLADE on both slot states + LSI_SA_LLD_DANCING_BLADE_LOOP ( 380 ), registered by CH3a
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
+		RegisterDancingBladeStates( normalStateData, hyperStateData );	// char-luciel CH3a
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL
 		return;
 	}
 
@@ -19526,6 +20135,173 @@ void CX2GULuciel::LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture()
 				stateData.stateID					= LSI_A_LDB_M_PHANTOM_RUSH_TARGET;
 				m_LuaManager.MakeTableReference( "LSI_A_LDB_M_PHANTOM_RUSH_TARGET", stateData.stateID );
 				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDB_F_PHANTOM_RUSH_TARGET_StateStartFuture );	// June 32b4e580
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::SI_SA_LLD_DANCING_BLADE:	// char-luciel CH3a: June @32b46ab5 ( id 10018 ); the memo branch above registers the same states
+			{
+				RegisterDancingBladeStates( normalStateData, hyperStateData );
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LLD_OBLIVION:	// char-luciel CH3a: June @32b46fa2 ( ids 30014 / 30066 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LLC_OBLIVION", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLC_OBLIVION_Init );	// June 32b4afb0
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLC_OBLIVION_FrameMove );	// June 32b4e120
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLC_OBLIVION_EventProcess );	// June 32b4c250
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LLC_OBLIVION", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LLD_PHANTOM_BLADE:	// char-luciel CH3a: June @32b475e3 ( ids 30015 / 30067 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_PHANTOM_BLADE", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_PHANTOM_BLADE_Init );	// June 32b4b0f0
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_PHANTOM_BLADE_EventProcess );	// June 32b4b100
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_PHANTOM_BLADE", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LLD_PHANTOM_BLADE_ATTACK;
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_PHANTOM_BLADE_ATTACK", stateData.stateID );
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_PHANTOM_BLADE_ATTACK_StateStartFuture );	// June 32b4e190
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_SA_LLD_PHANTOM_BLADE_FAIL;
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_PHANTOM_BLADE_FAIL", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LLD_SUMMON_DARKNESS:	// char-luciel CH3a: June @32b476a7 ( ids 30013 / 30065 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_SUMMON_DARKNESS", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_SUMMON_DARKNESS_Init );	// June 32b4b110
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericSpecialActiveSkillEventProcess );	// June 329cbfc0 > 31fcc740
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_SUMMON_DARKNESS_FrameMove );	// June 32b4e1a0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_SUMMON_DARKNESS", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+				hyperStateData.OnFrameMove			= normalStateData.OnFrameMove;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LLD_SUPREME_PUNISHMENT:	// char-luciel CH3a: June @32b47715 ( ids 30012 / 30064 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_SUPREME_PUNISHMENT", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_SUPREME_PUNISHMENT_Init );	// June 32b4b120
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_SUPREME_PUNISHMENT_EventProcess );	// June 32b4c310
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_SUPREME_PUNISHMENT", hyperStateData.stateID );
+				CopyStateCallbacks( hyperStateData, normalStateData );	// June 329cc2c0: the hyper state takes all nine
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LLD_FEAR_TOMORROW:	// char-luciel CH3a: June @32b49160 ( id 30055 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_FEAR_TOMORROW", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_FEAR_TOMORROW_Init );	// June 32b4b310
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_FEAR_TOMORROW", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LLD_DEAD_CROSS:	// char-luciel CH3a: June @32b491b7 ( id 30056 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_DEAD_CROSS", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DEAD_CROSS_Init );	// June 32b4b320
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_DEAD_CROSS", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+			} break;
+
+		case CX2SkillTree::RNSI_SA_LLD_DEMONIC_CANNON:	// char-luciel CH3a: June @32b494fa ( id 30083 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_DEMONIC_CANNON", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LLD_DEMONIC_CANNON_Init );	// June 32b4b370
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_SA_LLD_DEMONIC_CANNON", hyperStateData.stateID );
+				CopyStateCallbacks( hyperStateData, normalStateData );	// June 329cc2c0: the hyper state takes all nine
+			} break;
+
+		case CX2SkillTree::RNSI_A_LLD_FEAR_ABSORPTION:	// char-luciel CH3a: June @32b499e0 ( ids 30204 / 30308 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_F_FEAR_ABSORPTION", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_FEAR_ABSORPTION_Init );	// June 32b4b460
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_F_FEAR_ABSORPTION", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LLD_M_FEAR_ABSORPTION;
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_M_FEAR_ABSORPTION", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b49a4b byte +0x11
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LLD_CHAINS_OF_BONDAGE:	// char-luciel CH3a: June @32b49a6c ( ids 30206 / 30309 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_F_CHAINS_OF_BONDAGE", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_CHAINS_OF_BONDAGE_Init );	// June 32b4b470
+				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_CHAINS_OF_BONDAGE_StateStartFuture );	// June 32b4b480
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_CHAINS_OF_BONDAGE_EventProcess );	// June 32b4c740
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_CHAINS_OF_BONDAGE_FrameMove );	// June 32b4e420
+
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_F_CHAINS_OF_BONDAGE", hyperStateData.stateID );
+				CopyStateCallbacks( hyperStateData, normalStateData );	// June 329cc2c0: the hyper state takes all nine
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LLD_F_CHAINS_OF_BONDAGE_DASH_ATTACK;
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_F_CHAINS_OF_BONDAGE_DASH_ATTACK", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LLD_M_CHAINS_OF_BONDAGE;
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_M_CHAINS_OF_BONDAGE", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b49b36 byte +0x11
+				stateData.StateStartFuture			= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_CHAINS_OF_BONDAGE_StateStartFuture );	// June 32b4b480: the female body's
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_CHAINS_OF_BONDAGE_EventProcess );	// June 32b4c740
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_F_CHAINS_OF_BONDAGE_FrameMove );	// June 32b4e420
+				m_StateList[stateData.stateID] = stateData;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LLD_M_CHAINS_OF_BONDAGE_DASH_ATTACK;
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_M_CHAINS_OF_BONDAGE_DASH_ATTACK", stateData.stateID );
+				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+				m_StateList[stateData.stateID] = stateData;
+			} break;
+
+		case CX2SkillTree::RNSI_A_LLD_BLUFF:	// char-luciel CH3a: June @32b4a1a4 ( id 30304 )
+			{
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_BLUFF_LU", normalStateData.stateID );
+				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_BLUFF_LU_Init );	// June 32b4b500
+				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
+
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_BLUFF_LU", hyperStateData.stateID );
+				hyperStateData.m_bHyperState		= true;
+				hyperStateData.OnEventProcess		= normalStateData.OnEventProcess;
+
+				stateData.Init();
+				stateData.stateID					= LSI_A_LLD_BLUFF_CIEL;
+				m_LuaManager.MakeTableReference( "LSI_A_LLD_BLUFF_CIEL", stateData.stateID );
+				stateData.m_bSkillState				= true;	// June @32b4a25e byte +0x11
+				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LLD_BLUFF_LU_Init );	// June 32b4b500: Lu's preload, through the delegate maker 32b4c930
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
 				m_StateList[stateData.stateID] = stateData;
 			} break;

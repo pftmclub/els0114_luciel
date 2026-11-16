@@ -4600,6 +4600,33 @@ Opus 5.5. **Pass, no code change.** Reviewed `ca2afe20` against June in Ghidra (
 - **Retired:** `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG` commented out in `Always.h`. Build skipped: debug retire only.
 - **CH3a kickoff amended:** Summon Darkness's spawn shape (FrameMove helper `32b20260`, 1906 / 1937 by `GetIsNowPVPCorrectionGame`, `CreateNPCReq` `@32b20486`).
 
+### CH3a - Done (2026-11-16)
+
+Sonnet 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL` ( no new define ); `SERV_IRUHADEV_JUNE_ENUM_NAMES` for `BFI_DEBUFF_SUPPRESSION_OBLIVION` = 529 ( `X2BuffFactor.h`, bytepatch ); `_SKILL_DEBUG` is **on** again for the play-test
+( `Always.h`, one inserted line; the CH3b review retires it ). No review of its own ( the CH3b review covers CH3a ). Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h`, `Always.h`, `MODS.md`, `funcmap.tsv` ( `grep "(CH3a)"`, 9 Luciel rows ),
+`JUNE_BUGS.md` ( 770 ), `kickoffs/char-luciel/CH3a_save.sql` ( new ).
+- **Written ( every `CH3a` row of `ch0_class_map.tsv`: 26 functions, the thunks are not; read with `charport_adis.py` and the setter listing ):** ten preloads ( generated from the listings ), Oblivion ( frame move, event process, the execution helper
+  `32b1fc90` = `ApplyOblivionToEnemies` ), Summon Darkness ( frame move + the spawn helper `32b20260` = `CreateSummonDarknessNPC`, Eve's `CreateNPCReq` shape ), Phantom Blade ( event process, attack start ), Supreme Punishment, Dancing Blade ( start, loop start,
+  end, event process ), Chains of Bondage ( start, frame move, event process, both bodies ), and the 12 setter cases: Oblivion, Phantom Blade ( + 381 / 382 ), Summon Darkness, Supreme Punishment, Fear Tomorrow, Dead Cross, Demonic Cannon, Fear Absorption ( + 377 ),
+  Chains ( + 376 / 378 / 379 ), Bluff ( + 575 ), Dancing Blade ( id 10018 ) and the memo branch ( one shared `RegisterDancingBladeStates` ). Dancing Blade is June's one duplicated registration, written once.
+- **Decoded, not guessed:** every offset of an extra state's registration with the stack-offset rule ( base = esp0 + 0x1c, a push moves later offsets by 4 ); the shared tails ( `32b46d06` = FM + EP copied to the hyper state, `32b47028` = all nine, `32b4a7e5` = register );
+  vslot 0x6a0 takes ( id, 1, 1 ) = `GetActualMPConsume( id, 1 )`; `0x260` = `IsMinorUnitActive()`; `0x4b0` / `0x4b4` = `GetComboZStateID()` / `GetComboXStateID()`; SA ids 7 / 0xa1 / 0x10 / 0x1d = `SA_ATK_PHYSIC_REL` / `_PVP` / `SA_DAMAGED_REL` / `SA_SCOPE_ABS`
+  ( same values in June's data: Summon Darkness's template has `SA_DAMAGED_REL` first ); BFI 0x211 = June's `BFI_DEBUFF_SUPPRESSION_OBLIVION` ( Enum.lua 529 ).
+- **Deviations / stand-ins.** Oblivion's memo reads ( x1.3, range 960 ) are not written: June's `GetEqippedSkillMemo` `31fca9e0` is a stub that answers 0 ( March's is replaced by it already ). `32b1fc90`'s unit test `vslot 0x1bc` is read as
+  `GetEnchantExtraDamageType()` and the NPC grade member `+0x8f08` as `GetIsBosRaidNPC() || GetIsMiddleBosRaidNPC()` ( grade 3 is never set offline ): a unit with either resists the execution and takes the debuff. The class map's guess "`BLUFF_CIEL.StartFuture`"
+  is wrong: June registers Lu's preload as Ciel's **StateInit** ( the delegate maker `32b4c930` fills slot +0x18 ). State 378 ( male chains ) has the skill-state byte in the listing @32b49b36 although `ch1n_skill_cases.tsv` lists none; it is set.
+  Dancing Blade's loop path needs a transcendence memo ( `GetTranscendenceMemoSkillID` reads the skill-note memos, CH4c ): without one the second key press shows the lack-of-MP pop-up ( `JUNE_BUGS` 770 ), so the loop cannot be play-tested yet.
+- **June bug:** `JUNE_BUGS.md` 770 ( Dancing Blade shows the lack-of-MP text when there is no memo ).
+- **Debug lines ( `_SKILL_DEBUG` ), tag `[JUNE_CHAR] LUCIEL SKILL`:** `oblivion kill unit hp H line L` / `oblivion debuff unit hp H line L resists N`, `summon darkness create npc N key K body B`, `dancing blade loop start count N` / `no loop ( memo skill N, count N )`,
+  `phantom blade attack ( hit armed )` / `fail ( no hit, half the cost returns )` / `attack start target found N`, `chains of bondage projectile body B upgraded N` / `dash attack body B`; the `equip` / `use` / `cooldown` lines of CH2a stay.
+- **Gates ( worktree; the file also holds a peer's uncommitted CH4b hunks, passed as `--with` partners ):** `finish.py --files X2GULuciel.cpp .h X2BuffFactor.h --with JUNE_CHAR_LUCIEL_SKILL JUNE_ENUM_NAMES JUNE_CHAR_LUCIEL_SKILL_DEBUG --state X2GULuciel.cpp Luciel_Duo
+  --icons 10018 30012-30015 30035 30055-30056 30064-30067 30082-30083 30204-30206 30304-30309`: FINISH RESULT PASS ( 7 gates, 0 failed, 1 skipped = luabind: no `.lua` staged ); flagcheck `_SKILL` ( with `_PASSIVE` as a partner ) 2 PASS, 0 FAIL, mine = 0 deleted lines;
+  `JUNE_ENUM_NAMES` PASS~ ; junediverge PASS, enumscan exit 0, stateends PASS, skillicons PASS. `/Zs` probe of `X2GULuciel.cpp` ( census `cl_cmd`, debug on ): 0 errors. The range gate on the commit goes in a follow-up commit.
+- **Build:** `build.py --deploy` ran its own full build ( main 9fb16748 + the uncommitted files of this tree ): `DEPLOY OK: X2_offline.exe is 27,133,440 B, dated 2026-11-16 10:38:08, md5 85d46dcf40f1843140ce152466d7cc5c, equal to X2/US_SERVICE/x2.exe (2026-11-16 10:38:01); built at main 9fb16748 + 10 uncommitted code file(s).` `EXESTR OK: 6 of 6 found in X2_offline.exe` ( wide: the oblivion / summon darkness / dancing blade / phantom blade / chains debug lines, `EffectSet_SA_LLC_OBLIVION_Death` ).
+- **Play-test save ( applied 10:23 with the game closed; backups `db_backup/els_db_20261116_102243_pre_createchar.sql`, `..102326_pre_sql.sql`, integrity ok ):** `python tools/elsdb.py x --file kickoffs/char-luciel/CH3a_save.sql` ( file kept ):
+  `LuDlA` ( unit 223, Lu / Dread Lord, level 70, base skills ) and `LuDlB` ( unit 224, the enhanced skills ), 3 / 2 skill pages, slots 0-3 on keys A S D C and the same on 5-8 ( Q W E R ), slots 4 / 9 empty.
+- **Play-test hand-off:** in the message that closes the session ( per page and key, the log lines to expect ). Logs to read: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL SKILL"`.
+
 ## Phase CH4 - Passives and class mechanics
 
 **Run with:** Opus 5.5 high, Opus review, user play-test.

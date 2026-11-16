@@ -1392,6 +1392,34 @@ protected:
 	void				ApplyFearOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b3d380
 	bool				CreateFearDamageEffect( CX2GameUnit* pDefender_, const float fThreatOfFearRate_, const bool bHitFromBehind_ );	// June 32b3ca30
 	void				ApplyPowerOfOriaxStunOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b0fc50
+	// char-luciel CH3a: Dread Lord ( 127 ) skills
+	void				LSI_SA_LLC_OBLIVION_Init();	// June 32ae6cf0
+	void				LSI_SA_LLC_OBLIVION_FrameMove();	// June 32b2b9c0
+	void				LSI_SA_LLC_OBLIVION_EventProcess();	// June 32b000f0
+	void				ApplyOblivionToEnemies();	// June 32b1fc90
+	void				LSI_SA_LLD_DANCING_BLADE_Init();	// June 32ae7b50
+	void				LSI_SA_LLD_DANCING_BLADE_StateStartFuture();	// June 32ae7bc0
+	void				LSI_SA_LLD_DANCING_BLADE_LOOP_StateStartFuture();	// June 32ae7bf0
+	void				LSI_SA_LLD_DANCING_BLADE_StateEndFuture();	// June 32ae7c10, both states
+	void				LSI_SA_LLD_DANCING_BLADE_EventProcess();	// June 32b3c3b0, both states
+	void				RegisterDancingBladeStates( UserUnitStateData& rNormalStateData_, UserUnitStateData& rHyperStateData_ );	// June @32b466c5 / @32b46ab5
+	void				LSI_SA_LLD_PHANTOM_BLADE_Init();	// June 32ae7c40
+	void				LSI_SA_LLD_PHANTOM_BLADE_EventProcess();	// June 32ae7c90
+	void				LSI_SA_LLD_PHANTOM_BLADE_ATTACK_StateStartFuture();	// June 32b2f1c0
+	void				LSI_SA_LLD_SUMMON_DARKNESS_Init();	// June 32ae7d20
+	void				LSI_SA_LLD_SUMMON_DARKNESS_FrameMove();	// June 32b2f3f0
+	void				CreateSummonDarknessNPC();	// June 32b20260
+	void				LSI_SA_LLD_SUPREME_PUNISHMENT_Init();	// June 32ae7e30
+	void				LSI_SA_LLD_SUPREME_PUNISHMENT_EventProcess();	// June 32b018d0
+	void				LSI_SA_LLD_FEAR_TOMORROW_Init();	// June 32aea120
+	void				LSI_SA_LLD_DEAD_CROSS_Init();	// June 32aea1b0
+	void				LSI_SA_LLD_DEMONIC_CANNON_Init();	// June 32aea5b0
+	void				LSI_A_LLD_F_FEAR_ABSORPTION_Init();	// June 32ae81b0
+	void				LSI_A_LLD_F_CHAINS_OF_BONDAGE_Init();	// June 32ae8240
+	void				LSI_A_LLD_F_CHAINS_OF_BONDAGE_StateStartFuture();	// June 32ae8360, both bodies
+	void				LSI_A_LLD_F_CHAINS_OF_BONDAGE_FrameMove();	// June 32b30970, both bodies
+	void				LSI_A_LLD_F_CHAINS_OF_BONDAGE_EventProcess();	// June 32b021a0, both bodies
+	void				LSI_A_LLD_BLUFF_LU_Init();	// June 32ae9f40, both bodies
 	void				AddSoulCollectorStackOnHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b43590
 	void				PlaySoulExtortionDrain( const CX2DamageManager::DamageData& damageData_ );	// June 32b435f0
 	void				SetMakeTargetOnPhantomBladeHit( const CX2DamageManager::DamageData& damageData_ );	// June 32b0fce0

@@ -1062,6 +1062,11 @@ enum BUFF_FACTOR_ID
 	BFI_BUFF_ALTAR_OF_EVIL                = 789,	// June's Enum.lua; the Altar of Evil transformed form's buff
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-16 // char-luciel CH3a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_DEBUFF_SUPPRESSION_OBLIVION       = 529,	// June's Enum.lua; Oblivion's debuff on a unit it does not execute
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 
