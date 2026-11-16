@@ -1441,7 +1441,15 @@ MAXHP, PASSIVE).
 **Debug lines** (`[JUNE_STATCALC]`): `MAXHP` (my unit, each ResetMaxHP), `PASSIVE` (emulator, each game stat), `HITRATE` (1 / s), `DODGEROLL`
 (1 / s, ExtraNPCStat defenders only).
 
-Play-test: below; review `kickoffs/june-stat-calc/S1b-review.md`.
+**Play-test passed (user, 2026-11-16; logs of the deployed exe, run 11:53-11:56).** jtLordKnight: `PASSIVE unit=25 class=100 hp=157000>166420`,
+`SHEET emu ... game hp=235624`, `SHEET game ... hp=235624`, `MAXHP unit=25 hp=235624` = `SHEET window total=235624` (was 226204). testlu1:
+`PASSIVE hp=128500>128500`, game / MAXHP / window all 128500. Every other unit's `PASSIVE` line is unchanged (none holds the four passives;
+units 204 / 205, also Lord Knights, show 157000>166420). Elder Secret Dungeon (Hell) stage 0: 31 `DODGEROLL` lines on NPC 1466 (Bunker) and 530
+(`NUI_SOLDIER_BENDERS_ROYAL_COMMON`, also a NewNPCStat row), both attackers (units 25 and 166), offsets 0-97; 34 `HITRATE` lines (user -> NPC
+hit=1.000 at acc 1 / avoid 1; NPC 1000001 -> testlu1 3 lines). Stage 2 (Punch Boss 1470) was not entered: same path, not re-asked. Packets 0
+EXCEPTION.
+
+Review: `kickoffs/june-stat-calc/S1b-review.md`.
 
 ## Phase Z - Close
 
