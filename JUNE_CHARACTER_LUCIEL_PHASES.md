@@ -4463,44 +4463,6 @@ Opus 5.5. Lu/Ciel's summoned NPCs exist and are set up as June does; Lu has no s
 
 **Done gate:** each passive's effect shows (CH0 names the stat or log line); 0 `no_state` rows left except passives with no state in June.
 
-### CH4a - Done (2026-11-16)
-
-Opus 5.5 high. Flags: `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_PASSIVE` ( new; `#error` guard needs `_CHAR_LUCIEL_SKILL`, `_JUNE_SOCKET_PARITY`, `_STATCALC_DAMAGE_REACT`,
-`_ENCHANT_PARITY`, `_BUFF_BEHAVIOR_PARITY`, `_CHAR_ENEMY_SCAN`, `_CHAR_BUFF_TIME_PASS`, `_JUNE_DAMAGEDATA`; not tripped ), `_PASSIVE_DEBUG` ( new, stays on: the CH4b
-review retires it ), `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( 7 BFI + 3 BTI names in `X2BuffFactor.h`, June's `Enum.lua` values ). Files: `X2GULuciel.h` / `.cpp`, `X2BuffFactor.h`
-( bytepatch ), `Always.h` ( bytepatch ). funcmap `grep "(CH4a)"` ( 10 rows ). No review of its own: `CH4b-review.md` covers CH4a and CH4b.
-- **Ported whole ( June `32b45820`, vslot 0x690, uncarved: read from the capstone listing ):** `InitPassiveSkillState` reads 15 `RNSI_P` passives ( 30401-30408,
-  30410-30415, 30417 ) and Backstab / Power of Oriax through `TryGetAcquiredSkillAbilityValue`, in June's order, with June's resets, and pushes the ten delegates:
-  nine on the attack-result list ( `AddCombinationPointOnHit` CH1p, `ApplyFearOnHit` `32b3d380`, `ApplyPowerOfOriaxStunOnHit` `32b0fc50`, `AddSoulCollectorStackOnHit`
-  `32b43590`, `PlaySoulExtortionDrain` `32b435f0`, `SetMakeTargetOnPhantomBladeHit` `32b0fce0`, `AddDarkCrescentTargetOnRuinousImpactHit` `32b177b0` ( + its find
-  `32b4caf0`, inlined ), `SetMakeTargetOnRapidImpactHit` `32b13c80`, `AddInvasionOfDarkEnergyTargetOnHit` `32b17f90` ) and `FrameMoveMadnessCrave` `32b3e470` on the
-  frame-move list ( `+0x66cc` ). Plus `CreateFearDamageEffect` `32b3ca30`. The seven debuff groups of the Lord of Fear test ( `3226e230..90`, tables `3373daa4..e8`, read
-  from the exe ) are one 18-entry list in the CH4a namespace. Engine offsets settled: `+0x6898 / +0x68a0` = `SetMakeTarget`, gameunit `+0x264` = `GetGameUnitType`,
-  vslot 0x200 `GetRidingOn`, 0x3e4 = bone position or `GetPos`, sequence `+0x310 / +0x3e0 / +0x404` = black hole / add rotate / axis angle, `+0x4060` = no-down %,
-  `+0x4ca8` = `m_AdditionalCriticalRate`.
-- **Already done, not re-ported:** `SetSpecificValueByBuffTempletID` / `StartTransformedForm` ( CH2d3 ); `UnSetSpecificValueByBuffTempletID` is a `jmp` to the base.
-- **Members renamed from their writer ( kickoff amendments CH1f2 / CH1l3 / CH1p ):** `+0x9614` `m_fSoulCollectorDamageRate` ( SA_ATK_REL ), `+0x9618`
-  `m_fSoulCollectorRangeRate` ( SA_PROJECTILE_RANGE_REL; JUNE_BUGS 699's life time ), `+0x961c` `m_usSoulCollectorPiercingCount`, `+0x960c` `m_fSoulCollectorStackCoolTime`,
-  `+0x9600 / +0x9604` `m_fBackstabAttackRate` / `m_fPowerOfOriaxAttackRate`, `+0x97c0..0x97d0` Invasion of Dark Energy target time / cool time left ( the timer
-  CH1l3 asked about ) / cool time / damage rate / force down, `+0x980c..0x981c` Madness Crave damaged / move / jump / near range / far range, `+0x9820` a
-  `CKTDXCheckElapsedTime`, `+0x9828 / +0x982c` Madness Destroy cool-time / debuff-time rates. `m_fFreeBoundingStrikeRate` / `m_fBoundingDamageRateEx` agree ( kept ).
-- **Stand-in and routed ( kickoff `CH4b.md` amended ):** DamageData `+0x5c0` ( hit from behind, written by both DamageReacts ) has no March member: `bHitFromBehind`
-  is `false`, so Lord of Fear's damage effect cannot play until CH4b. The `CX2GUUser` slot-251 buff hook `3204dcd0` ( Tribute / Noble Devotion 30419 ) goes to CH4b
-  too: the CH3a0 peer held `X2GUUser.*`. Not read here and not CH4a's: Hyper Aura 106 ( no class reader ), the Open Mind trio and Stable Dark Energy ( CH1l3 ),
-  Tribute ( CH2c2 ). The 13 old `SI_P_*` ids ( 10400-10412 ) have no reader in June's class: passives with no state.
-- **June bugs kept ( JUNE_BUGS 766-768 ):** the burst's templet read unchecked ( guarded ), the Oriax stun at Seized by Fear's level, four values never reset.
-  Quirks kept with a comment: the Lord of Fear stack raise carries to later units, the Soul Extortion MP's unsigned difference, the dropped memo 610016 read.
-- **Gates ( worktree, `finish.py --files` 4 files `--with JUNE_CHAR_LUCIEL_PASSIVE _PASSIVE_DEBUG JUNE_CHAR_LUCIEL_CORE` ):** junediverge PASS, enumscan exit 0;
-  flagcheck 2 PASS each but 1 ERROR on `Always.h` from the peer's uncommitted CH3a0 hunks; the committed range below is the verdict. 57 deleted lines = the renamed
-  lines ( 38 cpp, 19 h ) and the two ctor inits. `/Zs` probe of `X2GULuciel.cpp`: 0 errors, `_PASSIVE` proven on by an `#error` probe.
-RANGE_GATE_PLACEHOLDER
-BUILD_PLACEHOLDER
-- **How to see it in game:** the hand-off in the closing message ( units `LuPasLD` / `LuPasCN` / `LuPasDN` ). Logs: `python tools/logs.py --grep "JUNE_CHAR\] LUCIEL"`.
-  Per passive: init lines `LUCIEL PASSIVE init` / `init 2` ( every value ); Seized by Fear / Lord / Aura / Threat `fear: seized by fear ...`, `burst fear`, `threat of fear`;
-  Power of Oriax `power of oriax stun`; Soul Collector `soul collector stack N`; Soul Extortion `soul extortion drain`; Communion Recovery `rest mp` in `init`;
-  Communion Expand / Absorb `no-down N%` and `force down` in `init 2`; Chemistry the V key over a bounded enemy; Invasion `invasion of dark energy mark`;
-  Madness Crave `madness crave ( nearest ... )`; Madness Destroy `crit rate x` in `init 2`; the point on hit ( CH2a2's owed check ) `LUCIEL DUO point: +1 on hit`.
-
 ## Phase CH5 - UI and data
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_LUCIEL_UI`, sub-tag `UI`. The skill and hyper cut-in
