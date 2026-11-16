@@ -1962,11 +1962,14 @@ flag-nesting move, all under `SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY` (`X2UnitViewerU
   `FINISH RESULT: PASS (10 gates, 0 failed, 5 skipped)`; OTHER rows = `Always.h` peers' blocks and each file's other flag; 8 EOL-mismatched lines =
   `X2Inventory.cpp`'s namespace (as the phase note says); `JUNE_CHAR_ADD_DP` / `JUNE_EQIP_FRAME_MOVE_DEBUG` retired. The fix: `finish.py --files
   X2UnitViewerUI.cpp --with SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY`: PASS (6 gates); 9 deleted lines, all DU5c2's own lines under the flag (the
-  comment, the moved block, the enchant lines now in the helper). Post-commit `--range`: see below.
+  comment, the moved block, the enchant lines now in the helper). Post-commit `finish.py --range 303795cf^..303795cf --with
+  SERV_IRUHADEV_JUNE_CHAR_DUO_LOBBY`: PASS (6 gates).
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,090,432 B, dated 2026-11-16 09:23:17, md5 65db270adcaffe9c32baccee653ab7f4` (built at main db9bd3ef + 5
   uncommitted code files: this fix and peers' in-progress files; nothing relinked: a peer's 09:22 link already holds `X2UnitViewerUI.obj` 09:21:32,
   newer than the edit at 09:16:25). No new strings, so no `exestr` line.
-- **Play-test owed:** a regression of the create / select screens (both bodies, Ciel's gear, an enchanted weapon's glow on the shown body).
+- **Play-test passed** (user, 2026-11-16, md5 `65db270a`): create screen, select screen ( `testlu1`, `jtLordKnight` ), the enchant glow, other
+  classes. Log: `[09:38:09.717] [JUNE_CHAR] LUCIEL DUO LOBBY create screen: both bodies, Ciel turned 30.0 deg`, `[09:39:11.757] ... select screen: unit
+  166 class 200, both bodies, minor body turned 30.0 deg`; 0 EXCEPTION, 0 ErrorLog lines. DU5c2 done; next DU5d (`DU5d.md`).
 
 ### DU5e - Done (2026-11-15)
 
