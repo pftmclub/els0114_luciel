@@ -974,11 +974,22 @@ DECL_DATA( KQuestInstance )
 
 DECL_DATA( KStat )
 {	
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	// june-stat-calc S1: June's KStat { float hp; int atkP, atkM, rangeP, rangeM, defP, defM } ( 322814a0 / 323571c0 )
+	float		m_fBaseHP;
+	int			m_iAtkPhysic;
+	int			m_iAtkMagic;
+	int			m_iAtkPhysicRange;
+	int			m_iAtkMagicRange;
+	int			m_iDefPhysic;
+	int			m_iDefMagic;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	int			m_iBaseHP;
 	int			m_iAtkPhysic;
 	int			m_iAtkMagic;
 	int			m_iDefPhysic;
 	int			m_iDefMagic;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	KStat()
 	{
@@ -987,34 +998,68 @@ DECL_DATA( KStat )
 
 	void Init()
 	{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+		m_fBaseHP			= 0.0f;
+		m_iAtkPhysic		= 0;
+		m_iAtkMagic			= 0;
+		m_iAtkPhysicRange	= 0;
+		m_iAtkMagicRange	= 0;
+		m_iDefPhysic		= 0;
+		m_iDefMagic			= 0;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		m_iBaseHP			= 0;
 		m_iAtkPhysic		= 0;
 		m_iAtkMagic			= 0;
 		m_iDefPhysic		= 0;
 		m_iDefMagic			= 0;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	}
 
 	void AddStat( KStat& stat )
 	{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+		m_fBaseHP			+= stat.m_fBaseHP;
+		m_iAtkPhysic		+= stat.m_iAtkPhysic;
+		m_iAtkMagic			+= stat.m_iAtkMagic;
+		m_iAtkPhysicRange	+= stat.m_iAtkPhysicRange;
+		m_iAtkMagicRange	+= stat.m_iAtkMagicRange;
+		m_iDefPhysic		+= stat.m_iDefPhysic;
+		m_iDefMagic			+= stat.m_iDefMagic;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		m_iBaseHP			+= stat.m_iBaseHP;
 		m_iAtkPhysic		+= stat.m_iAtkPhysic;
 		m_iAtkMagic			+= stat.m_iAtkMagic;
 		m_iDefPhysic		+= stat.m_iDefPhysic;
 		m_iDefMagic			+= stat.m_iDefMagic;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	}
 
 	void MultiplyStat( float fFactor )
 	{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+		m_fBaseHP			= m_fBaseHP * fFactor;
+		m_iAtkPhysic		= (int)((float)m_iAtkPhysic		* fFactor);
+		m_iAtkMagic			= (int)((float)m_iAtkMagic		* fFactor);
+		m_iAtkPhysicRange	= (int)((float)m_iAtkPhysicRange	* fFactor);
+		m_iAtkMagicRange	= (int)((float)m_iAtkMagicRange	* fFactor);
+		m_iDefPhysic		= (int)((float)m_iDefPhysic		* fFactor);
+		m_iDefMagic			= (int)((float)m_iDefMagic		* fFactor);
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		m_iBaseHP			= (int)((float)m_iBaseHP		* fFactor);
 		m_iAtkPhysic		= (int)((float)m_iAtkPhysic		* fFactor);
 		m_iAtkMagic			= (int)((float)m_iAtkMagic		* fFactor);
 		m_iDefPhysic		= (int)((float)m_iDefPhysic		* fFactor);
 		m_iDefMagic			= (int)((float)m_iDefMagic		* fFactor);
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	}
 
 	void MultiplyBaseHP( float fFactor )
 	{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+		m_fBaseHP			= m_fBaseHP * fFactor;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		m_iBaseHP			= (int)((float)m_iBaseHP		* fFactor);
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	}
 	void MultiplyAttPhysic( float fFactor )
 	{

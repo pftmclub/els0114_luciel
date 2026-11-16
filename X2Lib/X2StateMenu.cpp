@@ -4773,7 +4773,11 @@ bool CX2StateMenu::Handler_EGS_CHANGE_EQUIPPED_ITEM_IN_ROOM_NOT( HWND hWnd, UINT
 	pUnitData->m_GameStat.SetKStat( kEvent.m_kGameStat );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	pUser->SetMaxHp( kEvent.m_kGameStat.m_fBaseHP );	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	pUser->SetMaxHp( static_cast< const float >( kEvent.m_kGameStat.m_iBaseHP ) );
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	if ( pUser->GetNowHp() > pUser->GetMaxHp() )
 	{
 		pUser->SetNowHp( pUser->GetMaxHp() );
@@ -5209,7 +5213,11 @@ bool CX2StateMenu::Hander_EGS_ZERO_ENDURANCE_ITEM_IN_ROOM_NOT( HWND hWnd, UINT u
 		// 유저 변경
 		pUser->SetGameStat( kEvent.m_kGameStat );
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+		pUser->SetMaxHp( kEvent.m_kGameStat.m_fBaseHP );	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		pUser->SetMaxHp( (float)kEvent.m_kGameStat.m_iBaseHP );
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 
 

@@ -720,21 +720,42 @@ SERIALIZE_DEFINE_GET( KTCClearInfo, obj, ks )
 
 SERIALIZE_DEFINE_PUT( KStat, obj, ks )
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	// june-stat-calc S1: June's 7-field order
+	return PUT( m_fBaseHP )
+		&& PUT( m_iAtkPhysic )
+		&& PUT( m_iAtkMagic )
+		&& PUT( m_iAtkPhysicRange )
+		&& PUT( m_iAtkMagicRange )
+		&& PUT( m_iDefPhysic )
+		&& PUT( m_iDefMagic )
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	return PUT( m_iBaseHP )
 		&& PUT( m_iAtkPhysic )
 		&& PUT( m_iAtkMagic )
 		&& PUT( m_iDefPhysic )
 		&& PUT( m_iDefMagic )
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		;
 }
 
 SERIALIZE_DEFINE_GET( KStat, obj, ks )
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	return GET( m_fBaseHP )
+		&& GET( m_iAtkPhysic )
+		&& GET( m_iAtkMagic )
+		&& GET( m_iAtkPhysicRange )
+		&& GET( m_iAtkMagicRange )
+		&& GET( m_iDefPhysic )
+		&& GET( m_iDefMagic )
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	return GET( m_iBaseHP )
 		&& GET( m_iAtkPhysic )
 		&& GET( m_iAtkMagic )
 		&& GET( m_iDefPhysic )
 		&& GET( m_iDefMagic )
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		;
 }
 

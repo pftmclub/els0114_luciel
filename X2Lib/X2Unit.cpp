@@ -2301,6 +2301,10 @@ CX2Stat::Stat CX2Unit::GetEqipStat( const bool bWithPvpEquip_, const int iEquipG
 		retStat.m_fBaseHP		= kItemStat.m_fBaseHP + retStat.m_fBaseHP;
 		retStat.m_fAtkPhysic	= kItemStat.m_fAtkPhysic + retStat.m_fAtkPhysic;
 		retStat.m_fAtkMagic		= kItemStat.m_fAtkMagic + retStat.m_fAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+		retStat.m_fAtkPhysicRange	= kItemStat.m_fAtkPhysicRange + retStat.m_fAtkPhysicRange;	// june-stat-calc S1: 3234e210 adds floats [6..12]
+		retStat.m_fAtkMagicRange	= kItemStat.m_fAtkMagicRange + retStat.m_fAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		retStat.m_fDefPhysic	= kItemStat.m_fDefPhysic + retStat.m_fDefPhysic;
 		retStat.m_fDefMagic		= kItemStat.m_fDefMagic + retStat.m_fDefMagic;
 	}
@@ -2328,6 +2332,10 @@ CX2Stat::Stat CX2Unit::GetEqipStat( const bool bWithPvpEquip_, const int iEquipG
 		retStat.m_fBaseHP		= kItemStat.m_fBaseHP + retStat.m_fBaseHP;
 		retStat.m_fAtkPhysic	= kItemStat.m_fAtkPhysic + retStat.m_fAtkPhysic;
 		retStat.m_fAtkMagic		= kItemStat.m_fAtkMagic + retStat.m_fAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+		retStat.m_fAtkPhysicRange	= kItemStat.m_fAtkPhysicRange + retStat.m_fAtkPhysicRange;	// june-stat-calc S1: 3234e210 adds floats [6..12]
+		retStat.m_fAtkMagicRange	= kItemStat.m_fAtkMagicRange + retStat.m_fAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		retStat.m_fDefPhysic	= kItemStat.m_fDefPhysic + retStat.m_fDefPhysic;
 		retStat.m_fDefMagic		= kItemStat.m_fDefMagic + retStat.m_fDefMagic;
 	}

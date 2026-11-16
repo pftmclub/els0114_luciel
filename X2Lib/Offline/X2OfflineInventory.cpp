@@ -435,12 +435,66 @@ void CX2OfflineInventory::AddEquippedStat( IN OUT KStat& kInOut ) const
 		fDefMagic	+= kStatData.m_fDefMagic	* fEnchantScale;
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	kInOut.m_fBaseHP	+= fBaseHP;	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kInOut.m_iBaseHP	+= (int)fBaseHP;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kInOut.m_iAtkPhysic	+= (int)fAtkPhysic;
 	kInOut.m_iAtkMagic	+= (int)fAtkMagic;
 	kInOut.m_iDefPhysic	+= (int)fDefPhysic;
 	kInOut.m_iDefMagic	+= (int)fDefMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	AddEquippedWeaponRange( kInOut, iEquipGroup );	// june-stat-calc S1: stand-in for June's server range
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
+
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+// june-stat-calc S1 stand-in ( no June server ): range = the weapon's own attack x item.kim damage_range / 100 ( cobodex.eu calculator )
+int CX2OfflineInventory::AddEquippedWeaponRange( IN OUT KStat& kInOut, const int iEquipGroup ) const
+{
+	if( NULL == g_pData )
+		return 0;
+
+	int iWeaponItemID = 0;
+	float fAtkPhysicRange = 0.0f;
+	float fAtkMagicRange = 0.0f;
+	for( int iSlot = 0; iSlot < GetSlotSize( CX2Inventory::ST_E_EQUIP ); ++iSlot )
+	{
+		const UidType nItemUID = GetItemUID( CX2Inventory::ST_E_EQUIP, iSlot );
+		if( 0 == nItemUID )
+			continue;
+
+		const int iSlotGroup = GetEquipGroupOfSlot( iSlot );
+		if( 2 != iEquipGroup && 2 != iSlotGroup && iSlotGroup != iEquipGroup )
+			continue;
+
+		const KOfflineItemRow* pRow = FindRow( nItemUID );
+		if( NULL == pRow )
+			continue;
+
+		if( CX2Item::PT_ENDURANCE == pRow->m_iUsageType && pRow->m_iEndurance <= 0 )
+			continue;
+
+		const CX2Item::ItemTemplet* pTemplet = Templet( pRow->m_iItemID );
+		if( NULL == pTemplet || true == pTemplet->GetFashion() || CX2Unit::EP_WEAPON_HAND != pTemplet->GetEqipPosition() )
+			continue;
+
+		CX2Item::KItemFormatStatData kStatData;
+		g_pData->GetItemStatCalculator().CalculateItemStat( kStatData, pTemplet );
+
+		const float fEnchantScale = EnchantStatScale( pRow->m_iEnchantLevel, pTemplet );
+		const float fDamageRangeRate = pTemplet->GetDamageRange() / 100.0f;
+		fAtkPhysicRange	+= kStatData.m_fAtkPhysic * fEnchantScale * fDamageRangeRate;
+		fAtkMagicRange	+= kStatData.m_fAtkMagic * fEnchantScale * fDamageRangeRate;
+		iWeaponItemID = pRow->m_iItemID;
+	}
+
+	kInOut.m_iAtkPhysicRange	+= (int)fAtkPhysicRange;
+	kInOut.m_iAtkMagicRange		+= (int)fAtkMagicRange;
+	return iWeaponItemID;
+}
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 //////////////////////////////////////////////////////////////////////////
 

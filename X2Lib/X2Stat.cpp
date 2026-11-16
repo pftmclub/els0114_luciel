@@ -27,6 +27,16 @@ bool CX2Stat::Stat::Verify() const
 		return false;
 	}
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	// june-stat-calc S1: June's 13-dword block is checked whole, the range pair included
+	if( m_fAtkPhysicRange.Verify() == false || m_fAtkMagicRange.Verify() == false )
+	{
+		g_pKTDXApp->SetFindHacking( true );
+
+		return false;
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+
 	return true;
 }
 

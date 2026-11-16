@@ -16905,6 +16905,21 @@ void CX2GameUnit::EraseAdditionalStat( const BUFF_BEHAVIOR_TYPE eBehaviorType_, 
 */
 /*virtual*/ void CX2GameUnit::SetGameStat( const KStat& kGameStat_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	// june-stat-calc S1: June 322814a0, the seven basics from the 7-field KStat, then the stored block ( June skips an unchanged one )
+	CX2Stat::Stat kNewStat;
+	kNewStat.SetKStat( kGameStat_ );
+
+	m_AdditionalMaxHp.SetBasicStatValue( kNewStat.m_fBaseHP );
+	m_AdditionalPhysicAttack.SetBasicStatValue( kNewStat.m_fAtkPhysic );
+	m_AdditionalMagicAttack.SetBasicStatValue( kNewStat.m_fAtkMagic );
+	m_AdditionalPhysicAttackRange.SetBasicStatValue( kNewStat.m_fAtkPhysicRange );
+	m_AdditionalMagicAttackRange.SetBasicStatValue( kNewStat.m_fAtkMagicRange );
+	m_AdditionalPhysicDefence.SetBasicStatValue( kNewStat.m_fDefPhysic );
+	m_AdditionalMagicDefence.SetBasicStatValue( kNewStat.m_fDefMagic );
+
+	m_Stat.AccessStat() = kNewStat;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	CX2Stat::Stat& kStat = m_Stat.AccessStat();
 	kStat.SetKStat( kGameStat_ );
 
@@ -16916,6 +16931,7 @@ void CX2GameUnit::EraseAdditionalStat( const BUFF_BEHAVIOR_TYPE eBehaviorType_, 
 #endif defined( SERV_IRUHADEV_JUNE_ATTACK_RANGE_DESIGN ) && defined( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY )
 	m_AdditionalPhysicDefence.SetBasicStatValue( kStat.m_fDefPhysic );
 	m_AdditionalMagicDefence.SetBasicStatValue( kStat.m_fDefMagic );	
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
 
 /** @function : SetGameStat
@@ -16924,6 +16940,20 @@ void CX2GameUnit::EraseAdditionalStat( const BUFF_BEHAVIOR_TYPE eBehaviorType_, 
 */
 /*virtual*/ void CX2GameUnit::SetGameStat( const CX2Stat::Stat& Stat_ )
 {
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	// june-stat-calc S1: June 32281690, the whole 13-dword Stat ( rates kept ), its seven basics, then the stored block
+	const CX2Stat::Stat kNewStat = Stat_;
+
+	m_AdditionalMaxHp.SetBasicStatValue( kNewStat.m_fBaseHP );
+	m_AdditionalPhysicAttack.SetBasicStatValue( kNewStat.m_fAtkPhysic );
+	m_AdditionalMagicAttack.SetBasicStatValue( kNewStat.m_fAtkMagic );
+	m_AdditionalPhysicAttackRange.SetBasicStatValue( kNewStat.m_fAtkPhysicRange );
+	m_AdditionalMagicAttackRange.SetBasicStatValue( kNewStat.m_fAtkMagicRange );
+	m_AdditionalPhysicDefence.SetBasicStatValue( kNewStat.m_fDefPhysic );
+	m_AdditionalMagicDefence.SetBasicStatValue( kNewStat.m_fDefMagic );
+
+	m_Stat.AccessStat() = kNewStat;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	CX2Stat::Stat& kStat = m_Stat.AccessStat();
     if ( &kStat != &Stat_ )
     {
@@ -16938,6 +16968,7 @@ void CX2GameUnit::EraseAdditionalStat( const BUFF_BEHAVIOR_TYPE eBehaviorType_, 
 #endif defined( SERV_IRUHADEV_JUNE_ATTACK_RANGE_DESIGN ) && defined( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY )
 	m_AdditionalPhysicDefence.SetBasicStatValue( kStat.m_fDefPhysic );
 	m_AdditionalMagicDefence.SetBasicStatValue( kStat.m_fDefMagic );	
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
 
 /** @function : CheckAndUpdateAdditionalStat

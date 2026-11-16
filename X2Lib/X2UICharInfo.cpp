@@ -2110,6 +2110,40 @@ void CX2UICharInfo::ResetStat( const bool bUseViewerForm_ /*= false*/ )
 	m_Stat.AddStat( pMyUnit->GetGuildSkillStat() );
 	m_Stat.AddStat( g_pData->GetTitleManager()->GetSocketStat() );
 	m_Stat.AddStat( socketData.m_Stat );
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT )
+	{
+		// june-stat-calc S1 SHEET: June's window sum ( 3291cfb0 ) by source, hp/atkP/atkM/rangeP/rangeM/defP/defM, at most once a second
+		static DWORD s_dwLastSheetTick = 0;
+		const DWORD dwSheetTick = ::GetTickCount();
+		if( dwSheetTick - s_dwLastSheetTick >= 1000 )
+		{
+			s_dwLastSheetTick = dwSheetTick;
+			const CX2Stat::Stat kSheetPart[7] = { m_Stat.GetStat(), pMyUnit->GetUnitStat(), GetShownEquipStat( pMyUnit, bMinorUnitForm ), pMyUnit->GetSkillStat(),
+				pMyUnit->GetGuildSkillStat(), g_pData->GetTitleManager()->GetSocketStat(), socketData.m_Stat };
+			int iSheet[7][7];
+			for( int i = 0; i < 7; ++i )
+			{
+				iSheet[i][0] = static_cast<int>( kSheetPart[i].m_fBaseHP );
+				iSheet[i][1] = static_cast<int>( kSheetPart[i].m_fAtkPhysic );
+				iSheet[i][2] = static_cast<int>( kSheetPart[i].m_fAtkMagic );
+				iSheet[i][3] = static_cast<int>( kSheetPart[i].m_fAtkPhysicRange );
+				iSheet[i][4] = static_cast<int>( kSheetPart[i].m_fAtkMagicRange );
+				iSheet[i][5] = static_cast<int>( kSheetPart[i].m_fDefPhysic );
+				iSheet[i][6] = static_cast<int>( kSheetPart[i].m_fDefMagic );
+			}
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] SHEET window form=%d pvp=%d total=%d/%d/%d/%d/%d/%d/%d unit=%d/%d/%d/%d/%d/%d/%d equip=%d/%d/%d/%d/%d/%d/%d",
+				bMinorUnitForm ? 1 : 0, m_bShowPVPOption ? 1 : 0,
+				iSheet[0][0], iSheet[0][1], iSheet[0][2], iSheet[0][3], iSheet[0][4], iSheet[0][5], iSheet[0][6],
+				iSheet[1][0], iSheet[1][1], iSheet[1][2], iSheet[1][3], iSheet[1][4], iSheet[1][5], iSheet[1][6],
+				iSheet[2][0], iSheet[2][1], iSheet[2][2], iSheet[2][3], iSheet[2][4], iSheet[2][5], iSheet[2][6] );
+			CX2OfflineLog::Server( L"[JUNE_STATCALC] SHEET window parts skill=%d/%d/%d/%d/%d/%d/%d guild=%d/%d/%d/%d/%d/%d/%d title=%d/%d/%d/%d/%d/%d/%d socket=%d/%d/%d/%d/%d/%d/%d",
+				iSheet[3][0], iSheet[3][1], iSheet[3][2], iSheet[3][3], iSheet[3][4], iSheet[3][5], iSheet[3][6],
+				iSheet[4][0], iSheet[4][1], iSheet[4][2], iSheet[4][3], iSheet[4][4], iSheet[4][5], iSheet[4][6],
+				iSheet[5][0], iSheet[5][1], iSheet[5][2], iSheet[5][3], iSheet[5][4], iSheet[5][5], iSheet[5][6],
+				iSheet[6][0], iSheet[6][1], iSheet[6][2], iSheet[6][3], iSheet[6][4], iSheet[6][5], iSheet[6][6] );
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	UpdateBasicStatFromSpecialSkill();
 	UpdateBasicStatUI( socketData );
@@ -2193,14 +2227,22 @@ void CX2UICharInfo::UpdateBasicStatUI( const CX2SocketItem::SocketData& socketDa
 	StringCchPrintfW( wszBuffer, MAX_PATH, L"%5d", iAtkMagic );
 	SetStatInfoStatic( L"g_pStaticinfo_m_attack", wszBuffer );
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	const float fAtkPhysicSpread = kStat.m_fAtkPhysicRange;		// june-stat-calc S1: June Stat [9] ( +0x108 )
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	const float fAtkPhysicSpread = 0.f;		// stand-in: June Stat [9] ( +0x108 ) has no March member ( Stage 33 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	const int iMinAtkPhysic = static_cast<int>( ( fAtkPhysic - fAtkPhysicSpread ) * ( kExtraStat.m_fIncreaseAtkPhysicRate + 1.0 ) );
 	const int iMaxAtkPhysic = static_cast<int>( ( fAtkPhysicSpread + fAtkPhysic ) * ( kExtraStat.m_fIncreaseAtkPhysicRate + 1.0 ) );
 	const float fPhysicMaximizeRate = CX2SocketItem::GetFinalDamageMaximizeRate( socketData_.m_fDamageMaximizeRate, iMyLevel );
 	const int iMaximizedAtkPhysic = iMinAtkPhysic + static_cast<int>( fPhysicMaximizeRate * ( iMaxAtkPhysic - iMinAtkPhysic ) );
 	SetStatInfoGuideDesc( L"Button_PhysicAttack", GET_REPLACED_STRING( ( 39431, "iiii", iMinAtkPhysic, iMaxAtkPhysic, iMaximizedAtkPhysic, iMaxAtkPhysic ) ) );
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	const float fAtkMagicSpread = kStat.m_fAtkMagicRange;		// june-stat-calc S1: June Stat [10] ( +0x10c )
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	const float fAtkMagicSpread = 0.f;		// stand-in: June Stat [10] ( +0x10c ) has no March member ( Stage 33 )
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	const int iMinAtkMagic = static_cast<int>( ( fAtkMagic - fAtkMagicSpread ) * ( kExtraStat.m_fIncreaseAtkMagicRate + 1.0 ) );
 	const int iMaxAtkMagic = static_cast<int>( ( fAtkMagicSpread + fAtkMagic ) * ( kExtraStat.m_fIncreaseAtkMagicRate + 1.0 ) );
 	const float fMagicMaximizeRate = CX2SocketItem::GetFinalDamageMaximizeRate( socketData_.m_fDamageMaximizeRate, iMyLevel );

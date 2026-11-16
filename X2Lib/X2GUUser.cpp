@@ -3327,6 +3327,15 @@ void CX2GUUser::InitStat()
 		SetGameStat( GetUnit()->GetUnitData().m_Stat );
 	}
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_BODY
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT )
+	if( true == IsMyUnit() )	// june-stat-calc S1 SHEET: the stat block SetGameStat stored ( June 322814a0 / 32281690 )
+	{
+		const CX2Stat::Stat& kSheet = GetStat().GetStat();
+		CX2OfflineLog::Server( L"[JUNE_STATCALC] SHEET game unit=%I64d minor=%d hp=%d atk=%d/%d range=%d/%d def=%d/%d",
+			(__int64)GetUnitUID(), IsMinorUnitActive() ? 1 : 0, static_cast<int>( kSheet.m_fBaseHP ), static_cast<int>( kSheet.m_fAtkPhysic ), static_cast<int>( kSheet.m_fAtkMagic ),
+			static_cast<int>( kSheet.m_fAtkPhysicRange ), static_cast<int>( kSheet.m_fAtkMagicRange ), static_cast<int>( kSheet.m_fDefPhysic ), static_cast<int>( kSheet.m_fDefMagic ) );
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 }
 

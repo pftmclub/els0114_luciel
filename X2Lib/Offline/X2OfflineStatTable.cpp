@@ -256,7 +256,11 @@ void CX2OfflineStatTable::SetUnitStat_LUA( int iUnitClass, int iLevel )
 		return;
 
 	KStat kStat;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	kStat.m_fBaseHP		= (float)uiHP;	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kStat.m_iBaseHP		= (int)uiHP;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kStat.m_iAtkPhysic	= (int)usAtkPhysic;
 	kStat.m_iAtkMagic	= (int)usAtkMagic;
 	kStat.m_iDefPhysic	= (int)usDefPhysic;
@@ -332,7 +336,11 @@ void CX2OfflineStatTable::SetUnitStat_LUA( int iUnitClass, int iLevel )
 {
 	const double fSteps = (double)( iLevel - 1 );
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	kOut.m_fBaseHP		= (float)(int)( SYN_HP_L1   + SYN_HP_PER_LEVEL   * fSteps );	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kOut.m_iBaseHP		= (int)( SYN_HP_L1   + SYN_HP_PER_LEVEL   * fSteps );
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kOut.m_iAtkPhysic	= (int)( SYN_ATKP_L1 + SYN_ATKP_PER_LEVEL * fSteps );
 	kOut.m_iAtkMagic	= (int)( SYN_ATKM_L1 + SYN_ATKM_PER_LEVEL * fSteps );
 	kOut.m_iDefPhysic	= (int)( SYN_DEFP_L1 + SYN_DEFP_PER_LEVEL * fSteps );

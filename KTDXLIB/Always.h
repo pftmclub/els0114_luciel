@@ -12609,7 +12609,7 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 // Date: 2026-11-12
 // Description: june-stat-calc (from D1) - per-hit "[JUNE_STATCALC] HIT" line in offline_server.log, about once a second per
 //              attacker-defender pair, with March's rate beside June's. Retired by the D6 review (2026-11-16); uncomment for a play-test.
-//#define SERV_IRUHADEV_JUNE_STATCALC_DEBUG
+#define SERV_IRUHADEV_JUNE_STATCALC_DEBUG
 #if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && !defined( SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE )
 #error SERV_IRUHADEV_JUNE_STATCALC_DEBUG needs SERV_IRUHADEV_JUNE_STATCALC_DEFENCE_CURVE
 #endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG
@@ -14095,4 +14095,16 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #if defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG ) && !( defined( SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON ) && defined( SERV_IRUHADEV_OFFLINE ) )
 #error SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG needs SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON and SERV_IRUHADEV_OFFLINE ( CX2OfflineLog )
 #endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SUMMON_DEBUG
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: june-stat-calc S1 - June's stat block: KStat { float hp; int atkP, atkM, rangeP, rangeM, defP, defM } (322814a0), the
+//              attack-range pair in CX2Stat::Stat (Stat [9] / [10]), SetGameStat's seven basics and every reader; the emulator fills the
+//              range from the equipped weapon (attack x item.kim damage_range / 100, cobodex.eu's formula; supersedes the designed 10%).
+//              Also defined in KncWX2Server/Common/ServerDefine.h and X2ServerProtocol_2010.vcxproj ( X2TOOL ): toggle all three.
+#define SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT ) && !( defined( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY ) && defined( SERV_IRUHADEV_JUNE_BUFF_NEW_STAT ) && defined( SERV_IRUHADEV_JUNE_CHAR_DUO_STAT ) )
+#error SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT needs the range members ( SERV_IRUHADEV_JUNE_BUFF_BEHAVIOR_PARITY, SERV_IRUHADEV_JUNE_BUFF_NEW_STAT ) and the emulator's equip groups ( SERV_IRUHADEV_JUNE_CHAR_DUO_STAT )
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 //////////////////////////////////////////////////////////////////////////

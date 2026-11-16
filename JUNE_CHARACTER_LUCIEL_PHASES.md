@@ -2010,7 +2010,9 @@ Opus 5.5 high. Flag `SERV_IRUHADEV_JUNE_CHAR_DUO_VIEWER` (DU5b's). Files: `X2Uni
 - **Build:** `DEPLOY OK: X2_offline.exe is 27,104,768 B, dated 2026-11-16 10:16:26, md5 65ccb63e7b13cee700e2ae15090828c5` (built at main 63e45d19 +
   28 uncommitted code files: this phase's and peers' in-progress files). `EXESTR OK: 3 of 3 found in X2_offline.exe` (`ATTACK_LINE_START0_RWeapon`,
   `ATTACK_LINE_START0_LWeapon`, `Dummy3_RWeapon`, wide).
-- **Play-test:** handed off 2026-11-16 (character window, `testlu1`); review `DU5d-review.md` after it passes.
+- **Play-test passed** (user, 2026-11-16, md5 `65ccb63e`): character window on `testlu1`, Lu shown / Ciel shown / swaps / reopen, another class
+  unchanged. Logs (run after the deploy): 0 EXCEPTION; `LUCIEL DUO FORM` / `AVATAR` / `LOBBY` lines as before; ErrorLog's `OpenXET` misses
+  (`MOTION_CIEL_LDN_EVIL.XET` among many classes' XETs at game load) are a load-time batch, not this phase. Next: `DU5d-review.md`.
 - **Save:** `testlu1` (166) normal weapon 62119 set to +13, fire attribute (`attrib0` 1); backup `db_backup\els_db_20261116_100555_pre_sql.sql`.
 
 ### DU5e - Done (2026-11-15)

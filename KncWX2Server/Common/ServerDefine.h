@@ -4818,3 +4818,9 @@
 // Description: char-luciel DU5e: KRoomUserInfo and the room NOTs carry June's second KStat ( each Lu/Ciel body's game stat ). Also defined in KTDXLIB/Always.h and in X2ServerProtocol_2010.vcxproj ( X2TOOL ): toggle all three.
 #define SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-16
+// Description: june-stat-calc S1: June's 7-field KStat ( float hp, the attack-range pair ). Also defined in KTDXLIB/Always.h and in X2ServerProtocol_2010.vcxproj ( X2TOOL ): toggle all three.
+#define SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+//////////////////////////////////////////////////////////////////////////

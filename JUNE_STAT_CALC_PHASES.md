@@ -1286,6 +1286,51 @@ pure function, an Opus review, and a play-test on every character (level 99, wit
 **Run with.** Opus 5.5 / high each, Opus review each. **Depends.** S0 review, Stage 7 and Stage 8 closed, D6 review. One at a time
 (shared files). S0 may split or merge them.
 
+### Phase S1 - Done (2026-11-16)
+
+Flag `SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT` (three homes: `Always.h`, `ServerDefine.h`, `X2ServerProtocol_2010.vcxproj` X2TOOL; flagcheck
+`SECOND_HOMES`); `_STATCALC_DEBUG` back on (Z retires it). Commit: see `git log --grep "june-stat-calc Phase S1:"`.
+
+**The range decision (user, 2026-11-16).** The user pointed at cobodex.eu's calculator: it computes a character's attack range as the
+equipped weapon's own attack x the item's `m_fDamageRange` / 100 (`getWeaponDamageRange`; `min = E (2 maxi - 1)`, `max = E`, the same shape
+as June's roll `322788c0`). June's `item.kim` carries the field (+44): every level-90+ weapon has it (10655 weapons, 10-55), basic weapons
+10. June's client never derives range itself (`328842f0` -> `328d68c0` writes item stat slots 0-2 / 5-6 only; templet slots 3 / 4 are 0 in
+all 75556 rows), so the server did: the emulator now does, in the base stat and the game stat (the window reads range from the base,
+`3291cfb0`). Percent-attack multipliers in cobodex's term are left to the client's buff factors. The designed 10% is no longer called.
+
+**What landed (each = June, read in the exe this session).**
+- `KStat` = June's `{ float hp; int atkP, atkM, rangeP, rangeM, defP, defM }` (`322814a0` fld / fild, `323571c0` off the stack), Put / Get
+  in that order. Live hp readers moved: `X2Room.cpp` (DEFENCE_DUNGEON NOT), `X2StateMenu.cpp` x2, `X2ItemManager.cpp` x2 (March's integer
+  division kept), `X2Stat.h`, emulator. Dead, not touched: `X2StateMenu.cpp` `#else` of `SERV_CHANGE_EQUIPPED_PACKET_REFAC`,
+  `X2StateDungeonGame.cpp` (`SERV_TOONILAND_CHANNELING_EVENT` off), commented sites. No save-DB column holds KStat: no migration.
+- `CX2Stat::Stat` gains `m_fAtkPhysicRange` / `m_fAtkMagicRange` (June [9] / [10]) in Init / AddStat / ConvertAndAddStat / DecStat /
+  MultiplyStat / SetKStat / SetStat / Verify. Read in June: SetStat `322a91a0`, AddStat `32368910` (7 floats) and the window's full add;
+  DecStat / MultiplyStat / ConvertAndAddStat assumed uniform over [6..12] (review checks one).
+- `SetGameStat` both overloads = June `322814a0` / `32281690`: 7 basics (range included), then the block (June skips an unchanged block;
+  same values). `SetGameStats` needs no edit (two SetKStats). `GetEqipStat` adds the pair ([6..12], `3234e210`); the window guides
+  39431 / 39432 read it (stand-in 0 gone). Item stat range stays 0, as June.
+- Emulator: `CX2OfflineInventory::AddEquippedWeaponRange` (non-fashion `EP_WEAPON_HAND`, enchant scale, group test) from `AddEquippedStat`
+  and `AddBaseWeaponRange` (`MakeUnitInfoFromRow` base, `PushLevelUp` base); hp summed as float.
+- SHEET: `[JUNE_STATCALC] SHEET emu` (room join: StatTable base, game stat, weapon, damage_range), `SHEET game` (InitStat: the stored
+  block), `SHEET window` + `parts` (ResetStat: total, unit, equip, skill, guild, title, socket; once a second).
+
+**Proof.** `python june2017_re/statcalc/emu_unit_stat.py`: `EMU_UNIT_STAT: 370 KStat sets, 303 SetStat sets, 0 mismatch(es) -> PASS`
+(Unicorn: `322814a0` @322814e4-3228154e and `322a91a0` against the port). /Zs probes: 13 files, 0 errors; flagprobe UNIT_STAT / DEBUG ON.
+Map: the 7 S1 rows updated (SetGameStats, SetGameStat, Stat [9] / [10], stat block copy -> `June`).
+
+**Gates.** `finish.py` (worktree): flagcheck UNIT_STAT `RESULT: PASS` (11 PASS, 3 PASS~, 2 DEFINE; the 1 deleted line is the
+`//#define SERV_IRUHADEV_JUNE_STATCALC_DEBUG` uncommented; the 2 OTHER rows were a peer's uncommitted char-luciel CH4b hunks, not committed
+here); junediverge `RESULT: PASS`; enumscan exit 1 on 192 pre-existing rows, 0 on lines this phase changed. Range gate: PENDING_RANGE.
+Build: `BUILD OK: X2/US_SERVICE/x2.exe 27,124,224 B, 2026-11-16 10:26:54`; deploy refused (the game was running), `build.py --deploy-only`
+owed before the play-test. `EXESTR OK: 3 of 3 found in x2.exe, 27124224 B, dated 2026-11-16 10:26:54, md5 d22e408925cd8ae2e9b433dc7c3df1eb`
+(the three SHEET strings, wide, `--exe build`).
+
+**Not ported, routed.** Socket option data's range ([9] / [10] of the option stat, `+0x314` / `+0x318` in `328842f0`'s sum) -> S3 with the
+option vectors. Item-side `KItemFormatStatData` has no range slot (June's templet slots are 0) -> nothing. A weapon swap in the village
+refreshes the game stat at once; the base stat (window range) follows on the next unit info / level-up, as no NOT carries the base.
+
+Play-test: below; review `kickoffs/june-stat-calc/S1-review.md`.
+
 ## Phase Z - Close
 
 **Scope.** `MODS.md` complete, the map has no `March` / `mixed` / `unknown` row, `tools/data/june_diverge_allow.tsv` holds no `stage33`

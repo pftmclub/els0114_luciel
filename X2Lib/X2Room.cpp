@@ -2659,7 +2659,11 @@ bool CX2Room::Handler_EGS_CHANGE_GAME_STAT_INFO_IN_ROOM_NOT( KEGS_CHANGE_GAME_ST
 	kUnitData.m_GameStat.SetKStat( kEvent_.m_kGameStat );
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	pUser->SetMaxHp( kEvent_.m_kGameStat.m_fBaseHP );	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	pUser->SetMaxHp( static_cast< const float >( kEvent_.m_kGameStat.m_iBaseHP ) );
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	if ( pUser->GetNowHp() > pUser->GetMaxHp() )
 	{
 		pUser->SetNowHp( pUser->GetMaxHp() );

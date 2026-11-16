@@ -291,6 +291,22 @@ void CX2OfflineServer::MakeRoomUserInfo( const KOfflineUnitRow& kRow, OUT KRoomU
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	MakeMinorUnitGameStat( kRow, kOut.m_kMinorUnitGameStat );	// char-luciel DU5e: Ciel's own stat, SetKRoomUserInfo's second KStat
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
+#if defined( SERV_IRUHADEV_JUNE_STATCALC_DEBUG ) && defined( SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT )
+	{
+		// june-stat-calc S1 SHEET: the emulator's game stat = the StatTable base + gear, and the weapon range in it
+		KStat kBase;
+		CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel, kBase );
+		KStat kRange;
+		const int iEquipGroup = ( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow.m_iUnitClass ) ) ? 0 : 2;
+		const int iWeaponItemID = CX2OfflineInventory::Instance()->AddEquippedWeaponRange( kRange, iEquipGroup );
+		const CX2Item::ItemTemplet* pWeaponTemplet = ( 0 != iWeaponItemID && NULL != g_pData && NULL != g_pData->GetItemManager() ) ? g_pData->GetItemManager()->GetItemTemplet( iWeaponItemID ) : NULL;
+		const KStat& kGame = kOut.m_kGameStat;
+		CX2OfflineLog::Server( L"[JUNE_STATCALC] SHEET emu unit=%I64d class=%d lv=%d base hp=%d atk=%d/%d def=%d/%d | game hp=%d atk=%d/%d range=%d/%d def=%d/%d | weapon=%d damage_range=%g",
+			(__int64)kRow.m_nUnitUID, kRow.m_iUnitClass, kRow.m_iLevel, (int)kBase.m_fBaseHP, kBase.m_iAtkPhysic, kBase.m_iAtkMagic, kBase.m_iDefPhysic, kBase.m_iDefMagic,
+			(int)kGame.m_fBaseHP, kGame.m_iAtkPhysic, kGame.m_iAtkMagic, kGame.m_iAtkPhysicRange, kGame.m_iAtkMagicRange, kGame.m_iDefPhysic, kGame.m_iDefMagic,
+			iWeaponItemID, ( NULL != pWeaponTemplet ) ? pWeaponTemplet->GetDamageRange() : 0.0f );
+	}
+#endif SERV_IRUHADEV_JUNE_STATCALC_DEBUG && SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	// The equipped items and the skill state, so the in-dungeon character wears
 	// what the village character was wearing and has the same skills on its
@@ -4556,7 +4572,11 @@ int CX2OfflineServer::ComputeDungeonResultRank( KDungeonUnitResultInfo& kUnitRes
 		{
 			KStat kStat;
 			MakeGameStat( kRow, kStat );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+			iBaseHP = (int)kStat.m_fBaseHP;	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 			iBaseHP = kStat.m_iBaseHP;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 		}
 	}
 

@@ -4178,7 +4178,11 @@ bool CX2ItemManager::SetItemLevelEnchantData_LUA( int iAtkPhysic, int iAtkMagic,
 	m_kItemLevelEnchantData.m_iAtkMagic = iAtkMagic;
 	m_kItemLevelEnchantData.m_iDefPhysic = iDefPhysic;
 	m_kItemLevelEnchantData.m_iDefMagic = iDefMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	m_kItemLevelEnchantData.m_fBaseHP = static_cast<float>( iBaseHP );	// june-stat-calc S1: June's KStat hp is a float
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	m_kItemLevelEnchantData.m_iBaseHP = iBaseHP;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	return true;
 }
 
@@ -4230,7 +4234,11 @@ void CX2ItemManager::GetCaculatedItemLevelByEnchantStat( IN const KStat& kEnchan
 {
 	iItemLevel = 0;
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	iItemLevel += ( static_cast<int>( kEnchantItemStat.m_fBaseHP ) / static_cast<int>( m_kItemLevelEnchantData.m_fBaseHP ) );	// june-stat-calc S1: March's integer division kept
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	iItemLevel += ( kEnchantItemStat.m_iBaseHP / m_kItemLevelEnchantData.m_iBaseHP );
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	iItemLevel += ( kEnchantItemStat.m_iAtkPhysic / m_kItemLevelEnchantData.m_iAtkPhysic );
 	iItemLevel += ( kEnchantItemStat.m_iAtkMagic / m_kItemLevelEnchantData.m_iAtkMagic );
 	iItemLevel += ( kEnchantItemStat.m_iDefPhysic / m_kItemLevelEnchantData.m_iDefPhysic );

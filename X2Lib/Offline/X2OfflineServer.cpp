@@ -524,6 +524,22 @@ bool CX2OfflineServer::ReplyID( KOfflineSession& kSes, unsigned short usEventID 
 	kOut.m_kGameStat = kOut.m_kStat;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+namespace _CONST_OFFLINE_SERVER_S1_
+{
+	// june-stat-calc S1 stand-in: the base stat carries the weapon range too, as June's character window reads it from the unit stat ( 3291cfb0 )
+	int AddBaseWeaponRange( const KOfflineUnitRow& kRow_, IN OUT KStat& kBaseStat_ )
+	{
+		const int iEquipGroup = ( CX2Unit::UT_LUCIEL == CX2OfflineStatTable::UnitTypeOf( kRow_.m_iUnitClass ) ) ? 0 : 2;
+		CX2OfflineInventory* pInven = CX2OfflineInventory::Instance();
+		if( false == pInven->Load( kRow_.m_nUnitUID ) )
+			return 0;
+		return pInven->AddEquippedWeaponRange( kBaseStat_, iEquipGroup );
+	}
+}
+using namespace _CONST_OFFLINE_SERVER_S1_;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+
 /*static*/ void CX2OfflineServer::MakeGameStat( const KOfflineUnitRow& kRow, OUT KStat& kOut )
 {
 	CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel, kOut );
@@ -561,9 +577,16 @@ bool CX2OfflineServer::ReplyID( KOfflineSession& kSes, unsigned short usEventID 
 
 	KStat kMajor;
 	MakeGameStat( kRow, kMajor );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	// june-stat-calc S1: June's KStat hp is a float and carries the range pair
+	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO STAT unit %I64d: Lu hp %d atk %d / %d range %d / %d def %d / %d, Ciel hp %d atk %d / %d range %d / %d def %d / %d",
+		(__int64)kRow.m_nUnitUID, (int)kMajor.m_fBaseHP, kMajor.m_iAtkPhysic, kMajor.m_iAtkMagic, kMajor.m_iAtkPhysicRange, kMajor.m_iAtkMagicRange, kMajor.m_iDefPhysic, kMajor.m_iDefMagic,
+		(int)kOut.m_fBaseHP, kOut.m_iAtkPhysic, kOut.m_iAtkMagic, kOut.m_iAtkPhysicRange, kOut.m_iAtkMagicRange, kOut.m_iDefPhysic, kOut.m_iDefMagic );
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL DUO STAT unit %I64d: Lu hp %d atk %d / %d def %d / %d, Ciel hp %d atk %d / %d def %d / %d",
 		(__int64)kRow.m_nUnitUID, kMajor.m_iBaseHP, kMajor.m_iAtkPhysic, kMajor.m_iAtkMagic, kMajor.m_iDefPhysic, kMajor.m_iDefMagic,
 		kOut.m_iBaseHP, kOut.m_iAtkPhysic, kOut.m_iAtkMagic, kOut.m_iDefPhysic, kOut.m_iDefMagic );
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 
@@ -1120,6 +1143,9 @@ bool CX2OfflineServer::EnsureAccount( KOfflineSession& kSes, const std::wstring&
 	// The game stat is base plus gear, so it has to be rebuilt now that the
 	// gear is known - MakeDefaultUnitInfo only had the class and the level.
 	MakeGameStat( kRow, kOut.m_kGameStat );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	AddBaseWeaponRange( kRow, kOut.m_kStat );	// june-stat-calc S1
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 }
 
 //{{ Iruha : 2026-09-08 // phase 36 - the shared "money changed" fill
@@ -1219,6 +1245,9 @@ void CX2OfflineServer::PushLevelUp( KOfflineSession& kSes, UidType nUnitUID )
 	// so sending only one would quietly halve the character.
 	CX2OfflineStatTable::Instance()->GetUnitStat( kRow.m_iUnitClass, kRow.m_iLevel,
 												 kNot.m_kBaseStat );
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	AddBaseWeaponRange( kRow, kNot.m_kBaseStat );	// june-stat-calc S1
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	MakeGameStat( kRow, kNot.m_kGameStat );
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_STAT
 	MakeMinorUnitGameStat( kRow, kNot.m_kMinorUnitGameStat );	// char-luciel DU5e
@@ -1239,14 +1268,23 @@ void CX2OfflineServer::PushLevelUp( KOfflineSession& kSes, UidType nUnitUID )
 
 	// KGamePlayStatus's own constructor does NOT initialise m_iMaxHP - it is the
 	// one field it forgets - so every field here is set explicitly.
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	const int iGameStatMaxHP = (int)kStat.m_fBaseHP;	// june-stat-calc S1: June's KStat hp is a float
+	kOut.m_iMaxHP			= iGameStatMaxHP;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kOut.m_iMaxHP			= kStat.m_iBaseHP;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	// cur_hp 0 is the schema's "never stored" marker, and it is also what a
 	// character who died would carry. Either way it must not be handed back as
 	// zero: Handler_EGS_GET_MY_INVENTORY_ACK routes a zero-HP character out of a
 	// battlefield and back to the village, and there is nowhere in a village to
 	// heal. So a stored zero means full health.
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+	kOut.m_iCurHP			= ( kRow.m_iCurHP > 0 ) ? kRow.m_iCurHP : iGameStatMaxHP;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 	kOut.m_iCurHP			= ( kRow.m_iCurHP > 0 ) ? kRow.m_iCurHP : kStat.m_iBaseHP;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 	if( kOut.m_iCurHP > kOut.m_iMaxHP )
 		kOut.m_iCurHP		= kOut.m_iMaxHP;		///< a level or gear change shrank max HP

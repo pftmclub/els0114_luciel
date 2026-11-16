@@ -24,6 +24,11 @@ class CX2Stat
 			//공격
 			KProtectedType<float>	m_fAtkPhysic;
 			KProtectedType<float>	m_fAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+			// june-stat-calc S1: June Stat [9] / [10], the attack range ( 322814a0, 322a91a0, 32913df0 )
+			KProtectedType<float>	m_fAtkPhysicRange;
+			KProtectedType<float>	m_fAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 			//방어
 			KProtectedType<float>	m_fDefPhysic;
@@ -42,6 +47,10 @@ class CX2Stat
 				
 				m_fAtkPhysic		= 0.0f;
 				m_fAtkMagic			= 0.0f;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fAtkPhysicRange	= 0.0f;
+				m_fAtkMagicRange	= 0.0f;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fDefPhysic		= 0.0f;
 				m_fDefMagic			= 0.0f;
@@ -62,6 +71,10 @@ class CX2Stat
 
 				m_fAtkPhysic		+= baseStat.m_fAtkPhysic;
 				m_fAtkMagic			+= baseStat.m_fAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fAtkPhysicRange	+= baseStat.m_fAtkPhysicRange;
+				m_fAtkMagicRange	+= baseStat.m_fAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fDefPhysic		+= baseStat.m_fDefPhysic;
 				m_fDefMagic			+= baseStat.m_fDefMagic;
@@ -87,6 +100,10 @@ class CX2Stat
 
 				m_fAtkPhysic		+= baseStat_.m_fAtkPhysic;
 				m_fAtkMagic			+= baseStat_.m_fAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fAtkPhysicRange	+= baseStat_.m_fAtkPhysicRange;
+				m_fAtkMagicRange	+= baseStat_.m_fAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fDefPhysic		+= baseStat_.m_fDefPhysic;
 				m_fDefMagic			+= baseStat_.m_fDefMagic;
@@ -109,6 +126,10 @@ class CX2Stat
 
 				m_fAtkPhysic		-= baseStat.m_fAtkPhysic;
 				m_fAtkMagic			-= baseStat.m_fAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fAtkPhysicRange	-= baseStat.m_fAtkPhysicRange;
+				m_fAtkMagicRange	-= baseStat.m_fAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fDefPhysic		-= baseStat.m_fDefPhysic;
 				m_fDefMagic			-= baseStat.m_fDefMagic;
@@ -133,6 +154,10 @@ class CX2Stat
 
 				m_fAtkPhysic		*= fFactor;
 				m_fAtkMagic			*= fFactor;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fAtkPhysicRange	*= fFactor;
+				m_fAtkMagicRange	*= fFactor;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fDefPhysic		*= fFactor;
 				m_fDefMagic			*= fFactor;
@@ -153,10 +178,18 @@ class CX2Stat
 
 			void SetKStat( const KStat& kStat )
 			{
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fBaseHP			= kStat.m_fBaseHP;
+#else SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 				m_fBaseHP			= (float)kStat.m_iBaseHP;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fAtkPhysic		= (float)kStat.m_iAtkPhysic;
 				m_fAtkMagic			= (float)kStat.m_iAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fAtkPhysicRange	= (float)kStat.m_iAtkPhysicRange;
+				m_fAtkMagicRange	= (float)kStat.m_iAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fDefPhysic		= (float)kStat.m_iDefPhysic;
 				m_fDefMagic			= (float)kStat.m_iDefMagic;
@@ -178,6 +211,10 @@ class CX2Stat
 
 				m_fAtkPhysic		= (float)kStat.m_fAtkPhysic;
 				m_fAtkMagic			= (float)kStat.m_fAtkMagic;
+#ifdef SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
+				m_fAtkPhysicRange	= (float)kStat.m_fAtkPhysicRange;
+				m_fAtkMagicRange	= (float)kStat.m_fAtkMagicRange;
+#endif SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 
 				m_fDefPhysic		= (float)kStat.m_fDefPhysic;
 				m_fDefMagic			= (float)kStat.m_fDefMagic;
