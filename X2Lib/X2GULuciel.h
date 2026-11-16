@@ -1490,6 +1490,10 @@ protected:
 	void				LSI_A_LDN_F_RAPID_IMPACT_EventProcess();	// June 32b04fc0
 	void				LSI_A_LDN_F_RAPID_IMPACT_MOVEATTACK_EventProcess();	// June 32b05290
 	void				LSI_SA_LDN_SINISTER_MIND_StateStartFuture();	// June 32b05520
+	void				LSI_SA_LDN_SINISTER_MIND_FrameMove();	// June 32b32fe0, also the fly state's
+	void				LSI_A_LDN_F_PUNISHER_FrameMove();	// June 32b32800
+	void				LSI_A_LDN_M_PUNISHER_FrameMove();	// June 32b32b30
+	void				LSI_SA_LDN_GARDEN_OF_HAURES_FrameMove();	// June 32b33dc0
 	void				LSI_SA_LDN_SINISTER_MIND_EventProcess();	// June 32b05570
 	void				LSI_SA_LDN_SINISTER_MIND_FLY_EventProcess();	// June 32b057f0
 	void				LSI_SA_LDN_TRANSCENDENCE_EventProcess();	// June 32b05950

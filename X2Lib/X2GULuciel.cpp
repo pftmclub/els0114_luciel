@@ -20083,6 +20083,14 @@ namespace _CONST_LUCIEL_CH3C_
 	const double	TRANSFORM_LANDING_FALL_DISTANCE				= 45.0;		// June 32b05af0 ( 33472998 )
 	const double	TRANSFORM_TURN_DEGREE						= 180.0;	// June 32b061c0 ( 33438080 )
 	const int		TRANSFORM_SHREWD_CUTTER_END_SECOND_STATE_ID	= 499;		// June @32b48f1e ( 0x1f3 ): Enum.lua has no name for it ( between SHREWD_CUTTER_END 498 and SILENT_RAGE 500 )
+	const float		SINISTER_MIND_READY_EFFECT_TIME				= 0.1f;		// June 32b32fe0 ( 334395e0 )
+	const float		SINISTER_MIND_ATTACK_EFFECT_TIME			= 0.463f;	// June 32b32fe0 ( 334f2ff4 )
+	const float		PUNISHER_START_EFFECT_TIME					= 0.001f;	// June 32b32800 / 32b32b30 / 32b33dc0 ( 33431564 )
+	const float		PUNISHER_CIEL_ATTACK_EFFECT_TIME			= 0.4f;		// June 32b32b30 ( 33446fa0 )
+	const double	GARDEN_OF_HAURES_FRONT_DISTANCE				= 120.0;	// June 32b33dc0 ( 33439d10 )
+	const double	GARDEN_OF_HAURES_PROBE_HEIGHT				= 45.0;		// June 32b33dc0 ( 33472998 )
+	const float		GARDEN_OF_HAURES_PROBE_RADIUS				= 30.f;		// June 32b33dc0 ( 334ed3f8 )
+	const float		GARDEN_OF_HAURES_SPAWN_DELAY				= 0.3f;		// June 32b33dc0 ( 3345993c )
 }
 using namespace _CONST_LUCIEL_CH3C_;
 
@@ -20788,6 +20796,98 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_COMBO_ZZZZ_EventProcess()
 	CommonEventProcess();
 }
 
+// char-luciel CH3c: June 32b32fe0 ( thunk 32b4e360, the fly state registers it too ): the ready effect at 0.1 s, the skill's own at 0.463 s ( the transcendence one with Stable Dark Energy learned )
+void CX2GULuciel::LSI_SA_LDN_SINISTER_MIND_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SINISTER_MIND_READY_EFFECT_TIME ) )
+		g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDN_SINISTER_MIND_Ready_FX", this );
+
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( SINISTER_MIND_ATTACK_EFFECT_TIME ) )
+	{
+		if ( 0 < GetUnit()->AccessUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDN_SINISTER_MIND_TRANSCENDENCE", this );
+		else
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_SA_LDN_SINISTER_MIND", this );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3c: June 32b32800 ( thunk 32b4e460 ): the attack effect set of Lu's body, the transcendence one with Stable Dark Energy learned
+void CX2GULuciel::LSI_A_LDN_F_PUNISHER_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( PUNISHER_START_EFFECT_TIME ) )
+	{
+		if ( 0 < GetUnit()->AccessUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDN_PUNISHER_Attack_Lu_TRANSCENDENCE", this );
+		else
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDN_PUNISHER_Attack_Lu", this );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3c: June 32b32b30 ( thunk 32b4e470 ): Ciel's gun effect set ( its handle is kept, the hit stops it ) at once, her attack effect set at 0.4 s
+void CX2GULuciel::LSI_A_LDN_M_PUNISHER_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( PUNISHER_START_EFFECT_TIME ) )
+		m_hPunisherEffectSet = g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDN_PUNISHER_Gun_FX", this );
+
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( PUNISHER_CIEL_ATTACK_EFFECT_TIME ) )
+	{
+		if ( 0 < GetUnit()->AccessUnitData().m_UserSkillTree.GetSkillLevel( CX2SkillTree::RNSI_P_LDN_STABLE_DARKENERGY, false, 0, true ) )
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDN_PUNISHER_Attack_Ciel_TRANSCENDENCE", this );
+		else
+			g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_A_LDN_PUNISHER_Attack_Ciel", this );
+	}
+
+	CommonFrameMove();
+}
+
+// char-luciel CH3c: June 32b33dc0 ( thunk 32b4e3c0 ): at once the old garden dies and a new one stands 120 in front of the user ( the ground probe 45 above decides the height ), its key the skill's effective time
+void CX2GULuciel::LSI_SA_LDN_GARDEN_OF_HAURES_FrameMove()
+{
+	if ( true == GetXSkinAnimPtr()->EventTimerOneshot( PUNISHER_START_EFFECT_TIME ) )
+	{
+		KillMySummonedNPC( CX2UnitManager::NUI_SA_LDN_GARDEN_OF_HAURES );
+
+		const bool bIsRight = GetIsRight();
+		D3DXVECTOR3 vSpawnPos = GetPos( false );
+		const D3DXVECTOR3 vDirection = GetDirVector();
+		const D3DXVECTOR3 vFrontOffset(
+			static_cast<float>( vDirection.x * GARDEN_OF_HAURES_FRONT_DISTANCE ),
+			static_cast<float>( vDirection.y * GARDEN_OF_HAURES_FRONT_DISTANCE ),
+			static_cast<float>( vDirection.z * GARDEN_OF_HAURES_FRONT_DISTANCE ) );
+		if ( true == bIsRight )
+			vSpawnPos += vFrontOffset;
+		else
+			vSpawnPos -= vFrontOffset;
+
+		D3DXVECTOR3 vProbePos = vSpawnPos;
+		vProbePos.y = static_cast<float>( vProbePos.y + GARDEN_OF_HAURES_PROBE_HEIGHT );
+		const int iLastTouchLineIndex = static_cast<int>( m_FrameDataNow.syncData.lastTouchLineIndex );
+		D3DXVECTOR3 vLandPos = vProbePos;
+		const bool bGroundFound = g_pX2Game->GetWorld()->GetLineMap()->CanDown( vProbePos, GARDEN_OF_HAURES_PROBE_RADIUS, &vLandPos, &iLastTouchLineIndex, NULL, true, false, true, false );
+		if ( false == bGroundFound )
+			vSpawnPos = GetPos( false );
+		else
+			vSpawnPos.y = vProbePos.y;
+
+		if ( true == IsMyUnit() )
+		{
+			const int iSummonKeyCode = static_cast<int>( GetLearnedSkillAbilityValue( CX2SkillTree::SA_EFFECTIVE_TIME, GetNowStateSkillID() ) );
+			g_pX2Game->CreateNPCReq( CX2UnitManager::NUI_SA_LDN_GARDEN_OF_HAURES, ( true == IsHyperState() ? 1 : 0 ), true, vSpawnPos, true, GARDEN_OF_HAURES_SPAWN_DELAY, true, iSummonKeyCode,
+				(CX2Room::TEAM_NUM) GetTeam(), CX2NPCAI::NAT_ALLY, GetUnitUID(), false, CX2Room::TN_NONE, CX2GUNPC::NCT_NONE );
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_CHAR] LUCIEL SKILL garden of haures spawn ( ground %d, my unit %d ) at %.0f %.0f %.0f", static_cast<int>( bGroundFound ), static_cast<int>( IsMyUnit() ), vSpawnPos.x, vSpawnPos.y, vSpawnPos.z );	// char-luciel CH3c
+#endif SERV_IRUHADEV_JUNE_CHAR_LUCIEL_SKILL_DEBUG
+	}
+
+	CommonFrameMove();
+}
+
 // char-luciel CH3c: June 32b061c0 @32b0627e-32b062d2 ( inline; the same block sits in 32b06570 and 32b06920 ): a held direction opposite to the facing turns the unit round when the next hit starts
 void CX2GULuciel::TurnTransformComboToHeldDirection()
 {
@@ -21127,7 +21227,7 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_SINISTER_MIND", normalStateData.stateID );
 				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_Init );	// June 32b4b240
 				normalStateData.StateStartFuture	= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_StateStartFuture );	// June 32b4c4b0
-				// June 32b4e360 ( FrameMove ): LSI_SA_LDN_SINISTER_MIND_FrameMove, body in CH3c2
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_FrameMove );	// June 32b4e360
 				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_EventProcess );	// June 32b4c4c0
 
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_SINISTER_MIND", hyperStateData.stateID );
@@ -21139,7 +21239,7 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				stateData.Init();
 				stateData.stateID					= LSI_SA_LDN_SINISTER_MIND_FLY;
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_SINISTER_MIND_FLY", stateData.stateID );
-				// June 32b4e360 ( FrameMove ): LSI_SA_LDN_SINISTER_MIND_FrameMove, body in CH3c2
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_FrameMove );	// June 32b4e360
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_SINISTER_MIND_FLY_EventProcess );	// June 32b4c4d0
 				m_StateList[stateData.stateID] = stateData;
 			} break;
@@ -21148,7 +21248,7 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 			{
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_GARDEN_OF_HAURES", normalStateData.stateID );
 				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_GARDEN_OF_HAURES_Init );	// June 32b4b300
-				// June 32b4e3c0 ( FrameMove ): LSI_SA_LDN_GARDEN_OF_HAURES_FrameMove, body in CH3c2
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_SA_LDN_GARDEN_OF_HAURES_FrameMove );	// June 32b4e3c0
 				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
 
 				m_LuaManager.MakeTableReference( "LSI_SA_LDN_GARDEN_OF_HAURES", hyperStateData.stateID );
@@ -21210,7 +21310,7 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_PUNISHER", normalStateData.stateID );
 				normalStateData.StateInit			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_PUNISHER_Init );	// June 32b4b4f0
 				normalStateData.OnEventProcess		= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
-				// June 32b4e460 ( FrameMove ): LSI_A_LDN_F_PUNISHER_FrameMove, body in CH3c2
+				normalStateData.OnFrameMove			= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_PUNISHER_FrameMove );	// June 32b4e460
 
 				m_LuaManager.MakeTableReference( "LSI_A_LDN_F_PUNISHER", hyperStateData.stateID );
 				hyperStateData.m_bHyperState		= true;
@@ -21224,7 +21324,7 @@ void CX2GULuciel::LSI_SA_LDN_TRANSCENDENCE_TRANSFORM_SILENT_RAGE_StateStart()
 				stateData.m_bSkillState				= true;	// June @32b4a179 byte +0x11
 				stateData.StateInit					= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_F_PUNISHER_Init );	// June 32b4b4f0 ( the delegate maker 32b4c910 fills the Init slot, +0x18 )
 				stateData.OnEventProcess			= SET_CB_FUNC( CX2GUUser, GenericActiveSkillEventProcess );	// June 329cba60 > 31fcc9d0
-				// June 32b4e470 ( FrameMove ): LSI_A_LDN_M_PUNISHER_FrameMove, body in CH3c2
+				stateData.OnFrameMove				= SET_CB_FUNC( CX2GULuciel, LSI_A_LDN_M_PUNISHER_FrameMove );	// June 32b4e470
 				m_StateList[stateData.stateID] = stateData;
 			} break;
 
