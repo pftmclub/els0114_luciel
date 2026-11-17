@@ -480,6 +480,16 @@ names it.
 **Census re-run:** June kom numbers with no live archive 0; P4a rows left 2 (the zero-byte files); P4b 12,748, P4c 14,467 unchanged.
 **Build:** no build: data only (exe is P1's). `finish.py` not run: no client source changed.
 
+## Phase P4b - Done (2026-11-17, Sonnet 5.5 medium; data only, no client source; play-test owed)
+
+**What landed.** June-only files in data151-185: **12,748 files in 21 existing koms** (`june2017_re/P4b_stage_plan.tsv`, `MODS.md` entry). Wave list = the 12,748 census rows with `route=P4b` (none zero-byte, none held); list file `.build/P4b_wave.tsv`.
+
+**Gates.** 1 `stage-june`: 21 koms, 12,748 new, 0 replaced, 0 refused. 2 `verify-staged`: 12,748 equal June's strict decode, 0 problems. 3 `pack --wave` x21: every kom `PACK OK` + wave gate, `-0 removed`, `~0 changed`, 0 unexplained, `+added` equals the list count per kom. 4 `dupcheck --with` the 21: `DUPCHECK OK: 0 duplicate names` (209,053 names). 5 `copy --wave` x21 (one per call): 21 `COPY OK` (e.g. data185 72,214,338 B, 4,314 entries, md5 82aea178; data179 261,866,184 B, 3,952 entries, md5 91526e38).
+**Census re-run:** June kom numbers with no live archive 0; live-only entries with no file 0; P4b june-only rows left 0; P4c 14,470 (was 14,467: peers' later stagings moved a few names).
+**Build:** no build: data only (exe is P1's). `finish.py` not run: no client source changed.
+**Routes:** none of the Inbound routes land in P4b.
+**Open:** play-test (below). P4c next.
+
 ## Phase P5 - Collision key forecast
 
 **Run with:** Opus 5.5 high. No build. Opus phase: delegate the mechanical reads and scans (census greps, loader parsers' test runs,

@@ -62,8 +62,8 @@ Plan `JUNE_ASSET_PORT_PHASES.md` (brought up to date 2026-11-16: "Amended 2026-1
 | P2 | done 2026-11-16 (15 new koms, 4,421 files; play-tested: 258 / 258 `[KOM_MOUNT]` lines, 963 ms, 169 MB; P11 not needed) | Sonnet 5.5 / high | P1 review | new `kom_contents/data169,...,datai032_kom`, game dir koms | `P2.md` |
 | P3 | retired 2026-11-16 (merged into P2; GodBeast Fire moved to P4) | - | - | - | `P3.md` (stub) |
 | P4a | copied 2026-11-16 (92 koms, 9,429 files, data037 GodBeast lua copied); play-test owed | Sonnet 5.5 / medium, then user play-test | P2 | `kom_contents/data001-150_kom`, game dir koms | `P4a.md` |
-| P4b | ready (P4a copied) | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data151-185_kom`, game dir koms | `P4b.md` |
-| P4c | waiting (P4b) | Sonnet 5.5 / medium, then user play-test | P4b | `kom_contents/data186-226_kom`, `datai*_kom`, game dir koms | `P4c.md` |
+| P4b | copied 2026-11-17 (21 koms, 12,748 files, 0 removed / 0 unexplained, dupcheck 0); play-test owed | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data151-185_kom`, game dir koms | `P4b.md` |
+| P4c | ready (P4b copied) | Sonnet 5.5 / medium, then user play-test | P4b | `kom_contents/data186-226_kom`, `datai*_kom`, game dir koms | `P4c.md` |
 | P5 | ready (P0 done; can run alongside P1-P4) | Opus 5.5 / high | P0 | new `june2017_re/asset_keys.py`, `p5_*.tsv`, `p6/p7/p8_wave.tsv`, owners' docs ... | `P5.md` |
 | P5 review | waiting (P5) | Opus 5.5 / high | P5 | review | `P5-review.md` |
 | P6 | waiting (P4c, P5 review) | Sonnet 5.5 / high, then user play-test | P4c, P5 review | koms on `p6_wave.tsv` | `P6.md` |
@@ -269,15 +269,13 @@ Plan `JUNE_SPA_PHASES.md` - branch `main` - log tag `[JUNE_SPA]` (`offline_serve
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| S3a | done 2026-11-17 (inert; probe build): 0x637-0x639 packets, BTI 918 / 919 + BFI 948, `SPA_BUFF_TYPE`, emulator refresh-on-entry stand-in; review in S3b's | Opus 5.5 / high; review in S3b's | S2b review | `KncWX2Server/Common` packets + event ids, `Offline/Handlers_*`, `X2BuffFactor.h` / buff enums | `S3a.md` |
-| S3b | **review ready** (start: `/x2-phase june-spa S3b review`, covers S3a + S3c); play-test passed 2026-11-17: soak loop, 0x638 / 0x639, notice, effect, dtor send | Opus 5.5 / high, Opus review | S3a | `X2TFieldGame.*` | `S3b.md`, `S3b-review.md` |
-| S3c | play-test passed 2026-11-17: user's 60 s soak timer, pause / resume, re-grant each minute (emulator stand-in); review in S3b's | Opus 5.5 / high; review in S3b's | S3b | `Offline/Handlers_Field.cpp`, `X2OfflineServer.h` | none (user ask, Done note) |
-| S4a | blocked (S3b review): the Pporu class (14 methods), new files; inert, probe build | Opus 5.5 / high; review in S4b's | S3b review | new Pporu class files, `X2Lib_2010.vcxproj` | `S4a.md` |
+| S3b | **play-test owed** (review 2026-11-17: pass after one fix, June clamps the notice time at 0; covers S3a + S3c): notice reads `0 : 00` at a countdown's end | Opus 5.5 / high, Opus review | S3a | `X2TFieldGame.*` | `S3b.md`, `S3b-review.md` |
+| S4a | **ready** (start: `/x2-phase june-spa S4a`): the Pporu class (14 methods), new files; inert, probe build | Opus 5.5 / high; review in S4b's | S3b review | new Pporu class files, `X2Lib_2010.vcxproj` | `S4a.md` |
 | S4b | blocked (S4a): Pporu hooks in the field game, `SetAppearPPoruCheat` bind | Opus 5.5 / high, Opus review | S4a | `X2TFieldGame.*`, Lua bind list | `S4b.md`, `S4b-review.md` |
 | S5 | blocked (S4b review): rock-scissors-paper (spa-only): map the class, data, user-approved stand-in, port | Opus 5.5 / high, Opus review | S4b review | per its map; NPC shop / message UI, data034 / 036 | `S5.md`, `S5-review.md` |
 | Z | blocked (every review): retire `_DEBUG`, MODS.md, backlog Stage 24 closed, archive | Sonnet 5.5 / medium | S2b, S3b, S4b, S5 reviews | `Always.h`, `MODS.md`, backlog, STATUS archive | `Z.md` |
 
-Done: S2b (2026-11-17: doors, enter box, Z exit, June's field-change REQ; seam play-test passed; reviewed 2026-11-17: pass, no code change, funcmap rows fixed), S2a (2026-11-17: code_events v25, SpaData, door keys, spa cases; reviewed in S2b's: pass), S1 (2026-11-16: spa Lua rows merged, spa world / NPC UI luas adopted, `li_spa_ruben001.ogg` copied, data034 / 036 / 037 / 039 / 040 packed and copied; play-test section batched into S2b), S0 (2026-11-16: `spa_map.tsv` 106 rows, 46 funcmap rows, events field by field; Decisions answered: refresh on every entry, login inside a spa allowed, no live DB (CLAUDE.md rule rewritten); S2-S4 split into a / b; RPS kept as S5; no code, no build).
+Done: S3c (2026-11-17: user's 60 s soak timer, pause / resume, re-grant each minute; reviewed in S3b's: pass), S3a (2026-11-17: 0x637-0x639 packets, spa buff enums, emulator stand-in; reviewed in S3b's: pass), S2b (2026-11-17: doors, enter box, Z exit, June's field-change REQ; seam play-test passed; reviewed 2026-11-17: pass, no code change, funcmap rows fixed), S2a (2026-11-17: code_events v25, SpaData, door keys, spa cases; reviewed in S2b's: pass), S1 (2026-11-16: spa Lua rows merged, spa world / NPC UI luas adopted, `li_spa_ruben001.ogg` copied, data034 / 036 / 037 / 039 / 040 packed and copied; play-test section batched into S2b), S0 (2026-11-16: `spa_map.tsv` 106 rows, 46 funcmap rows, events field by field; Decisions answered: refresh on every entry, login inside a spa allowed, no live DB (CLAUDE.md rule rewritten); S2-S4 split into a / b; RPS kept as S5; no code, no build).
 
 ## Other plans (no STATUS rows)
 

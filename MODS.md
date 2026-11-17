@@ -7331,6 +7331,11 @@ Data only, no client source, no flag (the exe is P1's, `SERV_IRUHADEV_KOM_MOUNT_
 - **Revert:** live koms from `kom_backup_tools\dataNNN.kom.<stamp>` (newest per kom); staged tree is all new files (`june2017_re/P4a_stage_plan.tsv` lists them), delete them from `kom_contents/dataNNN_kom` + manifest, repack.
 - **Proof:** `python tools/logs.py --kom-mount` after a boot: 258 koms, `KOM_MOUNT CHECK: PASS`, 0 KEM_ERROR, `existfileinfo.txt` unchanged.
 
+### asset-port P4b (2026-11-17): June-only files into data151-185 (21 existing koms, 12,748 files)
+- 12,748 census rows (`route=P4b`, none zero-byte). Biggest: data185 4,262 (Gunner / weapon textures), data179 2,299, data174 1,019, data167 906, data171 846, data173 826, data175 725, data178 555. Types: ogg 8,075, tga 2,248, x 1,885, y 251, xet 168, dds 80, tet 41.
+- **Revert:** live koms from `kom_backup_tools\dataNNN.kom.<stamp>` (newest per kom); staged tree is all new files (`june2017_re/P4b_stage_plan.tsv` lists them), delete them from `kom_contents/dataNNN_kom` + manifest, repack.
+- **Proof:** `python tools/logs.py --kom-mount` after a boot: 258 koms, `KOM_MOUNT CHECK: PASS`, 0 KEM_ERROR, `existfileinfo.txt` unchanged.
+
 ## June character: Lu/Ciel (Stage 8, plan char-luciel, closed 2026-11-16)
 
 Plan `JUNE_CHARACTER_LUCIEL_PHASES.md` (313 commits, `char-luciel Phase ...`). Lu/Ciel (unit type 10; classes 200 / 37 / 38 / 39 / 127 / 128 / 129) is playable on June's class `CX2GULuciel`: two bodies, skills, passives, cut-ins, job change, tutorial and transcendence rows. Third jobs (177-179) are out of scope. Per-phase detail is in the plan's Done notes and the sections above (`DU4`, `CH3a` to `CH3d`).
