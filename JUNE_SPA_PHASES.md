@@ -588,7 +588,8 @@ so it has no kickoff of its own; S3b's review covers it. **Run with.** Opus 5.5 
 - **Debug:** `SERV_IRUHADEV_JUNE_SPA_DEBUG` stays on (S4b / S5 log through it; Z retires it).
 - **Build.** `DEPLOY OK: X2_offline.exe is 27,262,976 B, dated 2026-11-17 09:22:50, md5 805c9326b9d369ca1a76b2d2262b745a` (main a6d9c677 + the fixed
   `X2TFieldGame.cpp`). No new strings (exestr not needed).
-- **Range gate.** RANGE_LINE
+- **Range gate.** `finish.py --range 860cf809^..860cf809 --with SERV_IRUHADEV_JUNE_SPA_BUFF`: flagcheck PASS (1 PASS, 2 deleted lines inside the flag),
+  junediverge PASS, enumscan PASS. STATUS rows for this review were committed inside bba7cf09 (a peer's whole-file commit).
 - Play-test: hand-off now (the notice at the end of a countdown).
 
 ## Phase S4a - The Pporu class
