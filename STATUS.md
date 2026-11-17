@@ -63,7 +63,7 @@ Plan `JUNE_ASSET_PORT_PHASES.md` (brought up to date 2026-11-16: "Amended 2026-1
 | P3 | retired 2026-11-16 (merged into P2; GodBeast Fire moved to P4) | - | - | - | `P3.md` (stub) |
 | P4a | copied 2026-11-16 (92 koms, 9,429 files, data037 GodBeast lua copied); play-test owed | Sonnet 5.5 / medium, then user play-test | P2 | `kom_contents/data001-150_kom`, game dir koms | `P4a.md` |
 | P4b | done 2026-11-17 (21 koms, 12,748 files; play-tested: 258 / 258 `[KOM_MOUNT]` lines, 1,138 ms, 175 MB) | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data151-185_kom`, game dir koms | `P4b.md` |
-| P4c | copied 2026-11-17 (33 koms, 14,467 files, 33 COPY OK); play-test owed | Sonnet 5.5 / medium, then user play-test | P4b | `kom_contents/data186-226_kom`, `datai*_kom`, game dir koms | `P4c.md` |
+| P4c | done 2026-11-17 (33 koms, 14,467 files; play-tested: 258 / 258 `[KOM_MOUNT]` lines, 1,289 ms, 178 MB) | Sonnet 5.5 / medium, then user play-test | P4b | `kom_contents/data186-226_kom`, `datai*_kom`, game dir koms | `P4c.md` |
 | P5 | ready (P0 done; can run alongside P1-P4) | Opus 5.5 / high | P0 | new `june2017_re/asset_keys.py`, `p5_*.tsv`, `p6/p7/p8_wave.tsv`, owners' docs ... | `P5.md` |
 | P5 review | waiting (P5) | Opus 5.5 / high | P5 | review | `P5-review.md` |
 | P6 | waiting (P4c, P5 review) | Sonnet 5.5 / high, then user play-test | P4c, P5 review | koms on `p6_wave.tsv` | `P6.md` |

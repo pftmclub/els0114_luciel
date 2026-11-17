@@ -499,7 +499,7 @@ names it.
 **Build:** no build: data only (exe is P1's). `finish.py` not run: no client source changed.
 **Routes:** the 37 costume-shop withheld files rode this wave; `Village_ADBoard_1/2/3.dds` (data216) landed. No GodBeast files here.
 
-**Play-test:** owed (see hand-off). Next: P5 / P6 per STATUS.
+**Play-test 2026-11-17 (logs):** 258 / 258 `[KOM_MOUNT]` lines, 223,520 entries, 1,289 ms, 178 MB private, `KOM_MOUNT CHECK: PASS`; 0 KEM_ERROR, 0 Motion Error, `existfileinfo.txt` unchanged (Sep 22). Ain / Rose face check dropped: not ported yet. Next: P5 / P6 per STATUS.
 
 ## Phase P5 - Collision key forecast
 
