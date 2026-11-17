@@ -378,6 +378,7 @@ Log lines `door`, `enter`, the emulator's `FIELD` lines. `exestr.py` for the deb
   only (X2CashShop.cpp class tables 13936-14379, X2State.cpp:9434 `SI_ETC_WS_COMMON_LOVE`; none in S2b's hunks). 447 inserted lines, 0 deleted (bytepatch).
 - **Build.** `DEPLOY OK: X2_offline.exe is 27,246,592 B, dated 2026-11-17 07:05:07, md5 246d12fc982940ef538d068347235891` (main 6e10cb8c + 9 code files).
   `EXESTR OK: 3 of 3 found` (`door near=`, `exit to=`, `enter village=`, wide).
+- **Range gate.** `finish.py --range c81726b0^..c81726b0`: flagcheck PASS (8 PASS, 1 DEFINE), junediverge PASS, enumscan the same pre-existing rows.
 - **Play-test:** seam: S1 + S2a + S2b assembled (`playtest.py check` PASS). JUNE_BUGS: none. Open questions: none.
 
 ## Phase S3a - Spa packets and the emulator's buff answer
