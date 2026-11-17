@@ -36,7 +36,9 @@ Play-test in both spas (give the dev-console line for the cheat and the `/addite
 - the cheat makes Pporu appear: alarm, "Start" anim, on-screen notice;
 - click it during "Wait": the Hard-boiled Egg (164548) arrives and 20000 ED is taken;
 - with less than 20000 ED: June's refusal line, no egg;
-- leave and re-enter twice: no crash, no second object.
+- leave and re-enter twice: no crash, no second object;
+- before Pporu appears, Z anywhere in the spa opens no dialog (user, S3b review play-test 2026-11-17: Z opened a blank dialog, server log
+  `talked to NPC 10196` = `NUI_SPA_PPORU`; its house row has `JoinArea = 5000`, so it is "in area" everywhere until the hidden start disables it).
 
 Expected log lines: `pporu create`, `pporu appear`, `pporu click`, `pporu free`, the emulator's buy line.
 

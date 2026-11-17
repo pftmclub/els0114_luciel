@@ -590,7 +590,11 @@ so it has no kickoff of its own; S3b's review covers it. **Run with.** Opus 5.5 
   `X2TFieldGame.cpp`). No new strings (exestr not needed).
 - **Range gate.** `finish.py --range 860cf809^..860cf809 --with SERV_IRUHADEV_JUNE_SPA_BUFF`: flagcheck PASS (1 PASS, 2 deleted lines inside the flag),
   junediverge PASS, enumscan PASS. STATUS rows for this review were committed inside bba7cf09 (a peer's whole-file commit).
-- Play-test: hand-off now (the notice at the end of a countdown).
+- **Play-test passed 2026-11-17** (user): the notice stops at `0 : 00`; log `emu soak start` / `pause left=31` / resume / `emu grant buff=919` 47 s
+  after re-entry / `next countdown` + `recv 0x639`. **Found:** Z anywhere in a spa opens a blank NPC dialog with a stray portrait. Server log
+  `talked to NPC 10196` = `NUI_SPA_PPORU`: S1 staged June's Pporu house (`JoinArea = 5000`, `AlwaysShow`), and what keeps it out of reach in June
+  (hidden at add `323b0980 @323b0ab8` via `DisableNpc` 325ca920, Z skip `323b2e80 @323b337a`) needs the Pporu object: S4b's rows. Routed to S4b
+  (play-test check added to `S4b.md`); no interim fix.
 
 ## Phase S4a - The Pporu class
 
