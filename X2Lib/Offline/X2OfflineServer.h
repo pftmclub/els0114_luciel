@@ -122,6 +122,13 @@ public:
 		/// first dismantle after this session starts is always a jackpot
 		/// attempt.
 		__int64			m_tNextJackpotAt;
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+		// june-spa S3c: the spa soak countdown ( stand-in, user 2026-11-17 ); m_iSpaSoakBuffID 0 = not in a pool
+		UidType			m_nSpaSoakUnitUID;
+		int				m_iSpaSoakBuffID;
+		__int64			m_tSpaSoakGrantAt;
+		int				m_iSpaSoakLeftSec;
+#endif SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
 
 		KOfflineSession()
 			: m_pSession( NULL )
@@ -143,6 +150,12 @@ public:
 #endif SERV_IRUHADEV_OFFLINE_ROOM_RIDING_PET
 			, m_bPetRestorePending( false )
 			, m_tNextJackpotAt( 0 )
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+			, m_nSpaSoakUnitUID( 0 )
+			, m_iSpaSoakBuffID( 0 )
+			, m_tSpaSoakGrantAt( 0 )
+			, m_iSpaSoakLeftSec( 0 )
+#endif SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
 		{
 		}
 	};
@@ -809,6 +822,10 @@ private:
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 #ifdef SERV_IRUHADEV_OFFLINE_SPA_BUFF
 	bool Handler_EGS_SPA_SOAK_REQ( KOfflineSession& kSes, const KEvent& kEvent );	// june-spa S3a: June 0x637, answered with 0x638 ( stand-in )
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+	bool OnSpaSoakReq( KOfflineSession& kSes, bool bInPool, int iSpaBuffType );	// june-spa S3c: start / resume / pause the soak countdown
+	void TickSpaSoak( KOfflineSession& kSes );	// june-spa S3c: grants the earned buff on EGS_UPDATE_PLAY_STATUS_NOT's beat
+#endif SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
 #endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
 
 	//////////////////////////////////////////////////////////////////////////

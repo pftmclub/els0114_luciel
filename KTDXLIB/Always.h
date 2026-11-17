@@ -14292,3 +14292,15 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_OFFLINE_SPA_BUFF needs SERV_IRUHADEV_OFFLINE ( the emulator ), _OFFLINE_ITEM_BUFF ( CX2OfflineBuff ) and _JUNE_SPA_BUFF ( the packets )
 #endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-17
+// Description: june-spa S3c - the user's soak timer replaces S3a's grant on entry ( stand-in, user 2026-11-17 ): { 1, type } starts or
+//              resumes a 60 s countdown ( EGS_SPA_SOAK_ACK carries its end ), { 0, -1 } pauses it and keeps the seconds already soaked;
+//              at 0 ( checked on EGS_UPDATE_PLAY_STATUS_NOT's 3 s beat ) the type's buff is (re)granted for its BuffTemplet period and
+//              EGS_SPA_BUFF_END_TIME_NOT starts the next 60 s. Log [JUNE_SPA] emu soak. Revert: comment out the #define ( S3a's grant on entry ).
+#define SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+#if defined( SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER ) && !defined( SERV_IRUHADEV_OFFLINE_SPA_BUFF )
+#error SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER needs SERV_IRUHADEV_OFFLINE_SPA_BUFF ( the soak REQ handler and CX2OfflineBuff::OnSoakSpa )
+#endif SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+//////////////////////////////////////////////////////////////////////////

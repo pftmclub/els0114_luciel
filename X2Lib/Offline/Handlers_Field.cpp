@@ -276,6 +276,10 @@ bool CX2OfflineServer::Handler_EGS_UPDATE_PLAY_STATUS_NOT( KOfflineSession& kSes
 	CheckBuffPeriod( kSes );
 #endif SERV_IRUHADEV_OFFLINE_ITEM_BUFF
 
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+	// june-spa S3c: the spa soak countdown rides the same beat, so the buff lands up to 3 s after the notice reaches 0
+	TickSpaSoak( kSes );
+#endif SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
 	// Note this one carries a bare KGamePlayStatus, not the
 	// KGamePlayStatusContainer that EGS_SELECT_UNIT_4_NOT uses.
 	const KGamePlayStatus& kStatus = kReq.m_kGamePlayStatus;
@@ -465,6 +469,11 @@ bool CX2OfflineServer::Handler_EGS_SPA_SOAK_REQ( KOfflineSession& kSes, const KE
 	if( false == ReadReq( kEvent, kReq ) )
 		return false;
 
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+	// june-spa S3c: the user's soak countdown replaces the grant on entry below
+	return OnSpaSoakReq( kSes, kReq.m_bInPool, (int)kReq.m_cSpaBuffType );
+#else SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+
 	const int iSpaBuffType = (int)kReq.m_cSpaBuffType;
 	if( false == kReq.m_bInPool )
 	{
@@ -506,7 +515,101 @@ bool CX2OfflineServer::Handler_EGS_SPA_SOAK_REQ( KOfflineSession& kSes, const KE
 
 	SendUpdateBuffInfo( kSes );
 	return true;
+#endif SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
 }
+
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
+namespace _CONST_OFFLINE_SERVER_S3C_
+{
+	const int SPA_SOAK_SECONDS = 60;	// june-spa S3c stand-in: soak time that earns the spa buff ( user 2026-11-17; June's server value is lost )
+}
+using namespace _CONST_OFFLINE_SERVER_S3C_;
+
+// june-spa S3c: { 1, type } starts or resumes the countdown and answers its end, { 0, -1 } pauses it; seconds soaked are kept
+bool CX2OfflineServer::OnSpaSoakReq( KOfflineSession& kSes, bool bInPool, int iSpaBuffType )
+{
+	if( 0 == kSes.m_nSelectedUnitUID )
+	{
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu soak REQ in=%d type=%d ignored: no selected unit", (int)bInPool, iSpaBuffType );
+		return true;
+	}
+
+	if( kSes.m_nSpaSoakUnitUID != kSes.m_nSelectedUnitUID )
+	{
+		kSes.m_nSpaSoakUnitUID	= kSes.m_nSelectedUnitUID;
+		kSes.m_iSpaSoakBuffID	= 0;
+		kSes.m_iSpaSoakLeftSec	= SPA_SOAK_SECONDS;
+	}
+
+	const __int64 tNow = _time64( NULL );
+	bool bPaused = false;
+	if( 0 != kSes.m_iSpaSoakBuffID )
+	{
+		const __int64 tLeft = kSes.m_tSpaSoakGrantAt - tNow;
+		kSes.m_iSpaSoakLeftSec	= ( tLeft > 0 ) ? (int)tLeft : 0;
+		kSes.m_iSpaSoakBuffID	= 0;
+		bPaused = true;
+	}
+
+	if( false == bInPool )
+	{
+		if( true == bPaused )
+			CX2OfflineLog::Server( L"[JUNE_SPA] emu soak pause left=%d sec stand-in: the countdown resumes on the next pool entry", kSes.m_iSpaSoakLeftSec );
+		return true;
+	}
+
+	int iBuffID = 0;
+	switch( iSpaBuffType )
+	{
+	case CX2LocationManager::SBT_GROW:		iBuffID = BTI_SPA_GROW_BUFF;	break;
+	case CX2LocationManager::SBT_STRONG:	iBuffID = BTI_SPA_STRONG_BUFF;	break;
+	default:
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu soak REQ type=%d is no SPA_BUFF_TYPE: ignored", iSpaBuffType );
+		return true;
+	}
+
+	kSes.m_iSpaSoakBuffID	= iBuffID;
+	kSes.m_tSpaSoakGrantAt	= tNow + kSes.m_iSpaSoakLeftSec;
+	CX2OfflineLog::Server( L"[JUNE_SPA] emu soak start buff=%d left=%d sec stand-in: %d s in the pool earns the buff ( end=%I64d )",
+		iBuffID, kSes.m_iSpaSoakLeftSec, SPA_SOAK_SECONDS, kSes.m_tSpaSoakGrantAt );
+
+	KEGS_SPA_SOAK_ACK kAck;
+	kAck.m_iOK			= NetError::NET_OK;
+	kAck.m_bSoaking		= true;
+	kAck.m_tBuffEndTime	= kSes.m_tSpaSoakGrantAt;
+	return Reply( kSes, EGS_SPA_SOAK_ACK, kAck );
+}
+
+// june-spa S3c: at the countdown's end the buff is (re)granted and the next countdown starts, so staying in tops the buff up
+void CX2OfflineServer::TickSpaSoak( KOfflineSession& kSes )
+{
+	if( 0 == kSes.m_iSpaSoakBuffID || kSes.m_nSpaSoakUnitUID != kSes.m_nSelectedUnitUID )
+		return;
+
+	const __int64 tNow = _time64( NULL );
+	if( tNow < kSes.m_tSpaSoakGrantAt )
+		return;
+
+	const int iBuffID = kSes.m_iSpaSoakBuffID;
+	__int64 tBuffEndTime = 0;
+	if( true == CX2OfflineBuff::Instance()->OnSoakSpa( kSes.m_nSelectedUnitUID, iBuffID, tBuffEndTime ) )
+	{
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu grant buff=%d sec=%I64d stand-in: earned by %d s in the pool", iBuffID, tBuffEndTime - tNow, SPA_SOAK_SECONDS );
+		SendUpdateBuffInfo( kSes );
+	}
+	else
+	{
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu buff=%d not granted ( see the BUFF line above ); the countdown restarts", iBuffID );
+	}
+
+	kSes.m_iSpaSoakLeftSec	= SPA_SOAK_SECONDS;
+	kSes.m_tSpaSoakGrantAt	= tNow + SPA_SOAK_SECONDS;
+	KEGS_SPA_BUFF_END_TIME_NOT kNot;
+	kNot.m_tBuffEndTime = kSes.m_tSpaSoakGrantAt;
+	CX2OfflineLog::Server( L"[JUNE_SPA] emu soak next countdown end=%I64d ( 0x639 )", kNot.m_tBuffEndTime );
+	Reply( kSes, EGS_SPA_BUFF_END_TIME_NOT, kNot );
+}
+#endif SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER
 #endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
 
 #endif SERV_IRUHADEV_OFFLINE

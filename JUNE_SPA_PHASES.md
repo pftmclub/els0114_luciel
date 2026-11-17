@@ -526,6 +526,33 @@ inserted, 0 deleted (`bytepatch.py`). Map: the 9 live S3b rows -> `ported S3b`; 
   `EXESTR OK: 4 of 4 found` (`send 0x637`, `recv 0x638`, `effect play`, `EffectSet_SPA_Buff`; wide).
 - **Range gate.** `finish.py --range ad7b358e^..ad7b358e`: flagcheck `JUNE_SPA_BUFF` PASS (2 PASS, 0 OTHER), junediverge PASS, enumscan PASS.
 - **funcmap** +1 row (`323bda90 (S3b)`). Play-test: hand-off now (below). Review: `S3b-review.md` (covers S3a).
+- **Play-test passed 2026-11-17** (user, both spas, dungeon). Log: `type -1 -> 1 line=8`, `send 0x637 flag=1 type=1`, `emu grant buff=919 sec=1200`,
+  `recv 0x638 ok=0 soaking=1`, `effect play` / `effect stop`, up to three `flag=0 type=-1` sends after leaving, the `(dtor)` send. The user then asked
+  for a 1-minute soak timer: S3c.
+
+## Phase S3c - The user's soak timer (stand-in)
+
+**Scope.** Emulator only, flag `SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER` ("Decisions" 1 as amended 2026-11-17). Asked for by the user after S3b's play-test,
+so it has no kickoff of its own; S3b's review covers it. **Run with.** Opus 5.5 / high (same session as S3b).
+
+## Phase S3c - Done
+
+2026-11-17, Opus 5.5 / high. `X2Lib/Offline/Handlers_Field.cpp`, `X2OfflineServer.h`, `KTDXLIB/Always.h`; 132 lines inserted, 0 deleted (`bytepatch.py`).
+- **Design (user):** 60 s in a pool earns the buff; stepping out pauses the countdown and keeps the seconds soaked; at 0 the buff is (re)granted for
+  its `BuffTemplet` period (`BTI_SPA_STRONG_BUFF` 1200 s) and the next 60 s starts, so staying in tops the buff up every minute. June's server value is
+  lost: `SPA_SOAK_SECONDS = 60` is labelled `stand-in` (`_CONST_OFFLINE_SERVER_S3C_`).
+- **REQ** (`Handler_EGS_SPA_SOAK_REQ` -> `OnSpaSoakReq`; S3a's grant on entry in `#else`): a running countdown is banked first (`m_iSpaSoakLeftSec` =
+  seconds to the end, 0 floor); `{ 0, -1 }` -> `emu soak pause left=` (only when it was running; no reply, as S3a); `{ 1, SBT_* }` -> end = now + left,
+  `emu soak start buff= left=`, `EGS_SPA_SOAK_ACK { NET_OK, true, end }`. A new selected unit restarts at 60 s. Progress lives in the session
+  (`KOfflineSession` +4 members), not the save: a restart of the game starts at 60 s again.
+- **Tick** (`TickSpaSoak`, on `EGS_UPDATE_PLAY_STATUS_NOT`'s 3 s beat, before the max-HP early-out): end reached -> `OnSoakSpa` (S3a's end-and-reactivate),
+  `emu grant buff= sec=`, `SendUpdateBuffInfo`; then end = now + 60 and `EGS_SPA_BUFF_END_TIME_NOT` (0x639; its first use), `emu soak next countdown`.
+  The client's 0x639 case (S3b) replaces the end time only, so the notice restarts at `1 : 00`. The grant lands up to 3 s after the notice reads `0 : 00`
+  (it may show `0 : 0-1` .. `0 : 0-3` meanwhile, JUNE_BUGS 788's no-clamp display).
+- **Gates.** `finish.py --files KTDXLIB/Always.h X2Lib/Offline/Handlers_Field.cpp X2Lib/Offline/X2OfflineServer.h --with SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER`:
+  flagcheck PASS (1 PASS, 1 PASS~, 1 DEFINE, 0 OTHER, 0 FAIL), junediverge PASS, enumscan PASS. `/Zs` probe of `Handlers_Field.cpp`: 0 errors.
+- **Build.** `DEPLOY OK: X2_offline.exe is 27,256,832 B, dated 2026-11-17 09:00:56, md5 22a18bfd44f151361ac10325b596ca21` (main 2ef4c11e + the 3 S3c files).
+  `EXESTR OK: 3 of 3 found` (`emu soak start`, `emu soak pause`, `emu soak next countdown`; wide). Play-test: hand-off now.
 
 ## Phase S4a - The Pporu class
 
@@ -589,6 +616,9 @@ Written by S0 and answered by the user on 2026-11-16 (`AskUserQuestion`).
    `BuffTemplet` period from now, reply 0x638 `{ NET_OK, true, now + period }`, sync the buff list; log `stand-in:` with the buff id and seconds.
    `{ 0, -1 }`: logged, no reply. Other types: logged, ignored. 0x639 is never sent, so a player who stands in the pool past the 20 minutes
    sees June's notice count below zero (June's client has no clamp) until they step out and back in.
+   **Amended 2026-11-17 by the user after the S3b play-test (S3c, `SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER`):** the countdown is the soak time that
+   *earns* the buff (as STR 43476 reads, "@1 left before getting ..."), 60 s instead of 20 minutes; stepping out pauses it and stepping back in
+   continues it; at 0 the buff is (re)granted for its `BuffTemplet` period and 0x639 starts the next 60 s. S3a's grant on entry stays in `#else`.
 2. **Login with a saved position inside a spa.** June's client has no spa rule at login (it loads the saved village once the templet exists,
    which S2a's `SpaData` read gives), and June's exit needs no stored data (fixed spots by each door). Options: allow it (recommended) / never
    save a spa as last position. **Answer: allow it.** The emulator keeps saving 1500 / 1501 like any village. With code event 31 off, June
