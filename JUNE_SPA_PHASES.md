@@ -463,7 +463,8 @@ Inert on the client (nothing sends 0x637 until S3b).
   2 DEFINE, 6 OTHER, 0 FAIL), `OFFLINE_SPA_BUFF` PASS (3 PASS, 2 PASS~, 1 DEFINE, 6 OTHER), junediverge PASS, enumscan PASS; `FINISH RESULT: PASS`.
   OTHER rows: each flag's rows are the other flag's files, plus `X2BuffFactor.h` (`JUNE_ENUM_NAMES`, insert-only: 11 lines, 0 deleted). Adding
   `JUNE_ENUM_NAMES` to `--with` errors on peers' `!defined( SERV_IRUHADEV_JUNE_ENUM_NAMES )` guards in `Always.h`, so it stays INFO. `PASS~`: the blank
-  line before each new block. CP949 files through `bytepatch.py`: 125 inserted lines, 0 deleted.
+  line before each new block. CP949 files through `bytepatch.py`: 125 inserted lines, 0 deleted. Commit `35844836`: `finish.py --range
+  35844836^..35844836` `FINISH RESULT: PASS` (same tallies).
 - **Build.** Full build skipped: no play-test. `/Zs` probe (X2Lib context) of `X2ServerPacket.cpp` (includes `ClientPacket.cpp`), `Handlers_Field.cpp`,
   `Handlers_Inventory.cpp`, `X2OfflineServer.cpp`, `X2OfflineEventName.cpp` and a flag probe: 0 errors, all four flags ON (`JUNE_SPA_BUFF`,
   `OFFLINE_SPA_BUFF`, `JUNE_ENUM_NAMES`, `OFFLINE_ITEM_BUFF`).
