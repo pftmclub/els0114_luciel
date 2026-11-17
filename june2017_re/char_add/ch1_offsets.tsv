@@ -164,3 +164,6 @@ offset	kind	name	note
 0x96d8	field	m_NasodArmorAttackTargetData.m_uidTargetUID	CX2GUAdd, 8 bytes; WaitStart / HyperWaitStart zero it ( ResetTargetData, CH1a )
 0x96e0	field	m_NasodArmorAttackTargetData.m_bIsNPC	CX2GUAdd bool; zeroed with the uid ( CH1a )
 0x98e4	field	m_bApocalypseFinishBlocked	CX2GUAdd bool ( Mastermind ); June only ever stores 0 ( ctor / ReInit 32a22ffc, Apocalypse FrameMove 329f52b7, 329fb6c0 ); read by FinishSummonedNPC 329fb710 @329fb87a ( CH1b )
+0x9684	field	m_fXXDownXTickStateTime	Add float ( CH1f ): the state time of the last MP / beam tick of ANSI_AMM_COMBO_XXDownX_LOOP ( 329ee950 ), 0 after the START / LOOP end ( 329d2290 ); CH1h clears it in the ctor
+0x9688	field	m_hXXDownXLoopEffect	Add CX2DamageEffect::CEffectHandle ( CH1f ): the beam DamageEffect_AMM_XXDownX_Loop ( 329ee950 ); -1 = none, CH1h sets INVALID_DAMAGE_EFFECT_HANDLE in the ctor
+0x968c	field	m_vXXDownXTargetPos	Add D3DXVECTOR3 ( CH1f ): the point the XXDownX beam is aimed at: set by LOOP.Start 329dc2b0, DoAimingTarget in 329ee950, read by the END FrameMove 329eed20

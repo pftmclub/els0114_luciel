@@ -12725,3 +12725,37 @@ user +0x94a0 (StatCalc S33 S3)	CX2GUUser second socket-option list (no March mem
 32a0b470	CX2GUAdd::ANSI_APT_DASH_COMBO_ZXX_EventProcess (CH1e)	PORTED	Char Add CH1e: new under _CORE. The animation-end-first fall ( JUNE_BUGS 790 ), CH1d's nasod armor arm with m_NasodArmorAttackTargetData, skill, walk / dash on a line, ZX cancel
 32a0b830	CX2GUAdd::ANSI_ALP_DASH_COMBO_XXX_EventProcess (CH1e)	PORTED	Char Add CH1e: new under _CORE. Fall, animation end -> wait, CH1d's nasod armor arm, skill, walk / dash on a line, ZX cancel
 32294460 (CH1e)	CX2Game::GetUnitByUIDAndType on CX2GUAdd +0x9910	confirmed	Char Add CH1e: GetComboChainTargetUnit ( _CORE ); +0x9910 { UidType, GAME_UNIT_TYPE } = ComboChainTargetData, ctor -1 / user, read by 329de850 and 329ef130, reset by 329eee90 and 329ef130, written by 329e57a0 and 329e5df0 ( CH1h4 )
+329d2190	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_StateStart (CH1f)	PORTED	Char Add CH1f: new under _CORE. as DashComboXStateStart: keeps the custom render state ( +0x8e64 ) and the render colour alpha ( +0xc44 )
+329d21c0	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_StateEndFuture (CH1f)	PORTED	Char Add CH1f: new under _CORE. as DashComboXStateEndFuture: turns round
+329d2200	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_StateEnd (CH1f)	PORTED	Char Add CH1f: new under _CORE. as DashComboXStateEnd: puts back what the start kept
+329d2230	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_StateStart (CH1f)	PORTED	Char Add CH1f: new under _CORE. the same as ZX
+329d2260	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_StateEnd (CH1f)	PORTED	Char Add CH1f: new under _CORE. the same as ZX
+329d2290	CX2GUAdd::ANSI_AMM_COMBO_XXDownX_START_StateEnd (CH1f)	PORTED	Char Add CH1f: new under _CORE. START.End and LOOP.End: +0x9684 ( m_fXXDownXTickStateTime ) = 0, CommonStateEnd
+329daf60	CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_X_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. X -> _XX; foot, animation end, flag arm with the animation-end clause, skill / walk / dash cancels
+329db1e0	CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_XX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. X -> _XXX
+329db460	CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_XXX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. no key arm: foot, animation end, cancels
+329db620	CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_Z_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. Z ( oneZ ) -> _ZZ
+329db8a0	CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_ZZ_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. Z -> _ZZZ
+329dbb20	CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_ZZZ_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. no key arm
+329dbce0	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_FrameMove (CH1f)	PORTED	Char Add CH1f: new under _CORE. CommonFrameMove, then CRS_INVISIBLE while the animation time is in [ 0.085, 0.43 ), else the start's state
+329dbd40	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. X -> ANSI_DASH_COMBO_XX ( animation-end clause ); skill / walk / dash cancels
+329dbfc0	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_FrameMove (CH1f)	PORTED	Char Add CH1f: new under _CORE. CRS_INVISIBLE while the animation time is in [ 0, 0.233 )
+329dc020	CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. flag arm has no animation-end clause and no flag reset; sets m_bComboXXAfterDashComboZBackX ( +0x9698 ) then ANSI_COMBO_XX
+329dc280	CX2GUAdd::ANSI_AMM_COMBO_XXDownX_START_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. animation end -> ANSI_AMM_COMBO_XXDownX_LOOP
+329dc2b0	CX2GUAdd::ANSI_AMM_COMBO_XXDownX_LOOP_StateStart (CH1f)	PORTED	Char Add CH1f: new under _CORE. SetNoDetonation( true ) ( +0x6890 ); target point +0x968c = Bip01_R_Hand +- dir * 750
+329dc3c0	CX2GUAdd::ANSI_AMM_COMBO_XXDownX_LOOP_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. foot, skill cancel, then from 0.3 s: X released or 3 s -> _END; walk / dash cancels
+329dc5d0	CX2GUAdd::ANSI_AMM_DASH_JUMP_COMBO_XZ_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. on a line -> USI_DASH_JUMP_LANDING; Z -> _XZZ ( animation-end clause ); cancels
+329deec0	CX2GUAdd::ANSI_AAT_DASH_JUMP_COMBO_ZX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. animation end first, the foot test inside it ( JUNE_BUGS 791 ); walk / dash / ZX cancels
+329df090	CX2GUAdd::ANSI_AMM_COMBO_ZZX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. X with a recorded target ( GetComboChainTargetUnit ) -> ANSI_AMM_COMBO_ZZXX; cancels incl. ZX
+329df3f0	CX2GUAdd::ANSI_AMM_COMBO_ZZXX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. foot, animation end, cancels incl. ZX
+329df670	CX2GUAdd::ANSI_AMM_DASH_COMBO_XX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. X -> ANSI_AMM_DASH_COMBO_XXX; June registers it with no script table ( JUNE_BUGS 792 )
+329df9b0	CX2GUAdd::ANSI_AMM_DASH_COMBO_XXX_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. foot, animation end, cancels incl. ZX
+329ee950	CX2GUAdd::ANSI_AMM_COMBO_XXDownX_LOOP_FrameMove (CH1f)	PORTED	Char Add CH1f: new under _CORE. every 0.05 s: FlushMp( elapsed * 13.3333 ); beam DamageEffect_AMM_XXDownX_Loop created or looked up ( +0x9688 ), DoAimingTarget ( 600 PvP / PvE else 800 ) into +0x968c, SetLinkMainEffectByPos; no MP: DestroyInstanceHandle + CreateNotEnoughMPEffect
+329eed20	CX2GUAdd::ANSI_AMM_COMBO_XXDownX_END_FrameMove (CH1f)	PORTED	Char Add CH1f: new under _CORE. EventTimerOneshot( 0.01 ): DamageEffect_AMM_XXDownX_Finish from Bip01_R_Hand to +0x968c; CommonFrameMove
+329efbf0	CX2GUAdd::ANSI_AMM_COMBO_ZZX_FrameMove (CH1f)	PORTED	Char Add CH1f: new under _CORE. as ANSI_ALP_COMBO_ZZX_FrameMove: EffectSet_AMM_Combo_ZZX_Attack, 2 MP, target record reset
+329efe90	CX2GUAdd::ANSI_AMM_DASH_COMBO_XXX_FrameMove (CH1f)	PORTED	Char Add CH1f: new under _CORE. EventTimerOneshot( 0.01 ): EffectSet_AMM_DashComboXXX, 3 MP
+32a0a850	CX2GUAdd::ANSI_AMM_COMBO_XXDownX_END_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. foot, animation end, cancels, then the nasod armor arm ( GetIsFormationMode key arm )
+32a0ab60	CX2GUAdd::ANSI_AMM_DASH_JUMP_COMBO_XZZ_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. on a line -> USI_DASH_JUMP_LANDING, nasod armor arm before the cancels
+32a18ec0	CX2GUAdd::ANSI_AAT_CREATE_DYNAMO_FACTORY_EventProcess (CH1f)	PORTED	Char Add CH1f: new under _CORE. ids 291-294 and 299; animation end -> USI_WAIT, cancels, nasod armor arm
+329e6f30	CX2GUAdd::HasTranscendedPassiveAbilityValue (CH1f)	PORTED	Char Add CH1f: new under _CORE. transcended unit and the +0x9668 cache holds the skill id
+329f8c70	CX2GUAdd::PlayDynamoFactoryChangeEffectSets (CH1f)	PORTED	Char Add CH1f: new under _CORE. switch by the new installation skill id: Drone_Change_1 / _2 / _3 or Charged_Impulsar_Start, then DynamoFactoryTransform_Start / _Impact

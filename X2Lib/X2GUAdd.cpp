@@ -7516,6 +7516,652 @@ void CX2GUAdd::ANSI_ALP_DASH_COMBO_XXX_EventProcess()
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+// char-add CH1f: June's nasod armor arm of 32a0a850 / 32a0ab60 / 32a18ec0: as CH1d's macro, but the key arm needs GetIsFormationMode() ( vslot 0x6c8 ) and not IsNasodArmorAttackPossible
+#define ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_FORMATION_MODE_MUTATION( iEventFlagIndex, fInputTimingStart, fInputTiming, fChangeTiming, uidTargetUID ) \
+	else if( m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] == true && \
+			 m_pXSkinAnimFuture->GetNowAnimationTime() > (float)(fChangeTiming) && 0 != (uidTargetUID) ) \
+			{ ConsumeMutationCountByNasodArmorAttack(); StateChange( CX2GUAdd::ANSI_COMBO_NASOD_ARMOR_READY ); m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = false; } \
+	else if( ( true == m_InputData.oneZ || true == m_InputData.oneX ) && \
+			 m_pXSkinAnimFuture->GetNowAnimationTime() < (float)(fInputTiming) && \
+			 m_pXSkinAnimFuture->GetNowAnimationTime() >= (float)(fInputTimingStart) && \
+			 NULL != GetUnit() && CX2Unit::UC_ADD_NASOD_RULER != GetUnit()->GetClass() && \
+			 true == GetIsFormationMode() ) \
+			{ m_FrameDataFuture.stateParam.bEventFlagList[(int)(iEventFlagIndex)] = true; }
+
+// char-add CH1f: June 329d2190 ( ANSI_AAT_DASH_COMBO_ZX.Start, as DashComboXStateStart: keeps the custom render state and the render colour alpha )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_StateStart()
+{
+	m_iCustomRenderStateOnStateStart	= m_iBuffCustomRenderState;
+	m_fRenderParamColorAOnStateStart	= m_RenderParam.color.a;
+
+	CommonStateStart();
+}
+
+// char-add CH1f: June 329d21c0 ( ANSI_AAT_DASH_COMBO_ZX.EndFuture, as DashComboXStateEndFuture: turns round )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_StateEndFuture()
+{
+	CommonStateStartFuture();
+
+	m_FrameDataFuture.unitCondition.dirDegree.y	+= 180.0f;
+	m_FrameDataFuture.syncData.bIsRight			= !m_FrameDataFuture.syncData.bIsRight;
+}
+
+// char-add CH1f: June 329d2200 ( ANSI_AAT_DASH_COMBO_ZX.End, as DashComboXStateEnd )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_StateEnd()
+{
+	m_RenderParam.color.a				= m_fRenderParamColorAOnStateStart;
+	m_iBuffCustomRenderState			= m_iCustomRenderStateOnStateStart;
+	m_fRenderParamColorAOnStateStart	= 1.f;
+
+	CommonStateEnd();
+}
+
+// char-add CH1f: June 329dbce0 ( ANSI_AAT_DASH_COMBO_ZX.FrameMove, as DashComboXFrameMove: invisible from 0.085 to 0.43 )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_FrameMove()
+{
+	CommonFrameMove();
+
+	if( 0.085f <= m_pXSkinAnim->GetNowAnimationTime() && 0.43f > m_pXSkinAnim->GetNowAnimationTime() )
+		m_iBuffCustomRenderState	= CX2GUUser::CRS_INVISIBLE;
+	else
+		m_iBuffCustomRenderState	= m_iCustomRenderStateOnStateStart;
+}
+
+// char-add CH1f: June 329dbd40 ( ANSI_AAT_DASH_COMBO_ZX.EventProcess; the X key goes on to ANSI_DASH_COMBO_XX )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ANSI_DASH_COMBO_XX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329d2230 ( ANSI_AAT_DASH_COMBO_ZBackX.Start, the same as ZX )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_StateStart()
+{
+	m_iCustomRenderStateOnStateStart	= m_iBuffCustomRenderState;
+	m_fRenderParamColorAOnStateStart	= m_RenderParam.color.a;
+
+	CommonStateStart();
+}
+
+// char-add CH1f: June 329d2260 ( ANSI_AAT_DASH_COMBO_ZBackX.End, the same as ZX )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_StateEnd()
+{
+	m_RenderParam.color.a				= m_fRenderParamColorAOnStateStart;
+	m_iBuffCustomRenderState			= m_iCustomRenderStateOnStateStart;
+	m_fRenderParamColorAOnStateStart	= 1.f;
+
+	CommonStateEnd();
+}
+
+// char-add CH1f: June 329dbfc0 ( ANSI_AAT_DASH_COMBO_ZBackX.FrameMove: invisible while the animation is below 0.233 )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_FrameMove()
+{
+	CommonFrameMove();
+
+	if( 0.f <= m_pXSkinAnim->GetNowAnimationTime() && 0.233f > m_pXSkinAnim->GetNowAnimationTime() )
+		m_iBuffCustomRenderState	= CX2GUUser::CRS_INVISIBLE;
+	else
+		m_iBuffCustomRenderState	= m_iCustomRenderStateOnStateStart;
+}
+
+// char-add CH1f: June 329dc020 ( ANSI_AAT_DASH_COMBO_ZBackX.EventProcess; no animation end clause and no flag reset on the X key: ANSI_COMBO_XX is entered with m_bComboXXAfterDashComboZBackX set )
+void CX2GUAdd::ANSI_AAT_DASH_COMBO_ZBackX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	else if( m_FrameDataFuture.stateParam.bEventFlagList[0] == true && m_pXSkinAnimFuture->GetNowAnimationTime() > m_fEventTime[0].stateChange )
+	{
+		m_bComboXXAfterDashComboZBackX = true;
+		StateChange( ANSI_COMBO_XX );
+	}
+	ELSE_IF_KEY_SET_FLAG_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_InputData.oneX == true )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329d2290 ( ANSI_AMM_COMBO_XXDownX_START.End and _LOOP.End: the loop's last effect tick time goes back to 0 )
+void CX2GUAdd::ANSI_AMM_COMBO_XXDownX_START_StateEnd()
+{
+	m_fXXDownXTickStateTime = 0.f;
+
+	CommonStateEnd();
+}
+
+// char-add CH1f: June 329dc280 ( ANSI_AMM_COMBO_XXDownX_START.EventProcess )
+void CX2GUAdd::ANSI_AMM_COMBO_XXDownX_START_EventProcess()
+{
+	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+		StateChange( ANSI_AMM_COMBO_XXDownX_LOOP );
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329dc2b0 ( ANSI_AMM_COMBO_XXDownX_LOOP.Start: the beam's target point starts 750 in front of the right hand )
+void CX2GUAdd::ANSI_AMM_COMBO_XXDownX_LOOP_StateStart()
+{
+	CommonStateStart();
+
+	SetNoDetonation( true );
+
+	const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01_R_Hand" );
+
+	if( true == GetIsRight() )
+		m_vXXDownXTargetPos	= vBonePos + GetDirVector() * 750.f;
+	else
+		m_vXXDownXTargetPos	= vBonePos - GetDirVector() * 750.f;
+}
+
+// char-add CH1f: June 329dc3c0 ( ANSI_AMM_COMBO_XXDownX_LOOP.EventProcess; ends once X is released after 0.3 s or after 3 s )
+void CX2GUAdd::ANSI_AMM_COMBO_XXDownX_LOOP_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	else if( 0.3f <= m_FrameDataNow.unitCondition.fStateTime )
+	{
+		if( false == m_InputData.pureX || 3.f <= m_FrameDataNow.unitCondition.fStateTime )
+			StateChange( ANSI_AMM_COMBO_XXDownX_END );
+	}
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329ee950 ( ANSI_AMM_COMBO_XXDownX_LOOP.FrameMove; every 0.05 s the beam costs MP, is created or looked up and is aimed at the target point )
+void CX2GUAdd::ANSI_AMM_COMBO_XXDownX_LOOP_FrameMove()
+{
+	CommonFrameMove();
+
+	if( 0.05f <= m_FrameDataNow.unitCondition.fStateTime - m_fXXDownXTickStateTime )
+	{
+		m_fXXDownXTickStateTime = m_FrameDataNow.unitCondition.fStateTime;
+
+		if( true == FlushMp( m_fElapsedTime * 13.3333f ) )
+		{
+			if( NULL == g_pX2Game || NULL == g_pX2Game->GetDamageEffect() )
+				return;
+
+			const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01_R_Hand" );
+
+			CX2DamageEffect::CEffect* pEffect = NULL;
+
+			if( INVALID_DAMAGE_EFFECT_HANDLE == m_hXXDownXLoopEffect )
+			{
+				pEffect = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_AMM_XXDownX_Loop", GetPowerRate(), vBonePos,
+																		GetRotateDegree(), GetRotateDegree() );
+
+				if( NULL == pEffect )
+					return;
+
+				m_hXXDownXLoopEffect = pEffect->GetHandle();
+			}
+			else
+			{
+				pEffect = g_pX2Game->GetDamageEffect()->GetInstance( m_hXXDownXLoopEffect, true );
+			}
+
+			if( NULL == pEffect )
+				return;
+
+			// June 322cc1a0: the aiming range is 600 in a PvP or PvE game, else 800
+			const float fAimingDistance = ( true == g_pX2Game->GetIsNowPVPCorrectionGame() ) ? 600.f : 800.f;
+			bool bIsTarget = false;
+			const D3DXVECTOR3 vCoefficient( static_cast<float>( tan( 1.0471975803375244 ) ), static_cast<float>( tan( 0.1745329350233078 ) ) * -1.f, 0.17453294f );
+			D3DXVECTOR3 vLandPos;
+
+			DoAimingTarget( fAimingDistance, vCoefficient, bIsTarget, m_vXXDownXTargetPos, vLandPos, false );
+
+			if( false == bIsTarget )
+			{
+				if( true == GetIsRight() )
+					m_vXXDownXTargetPos	= vBonePos + GetDirVector() * 750.f;
+				else
+					m_vXXDownXTargetPos	= vBonePos - GetDirVector() * 750.f;
+			}
+
+			pEffect->SetLinkMainEffectByPos( vBonePos, m_vXXDownXTargetPos, 99999.f );
+		}
+		else
+		{
+			if( NULL != g_pX2Game && NULL != g_pX2Game->GetDamageEffect() )
+				g_pX2Game->GetDamageEffect()->DestroyInstanceHandle( m_hXXDownXLoopEffect, false );
+
+			CreateNotEnoughMPEffect( GetBonePos( L"Bip01_R_Hand" ), 0.f, 0.f, 0.f );
+		}
+	}
+}
+
+// char-add CH1f: June 329eed20 ( ANSI_AMM_COMBO_XXDownX_END.FrameMove; the finishing beam from the right hand to the loop's last target point, once at 0.01 s )
+void CX2GUAdd::ANSI_AMM_COMBO_XXDownX_END_FrameMove()
+{
+	if( m_pXSkinAnim->EventTimerOneshot( 0.01f ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01_R_Hand" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetDamageEffect() )
+		{
+			CX2DamageEffect::CEffect* pEffect = g_pX2Game->GetDamageEffect()->CreateInstance( this, L"DamageEffect_AMM_XXDownX_Finish", GetPowerRate(), vBonePos,
+																							  GetRotateDegree(), GetRotateDegree() );
+
+			if( NULL != pEffect )
+				pEffect->SetLinkMainEffectByPos( vBonePos, m_vXXDownXTargetPos, 99999.f );
+		}
+	}
+
+	CommonFrameMove();
+}
+
+// char-add CH1f: June 32a0a850 ( ANSI_AMM_COMBO_XXDownX_END.EventProcess, the nasod armor arm after the cancels )
+void CX2GUAdd::ANSI_AMM_COMBO_XXDownX_END_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_FORMATION_MODE_MUTATION( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_NasodArmorAttackTargetData.m_uidTargetUID )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329daf60 ( ANSI_AAT_COMBO_NASOD_ARMOR_X.EventProcess; X goes on to _XX )
+void CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_X_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ANSI_AAT_COMBO_NASOD_ARMOR_XX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329db1e0 ( ANSI_AAT_COMBO_NASOD_ARMOR_XX.EventProcess; X goes on to _XXX )
+void CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_XX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ANSI_AAT_COMBO_NASOD_ARMOR_XXX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329db460 ( ANSI_AAT_COMBO_NASOD_ARMOR_XXX.EventProcess; the last of the X line )
+void CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_XXX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329db620 ( ANSI_AAT_COMBO_NASOD_ARMOR_Z.EventProcess; Z goes on to _ZZ )
+void CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_Z_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ANSI_AAT_COMBO_NASOD_ARMOR_ZZ )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329db8a0 ( ANSI_AAT_COMBO_NASOD_ARMOR_ZZ.EventProcess; Z goes on to _ZZZ )
+void CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_ZZ_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ANSI_AAT_COMBO_NASOD_ARMOR_ZZZ )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329dbb20 ( ANSI_AAT_COMBO_NASOD_ARMOR_ZZZ.EventProcess; the last of the Z line )
+void CX2GUAdd::ANSI_AAT_COMBO_NASOD_ARMOR_ZZZ_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329deec0 ( ANSI_AAT_DASH_JUMP_COMBO_ZX.EventProcess; the animation end is tested first and the foot only inside it: JUNE_BUGS 790 )
+void CX2GUAdd::ANSI_AAT_DASH_JUMP_COMBO_ZX_EventProcess()
+{
+	if( true == m_pXSkinAnimFuture->IsAnimationEnd() )
+	{
+		if( false == IsOnSomethingFuture() )
+		{
+			StateChange( USI_JUMP_DOWN );
+			m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+		}
+		else
+		{
+			StateChange( USI_WAIT );
+		}
+	}
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_ON_LINE_( m_fAttackCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329dc5d0 ( ANSI_AMM_DASH_JUMP_COMBO_XZ.EventProcess; Z goes on to _XZZ )
+void CX2GUAdd::ANSI_AMM_DASH_JUMP_COMBO_XZ_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneZ == true, ANSI_AMM_DASH_JUMP_COMBO_XZZ )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 32a0ab60 ( ANSI_AMM_DASH_JUMP_COMBO_XZZ.EventProcess, the nasod armor arm before the cancels )
+void CX2GUAdd::ANSI_AMM_DASH_JUMP_COMBO_XZZ_EventProcess()
+{
+	if( true == IsOnSomethingFuture() )
+	{
+		StateChange( USI_DASH_JUMP_LANDING );
+	}
+	ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_FORMATION_MODE_MUTATION( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_NasodArmorAttackTargetData.m_uidTargetUID )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329df090 ( ANSI_AMM_COMBO_ZZX.EventProcess; the X key needs a recorded target that is still in the game, as ANSI_ALP_COMBO_ZZX )
+void CX2GUAdd::ANSI_AMM_COMBO_ZZX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true && NULL != GetComboChainTargetUnit(), ANSI_AMM_COMBO_ZZXX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_ON_LINE_( m_fAttackCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329df3f0 ( ANSI_AMM_COMBO_ZZXX.EventProcess )
+void CX2GUAdd::ANSI_AMM_COMBO_ZZXX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_ON_LINE_( m_fAttackCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329df670 ( ANSI_AMM_DASH_COMBO_XX.EventProcess; June registers it with no script table: JUNE_BUGS )
+void CX2GUAdd::ANSI_AMM_DASH_COMBO_XX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	ELSE_IF_STATE_CHANGE_ON_EX_OR_ANIMATION_END_( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_InputData.oneX == true, ANSI_AMM_DASH_COMBO_XXX )
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_ON_LINE_( m_fAttackCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329df9b0 ( ANSI_AMM_DASH_COMBO_XXX.EventProcess )
+void CX2GUAdd::ANSI_AMM_DASH_COMBO_XXX_EventProcess()
+{
+	if( false == IsOnSomethingFuture() )
+	{
+		StateChange( USI_JUMP_DOWN );
+		m_FrameDataFuture.syncData.position.y -= LINE_RADIUS;
+	}
+	else if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ZX_CANCEL_AFTER_ON_LINE_( m_fAttackCancelAfter )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329efbf0 ( ANSI_AMM_COMBO_ZZX.FrameMove, as ANSI_ALP_COMBO_ZZX_FrameMove )
+void CX2GUAdd::ANSI_AMM_COMBO_ZZX_FrameMove()
+{
+	if( m_pXSkinAnim->EventTimerOneshot( 0.2f ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() )
+		{
+			if( true == IsEnoughMPForAttack( 2.f, vBonePos ) )
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_AMM_Combo_ZZX_Attack", this, NULL, IsHyperState(), GetPowerRate() );
+		}
+
+		m_ComboChainTarget.ResetTargetData();
+	}
+
+	CommonFrameMove();
+}
+
+// char-add CH1f: June 329efe90 ( ANSI_AMM_DASH_COMBO_XXX.FrameMove )
+void CX2GUAdd::ANSI_AMM_DASH_COMBO_XXX_FrameMove()
+{
+	if( m_pXSkinAnim->EventTimerOneshot( 0.01f ) )
+	{
+		const D3DXVECTOR3 vBonePos = GetBonePos( L"Bip01" );
+
+		if( NULL != g_pX2Game && NULL != g_pX2Game->GetEffectSet() )
+		{
+			if( true == IsEnoughMPForAttack( 3.f, vBonePos ) )
+				g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_AMM_DashComboXXX", this, NULL, IsHyperState(), GetPowerRate() );
+		}
+	}
+
+	CommonFrameMove();
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+// char-add CH1f: June 329e6f30 ( the unit is transcended and the cache of CH4a holds the skill; false otherwise )
+bool CX2GUAdd::HasTranscendedPassiveAbilityValue( const CX2SkillTree::SKILL_ID eSkillID_ ) const
+{
+	if ( NULL == GetUnit() || 0 == GetUnit()->GetUnitData().m_iUnitClassTran )
+		return false;
+
+	return m_mapTranscendedPassiveAbilityValue.end() != m_mapTranscendedPassiveAbilityValue.find( static_cast<int>( eSkillID_ ) );
+}
+
+// char-add CH1f: June 32a18ec0 ( ANSI_AAT_CREATE_DYNAMO_FACTORY.EventProcess, registered for ids 291-294 and 299; the nasod armor arm closes the chain )
+void CX2GUAdd::ANSI_AAT_CREATE_DYNAMO_FACTORY_EventProcess()
+{
+	if( m_pXSkinAnimFuture->IsAnimationEnd() == true )
+	{
+		StateChange( USI_WAIT );
+	}
+	SKILL_CANCEL_AFTER_ONLY_ADD( m_fSkillCancelAfter )
+	WALK_CANCEL_AFTER_ON_LINE_( m_fWalkCancelAfter )
+	DASH_CANCEL_AFTER_ON_LINE_( m_fDashCancelAfter )
+	ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_FORMATION_MODE_MUTATION( 0, m_fEventTime[0].keyInputStart, m_fEventTime[0].keyInputEnd, m_fEventTime[0].stateChange,
+		m_NasodArmorAttackTargetData.m_uidTargetUID )
+
+	CommonEventProcess();
+}
+
+// char-add CH1f: June 329f8c70 ( the effect sets played when the dynamo factory changes to an installation skill: the skill's change set, then the transform pair )
+void CX2GUAdd::PlayDynamoFactoryChangeEffectSets( const int iInstallationSkillID_ )
+{
+	if( NULL == g_pX2Game || NULL == g_pX2Game->GetEffectSet() )
+		return;
+
+	wstring wstrEffectSetName;
+
+	switch( iInstallationSkillID_ )
+	{
+	case CX2SkillTree::RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR:
+	case CX2SkillTree::RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR_UPGRADE:
+		wstrEffectSetName = L"EffectSet_SI_SA_AAT_Installation_Drone_Change_1";
+		break;
+
+	case CX2SkillTree::RNSI_SA_AMM_INSTALLATION_STAR_FALL:
+	case CX2SkillTree::RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY:
+	case CX2SkillTree::RNSI_SA_AMM_INSTALLATION_STAR_FALL_UPGRADE:
+	case CX2SkillTree::RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY_UPGRADE:
+		wstrEffectSetName = L"EffectSet_SI_SA_AAT_Installation_Drone_Change_3";
+		break;
+
+	case CX2SkillTree::RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER:
+	case CX2SkillTree::RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER_UPGRADE:
+		wstrEffectSetName = L"EffectSet_SI_SA_AAT_Installation_Drone_Change_2";
+		break;
+
+	case CX2SkillTree::RNSI_SA_AMM_CHARGED_IMPULSAR:
+		wstrEffectSetName = L"EffectSet_SA_AMM_Charged_Impulsar_Start";
+		break;
+	}
+
+	if( false == wstrEffectSetName.empty() )
+		g_pX2Game->GetEffectSet()->PlayEffectSet( wstrEffectSetName, this );
+
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_DynamoFactoryTransform_Start", this );
+	g_pX2Game->GetEffectSet()->PlayEffectSet( L"EffectSet_DynamoFactoryTransform_Impact", this );
+}
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// ANSI_DASH_COMBO_Z
 void CX2GUAdd::DashComboZFrameMoveFuture()
 {

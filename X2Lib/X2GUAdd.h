@@ -529,6 +529,17 @@ public:
 		ANSI_APT_DASH_JUMP_COMBO_ZX_LANDING,			/// 270
 		ANSI_ALP_COMBO_ZZXX,							/// 272
 		ANSI_ALP_COMBO_ZZXX_LANDING,					/// 273
+		/// char-add CH1f: the Arc Tracer / Mastermind states with a function of their own ( ids are June's script ids )
+		ANSI_AAT_COMBO_NASOD_ARMOR_XX,					/// 223
+		ANSI_AAT_COMBO_NASOD_ARMOR_XXX,					/// 224
+		ANSI_AAT_COMBO_NASOD_ARMOR_ZZ,					/// 226
+		ANSI_AAT_COMBO_NASOD_ARMOR_ZZZ,					/// 227
+		ANSI_AMM_COMBO_XXDownX_LOOP,					/// 236
+		ANSI_AMM_COMBO_XXDownX_END,						/// 237
+		ANSI_AMM_DASH_JUMP_COMBO_XZZ,					/// 239
+		ANSI_AMM_COMBO_ZZXX,							/// 278
+		ANSI_AMM_DASH_COMBO_XX,							/// 279
+		ANSI_AAT_CREATE_DYNAMO_FACTORY,					/// 291 ( also 292-294 and 299: one function set )
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 	};
 
@@ -878,6 +889,40 @@ protected:
 	void ANSI_ALP_COMBO_ZZXX_LANDING_EventProcess();	/// char-add CH1e: June 329debf0
 	void ANSI_ALP_DASH_JUMP_COMBO_XZ_EventProcess();	/// char-add CH1e: June 329dee70
 	void ANSI_ALP_DASH_COMBO_XXX_EventProcess();		/// char-add CH1e: June 32a0b830
+	void ANSI_AAT_DASH_COMBO_ZX_StateStart();			/// char-add CH1f: June 329d2190
+	void ANSI_AAT_DASH_COMBO_ZX_StateEndFuture();		/// char-add CH1f: June 329d21c0
+	void ANSI_AAT_DASH_COMBO_ZX_StateEnd();				/// char-add CH1f: June 329d2200
+	void ANSI_AAT_DASH_COMBO_ZX_FrameMove();			/// char-add CH1f: June 329dbce0
+	void ANSI_AAT_DASH_COMBO_ZX_EventProcess();			/// char-add CH1f: June 329dbd40
+	void ANSI_AAT_DASH_COMBO_ZBackX_StateStart();		/// char-add CH1f: June 329d2230
+	void ANSI_AAT_DASH_COMBO_ZBackX_StateEnd();			/// char-add CH1f: June 329d2260
+	void ANSI_AAT_DASH_COMBO_ZBackX_FrameMove();		/// char-add CH1f: June 329dbfc0
+	void ANSI_AAT_DASH_COMBO_ZBackX_EventProcess();		/// char-add CH1f: June 329dc020
+	void ANSI_AMM_COMBO_XXDownX_START_StateEnd();		/// char-add CH1f: June 329d2290 ( also LOOP.End )
+	void ANSI_AMM_COMBO_XXDownX_START_EventProcess();	/// char-add CH1f: June 329dc280
+	void ANSI_AMM_COMBO_XXDownX_LOOP_StateStart();		/// char-add CH1f: June 329dc2b0
+	void ANSI_AMM_COMBO_XXDownX_LOOP_EventProcess();	/// char-add CH1f: June 329dc3c0
+	void ANSI_AMM_COMBO_XXDownX_LOOP_FrameMove();		/// char-add CH1f: June 329ee950
+	void ANSI_AMM_COMBO_XXDownX_END_FrameMove();		/// char-add CH1f: June 329eed20
+	void ANSI_AMM_COMBO_XXDownX_END_EventProcess();		/// char-add CH1f: June 32a0a850
+	void ANSI_AAT_COMBO_NASOD_ARMOR_X_EventProcess();	/// char-add CH1f: June 329daf60
+	void ANSI_AAT_COMBO_NASOD_ARMOR_XX_EventProcess();	/// char-add CH1f: June 329db1e0
+	void ANSI_AAT_COMBO_NASOD_ARMOR_XXX_EventProcess();	/// char-add CH1f: June 329db460
+	void ANSI_AAT_COMBO_NASOD_ARMOR_Z_EventProcess();	/// char-add CH1f: June 329db620
+	void ANSI_AAT_COMBO_NASOD_ARMOR_ZZ_EventProcess();	/// char-add CH1f: June 329db8a0
+	void ANSI_AAT_COMBO_NASOD_ARMOR_ZZZ_EventProcess();	/// char-add CH1f: June 329dbb20
+	void ANSI_AAT_DASH_JUMP_COMBO_ZX_EventProcess();	/// char-add CH1f: June 329deec0
+	void ANSI_AMM_DASH_JUMP_COMBO_XZ_EventProcess();	/// char-add CH1f: June 329dc5d0
+	void ANSI_AMM_DASH_JUMP_COMBO_XZZ_EventProcess();	/// char-add CH1f: June 32a0ab60
+	void ANSI_AMM_COMBO_ZZX_EventProcess();				/// char-add CH1f: June 329df090
+	void ANSI_AMM_COMBO_ZZX_FrameMove();				/// char-add CH1f: June 329efbf0
+	void ANSI_AMM_COMBO_ZZXX_EventProcess();			/// char-add CH1f: June 329df3f0
+	void ANSI_AMM_DASH_COMBO_XX_EventProcess();			/// char-add CH1f: June 329df670
+	void ANSI_AMM_DASH_COMBO_XXX_EventProcess();		/// char-add CH1f: June 329df9b0
+	void ANSI_AMM_DASH_COMBO_XXX_FrameMove();			/// char-add CH1f: June 329efe90
+	bool HasTranscendedPassiveAbilityValue( const CX2SkillTree::SKILL_ID eSkillID_ ) const;	/// char-add CH1f: June 329e6f30
+	void ANSI_AAT_CREATE_DYNAMO_FACTORY_EventProcess();	/// char-add CH1f: June 32a18ec0
+	void PlayDynamoFactoryChangeEffectSets( const int iInstallationSkillID_ );	/// char-add CH1f: June 329f8c70
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 	/// ANSI_JUMP_ATTACK_Z
@@ -1472,6 +1517,9 @@ protected:
 	int						m_iCustomRenderStateOnStateStart;	/// char-add CH1d2 review: June +0x95b4, the user's custom render state a dash X / ZX / ZBackX starts with ( CH1h ctor clears it )
 	float					m_fRenderParamColorAOnStateStart;	/// char-add CH1d2 review: June +0x95b8, the render colour alpha it starts with, 1.0 after its end ( CH1h ctor clears it )
 	ComboChainTargetData	m_ComboChainTarget;			/// char-add CH1e: June +0x9910 ( its ctor sets -1, -1, 0 )
+	float					m_fXXDownXTickStateTime;	/// char-add CH1f: June +0x9684, the state time of the last MP / beam tick of ANSI_AMM_COMBO_XXDownX_LOOP, 0 after the START / LOOP end ( CH1h clears it in the ctor )
+	CX2DamageEffect::CEffectHandle	m_hXXDownXLoopEffect;	/// char-add CH1f: June +0x9688, the beam DamageEffect_AMM_XXDownX_Loop ( CH1h sets INVALID_DAMAGE_EFFECT_HANDLE in the ctor )
+	D3DXVECTOR3				m_vXXDownXTargetPos;		/// char-add CH1f: June +0x968c, the point the beam is aimed at
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// protected Valuable End
 

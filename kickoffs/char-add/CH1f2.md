@@ -56,3 +56,7 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 
 - Class map: **21** functions (2 listing-only; 0 `inside`, 21 `new`), filter `awk -F'\t' '$7=="CH1f2"' june2017_re/char_add/ch0_class_map.tsv` (col 7 phase, col 5 inside / new, col 6 proposed name, col 9 carved y / n).
 - CH0 split off CH1f: 21 container / template helpers (`32a2cbc0` .. `32a315f0`); several are also called from outside the class (shared template code): write each once, plain names.
+
+## Amended by CH1f (2026-11-17)
+
+- CH1f routed 7 rows to the new phase `CH1f3` ( Opus: the installation record at `+0x97f4`, the drone entry / list, `32a288d0` ). Most of the 21 container helpers here ( `32a2cbc0`, `32a2f970`, `32a2fa60`, `32a315f0`, ... ) are the compiled `std::vector` / copy code of the drone entry / list, so this phase starts after CH1f3 and reads its Done note first: a helper that `std::vector` already does is "= std", not code.

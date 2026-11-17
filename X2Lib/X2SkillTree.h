@@ -3141,6 +3141,20 @@ public:
 		RNSI_SA_ALP_SUPERSONIC                                = 29058,	// June's Enum.lua: GetFinalDamage's HP-rate gate 322726f0
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-17 // char-add CH1f
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+		// June's Enum.lua: the Add installation skills whose change effect set CX2GUAdd::PlayDynamoFactoryChangeEffectSets picks
+		RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR              = 29013,
+		RNSI_SA_AMM_INSTALLATION_STAR_FALL                    = 29016,
+		RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY                = 29017,
+		RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER              = 29018,
+		RNSI_SA_AAT_INSTALLATION_DRONE_ACTIVATOR_UPGRADE      = 29035,
+		RNSI_SA_AMM_CHARGED_IMPULSAR                          = 29039,
+		RNSI_SA_AMM_INSTALLATION_STAR_FALL_UPGRADE            = 29050,
+		RNSI_SA_AMM_INSTALLATION_ULTIMATE_FURY_UPGRADE        = 29051,
+		RNSI_SA_AMM_INSTALLATION_SHOOTING_CHASER_UPGRADE      = 29052,
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 //{{ Iruha : 2026-11-14 // char-luciel CH1a
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 		SI_SA_COMMON_AURA_DARKNESS_ACCEL                      = 208,	// June's Enum.lua: the Lu/Ciel aura tree id ( StateChangeBySkillID )

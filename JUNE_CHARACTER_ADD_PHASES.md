@@ -811,6 +811,33 @@ All 19 class-map rows of phase CH1e are accounted for: 11 `new` under `SERV_IRUH
 
 **Nothing to play-test.** No `_DEBUG` define here; the CH1g review covers CH1e-CH1g. Next: `/x2-phase char-add CH1f` ( Sonnet 5.5 high; kickoff ready ).
 
+### CH1f - Done (2026-11-17)
+
+**34 of the 41 class-map rows of CH1f are written, all `new` under `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE`** ( tag `// char-add CH1f: June <va>`; 41 carved, 0 listing-only ). **7 rows are not written and go to a new phase `CH1f3` ( Opus ): "this needs Opus"** ( reasons below ). `_LIVE` stays `//#define`; 34 funcmap rows `Char Add CH1f` ( two of them, `329e6f30` / `329f8c70`, name a helper CH0 had no name for ).
+
+**Rows written** ( June `CX2GUAdd::` -> name ):
+- AAT dash: `329d2190` `329d21c0` `329d2200` `329dbce0` `329dbd40` ( `ANSI_AAT_DASH_COMBO_ZX` Start / EndFuture / End / FrameMove / EventProcess ), `329d2230` `329d2260` `329dbfc0` `329dc020` ( `ZBackX` Start / End / FrameMove / EventProcess ), `329deec0` ( `ANSI_AAT_DASH_JUMP_COMBO_ZX` ).
+- AAT nasod armor lines: `329daf60` `329db1e0` `329db460` ( X, XX, XXX ), `329db620` `329db8a0` `329dbb20` ( Z, ZZ, ZZZ ) EventProcess; `32a18ec0` ( `ANSI_AAT_CREATE_DYNAMO_FACTORY` EventProcess, shared by ids 291-294 / 299 ).
+- AMM: `329d2290` ( `XXDownX_START` / `_LOOP` End ), `329dc280` `329dc2b0` `329dc3c0` `329ee950` ( START EventProcess, LOOP Start / EventProcess / FrameMove ), `329eed20` `32a0a850` ( END FrameMove / EventProcess ), `329dc5d0` `32a0ab60` ( dash-jump XZ / XZZ ), `329df090` `329efbf0` `329df3f0` ( ZZX EventProcess / FrameMove, ZZXX EventProcess ), `329df670` `329df9b0` `329efe90` ( dash XX / XXX EventProcess, XXX FrameMove ).
+- Helpers: `329e6f30` `HasTranscendedPassiveAbilityValue( skill )` ( transcended unit and the `+0x9668` cache holds the skill ), `329f8c70` `PlayDynamoFactoryChangeEffectSets( skill )` ( the skill's `Drone_Change_1/2/3` or `Charged_Impulsar_Start` set, then `DynamoFactoryTransform_Start` / `_Impact`; all `PlayEffectSet` arguments are the header defaults ).
+- New under `_CORE`: 9 `ANSI_*` enum names ( 223, 224, 226, 227, 236, 237, 239, 278, 279 ) + `ANSI_AAT_CREATE_DYNAMO_FACTORY` ( 291 ); members `m_fXXDownXTickStateTime` ( +0x9684 ), `m_hXXDownXLoopEffect` ( +0x9688 ), `m_vXXDownXTargetPos` ( +0x968c ) ( CH1h clears them in the ctor; rows in `ch1_offsets.tsv` ); macro `ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_FORMATION_MODE_MUTATION` ( the CH1d arm with `GetIsFormationMode()`, vslot `0x6c8`, as key test: `32a0a850` / `32a0ab60` / `32a18ec0` ). 9 `RNSI_SA_AAT_` / `RNSI_SA_AMM_` installation skill names in `X2SkillTree.h` under `SERV_IRUHADEV_JUNE_ENUM_NAMES` ( 29013, 29016-29018, 29035, 29039, 29050-29052; values from June's `Enum.src.lua` ).
+
+**Not written ( CH1f3, Opus ):** `329f85a0` / `329f8680` ( the installation record at `+0x97f4`: reset, and the state change that plays `Start` / `Attack` ), `329fb150` / `329fb270` ( one 0x38-byte drone entry reset and the drone list clear ), `32a247e0` ( `ANSI_AMM_COMBO_ZZXX` FrameMove: builds three drone entries, the Ultimate Fury drone effects ), `32a27900` ( the installation switch: buff `0x16e` / `0x16f`, buff-time finalizer `0x156`, the `+0x97f4` record ) and `32a288d0` ( the Dynamo Factory Start ). Why: they construct and read two record types ( the installation record, the drone entry and list ) whose other readers are CH2c / CH3b / CH1h-CH1j functions, so naming their fields here would be a design decision; `32a288d0` also calls `32d41960` ( `none in March`, port planned C6c: an unmapped engine callee ). The CH1f2 helpers ( 21, all container code for those records ) wait for CH1f3.
+
+**Where June differs from March / what to know** ( every function read branch by branch ):
+- **ZBackX EventProcess `329dc020`:** its flag arm has no animation-end clause and never clears flag 0; it sets `m_bComboXXAfterDashComboZBackX` before `ANSI_COMBO_XX`. ZX `329dbd40` and the nasod X / Z lines use the animation-end clause and clear it.
+- **XXDownX:** LOOP ends when X is released after 0.3 s or at 3 s ( `fStateTime` ); every 0.05 s the beam costs `m_fElapsedTime * 13.3333` MP, is aimed with `DoAimingTarget` ( 600 PvP / PvE, else 800 ) and linked to the right hand; no MP destroys the beam and plays the no-MP effect. The END FrameMove draws the finishing beam to the last target point.
+- **Nasod arm of `32a0a850` / `32a0ab60` / `32a18ec0`:** its key arm tests `GetIsFormationMode()` where CH1d's tests `IsNasodArmorAttackPossible` ( June's two functions differ ); the mutation count is spent as in CH1d.
+- **Class-line ZZX ( `329df090` ):** the X key needs `GetComboChainTargetUnit()` ( CH1e ). **Dash-jump ZX `329deec0`:** the foot test sits inside the animation end ( JUNE_BUGS 791 ). **`ANSI_AMM_DASH_COMBO_XX`:** June registers it with no script table ( JUNE_BUGS 792 ).
+- `329d2290` is one function for START.End and LOOP.End ( registered twice ); `329f8c70` uses the `RNSI_` names ( no literal ids ).
+
+**Gates.**
+- `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h X2Lib/X2SkillTree.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE JUNE_ENUM_NAMES`: `_CORE` PASS ( `files: 2 PASS, 0 PASS~, 0 DEFINE, 1 OTHER, 0 FAIL, 0 ERROR` ), `_LIVE` INERT ( `//#define`; 0 deleted / non-ASCII / EOL-mismatched, 0 `#else`/`#endif` without the token ), `JUNE_ENUM_NAMES` PASS, `junediverge` PASS, `enumscan` PASS; `stateends` skipped ( no skill state registered ), `skillicons` / `luabind` skipped. `git diff --numstat`: `X2GUAdd.cpp` 646 / 0, `X2GUAdd.h` 48 / 0, `X2SkillTree.h` 14 / 0.
+- One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`.
+- Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** No `_DEBUG` define here; the CH1g review covers CH1e-CH1g. Next: `/x2-phase char-add CH1f3` ( Opus 5.5 high ), then CH1f2 ( Sonnet 5.5 high ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.
