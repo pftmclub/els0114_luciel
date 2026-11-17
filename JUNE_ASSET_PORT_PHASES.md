@@ -488,7 +488,7 @@ names it.
 **Census re-run:** June kom numbers with no live archive 0; live-only entries with no file 0; P4b june-only rows left 0; P4c 14,470 (was 14,467: peers' later stagings moved a few names).
 **Build:** no build: data only (exe is P1's). `finish.py` not run: no client source changed.
 **Routes:** none of the Inbound routes land in P4b.
-**Open:** play-test (below). P4c next.
+**Play-test 2026-11-17 (logs):** 258 / 258 `[KOM_MOUNT]` lines, 209,053 entries, 1,138 ms, 175 MB private, `KOM_MOUNT CHECK: PASS`; 0 KEM_ERROR, 0 Motion Error, `existfileinfo.txt` unchanged (Sep 22). Ain-creation and Gunner checks dropped: those characters are not ported yet. P4c next.
 
 ## Phase P5 - Collision key forecast
 

@@ -62,7 +62,7 @@ Plan `JUNE_ASSET_PORT_PHASES.md` (brought up to date 2026-11-16: "Amended 2026-1
 | P2 | done 2026-11-16 (15 new koms, 4,421 files; play-tested: 258 / 258 `[KOM_MOUNT]` lines, 963 ms, 169 MB; P11 not needed) | Sonnet 5.5 / high | P1 review | new `kom_contents/data169,...,datai032_kom`, game dir koms | `P2.md` |
 | P3 | retired 2026-11-16 (merged into P2; GodBeast Fire moved to P4) | - | - | - | `P3.md` (stub) |
 | P4a | copied 2026-11-16 (92 koms, 9,429 files, data037 GodBeast lua copied); play-test owed | Sonnet 5.5 / medium, then user play-test | P2 | `kom_contents/data001-150_kom`, game dir koms | `P4a.md` |
-| P4b | copied 2026-11-17 (21 koms, 12,748 files, 0 removed / 0 unexplained, dupcheck 0); play-test owed | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data151-185_kom`, game dir koms | `P4b.md` |
+| P4b | done 2026-11-17 (21 koms, 12,748 files; play-tested: 258 / 258 `[KOM_MOUNT]` lines, 1,138 ms, 175 MB) | Sonnet 5.5 / medium, then user play-test | P4a | `kom_contents/data151-185_kom`, game dir koms | `P4b.md` |
 | P4c | ready (P4b copied) | Sonnet 5.5 / medium, then user play-test | P4b | `kom_contents/data186-226_kom`, `datai*_kom`, game dir koms | `P4c.md` |
 | P5 | ready (P0 done; can run alongside P1-P4) | Opus 5.5 / high | P0 | new `june2017_re/asset_keys.py`, `p5_*.tsv`, `p6/p7/p8_wave.tsv`, owners' docs ... | `P5.md` |
 | P5 review | waiting (P5) | Opus 5.5 / high | P5 | review | `P5-review.md` |
