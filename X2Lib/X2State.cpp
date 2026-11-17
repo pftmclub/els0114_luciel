@@ -7104,6 +7104,113 @@ bool CX2State::Handler_EGS_OPTION_UPDATE_ACK( HWND hWnd, UINT uMsg, WPARAM wPara
 
 bool CX2State::Handler_EGS_STATE_CHANGE_FIELD_REQ(int iVillageId)
 {
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2b: June 31f12630 whole, the return spot picked by state; in a spa it is the spot by that village's spa door
+	if( true == g_pMain->IsWaitingServerPacket( EGS_STATE_CHANGE_FIELD_ACK ) )
+		return false;
+
+	KEGS_STATE_CHANGE_FIELD_REQ kPacket;
+
+	int iMapId = 0;
+	D3DXVECTOR3 vStartPos = D3DXVECTOR3( 0.f, 0.f, 0.f );
+	int iStartPosLineIndex = 0;
+	CX2LocationManager* pLocationManager = g_pData->GetLocationManager();
+
+	if( iVillageId <= 0 )
+	{
+		// stand-in: June tests the unit-select game-start flag ( g_pData +0x5b8, set in 32578bc0 case 10 ) instead of m_EXP; not ported
+		if( g_pMain->GetIsExitingTutorial() == true &&
+			g_pData->GetMyUser()->GetSelectUnit()->GetUnitData().m_EXP <= 0 &&
+			g_pInstanceData != NULL && g_pInstanceData->GetFirstJoinVillage() == true )
+		{
+			iMapId = SEnum::VMI_RUBEN;
+			vStartPos = pLocationManager->GetStartPosLoc( 1 );
+		}
+		else
+		{
+			switch( g_pMain->GetNowStateID() )
+			{
+			// stand-in: June's case 15 ( XS_GUILD_AGIT_GAME, location +0xb4-+0xc4 ) is left out, March has no such state
+			case CX2Main::XS_WEDDING_GAME:
+				{
+					iMapId = pLocationManager->GetCurrentVillageID();
+					vStartPos = pLocationManager->GetLastPos();
+					iStartPosLineIndex = pLocationManager->GetLastPosLineIndex();
+				} break;
+
+			case CX2Main::XS_VILLAGE_MAP:
+				{
+					if( SEnum::VMI_SPA_RUBEN == pLocationManager->GetCurrentVillageID() )
+					{
+						iMapId = SEnum::VMI_RUBEN;
+						vStartPos = D3DXVECTOR3( 2569.f, 60.f, 150.f );
+						iStartPosLineIndex = 5;
+					}
+					else if( SEnum::VMI_SPA_RANOX == pLocationManager->GetCurrentVillageID() )
+					{
+						iMapId = SEnum::VMI_RANOX;
+						vStartPos = D3DXVECTOR3( -4100.f, 790.f, 266.f );
+						iStartPosLineIndex = 31;
+					}
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_SPA] exit to=%d/%d from=%d", iMapId, iStartPosLineIndex, (int)pLocationManager->GetCurrentVillageID() );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+				} break;
+
+			default:
+				{
+					const int iVillageIdBeforeDungeonStart = pLocationManager->GetVillageIdBeforeDungeonStart();
+					if( 0 != iVillageIdBeforeDungeonStart )
+					{
+						iMapId = iVillageIdBeforeDungeonStart;
+						vStartPos = pLocationManager->GetPositionInVillageBeforeDungeonStart();
+						iStartPosLineIndex = pLocationManager->GetLastTouchedIndexInVillageBeforeDungeonStart();
+					}
+					else
+					{
+						iMapId = pLocationManager->GetCurrentVillageID();
+						vStartPos = pLocationManager->GetStartPosLoc( pLocationManager->GetLoginPos( iMapId ) );
+					}
+				} break;
+			}
+
+			if( NULL == pLocationManager->GetVillageMapTemplet( (SEnum::VILLAGE_MAP_ID)iMapId ) )
+			{
+				iMapId = SEnum::VMI_RUBEN;
+				vStartPos = pLocationManager->GetStartPosLoc( pLocationManager->GetLoginPos( iMapId ) );
+			}
+		}
+
+		if( g_pInstanceData != NULL )
+			g_pInstanceData->SetFirstJoinVillage( false );
+
+		kPacket.m_bUseWarpItem = false;
+	}
+	else
+	{
+		iMapId = iVillageId;
+		vStartPos = pLocationManager->GetWarpPos( iMapId );
+		if( D3DXVECTOR3( 0, 0, 0 ) == vStartPos )
+		{
+			SEnum::VILLAGE_MAP_ID eTempVillageID = SEnum::VMI_INVALID;
+			pLocationManager->GetVillage( eTempVillageID, vStartPos );
+		}
+
+		if( g_pData != NULL )
+			g_pData->GetUIManager()->CloseAll();
+
+		kPacket.m_bUseWarpItem = true;
+	}
+
+	kPacket.m_iMapID = iMapId;
+	pLocationManager->SetVillage( (SEnum::VILLAGE_MAP_ID)kPacket.m_iMapID, vStartPos, iStartPosLineIndex );
+
+	g_pData->GetServerProtocol()->SendPacket( EGS_STATE_CHANGE_FIELD_REQ, kPacket );
+	g_pMain->AddServerPacket( EGS_STATE_CHANGE_FIELD_ACK );
+
+	SAFE_DELETE_DIALOG( m_pDLGMsgBox );
+	m_pDLGMsgBox = g_pMain->KTDGUIMsgBox( D3DXVECTOR2( 250, 300 ), GET_STRING( STR_ID_545 ), this );
+#else SERV_IRUHADEV_JUNE_SPA_ENTRY
 	KEGS_STATE_CHANGE_FIELD_REQ kPacket;
 
 	int iMapId = 0;
@@ -7185,6 +7292,7 @@ bool CX2State::Handler_EGS_STATE_CHANGE_FIELD_REQ(int iVillageId)
 	SAFE_DELETE_DIALOG( m_pDLGMsgBox );
 	m_pDLGMsgBox = g_pMain->KTDGUIMsgBox( D3DXVECTOR2(250,300), GET_STRING( STR_ID_545 ), this );	
 
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	return true;
 }
 

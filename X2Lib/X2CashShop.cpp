@@ -2826,6 +2826,11 @@ void CX2CashShop::SetOpen( bool bOpen )
 	{
 
 #ifdef TAKE_OFF_ALL_ITEM
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2b: June SetOpen 3223d680 @3223d97f, opening the shop hides the spa entrance prompt
+		if( NULL != g_pTFieldGame )
+			g_pTFieldGame->HideJoinSpa();
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 		m_bShowInvenEquip = true;
 		if ( m_pUnitViewerUI != NULL )
 			m_pUnitViewerUI->SetShowInvenEquip ( m_bShowInvenEquip );		

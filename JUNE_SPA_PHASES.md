@@ -343,6 +343,43 @@ BGM, world, NPCs); a level-9 unit gets June's refusal; talking to the sign opens
 (Ruben line 5, Ranox line 31). A relog inside a spa loads the spa. `elsdb.py code-event off 31`, relog: no doors, no signs, no spa warp rows.
 Log lines `door`, `enter`, the emulator's `FIELD` lines. `exestr.py` for the debug tag.
 
+## Phase S2b - Done
+
+2026-11-17, Opus 5.5 / high. Flags `SERV_IRUHADEV_JUNE_SPA_ENTRY` (S2a's, description extended), `SERV_IRUHADEV_JUNE_SPA_DEBUG`. Map rows S2b: all `ported S2b`.
+- **Lists.** `CX2LocationManager::GetVecSpaEnterPos` / `GetVecSpaOutPos` (`324f2ca0` / `324f2d30`: this village's start positions with `m_bIsSpaEnter` /
+  `m_bIsSpaOut`). TFG ctor fills `m_vecSpaEnterPos` / `m_vecSpaOutPos` only when `IsEnableCode( CEI_SPA_ON_OFF )` (@323bb5b5); dtor clears them;
+  `m_bJoinSpa` / `m_bExitSpa` (+0x460 / +0x461) start false. The sign test at `AddFieldNpc` now reads `CEI_SPA_ON_OFF` (`#else` keeps Atlas's `31`).
+- **Prompts.** `ShowJoinSpa` / `ShowExitSpa` (`323ab220` / `323ab390`): the market arrow particle (`m_hMarketInArea`, +0x3a0) at pos + 270 y,
+  `Get_In_*` drawn 60 lower, `Get_Out_*` not, frames by `m_fMarketTime` as March's market; hidden while dialogs are hidden. `HideJoinSpa` (`323ab4f0`)
+  resets the **entrance prompt only** (S0's row said both; corrected in the map); callers `CX2CashShop::SetOpen` open path (@3223d97f) and
+  `CX2StateField::SetShowStateDLG`'s hide branch (`32508a90` @32508e3e; S0's "CX2StateField slot").
+- **OnFrameMove** (@323b6759-323b6aa4), inside March's `IsNearPortalToBattleField() == false` block after the market loop, as June: entrance reset,
+  exit reset, entrance loop (<= 150, first hit), and in 1500 / 1501 the exit loop then `ExitSpa` while `m_bExitSpa`. The Pporu tick is S4b's. NPC loop:
+  a spa sign 40141 / 40142 is in reach while `m_bJoinSpa` (@323b7346); Atlas's comment is kept in `#else` with a one-line replacement.
+- **Enter.** `TalkNpc()` (`323b2e80` @323b2ee9): by a door, `OpenSpaEnterMsgBox` (SetLastPos / line, name 43064 Ruben / 43065 Ranox, box 43070 at
+  (250, 300), OK = `USCM_ENTER`), then March's flow continues (June also runs its NPC loop after the box). `TalkNpc( int )` cases 40141 / 40142 open the
+  same box and return true. `USCM_ENTER` (75000, enum `UI_SPA_CUSTOM_MSG` in `X2TFieldGame.h`): deletes the box; level < 10 -> OK box 43071; else
+  Ruben -> REQ( `VMI_SPA_RUBEN` ), Ranox -> REQ( `VMI_SPA_RANOX` ) (warp branch, the spa's `IsWarp` position).
+- **Exit.** `ExitSpa` (`323a8a60`): the key is action 0 = `GA_ATTACK_FAST` (Z, the village talk key), not "up" as S0 wrote; once per move
+  (`m_bNowMovingToBattleField`, +0x22f; `friend class CX2TFieldGame` in `X2StateField.h`), closes the user-list popup, the user menu and all UI, shortcut
+  keys off, `CX2State::Handler_EGS_STATE_CHANGE_FIELD_REQ( 0 )`.
+- **`Handler_EGS_STATE_CHANGE_FIELD_REQ`** (`31f12630`) June's whole body (new `replace` row, done): false while the ACK is awaited (`31d70e00`); by
+  state: `XS_VILLAGE_MAP` in 1500 -> Ruben (2569, 60, 150) line 5, 1501 -> Ranox (-4100, 790, 266) line 31 (`.rdata` 3346bda8-3346bdb8 / 33458fa0),
+  any other village -> 0 -> Ruben's login position; `XS_WEDDING_GAME` (June 0x16) -> current village + last pos; default -> the before-dungeon village,
+  else the current village's **login position** (`GetLoginPos`, `324f2dc0`; March used the last position); templet miss -> Ruben's login position.
+  Stand-ins (labelled): June's state 15 `XS_GUILD_AGIT_GAME` left out (no March state); the tutorial branch tests the unit-select game-start flag
+  `g_pData +0x5b8` (set in `32578bc0` case 10) instead of `m_EXP <= 0`: not ported, March's test kept. Both routed to Stage 38. Every other caller in a
+  village passes a map id; only the spa exit sends 0.
+- **Divergence rows** (`june_march_divergent.tsv`): `Handler_EGS_STATE_CHANGE_FIELD_REQ` replace (done); `TalkNpc`, `CX2TFieldGame::UICustomEventProc`,
+  `SetShowStateDLG` as `stage38` (June rewrote them; only the spa pieces are ported here, kickoff scope). Backlog Stage 38 bullet added. funcmap +8 rows.
+- **Debug** (`_DEBUG`): `door lists village= enter= exit=` (each TFG), `door near= pos=` (on change, at most 1/s), `enter village= return=`, `exit to= from=`.
+- **Gates.** `finish.py --with SERV_IRUHADEV_JUNE_SPA_ENTRY SERV_IRUHADEV_JUNE_SPA_DEBUG`: flagcheck `JUNE_SPA_ENTRY` PASS (8 PASS, 1 DEFINE, 0 OTHER;
+  `ELYSION_VILLAGE` INFO: the wrapped comment and the sign test sit in its block), junediverge `RESULT: PASS`, enumscan exit 1 on **pre-existing** lines
+  only (X2CashShop.cpp class tables 13936-14379, X2State.cpp:9434 `SI_ETC_WS_COMMON_LOVE`; none in S2b's hunks). 447 inserted lines, 0 deleted (bytepatch).
+- **Build.** `DEPLOY OK: X2_offline.exe is 27,246,592 B, dated 2026-11-17 07:05:07, md5 246d12fc982940ef538d068347235891` (main 6e10cb8c + 9 code files).
+  `EXESTR OK: 3 of 3 found` (`door near=`, `exit to=`, `enter village=`, wide).
+- **Play-test:** seam: S1 + S2a + S2b assembled (`playtest.py check` PASS). JUNE_BUGS: none. Open questions: none.
+
 ## Phase S3a - Spa packets and the emulator's buff answer
 
 **Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_BUFF`, `SERV_IRUHADEV_OFFLINE_SPA_BUFF` (stand-in); the map rows marked S3a:

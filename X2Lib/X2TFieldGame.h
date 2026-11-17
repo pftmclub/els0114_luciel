@@ -41,6 +41,13 @@ class CX2TFieldGame
 			REUM_CANCEL = 99111,
 		};
 #endif SERV_RELATIONSHIP_EVENT_INT
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2b: June Enum.lua UI_SPA_CUSTOM_MSG
+		enum UI_SPA_CUSTOM_MSG
+		{
+			USCM_ENTER = 75000,
+		};
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 		struct SquareSlot
 		{
@@ -423,6 +430,14 @@ class CX2TFieldGame
 
 		void SetShowNpcMessage(bool val);
 		void ShowJoinMarket(bool val, D3DXVECTOR3 vPos);
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2b: June 323ab220 / 323ab390 / 323ab4f0 / 323a8a60
+		void ShowJoinSpa( bool val, D3DXVECTOR3 vPos );
+		void ShowExitSpa( bool val, D3DXVECTOR3 vPos );
+		void HideJoinSpa();
+		void ExitSpa();
+		void OpenSpaEnterMsgBox();
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 		
 		bool UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 		bool UIServerEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -647,6 +662,13 @@ class CX2TFieldGame
 		
 		std::vector<int>			m_vecLinkedPos;			/// 포탈들의 위치
 		std::vector<int>			m_vecMarketPos;			/// 마켓 입구 위치
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2b: June TFG +0x324 / +0x334 / +0x460 / +0x461
+		std::vector<int>			m_vecSpaEnterPos;
+		std::vector<int>			m_vecSpaOutPos;
+		bool						m_bJoinSpa;
+		bool						m_bExitSpa;
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 		int							m_iVillageStartPosIdToBattleField;				/// 멤버로 가지고 있을 이유가 없음
 		int							m_iLastPos;				/// 멤버로 가지고 있을 이유가 없음
 

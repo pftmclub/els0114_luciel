@@ -37,6 +37,8 @@ Review S1's data and S2a's and S2b's code against the map and the exe.
 - the prompt distances, textures and flags;
 - `323b2e80`'s stored fields, the box and `USCM_ENTER`;
 - the exit path and `Handler_EGS_STATE_CHANGE_FIELD_REQ`'s spa return (positions from `.rdata`).
+- S2b's calls (Done note): the exit key is action 0 (`GA_ATTACK_FAST`), `HideJoinSpa` resets the entrance prompt only, the REQ's two stand-ins
+  (the `g_pData +0x5b8` game-start flag, guild agit state 15) and the `stage38` rows for June's `TalkNpc` / `UICustomEventProc` / `SetShowStateDLG`.
 
 Spot-check three June reads in Ghidra. If one fails, re-check the whole phase.
 

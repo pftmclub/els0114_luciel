@@ -5,6 +5,10 @@ using namespace std;
 class CX2StateField : public CX2StateMenu
 {
 public:
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2b: the spa exit ( June 323a8a60 ) reads and sets the moving flag ( +0x22f )
+	friend class CX2TFieldGame;
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	friend class CX2StateAutoChanger;	
 
 	struct DRAWFACE_RHW_VERTEX

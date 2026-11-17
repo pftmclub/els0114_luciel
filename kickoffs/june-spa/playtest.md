@@ -108,3 +108,77 @@ for every step. The game must be closed before the two `elsdb.py` lines; I run t
 
 ### Logs
 [JUNE_SPA] and the emulator's `FIELD` lines (`python tools/logs.py --tag JUNE_SPA`, then `--grep FIELD`)
+
+## S2b - Spa doors: prompt, enter box, signs, exits, level refusal
+
+New: each village's spa door shows June's arrow prompt when you stand within 150 of it; the talk key (**Z**) there opens June's OK / Cancel box,
+OK takes you into that village's spa. Clicking the spa sign while you stand at the door opens the same box. Inside a spa, both exits show the
+"out" arrow and **Z** takes you back to June's fixed spot by the door. A unit below level 10 gets June's refusal box. All of it needs code event
+31 (on since S2a step 8). Use **reyaa** (Grand Archer, level 99) and, for the refusal, **alishua** (Violet Mage, level 2). Code event 31 must
+be on before you start: `python tools/elsdb.py code-event list` shows `31 on` (I run it if you ask).
+
+### Dev console
+`/warp 0`
+`/warp 15`
+`/warp 19`
+`python tools/elsdb.py code-event off 31` (terminal, game closed)
+`python tools/elsdb.py code-event on 31` (terminal, game closed)
+
+### Loadout
+| key | skill (nickname) | page / slot |
+|---|---|---|
+| Z | the village talk / enter key (not a skill) | none |
+
+### Steps
+1. Start the game from `start_offline.bat`, log in with **reyaa**. Open the dev console (END key) and paste `/warp 0` (Ruben).
+2. **Ruben door.** Walk right to the far right end of Ruben, where the Ruben spa sign stands. When you are close to the spa door (x about 2569)
+   a blinking blue arrow appears above the door spot. Walk away: it disappears; walk back: it shows again.
+3. Standing at the door with the arrow showing, press **Z**. A box opens with June's text (the Ruben spa name in it) and OK / Cancel. Press
+   **Cancel**: the box closes and you stay in Ruben.
+4. Press **Z** again and press **OK**. Look at: the spa loading pictures, the spa music (a different BGM from Ruben), the spa world (pools), and
+   the spa NPCs (Mei / Meiseu, the wisps, the spa billboard).
+5. **Ruben spa exits.** Inside the Ruben spa there are two exits. Walk to the first: a blinking "out" arrow appears above it. Press **Z**: loading,
+   then you stand in Ruben **right next to the spa door** (not at the village's login spot). Press **Z** at the door, OK, and in the spa walk to
+   the **other** exit and leave the same way: again you land by the Ruben spa door.
+6. **Ruben sign.** Stand at the Ruben spa door (arrow showing) and **click the spa sign with the mouse**. The same OK / Cancel box opens.
+   Press Cancel. (The sign can only be talked to while you stand at the door, as in June.)
+7. **Ranox door.** Paste `/warp 15` (Ranox). Walk to Ranox's spa door (upper left of the village, x about -4106, on the upper ledge, beside the
+   Ranox spa sign). Same as steps 2 to 4: arrow, Z, Cancel stays, Z + OK enters the **Ranox spa**.
+8. **Ranox spa exits.** Same as step 5 with both Ranox spa exits: each lands you next to the Ranox spa door (upper left of Ranox).
+9. **Ranox sign.** Same as step 6 with the Ranox spa sign.
+10. **Relog in a spa.** Enter the Ruben spa (`/warp 19` is fine), quit by the normal exit, start again and log in with reyaa: you arrive in the
+    Ruben spa. Leave by an exit (Z): you land by the Ruben door.
+11. **Level refusal.** Quit to character select and log in with **alishua**. Paste `/warp 0`, walk to the Ruben spa door, press **Z**, press
+    **OK**: a June box says your level is too low (the text names level 10) with one OK button. You stay in Ruben.
+12. **Event off.** Quit the game. Run `python tools/elsdb.py code-event off 31` (or ask me). Start, log in with **reyaa**, paste `/warp 0`, walk
+    to the Ruben spa door: **no arrow, no spa sign**, Z does nothing there. Paste `/warp 19` (the dev warp still works): in the Ruben spa
+    walk to both exits: **no out arrow**, Z does nothing (June builds no exits with the event off). Leave with `/warp 0`.
+13. Quit. Run `python tools/elsdb.py code-event on 31` (or ask me) so the event is on for the next phases.
+
+### Expect
+- Each time a village loads, `offline_server.log` shows a `[JUNE_SPA] door lists ...` line: Ruben `village=20000 enter=1
+  exit=0`, Ranox `village=20008 enter=1 exit=0`, Ruben spa `village=1500 enter=0 exit=2`, Ranox spa `village=1501 enter=0 exit=2`. In step 12
+  every one of them shows `enter=0 exit=0`.
+- Steps 2 / 7: `[JUNE_SPA] door near=1 pos=5` at the Ruben door, `door near=1 pos=146` at the Ranox door, `door near=0 pos=-1` when you walk
+  away (at most one line a second).
+- Steps 4 / 7: `[JUNE_SPA] enter village=1500 return=20000/N` (Ruben) and `enter village=1501 return=20008/N` (Ranox), N = the door's line, then the
+  emulator's `FIELD` line with `mapID=1500` / `mapID=1501`. Cancel writes no `enter` line.
+- Steps 5 / 8 / 10: `[JUNE_SPA] exit to=20000/5 from=1500` (Ruben) and `exit to=20008/31 from=1501` (Ranox), then `FIELD` with `mapID=20000` /
+  `mapID=20008`. You stand right by the door: Ruben spot (2569, 60), Ranox spot (-4100, 790).
+- Step 11: the refusal box only; no `enter` line and no `FIELD` line.
+- The box texts are June's strings 43070 (enter, with the spa name 43064 Ruben / 43065 Ranox) and 43071 (level 10).
+- No new `ErrorLog.txt` line, no `EXCEPTION` / `UNHANDLED` for these steps.
+
+### If not
+- No arrow at a door: send the `door lists` line for that village (`enter=0` with the event on = the door row was not read: `DLG_Map_Village.lua`,
+  start pos 5 / 146 with `IsSpaEnter`).
+- Arrow shows but Z does nothing: say whether a box flashed; send the `door near` lines. Also check that no chat box had focus.
+- The box shows an empty or `[S...]` text: name the box (enter / level); the string table lacks 43064 / 43065 / 43070 / 43071.
+- OK enters but you land at Ruben's login spot or in the wrong village: send the `enter` and `FIELD` lines.
+- An exit with no arrow, or Z at an exit doing nothing, or landing at the wrong spot: name the spa and which exit (left / right); send the
+  `exit to=` line (missing = the exit key path did not run).
+- After leaving a spa you cannot move or open menus: say so (the shortcut keys come back with the field-change ACK).
+- A sign that cannot be clicked at the door: name the village.
+
+### Logs
+[JUNE_SPA] and the emulator's `FIELD` lines (`python tools/logs.py --tag JUNE_SPA`, then `--grep FIELD`)

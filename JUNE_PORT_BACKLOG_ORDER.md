@@ -1735,6 +1735,13 @@ field game itself; Atlas (Stage 1) and Stage 24 edited `X2TFieldGame.cpp` for en
   row after the spas (`324627f0` @32462b24, no gate), the warp-destination case (`32476050` @32479a1f-@32479c76: `-1` index allowed in state 15,
   agit-only id tests, `UseWarpPopup( false )` for 25000), and per Atlas A5's omission comments `IsValidWarpField` and both `X2FieldMapBase`
   functions. Decide here: a stand-in guild agit, or leave it out (it needs a guild).
+- **June's village talk / UI bodies (found by june-spa S2b, 2026-11-17; `june_march_divergent.tsv` rows `stage38`).** June rewrote
+  `CX2TFieldGame::TalkNpc()` (`323b2e80`: shortcut-key gate, no market branch, Pporu skip, camera / UI tail), `TalkNpc( int )` (`323b3690`: gates,
+  guild-mark 40083 and Christmas-tree cases), `UICustomEventProc` (`323b4040`: only `MLUI_CLOSE` and `USCM_ENTER`) and
+  `CX2StateField::SetShowStateDLG` (`32508a90`: guild-mark reset `323ab1b0`, two TFG resets, gauge gated on the NPC talk). june-spa S2b ported only
+  the spa pieces (door branch, sign cases, `USCM_ENTER`, the spa reset). Related: the market loop's neighbours in `OnFrameMove` (`323ab1b0`, the
+  TFG +0x314 list with `323ab050`, `@323b6640-323b6759`) and the unit-select game-start flag (`g_pData +0x5b8`, set in `32578bc0` case 10 /
+  `32575620`, read and cleared by `Handler_EGS_STATE_CHANGE_FIELD_REQ`'s tutorial branch; S2b kept March's EXP test as a labelled stand-in).
 - **Depends on:** nothing for planning. Start: `/x2-phase new-plan june-field` (Opus 5.5 high), brief `kickoffs/june-backlog/stage38-plan.md`.
 
 ### Stage 39: June game-event systems (june-census V2, 2026-11-09)

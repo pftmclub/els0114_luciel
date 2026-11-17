@@ -1010,6 +1010,11 @@ void CX2StateField::SetShowStateDLG(bool bShow)
 				g_pTFieldGame->GetTalkBoxManager()->SetShowObject( false );
 			}
 		}
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2b: June SetShowStateDLG 32508a90 @32508e3e, hiding the field hides the spa entrance prompt
+		if( NULL != g_pTFieldGame )
+			g_pTFieldGame->HideJoinSpa();
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	}
 
 	CX2GageManager::GetInstance()->SetShow( bShow );

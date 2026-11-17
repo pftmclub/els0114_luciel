@@ -1814,6 +1814,31 @@ void CX2LocationManager::GetVecMarketPos(std::vector<int>& vStart)
 	}	
 }
 
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+// june-spa S2b: June 324f2ca0, this village's start positions with IsSpaEnter
+void CX2LocationManager::GetVecSpaEnterPos( std::vector<int>& vStart )
+{
+	std::map<int, CX2LocationManager::VillageStartPos*>::iterator mit;
+	for( mit = m_mapVillageMap.begin(); mit != m_mapVillageMap.end(); ++mit )
+	{
+		const CX2LocationManager::VillageStartPos* pVillageStartPos = mit->second;
+		if( NULL != pVillageStartPos && pVillageStartPos->m_VillageID == m_eCurrentVillage && true == pVillageStartPos->m_bIsSpaEnter )
+			vStart.push_back( mit->first );
+	}
+}
+
+// june-spa S2b: June 324f2d30, this village's start positions with IsSpaOut
+void CX2LocationManager::GetVecSpaOutPos( std::vector<int>& vStart )
+{
+	std::map<int, CX2LocationManager::VillageStartPos*>::iterator mit;
+	for( mit = m_mapVillageMap.begin(); mit != m_mapVillageMap.end(); ++mit )
+	{
+		const CX2LocationManager::VillageStartPos* pVillageStartPos = mit->second;
+		if( NULL != pVillageStartPos && pVillageStartPos->m_VillageID == m_eCurrentVillage && true == pVillageStartPos->m_bIsSpaOut )
+			vStart.push_back( mit->first );
+	}
+}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 // int	CX2LocationManager::GetStartPosLink(int startPos) const
 // {
 // 	const CX2LocationManager::VillageStartPos* pVillageStartPos  = GetVillageStartPos(startPos);

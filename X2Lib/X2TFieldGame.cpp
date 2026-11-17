@@ -3,6 +3,9 @@
 
 
 #include ".\x2TFieldGame.h"
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+#include "Offline/X2OfflineLog.h"
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
 
 CX2TFieldGame::CX2TFieldGame( CX2World::WORLD_ID worldID, SquareData* pSquareData )
 : m_pNpcShadow( NULL )
@@ -148,6 +151,11 @@ CX2TFieldGame::CX2TFieldGame( CX2World::WORLD_ID worldID, SquareData* pSquareDat
 	m_iJoinNpcIndex			= -1;	
 	m_bJoinMarket			= false;
 	m_bShowMarketList		= false;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2b: June ctor 323bad00 @323bc7d4
+	m_bJoinSpa				= false;
+	m_bExitSpa				= false;
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 	m_bLoadComplete			= false;
 	m_bFindOtherLine		= false;
@@ -320,6 +328,18 @@ CX2TFieldGame::CX2TFieldGame( CX2World::WORLD_ID worldID, SquareData* pSquareDat
 	AddFieldNpc();
 	g_pData->GetLocationManager()->GetVecLinkedPos(m_vecLinkedPos);	
 	g_pData->GetLocationManager()->GetVecMarketPos(m_vecMarketPos);	
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2b: June ctor 323bad00 @323bb5b5-323bb61f, the spa door lists only with code event 31 on
+	if( NULL != g_pInstanceData && true == g_pInstanceData->IsEnableCode( CEI_SPA_ON_OFF ) )
+	{
+		g_pData->GetLocationManager()->GetVecSpaEnterPos( m_vecSpaEnterPos );
+		g_pData->GetLocationManager()->GetVecSpaOutPos( m_vecSpaOutPos );
+	}
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+	CX2OfflineLog::Server( L"[JUNE_SPA] door lists village=%d enter=%d exit=%d", (int)g_pData->GetLocationManager()->GetCurrentVillageID(),
+		(int)m_vecSpaEnterPos.size(), (int)m_vecSpaOutPos.size() );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 	m_hMarketInArea = GetUiParticle()->CreateSequenceHandle( NULL,  L"MarketInArea", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f );
 	CKTDGParticleSystem::CParticleEventSequence* pSeqMarket	= GetUiParticle()->GetInstanceSequence( m_hMarketInArea );
@@ -641,6 +661,11 @@ g_pData->GetUIManager()->DestoryUITempInventory();
 
 	m_vecLinkedPos.clear();
 	m_vecMarketPos.clear();
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2b: June dtor 323b8ba0 @323b95c4-323b9632
+	m_vecSpaOutPos.clear();
+	m_vecSpaEnterPos.clear();
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 	//SAFE_DELETE( m_pUiParticle );			// delete 하면 안됨
 	//SAFE_DELETE( m_pUiXMeshPlayer );		// delete 하면 안됨
@@ -1262,6 +1287,127 @@ void CX2TFieldGame::ShowJoinMarket(bool val, D3DXVECTOR3 vPos)
 	m_bJoinMarket = bShow;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+// june-spa S2b: June 323ab220, the spa entrance prompt (the market arrow, drawn 60 lower)
+void CX2TFieldGame::ShowJoinSpa( bool val, D3DXVECTOR3 vPos )
+{
+	bool bShow = val;
+	if( g_pKTDXApp->GetDGManager()->GetDialogManager()->GetHideDialog() == true )
+		bShow = false;
+
+	vPos.y += 270.f;
+	const D3DXVECTOR2 finalPos = g_pKTDXApp->GetProj3DPos( vPos );
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeq = GetUiParticle()->GetInstanceSequence( m_hMarketInArea );
+	if( NULL != pSeq )
+	{
+		if( m_fMarketTime <= 0.5f )
+		{
+			pSeq->ChangeTexForce( L"Get_In_Up.dds" );
+		}
+		else if( m_fMarketTime <= 1.f )
+		{
+			pSeq->ChangeTexForce( L"Get_In_Down.dds" );
+		}
+		else
+		{
+			m_fMarketTime = 0.f;
+			pSeq->ChangeTexForce( L"Get_In_Up.dds" );
+		}
+
+		pSeq->SetPosition( D3DXVECTOR3( finalPos.x, finalPos.y - 60.f, 0.f ) );
+		pSeq->SetShowObject( bShow );
+	}
+
+	m_bJoinSpa = bShow;
+}
+
+// june-spa S2b: June 323ab390, the spa exit prompt
+void CX2TFieldGame::ShowExitSpa( bool val, D3DXVECTOR3 vPos )
+{
+	bool bShow = val;
+	if( g_pKTDXApp->GetDGManager()->GetDialogManager()->GetHideDialog() == true )
+		bShow = false;
+
+	vPos.y += 270.f;
+	const D3DXVECTOR2 finalPos = g_pKTDXApp->GetProj3DPos( vPos );
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeq = GetUiParticle()->GetInstanceSequence( m_hMarketInArea );
+	if( NULL != pSeq )
+	{
+		if( m_fMarketTime <= 0.5f )
+		{
+			pSeq->ChangeTexForce( L"Get_Out_Up.dds" );
+		}
+		else if( m_fMarketTime <= 1.f )
+		{
+			pSeq->ChangeTexForce( L"Get_Out_Down.dds" );
+		}
+		else
+		{
+			m_fMarketTime = 0.f;
+			pSeq->ChangeTexForce( L"Get_Out_Up.dds" );
+		}
+
+		pSeq->SetPosition( D3DXVECTOR3( finalPos.x, finalPos.y, 0.f ) );
+		pSeq->SetShowObject( bShow );
+	}
+
+	m_bExitSpa = bShow;
+}
+
+// june-spa S2b: June 323ab4f0, hides the entrance prompt only
+void CX2TFieldGame::HideJoinSpa()
+{
+	if( false == m_bJoinSpa )
+		return;
+
+	CKTDGParticleSystem::CParticleEventSequence* pSeq = GetUiParticle()->GetInstanceSequence( m_hMarketInArea );
+	if( NULL != pSeq )
+		pSeq->SetShowObject( false );
+
+	m_bJoinSpa = false;
+}
+
+// june-spa S2b: June 323a8a60, the fast-attack key (action 0) at a spa exit leaves through CX2State's field change ( 0 )
+void CX2TFieldGame::ExitSpa()
+{
+	CX2StateField* pStateField = static_cast<CX2StateField*>( g_pMain->GetNowState() );
+	if( NULL == pStateField || true == pStateField->GetNowMovingToBattleField() )
+		return;
+
+	if( TRUE != g_pKTDXApp->GetDIManager()->GetPureActionState( GA_ATTACK_FAST ) )
+		return;
+
+	pStateField->SetNowMovingToBattleField( true );
+
+	if( NULL != g_pData->GetUserListPopUp() )
+		g_pData->GetUserListPopUp()->ClosePopupMenu();
+	if( NULL != g_pData->GetUserMenu() )
+		g_pData->GetUserMenu()->ClosePopupMenu();
+	g_pData->GetUIManager()->CloseAll();
+
+	pStateField->SetEnableShortCutKey( false );
+	pStateField->CX2State::Handler_EGS_STATE_CHANGE_FIELD_REQ( 0 );
+}
+
+// june-spa S2b: June inlines this in TalkNpc 323b2e80 @323b2ee9 and TalkNpc( int ) 323b3690 @323b399a
+void CX2TFieldGame::OpenSpaEnterMsgBox()
+{
+	g_pData->GetLocationManager()->SetLastPos( m_pMyUnit->GetLandPosition() );
+	g_pData->GetLocationManager()->SetLastPosLineIndex( m_pMyUnit->GetLastTouchLineIndex() );
+
+	std::wstring wstrSpaName = L"";
+	const int iVillageID = g_pData->GetLocationManager()->GetCurrentVillageID();
+	if( SEnum::VMI_RUBEN == iVillageID )
+		wstrSpaName = GET_STRING( 43064 );	// string id 43064
+	else if( SEnum::VMI_RANOX == iVillageID )
+		wstrSpaName = GET_STRING( 43065 );	// string id 43065
+
+	g_pMain->KTDGUIOkAndCancelMsgBox( D3DXVECTOR2( 250, 300 ), GET_REPLACED_STRING( ( 43070, "L", wstrSpaName ) ), USCM_ENTER,
+		(CKTDXStage*) g_pMain->GetNowState() );	// string id 43070
+}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 HRESULT	CX2TFieldGame::OnFrameMove( double fTime, float fElapsedTime )
 {		
 	KTDXPROFILE();	
@@ -1634,6 +1780,64 @@ HRESULT	CX2TFieldGame::OnFrameMove( double fTime, float fElapsedTime )
 				}
 			}
 		}		
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2b: June OnFrameMove 323b5970 @323b6759-323b6aa4, the spa door prompts within 150 and the exit key
+		HideJoinSpa();
+		if( true == m_bExitSpa )
+		{
+			CKTDGParticleSystem::CParticleEventSequence* pSeqSpaExit = GetUiParticle()->GetInstanceSequence( m_hMarketInArea );
+			if( NULL != pSeqSpaExit )
+				pSeqSpaExit->SetShowObject( false );
+			m_bExitSpa = false;
+		}
+
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+		int iSpaDoorPos = -1;
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+		for( UINT iSpaPos = 0; iSpaPos < m_vecSpaEnterPos.size(); ++iSpaPos )
+		{
+			const D3DXVECTOR3 vSpaPos = g_pData->GetLocationManager()->GetStartPosLoc( m_vecSpaEnterPos[iSpaPos] );
+			if( GetDistance( m_pMyUnit->GetPos(), vSpaPos ) <= 150.f )
+			{
+				ShowJoinSpa( true, vSpaPos );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+				iSpaDoorPos = m_vecSpaEnterPos[iSpaPos];
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+				break;
+			}
+		}
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+		{
+			static bool s_bSpaDoorNearLogged = false;
+			static DWORD s_dwSpaDoorLogged = 0;
+			if( s_bSpaDoorNearLogged != m_bJoinSpa && ::GetTickCount() - s_dwSpaDoorLogged >= 1000 )
+			{
+				s_bSpaDoorNearLogged = m_bJoinSpa;
+				s_dwSpaDoorLogged = ::GetTickCount();
+				CX2OfflineLog::Server( L"[JUNE_SPA] door near=%d pos=%d", (int)m_bJoinSpa, iSpaDoorPos );
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+
+		if( NULL != g_pData->GetLocationManager() &&
+			( SEnum::VMI_SPA_RUBEN == g_pData->GetLocationManager()->GetCurrentVillageID() ||
+			SEnum::VMI_SPA_RANOX == g_pData->GetLocationManager()->GetCurrentVillageID() ) )
+		{
+			// the Pporu tick ( TFG +0x624, 32ec7240 ) is june-spa S4b's
+			for( UINT iSpaPos = 0; iSpaPos < m_vecSpaOutPos.size(); ++iSpaPos )
+			{
+				const D3DXVECTOR3 vSpaPos = g_pData->GetLocationManager()->GetStartPosLoc( m_vecSpaOutPos[iSpaPos] );
+				if( GetDistance( m_pMyUnit->GetPos(), vSpaPos ) <= 150.f )
+				{
+					ShowExitSpa( true, vSpaPos );
+					break;
+				}
+			}
+
+			if( true == m_bExitSpa )
+				ExitSpa();
+		}
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	}
 	
 
@@ -1934,9 +2138,13 @@ HRESULT	CX2TFieldGame::OnFrameMove( double fTime, float fElapsedTime )
 		// - AlwaysShow (templet +0x5a0) shows an NPC at any distance (@323b7245);
 		// - the village-NPC effect set (+0x190) follows the NPC's show state (@323b7263 / @323b73a0);
 		// - quest info is refreshed once a second (+0x458), and +0x239 tells OnFrameMove it was (@323b72e4);
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// - june-spa S2b: the spa-sign flag (+0x460) is below; June's spa manager (TFG +0x624) and guild-mark flag (+0x354) are not here yet.
+#else SERV_IRUHADEV_JUNE_SPA_ENTRY
 		// - June's spa manager (TFG +0x624, built only in villages 1500 / 1501 by 32ec76e0, house 40147 HI_SPA_PPORU, @323b7131 /
 		//   @323b72b3) and the guild-mark / spa-sign UI flags (TFG +0x354 / +0x460, @323b7324-323b735d) have no March system: the
 		//   pointer is null and both flags stay false here, so those branches never run.
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 		bool bFindJoinNpc = false;
 		m_fNpcQuestInfoTime += fElapsedTime;
 		for(unsigned int i=0; i<m_vecFieldNpc.size(); ++i)
@@ -1978,6 +2186,15 @@ HRESULT	CX2TFieldGame::OnFrameMove( double fTime, float fElapsedTime )
 
 				if( g_pKTDXApp->GetDGManager()->GetDialogManager()->GetHideDialog() == false )
 				{
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+					// june-spa S2b: June @323b7346-323b735d, a spa sign is in reach while my unit stands at its door
+					if( true == m_bJoinSpa &&
+						( CX2LocationManager::HI_SPA_SIGN_RUBEN == pNpcNode->m_NpcHouseID || CX2LocationManager::HI_SPA_SIGN_RANOX == pNpcNode->m_NpcHouseID ) )
+					{
+						pNpcNode->SetInArea(true);
+					}
+					else
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 					if( fNpcDistance <= pNpcNode->m_NPCJoinArea )
 					{
 						pNpcNode->SetInArea(true);
@@ -3385,7 +3602,12 @@ void CX2TFieldGame::AddFieldNpc()
 
 		// @323ba88d: the spa signs (40141 / 40142) need code event 31.
 		if( ( CX2LocationManager::HI_SPA_SIGN_RUBEN == pHouseTemplate->m_ID || CX2LocationManager::HI_SPA_SIGN_RANOX == pHouseTemplate->m_ID ) &&
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+			// june-spa S2b: June's 31 is CEI_SPA_ON_OFF
+			NULL != g_pInstanceData && false == g_pInstanceData->IsEnableCode( CEI_SPA_ON_OFF ) )
+#else SERV_IRUHADEV_JUNE_SPA_ENTRY
 			NULL != g_pInstanceData && false == g_pInstanceData->IsEnableCode( 31 ) )
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 			continue;
 
 		AddFieldNpc( pHouseTemplate, L"" );
@@ -3989,6 +4211,11 @@ bool CX2TFieldGame::TalkNpc()
 {
     if ( m_pMyUnit == NULL )
         return false;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2b: June TalkNpc 323b2e80 @323b2ee9-323b3300, by a spa door the key opens the enter box (the NPC loop still runs)
+	if( true == m_bJoinSpa )
+		OpenSpaEnterMsgBox();
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 
 	// 마켓진입구인지 확인
 	if(m_bJoinMarket == true && m_iJoinMarketIndex >= 0)
@@ -4107,6 +4334,17 @@ bool CX2TFieldGame::TalkNpc(int iNpc)
 				}
 				break;
 
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+			// june-spa S2b: June TalkNpc( int ) 323b3690 cases 40141 / 40142, a spa sign opens the enter box
+			case CX2LocationManager::HI_SPA_SIGN_RUBEN:
+			case CX2LocationManager::HI_SPA_SIGN_RANOX:
+				{
+					OpenSpaEnterMsgBox();
+					return true;
+				}
+				break;
+
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 			default:
 				return false;
 			}
@@ -4408,6 +4646,39 @@ bool CX2TFieldGame::UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
             }//if
 
 		} break;
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+	// june-spa S2b: June UICustomEventProc 323b4040 @323b41a3-323b4238, level 10 or more goes to this village's spa
+	case USCM_ENTER:
+		{
+			if( NULL != lParam )
+			{
+				CKTDGUIControl* pControl = (CKTDGUIControl*)lParam;
+				g_pKTDXApp->SendGameDlgMessage( XGM_DELETE_DIALOG, pControl->GetDialog(), NULL, false );
+			}
+
+			if( g_pData->GetSelectUnitLevel() < 10 )
+			{
+				g_pMain->KTDGUIOKMsgBox( D3DXVECTOR2( 250, 300 ), GET_STRING( 43071 ), (CKTDXStage*) g_pMain->GetNowState() );	// string id 43071
+			}
+			else if( NULL != g_pMain->GetNowState() )
+			{
+				CX2State* pNowState = static_cast<CX2State*>( g_pMain->GetNowState() );
+				const int iVillageID = g_pData->GetLocationManager()->GetCurrentVillageID();
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+				const int iReturnLineIndex = g_pData->GetLocationManager()->GetLastPosLineIndex();
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+				if( SEnum::VMI_RUBEN == iVillageID )
+					pNowState->Handler_EGS_STATE_CHANGE_FIELD_REQ( SEnum::VMI_SPA_RUBEN );
+				else if( SEnum::VMI_RANOX == iVillageID )
+					pNowState->Handler_EGS_STATE_CHANGE_FIELD_REQ( SEnum::VMI_SPA_RANOX );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+				CX2OfflineLog::Server( L"[JUNE_SPA] enter village=%d return=%d/%d", (int)g_pData->GetLocationManager()->GetCurrentVillageID(), iVillageID,
+					iReturnLineIndex );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+			}
+		}
+		return true;
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 #ifdef SERV_READY_TO_SOSUN_EVENT
 	case RTSEUM_EVENT_OK:
 		{

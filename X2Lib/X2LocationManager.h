@@ -617,6 +617,11 @@ class CX2LocationManager
 #endif SERV_IRUHADEV_RANOX_SCENE_DEBUG
 		void GetVecLinkedPos(std::vector<int>& vStart);
 		void GetVecMarketPos(std::vector<int>& vStart);
+#ifdef SERV_IRUHADEV_JUNE_SPA_ENTRY
+		// june-spa S2b: June 324f2ca0 / 324f2d30
+		void GetVecSpaEnterPos( std::vector<int>& vStart );
+		void GetVecSpaOutPos( std::vector<int>& vStart );
+#endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 		D3DXVECTOR3 GetStartPosLoc(int startPos) const;
 		//int	GetStartPosLink(int startPos) const;		
 		int GetLoginPos(int mapId);
