@@ -554,6 +554,9 @@ so it has no kickoff of its own; S3b's review covers it. **Run with.** Opus 5.5 
 - **Build.** `DEPLOY OK: X2_offline.exe is 27,256,832 B, dated 2026-11-17 09:00:56, md5 22a18bfd44f151361ac10325b596ca21` (main 2ef4c11e + the 3 S3c files).
   `EXESTR OK: 3 of 3 found` (`emu soak start`, `emu soak pause`, `emu soak next countdown`; wide). Play-test: hand-off now.
 - **Range gate.** `finish.py --range d91db863^..d91db863`: flagcheck PASS (1 PASS, 1 PASS~, 1 DEFINE, 0 OTHER), junediverge PASS, enumscan PASS.
+- **Play-test passed 2026-11-17** (user). Log: `emu soak start buff=919 left=60`, `pause left=47`, `start left=47` (resumed), `emu grant buff=919
+  sec=1200 stand-in: earned by 60 s in the pool` 47 s after re-entry, `next countdown` + `recv 0x639`, `pause left=56`; effect play / stop on each
+  entry / exit; no spa `UNHANDLED` / `EXCEPTION`.
 
 ## Phase S4a - The Pporu class
 
