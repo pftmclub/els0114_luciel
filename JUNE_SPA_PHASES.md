@@ -524,6 +524,7 @@ inserted, 0 deleted (`bytepatch.py`). Map: the 9 live S3b rows -> `ported S3b`; 
   around the soak loop). `OFFLINE_SPA_BUFF` (the kickoff's `--with`) is on no S3b line: dropped. `/Zs` probe of `X2TFieldGame.cpp`: 0 errors.
 - **Build.** `DEPLOY OK: X2_offline.exe is 27,255,296 B, dated 2026-11-17 08:36:36, md5 0d5f427e0a72209ef08e880c8f5d3b74` (main d54bb444 + the 2 S3b files).
   `EXESTR OK: 4 of 4 found` (`send 0x637`, `recv 0x638`, `effect play`, `EffectSet_SPA_Buff`; wide).
+- **Range gate.** `finish.py --range ad7b358e^..ad7b358e`: flagcheck `JUNE_SPA_BUFF` PASS (2 PASS, 0 OTHER), junediverge PASS, enumscan PASS.
 - **funcmap** +1 row (`323bda90 (S3b)`). Play-test: hand-off now (below). Review: `S3b-review.md` (covers S3a).
 
 ## Phase S4a - The Pporu class
