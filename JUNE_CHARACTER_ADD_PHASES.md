@@ -784,6 +784,33 @@ enumscan                       PASS
 
 **Nothing to play-test.** Next: `/x2-phase char-add CH1e` ( Sonnet 5.5 high; kickoff ready ).
 
+### CH1e - Done (2026-11-17)
+
+All 19 class-map rows of phase CH1e are accounted for: 11 `new` under `SERV_IRUHADEV_JUNE_CHAR_ADD_CORE` ( 10 state functions + the FrameMove ), 5 `inside` with a June body ( inside March's own `CX2GUAdd` function under `SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`, March's in `#else`, tag `// char-add CH1e: June <va>` ) and 3 that are March's own text ( no code: `329d2860`, `329e16c0`, `329e1730` ). 17 carved ( decompile + listing ), 2 listing-only ( `329e16c0`, `329e1730`, `charport_adis.py add` ). None needed "this needs Opus". `_LIVE` stays `//#define`; 20 funcmap rows `Char Add CH1e`.
+
+**Rows** ( June `CX2GUAdd::` -> name ):
+- `new`: `329de260` `ANSI_APT_DASH_COMBO_ZX_EventProcess`, `32a0b470` `ANSI_APT_DASH_COMBO_ZXX_EventProcess` ( nasod arm ), `329de5a0` `ANSI_APT_DASH_JUMP_COMBO_ZX_EventProcess`, `329de5d0` `..._ZX_LANDING_EventProcess`, `329eee90` `ANSI_ALP_COMBO_ZZX_FrameMove`, `329de850` `ANSI_ALP_COMBO_ZZX_EventProcess`, `329ef130` `ANSI_ALP_COMBO_ZZXX_StateStartFuture`, `329debb0` `ANSI_ALP_COMBO_ZZXX_EventProcess`, `329debf0` `..._ZZXX_LANDING_EventProcess`, `329dee70` `ANSI_ALP_DASH_JUMP_COMBO_XZ_EventProcess`, `32a0b830` `ANSI_ALP_DASH_COMBO_XXX_EventProcess` ( nasod arm ).
+- `inside`: `329e9b60` / `329e9db0` / `329e1790` ( `NasodArmorComboZZFrontZ` START / LOOP / `ZX` EventProcess ), `329ea100` / `329e1950` ( `NasodArmorComboXDirectionX` LOOP / `XZ` EventProcess ).
+- = March: `329d2860` ( XDirectionX LOOP end: bIsRight flips, dirDegree.y + 180.0 ), `329e16c0` / `329e1730` ( ZZFrontZ LOOP start: ResetAnimSpeed with 0.1 * count, listing read ).
+- New under `_CORE`: macro `ZX_CANCEL_AFTER_ON_LINE_` ( `m_fAttackCancelAfter` +0x8c8c, pureZ / pureX on a line, `GetComboZStateID` / `GetComboXStateID` = vslots 0x4b0 / 0x4b4 ), `GetComboChainTargetUnit` ( June `32294460` on +0x9910 = `CX2Game::GetUnitByUIDAndType` ), struct `ComboChainTargetData` + member `m_ComboChainTarget` ( +0x9910, { uid, GAME_UNIT_TYPE }, its ctor gives June's -1 / user: CH1h clears nothing ), 4 enum names ( `ANSI_APT_DASH_COMBO_ZXX` 268, `ANSI_APT_DASH_JUMP_COMBO_ZX_LANDING` 270, `ANSI_ALP_COMBO_ZZXX` 272, `..._ZZXX_LANDING` 273; CH1m maps them ).
+
+**Where June differs from March** ( every function read branch by branch ):
+- **The five `inside` rows:** only the walk ( `+0x8c98` ) and dash ( `+0x8c9c` ) cancels change ( they also test `bFootOnLine` ); counts ( ZZFrontZ min 1 / max 10, XDirectionX max 6 ), the DP test ( `DP > 0.0` through `GetDPValue`, March's `0.f >= GetDPValue()` ) and the flag arms are March's.
+- **`329de260`, `32a0b470`, `329dee70`:** the first test is the animation end and the foot test sits inside it ( JUNE_BUGS 790 ); the other new states test the foot first.
+- **ZX state chain:** `329de260` flag 0 ( X ) -> ZXX; `329de850` flag 0 needs X **and** a recorded target still in the game ( `GetComboChainTargetUnit() != NULL` ) -> `ANSI_ALP_COMBO_ZZXX`; `329debb0` animation end on a line -> its landing; the dash-jump `ZX` goes to its landing the moment it is on a line.
+- **`329ef130` ( ZZXX start ):** CH1d's AttackStartFuture checks and snap ( hp <= 0, same team, slot 94 with `AT_COMMAND`, line data, 500.0 swap, `GetFixedDistancePositionForWeaponTaker` 100.0 behind, `GetNearestLinePosForNasodArmorAttack` ) on the recorded target, **without** the bone-line-height return; the target record is cleared after the move only ( an early return keeps it ). `329eee90` clears it at the ZZX attack frame ( inside the oneshot, MP gate or not ).
+- **Writers of +0x9910:** the two CH1h4 helpers `329e57a0` / `329e5df0` ( by state id, when no valid target is held ); CH1h4 writes them against `m_ComboChainTarget`.
+- **Nasod arms ( `32a0b470`, `32a0b830` ):** CH1d's macro `ELSE_IF_CAN_NASOD_ARMOR_ATTACK_BY_MUTATION` with `m_NasodArmorAttackTargetData`, then the ZX cancel.
+
+**Routed:** CH1f's `ANSI_AMM_COMBO_ZZX.EventProcess` ( `329df090` ) reads the same record: it reuses `GetComboChainTargetUnit` ( CH1f kickoff amended ). CH1h4 writes `m_ComboChainTarget` in `329e57a0` / `329e5df0`.
+
+**Gates.** `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE`: `_CORE` PASS ( `files: 2 PASS, 0 OTHER, 0 FAIL` ), `_LIVE` INERT ( `//#define`; `files: 1 PASS`, 0 deleted / non-ASCII / EOL-mismatched, 0 `#else`/`#endif` without the token; `X2GUAdd.h` is `_CORE`'s ), `junediverge` PASS, `enumscan` PASS; `stateends` skipped ( no skill state registered ), `skillicons` / `luabind` skipped. `git diff --minimal --numstat`: `X2GUAdd.cpp` 388 / 0, `X2GUAdd.h` 37 / 0.
+- One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off, with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` and with `_LIVE` + `_DP`. `/P` counts, off / on: on-line walk cancels 6 / 46 ( the 6 new states are in both ), `GetComboChainTargetUnit` 4 / 4, `m_ComboChainTarget.ResetTargetData` 2 / 2.
+- Range gate: see the follow-up line below ( after the commit ).
+- Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line.
+
+**Nothing to play-test.** No `_DEBUG` define here; the CH1g review covers CH1e-CH1g. Next: `/x2-phase char-add CH1f` ( Sonnet 5.5 high; kickoff ready ).
+
 ## Phase CH5 - UI and data: UnitTemplet rows, cut-ins, tree-UI pieces
 
 **Run with:** Sonnet 5.5 high, Opus review, user play-test. Flag `SERV_IRUHADEV_JUNE_CHAR_ADD_UI`. Sub-tag `UI`.

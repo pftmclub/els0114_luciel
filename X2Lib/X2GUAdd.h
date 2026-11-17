@@ -70,6 +70,25 @@ public:
 			m_bIsNPC		= false;
 		}
 	};
+#ifdef SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
+	/// char-add CH1e: June +0x9910, { UID, GAME_UNIT_TYPE } of the unit the Lunatic Psyker ZZX chains onto ( ctor -1, -1, 0 ); recorded by 329e57a0 / 329e5df0 ( CH1h4 )
+	struct ComboChainTargetData
+	{
+		UidType		m_uidGameUnit;
+		int			m_eGameUnitType;
+
+		ComboChainTargetData()
+		: m_uidGameUnit( -1 )
+		, m_eGameUnitType( CX2GameUnit::GUT_USER )
+		{}
+
+		void ResetTargetData()
+		{
+			m_uidGameUnit	= -1;
+			m_eGameUnitType	= CX2GameUnit::GUT_USER;
+		}
+	};
+#endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 	/// 다이너모 마그네트론 소환 정보 ( 다이너모 구성 - 마그네트론 )
 	struct MagnetronDamageEffectData
@@ -505,6 +524,11 @@ public:
 		ANSI_ATT_DASH_JUMP_COMBO_ZX,					/// 282
 		ANSI_ADE_DASH_COMBO_XX,							/// 287
 		ANSI_ADE_DASH_JUMP_COMBO_XZ,					/// 289
+		/// char-add CH1e: the Psychic Tracer / Lunatic Psyker states with a function of their own ( ids are June's script ids )
+		ANSI_APT_DASH_COMBO_ZXX,						/// 268
+		ANSI_APT_DASH_JUMP_COMBO_ZX_LANDING,			/// 270
+		ANSI_ALP_COMBO_ZZXX,							/// 272
+		ANSI_ALP_COMBO_ZZXX_LANDING,					/// 273
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 	};
 
@@ -842,6 +866,18 @@ protected:
 	void ANSI_DASH_JUMP_COMBO_Z_FrameMove();			/// char-add CH1d2: June 329ed380
 	void ANSI_DASH_JUMP_COMBO_ZZ_FrameMove();			/// char-add CH1d2: June 329ed600
 	void ANSI_DASH_JUMP_COMBO_ZZZ_FrameMove();			/// char-add CH1d2: June 329ed880
+	CX2GameUnit* GetComboChainTargetUnit() const;		/// char-add CH1e: June 32294460 on +0x9910
+	void ANSI_APT_DASH_COMBO_ZX_EventProcess();			/// char-add CH1e: June 329de260
+	void ANSI_APT_DASH_COMBO_ZXX_EventProcess();		/// char-add CH1e: June 32a0b470
+	void ANSI_APT_DASH_JUMP_COMBO_ZX_EventProcess();	/// char-add CH1e: June 329de5a0
+	void ANSI_APT_DASH_JUMP_COMBO_ZX_LANDING_EventProcess();	/// char-add CH1e: June 329de5d0
+	void ANSI_ALP_COMBO_ZZX_FrameMove();				/// char-add CH1e: June 329eee90
+	void ANSI_ALP_COMBO_ZZX_EventProcess();				/// char-add CH1e: June 329de850
+	void ANSI_ALP_COMBO_ZZXX_StateStartFuture();		/// char-add CH1e: June 329ef130
+	void ANSI_ALP_COMBO_ZZXX_EventProcess();			/// char-add CH1e: June 329debb0
+	void ANSI_ALP_COMBO_ZZXX_LANDING_EventProcess();	/// char-add CH1e: June 329debf0
+	void ANSI_ALP_DASH_JUMP_COMBO_XZ_EventProcess();	/// char-add CH1e: June 329dee70
+	void ANSI_ALP_DASH_COMBO_XXX_EventProcess();		/// char-add CH1e: June 32a0b830
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 
 	/// ANSI_JUMP_ATTACK_Z
@@ -1435,6 +1471,7 @@ protected:
 	std::map< int, std::map< int, float > >	m_mapTranscendedPassiveAbilityValue;	/// char-add CH1d: June +0x9668, skill id -> ability type -> value, filled by InitPassiveSkillState ( CH4a )
 	int						m_iCustomRenderStateOnStateStart;	/// char-add CH1d2 review: June +0x95b4, the user's custom render state a dash X / ZX / ZBackX starts with ( CH1h ctor clears it )
 	float					m_fRenderParamColorAOnStateStart;	/// char-add CH1d2 review: June +0x95b8, the render colour alpha it starts with, 1.0 after its end ( CH1h ctor clears it )
+	ComboChainTargetData	m_ComboChainTarget;			/// char-add CH1e: June +0x9910 ( its ctor sets -1, -1, 0 )
 #endif SERV_IRUHADEV_JUNE_CHAR_ADD_CORE
 /// protected Valuable End
 

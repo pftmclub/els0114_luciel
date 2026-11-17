@@ -66,3 +66,8 @@ Phase tag (user, 2026-11-09): every edited or new code block carries a one-line 
 ## Added by the CH1d2 review (2026-11-16)
 
 - `ANSI_AAT_DASH_COMBO_ZX` Start / End / FrameMove ( `329d2190` / `329d2200` / `329dbce0` ) and `ZBackX` Start / End / FrameMove ( `329d2230` / `329d2260` / `329dbfc0` ) are the dash X render pattern: write them exactly as the reviewed `DashComboXStateStart` / `End` / `FrameMove` ( `X2GUAdd.cpp`, tag `char-add CH1d2 review` ): `+0x8e64` is the user's `m_iBuffCustomRenderState`, `+0xc44` is `m_RenderParam.color.a` ( not Add's `m_fRenderParamColorA` ), state 5 is `CX2GUUser::CRS_INVISIBLE`, the members are `m_iCustomRenderStateOnStateStart` / `m_fRenderParamColorAOnStateStart`. Never Add's own `m_eCustomRenderState` / `CRS_COMBO_DASH_X`.
+
+## Added by CH1e (2026-11-17)
+
+- `CX2GUAdd::m_ComboChainTarget` ( June `+0x9910`, `ComboChainTargetData`, ctor -1 / user ) and `GetComboChainTargetUnit()` ( June `32294460` ) exist under `_CORE`: `ANSI_AMM_COMBO_ZZX.EventProcess` ( `329df090` ) reads it exactly as `329de850` does ( the X key arm needs `NULL != GetComboChainTargetUnit()` ); do not add a second target member.
+- The enum holds `ANSI_APT_DASH_COMBO_ZXX`, `ANSI_APT_DASH_JUMP_COMBO_ZX_LANDING`, `ANSI_ALP_COMBO_ZZXX` and `ANSI_ALP_COMBO_ZZXX_LANDING` ( added by CH1e ). `ZX_CANCEL_AFTER_ON_LINE_` ( `m_fAttackCancelAfter`, pureZ / pureX on a line ) is a macro in `X2GUAdd.cpp` under `_CORE`: June's tails use it after the dash cancel. `329de260`-style states test the animation end before the foot ( JUNE_BUGS 790 ): read each function's first test in the listing.
