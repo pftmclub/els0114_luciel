@@ -806,7 +806,7 @@ All 19 class-map rows of phase CH1e are accounted for: 11 `new` under `SERV_IRUH
 
 **Gates.** `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE`: `_CORE` PASS ( `files: 2 PASS, 0 OTHER, 0 FAIL` ), `_LIVE` INERT ( `//#define`; `files: 1 PASS`, 0 deleted / non-ASCII / EOL-mismatched, 0 `#else`/`#endif` without the token; `X2GUAdd.h` is `_CORE`'s ), `junediverge` PASS, `enumscan` PASS; `stateends` skipped ( no skill state registered ), `skillicons` / `luabind` skipped. `git diff --minimal --numstat`: `X2GUAdd.cpp` 388 / 0, `X2GUAdd.h` 37 / 0.
 - One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off, with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE` and with `_LIVE` + `_DP`. `/P` counts, off / on: on-line walk cancels 6 / 46 ( the 6 new states are in both ), `GetComboChainTargetUnit` 4 / 4, `m_ComboChainTarget.ResetTargetData` 2 / 2.
-- Range gate: see the follow-up line below ( after the commit ).
+- Range `finish.py --range bd711ac4^..bd711ac4` ( same `--with` ): `_CORE` PASS ( `files: 2 PASS` ), `_LIVE` INERT, `junediverge` PASS, `enumscan` PASS. Commit `bd711ac4`.
 - Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line.
 
 **Nothing to play-test.** No `_DEBUG` define here; the CH1g review covers CH1e-CH1g. Next: `/x2-phase char-add CH1f` ( Sonnet 5.5 high; kickoff ready ).
