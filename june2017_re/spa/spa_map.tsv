@@ -37,7 +37,7 @@ june_va	what	march	state	phase	readers
 323b1e40	static send 0x637 { a, b } through 323c1fc0; no caller, no xref (dead)	-	absent (dead)	- (not ported)	-
 323aea40 @323aec01-323aef25	render, in 1500 / 1501 with my unit: +0x462 and !+0x463 and !+0x464 -> notice STR 43074 (type SBT_GROW) / 43476 (SBT_STRONG) + 323ac3e0 time, font +0x480 at (512, 150), skipped when 31d03920(); EffectSet_SPA_Buff on my unit -> +0x484 when -1; otherwise stop +0x484 (321dafb0)	EffectSet_SPA_Buff in March UIEffectSet.lua	ported S3b	S3b	-
 323aea40 @323aef25-323aef6e	render: Pporu shown (+0x624; NPC house 40147, +0x5fa) -> 32ec7820	-	absent	S4b	-
-323ac3e0	notice time: difftime( mktime( localtime64( +0x478 ) ), GetServerCurrentTime 31edca50 ) -> (s % 3600) / 60 ":" s % 60, zero-padded seconds	-	ported S3b	S3b	323aea40
+323ac3e0	notice time: difftime( mktime( localtime64( +0x478 ) ), GetServerCurrentTime 31edca50 ), clamped at 0 (fldz / fcom @323ac458) -> (s % 3600) / 60 ":" s % 60, zero-padded seconds	-	ported S3b	S3b	323aea40
 323ad4c0	my unit has the spa factor of the current type (SBT_GROW -> BFI_SPA_GROW_BUFF 948, SBT_STRONG -> BFI_SPA_STRONG_BUFF 949); no caller, no xref	-	absent (dead)	S3b (port only if a caller turns up)	-
 323b8ba0 @323b8bfd-323b8c25	TFG dtor: +0x480 = 0; Pporu dtor 32ec7210 + delete, +0x624 = 0	X2TFieldGame.cpp dtor	absent	S4b	-
 323b8ba0 @323b9380-323b9431	TFG dtor: stop +0x484 effect; in 1500 / 1501 with a session -> send 0x637 { 0, -1 }	-	ported S3b	S3b	-

@@ -5031,7 +5031,7 @@ void CX2TFieldGame::UpdateSpaBuffType()
 	m_iSpaBuffType = iSpaBuffType;
 }
 
-// june-spa S3b: June 323ac3e0, the buff's time left as "M : SS" ( 32-bit mktime / difftime and no clamp below zero, as June )
+// june-spa S3b: June 323ac3e0, the buff's time left as "M : SS" ( 32-bit mktime / difftime, clamped at 0 as June )
 void CX2TFieldGame::AppendSpaBuffLeftTime( std::wstringstream& wstrmLeftTime )
 {
 	__time64_t tBuffEndTime = m_tSpaBuffEndTime;
@@ -5042,7 +5042,10 @@ void CX2TFieldGame::AppendSpaBuffLeftTime( std::wstringstream& wstrmLeftTime )
 		tmBuffEnd = tmLocal;
 
 	const __time32_t tBuffEnd32 = _mktime32( &tmBuffEnd );
-	const int iLeftSec = static_cast<int>( _difftime32( tBuffEnd32, static_cast<__time32_t>( tServerNow ) ) );
+	double dLeftSec = _difftime32( tBuffEnd32, static_cast<__time32_t>( tServerNow ) );
+	if( dLeftSec < 0.0 )	// june-spa S3b review: June clamps at 0 ( fldz / fcom @323ac458 )
+		dLeftSec = 0.0;
+	const int iLeftSec = static_cast<int>( dLeftSec );
 	const int iLeftMinute = ( iLeftSec % 3600 ) / 60;
 	const int iLeftSecond = ( iLeftSec % 3600 ) % 60;
 	if( iLeftSecond < 10 )

@@ -12658,7 +12658,7 @@ user +0x94a0 (StatCalc S33 S3)	CX2GUUser second socket-option list (no March mem
 323ab4f0	CX2TFieldGame::HideJoinSpa (none in March; june-spa S2b)	confirmed	Spa S24 (june-spa S0; S2b review re-read): hides the entrance prompt and clears +0x460 only, when set; callers CX2CashShop::SetOpen 3223d97f, 32508a90 (CX2StateField vtable slot)
 323a8a60	CX2TFieldGame::ExitSpa (none in March; june-spa S2b)	confirmed	Spa S24 (june-spa S0; S2b review re-read: action 0 = GA_ATTACK_FAST, not up): 31c488c0( 0 ) once (state +0x22f), closes g_pData+0x32c / +0x2e0 UIs, 32151680, state +0xc4 = 0, 31f12630( 0 )
 323ac9d0	none in March: spa type from SPA_INFO by my unit's line	confirmed	Spa S24 (june-spa S0): templet +0x70 rows (0x14: Type, vector LineIdx) vs unit +0x3d4 -> +0x474; changed -> +0x464, none -> +0x463
-323ac3e0	none in March: spa notice remaining time M:SS	confirmed	Spa S24 (june-spa S0): localtime64( +0x478 ) -> mktime, difftime with GetServerCurrentTime 31edca50
+323ac3e0	none in March: spa notice remaining time M:SS	confirmed	Spa S24 (june-spa S0): localtime64( +0x478 ) -> mktime, difftime with GetServerCurrentTime 31edca50, clamped at 0 (@323ac458; S3b review)
 323ac910	none in March: 0x638 handler twin (dead)	confirmed	Spa S24 (june-spa S0): same body as EventProcess 0x638, returns bool; no caller, no xref
 323ac990	none in March: 0x639 handler twin (dead)	confirmed	Spa S24 (june-spa S0): same body as EventProcess 0x639; no caller, no xref
 323ad4c0	none in March: my unit has the current spa type's factor (dead)	confirmed	Spa S24 (june-spa S0): SBT_GROW -> BFI 948, SBT_STRONG -> BFI 949 in unit +0x1a0 +0xdbc list; no caller, no xref

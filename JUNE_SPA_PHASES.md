@@ -558,6 +558,39 @@ so it has no kickoff of its own; S3b's review covers it. **Run with.** Opus 5.5 
   sec=1200 stand-in: earned by 60 s in the pool` 47 s after re-entry, `next countdown` + `recv 0x639`, `pause left=56`; effect play / stop on each
   entry / exit; no spa `UNHANDLED` / `EXCEPTION`.
 
+## Phase S3b - Review
+
+2026-11-17, Opus 5.5 / high. Covers S3a `35844836`, S3b `ad7b358e`, S3c `d91db863`. Verdict: **pass after one transcription fix** (below).
+- **Ghidra spot checks** (June listings, not the map): (1) OnFrameMove soak `323b6aa9-323b6cd2`: hold test (64-bit end > 0, `+0x464 != 1`,
+  `+0x463 != 1`), `>= 1.0` (`test ah, 1; jnz` skip), leave `<= 3.0` (`test ah, 0x41; jp` skip), flags / timers cleared after the send even when the
+  session is down, `+0x470 = 0` on both in-pool paths, REQ bytes `{ 1, type }` / `0xff00`: match. (2) `UIServerEventProc` `323bdc82-323bdd22`
+  (0x5a2 + 0x96 = 0x638, next = 0x639): IsValidPacket fail -> false; bool -> end + notice on; 0x639 end only: match. (3) Render `323aebea-323aef25`:
+  type 0 -> 0xa842 (43074), 1 -> 0xa9d4 (43476); `GetHideDialog` skip; `OutTextMultiline` args (512, 150, text, 0xffffff80, `FS_SHELL` 2,
+  0xff000000, 1.0, NULL, `DT_CENTER`, then June's -1 / 1.0 / 1.0 / false = March's defaults); effect on `m_pMyUnit` while -1, stop in the else
+  inside the village block: match. **(4) `AppendSpaBuffLeftTime` `323ac3e0`: fail.** After `_difftime32` June runs `fldz; fcom; test ah, 0x41;
+  jnz` / `fstp st1` (@323ac458-323ac46c): a negative time left becomes 0 before `_ftol2`. S3b ported it with no clamp and filed JUNE_BUGS 788.
+- **Whole-phase re-check** after the fail: `UpdateSpaBuffType` `323ac9d0` (byte line index, last match wins, flag order), dtor `323b936d-323b9431`
+  (stop, village test, `{ 0, -1 }`), ctor init: match. Put / Get order (`320acab0` bool, char; `320acb70` int, bool, int64; `320acbe0` int64)
+  as the map; ACK zero-init before the read as June.
+- **Fix** (`SERV_IRUHADEV_JUNE_SPA_BUFF`, `X2TFieldGame.cpp`, inside S3b's own new function, +5 / -2 via `bytepatch.py`): `dLeftSec < 0.0` -> 0
+  (NaN kept, as June's unordered `jnz`); the function's comment corrected. JUNE_BUGS 788 withdrawn (row kept, marked); `spa_map.tsv` / `funcmap.tsv`
+  323ac3e0 rows and "Decisions" 1 note the clamp. The S3b / S3c Done notes' "below zero" lines are history: the notice now reads `0 : 00` until the
+  grant (S3c) or a new entry.
+- **Emulator** (S3a / S3c): matches "Decisions" 1 as amended: 60 s soak, `{ 0, -1 }` pauses and banks the seconds, grant + 0x639 per minute on the
+  3 s beat, `stand-in:` on every grant / start / pause line; S3a's grant on entry intact in `#else SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER`.
+- **`#else` paths:** every S3a / S3b / S3c client block is insert-only (no March line replaced); flag off = March.
+- **Gates.** `finish.py --review --commits 35844836 ad7b358e d91db863 --with JUNE_SPA_BUFF OFFLINE_SPA_BUFF OFFLINE_SPA_SOAK_TIMER JUNE_SPA_DEBUG -v`:
+  `JUNE_SPA_BUFF` PASS (4 PASS, 2 PASS~, 3 DEFINE, 8 OTHER), `OFFLINE_SPA_BUFF` PASS (5 PASS, 2 PASS~, 2 DEFINE, 6 OTHER), `OFFLINE_SPA_SOAK_TIMER`
+  PASS (2 PASS, 1 DEFINE), 0 deleted lines, junediverge + `--check-all` PASS, enumscan PASS; `FINISH RESULT: PASS`. OTHER rows: each flag's rows
+  are the sibling flags' files (packets vs emulator vs timer) and `X2BuffFactor.h` (`JUNE_ENUM_NAMES`, insert-only). INFO: `JUNE_ENUM_NAMES`,
+  `JUNE_SPA_ENTRY`, `OFFLINE`, `OFFLINE_ITEM_BUFF` (enclosing guards, not this plan's change). Fix: `finish.py --files X2Lib/X2TFieldGame.cpp
+  --with SERV_IRUHADEV_JUNE_SPA_BUFF`: PASS (1 PASS; 2 deleted lines, both S3b's own lines inside the flag), junediverge PASS, enumscan PASS.
+- **Debug:** `SERV_IRUHADEV_JUNE_SPA_DEBUG` stays on (S4b / S5 log through it; Z retires it).
+- **Build.** `DEPLOY OK: X2_offline.exe is 27,262,976 B, dated 2026-11-17 09:22:50, md5 805c9326b9d369ca1a76b2d2262b745a` (main a6d9c677 + the fixed
+  `X2TFieldGame.cpp`). No new strings (exestr not needed).
+- **Range gate.** RANGE_LINE
+- Play-test: hand-off now (the notice at the end of a countdown).
+
 ## Phase S4a - The Pporu class
 
 **Scope.** Flag `SERV_IRUHADEV_JUNE_SPA_PPORU`; the map rows marked S4a: the `+0x624` object (`32ec76e0` .. `32ec8350`, 14 methods) as a new
@@ -619,7 +652,7 @@ Written by S0 and answered by the user on 2026-11-16 (`AskUserQuestion`).
    **Answer: (c) refresh on every entry.** On `{ 1, type }` with type `SBT_GROW` / `SBT_STRONG`: grant (or re-grant) that type's buff for its
    `BuffTemplet` period from now, reply 0x638 `{ NET_OK, true, now + period }`, sync the buff list; log `stand-in:` with the buff id and seconds.
    `{ 0, -1 }`: logged, no reply. Other types: logged, ignored. 0x639 is never sent, so a player who stands in the pool past the 20 minutes
-   sees June's notice count below zero (June's client has no clamp) until they step out and back in.
+   sees June's notice count below zero (June's client has no clamp) until they step out and back in. (S3b review: June does clamp; it reads `0 : 00`.)
    **Amended 2026-11-17 by the user after the S3b play-test (S3c, `SERV_IRUHADEV_OFFLINE_SPA_SOAK_TIMER`):** the countdown is the soak time that
    *earns* the buff (as STR 43476 reads, "@1 left before getting ..."), 60 s instead of 20 minutes; stepping out pauses it and stepping back in
    continues it; at 0 the buff is (re)granted for its `BuffTemplet` period and 0x639 starts the next 60 s. S3a's grant on entry stays in `#else`.
