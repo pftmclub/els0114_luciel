@@ -270,16 +270,14 @@ Plan `JUNE_SPA_PHASES.md` - branch `main` - log tag `[JUNE_SPA]` (`offline_serve
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| S2a | **done 2026-11-17** (play-test in S2b's seam): code_events v25 + login send + `elsdb.py code-event`, `SpaData`, door keys, spa cases | Opus 5.5 / high; review in S2b's | S1 | `Offline/X2OfflineDB.*`, `Offline/Handlers_*`, `tools/elsdb.py`, `X2LocationManager.cpp`, `X2Main.cpp`, `X2FieldMapBase.cpp`, `X2StateMenu.cpp`, `X2UIInventory.cpp`, `X2MiniMapUI.cpp`, `X2TFieldGame.cpp` (3 cases) | `S2a.md` |
-| S2b | **done 2026-11-17, seam play-test passed**; review next (S1 + S2a + S2b): door / sign prompts, enter box, exit by Z, June's field-change REQ | Opus 5.5 / high, Opus review | S2a | `X2TFieldGame.*`, `X2State.cpp`, `X2LocationManager.*`, `X2CashShop.cpp`, `X2StateField.*` | `S2b.md`, `S2b-review.md` |
-| S3a | blocked (S2b review): 0x637-0x639 packets, BTI / BFI names, emulator buff stand-in; inert, probe build | Opus 5.5 / high; review in S3b's | S2b review | `KncWX2Server/Common` packets + event ids, `Offline/Handlers_*`, `X2BuffFactor.h` / buff enums | `S3a.md` |
+| S3a | **ready** (start: `/x2-phase june-spa S3a`): 0x637-0x639 packets, BTI / BFI names, emulator buff stand-in; inert, probe build | Opus 5.5 / high; review in S3b's | S2b review | `KncWX2Server/Common` packets + event ids, `Offline/Handlers_*`, `X2BuffFactor.h` / buff enums | `S3a.md` |
 | S3b | blocked (S3a): soak timers, type pick, 0x638 / 0x639, notice + `EffectSet_SPA_Buff`, dtor send | Opus 5.5 / high, Opus review | S3a | `X2TFieldGame.*` | `S3b.md`, `S3b-review.md` |
 | S4a | blocked (S3b review): the Pporu class (14 methods), new files; inert, probe build | Opus 5.5 / high; review in S4b's | S3b review | new Pporu class files, `X2Lib_2010.vcxproj` | `S4a.md` |
 | S4b | blocked (S4a): Pporu hooks in the field game, `SetAppearPPoruCheat` bind | Opus 5.5 / high, Opus review | S4a | `X2TFieldGame.*`, Lua bind list | `S4b.md`, `S4b-review.md` |
 | S5 | blocked (S4b review): rock-scissors-paper (spa-only): map the class, data, user-approved stand-in, port | Opus 5.5 / high, Opus review | S4b review | per its map; NPC shop / message UI, data034 / 036 | `S5.md`, `S5-review.md` |
 | Z | blocked (every review): retire `_DEBUG`, MODS.md, backlog Stage 24 closed, archive | Sonnet 5.5 / medium | S2b, S3b, S4b, S5 reviews | `Always.h`, `MODS.md`, backlog, STATUS archive | `Z.md` |
 
-Done: S1 (2026-11-16: spa Lua rows merged, spa world / NPC UI luas adopted, `li_spa_ruben001.ogg` copied, data034 / 036 / 037 / 039 / 040 packed and copied; play-test section batched into S2b), S0 (2026-11-16: `spa_map.tsv` 106 rows, 46 funcmap rows, events field by field; Decisions answered: refresh on every entry, login inside a spa allowed, no live DB (CLAUDE.md rule rewritten); S2-S4 split into a / b; RPS kept as S5; no code, no build).
+Done: S2b (2026-11-17: doors, enter box, Z exit, June's field-change REQ; seam play-test passed; reviewed 2026-11-17: pass, no code change, funcmap rows fixed), S2a (2026-11-17: code_events v25, SpaData, door keys, spa cases; reviewed in S2b's: pass), S1 (2026-11-16: spa Lua rows merged, spa world / NPC UI luas adopted, `li_spa_ruben001.ogg` copied, data034 / 036 / 037 / 039 / 040 packed and copied; play-test section batched into S2b), S0 (2026-11-16: `spa_map.tsv` 106 rows, 46 funcmap rows, events field by field; Decisions answered: refresh on every entry, login inside a spa allowed, no live DB (CLAUDE.md rule rewritten); S2-S4 split into a / b; RPS kept as S5; no code, no build).
 
 ## Other plans (no STATUS rows)
 

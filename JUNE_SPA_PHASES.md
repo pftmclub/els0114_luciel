@@ -381,6 +381,46 @@ Log lines `door`, `enter`, the emulator's `FIELD` lines. `exestr.py` for the deb
 - **Range gate.** `finish.py --range c81726b0^..c81726b0`: flagcheck PASS (8 PASS, 1 DEFINE), junediverge PASS, enumscan the same pre-existing rows.
 - **Play-test:** seam: S1 + S2a + S2b assembled (`playtest.py check` PASS); **passed 2026-11-17** (user). JUNE_BUGS #787: the Ruben door also opens the mailbox (June's layout and loop). Open questions: none.
 
+## Phase S2b - Review
+
+2026-11-17, Opus 5.5 / high. Covers S1 (`1d593cb8`, `a82d1f72`), S2a (`d33805a3`) and S2b (`c81726b0`). **Verdict: pass, no code change.**
+- **S1 (data).** Merged rows equal June's (brace-matched, comments / whitespace ignored): `Village[1500]` / `[1501]`, Ruben door 5, Ranox door,
+  `HI_SPA_SIGN_RUBEN` last in Ruben's house list, houses 40141-40144 / 40147, the four NPCTemplet rows, both `AddMapData` + Cobo zones 1 / 15, `WI_SPA_*`, the
+  Enum values (no collisions), `SpaData`. Ruben's other two differences (`HI_POSTBOX` for June's `HI_ADAMS_HOUSE`, start pos 4's March key names) predate S1.
+  Adopted files: `adopt-june --dry-run` 13 of 13 identical; the 9 in the run record match its `shipped_sha1`. `core --check` / `ledger --check` PASS, `luabind`
+  on the 11 luas `RESULT: PASS` (ENUM 0 missing); `kom.py status` 131 in sync. data034 is now md5 144c4621 (a later repack; S1's note says 946358ce).
+- **S2a.** Migration v25 follows the ladder's own rung idiom (`BEGIN` / `ROLLBACK` / `COMMIT` inside `Migrate()`, as v16-v24), `INSERT OR IGNORE` seed, forward
+  only. Login send: map of enabled ids + C9h-2d's two empty sets, after both unit-list ACKs; `elsdb.py code-event` writes through `Writer` (backup first).
+  `SpaData` read after `BattleFieldRestData`, reset per local map, templet arg, `VillageParsing` skipped for -1 and 0 (as @32502f9e). Door keys
+  `OtherPlaceID` / `OtherPlaceStartLineIndex` default to March's names' values: correct for this file's mixed key names. Spa cases (warp field, warp
+  command 19, both warp lists, level-10 gate, field image, `LoadUI`, field name 29, field map, minimap) each match their map row.
+- **S2b.** Ctor lists under `IsEnableCode( CEI_SPA_ON_OFF )`, dtor clears, flags start false; distance 150.0 (`3346bda8`); `USCM_ENTER` 75000; enter box
+  43070 with name 43064 / 43065 at (250, 300); level < 10 -> 43071; the sign cases 40141 / 40142; the exit and the REQ, below.
+- **Ghidra spot-checks (3 of 3 pass).**
+  1. `31f12630`, re-decompiled: early return on `31d70e00( 0x220 )`; tutorial test `+0x16c`, instance `+0xf8`, `g_pData +0x5b8 == 0` (the labelled stand-in);
+     state 0x16 wedding = current village + last pos / line; state 0xe = 1500 -> 20000 line 5, 1501 -> 20008 line 31, any other village -> 0 -> templet
+     miss -> Ruben login pos; default = before-dungeon village, else `GetLoginPos`; warp branch `324f30d0` / `324f1e10` / `32151680`; `.rdata` read from
+     the exe: (2569.0, 60.0, 150.0), (-4100.0, 790.0, 266.0), box (250.0, 300.0), string 0x221 = 545. Equal to the port. Not ported (stand-in's tail):
+     June clears `+0x5b8` at the end.
+  2. `323ab220` / `323ab4f0`: y + 270.0 (double `33491e08`), drawn 60.0 lower (`33457f50`), Up at <= 0.5 (`3343777c`), Down to 1.0, reset after; `+0x460`
+     = bShow. `323ab4f0` hides and clears `+0x460` only when set. Equal.
+  3. `323a8a60`: state `+0x22f` latch, `31c488c0( 0 )` = `GetPureActionState( GAMEACTION_ATTACK_FAST )` (enum value 0), closes `+0x32c` / `+0x2e0`, `32151680`,
+     state `+0xc4` = 0, `31f12630( 0 )`. Equal.
+- **S2b's calls, confirmed:** exit key action 0 (`GA_ATTACK_FAST`); `HideJoinSpa` = entrance only; the two REQ stand-ins are labelled `stand-in:` in code and
+  routed (backlog Stage 38 bullets "Guild agit" and "June's village talk / UI bodies"); `june_march_divergent.tsv` rows 549 (`replace`, done) and 550-552
+  (`stage38`) present. June's "other village -> Ruben" branch has no offline reach besides the spa exit: the only other zero-argument callers in a
+  village are the two `EGS_UDP_KICK_STATE_CHANGE_FIELD_NOT` handlers (server pushes, never sent offline).
+- **Fixed (bookkeeping):** `funcmap.tsv` rows `323ab220`, `323ab390`, `323ab4f0`, `323a8a60` still carried S0's reading ("none in March", "hide both
+  prompts, clears +0x461", "up key"); renamed to the ported functions and corrected. No code changed.
+- **Gates.** `finish.py --review --commits d33805a3 c81726b0 --with OFFLINE_CODE_EVENTS JUNE_SPA_ENTRY JUNE_SPA_DEBUG -v`: flagcheck `JUNE_SPA_ENTRY`
+  PASS (17 PASS, 2 DEFINE, 4 OTHER, 0 deleted), `OFFLINE_CODE_EVENTS` PASS (1 PASS, 3 PASS~, 2 DEFINE, 17 OTHER, 0 deleted), junediverge PASS,
+  `--check-all` PASS; enumscan exit 1 (119 rows in 19 files): `git blame` on every row, **none** from `d33805a3` / `c81726b0` (pre-existing, e.g.
+  `X2CashShop.cpp` class tables, `X2State.cpp:9434`), so `FINISH RESULT: FAIL` is not this plan's.
+  OTHER rows: `JUNE_SPA_ENTRY`'s four are `OFFLINE_CODE_EVENTS`' files (`ScriptID_Code.h`, `Handlers_Unit.cpp`, `X2OfflineDB.*`); `OFFLINE_CODE_EVENTS`'
+  17 are `JUNE_SPA_ENTRY`'s files. PASS~ = the one blank line after each block. `JUNE_SPA_DEBUG` lines sit inside the other two flags' blocks.
+- **Build.** None: no code change (full build skipped: no play-test; S2b's `DEPLOY OK` 246d12fc stands, play-test passed 2026-11-17).
+- **Debug:** `SERV_IRUHADEV_JUNE_SPA_DEBUG` stays on (Rule 7: Z retires it). Next: S3a (`kickoffs/june-spa/S3a.md` checked, current). Open questions: none.
+
 ## Phase S3a - Spa packets and the emulator's buff answer
 
 **Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_BUFF`, `SERV_IRUHADEV_OFFLINE_SPA_BUFF` (stand-in); the map rows marked S3a:
