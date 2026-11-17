@@ -490,6 +490,17 @@ names it.
 **Routes:** none of the Inbound routes land in P4b.
 **Play-test 2026-11-17 (logs):** 258 / 258 `[KOM_MOUNT]` lines, 209,053 entries, 1,138 ms, 175 MB private, `KOM_MOUNT CHECK: PASS`; 0 KEM_ERROR, 0 Motion Error, `existfileinfo.txt` unchanged (Sep 22). Ain-creation and Gunner checks dropped: those characters are not ported yet. P4c next.
 
+## Phase P4c - Done (2026-11-17, Sonnet 5.5 medium; data only, no client source; play-test owed)
+
+**What landed.** June-only files in data186-226 plus datai: **14,467 files in 33 existing koms** (`june2017_re/P4c_stage_plan.tsv`, `MODS.md` entry). Wave list = the 14,467 census rows with `route=P4c` (none zero-byte, none held); list file `.build/P4c_wave.tsv`. The cut held: 14,467 rows, as planned.
+
+**Gates.** 1 `stage-june`: 33 koms, 14,467 new, 0 replaced, 0 refused. 2 `verify-staged`: 14,467 equal June's strict decode, 0 problems. 3 `pack --wave` x33: 33 `PACK OK` + 33 `WAVE GATE OK`, `-0 removed`, `~0 changed`, 0 unexplained, `+added` equals the list count per kom. 4 `dupcheck --with` the 33: `DUPCHECK OK: 0 duplicate names` (223,520 names). 5 `copy --wave` x33 (one per call): 33 `COPY OK` (e.g. data211 44,454,558 B, 2,503 entries, md5 0c0d78aa; data198 12,096,039 B, 5,356 entries, md5 99002c5d; datai023 21,717,148 B, 10,911 entries, md5 573100cb).
+**Census re-run:** June kom numbers with no live archive 0; live-only entries with no file 0; P4c june-only rows left 0 (June-only rows left are routed to later phases: lua-port 7,329, held 8, txt-review 8, june-item-kim 1).
+**Build:** no build: data only (exe is P1's). `finish.py` not run: no client source changed.
+**Routes:** the 37 costume-shop withheld files rode this wave; `Village_ADBoard_1/2/3.dds` (data216) landed. No GodBeast files here.
+
+**Play-test:** owed (see hand-off). Next: P5 / P6 per STATUS.
+
 ## Phase P5 - Collision key forecast
 
 **Run with:** Opus 5.5 high. No build. Opus phase: delegate the mechanical reads and scans (census greps, loader parsers' test runs,
