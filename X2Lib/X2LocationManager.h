@@ -465,6 +465,13 @@ class CX2LocationManager
 		};
 		//}}
 #endif SERV_IRUHADEV_ELYSION_VILLAGE
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+		enum SPA_BUFF_TYPE		// june-spa S3a: June's Enum.lua SPA_BUFF_TYPE ( SpaInfo::m_iType, the soak REQ's type )
+		{
+			SBT_GROW	= 0,
+			SBT_STRONG	= 1,
+		};
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 		struct VillageTemplet
 		{
 			wstring							m_Name;

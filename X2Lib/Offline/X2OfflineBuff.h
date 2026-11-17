@@ -116,6 +116,10 @@ public:
 	bool	OnJoinVillage( UidType nUnitUID );
 	bool	OnLeaveVillage( UidType nUnitUID );
 #endif SERV_IRUHADEV_OFFLINE_VILLAGE_BUFF
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_BUFF
+	/// june-spa S3a stand-in: (re)activates iBuffID from now for its templet period; true with its end time.
+	bool	OnSoakSpa( UidType nUnitUID, int iBuffID, OUT __int64& tBuffEndTime );
+#endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
 
 	/// KUserServerBuffManager::CheckBuffPeriod: start != end and now > end.
 	bool	CheckBuffPeriod( UidType nUnitUID );

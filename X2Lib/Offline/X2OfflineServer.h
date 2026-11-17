@@ -807,6 +807,9 @@ private:
 #ifdef SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 	bool Handler_EGS_CHANGE_UNIT_FORM_REQ( KOfflineSession& kSes, const KEvent& kEvent );	// char-luciel DU5: June 0x4d9, answered with 0x4da
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_BUFF
+	bool Handler_EGS_SPA_SOAK_REQ( KOfflineSession& kSes, const KEvent& kEvent );	// june-spa S3a: June 0x637, answered with 0x638 ( stand-in )
+#endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
 
 	//////////////////////////////////////////////////////////////////////////
 	// Handlers_Square.cpp - Cobo Express, the trade square. Not a KOfflineRoom:

@@ -8456,6 +8456,51 @@ SERIALIZE_DEFINE_GET( KEGS_ADMIN_ADD_ITEM_ACK, obj, ks )
 		;
 }
 #endif SERV_IRUHADEV_ADMIN_CHEATS
+
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+// june-spa S3a: field order as June's 320acab0 / 320acb70 / 320acbe0
+SERIALIZE_DEFINE_PUT( KEGS_SPA_SOAK_REQ, obj, ks )
+{
+	return PUT( m_bInPool )
+		&& PUT( m_cSpaBuffType )
+		;
+}
+
+SERIALIZE_DEFINE_GET( KEGS_SPA_SOAK_REQ, obj, ks )
+{
+	return GET( m_bInPool )
+		&& GET( m_cSpaBuffType )
+		;
+}
+
+SERIALIZE_DEFINE_PUT( KEGS_SPA_SOAK_ACK, obj, ks )
+{
+	return PUT( m_iOK )
+		&& PUT( m_bSoaking )
+		&& PUT( m_tBuffEndTime )
+		;
+}
+
+SERIALIZE_DEFINE_GET( KEGS_SPA_SOAK_ACK, obj, ks )
+{
+	return GET( m_iOK )
+		&& GET( m_bSoaking )
+		&& GET( m_tBuffEndTime )
+		;
+}
+
+SERIALIZE_DEFINE_PUT( KEGS_SPA_BUFF_END_TIME_NOT, obj, ks )
+{
+	return PUT( m_tBuffEndTime )
+		;
+}
+
+SERIALIZE_DEFINE_GET( KEGS_SPA_BUFF_END_TIME_NOT, obj, ks )
+{
+	return GET( m_tBuffEndTime )
+		;
+}
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 //}}
 
 

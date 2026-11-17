@@ -438,6 +438,38 @@ Inert on the client (nothing sends 0x637 until S3b).
 
 **Done gate.** `finish.py` PASS; probe build 0 errors (full build skipped: no play-test).
 
+## Phase S3a - Done
+
+2026-11-17, Opus 5.5 / high. Flags `SERV_IRUHADEV_JUNE_SPA_BUFF` (client + shared packets; second home `ServerDefine.h`, `SECOND_HOMES` row in
+`tools/flagcheck.py`) and `SERV_IRUHADEV_OFFLINE_SPA_BUFF` (emulator stand-in), both on, each with an `#error` guard (`cl` probe: all deps on).
+- **Events.** `EGS_SPA_SOAK_REQ` / `EGS_SPA_SOAK_ACK` / `EGS_SPA_BUFF_END_TIME_NOT` appended after `ADMIN_CHEATS` in `EventID_Client.h` (June 0x637 /
+  0x638 / 0x639; the wire ids are March ordinals, as every earlier appended event). Structs and `Put` / `Get` in `ClientPacket.h` / `.cpp`, field order
+  as S0 read them: REQ `{ bool m_bInPool; char m_cSpaBuffType }`, ACK `{ int m_iOK; bool m_bSoaking; __int64 m_tBuffEndTime }`, NOT
+  `{ __int64 m_tBuffEndTime }`. Not in `CommonPacket.h`, so no X2TOOL define.
+- **Enums.** `BTI_SPA_GROW_BUFF` 918, `BTI_SPA_STRONG_BUFF` 919, `BFI_SPA_GROW_BUFF` 948 under `JUNE_ENUM_NAMES` in `X2BuffFactor.h` (no March member at those
+  values; `BFI_SPA_STRONG_BUFF` 949 was already there, `JUNE_BUFF_PREMIUM`). June's `SPA_BUFF_TYPE` (`SBT_GROW` 0, `SBT_STRONG` 1, `Enum.src.lua:17985`)
+  was in no C++ enum: `CX2LocationManager::SPA_BUFF_TYPE` beside `SpaInfo` (whose `m_iType` holds it), under `JUNE_SPA_BUFF`.
+- **Data, live in data036** (`kom_contents/data036_kom`): `BuffTemplet.lua` carries both rows (918: 1200 s, PvP / dungeon / field, factor 948; 919:
+  1200 s, dungeon / field, factor 949, `NOT_USE_IN_PVE`), `BattleFieldBuffTemplet.lua` both BTIs, `BattleFieldBuffFactor.lua` both factors (948 -> 918,
+  949 -> 919), so `ActivateBuff`'s factor check passes. No pack needed.
+- **Emulator** (`Handlers_Field.cpp` `Handler_EGS_SPA_SOAK_REQ`, dispatch in `X2OfflineServer.cpp`): `{ 0, * }` -> `[JUNE_SPA] emu soak REQ out of the pool`,
+  no reply; a type that is not `SBT_*` -> logged, ignored; `{ 1, SBT_GROW / SBT_STRONG }` -> `CX2OfflineBuff::OnSoakSpa` (new, `Handlers_Inventory.cpp`):
+  `DeactivateBuff` then `ActivateBuff( now )` (March's `ActivateBuff` refuses an active buff, so the refresh ends it first), end time read back from
+  `unit_buff`; then `[JUNE_SPA] emu grant buff=<BTI> sec=<n> stand-in: ...`, `EGS_SPA_SOAK_ACK { NET_OK, true, end }`, `SendUpdateBuffInfo`. A failed
+  grant logs the `BUFF` reason plus `emu buff=<id> not granted` and sends nothing. `EGS_SPA_BUFF_END_TIME_NOT` is never sent ("Decisions" 1). The
+  per-packet savepoint makes the end-and-reactivate one transaction.
+- **Map:** the 6 S3a rows -> `ported S3a` (`323c15e0` stays `March`: `KSession::SendPacket`, used by S3b).
+- **Gates.** `finish.py --with SERV_IRUHADEV_JUNE_SPA_BUFF SERV_IRUHADEV_OFFLINE_SPA_BUFF` (worktree): flagcheck `JUNE_SPA_BUFF` PASS (2 PASS, 2 PASS~,
+  2 DEFINE, 6 OTHER, 0 FAIL), `OFFLINE_SPA_BUFF` PASS (3 PASS, 2 PASS~, 1 DEFINE, 6 OTHER), junediverge PASS, enumscan PASS; `FINISH RESULT: PASS`.
+  OTHER rows: each flag's rows are the other flag's files, plus `X2BuffFactor.h` (`JUNE_ENUM_NAMES`, insert-only: 11 lines, 0 deleted). Adding
+  `JUNE_ENUM_NAMES` to `--with` errors on peers' `!defined( SERV_IRUHADEV_JUNE_ENUM_NAMES )` guards in `Always.h`, so it stays INFO. `PASS~`: the blank
+  line before each new block. CP949 files through `bytepatch.py`: 125 inserted lines, 0 deleted.
+- **Build.** Full build skipped: no play-test. `/Zs` probe (X2Lib context) of `X2ServerPacket.cpp` (includes `ClientPacket.cpp`), `Handlers_Field.cpp`,
+  `Handlers_Inventory.cpp`, `X2OfflineServer.cpp`, `X2OfflineEventName.cpp` and a flag probe: 0 errors, all four flags ON (`JUNE_SPA_BUFF`,
+  `OFFLINE_SPA_BUFF`, `JUNE_ENUM_NAMES`, `OFFLINE_ITEM_BUFF`).
+- **Play-test:** none of its own; S3b's sends the REQ (expected line `[JUNE_SPA] emu grant buff=919 sec=1200 stand-in`).
+- **Open questions:** none. Review: in S3b's.
+
 ## Phase S3b - Soaking, the spa notice and effect
 
 **Scope.** Flags `SERV_IRUHADEV_JUNE_SPA_BUFF` (+ `_DEBUG`); the map rows marked S3b, June's code whole: the ctor's spa state init and the

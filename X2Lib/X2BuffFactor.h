@@ -725,6 +725,12 @@ enum BUFF_TEMPLET_ID
 	BTI_BUFF_MADNESS_CRAVE_SPEED_BUFF              = 776,	// June's Enum.lua; Madness Crave with no enemy near
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
+//{{ Iruha : 2026-11-17 // june-spa S3a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BTI_SPA_GROW_BUFF                     = 918,	// june-spa S3a: June's Enum.lua; the spa soak buff of SBT_GROW
+	BTI_SPA_STRONG_BUFF                   = 919,	// June's Enum.lua; the spa soak buff of SBT_STRONG ( both spas )
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
 };
 
 enum BUFF_FACTOR_ID
@@ -1084,6 +1090,11 @@ enum BUFF_FACTOR_ID
 #ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
 	BFI_BUFF_TRANSCENDENCE                = 790,	// June's Enum.lua; the Transcendence transformed form's buff
 	BFI_DEBUFF_DESPERADO_MOVE_BRAKE_ADD   = 792,	// June's Enum.lua; Desperado's move brake on every target when the shot count is reached
+#endif SERV_IRUHADEV_JUNE_ENUM_NAMES
+//}}
+//{{ Iruha : 2026-11-17 // june-spa S3a
+#ifdef SERV_IRUHADEV_JUNE_ENUM_NAMES
+	BFI_SPA_GROW_BUFF                     = 948,	// june-spa S3a: June's Enum.lua; BTI_SPA_GROW_BUFF's factor
 #endif SERV_IRUHADEV_JUNE_ENUM_NAMES
 //}}
 };

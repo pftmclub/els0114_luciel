@@ -14269,3 +14269,26 @@ static const int MAGIC_HERO_MATCH_GAME_KILL_COUNT = 8;
 #error SERV_IRUHADEV_JUNE_SPA_DEBUG needs SERV_IRUHADEV_OFFLINE ( CX2OfflineLog ) and SERV_IRUHADEV_JUNE_SPA_ENTRY
 #endif SERV_IRUHADEV_JUNE_SPA_DEBUG
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-17
+// Description: june-spa S3a - the spa soak packets EGS_SPA_SOAK_REQ / EGS_SPA_SOAK_ACK / EGS_SPA_BUFF_END_TIME_NOT ( June 0x637 / 0x638 /
+//              0x639 ) and June's SPA_BUFF_TYPE in CX2LocationManager. Also defined in KncWX2Server/Common/ServerDefine.h ( EventID_Client.h
+//              and ClientPacket.h are compiled before Always.h is reachable ): comment out both together. Log [JUNE_SPA].
+#define SERV_IRUHADEV_JUNE_SPA_BUFF
+#if defined( SERV_IRUHADEV_JUNE_SPA_BUFF ) && ( !defined( SERV_IRUHADEV_JUNE_ENUM_NAMES ) || !defined( SERV_IRUHADEV_JUNE_SPA_ENTRY ) )
+#error SERV_IRUHADEV_JUNE_SPA_BUFF needs _JUNE_ENUM_NAMES ( BTI_SPA_GROW_BUFF / BTI_SPA_STRONG_BUFF ) and _JUNE_SPA_ENTRY ( the spa villages )
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-17
+// Description: june-spa S3a - stand-in for June's missing server answer to EGS_SPA_SOAK_REQ ( "Decisions" 1, refresh on every pool entry ):
+//              { 1, SBT_GROW / SBT_STRONG } (re)grants that type's spa buff for its BuffTemplet period from now, replies EGS_SPA_SOAK_ACK
+//              { NET_OK, true, end time } and sends the buff list; { 0, -1 } and other types are logged only; EGS_SPA_BUFF_END_TIME_NOT is
+//              never sent. Log [JUNE_SPA] emu. Revert: comment out the #define.
+#define SERV_IRUHADEV_OFFLINE_SPA_BUFF
+#if defined( SERV_IRUHADEV_OFFLINE_SPA_BUFF ) && ( !defined( SERV_IRUHADEV_OFFLINE ) || !defined( SERV_IRUHADEV_OFFLINE_ITEM_BUFF ) || !defined( SERV_IRUHADEV_JUNE_SPA_BUFF ) )
+#error SERV_IRUHADEV_OFFLINE_SPA_BUFF needs SERV_IRUHADEV_OFFLINE ( the emulator ), _OFFLINE_ITEM_BUFF ( CX2OfflineBuff ) and _JUNE_SPA_BUFF ( the packets )
+#endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
+//////////////////////////////////////////////////////////////////////////

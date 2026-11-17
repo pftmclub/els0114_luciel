@@ -5726,6 +5726,33 @@ DECL_PACKET( EGS_ADMIN_ADD_ITEM_ACK )
 };
 #endif SERV_IRUHADEV_ADMIN_CHEATS
 
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+// june-spa S3a: June 0x637 Put 320acab0 ( bool, char ), 0x638 Get 320acb70 ( int, bool, __int64 ), 0x639 Get 320acbe0 ( __int64 ); end times are absolute.
+DECL_PACKET( EGS_SPA_SOAK_REQ )
+{
+	bool							m_bInPool;
+	char							m_cSpaBuffType;
+
+	KEGS_SPA_SOAK_REQ() : m_bInPool( false ), m_cSpaBuffType( -1 ) {}
+};
+
+DECL_PACKET( EGS_SPA_SOAK_ACK )
+{
+	int								m_iOK;
+	bool							m_bSoaking;
+	__int64							m_tBuffEndTime;
+
+	KEGS_SPA_SOAK_ACK() : m_iOK( 0 ), m_bSoaking( false ), m_tBuffEndTime( 0 ) {}
+};
+
+DECL_PACKET( EGS_SPA_BUFF_END_TIME_NOT )
+{
+	__int64							m_tBuffEndTime;
+
+	KEGS_SPA_BUFF_END_TIME_NOT() : m_tBuffEndTime( 0 ) {}
+};
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
+
 
 //////////////////////////////////////////////////////////////////////////
 //{{ 2009. 6. 3  최육사		확성기

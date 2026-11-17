@@ -3926,6 +3926,34 @@ bool CX2OfflineBuff::OnLeaveVillage( UidType nUnitUID )
 }
 #endif SERV_IRUHADEV_OFFLINE_VILLAGE_BUFF
 
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_BUFF
+// june-spa S3a: stand-in, "Decisions" 1 = refresh on every pool entry, so an active spa buff is ended and activated again from now
+bool CX2OfflineBuff::OnSoakSpa( UidType nUnitUID, int iBuffID, OUT __int64& tBuffEndTime )
+{
+	tBuffEndTime = 0;
+
+	EnsureLoaded();
+
+	DeactivateBuff( nUnitUID, iBuffID );
+	if( false == ActivateBuff( nUnitUID, iBuffID, _time64( NULL ) ) )
+		return false;
+
+	std::vector< KOfflineBuffRow > vecRow;
+	CX2OfflineDB::Instance()->LoadUnitBuffs( nUnitUID, vecRow );
+
+	for( size_t i = 0; i < vecRow.size(); ++i )
+	{
+		if( vecRow[i].m_iBuffID == iBuffID )
+		{
+			tBuffEndTime = vecRow[i].m_iEndTime;
+			return true;
+		}
+	}
+
+	return false;
+}
+#endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
+
 bool CX2OfflineBuff::CheckBuffPeriod( UidType nUnitUID )
 {
 	std::vector< KOfflineBuffRow > vecRow;

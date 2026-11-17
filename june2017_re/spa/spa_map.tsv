@@ -28,11 +28,11 @@ june_va	what	march	state	phase	readers
 323bda90 @323bdb79-323bdb8f	EventProcess: +0x624 -> 32ec8330( all four args )	-	absent	S4b	-
 323ac910	0x638 handler twin (returns bool); no caller, no xref (dead)	-	absent (dead)	S3b (port only if a caller turns up)	-
 323ac990	0x639 handler twin; no caller, no xref (dead)	-	absent (dead)	S3b (port only if a caller turns up)	-
-323be4c0	0x638 DeSerialize: KSerBuffer -> 320acb70	-	absent	S3a	323bda90, 323ac910
-323be550	0x639 DeSerialize: KSerBuffer -> 320acbe0	-	absent	S3a	323bda90, 323ac990
-320acb70	0x638 Get: int m_iOK (tag 5) +0, bool (tag 0xc) +4, __int64 (tag 8) +5	-	absent	S3a	323be4c0
-320acbe0	0x639 Get: __int64 (tag 8)	-	absent	S3a	323be550
-323bf360 / 320acab0	0x637 Serialize + Put: bool (tag 0xc) +0, char (tag 2) +1	-	absent	S3a	323c15e0
+323be4c0	0x638 DeSerialize: KSerBuffer -> 320acb70	ClientPacket.cpp KEGS_SPA_SOAK_ACK GET (via KSerializer)	ported S3a	S3a	323bda90, 323ac910
+323be550	0x639 DeSerialize: KSerBuffer -> 320acbe0	ClientPacket.cpp KEGS_SPA_BUFF_END_TIME_NOT GET (via KSerializer)	ported S3a	S3a	323bda90, 323ac990
+320acb70	0x638 Get: int m_iOK (tag 5) +0, bool (tag 0xc) +4, __int64 (tag 8) +5	ClientPacket.h/.cpp KEGS_SPA_SOAK_ACK { m_iOK, m_bSoaking, m_tBuffEndTime }	ported S3a	S3a	323be4c0
+320acbe0	0x639 Get: __int64 (tag 8)	ClientPacket.h/.cpp KEGS_SPA_BUFF_END_TIME_NOT { m_tBuffEndTime }	ported S3a	S3a	323be550
+323bf360 / 320acab0	0x637 Serialize + Put: bool (tag 0xc) +0, char (tag 2) +1	ClientPacket.h/.cpp KEGS_SPA_SOAK_REQ { m_bInPool, m_cSpaBuffType }; EventID_Client.h EGS_SPA_SOAK_REQ / _ACK / EGS_SPA_BUFF_END_TIME_NOT	ported S3a	S3a	323c15e0
 323c15e0	KSession::SendPacket< 0x637 struct >( 0x202, 0, 0, 0x637, &data, true, false )	KSession::SendPacket template	March	S3a	323b5970 x2, 323b8ba0
 323b1e40	static send 0x637 { a, b } through 323c1fc0; no caller, no xref (dead)	-	absent (dead)	- (not ported)	-
 323aea40 @323aec01-323aef25	render, in 1500 / 1501 with my unit: +0x462 and !+0x463 and !+0x464 -> notice STR 43074 (type SBT_GROW) / 43476 (SBT_STRONG) + 323ac3e0 time, font +0x480 at (512, 150), skipped when 31d03920(); EffectSet_SPA_Buff on my unit -> +0x484 when -1; otherwise stop +0x484 (321dafb0)	EffectSet_SPA_Buff in March UIEffectSet.lua	absent	S3b	-
@@ -102,6 +102,6 @@ sweep: 323c9fa0 / 323cee10 / 323cf570 / 323d0ca0 / 323d0770 / 323d2b40 / 323d565
 sweep: gTFG functions (31d88bf0, 31d8e280, 31f0d390, 31f23e70, 3223d680, 323e05f0, 323e4cb0, 323eef70, 323f8080, 323fad80, 32507840, 32507d40, 32508a90, 32508e70, 32509170, 325094b0, 3250a800, 325ca2b0, 325cd7c0, 325cdfa0, 325ee7d0, 326ea980, 326ee190, 328a1d90, 328a2080, 328a7460, 328b6370, 32d2db50, 32e53d30)	load g_pTFieldGame but no spa-offset hit has it as the base register (scan: none); the offsets belong to their own objects	-	not-spa	-	-
 emu: code_events	emulator: code_events table (31 = on), EGS_UPDATE_CODE_EVENT_NOT at login after the unit list, elsdb.py code-event ("Design")	X2Lib/Offline (nothing sends it today)	absent	S2a	IsEnableCode( 31 ): 323bad00, 323ba5f0, 324627f0
 emu: last position	emulator: EGS_STATE_CHANGE_FIELD_REQ saves any map id as last_pos; login inside a spa per "Decisions" 2	Offline/Handlers_Field.cpp:62	design	S2a	X2StateServerSelect.cpp:7314-7410
-emu: 0x637	emulator answer to 0x637 per "Decisions" 1 (no June server code)	-	design	S3a	-
+emu: 0x637	emulator answer to 0x637 per "Decisions" 1 (no June server code)	Offline/Handlers_Field.cpp Handler_EGS_SPA_SOAK_REQ + CX2OfflineBuff::OnSoakSpa (Handlers_Inventory.cpp), flag OFFLINE_SPA_BUFF	ported S3a	S3a	-
 emu: 0xe6 / 0xe7	Pporu catch = shop buy of 164548 for its ED price; the emulator's buy handler already charges it	Offline/Handlers_Inventory.cpp:1329	March	S4b (check only)	-
 emu: 0x651-0x654	rock-scissors-paper packets: emulator stand-in designed in S5 once the structs are read	-	design	S5	-

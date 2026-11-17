@@ -270,8 +270,8 @@ Plan `JUNE_SPA_PHASES.md` - branch `main` - log tag `[JUNE_SPA]` (`offline_serve
 
 | Phase | State | Model / effort | Depends | Touches (main files) | Kickoff |
 |---|---|---|---|---|---|
-| S3a | **ready** (start: `/x2-phase june-spa S3a`): 0x637-0x639 packets, BTI / BFI names, emulator buff stand-in; inert, probe build | Opus 5.5 / high; review in S3b's | S2b review | `KncWX2Server/Common` packets + event ids, `Offline/Handlers_*`, `X2BuffFactor.h` / buff enums | `S3a.md` |
-| S3b | blocked (S3a): soak timers, type pick, 0x638 / 0x639, notice + `EffectSet_SPA_Buff`, dtor send | Opus 5.5 / high, Opus review | S3a | `X2TFieldGame.*` | `S3b.md`, `S3b-review.md` |
+| S3a | done 2026-11-17 (inert; probe build): 0x637-0x639 packets, BTI 918 / 919 + BFI 948, `SPA_BUFF_TYPE`, emulator refresh-on-entry stand-in; review in S3b's | Opus 5.5 / high; review in S3b's | S2b review | `KncWX2Server/Common` packets + event ids, `Offline/Handlers_*`, `X2BuffFactor.h` / buff enums | `S3a.md` |
+| S3b | **ready** (start: `/x2-phase june-spa S3b`): soak timers, type pick, 0x638 / 0x639, notice + `EffectSet_SPA_Buff`, dtor send | Opus 5.5 / high, Opus review | S3a | `X2TFieldGame.*` | `S3b.md`, `S3b-review.md` |
 | S4a | blocked (S3b review): the Pporu class (14 methods), new files; inert, probe build | Opus 5.5 / high; review in S4b's | S3b review | new Pporu class files, `X2Lib_2010.vcxproj` | `S4a.md` |
 | S4b | blocked (S4a): Pporu hooks in the field game, `SetAppearPPoruCheat` bind | Opus 5.5 / high, Opus review | S4a | `X2TFieldGame.*`, Lua bind list | `S4b.md`, `S4b-review.md` |
 | S5 | blocked (S4b review): rock-scissors-paper (spa-only): map the class, data, user-approved stand-in, port | Opus 5.5 / high, Opus review | S4b review | per its map; NPC shop / message UI, data034 / 036 | `S5.md`, `S5-review.md` |

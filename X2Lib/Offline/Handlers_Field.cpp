@@ -457,4 +457,56 @@ bool CX2OfflineServer::Handler_EGS_CHANGE_UNIT_FORM_REQ( KOfflineSession& kSes, 
 }
 #endif SERV_IRUHADEV_JUNE_CHAR_DUO_VIEW
 
+#ifdef SERV_IRUHADEV_OFFLINE_SPA_BUFF
+// june-spa S3a: stand-in for June's missing server answer to 0x637 ( "Decisions" 1: refresh on every entry; 0x639 is never sent )
+bool CX2OfflineServer::Handler_EGS_SPA_SOAK_REQ( KOfflineSession& kSes, const KEvent& kEvent )
+{
+	KEGS_SPA_SOAK_REQ kReq;
+	if( false == ReadReq( kEvent, kReq ) )
+		return false;
+
+	const int iSpaBuffType = (int)kReq.m_cSpaBuffType;
+	if( false == kReq.m_bInPool )
+	{
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu soak REQ out of the pool, type=%d: no reply", iSpaBuffType );
+		return true;
+	}
+
+	int iBuffID = 0;
+	switch( iSpaBuffType )
+	{
+	case CX2LocationManager::SBT_GROW:		iBuffID = BTI_SPA_GROW_BUFF;	break;
+	case CX2LocationManager::SBT_STRONG:	iBuffID = BTI_SPA_STRONG_BUFF;	break;
+	default:
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu soak REQ type=%d is no SPA_BUFF_TYPE: ignored", iSpaBuffType );
+		return true;
+	}
+
+	if( 0 == kSes.m_nSelectedUnitUID )
+	{
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu soak REQ type=%d ignored: no selected unit", iSpaBuffType );
+		return true;
+	}
+
+	__int64 tBuffEndTime = 0;
+	if( false == CX2OfflineBuff::Instance()->OnSoakSpa( kSes.m_nSelectedUnitUID, iBuffID, tBuffEndTime ) )
+	{
+		CX2OfflineLog::Server( L"[JUNE_SPA] emu buff=%d not granted ( see the BUFF line above ): no reply", iBuffID );
+		return true;
+	}
+
+	CX2OfflineLog::Server( L"[JUNE_SPA] emu grant buff=%d sec=%I64d stand-in: refreshed on every pool entry ( type=%d, end=%I64d )",
+		iBuffID, tBuffEndTime - _time64( NULL ), iSpaBuffType, tBuffEndTime );
+
+	KEGS_SPA_SOAK_ACK kAck;
+	kAck.m_iOK			= NetError::NET_OK;
+	kAck.m_bSoaking		= true;
+	kAck.m_tBuffEndTime	= tBuffEndTime;
+	Reply( kSes, EGS_SPA_SOAK_ACK, kAck );
+
+	SendUpdateBuffInfo( kSes );
+	return true;
+}
+#endif SERV_IRUHADEV_OFFLINE_SPA_BUFF
+
 #endif SERV_IRUHADEV_OFFLINE

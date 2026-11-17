@@ -4824,3 +4824,9 @@
 // Description: june-stat-calc S1: June's 7-field KStat ( float hp, the attack-range pair ). Also defined in KTDXLIB/Always.h and in X2ServerProtocol_2010.vcxproj ( X2TOOL ): toggle all three.
 #define SERV_IRUHADEV_JUNE_STATCALC_UNIT_STAT
 //////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Author: Iruha
+// Date: 2026-11-17
+// Description: june-spa S3a: the spa soak events and packets ( June 0x637 / 0x638 / 0x639 ). Also defined in KTDXLIB/Always.h; this second home exists because EventID_Client.h and ClientPacket.h are compiled before Always.h is reachable. Comment out both together.
+#define SERV_IRUHADEV_JUNE_SPA_BUFF
+//////////////////////////////////////////////////////////////////////////
