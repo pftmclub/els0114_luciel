@@ -833,6 +833,7 @@ All 19 class-map rows of phase CH1e are accounted for: 11 `new` under `SERV_IRUH
 
 **Gates.**
 - `finish.py --files X2Lib/X2GUAdd.cpp X2Lib/X2GUAdd.h X2Lib/X2SkillTree.h --with JUNE_CHAR_ADD_CORE JUNE_CHAR_ADD_LIVE JUNE_ENUM_NAMES`: `_CORE` PASS ( `files: 2 PASS, 0 PASS~, 0 DEFINE, 1 OTHER, 0 FAIL, 0 ERROR` ), `_LIVE` INERT ( `//#define`; 0 deleted / non-ASCII / EOL-mismatched, 0 `#else`/`#endif` without the token ), `JUNE_ENUM_NAMES` PASS, `junediverge` PASS, `enumscan` PASS; `stateends` skipped ( no skill state registered ), `skillicons` / `luabind` skipped. `git diff --numstat`: `X2GUAdd.cpp` 646 / 0, `X2GUAdd.h` 48 / 0, `X2SkillTree.h` 14 / 0.
+- Range `finish.py --range 62577326^..62577326` ( same `--with` ): `_CORE` PASS ( `files: 2 PASS` ), `_LIVE` INERT, `JUNE_ENUM_NAMES` PASS, `junediverge` PASS, `enumscan` PASS. Commit `62577326`.
 - One-file `/Zs` probes of `X2GUAdd.cpp` ( `census.cl_cmd`, no PCH ): 0 errors with `_LIVE` off and with `/D SERV_IRUHADEV_JUNE_CHAR_ADD_LIVE`.
 - Full build skipped: no play-test ( `_LIVE` is off ), so no `DEPLOY OK` / `exestr` line.
 
