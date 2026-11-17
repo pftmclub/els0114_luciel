@@ -486,6 +486,46 @@ unless a caller turns up.
 show, the buff icon appears with 20:00; step out and back in -> the buff restarts at 20:00 ("Decisions" 1); leaving the line stops the effect;
 a dungeon run shows the buff applied (and June's `NOT_USE_IN_PVE` rule). Log lines `type`, `send 0x637`, `recv 0x638`, `effect`, `emu grant`.
 
+## Phase S3b - Done
+
+2026-11-17, Opus 5.5 / high. Flags `SERV_IRUHADEV_JUNE_SPA_BUFF` (S3a's), `SERV_IRUHADEV_JUNE_SPA_DEBUG`. One file pair: `X2TFieldGame.cpp` / `.h`, 236 lines
+inserted, 0 deleted (`bytepatch.py`). Map: the 9 live S3b rows -> `ported S3b`; the dead twins `323ac910` / `323ac990` / `323ad4c0` stay out (no caller).
+- **State** (TFG +0x462..+0x484): `m_bShowSpaNotice`, `m_bOutOfSpaPool`, `m_bSpaBuffTypeChanged`, `m_fSpaSoakTime`, `m_fSpaLeaveSendTime`, `m_fSpaLeaveTime`,
+  `m_iSpaBuffType` (-1), `m_tSpaBuffEndTime` (-1), `m_pFontForSpaNotice`, `m_hSpaBuffEffect` (invalid), set in the ctor as June (@323baf69, @323bc7c3).
+  **Font:** June keeps its own member (+0x480 = `GetUKFont( 2 )` @323bb335, beside +0x120 = `m_pFontForUnitName`, also font 2), so S3b adds one:
+  `m_pFontForSpaNotice = GetUKFont( XUF_DODUM_15_BOLD )`; the dtor clears it beside `m_pFontForUnitName` (@323b8c0b).
+- **`UpdateSpaBuffType`** (`323ac9d0`): the current village templet's `m_vecSpaInfo` row whose `LineIdx` holds `GetLastTouchLineIndex()` (+0x3d4, as S2b);
+  the last match wins; changed -> type-changed flag; none -> out-of-pool flag.
+- **Soak loop** (OnFrameMove @323b6aa9-323b6cd2), inside S2b's spa-village block after `ExitSpa` (June's village test jumps past it, @323b6956):
+  in a pool, the timer is held at 0 while the end time is > 0 and neither flag is set; >= 1.0 s (double @334355b0) -> `EGS_SPA_SOAK_REQ { 1, type }`,
+  both flags and the timer cleared; leave timer 0. Out of a pool: both timers += dt; send timer >= 1.0 and leave time <= 3.0 (double @33439b50, `fcomp`
+  + `test ah, 0x41` + `jp`) -> `{ 0, -1 }`, notice off. Floats as June (`fstp dword` each add). Send = `CX2ServerProtocol::SendPacket` (June's inlined
+  template: logging on, no compress; its extra `+0x2c` byte test is June's protocol class, not this plan's).
+- **Packets:** March's `CX2TFieldGame::UIServerEventProc` is June's `323bda90` (the funcmap's "EventProcess", corrected: field-NPC loop, then the
+  switch; `CX2StateField` 3250d2f0 forwards to it). 0x638 (@323bdcc9): invalid `m_iOK` -> false; else if `m_bSoaking` -> end time, notice on; true.
+  0x639 (@323bdc9b): end time only; true. Written inline in the cases, as June compiled them (the out-of-line twins are dead).
+- **Render** (`323aea40` @323aebea-323aef25) at the end of March's `OnFrameRender` not-loading branch, after the talk box (June's order): in 1500 / 1501
+  with my unit, notice on and both flags clear -> STR 43074 (`SBT_GROW`) / 43476 (`SBT_STRONG`) with `AppendSpaBuffLeftTime`; drawn unless dialogs are
+  hidden: `OutTextMultiline( 512, 150, ..., 0xffffff80, FS_SHELL, 0xff000000, 1.0, NULL, DT_CENTER )` (31c3ae80, args read off the pushes);
+  `EffectSet_SPA_Buff` on my unit into the handle while it is invalid. Otherwise the handle is stopped. June's pass bool has no March counterpart here
+  (March's `OnFrameRender` takes none): drawn once per frame.
+- **`AppendSpaBuffLeftTime`** (`323ac3e0`): `_localtime64_s( end )`, `_mktime32`, `_difftime32( end, (time32)GetServerCurrentTime() )`, then
+  `M : 0S` / `M : SS` (separator `L" : "` @33459168, pad `L"0"` @33458f54). JUNE_BUGS 788 (no clamp below zero, reached past 20 min since the emulator
+  sends no 0x639) and 789 (an unset `tm` when the conversion fails; latent).
+- **Dtor** (@323b936d-323b9431), after the relation-templet cleanup (June's order): stop the effect; in 1500 / 1501 send `{ 0, -1 }`. One addition: a
+  `GetServerProtocol()` null test (March's shutdown order is not June's), commented.
+- **Strings** (live `General.ess`): 43074 "@1 left before getting the 'Ventus's Blessing' buff ...", 43476 "@1 left before getting the 'Denif's
+  Blessing' buff ...". Both spas are `SBT_STRONG`, so 43476 shows. The wording reads as a wait **until** the buff, while "Decisions" 1 grants it at
+  once; noted for the user, not changed (the stand-in is approved).
+- **Debug** (`_DEBUG`): `type <old> -> <new> line=` (on change, 1/s), `send 0x637 flag= type=` (+ ` (dtor)`), `recv 0x638 ok= soaking= end=`, `recv 0x639
+  end=`, `effect play/stop handle=`.
+- **Gates.** `finish.py --files X2Lib/X2TFieldGame.cpp X2Lib/X2TFieldGame.h --with SERV_IRUHADEV_JUNE_SPA_BUFF SERV_IRUHADEV_JUNE_SPA_DEBUG`: flagcheck
+  `JUNE_SPA_BUFF` PASS (2 PASS, 0 OTHER, 0 FAIL), junediverge `RESULT: PASS`, enumscan PASS; `FINISH RESULT: PASS`. `JUNE_SPA_ENTRY` INFO (S2b's block
+  around the soak loop). `OFFLINE_SPA_BUFF` (the kickoff's `--with`) is on no S3b line: dropped. `/Zs` probe of `X2TFieldGame.cpp`: 0 errors.
+- **Build.** `DEPLOY OK: X2_offline.exe is 27,255,296 B, dated 2026-11-17 08:36:36, md5 0d5f427e0a72209ef08e880c8f5d3b74` (main d54bb444 + the 2 S3b files).
+  `EXESTR OK: 4 of 4 found` (`send 0x637`, `recv 0x638`, `effect play`, `EffectSet_SPA_Buff`; wide).
+- **funcmap** +1 row (`323bda90 (S3b)`). Play-test: hand-off now (below). Review: `S3b-review.md` (covers S3a).
+
 ## Phase S4a - The Pporu class
 
 **Scope.** Flag `SERV_IRUHADEV_JUNE_SPA_PPORU`; the map rows marked S4a: the `+0x624` object (`32ec76e0` .. `32ec8350`, 14 methods) as a new

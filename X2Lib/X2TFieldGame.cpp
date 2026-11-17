@@ -156,6 +156,19 @@ CX2TFieldGame::CX2TFieldGame( CX2World::WORLD_ID worldID, SquareData* pSquareDat
 	m_bJoinSpa				= false;
 	m_bExitSpa				= false;
 #endif SERV_IRUHADEV_JUNE_SPA_ENTRY
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+	// june-spa S3b: June ctor 323bad00 @323baf69-323baf79 / @323bc7c3-323bc804
+	m_bShowSpaNotice		= false;
+	m_bOutOfSpaPool			= false;
+	m_bSpaBuffTypeChanged	= false;
+	m_fSpaSoakTime			= 0.f;
+	m_fSpaLeaveSendTime		= 0.f;
+	m_fSpaLeaveTime			= 0.f;
+	m_iSpaBuffType			= -1;
+	m_tSpaBuffEndTime		= -1;
+	m_pFontForSpaNotice		= NULL;
+	m_hSpaBuffEffect		= INVALID_EFFECTSET_HANDLE;
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 
 	m_bLoadComplete			= false;
 	m_bFindOtherLine		= false;
@@ -266,6 +279,10 @@ CX2TFieldGame::CX2TFieldGame( CX2World::WORLD_ID worldID, SquareData* pSquareDat
 
 	m_pFontForUnitName = g_pKTDXApp->GetDGManager()->GetDialogManager()->GetUKFont( XUF_DODUM_15_BOLD );	
     ASSERT( m_pFontForUnitName != NULL );
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+	// june-spa S3b: June ctor @323bb335-323bb35c, the soak notice's own font member
+	m_pFontForSpaNotice = g_pKTDXApp->GetDGManager()->GetDialogManager()->GetUKFont( XUF_DODUM_15_BOLD );
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 
 	//m_bEnableKey			= true;
 	m_bEnableKeyProcess		= true;
@@ -563,6 +580,9 @@ CX2TFieldGame::~CX2TFieldGame(void)
 	
 g_pData->GetUIManager()->DestoryUITempInventory();
 	m_pFontForUnitName = NULL;
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+	m_pFontForSpaNotice = NULL;	// june-spa S3b: June dtor @323b8c0b
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 
 #ifndef REFORM_NOVICE_GUIDE
 	// 초심자 가이드
@@ -626,6 +646,23 @@ g_pData->GetUIManager()->DestoryUITempInventory();
 		SAFE_DELETE( m_vecRelationHouseTemplet[i] );
 	m_vecRelationHouseTemplet.clear();
 #endif SERV_IRUHADEV_ELYSION_VILLAGE
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+	// june-spa S3b: June dtor 323b8ba0 @323b936d-323b9431, stop the soak effect and leave the pool
+	g_pData->GetUIEffectSet()->StopEffectSet( m_hSpaBuffEffect );
+	if( NULL != g_pData->GetLocationManager() &&
+		( SEnum::VMI_SPA_RUBEN == g_pData->GetLocationManager()->GetCurrentVillageID() ||
+		SEnum::VMI_SPA_RANOX == g_pData->GetLocationManager()->GetCurrentVillageID() ) &&
+		NULL != g_pData->GetServerProtocol() )	// null guard added: March's shutdown order is not June's
+	{
+		KEGS_SPA_SOAK_REQ kPacket;
+		kPacket.m_bInPool = false;
+		kPacket.m_cSpaBuffType = -1;
+		g_pData->GetServerProtocol()->SendPacket( EGS_SPA_SOAK_REQ, kPacket );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+		CX2OfflineLog::Server( L"[JUNE_SPA] send 0x637 flag=%d type=%d (dtor)", (int)kPacket.m_bInPool, (int)kPacket.m_cSpaBuffType );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+	}
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 
 	SAFE_DELETE( m_pWorld );
 	SAFE_DELETE( m_pCamera );
@@ -1836,6 +1873,48 @@ HRESULT	CX2TFieldGame::OnFrameMove( double fTime, float fElapsedTime )
 
 			if( true == m_bExitSpa )
 				ExitSpa();
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+			// june-spa S3b: June OnFrameMove 323b5970 @323b6aa9-323b6cd2, the soak timers and the soak REQ
+			UpdateSpaBuffType();
+			if( -1 != m_iSpaBuffType )
+			{
+				if( m_tSpaBuffEndTime > 0 && true != m_bSpaBuffTypeChanged && true != m_bOutOfSpaPool )
+					m_fSpaSoakTime = 0.f;
+
+				m_fSpaSoakTime += fElapsedTime;
+				if( m_fSpaSoakTime >= 1.0 )	// June double @334355b0
+				{
+					KEGS_SPA_SOAK_REQ kPacket;
+					kPacket.m_bInPool = true;
+					kPacket.m_cSpaBuffType = static_cast<char>( m_iSpaBuffType );
+					g_pData->GetServerProtocol()->SendPacket( EGS_SPA_SOAK_REQ, kPacket );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_SPA] send 0x637 flag=%d type=%d", (int)kPacket.m_bInPool, (int)kPacket.m_cSpaBuffType );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+					m_bOutOfSpaPool = false;
+					m_bSpaBuffTypeChanged = false;
+					m_fSpaSoakTime = 0.f;
+				}
+				m_fSpaLeaveTime = 0.f;
+			}
+			else
+			{
+				m_fSpaLeaveSendTime += fElapsedTime;
+				m_fSpaLeaveTime += fElapsedTime;
+				if( m_fSpaLeaveSendTime >= 1.0 && m_fSpaLeaveTime <= 3.0 )	// June doubles @334355b0 / @33439b50
+				{
+					KEGS_SPA_SOAK_REQ kPacket;
+					kPacket.m_bInPool = false;
+					kPacket.m_cSpaBuffType = -1;
+					g_pData->GetServerProtocol()->SendPacket( EGS_SPA_SOAK_REQ, kPacket );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_SPA] send 0x637 flag=%d type=%d", (int)kPacket.m_bInPool, (int)kPacket.m_cSpaBuffType );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+					m_bShowSpaNotice = false;
+					m_fSpaLeaveSendTime = 0.f;
+				}
+			}
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 		}
 #endif SERV_IRUHADEV_JUNE_SPA_ENTRY
 	}
@@ -2612,6 +2691,51 @@ HRESULT	CX2TFieldGame::OnFrameRender()
 		{
 			m_pTalkBoxManager->OnFrameRender();
 		}
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+		// june-spa S3b: June 323aea40 @323aebea-323aef25, the soak notice and EffectSet_SPA_Buff on my unit
+		if( NULL != g_pData->GetLocationManager() &&
+			( SEnum::VMI_SPA_RUBEN == g_pData->GetLocationManager()->GetCurrentVillageID() ||
+			SEnum::VMI_SPA_RANOX == g_pData->GetLocationManager()->GetCurrentVillageID() ) &&
+			NULL != m_pMyUnit )
+		{
+			if( true == m_bShowSpaNotice && false == m_bOutOfSpaPool && false == m_bSpaBuffTypeChanged )
+			{
+				wstring wstrSpaNotice = L"";
+				std::wstringstream wstrmLeftTime;
+				AppendSpaBuffLeftTime( wstrmLeftTime );
+				switch( m_iSpaBuffType )
+				{
+				case CX2LocationManager::SBT_GROW:
+					wstrSpaNotice = GET_REPLACED_STRING( ( 43074, "L", wstrmLeftTime.str() ) );
+					break;
+				case CX2LocationManager::SBT_STRONG:
+					wstrSpaNotice = GET_REPLACED_STRING( ( 43476, "L", wstrmLeftTime.str() ) );
+					break;
+				}
+
+				if( false == g_pKTDXApp->GetDGManager()->GetDialogManager()->GetHideDialog() )
+				{
+					m_pFontForSpaNotice->OutTextMultiline( 512, 150, wstrSpaNotice.c_str(), D3DCOLOR_ARGB( 255, 255, 255, 128 ), CKTDGFontManager::FS_SHELL,
+						D3DCOLOR_ARGB( 255, 0, 0, 0 ), 1.0f, NULL, DT_CENTER );
+				}
+
+				if( INVALID_EFFECTSET_HANDLE == m_hSpaBuffEffect )
+				{
+					m_hSpaBuffEffect = g_pData->GetUIEffectSet()->PlayEffectSet( wstring( L"EffectSet_SPA_Buff" ), m_pMyUnit );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+					CX2OfflineLog::Server( L"[JUNE_SPA] effect play handle=%d", (int)m_hSpaBuffEffect.GetValue() );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+				}
+			}
+			else if( INVALID_EFFECTSET_HANDLE != m_hSpaBuffEffect )
+			{
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+				CX2OfflineLog::Server( L"[JUNE_SPA] effect stop handle=%d", (int)m_hSpaBuffEffect.GetValue() );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+				g_pData->GetUIEffectSet()->StopEffectSet( m_hSpaBuffEffect );
+			}
+		}
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 	}	
 	else
 	{
@@ -4828,11 +4952,105 @@ bool CX2TFieldGame::UIServerEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case EGS_EVENT_PROPOSE_RESULT_ACCEPTOR_NOT:
 		return Handler_EGS_EVENT_PROPOSE_RESULT_ACCEPTOR_NOT( hWnd, uMsg, wParam, lParam );
 #endif SERV_RELATIONSHIP_EVENT_INT
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+	// june-spa S3b: June 323bda90 @323bdcc9-323bdd1e, a valid soak ACK turns the notice on
+	case EGS_SPA_SOAK_ACK:
+		{
+			KSerBuffer* pBuff = (KSerBuffer*)lParam;
+			KEGS_SPA_SOAK_ACK kEvent;
+			DeSerialize( pBuff, &kEvent );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_SPA] recv 0x638 ok=%d soaking=%d end=%I64d", kEvent.m_iOK, (int)kEvent.m_bSoaking, kEvent.m_tBuffEndTime );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+			if( true != g_pMain->IsValidPacket( kEvent.m_iOK ) )
+				return false;
+
+			if( true == kEvent.m_bSoaking )
+			{
+				m_tSpaBuffEndTime = kEvent.m_tBuffEndTime;
+				m_bShowSpaNotice = true;
+			}
+		}
+		return true;
+	// june-spa S3b: June 323bda90 @323bdc9b-323bdcc7, the end time only
+	case EGS_SPA_BUFF_END_TIME_NOT:
+		{
+			KSerBuffer* pBuff = (KSerBuffer*)lParam;
+			KEGS_SPA_BUFF_END_TIME_NOT kEvent;
+			DeSerialize( pBuff, &kEvent );
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+			CX2OfflineLog::Server( L"[JUNE_SPA] recv 0x639 end=%I64d", kEvent.m_tBuffEndTime );
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+			m_tSpaBuffEndTime = kEvent.m_tBuffEndTime;
+		}
+		return true;
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 	}
 
 	return false;
 }
 
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+// june-spa S3b: June 323ac9d0, the SPA_INFO type whose LineIdx list holds my unit's line ( the last match wins )
+void CX2TFieldGame::UpdateSpaBuffType()
+{
+	if( NULL == m_pMyUnit || NULL == g_pData->GetLocationManager() )
+		return;
+
+	const CX2LocationManager::VillageTemplet* pVillageTemplet =
+		g_pData->GetLocationManager()->GetVillageMapTemplet( g_pData->GetLocationManager()->GetCurrentVillageID() );
+	if( NULL == pVillageTemplet )
+		return;
+
+	const int iLineIndex = m_pMyUnit->GetLastTouchLineIndex();
+	int iSpaBuffType = -1;
+	for( UINT iSpa = 0; iSpa < pVillageTemplet->m_vecSpaInfo.size(); ++iSpa )
+	{
+		const CX2LocationManager::SpaInfo& spaInfo = pVillageTemplet->m_vecSpaInfo[iSpa];
+		if( spaInfo.m_vecLineIdx.end() != std::find( spaInfo.m_vecLineIdx.begin(), spaInfo.m_vecLineIdx.end(), iLineIndex ) )
+			iSpaBuffType = spaInfo.m_iType;
+	}
+
+	if( m_iSpaBuffType != iSpaBuffType )
+		m_bSpaBuffTypeChanged = true;
+	if( -1 == iSpaBuffType )
+		m_bOutOfSpaPool = true;
+
+#ifdef SERV_IRUHADEV_JUNE_SPA_DEBUG
+	{
+		static int s_iSpaBuffTypeLogged = -1;
+		static DWORD s_dwSpaBuffTypeLogged = 0;
+		if( s_iSpaBuffTypeLogged != iSpaBuffType && ::GetTickCount() - s_dwSpaBuffTypeLogged >= 1000 )
+		{
+			CX2OfflineLog::Server( L"[JUNE_SPA] type %d -> %d line=%d", s_iSpaBuffTypeLogged, iSpaBuffType, iLineIndex );
+			s_iSpaBuffTypeLogged = iSpaBuffType;
+			s_dwSpaBuffTypeLogged = ::GetTickCount();
+		}
+	}
+#endif SERV_IRUHADEV_JUNE_SPA_DEBUG
+	m_iSpaBuffType = iSpaBuffType;
+}
+
+// june-spa S3b: June 323ac3e0, the buff's time left as "M : SS" ( 32-bit mktime / difftime and no clamp below zero, as June )
+void CX2TFieldGame::AppendSpaBuffLeftTime( std::wstringstream& wstrmLeftTime )
+{
+	__time64_t tBuffEndTime = m_tSpaBuffEndTime;
+	const __time64_t tServerNow = g_pData->GetServerCurrentTime();
+	tm tmLocal;
+	tm tmBuffEnd;	// left unset when _localtime64_s fails, as June ( JUNE_BUGS )
+	if( 0 == _localtime64_s( &tmLocal, &tBuffEndTime ) )
+		tmBuffEnd = tmLocal;
+
+	const __time32_t tBuffEnd32 = _mktime32( &tmBuffEnd );
+	const int iLeftSec = static_cast<int>( _difftime32( tBuffEnd32, static_cast<__time32_t>( tServerNow ) ) );
+	const int iLeftMinute = ( iLeftSec % 3600 ) / 60;
+	const int iLeftSecond = ( iLeftSec % 3600 ) % 60;
+	if( iLeftSecond < 10 )
+		wstrmLeftTime << iLeftMinute << L" : " << L"0" << iLeftSecond;
+	else
+		wstrmLeftTime << iLeftMinute << L" : " << iLeftSecond;
+}
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 bool CX2TFieldGame::Handler_EGS_JOIN_SQUARE_REQ( UidType iSquareUID )
 {
     

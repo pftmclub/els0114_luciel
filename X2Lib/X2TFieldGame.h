@@ -438,6 +438,11 @@ class CX2TFieldGame
 		void ExitSpa();
 		void OpenSpaEnterMsgBox();
 #endif SERV_IRUHADEV_JUNE_SPA_ENTRY
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+		// june-spa S3b: June 323ac9d0 / 323ac3e0
+		void UpdateSpaBuffType();
+		void AppendSpaBuffLeftTime( std::wstringstream& wstrmLeftTime );
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 		
 		bool UICustomEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 		bool UIServerEventProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -669,6 +674,19 @@ class CX2TFieldGame
 		bool						m_bJoinSpa;
 		bool						m_bExitSpa;
 #endif SERV_IRUHADEV_JUNE_SPA_ENTRY
+#ifdef SERV_IRUHADEV_JUNE_SPA_BUFF
+		// june-spa S3b: June TFG +0x462 / +0x463 / +0x464 / +0x468 / +0x46c / +0x470 / +0x474 / +0x478 / +0x480 / +0x484
+		bool						m_bShowSpaNotice;
+		bool						m_bOutOfSpaPool;
+		bool						m_bSpaBuffTypeChanged;
+		float						m_fSpaSoakTime;
+		float						m_fSpaLeaveSendTime;
+		float						m_fSpaLeaveTime;
+		int							m_iSpaBuffType;			/// CX2LocationManager::SPA_BUFF_TYPE, -1 out of every pool
+		__int64						m_tSpaBuffEndTime;
+		CKTDGFontManager::CUKFont*	m_pFontForSpaNotice;
+		CX2EffectSet::Handle		m_hSpaBuffEffect;
+#endif SERV_IRUHADEV_JUNE_SPA_BUFF
 		int							m_iVillageStartPosIdToBattleField;				/// 멤버로 가지고 있을 이유가 없음
 		int							m_iLastPos;				/// 멤버로 가지고 있을 이유가 없음
 
